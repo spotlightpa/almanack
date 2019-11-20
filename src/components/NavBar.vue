@@ -21,16 +21,23 @@
               <router-link to="/" class="nav-link">Home</router-link>
             </li>
             <li class="nav-item" v-if="$auth.isAuthenticated">
-              <router-link to="/external-api" class="nav-link">External API</router-link>
+              <router-link to="/external-api" class="nav-link"
+                >External API</router-link
+              >
             </li>
           </ul>
           <ul class="navbar-nav d-none d-md-block">
-            <li v-if="!$auth.isAuthenticated && !$auth.loading" class="nav-item">
+            <li
+              v-if="!$auth.isAuthenticated && !$auth.loading"
+              class="nav-item"
+            >
               <button
                 id="qsLoginBtn"
                 class="btn btn-primary btn-margin"
                 @click.prevent="login"
-              >Login</button>
+              >
+                Login
+              </button>
             </li>
 
             <li class="nav-item dropdown" v-if="$auth.isAuthenticated">
@@ -49,18 +56,35 @@
               </a>
               <div class="dropdown-menu dropdown-menu-right">
                 <div class="dropdown-header">{{ $auth.user.name }}</div>
-                <router-link to="/profile" class="dropdown-item dropdown-profile">
+                <router-link
+                  to="/profile"
+                  class="dropdown-item dropdown-profile"
+                >
                   <font-awesome-icon class="mr-3" icon="user" />Profile
                 </router-link>
-                <a id="qsLogoutBtn" href="#" class="dropdown-item" @click.prevent="logout">
+                <a
+                  id="qsLogoutBtn"
+                  href="#"
+                  class="dropdown-item"
+                  @click.prevent="logout"
+                >
                   <font-awesome-icon class="mr-3" icon="power-off" />Log out
                 </a>
               </div>
             </li>
           </ul>
 
-          <ul class="navbar-nav d-md-none" v-if="!$auth.isAuthenticated && !$auth.loading">
-            <button id="qsLoginBtn" class="btn btn-primary btn-block" @click="login">Log in</button>
+          <ul
+            class="navbar-nav d-md-none"
+            v-if="!$auth.isAuthenticated && !$auth.loading"
+          >
+            <button
+              id="qsLoginBtn"
+              class="btn btn-primary btn-block"
+              @click="login"
+            >
+              Log in
+            </button>
           </ul>
 
           <ul
@@ -86,7 +110,9 @@
 
             <li>
               <font-awesome-icon icon="power-off" class="mr-3" />
-              <a id="qsLogoutBtn" href="#" class @click.prevent="logout">Log out</a>
+              <a id="qsLogoutBtn" href="#" class @click.prevent="logout"
+                >Log out</a
+              >
             </li>
           </ul>
         </div>
