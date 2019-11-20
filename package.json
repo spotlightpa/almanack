@@ -1,7 +1,6 @@
 {
-  "name": "02-calling-an-api",
+  "name": "almanack",
   "version": "0.1.0",
-  "private": true,
   "scripts": {
     "serve-vue": "vue-cli-service serve",
     "serve": "npm-run-all --parallel serve-vue backend-dev",
@@ -82,5 +81,9 @@
     "parserOptions": {
       "parser": "babel-eslint"
     }
-  }
+  },
+  "description": "Predicts future sports scores",
+  "repository": "git@github.com:spotlightpa/almanack.git",
+  "author": "webmaster@spotlightpa.org",
+  "license": "MIT"
 }

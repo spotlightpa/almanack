@@ -8,15 +8,5 @@ module.exports = {
         target: "http://localhost:3001"
       }
     }
-  },
-  configureWebpack: {
-    plugins: [
-      new webpack.ProvidePlugin({
-        $: "jquery",
-        jquery: "jquery",
-        "window.jQuery": "jquery",
-        jQuery: "jquery"
-      })
-    ]
   }
 };
