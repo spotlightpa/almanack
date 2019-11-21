@@ -6,8 +6,17 @@
 [build.environment]
   GO_IMPORT_PATH = "github.com/spotlightpa/almanack"
   GO111MODULE = "on"
+  ALMANACK_LAMBDA = "1"
+  NODE_VERSION = "12"
 
 [[redirects]]
   from = "/api/*"
   to = "/.netlify/functions/almanack-api/:splat"
+  force = true
   status = 200
+
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+  force = false
