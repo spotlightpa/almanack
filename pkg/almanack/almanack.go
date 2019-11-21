@@ -30,7 +30,7 @@ func CLI(args []string) error {
 func parseArgs(args []string) (*app, error) {
 	var a app
 	fl := flag.NewFlagSet(AppName, flag.ContinueOnError)
-	useAWS := flag.Bool("lambda", false, "use AWS Lambda rather than HTTP")
+	fl.BoolVar(&a.useAWS, "lambda", false, "use AWS Lambda rather than HTTP")
 	fl.StringVar(&a.port, "port", ":3001", "listen on port (HTTP only)")
 	a.Logger = log.New(nil, AppName+" ", log.LstdFlags)
 	fl.Var(
@@ -46,23 +46,24 @@ func parseArgs(args []string) (*app, error) {
 		return nil, err
 	}
 
-	a.listener = http.ListenAndServe
-	if *useAWS {
-		a.listener = gateway.ListenAndServe
-	}
-
 	return &a, nil
 }
 
 type app struct {
-	listener func(string, http.Handler) error
-	port     string
+	useAWS bool
+	port   string
 	*log.Logger
 }
 
 func (a *app) exec() error {
-	a.Printf("starting on port %s", a.port)
-	return a.listener(a.port, a.routes())
+	listener := http.ListenAndServe
+	if a.useAWS {
+		a.Printf("starting on AWS Lambda")
+		listener = gateway.ListenAndServe
+	} else {
+		a.Printf("starting on port %s", a.port)
+	}
+	return listener(a.port, a.routes())
 }
 
 func (a *app) routes() http.Handler {
