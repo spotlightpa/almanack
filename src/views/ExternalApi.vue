@@ -36,7 +36,7 @@ export default {
       const accessToken = await this.$auth.getTokenSilently();
 
       try {
-        const { data } = await this.$http.get("/api/external", {
+        const { data } = await this.$http.get("/api/healthcheck", {
           headers: {
             Authorization: `Bearer ${accessToken}`
           }

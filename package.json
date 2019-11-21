@@ -1,7 +1,6 @@
 {
   "name": "almanack",
   "version": "0.1.0",
-  "private": true,
   "scripts": {
     "serve": "PORT=3000 vue-cli-service serve",
     "build": "vue-cli-service build",
