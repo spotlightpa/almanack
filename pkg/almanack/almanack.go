@@ -1,6 +1,7 @@
 package almanack
 
 import (
+	"encoding/json"
 	"flag"
 	"fmt"
 	"log"
@@ -69,11 +70,12 @@ func (a *app) exec() error {
 func (a *app) routes() http.Handler {
 	mux := http.NewServeMux()
 	mux.HandleFunc("/api/healthcheck", a.hello)
+	mux.HandleFunc("/api/user-info", a.userInfo)
 	return mux
 }
 
 func (a *app) hello(w http.ResponseWriter, r *http.Request) {
-	a.Printf("hello: %v", r)
+	a.Println("start hello")
 	w.Header().Set("Content-Type", "text/plain")
 	w.Header().Set("Cache-Control", "public, max-age=60")
 	b, err := httputil.DumpRequest(r, true)
@@ -82,4 +84,20 @@ func (a *app) hello(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	w.Write(b)
+}
+
+func (a *app) userInfo(w http.ResponseWriter, r *http.Request) {
+	a.Println("start userInfo")
+	token := r.Header.Get("Authorization")
+	m, ok := gateway.RequestContext(r.Context())
+	a.jsonResponse(http.StatusOK, w, []interface{}{token, m, ok})
+}
+
+func (a *app) jsonResponse(statusCode int, w http.ResponseWriter, data interface{}) {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(statusCode)
+	enc := json.NewEncoder(w)
+	if err := enc.Encode(data); err != nil {
+		a.Printf("jsonResponse problem: %v", err)
+	}
 }
