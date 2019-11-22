@@ -54,5 +54,6 @@ export let AuthPlugin = {
 };
 
 export function authGuard(to, from, next) {
-  authComponent.isSignedIn ? next() : next("login");
+  let path = "/login" + window.location.hash;
+  authComponent.isSignedIn ? next() : next({ path });
 }
