@@ -1,6 +1,8 @@
 package almanack
 
 import (
+	"context"
+	"encoding/base64"
 	"encoding/json"
 	"flag"
 	"fmt"
@@ -13,6 +15,7 @@ import (
 	"github.com/aws/aws-lambda-go/lambdacontext"
 	"github.com/carlmjohnson/flagext"
 	"github.com/peterbourgon/ff"
+	"github.com/spotlightpa/almanack/internal/netlifyid"
 )
 
 const AppName = "almanack-api"
@@ -71,7 +74,9 @@ func (a *app) exec() error {
 func (a *app) routes() http.Handler {
 	mux := http.NewServeMux()
 	mux.HandleFunc("/api/healthcheck", a.hello)
-	mux.HandleFunc("/api/user-info", a.userInfo)
+	mux.Handle("/api/user-info",
+		a.netlifyIdentityMiddleware(http.HandlerFunc(a.userInfo)),
+	)
 	return mux
 }
 
@@ -89,10 +94,50 @@ func (a *app) hello(w http.ResponseWriter, r *http.Request) {
 
 func (a *app) userInfo(w http.ResponseWriter, r *http.Request) {
 	a.Println("start userInfo")
-	token := r.Header.Get("Authorization")
-	m, ok := gateway.RequestContext(r.Context())
-	l, ok2 := lambdacontext.FromContext(r.Context())
-	a.jsonResponse(http.StatusOK, w, []interface{}{token, l, ok2, m, ok})
+	ctx := r.Context()
+	userinfo := ctx.Value(netlifyidContextKey)
+	a.jsonResponse(http.StatusOK, w, userinfo)
+}
+
+type ErrorResponse struct {
+	Code    int
+	Message string
+}
+
+type netlifyidContextType int
+
+const netlifyidContextKey = iota
+
+func (a *app) netlifyIdentityMiddleware(h http.Handler) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		a.Println("start netlifyIdentityMiddleware")
+		ctx := r.Context()
+		lc, ok := lambdacontext.FromContext(ctx)
+		if !ok {
+			a.jsonResponse(http.StatusForbidden, w,
+				ErrorResponse{http.StatusForbidden, "no context given: is this localhost?"})
+			return
+		}
+		encoded := lc.ClientContext.Custom["netlify"]
+		jwtBytes, err := base64.StdEncoding.DecodeString(encoded)
+		if err != nil {
+			a.Printf("bad netlify context: %q", encoded)
+			a.jsonResponse(http.StatusInternalServerError, w,
+				ErrorResponse{http.StatusInternalServerError, "bad response from Netlify"})
+			return
+		}
+		var netID netlifyid.JWT
+		if err = json.Unmarshal(jwtBytes, &netID); err != nil {
+			a.Printf("could not unmarshal ID: %q", jwtBytes)
+			a.jsonResponse(http.StatusInternalServerError, w,
+				ErrorResponse{http.StatusInternalServerError, "bad JSON from Netlify"})
+			return
+		}
+
+		ctx = context.WithValue(ctx, netlifyidContextKey, netID)
+		r = r.WithContext(ctx)
+		h.ServeHTTP(w, r)
+	}
 }
 
 func (a *app) jsonResponse(statusCode int, w http.ResponseWriter, data interface{}) {
