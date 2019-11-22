@@ -2,7 +2,6 @@ package almanack
 
 import (
 	"context"
-	"encoding/base64"
 	"encoding/json"
 	"flag"
 	"fmt"
@@ -12,9 +11,11 @@ import (
 	"os"
 
 	"github.com/apex/gateway"
-	"github.com/aws/aws-lambda-go/lambdacontext"
 	"github.com/carlmjohnson/flagext"
 	"github.com/peterbourgon/ff"
+	"golang.org/x/xerrors"
+
+	"github.com/spotlightpa/almanack/internal/errutil"
 	"github.com/spotlightpa/almanack/internal/netlifyid"
 )
 
@@ -80,66 +81,6 @@ func (a *app) routes() http.Handler {
 	return mux
 }
 
-func (a *app) hello(w http.ResponseWriter, r *http.Request) {
-	a.Println("start hello")
-	w.Header().Set("Content-Type", "text/plain")
-	w.Header().Set("Cache-Control", "public, max-age=60")
-	b, err := httputil.DumpRequest(r, true)
-	if err != nil {
-		a.Printf("could not dump request: %v", err)
-		return
-	}
-	w.Write(b)
-}
-
-func (a *app) userInfo(w http.ResponseWriter, r *http.Request) {
-	a.Println("start userInfo")
-	ctx := r.Context()
-	userinfo := ctx.Value(netlifyidContextKey)
-	a.jsonResponse(http.StatusOK, w, userinfo)
-}
-
-type ErrorResponse struct {
-	Code    int
-	Message string
-}
-
-type netlifyidContextType int
-
-const netlifyidContextKey = iota
-
-func (a *app) netlifyIdentityMiddleware(h http.Handler) http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		a.Println("start netlifyIdentityMiddleware")
-		ctx := r.Context()
-		lc, ok := lambdacontext.FromContext(ctx)
-		if !ok {
-			a.jsonResponse(http.StatusForbidden, w,
-				ErrorResponse{http.StatusForbidden, "no context given: is this localhost?"})
-			return
-		}
-		encoded := lc.ClientContext.Custom["netlify"]
-		jwtBytes, err := base64.StdEncoding.DecodeString(encoded)
-		if err != nil {
-			a.Printf("bad netlify context: %q", encoded)
-			a.jsonResponse(http.StatusInternalServerError, w,
-				ErrorResponse{http.StatusInternalServerError, "bad response from Netlify"})
-			return
-		}
-		var netID netlifyid.JWT
-		if err = json.Unmarshal(jwtBytes, &netID); err != nil {
-			a.Printf("could not unmarshal ID: %q", jwtBytes)
-			a.jsonResponse(http.StatusInternalServerError, w,
-				ErrorResponse{http.StatusInternalServerError, "bad JSON from Netlify"})
-			return
-		}
-
-		ctx = context.WithValue(ctx, netlifyidContextKey, netID)
-		r = r.WithContext(ctx)
-		h.ServeHTTP(w, r)
-	}
-}
-
 func (a *app) jsonResponse(statusCode int, w http.ResponseWriter, data interface{}) {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(statusCode)
@@ -147,4 +88,69 @@ func (a *app) jsonResponse(statusCode int, w http.ResponseWriter, data interface
 	if err := enc.Encode(data); err != nil {
 		a.Printf("jsonResponse problem: %v", err)
 	}
+}
+
+func (a *app) errorResponse(w http.ResponseWriter, err error) {
+	var errResp errutil.Response
+	if !xerrors.As(err, &errResp) {
+		errResp.StatusCode = http.StatusInternalServerError
+		errResp.Message = "internal error"
+		errResp.Log = err.Error()
+	}
+	a.Println(errResp.Log)
+	a.jsonResponse(errResp.StatusCode, w, errResp)
+}
+
+func (a *app) hello(w http.ResponseWriter, r *http.Request) {
+	a.Println("start hello")
+	w.Header().Set("Content-Type", "text/plain")
+	w.Header().Set("Cache-Control", "public, max-age=60")
+	b, err := httputil.DumpRequest(r, true)
+	if err != nil {
+		a.errorResponse(w, err)
+		return
+	}
+	w.Write(b)
+}
+
+type netlifyidContextType int
+
+const netlifyidContextKey = iota
+
+func setNetlifyID(r *http.Request, netID *netlifyid.JWT) *http.Request {
+	ctx := context.WithValue(r.Context(), netlifyidContextKey, netID)
+	return r.WithContext(ctx)
+}
+
+func getNetlifyID(r *http.Request) *netlifyid.JWT {
+	ctx := r.Context()
+	val := ctx.Value(netlifyidContextKey)
+	if val == nil { // interface nil
+		return nil // *JWT nil
+	}
+	return val.(*netlifyid.JWT)
+}
+
+func (a *app) netlifyIdentityMiddleware(h http.Handler) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		a.Println("start netlifyIdentityMiddleware")
+		if !a.useAWS {
+			a.Println("skip netlifyIdentityMiddleware")
+			h.ServeHTTP(w, r)
+			return
+		}
+		netID, err := netlifyid.FromRequest(r)
+		if err != nil {
+			a.errorResponse(w, err)
+			return
+		}
+		r = setNetlifyID(r, netID)
+		h.ServeHTTP(w, r)
+	}
+}
+
+func (a *app) userInfo(w http.ResponseWriter, r *http.Request) {
+	a.Println("start userInfo")
+	userinfo := getNetlifyID(r)
+	a.jsonResponse(http.StatusOK, w, userinfo)
 }

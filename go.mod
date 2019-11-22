@@ -10,4 +10,5 @@ require (
 	github.com/peterbourgon/ff v1.6.0
 	github.com/pkg/errors v0.8.1 // indirect
 	github.com/tj/assert v0.0.0-20190920132354-ee03d75cd160 // indirect
+	golang.org/x/xerrors v0.0.0-20191011141410-1b5146add898
 )
