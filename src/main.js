@@ -5,11 +5,13 @@ import { faLink, faUser, faPowerOff } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 
 import App from "./components/TheApp.vue";
-import router from "./router";
+import router from "./router.js";
+import { AuthPlugin } from "./plugins/auth.js";
 
 library.add(faLink, faUser, faPowerOff);
 
 Vue.component("font-awesome-icon", FontAwesomeIcon);
+Vue.use(AuthPlugin);
 
 new Vue({
   router,
