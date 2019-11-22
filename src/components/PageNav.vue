@@ -16,13 +16,13 @@ export default {
 <template>
   <nav class="navbar" role="navigation" aria-label="main navigation">
     <div class="navbar-brand">
-      <nuxt-link
+      <router-link
         to="/"
         exact
         class="navbar-item is-size-3 has-text-white has-text-weight-bold"
       >
         Spotlight PA Almanack
-      </nuxt-link>
+      </router-link>
 
       <a
         role="button"
