@@ -10,6 +10,7 @@ import (
 	"os"
 
 	"github.com/apex/gateway"
+	"github.com/aws/aws-lambda-go/lambdacontext"
 	"github.com/carlmjohnson/flagext"
 	"github.com/peterbourgon/ff"
 )
@@ -90,7 +91,8 @@ func (a *app) userInfo(w http.ResponseWriter, r *http.Request) {
 	a.Println("start userInfo")
 	token := r.Header.Get("Authorization")
 	m, ok := gateway.RequestContext(r.Context())
-	a.jsonResponse(http.StatusOK, w, []interface{}{token, m, ok})
+	l, ok2 := lambdacontext.FromContext(r.Context())
+	a.jsonResponse(http.StatusOK, w, []interface{}{token, l, ok2, m, ok})
 }
 
 func (a *app) jsonResponse(statusCode int, w http.ResponseWriter, data interface{}) {

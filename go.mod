@@ -4,7 +4,7 @@ go 1.13
 
 require (
 	github.com/apex/gateway v1.1.1
-	github.com/aws/aws-lambda-go v1.13.3 // indirect
+	github.com/aws/aws-lambda-go v1.13.3
 	github.com/carlmjohnson/exitcode v0.0.3
 	github.com/carlmjohnson/flagext v0.0.6
 	github.com/peterbourgon/ff v1.6.0
