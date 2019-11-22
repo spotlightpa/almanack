@@ -1,8 +1,8 @@
 <template>
-  <div>
-    To use the Spotlight PA Almanack, please
-    <button @click="$auth.login">Login</button>
+  <div class="section container content">
+    To use the <strong>Spotlight PA Almanack</strong>, please
+    <a class="has-text-weight-semibold" @click="$auth.login">Login</a>
     or
-    <button @click="$auth.signup">Sign up</button>
+    <a class="has-text-weight-semibold" @click="$auth.signup">Sign up</a>
   </div>
 </template>
