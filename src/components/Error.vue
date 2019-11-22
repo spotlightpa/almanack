@@ -12,7 +12,8 @@ export default {
   name: "Error",
   computed: {
     msg() {
-      return this.$auth.error;
+      return "";
+      // return this.$auth.error;
     }
   }
 };

@@ -1,9 +1,9 @@
 import Vue from "vue";
 import Router from "vue-router";
 import Home from "./views/Home.vue";
-import Profile from "./views/Profile.vue";
-import ExternalApi from "./views/ExternalApi.vue";
-import { authGuard } from "./auth";
+// import Profile from "./views/Profile.vue";
+// import ExternalApi from "./views/ExternalApi.vue";
+// import { authGuard } from "./auth";
 
 Vue.use(Router);
 
@@ -15,18 +15,18 @@ const router = new Router({
       path: "/",
       name: "home",
       component: Home
-    },
-    {
-      path: "/profile",
-      name: "profile",
-      component: Profile,
-      beforeEnter: authGuard
-    },
-    {
-      path: "/external-api",
-      component: ExternalApi,
-      beforeEnter: authGuard
     }
+    // {
+    //   path: "/profile",
+    //   name: "profile",
+    //   component: Profile,
+    //   beforeEnter: authGuard
+    // },
+    // {
+    //   path: "/external-api",
+    //   component: ExternalApi,
+    //   beforeEnter: authGuard
+    // }
   ]
 });
 
