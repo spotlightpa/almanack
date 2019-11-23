@@ -38,7 +38,7 @@ export default {
       </a>
     </div>
 
-    <div class="navbar-menu">
+    <div class="navbar-menu" :class="{ 'is-active': isOpen }">
       <div class="navbar-end">
         <div class="navbar-item">
           <div class="buttons">
