@@ -21,7 +21,8 @@ export default {
         exact
         class="navbar-item is-size-3 has-text-white has-text-weight-bold"
       >
-        Spotlight PA Almanack
+        <img src="@/assets/circle-white-on-trans.svg" alt="Spotlight PA logo" />
+        Almanack
       </router-link>
 
       <a
@@ -42,22 +43,22 @@ export default {
         <div class="navbar-item">
           <div class="buttons">
             <button
-              class="button is-primary has-text-weight-semibold"
               v-if="!$auth.isSignedIn"
+              class="button is-primary has-text-weight-semibold"
               @click="$auth.login"
             >
               Login
             </button>
             <button
-              class="button is-success has-text-weight-semibold"
               v-if="!$auth.isSignedIn"
+              class="button is-success has-text-weight-semibold"
               @click="$auth.signup"
             >
               Sign up
             </button>
             <button
-              class="button is-warning has-text-weight-semibold"
               v-if="$auth.isSignedIn"
+              class="button is-warning has-text-weight-semibold"
               @click="$auth.logout"
             >
               Logout

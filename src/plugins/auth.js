@@ -8,6 +8,16 @@ let authComponent = new Vue({
       error: null
     };
   },
+  computed: {
+    token() {
+      return (
+        (this.user && this.user.token && this.user.token.access_token) || null
+      );
+    },
+    isSignedIn() {
+      return !!this.token;
+    }
+  },
   created() {
     netlifyIdentity.on("init", user => {
       this.user = user;
@@ -23,16 +33,6 @@ let authComponent = new Vue({
       this.error = err;
     });
     netlifyIdentity.init({ logo: false });
-  },
-  computed: {
-    token() {
-      return (
-        (this.user && this.user.token && this.user.token.access_token) || null
-      );
-    },
-    isSignedIn() {
-      return !!this.token;
-    }
   },
   methods: {
     signup() {
