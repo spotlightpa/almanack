@@ -1,51 +1,7 @@
 import Vue from "vue";
-import netlifyIdentity from "netlify-identity-widget";
+import StoreAuth from "../components/StoreAuth.vue";
 
-let authComponent = new Vue({
-  data() {
-    return {
-      user: null,
-      error: null
-    };
-  },
-  computed: {
-    token() {
-      return (
-        (this.user && this.user.token && this.user.token.access_token) || null
-      );
-    },
-    isSignedIn() {
-      return !!this.token;
-    }
-  },
-  created() {
-    netlifyIdentity.on("init", user => {
-      this.user = user;
-    });
-    netlifyIdentity.on("login", user => {
-      this.user = user;
-      netlifyIdentity.close();
-    });
-    netlifyIdentity.on("logout", () => {
-      this.user = null;
-    });
-    netlifyIdentity.on("error", err => {
-      this.error = err;
-    });
-    netlifyIdentity.init({ logo: false });
-  },
-  methods: {
-    signup() {
-      netlifyIdentity.open("signup");
-    },
-    login() {
-      netlifyIdentity.open("login");
-    },
-    logout() {
-      netlifyIdentity.logout();
-    }
-  }
-});
+let authComponent = new Vue(StoreAuth);
 
 export let AuthPlugin = {
   install(Vue) {
