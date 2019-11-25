@@ -5,7 +5,8 @@ const tryTo = promise =>
     .catch(error => [null, error]);
 
 export const endpoints = {
-  userInfo: `/api/user-info`
+  userInfo: `/api/user-info`,
+  upcoming: `/api/upcoming`
 };
 
 export function apiService($auth) {
@@ -27,6 +28,9 @@ export function apiService($auth) {
   return {
     async userInfo() {
       return await tryTo(request(endpoints.userInfo));
+    },
+    async upcoming() {
+      return await tryTo(request(endpoints.upcoming));
     }
   };
 }

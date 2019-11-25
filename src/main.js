@@ -9,6 +9,8 @@ import router from "./router.js";
 import { AuthPlugin } from "./plugins/auth.js";
 import { APIPlugin } from "./plugins/api.js";
 
+import "./filters/time.js";
+
 library.add(faLink, faUser, faPowerOff);
 
 Vue.component("font-awesome-icon", FontAwesomeIcon);

@@ -1,12 +1,10 @@
 <script>
+import Vue from "vue";
+import FeedAPI from "./FeedAPI.vue";
+
 export default {
   data() {
-    return { userInfo: null, error: null };
-  },
-  methods: {
-    async getUserInfo() {
-      [this.userInfo, this.error] = await this.$api.userInfo();
-    }
+    return { feed: new Vue(FeedAPI) };
   }
 };
 </script>
@@ -21,16 +19,61 @@ export default {
       ></span
       >).
     </h2>
-    <button
-      class="button is-primary has-text-weight-semibold"
-      type="button"
-      @click="getUserInfo"
+    <progress
+      v-if="feed.loading"
+      class="progress is-large is-warning"
+      max="100"
     >
-      Get User Info
-    </button>
-    <p>
-      {{ userInfo }}
-    </p>
-    <p v-if="error" class="message is-danger" v-text="error"></p>
+      Loading…
+    </progress>
+
+    <div v-if="feed.error" class="message is-danger ">
+      <div class="message-body">
+        <p>{{ feed.error }}</p>
+        <div class="buttons">
+          <button
+            class="button is-danger has-text-weight-semibold"
+            @click="feed.reload"
+          >
+            Reload?
+          </button>
+        </div>
+      </div>
+    </div>
+    <div v-if="!feed.loading" class="table-container">
+      <table
+        class="table is-bordered is-striped is-narrow is-hoverable is-fullwidth"
+      >
+        <thead>
+          <tr>
+            <th>Slug</th>
+            <th>Planned date</th>
+            <th>Published</th>
+          </tr>
+        </thead>
+        <tbody>
+          <template v-for="article of feed.contents">
+            <tr :key="article.slug">
+              <td>{{ article.slug }}</td>
+              <td>
+                {{
+                  article.planning.scheduling.planned_publish_date | formatDate
+                }}
+              </td>
+              <td>
+                {{ article.workflow.status_code === 6 ? "Y" : "N" }}
+              </td>
+            </tr>
+            <tr :key="article.slug + '-details'">
+              <td colspan="3">
+                <details>
+                  {{ article.planning.budget_line }}
+                </details>
+              </td>
+            </tr>
+          </template>
+        </tbody>
+      </table>
+    </div>
   </div>
 </template>
