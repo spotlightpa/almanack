@@ -5,15 +5,7 @@ export default {
   },
   methods: {
     async getUserInfo() {
-      let headers = await this.$auth.headers();
-      let [data, err] = await fetch("/api/user-info", {
-        headers
-      })
-        .then(resp => resp.json())
-        .then(data => [data, null])
-        .catch(err => [null, err]);
-      this.userInfo = data;
-      this.error = err;
+      [this.userInfo, this.error] = await this.$api.userInfo();
     }
   }
 };
