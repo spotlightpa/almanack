@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"flag"
 	"fmt"
+	"io/ioutil"
 	"log"
 	"net/http"
 	"net/http/httputil"
@@ -16,6 +17,7 @@ import (
 	"golang.org/x/xerrors"
 
 	"github.com/spotlightpa/almanack/internal/errutil"
+	"github.com/spotlightpa/almanack/internal/jsonschema"
 	"github.com/spotlightpa/almanack/internal/netlifyid"
 )
 
@@ -38,6 +40,7 @@ func parseArgs(args []string) (*app, error) {
 	fl := flag.NewFlagSet(AppName, flag.ContinueOnError)
 	fl.BoolVar(&a.useAWS, "lambda", false, "use AWS Lambda rather than HTTP")
 	fl.StringVar(&a.port, "port", ":3001", "listen on port (HTTP only)")
+	fl.StringVar(&a.srcFeedURL, "src-feed", "", "source URL for Arc feed")
 	a.Logger = log.New(nil, AppName+" ", log.LstdFlags)
 	fl.Var(
 		flagext.Logger(a.Logger, flagext.LogSilent),
@@ -56,8 +59,9 @@ func parseArgs(args []string) (*app, error) {
 }
 
 type app struct {
-	useAWS bool
-	port   string
+	useAWS     bool
+	port       string
+	srcFeedURL string
 	*log.Logger
 }
 
@@ -77,6 +81,9 @@ func (a *app) routes() http.Handler {
 	mux.HandleFunc("/api/healthcheck", a.hello)
 	mux.Handle("/api/user-info",
 		a.netlifyIdentityMiddleware(http.HandlerFunc(a.userInfo)),
+	)
+	mux.Handle("/api/upcoming",
+		a.netlifyPermissionMiddleware("editor", http.HandlerFunc(a.upcoming)),
 	)
 	return mux
 }
@@ -153,4 +160,113 @@ func (a *app) userInfo(w http.ResponseWriter, r *http.Request) {
 	a.Println("start userInfo")
 	userinfo := getNetlifyID(r)
 	a.jsonResponse(http.StatusOK, w, userinfo)
+}
+
+const adminRole = "admin"
+
+func (a *app) netlifyPermissionMiddleware(role string, next http.Handler) http.HandlerFunc {
+	var inner http.HandlerFunc = func(w http.ResponseWriter, r *http.Request) {
+		a.Println("starting permission middleware")
+		if !a.useAWS {
+			a.Println("skipping permission middleware")
+			next.ServeHTTP(w, r)
+			return
+		}
+
+		userinfo := getNetlifyID(r)
+		if userinfo == nil {
+			err := errutil.Response{
+				StatusCode: http.StatusInternalServerError,
+				Message:    "user info not set",
+				Log:        "no user info: is this localhost?",
+			}
+			a.errorResponse(w, err)
+			return
+		}
+		hasRole := false
+		for _, r := range userinfo.User.AppMetadata.Roles {
+			if r == role || r == adminRole {
+				hasRole = true
+				break
+			}
+		}
+		a.Printf("permission middleware has role: %t", hasRole)
+		if !hasRole {
+			err := errutil.Response{
+				StatusCode: http.StatusForbidden,
+				Message:    http.StatusText(http.StatusForbidden),
+				Log: fmt.Sprintf(
+					"unauthorized user only had roles: %v",
+					userinfo.User.AppMetadata.Roles),
+			}
+			a.errorResponse(w, err)
+			return
+		}
+		next.ServeHTTP(w, r)
+	}
+	return a.netlifyIdentityMiddleware(inner)
+}
+
+func (a *app) fetchJSON(ctx context.Context, method, url string, v interface{}) error {
+	req, err := http.NewRequestWithContext(ctx, method, url, nil)
+	if err != nil {
+		return errutil.Response{
+			StatusCode: http.StatusInternalServerError,
+			Message:    "internal error",
+			Log:        fmt.Sprintf("bad downstream request: %v", err),
+		}
+	}
+	resp, err := http.DefaultClient.Do(req)
+	if err != nil {
+		return errutil.Response{
+			StatusCode: http.StatusBadGateway,
+			Message:    "could not contact Inquirer server",
+			Log:        fmt.Sprintf("bad downstream connect: %v", err),
+		}
+	}
+	defer resp.Body.Close()
+	b, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return errutil.Response{
+			StatusCode: http.StatusBadGateway,
+			Message:    "could not read from Inquirer server",
+			Log:        fmt.Sprintf("bad downstream read: %v", err),
+		}
+	}
+
+	if err = json.Unmarshal(b, v); err != nil {
+		return errutil.Response{
+			StatusCode: http.StatusBadGateway,
+			Message:    "could not decode from Inquirer server",
+			Log:        fmt.Sprintf("bad downstream decode: %v", err),
+		}
+	}
+	return nil
+}
+
+const (
+	statusReady     = 5
+	statusPublished = 6
+)
+
+func (a *app) upcoming(w http.ResponseWriter, r *http.Request) {
+	a.Println("start upcoming")
+	a.Printf("fetching %s", a.srcFeedURL)
+	var feed jsonschema.API
+	if err := a.fetchJSON(r.Context(), http.MethodGet, a.srcFeedURL, &feed); err != nil {
+		a.errorResponse(w, err)
+		return
+	}
+	// Filter out sub-drafts
+	{
+		i := 0
+		for _, c := range feed.Contents {
+			if c.Workflow.StatusCode >= statusReady {
+				feed.Contents[i] = c
+				i++
+			}
+		}
+		feed.Contents = feed.Contents[:i]
+	}
+	a.jsonResponse(http.StatusOK, w, feed)
 }
