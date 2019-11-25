@@ -208,7 +208,7 @@ func (a *app) netlifyPermissionMiddleware(role string, next http.Handler) http.H
 }
 
 func (a *app) fetchJSON(ctx context.Context, method, url string, v interface{}) error {
-	req, err := http.NewRequestWithContext(ctx, method, url, nil)
+	req, err := http.NewRequest(method, url, nil)
 	if err != nil {
 		return errutil.Response{
 			StatusCode: http.StatusInternalServerError,
@@ -216,6 +216,7 @@ func (a *app) fetchJSON(ctx context.Context, method, url string, v interface{}) 
 			Log:        fmt.Sprintf("bad downstream request: %v", err),
 		}
 	}
+	req = req.WithContext(ctx)
 	resp, err := http.DefaultClient.Do(req)
 	if err != nil {
 		return errutil.Response{
