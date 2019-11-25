@@ -21,7 +21,10 @@ export default {
         exact
         class="navbar-item is-size-3 has-text-white has-text-weight-bold"
       >
-        <img src="@/assets/circle-white-on-trans.svg" alt="Spotlight PA logo" />
+        <img
+          src="@/assets/img/circle-white-on-trans.svg"
+          alt="Spotlight PA logo"
+        />
         Almanack
       </router-link>
 
