@@ -73,7 +73,7 @@ export default {
                 <a
                   v-if="article.workflow.status_code === 6"
                   :href="`https://www.inquirer.com${article.website_url}`"
-                  _target="blank"
+                  target="_blank"
                   >Inquirer Link</a
                 >
                 <span v-else>No</span>
