@@ -16,6 +16,14 @@ export default {
     },
     isSignedIn() {
       return !!this.token;
+    },
+    roles() {
+      return (
+        (this.isSignedIn &&
+          this.user.app_metadata &&
+          this.user.app_metadata.roles) ||
+        []
+      );
     }
   },
   created() {
@@ -49,6 +57,9 @@ export default {
       return {
         Authorization: `Bearer ${token}`
       };
+    },
+    hasRole(name) {
+      return this.roles.some(role => role === name || role === "admin");
     }
   }
 };

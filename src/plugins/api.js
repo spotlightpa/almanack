@@ -1,3 +1,5 @@
+import StoreFeed from "../components/StoreFeed.vue";
+
 const tryTo = promise =>
   promise
     // Wrap data/errors
@@ -37,6 +39,7 @@ export function apiService($auth) {
 
 export const APIPlugin = {
   install(Vue) {
-    Vue.prototype.$api = apiService(Vue.prototype.$auth);
+    let service = apiService(Vue.prototype.$auth);
+    Vue.prototype.$api = new Vue({ ...StoreFeed, propsData: { service } });
   }
 };
