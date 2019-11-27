@@ -1,12 +1,9 @@
 import Vue from "vue";
 
+import { apdate, aptime } from "journalize";
+
 let dateOpts = {
-  weekday: "short",
-  year: "numeric",
-  month: "short",
-  day: "numeric",
-  hour: "numeric",
-  minute: "numeric"
+  weekday: "short"
 };
 
 const dateLocalizer = new Intl.DateTimeFormat("en-US", dateOpts);
@@ -15,7 +12,7 @@ function dateFormatter(d) {
   if (typeof d === "string") {
     d = new Date(d);
   }
-  return dateLocalizer.format(d);
+  return dateLocalizer.format(d) + "., " + apdate(d) + ", " + aptime(d);
 }
 
 Vue.filter("formatDate", dateFormatter);
