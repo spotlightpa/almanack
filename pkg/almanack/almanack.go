@@ -10,6 +10,7 @@ import (
 	"net/http"
 	"net/http/httputil"
 	"os"
+	"time"
 
 	"github.com/apex/gateway"
 	"github.com/carlmjohnson/flagext"
@@ -85,7 +86,15 @@ func (a *app) routes() http.Handler {
 	mux.Handle("/api/upcoming",
 		a.netlifyPermissionMiddleware("editor", http.HandlerFunc(a.upcoming)),
 	)
-	return mux
+	return a.loggingMiddleware(mux)
+}
+
+func (a *app) loggingMiddleware(h http.Handler) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		start := time.Now()
+		h.ServeHTTP(w, r)
+		a.Printf("request took %v", time.Since(start))
+	}
 }
 
 func (a *app) jsonResponse(statusCode int, w http.ResponseWriter, data interface{}) {
@@ -190,7 +199,8 @@ func (a *app) netlifyPermissionMiddleware(role string, next http.Handler) http.H
 				break
 			}
 		}
-		a.Printf("permission middleware has role: %t", hasRole)
+		a.Printf("permission middleware: %s has role %s == %t",
+			userinfo.User.Email, role, hasRole)
 		if !hasRole {
 			err := errutil.Response{
 				StatusCode: http.StatusForbidden,
