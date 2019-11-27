@@ -11,7 +11,7 @@ export const endpoints = {
   upcoming: `/api/upcoming`
 };
 
-export function apiService($auth) {
+function createAPIService($auth) {
   async function request(url, options = {}) {
     let headers = await $auth.headers();
     let defaultOpts = {
@@ -39,7 +39,9 @@ export function apiService($auth) {
 
 export const APIPlugin = {
   install(Vue) {
-    let service = apiService(Vue.prototype.$auth);
-    Vue.prototype.$api = new Vue({ ...StoreFeed, propsData: { service } });
+    Vue.prototype.$api = new Vue({
+      ...StoreFeed,
+      propsData: { createAPIService }
+    });
   }
 };

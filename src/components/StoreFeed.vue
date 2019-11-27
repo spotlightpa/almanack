@@ -1,12 +1,15 @@
 <script>
 export default {
   props: {
-    service: { type: Object, required: true }
+    createAPIService: { type: Function, required: true }
   },
   data() {
     return { loading: true, feed: null, error: null };
   },
   computed: {
+    service() {
+      return this.createAPIService(this.$auth);
+    },
     contents() {
       if (this.loading || this.error) {
         return [];
