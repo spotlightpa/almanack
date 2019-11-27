@@ -53,7 +53,13 @@ export default {
       netlifyIdentity.logout();
     },
     async headers() {
-      let token = await this.user.jwt();
+      let token;
+      try {
+        token = await this.user.jwt(true);
+      } catch (e) {
+        this.logout();
+        throw e;
+      }
       return {
         Authorization: `Bearer ${token}`
       };
