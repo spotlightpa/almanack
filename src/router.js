@@ -1,7 +1,7 @@
 import Vue from "vue";
 import Router from "vue-router";
 import ViewLogin from "./components/ViewLogin.vue";
-import ViewHome from "./components/ViewHome.vue";
+import ViewArticleList from "./components/ViewArticleList.vue";
 
 import { authGuard } from "./plugins/auth.js";
 
@@ -11,16 +11,16 @@ export default new Router({
   mode: "history",
   base: process.env.BASE_URL,
   routes: [
-    { path: "/", redirect: "/home" },
+    { path: "/", redirect: { name: "home" } },
     {
       path: "/login",
       name: "login",
       component: ViewLogin
     },
     {
-      path: "/home",
+      path: "/articles",
       name: "home",
-      component: ViewHome,
+      component: ViewArticleList,
       beforeEnter: authGuard
     }
   ]

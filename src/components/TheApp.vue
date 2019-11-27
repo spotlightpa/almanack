@@ -8,12 +8,12 @@ export default {
     PageNav
   },
   mounted() {
-    this.$auth.$watch("user", (newUser, oldUser) => {
+    this.$auth.$watch("$auth.user", (newUser, oldUser) => {
       if (newUser === oldUser) {
         return;
       }
-      let route = newUser ? "/home" : "/login";
-      this.$router.push(route);
+      let name = newUser ? "home" : "login";
+      this.$router.push({ name });
     });
   }
 };
