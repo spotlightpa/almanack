@@ -19,7 +19,7 @@ export default {
       <router-link
         to="/"
         exact
-        class="navbar-item is-size-3 has-text-white has-text-weight-bold"
+        class="navbar-item is-size-3 has-text-weight-bold"
       >
         <img
           src="@/assets/img/circle-white-on-trans.svg"
@@ -72,3 +72,36 @@ export default {
     </div>
   </nav>
 </template>
+
+<style lang="scss" scoped>
+@import "@/css/variables.scss";
+
+.navbar-brand {
+  img {
+    height: 100%;
+    @media (max-width: 350px) {
+      height: 2rem;
+    }
+  }
+
+  color: $white;
+
+  &:hover {
+    color: $spotlight-darkblue;
+  }
+
+  &:active {
+    color: $spotlight-lightblue;
+  }
+}
+
+a.navbar-burger:hover {
+  color: $yellow;
+}
+
+@media screen and (max-width: $navbar-breakpoint - 1px) {
+  .navbar-end {
+    border-top: 1px solid $yellow;
+  }
+}
+</style>
