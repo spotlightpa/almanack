@@ -1,7 +1,7 @@
 import Vue from "vue";
 
 import { library } from "@fortawesome/fontawesome-svg-core";
-import { faNewspaper } from "@fortawesome/free-regular-svg-icons";
+import { faCopy, faNewspaper } from "@fortawesome/free-regular-svg-icons";
 import { faExternalLinkAlt } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 
@@ -14,7 +14,7 @@ import "./filters/intcomma.js";
 import "./filters/json.js";
 import "./filters/time.js";
 
-library.add(faNewspaper, faExternalLinkAlt);
+library.add(faCopy, faNewspaper, faExternalLinkAlt);
 
 Vue.component("font-awesome-icon", FontAwesomeIcon);
 Vue.use(AuthPlugin);
