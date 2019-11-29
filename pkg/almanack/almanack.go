@@ -10,8 +10,6 @@ import (
 	"net/http"
 	"net/http/httputil"
 	"os"
-	"reflect"
-	"sync"
 	"time"
 
 	"github.com/apex/gateway"
@@ -42,7 +40,7 @@ func parseArgs(args []string) (*app, error) {
 	var a app
 	fl := flag.NewFlagSet(AppName, flag.ContinueOnError)
 	fl.BoolVar(&a.isLambda, "lambda", false, "use AWS Lambda rather than HTTP")
-	fl.BoolVar(&a.shouldCache, "cache", false, "use in-memory cache for fetched JSON")
+	cache := fl.Bool("cache", false, "use in-memory cache for fetched JSON")
 	fl.StringVar(&a.port, "port", ":3001", "listen on port (HTTP only)")
 	fl.StringVar(&a.srcFeedURL, "src-feed", "", "source URL for Arc feed")
 	a.Logger = log.New(nil, AppName+" ", log.LstdFlags)
@@ -59,14 +57,19 @@ func parseArgs(args []string) (*app, error) {
 		return nil, err
 	}
 
+	a.c = http.DefaultClient
+	if *cache {
+		SetRounderTripper(a.c, a.Logger)
+	}
+
 	return &a, nil
 }
 
 type app struct {
-	isLambda    bool
-	shouldCache bool
-	port        string
-	srcFeedURL  string
+	isLambda   bool
+	port       string
+	srcFeedURL string
+	c          *http.Client
 	*log.Logger
 }
 
@@ -221,36 +224,7 @@ func (a *app) netlifyPermissionMiddleware(role string, next http.Handler) http.H
 	return a.netlifyIdentityMiddleware(inner)
 }
 
-var (
-	memCache     = map[[2]string]reflect.Value{}
-	memCacheLock sync.RWMutex
-)
-
-func inCache(method, url string, v interface{}) bool {
-	memCacheLock.RLock()
-	defer memCacheLock.RUnlock()
-
-	cval, ok := memCache[[...]string{method, url}]
-	if !ok {
-		return false
-	}
-	reflect.ValueOf(v).Elem().Set(cval)
-	return true
-}
-
-func addToCache(method, url string, v interface{}) {
-	memCacheLock.Lock()
-	defer memCacheLock.Unlock()
-
-	memCache[[...]string{method, url}] = reflect.ValueOf(v).Elem()
-}
-
 func (a *app) fetchJSON(ctx context.Context, method, url string, v interface{}) error {
-	if a.shouldCache && inCache(method, url, v) {
-		a.Printf("cache hit for %s %s", method, url)
-		return nil
-	}
-
 	req, err := http.NewRequest(method, url, nil)
 	if err != nil {
 		return errutil.Response{
@@ -260,7 +234,7 @@ func (a *app) fetchJSON(ctx context.Context, method, url string, v interface{}) 
 		}
 	}
 	req = req.WithContext(ctx)
-	resp, err := http.DefaultClient.Do(req)
+	resp, err := a.c.Do(req)
 	if err != nil {
 		return errutil.Response{
 			StatusCode: http.StatusBadGateway,
@@ -284,9 +258,6 @@ func (a *app) fetchJSON(ctx context.Context, method, url string, v interface{}) 
 			Message:    "could not decode from Inquirer server",
 			Log:        fmt.Sprintf("bad downstream decode: %v", err),
 		}
-	}
-	if a.shouldCache {
-		addToCache(method, url, v)
 	}
 
 	return nil
