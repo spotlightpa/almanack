@@ -1,5 +1,6 @@
 import Vue from "vue";
 import Router from "vue-router";
+import ViewArticleItem from "./components/ViewArticleItem.vue";
 import ViewArticleList from "./components/ViewArticleList.vue";
 import ViewError from "./components/ViewError.vue";
 import ViewLogin from "./components/ViewLogin.vue";
@@ -22,6 +23,13 @@ export default new Router({
       path: "/articles",
       name: "articles",
       component: ViewArticleList,
+      beforeEnter: authGuard
+    },
+    {
+      path: "/articles/:slug",
+      name: "article",
+      component: ViewArticleItem,
+      props: true,
       beforeEnter: authGuard
     },
     {

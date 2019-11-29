@@ -1,5 +1,6 @@
 <script>
 export default {
+  name: "ViewLogin",
   mounted() {
     if (this.$auth.isSignedIn) {
       this.$router.push({ name: "home" });

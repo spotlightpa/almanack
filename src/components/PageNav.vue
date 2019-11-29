@@ -1,5 +1,6 @@
 <script>
 export default {
+  name: "PageNav",
   data() {
     return {
       isOpen: false
