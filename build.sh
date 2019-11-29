@@ -8,5 +8,5 @@ THIS_DIR=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
 cd "$THIS_DIR"
 
 go version
-GOOS=linux go build -o $THIS_DIR/functions/ ./cmd/...
+GOBIN=$THIS_DIR/functions go install ./cmd/...
 yarn run build
