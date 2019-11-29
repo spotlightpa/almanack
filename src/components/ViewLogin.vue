@@ -1,3 +1,13 @@
+<script>
+export default {
+  mounted() {
+    if (this.$auth.isSignedIn) {
+      this.$router.push({ name: "home" });
+    }
+  }
+};
+</script>
+
 <template>
   <div class="section container content">
     <h2>Predicting future sports scores.</h2>

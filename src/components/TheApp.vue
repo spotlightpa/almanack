@@ -12,8 +12,7 @@ export default {
       if (newUser === oldUser) {
         return;
       }
-      let name = newUser ? "home" : "login";
-      this.$router.push({ name });
+      this.$router.push({ name: "home" });
     });
   }
 };

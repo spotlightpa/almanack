@@ -27,8 +27,14 @@ export default {
     }
   },
   created() {
-    netlifyIdentity.on("init", user => {
+    netlifyIdentity.on("init", async user => {
       this.user = user;
+      try {
+        await user.jwt();
+      } catch (e) {
+        this.error = e;
+        this.logout();
+      }
     });
     netlifyIdentity.on("login", user => {
       this.user = user;
