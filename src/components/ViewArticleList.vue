@@ -11,7 +11,7 @@ export default {
 </script>
 
 <template>
-  <div class="section container">
+  <div>
     <div class="content">
       <h2>
         Welcome, {{ $auth.user.user_metadata.full_name }}

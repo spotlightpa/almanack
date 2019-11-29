@@ -9,7 +9,7 @@ export default {
 </script>
 
 <template>
-  <div class="section container content">
+  <div class="content">
     <h2>Predicting future sports scores.</h2>
     <p class="has-text-centered">
       <img src="@/assets/img/pr-almanack.jpeg" class="almanack-img" />
