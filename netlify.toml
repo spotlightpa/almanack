@@ -15,7 +15,19 @@
   status = 200
 
 [[redirects]]
-  from = "/*"
+  from = "/login"
   to = "/index.html"
   status = 200
+  force = false
+
+[[redirects]]
+  from = "/articles/*"
+  to = "/index.html"
+  status = 200
+  force = false
+
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 404
   force = false
