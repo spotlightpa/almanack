@@ -12,7 +12,7 @@ export default {
 <template>
   <div>
     <h2 class="title">
-      Welcome, {{ $auth.user.user_metadata.full_name }}
+      Welcome, {{ $auth.fullName }}
       <small v-if="$auth.roles.length">
         (<span v-for="role of $auth.roles" :key="role" v-text="role"></span>)
       </small>

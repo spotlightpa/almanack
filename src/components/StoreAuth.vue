@@ -1,4 +1,5 @@
 <script>
+import Vue from "vue";
 import netlifyIdentity from "netlify-identity-widget";
 
 export default {
@@ -9,6 +10,14 @@ export default {
     };
   },
   computed: {
+    fullName() {
+      return (
+        (this.user &&
+          this.user.user_metadata &&
+          this.user.user_metadata.full_name) ||
+        ""
+      );
+    },
     token() {
       return (
         (this.user && this.user.token && this.user.token.access_token) || null
@@ -28,7 +37,7 @@ export default {
   },
   created() {
     netlifyIdentity.on("init", async user => {
-      this.user = user;
+      this.user = Vue.observable(user);
       try {
         await user.jwt();
       } catch (e) {
@@ -37,7 +46,7 @@ export default {
       }
     });
     netlifyIdentity.on("login", user => {
-      this.user = user;
+      this.user = Vue.observable(user);
       netlifyIdentity.close();
     });
     netlifyIdentity.on("logout", () => {
@@ -56,6 +65,7 @@ export default {
       netlifyIdentity.open("login");
     },
     logout() {
+      this.user = null;
       netlifyIdentity.logout();
     },
     async headers() {
