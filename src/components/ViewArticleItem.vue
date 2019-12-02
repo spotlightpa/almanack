@@ -1,18 +1,20 @@
 <script>
 import APILoader from "./APILoader.vue";
+import APIArticle from "./APIArticle.vue";
 import BulmaCopyInput from "./BulmaCopyInput.vue";
 
 export default {
   name: "ViewArticleItem",
   components: {
     APILoader,
+    APIArticle,
     BulmaCopyInput
   },
   props: {
     slug: String
   },
   computed: {
-    article() {
+    articleData() {
       return this.$api.contents.find(article => article.slug === this.slug);
     }
   }
@@ -26,7 +28,7 @@ export default {
 
       {{ slug }}
     </h1>
-    <div v-if="!article" class="message is-warning">
+    <div v-if="!articleData" class="message is-warning">
       <p class="message-header">
         Not found
       </p>
@@ -35,24 +37,24 @@ export default {
         <router-link :to="{ name: 'home' }">Go home</router-link>?
       </p>
     </div>
-    <div v-else>
+    <APIArticle v-else v-slot="{ article }" :data="articleData">
       <h2 class="title">
         Embargoed for
-        {{ article.planning.scheduling.planned_publish_date | formatDate }}
+        {{ article.plannedDate | formatDate }}
       </h2>
 
       <h2 class="title">Notes</h2>
       <p class="content">
-        {{ article.planning.budget_line }}
+        {{ article.budgetLine }}
       </p>
 
       <h2 class="title">Suggested Hed</h2>
-      <BulmaCopyInput :value="article.headlines.basic"></BulmaCopyInput>
+      <BulmaCopyInput :value="article.headline"></BulmaCopyInput>
 
       <h2 class="title">Suggested Description</h2>
-      <BulmaCopyInput :value="article.description.basic"></BulmaCopyInput>
+      <BulmaCopyInput :value="article.description"></BulmaCopyInput>
 
-      <pre class="code">{{ article | json }}</pre>
-    </div>
+      <pre class="code">{{ article.rawData | json }}</pre>
+    </APIArticle>
   </APILoader>
 </template>

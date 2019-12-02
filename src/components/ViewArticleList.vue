@@ -1,9 +1,11 @@
 <script>
+import APIArticle from "./APIArticle.vue";
 import APILoader from "./APILoader.vue";
 
 export default {
   name: "ViewArticleList",
   components: {
+    APIArticle,
     APILoader
   }
 };
@@ -23,78 +25,68 @@ export default {
           Spotlight PA Articles
         </h1>
         <article
-          v-for="article of $api.contents"
-          :key="article.slug"
+          v-for="articleData of $api.contents"
+          :key="articleData.slug"
           class="panel-block"
         >
-          <div class="control">
-            <router-link
-              :to="{ name: 'article', params: { slug: article.slug } }"
-              class="title is-3 has-text-link"
-            >
-              <font-awesome-icon :icon="['far', 'newspaper']" />
-              {{ article.slug }}
-            </router-link>
-            <p>
-              <strong>Planned for:</strong>
-              {{
-                article.planning.scheduling.planned_publish_date | formatDate
-              }}
+          <APIArticle v-slot="{ article }" :data="articleData">
+            <div class="control">
+              <router-link
+                :to="{ name: 'article', params: { slug: article.slug } }"
+                class="title is-3 has-text-link"
+              >
+                <font-awesome-icon :icon="['far', 'newspaper']" />
+                {{ article.slug }}
+              </router-link>
+              <p>
+                <strong>Planned for:</strong>
+                {{ article.plannedDate | formatDate }}
 
-              <strong v-if="article.workflow.status_code === 6">
-                <a
-                  :href="`https://www.inquirer.com${article.website_url}`"
-                  target="_blank"
-                  >Live Link
-                  <font-awesome-icon :icon="['fas', 'external-link-alt']" />
-                </a>
-              </strong>
-            </p>
-            <p class="has-margin-top-thin content is-small">
-              {{ article.planning.budget_line }}
-            </p>
+                <strong v-if="article.isPublished">
+                  <a :href="article.pubURL" target="_blank"
+                    >Live Link
+                    <font-awesome-icon :icon="['fas', 'external-link-alt']" />
+                  </a>
+                </strong>
+              </p>
+              <p class="has-margin-top-thin content is-small">
+                {{ article.budgetLine }}
+              </p>
 
-            <div class="level is-mobile is-clipped">
-              <div class="level-left">
-                <p
-                  v-if="article.planning.story_length.word_count_planned"
-                  class="level-item"
-                >
-                  <span>
-                    <strong>Planned Word Count:</strong>
-                    {{
-                      article.planning.story_length.word_count_planned
-                        | intcomma
-                    }}
-                  </span>
-                </p>
+              <div class="level is-mobile is-clipped">
+                <div class="level-left">
+                  <p v-if="article.plannedWordCount" class="level-item">
+                    <span>
+                      <strong>Planned Word Count:</strong>
+                      {{ article.plannedWordCount | intcomma }}
+                    </span>
+                  </p>
 
-                <p
-                  v-if="article.planning.story_length.word_count_actual"
-                  class="level-item is-hidden-mobile"
-                >
-                  <span>
-                    <strong>Word Count:</strong>
-                    {{
-                      article.planning.story_length.word_count_actual | intcomma
-                    }}
-                  </span>
-                </p>
-                <p class="level-item is-hidden-mobile">
-                  <span>
-                    <strong>Lines:</strong>
-                    {{ article.planning.story_length.line_count_actual }}
-                  </span>
-                </p>
-                <p class="level-item is-hidden-mobile">
-                  <span>
-                    <strong>Column inches:</strong>
-                    {{ article.planning.story_length.inch_count_actual }}
-                  </span>
-                </p>
+                  <p
+                    v-if="article.actualWordCount"
+                    class="level-item is-hidden-mobile"
+                  >
+                    <span>
+                      <strong>Word Count:</strong>
+                      {{ article.actualWordCount | intcomma }}
+                    </span>
+                  </p>
+                  <p class="level-item is-hidden-mobile">
+                    <span>
+                      <strong>Lines:</strong>
+                      {{ article.actualLineCount }}
+                    </span>
+                  </p>
+                  <p class="level-item is-hidden-mobile">
+                    <span>
+                      <strong>Column inches:</strong>
+                      {{ article.actualInchCount }}
+                    </span>
+                  </p>
+                </div>
               </div>
             </div>
-          </div>
+          </APIArticle>
         </article>
       </nav>
     </APILoader>
