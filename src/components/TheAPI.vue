@@ -1,5 +1,6 @@
 <script>
 export default {
+  name: "TheAPI",
   props: {
     createAPIService: { type: Function, required: true }
   },

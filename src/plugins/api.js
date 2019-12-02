@@ -39,8 +39,8 @@ function createAPIService($auth) {
 
 export const APIPlugin = {
   install(Vue) {
-    Vue.prototype.$api = new Vue({
-      ...TheAPI,
+    let APIComp = Vue.extend(TheAPI);
+    Vue.prototype.$api = new APIComp({
       propsData: { createAPIService }
     });
   }

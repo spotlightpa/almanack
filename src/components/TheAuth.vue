@@ -3,6 +3,7 @@ import Vue from "vue";
 import netlifyIdentity from "netlify-identity-widget";
 
 export default {
+  name: "TheAuth",
   data() {
     return {
       user: null,
