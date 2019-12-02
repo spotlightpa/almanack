@@ -1,4 +1,4 @@
-import StoreFeed from "../components/StoreFeed.vue";
+import TheAPI from "../components/TheAPI.vue";
 
 const tryTo = promise =>
   promise
@@ -40,7 +40,7 @@ function createAPIService($auth) {
 export const APIPlugin = {
   install(Vue) {
     Vue.prototype.$api = new Vue({
-      ...StoreFeed,
+      ...TheAPI,
       propsData: { createAPIService }
     });
   }

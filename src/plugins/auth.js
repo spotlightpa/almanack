@@ -1,7 +1,7 @@
 import Vue from "vue";
-import StoreAuth from "../components/StoreAuth.vue";
+import TheAuth from "../components/TheAuth.vue";
 
-let authComponent = new Vue(StoreAuth);
+let authComponent = new Vue(TheAuth);
 
 export let AuthPlugin = {
   install(Vue) {
