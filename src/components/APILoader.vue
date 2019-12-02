@@ -5,7 +5,7 @@ export default {
     role: String
   },
   created() {
-    if (this.$auth.hasRole("editor")) {
+    if (this.$auth.hasRole(this.role)) {
       this.$api.load();
     } else {
       this.$api.loading = false;
