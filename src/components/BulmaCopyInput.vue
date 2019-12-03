@@ -1,7 +1,7 @@
 <script>
 export default {
   name: "BulmaCopyInput",
-  props: { value: String },
+  props: { value: String, rows: { type: Number, default: 1 } },
   data() {
     return {
       copied: false
@@ -9,7 +9,7 @@ export default {
   },
   methods: {
     copy() {
-      this.$refs.input.select();
+      this.$refs.textarea.select();
       if (document.execCommand("copy")) {
         this.copied = true;
         window.setTimeout(() => {
@@ -25,32 +25,45 @@ export default {
 </script>
 
 <template>
-  <div>
-    <div class="field has-addons">
+  <div class="has-margin-bottom">
+    <div class="field">
       <div class="control">
+        <textarea
+          ref="textarea"
+          class="textarea is-large"
+          :rows="rows"
+          readonly
+          @click.once="select"
+          @focus="select"
+          v-text="value"
+        >
+        </textarea>
+      </div>
+    </div>
+    <div class="field">
+      <div class="buttons">
         <button
           type="button"
-          class="button is-primary"
+          class="button is-primary has-text-weight-semibold"
           title="Copy"
           @click="copy"
         >
-          <font-awesome-icon :icon="['far', 'copy']" />
+          <span class="icon">
+            <font-awesome-icon :icon="['far', 'copy']" />
+          </span>
+          <span>
+            Copy text
+          </span>
         </button>
+        <transition name="fade">
+          <div
+            v-if="copied"
+            class="tag is-rounded is-success is-light has-text-weight-semibold"
+          >
+            Copied
+          </div>
+        </transition>
       </div>
-      <div class="control is-expanded">
-        <input
-          ref="input"
-          class="input is-fullwidth"
-          type="text"
-          :value="value"
-          readonly
-          @focus="select"
-        />
-      </div>
-    </div>
-
-    <div class="help is-primary fade" :class="{ 'is-invisible': !copied }">
-      Copied
     </div>
   </div>
 </template>

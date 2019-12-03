@@ -10,9 +10,7 @@ import router from "./router.js";
 import { AuthPlugin } from "./plugins/auth.js";
 import { APIPlugin } from "./plugins/api.js";
 
-import "./filters/intcomma.js";
-import "./filters/json.js";
-import "./filters/time.js";
+import "./filters/index.js";
 
 library.add(faCopy, faNewspaper, faExternalLinkAlt);
 

@@ -21,7 +21,7 @@ export default {
 
 <template>
   <div>
-    <PageNav />
+    <PageNav id="top-nav" />
     <main class="section container">
       <router-view />
     </main>

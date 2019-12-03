@@ -31,23 +31,29 @@ export default {
         >
           <APIArticle v-slot="{ article }" :data="articleData">
             <div class="control">
-              <router-link
-                :to="{ name: 'article', params: { slug: article.slug } }"
-                class="title is-3 has-text-link"
-              >
-                <font-awesome-icon :icon="['far', 'newspaper']" />
-                {{ article.slug }}
-              </router-link>
+              <p class="title is-spaced is-3">
+                <router-link
+                  :to="{ name: 'article', params: { id: article.id } }"
+                >
+                  <font-awesome-icon :icon="['far', 'newspaper']" />
+                  {{ article.slug }}
+                </router-link>
+                <small v-if="article.isPublished" class="is-size-5">
+                  (<a :href="article.pubURL" target="_blank"
+                    >Live
+                    <font-awesome-icon
+                      :icon="['fas', 'external-link-alt']"
+                    /> </a
+                  >)
+                </small>
+              </p>
+              <p class="has-margin-top-negative">
+                <strong>Byline:</strong>
+                {{ article.authors | commaand }}
+              </p>
               <p>
                 <strong>Planned for:</strong>
                 {{ article.plannedDate | formatDate }}
-
-                <strong v-if="article.isPublished">
-                  <a :href="article.pubURL" target="_blank"
-                    >Live Link
-                    <font-awesome-icon :icon="['fas', 'external-link-alt']" />
-                  </a>
-                </strong>
               </p>
               <p class="has-margin-top-thin content is-small">
                 {{ article.budgetLine }}

@@ -19,6 +19,12 @@ export default {
     }
   },
   methods: {
+    getByID(id) {
+      return this.contents.find(article => article._id === id);
+    },
+    getBySlug(slug) {
+      return this.contents.find(article => article.slug === slug);
+    },
     async load() {
       if (!this.loading) {
         return;

@@ -11,11 +11,11 @@ export default {
     BulmaCopyInput
   },
   props: {
-    slug: String
+    id: String
   },
   computed: {
     articleData() {
-      return this.$api.contents.find(article => article.slug === this.slug);
+      return this.$api.getByID(this.id);
     }
   }
 };
@@ -23,11 +23,6 @@ export default {
 
 <template>
   <APILoader role="editor">
-    <h1 class="title">
-      <font-awesome-icon :icon="['far', 'newspaper']" />
-
-      {{ slug }}
-    </h1>
     <div v-if="!articleData" class="message is-warning">
       <p class="message-header">
         Not found
@@ -38,21 +33,39 @@ export default {
       </p>
     </div>
     <APIArticle v-else v-slot="{ article }" :data="articleData">
+      <h1 class="title has-text-grey">
+        <font-awesome-icon :icon="['far', 'newspaper']" />
+
+        {{ article.slug }}
+      </h1>
       <h2 class="title">
-        Embargoed for
+        Planned for
         {{ article.plannedDate | formatDate }}
       </h2>
-
-      <h2 class="title">Notes</h2>
-      <p class="content">
-        {{ article.budgetLine }}
-      </p>
+      <template v-if="article.note">
+        <h2 class="title is-stacked">
+          Internal Note
+        </h2>
+        <p class="content has-margin-top-negative">
+          {{ article.note }}
+        </p>
+      </template>
 
       <h2 class="title">Suggested Hed</h2>
-      <BulmaCopyInput :value="article.headline"></BulmaCopyInput>
+      <BulmaCopyInput :value="article.headline" :rows="2"></BulmaCopyInput>
 
       <h2 class="title">Suggested Description</h2>
-      <BulmaCopyInput :value="article.description"></BulmaCopyInput>
+      <BulmaCopyInput :value="article.description" :rows="2"></BulmaCopyInput>
+
+      <h2 class="title">Byline</h2>
+      <BulmaCopyInput :value="article.authors | commaand"></BulmaCopyInput>
+
+      <details class="block">
+        <summary class="title">Budget details</summary>
+        <p class="content">
+          {{ article.budgetLine }}
+        </p>
+      </details>
 
       <pre class="code">{{ article.rawData | json }}</pre>
     </APIArticle>

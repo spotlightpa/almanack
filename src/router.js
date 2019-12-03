@@ -26,7 +26,7 @@ export default new Router({
       beforeEnter: authGuard
     },
     {
-      path: "/articles/:slug",
+      path: "/articles/:id",
       name: "article",
       component: ViewArticleItem,
       props: true,
@@ -37,5 +37,12 @@ export default new Router({
       name: "error",
       component: ViewError
     }
-  ]
+  ],
+  scrollBehavior(to, from, savedPosition) {
+    if (savedPosition) {
+      return savedPosition;
+    } else {
+      return { selector: "#top-nav" };
+    }
+  }
 });
