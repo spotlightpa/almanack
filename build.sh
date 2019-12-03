@@ -7,6 +7,7 @@ THIS_DIR=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
 
 cd "$THIS_DIR"
 
+gimme list
 go version
 GOBIN=$THIS_DIR/functions go install ./cmd/...
 yarn run build
