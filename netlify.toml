@@ -7,6 +7,7 @@
   GO_IMPORT_PATH = "github.com/spotlightpa/almanack"
   GO111MODULE = "on"
   NODE_VERSION = "12"
+  GIMME_GO_VERSION = "1.13.4"
 
 [[redirects]]
   from = "/api/*"
