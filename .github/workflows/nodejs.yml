@@ -21,8 +21,8 @@ jobs:
       run: yarn
       env:
         CI: true
-    - name: yarn lint
-      run: yarn lint
+    - name: yarn test
+      run: yarn test
       env:
         CI: true
     - name: yarn build
