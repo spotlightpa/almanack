@@ -16,6 +16,21 @@ type JWT struct {
 	SiteURL  string   `json:"site_url"`
 	User     User     `json:"user"`
 }
+
+const adminRole = "admin"
+
+func (jwt *JWT) HasRole(role string) bool {
+	if jwt == nil {
+		return false
+	}
+	for _, r := range jwt.User.AppMetadata.Roles {
+		if r == role || r == adminRole {
+			return true
+		}
+	}
+	return false
+}
+
 type Identity struct {
 	Token string `json:"token"`
 	URL   string `json:"url"`

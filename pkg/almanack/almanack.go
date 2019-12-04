@@ -178,8 +178,6 @@ func (a *app) userInfo(w http.ResponseWriter, r *http.Request) {
 	a.jsonResponse(http.StatusOK, w, userinfo)
 }
 
-const adminRole = "admin"
-
 func (a *app) netlifyPermissionMiddleware(role string, next http.Handler) http.HandlerFunc {
 	var inner http.HandlerFunc = func(w http.ResponseWriter, r *http.Request) {
 		a.Println("starting permission middleware")
@@ -199,13 +197,7 @@ func (a *app) netlifyPermissionMiddleware(role string, next http.Handler) http.H
 			a.errorResponse(w, err)
 			return
 		}
-		hasRole := false
-		for _, r := range userinfo.User.AppMetadata.Roles {
-			if r == role || r == adminRole {
-				hasRole = true
-				break
-			}
-		}
+		hasRole := userinfo.HasRole(role)
 		a.Printf("permission middleware: %s has role %s == %t",
 			userinfo.User.Email, role, hasRole)
 		if !hasRole {
@@ -275,8 +267,9 @@ func (a *app) upcoming(w http.ResponseWriter, r *http.Request) {
 		a.errorResponse(w, err)
 		return
 	}
+
 	// Filter out sub-drafts
-	{
+	if userinfo := getNetlifyID(r); a.isLambda && !userinfo.HasRole("admin") {
 		i := 0
 		for _, c := range feed.Contents {
 			if c.Workflow.StatusCode >= statusReady {
