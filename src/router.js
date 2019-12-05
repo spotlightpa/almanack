@@ -39,10 +39,6 @@ export default new Router({
     }
   ],
   scrollBehavior(to, from, savedPosition) {
-    if (savedPosition) {
-      return savedPosition;
-    } else {
-      return { selector: "#top-nav" };
-    }
+    return savedPosition || { selector: "#top-nav" };
   }
 });
