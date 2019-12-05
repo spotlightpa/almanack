@@ -15,7 +15,14 @@ export default {
       if (this.loading || this.error) {
         return [];
       }
-      return this.feed && this.feed.contents;
+      return (
+        this.feed &&
+        Array.from(this.feed.contents).sort(
+          (a, b) =>
+            a.planning.scheduling.planned_publish_date <=
+            b.planning.scheduling.planned_publish_date
+        )
+      );
     }
   },
   methods: {
