@@ -1,6 +1,7 @@
 <script>
 import APILoader from "./APILoader.vue";
 import APIArticle from "./APIArticle.vue";
+import APIArticleContents from "./APIArticleContents.vue";
 import BulmaCopyInput from "./BulmaCopyInput.vue";
 
 export default {
@@ -8,6 +9,7 @@ export default {
   components: {
     APILoader,
     APIArticle,
+    APIArticleContents,
     BulmaCopyInput
   },
   props: {
@@ -58,7 +60,9 @@ export default {
       <BulmaCopyInput :value="article.description" :rows="2"></BulmaCopyInput>
 
       <h2 class="title">Byline</h2>
-      <BulmaCopyInput :value="article.authors | commaand"></BulmaCopyInput>
+      <BulmaCopyInput :value="article.byline"></BulmaCopyInput>
+
+      <APIArticleContents :article="article"></APIArticleContents>
 
       <details class="block">
         <summary class="title">Budget details</summary>
@@ -66,8 +70,10 @@ export default {
           {{ article.budgetLine }}
         </p>
       </details>
-
-      <pre class="code">{{ article.rawData | json }}</pre>
+      <details class="block">
+        <summary class="title">Raw JSON</summary>
+        <pre class="code">{{ article.rawData | json }}</pre>
+      </details>
     </APIArticle>
   </APILoader>
 </template>

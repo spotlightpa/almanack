@@ -1,4 +1,4 @@
 import "./commaand.js";
-import "./intcomma.js";
+import "./journalize.js";
 import "./json.js";
 import "./time.js";

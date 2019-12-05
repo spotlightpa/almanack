@@ -1,6 +1,6 @@
 import Vue from "vue";
 
-function commaAndJoiner(a) {
+export function commaAndJoiner(a) {
   if (!a || !a.length) {
     return "";
   }

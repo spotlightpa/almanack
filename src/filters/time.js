@@ -8,7 +8,7 @@ let dateOpts = {
 
 const dateLocalizer = new Intl.DateTimeFormat("en-US", dateOpts);
 
-function dateFormatter(d) {
+export function dateFormatter(d) {
   if (typeof d === "string") {
     d = new Date(d);
   }
