@@ -10,26 +10,37 @@ export default {
     },
     size: {
       type: String,
-      default: "is-large"
+      default: "is-medium"
     }
   },
   data() {
     return {
+      isFocused: false,
       copied: false
     };
   },
   methods: {
+    click() {
+      if (!this.isFocused) {
+        this.isFocused = true;
+        this.select();
+      }
+    },
+    select() {
+      let range = document.createRange();
+      range.selectNodeContents(this.$refs.textarea);
+      let selection = window.getSelection();
+      selection.removeAllRanges();
+      selection.addRange(range);
+    },
     copy() {
-      this.$refs.textarea.select();
+      this.select();
       if (document.execCommand("copy")) {
         this.copied = true;
         window.setTimeout(() => {
           this.copied = false;
         }, 5000); // 5s
       }
-    },
-    select(ev) {
-      ev.target.select();
     }
   }
 };
@@ -39,17 +50,17 @@ export default {
   <div class="has-margin-bottom">
     <div class="field">
       <div class="control">
-        <textarea
+        <div
           ref="textarea"
           class="textarea"
+          rows="bulmaoverride"
           :class="size"
-          :rows="rows"
-          readonly
-          @click.once="select"
+          contenteditable
+          @click="click"
+          @blur="isFocused = false"
           @focus="select"
           v-text="value"
-        >
-        </textarea>
+        ></div>
       </div>
     </div>
     <div class="field">
