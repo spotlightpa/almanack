@@ -1,11 +1,13 @@
 <script>
 import APIArticle from "./APIArticle.vue";
+import APIArticleSlugLine from "./APIArticleSlugLine.vue";
 import APILoader from "./APILoader.vue";
 
 export default {
   name: "ViewArticleList",
   components: {
     APIArticle,
+    APIArticleSlugLine,
     APILoader
   }
 };
@@ -32,31 +34,7 @@ export default {
           <APIArticle v-slot="{ article }" :data="articleData">
             <div class="control">
               <h2 class="title is-spaced is-3">
-                <router-link
-                  :to="{ name: 'article', params: { id: article.id } }"
-                >
-                  <font-awesome-icon :icon="['far', 'newspaper']" />
-                  {{ article.slug }}
-                </router-link>
-
-                <span class="tags is-inline-flex has-addons">
-                  <span class="tag is-light">Status</span>
-                  <a
-                    v-if="article.isPublished"
-                    :href="article.pubURL"
-                    class="tag is-success"
-                    target="_blank"
-                    :title="`${article.slug} on SpotlightPA.org`"
-                  >
-                    <span class="is-size-6">
-                      <font-awesome-icon class="" :icon="['fas', 'link']" />
-                    </span>
-                    {{ article.status | capfirst }}
-                  </a>
-                  <span v-else class="tag is-warning is-small">{{
-                    article.status | capfirst
-                  }}</span>
-                </span>
+                <APIArticleSlugLine :article="article"></APIArticleSlugLine>
               </h2>
 
               <p class="has-margin-top-negative">

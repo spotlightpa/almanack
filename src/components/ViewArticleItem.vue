@@ -1,6 +1,7 @@
 <script>
 import APILoader from "./APILoader.vue";
 import APIArticle from "./APIArticle.vue";
+import APIArticleSlugLine from "./APIArticleSlugLine.vue";
 import APIArticleContents from "./APIArticleContents.vue";
 import BulmaCopyInput from "./BulmaCopyInput.vue";
 
@@ -10,6 +11,7 @@ export default {
     APILoader,
     APIArticle,
     APIArticleContents,
+    APIArticleSlugLine,
     BulmaCopyInput
   },
   props: {
@@ -36,9 +38,7 @@ export default {
     </div>
     <APIArticle v-else v-slot="{ article }" :data="articleData">
       <h1 class="title has-text-grey">
-        <font-awesome-icon :icon="['far', 'newspaper']" />
-
-        {{ article.slug }}
+        <APIArticleSlugLine :article="article"></APIArticleSlugLine>
       </h1>
       <h2 class="title">
         Planned for
@@ -61,6 +61,16 @@ export default {
 
       <h2 class="title">Byline</h2>
       <BulmaCopyInput :value="article.byline"></BulmaCopyInput>
+
+      <h2 class="title">Embeds</h2>
+
+      <component
+        :is="component"
+        v-for="{ block, component, n } of article.embedComponents"
+        :key="n"
+        :block="block"
+        :n="n"
+      ></component>
 
       <APIArticleContents :article="article"></APIArticleContents>
 

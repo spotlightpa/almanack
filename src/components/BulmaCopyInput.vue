@@ -1,7 +1,18 @@
 <script>
 export default {
   name: "BulmaCopyInput",
-  props: { value: String, rows: { type: Number, default: 1 } },
+  props: {
+    value: String,
+    rows: { type: Number, default: 1 },
+    label: {
+      type: String,
+      default: "text"
+    },
+    size: {
+      type: String,
+      default: "is-large"
+    }
+  },
   data() {
     return {
       copied: false
@@ -30,7 +41,8 @@ export default {
       <div class="control">
         <textarea
           ref="textarea"
-          class="textarea is-large"
+          class="textarea"
+          :class="size"
           :rows="rows"
           readonly
           @click.once="select"
@@ -51,9 +63,7 @@ export default {
           <span class="icon">
             <font-awesome-icon :icon="['far', 'copy']" />
           </span>
-          <span>
-            Copy text
-          </span>
+          <span> Copy {{ label }} </span>
         </button>
         <transition name="fade">
           <div

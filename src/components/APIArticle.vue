@@ -1,9 +1,26 @@
 <script>
 import { commaAndJoiner } from "@/filters/commaand.js";
 
-// import APIArticleContentImage from "./APIArticleContentImage.vue";
+import APIArticleContentImage from "./APIArticleContentImage.vue";
+import APIArticleContentList from "./APIArticleContentList.vue";
+import APIArticleContentHTML from "./APIArticleContentHTML.vue";
+import APIArticleContentHeader from "./APIArticleContentHeader.vue";
 import APIArticleContentText from "./APIArticleContentText.vue";
 import APIArticleContentPlaceholder from "./APIArticleContentPlaceholder.vue";
+import APIArticleContentOEmbed from "./APIArticleContentOEmbed.vue";
+
+let contentComponentsTypes = {
+  text: APIArticleContentText,
+  header: APIArticleContentHeader,
+  list: APIArticleContentList
+};
+
+let embedComponentsTypes = {
+  image: APIArticleContentImage,
+  code: APIArticleContentHTML,
+  raw_html: APIArticleContentHTML,
+  oembed_response: APIArticleContentOEmbed
+};
 
 class Article {
   static from(rawData) {
@@ -58,15 +75,15 @@ class Article {
   get contentComponents() {
     let embedcount = 0;
 
-    return this.rawData.content_elements.flatMap(block =>
-      elementToComponent(block)
-    );
-
-    function elementToComponent(block) {
-      let component = {
-        text: APIArticleContentText
-      }[block.type];
-      if (!component) {
+    return this.rawData.content_elements.flatMap(block => {
+      let component = contentComponentsTypes[block.type];
+      if (component) {
+        return {
+          component,
+          block
+        };
+      }
+      if (embedComponentsTypes[block.type]) {
         embedcount++;
         let n = embedcount;
         return {
@@ -74,11 +91,28 @@ class Article {
           block: { n }
         };
       }
+      // eslint-disable-next-line no-console
+      console.warn("unknown block type", block.type, block);
+      return [];
+    });
+  }
+
+  get embedComponents() {
+    let embedcount = 0;
+
+    return this.rawData.content_elements.flatMap(block => {
+      let component = embedComponentsTypes[block.type];
+      if (!component) {
+        return [];
+      }
+      embedcount++;
+      let n = embedcount;
       return {
         component,
-        block
+        block,
+        n
       };
-    }
+    });
   }
 }
 
