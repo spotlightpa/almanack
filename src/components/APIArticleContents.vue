@@ -124,7 +124,12 @@ export default {
 
     <div v-if="!viewHTML" class="message height-50vh">
       <div class="message-body">
-        <div ref="richtextEl" class="content" @click="selectContent">
+        <div
+          ref="richtextEl"
+          class="content"
+          contenteditable
+          @focus="selectContent"
+        >
           <component
             :is="block.component"
             v-for="(block, i) of article.contentComponents"
