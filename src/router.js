@@ -5,11 +5,11 @@ import ViewArticleList from "./components/ViewArticleList.vue";
 import ViewError from "./components/ViewError.vue";
 import ViewLogin from "./components/ViewLogin.vue";
 
-import { authGuard } from "./plugins/auth.js";
+import { authComponent } from "./plugins/auth.js";
 
 Vue.use(Router);
 
-export default new Router({
+let router = new Router({
   mode: "history",
   base: process.env.BASE_URL,
   routes: [
@@ -23,14 +23,14 @@ export default new Router({
       path: "/articles",
       name: "articles",
       component: ViewArticleList,
-      beforeEnter: authGuard
+      meta: { requiresAuth: true }
     },
     {
       path: "/articles/:id",
       name: "article",
       component: ViewArticleItem,
       props: true,
-      beforeEnter: authGuard
+      meta: { requiresAuth: true }
     },
     {
       path: "/*",
@@ -42,3 +42,18 @@ export default new Router({
     return savedPosition || { selector: "#top-nav" };
   }
 });
+
+router.beforeEach((to, from, next) => {
+  if (to.matched.some(record => record.meta.requiresAuth)) {
+    if (!authComponent.isSignedIn) {
+      next({
+        name: "login",
+        hash: to.hash // For verifying tokens etc.
+      });
+      return;
+    }
+  }
+  next();
+});
+
+export default router;
