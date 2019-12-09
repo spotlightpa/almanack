@@ -2,7 +2,7 @@
 export default {
   name: "APILoader",
   props: {
-    role: String
+    role: String,
   },
   created() {
     if (this.$auth.hasRole(this.role)) {
@@ -10,7 +10,7 @@ export default {
     } else {
       this.$api.loading = false;
     }
-  }
+  },
 };
 </script>
 

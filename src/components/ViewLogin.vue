@@ -5,7 +5,7 @@ export default {
     if (this.$auth.isSignedIn) {
       this.$router.push({ name: "home" });
     }
-  }
+  },
 };
 </script>
 

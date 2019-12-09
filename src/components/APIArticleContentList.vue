@@ -1,7 +1,7 @@
 <script>
 export default {
   props: {
-    block: Object
+    block: Object,
   },
   computed: {
     listType() {
@@ -9,8 +9,8 @@ export default {
     },
     items() {
       return this.block.items.filter(item => item.type === "text");
-    }
-  }
+    },
+  },
 };
 </script>
 

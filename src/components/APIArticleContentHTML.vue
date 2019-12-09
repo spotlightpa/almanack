@@ -3,12 +3,12 @@ import BulmaCopyInput from "./BulmaCopyInput.vue";
 
 export default {
   components: {
-    BulmaCopyInput
+    BulmaCopyInput,
   },
   props: {
     block: Object,
-    n: Number
-  }
+    n: Number,
+  },
 };
 </script>
 

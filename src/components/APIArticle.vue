@@ -12,20 +12,20 @@ import APIArticleContentOEmbed from "./APIArticleContentOEmbed.vue";
 let contentComponentsTypes = {
   text: APIArticleContentText,
   header: APIArticleContentHeader,
-  list: APIArticleContentList
+  list: APIArticleContentList,
 };
 
 let embedComponentsTypes = {
   image: APIArticleContentImage,
   code: APIArticleContentHTML,
   raw_html: APIArticleContentHTML,
-  oembed_response: APIArticleContentOEmbed
+  oembed_response: APIArticleContentOEmbed,
 };
 
 let htmlComponentsTypes = {
   code: block => block.content,
   raw_html: block => block.content,
-  oembed_response: block => block.raw_oembed.html
+  oembed_response: block => block.raw_oembed.html,
 };
 
 class Article {
@@ -46,7 +46,7 @@ class Article {
       actualLineCount: "planning.story_length.line_count_actual",
       actualInchCount: "planning.story_length.inch_count_actual",
       slug: "slug",
-      id: "_id"
+      id: "_id",
     };
 
     let article = new Article();
@@ -70,7 +70,7 @@ class Article {
     return (
       {
         5: "ready",
-        6: "published"
+        6: "published",
       }[this.rawData.workflow.status_code] || "not ready"
     );
   }
@@ -86,7 +86,7 @@ class Article {
       if (component) {
         return {
           component,
-          block
+          block,
         };
       }
       if (embedComponentsTypes[block.type]) {
@@ -94,7 +94,7 @@ class Article {
         let n = embedcount;
         return {
           component: APIArticleContentPlaceholder,
-          block: { n }
+          block: { n },
         };
       }
       // eslint-disable-next-line no-console
@@ -116,7 +116,7 @@ class Article {
       return {
         component,
         block,
-        n
+        n,
       };
     });
   }
@@ -133,7 +133,7 @@ class Article {
       if (component) {
         return {
           component,
-          block
+          block,
         };
       }
       let renderer = htmlComponentsTypes[block.type];
@@ -142,16 +142,16 @@ class Article {
           component: {
             render(h) {
               return h("raw-html");
-            }
+            },
           },
-          block: renderer(block)
+          block: renderer(block),
         };
       }
       if (embedComponentsTypes[block.type]) {
         let n = embedcount;
         return {
           component: APIArticleContentPlaceholder,
-          block: { n }
+          block: { n },
         };
       }
       // eslint-disable-next-line no-console
@@ -164,11 +164,11 @@ class Article {
 export default {
   name: "APIArticle",
   props: {
-    data: { type: Object, required: true }
+    data: { type: Object, required: true },
   },
   data() {
     return { article: Article.from(this.data) };
-  }
+  },
 };
 </script>
 

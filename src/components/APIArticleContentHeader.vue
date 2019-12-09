@@ -1,13 +1,13 @@
 <script>
 export default {
   props: {
-    block: Object
+    block: Object,
   },
   computed: {
     hlevel() {
       return `h${this.block.level}`;
-    }
-  }
+    },
+  },
 };
 </script>
 

@@ -3,14 +3,14 @@ export default {
   name: "PageNav",
   data() {
     return {
-      isOpen: false
+      isOpen: false,
     };
   },
   methods: {
     menuToggle() {
       this.isOpen = !this.isOpen;
-    }
-  }
+    },
+  },
 };
 </script>
 

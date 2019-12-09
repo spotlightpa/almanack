@@ -7,5 +7,5 @@ export let AuthPlugin = {
     let AuthComp = Vue.extend(TheAuth);
     authComponent = new AuthComp();
     Vue.prototype.$auth = authComponent;
-  }
+  },
 };

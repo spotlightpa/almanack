@@ -17,30 +17,30 @@ let router = new Router({
     {
       path: "/login",
       name: "login",
-      component: ViewLogin
+      component: ViewLogin,
     },
     {
       path: "/articles",
       name: "articles",
       component: ViewArticleList,
-      meta: { requiresAuth: true }
+      meta: { requiresAuth: true },
     },
     {
       path: "/articles/:id",
       name: "article",
       component: ViewArticleItem,
       props: true,
-      meta: { requiresAuth: true }
+      meta: { requiresAuth: true },
     },
     {
       path: "/*",
       name: "error",
-      component: ViewError
-    }
+      component: ViewError,
+    },
   ],
   scrollBehavior(to, from, savedPosition) {
     return savedPosition || { selector: "#top-nav" };
-  }
+  },
 });
 
 router.beforeEach((to, from, next) => {
@@ -48,7 +48,7 @@ router.beforeEach((to, from, next) => {
     if (!authComponent.isSignedIn) {
       next({
         name: "login",
-        hash: to.hash // For verifying tokens etc.
+        hash: to.hash, // For verifying tokens etc.
       });
       return;
     }

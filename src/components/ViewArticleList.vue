@@ -8,8 +8,8 @@ export default {
   components: {
     APIArticle,
     APIArticleSlugLine,
-    APILoader
-  }
+    APILoader,
+  },
 };
 </script>
 

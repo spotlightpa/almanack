@@ -12,16 +12,16 @@ export default {
     APIArticle,
     APIArticleContents,
     APIArticleSlugLine,
-    BulmaCopyInput
+    BulmaCopyInput,
   },
   props: {
-    id: String
+    id: String,
   },
   computed: {
     articleData() {
       return this.$api.getByID(this.id);
-    }
-  }
+    },
+  },
 };
 </script>
 

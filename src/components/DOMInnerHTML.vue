@@ -10,7 +10,7 @@ export default {
         )
         .join("\n\n")
     );
-  }
+  },
 };
 </script>
 

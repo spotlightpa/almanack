@@ -1,8 +1,8 @@
 <script>
 export default {
   props: {
-    block: Object
-  }
+    block: Object,
+  },
 };
 </script>
 

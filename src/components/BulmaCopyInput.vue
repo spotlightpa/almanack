@@ -6,17 +6,17 @@ export default {
     rows: { type: Number, default: 1 },
     label: {
       type: String,
-      default: "text"
+      default: "text",
     },
     size: {
       type: String,
-      default: "is-medium"
-    }
+      default: "is-medium",
+    },
   },
   data() {
     return {
       isFocused: false,
-      copied: false
+      copied: false,
     };
   },
   methods: {
@@ -41,8 +41,8 @@ export default {
           this.copied = false;
         }, 5000); // 5s
       }
-    }
-  }
+    },
+  },
 };
 </script>
 

@@ -3,22 +3,22 @@ import DOMInnerHTML from "./DOMInnerHTML.vue";
 
 export default {
   components: {
-    DOMInnerHTML
+    DOMInnerHTML,
   },
   props: {
-    article: { type: Object, required: true }
+    article: { type: Object, required: true },
   },
   data() {
     return {
       copied: false,
       viewHTML: false,
-      articleHTML: ""
+      articleHTML: "",
     };
   },
   computed: {
     embeds() {
       return this.article.embedComponents;
-    }
+    },
   },
   methods: {
     async copy(kind) {
@@ -48,8 +48,8 @@ export default {
       let selection = window.getSelection();
       selection.removeAllRanges();
       selection.addRange(range);
-    }
-  }
+    },
+  },
 };
 </script>
 

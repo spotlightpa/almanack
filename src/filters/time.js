@@ -3,7 +3,7 @@ import Vue from "vue";
 import { apdate, aptime } from "journalize";
 
 let dateOpts = {
-  weekday: "short"
+  weekday: "short",
 };
 
 const dateLocalizer = new Intl.DateTimeFormat("en-US", dateOpts);

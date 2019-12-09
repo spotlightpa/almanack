@@ -8,14 +8,14 @@ const tryTo = promise =>
 
 export const endpoints = {
   userInfo: `/api/user-info`,
-  upcoming: `/api/upcoming`
+  upcoming: `/api/upcoming`,
 };
 
 function createAPIService($auth) {
   async function request(url, options = {}) {
     let headers = await $auth.headers();
     let defaultOpts = {
-      headers
+      headers,
     };
     options = { ...defaultOpts, options };
     let resp = await fetch(url, options);
@@ -33,7 +33,7 @@ function createAPIService($auth) {
     },
     async upcoming() {
       return await tryTo(request(endpoints.upcoming));
-    }
+    },
   };
 }
 
@@ -41,7 +41,7 @@ export const APIPlugin = {
   install(Vue) {
     let APIComp = Vue.extend(TheAPI);
     Vue.prototype.$api = new APIComp({
-      propsData: { createAPIService }
+      propsData: { createAPIService },
     });
-  }
+  },
 };

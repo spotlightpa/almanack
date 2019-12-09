@@ -2,7 +2,7 @@
 export default {
   name: "TheAPI",
   props: {
-    createAPIService: { type: Function, required: true }
+    createAPIService: { type: Function, required: true },
   },
   data() {
     return { loading: true, feed: null, error: null };
@@ -23,7 +23,7 @@ export default {
             b.planning.scheduling.planned_publish_date
         )
       );
-    }
+    },
   },
   methods: {
     getByID(id) {
@@ -43,7 +43,7 @@ export default {
       this.loading = true;
       [this.feed, this.error] = await this.service.upcoming();
       this.loading = false;
-    }
-  }
+    },
+  },
 };
 </script>

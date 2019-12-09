@@ -7,7 +7,7 @@ export default {
   data() {
     return {
       user: null,
-      error: null
+      error: null,
     };
   },
   computed: {
@@ -34,7 +34,7 @@ export default {
           this.user.app_metadata.roles) ||
         []
       );
-    }
+    },
   },
   created() {
     netlifyIdentity.on("init", async user => {
@@ -78,12 +78,12 @@ export default {
         throw e;
       }
       return {
-        Authorization: `Bearer ${token}`
+        Authorization: `Bearer ${token}`,
       };
     },
     hasRole(name) {
       return this.roles.some(role => role === name || role === "admin");
-    }
-  }
+    },
+  },
 };
 </script>

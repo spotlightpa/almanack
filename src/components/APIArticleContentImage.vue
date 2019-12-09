@@ -2,13 +2,13 @@
 export default {
   props: {
     block: Object,
-    n: Number
+    n: Number,
   },
   computed: {
     credits() {
       return this.block.credits.by.map(v => v.name);
-    }
-  }
+    },
+  },
 };
 </script>
 

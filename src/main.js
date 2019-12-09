@@ -5,7 +5,7 @@ import {
   faCopy,
   faFileCode,
   faFileWord,
-  faNewspaper
+  faNewspaper,
 } from "@fortawesome/free-regular-svg-icons";
 import { faFileDownload, faLink } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
@@ -34,5 +34,5 @@ Vue.config.ignoredElements = ["raw-html"];
 
 new Vue({
   router,
-  render: h => h(App)
+  render: h => h(App),
 }).$mount("#app");

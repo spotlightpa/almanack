@@ -5,7 +5,7 @@ import PageNav from "./PageNav.vue";
 
 export default {
   components: {
-    PageNav
+    PageNav,
   },
   mounted() {
     this.$auth.$watch("$auth.user", (newUser, oldUser) => {
@@ -15,7 +15,7 @@ export default {
       let name = newUser ? "articles" : "login";
       this.$router.push({ name });
     });
-  }
+  },
 };
 </script>
 

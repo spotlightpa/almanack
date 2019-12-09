@@ -3,18 +3,18 @@ export default {
   props: {
     article: {
       type: Object,
-      required: true
-    }
+      required: true,
+    },
   },
   computed: {
     tagStyle() {
       return {
         published: "is-success",
         ready: "is-warning",
-        "not ready": "is-danger"
+        "not ready": "is-danger",
       }[this.article.status];
-    }
-  }
+    },
+  },
 };
 </script>
 
