@@ -52,7 +52,7 @@ export default {
       <div class="control">
         <div
           ref="textarea"
-          class="textarea"
+          class="textarea pre-wrap"
           rows="bulmaoverride"
           :class="size"
           contenteditable
@@ -96,5 +96,9 @@ export default {
 
 .is-invisible {
   opacity: 0;
+}
+
+.pre-wrap {
+  white-space: pre-wrap;
 }
 </style>

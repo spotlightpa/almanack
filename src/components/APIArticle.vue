@@ -22,6 +22,12 @@ let embedComponentsTypes = {
   oembed_response: APIArticleContentOEmbed
 };
 
+let htmlComponentsTypes = {
+  code: block => block.content,
+  raw_html: block => block.content,
+  oembed_response: block => block.raw_oembed.html
+};
+
 class Article {
   static from(rawData) {
     const getter = pathStr =>
@@ -112,6 +118,45 @@ class Article {
         block,
         n
       };
+    });
+  }
+
+  get htmlComponents() {
+    let embedcount = 0;
+
+    return this.rawData.content_elements.flatMap(block => {
+      // Render code blocks but not use placeholder for images
+      if (embedComponentsTypes[block.type]) {
+        embedcount++;
+      }
+      let component = contentComponentsTypes[block.type];
+      if (component) {
+        return {
+          component,
+          block
+        };
+      }
+      let renderer = htmlComponentsTypes[block.type];
+      if (renderer) {
+        return {
+          component: {
+            render(h) {
+              return h("raw-html");
+            }
+          },
+          block: renderer(block)
+        };
+      }
+      if (embedComponentsTypes[block.type]) {
+        let n = embedcount;
+        return {
+          component: APIArticleContentPlaceholder,
+          block: { n }
+        };
+      }
+      // eslint-disable-next-line no-console
+      console.warn("unknown block type", block.type, block);
+      return [];
     });
   }
 }

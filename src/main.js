@@ -30,6 +30,8 @@ Vue.component("font-awesome-icon", FontAwesomeIcon);
 Vue.use(AuthPlugin);
 Vue.use(APIPlugin);
 
+Vue.config.ignoredElements = ["raw-html"];
+
 new Vue({
   router,
   render: h => h(App)

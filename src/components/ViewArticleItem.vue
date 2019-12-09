@@ -62,16 +62,6 @@ export default {
       <h2 class="title">Byline</h2>
       <BulmaCopyInput :value="article.byline"></BulmaCopyInput>
 
-      <h2 class="title">Embeds</h2>
-
-      <component
-        :is="component"
-        v-for="{ block, component, n } of article.embedComponents"
-        :key="n"
-        :block="block"
-        :n="n"
-      ></component>
-
       <APIArticleContents :article="article"></APIArticleContents>
 
       <details class="block">

@@ -15,6 +15,11 @@ export default {
       articleHTML: ""
     };
   },
+  computed: {
+    embeds() {
+      return this.article.embedComponents;
+    }
+  },
   methods: {
     async copy(kind) {
       let doHTML = kind === "html";
@@ -50,6 +55,19 @@ export default {
 
 <template>
   <div class="block">
+    <h2 v-if="embeds.length === 1" class="title">
+      Embed
+    </h2>
+    <h2 v-if="embeds.length > 1" class="title">Embeds: {{ embeds.length }}</h2>
+
+    <component
+      :is="component"
+      v-for="{ block, component, n } of embeds"
+      :key="n"
+      :block="block"
+      :n="n"
+    ></component>
+
     <div class="level">
       <div class="level-left">
         <div class="level-item">
@@ -141,7 +159,7 @@ export default {
     <DOMInnerHTML @mounted="articleHTML = $event">
       <component
         :is="block.component"
-        v-for="(block, i) of article.contentComponents"
+        v-for="(block, i) of article.htmlComponents"
         :key="i"
         :block="block.block"
       ></component>
