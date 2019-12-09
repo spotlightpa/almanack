@@ -1,5 +1,10 @@
 <script>
+import DOMInnerHTML from "./DOMInnerHTML.vue";
+
 export default {
+  components: {
+    DOMInnerHTML
+  },
   props: {
     article: { type: Object, required: true }
   },
@@ -9,12 +14,6 @@ export default {
       viewHTML: false,
       articleHTML: ""
     };
-  },
-  async mounted() {
-    await this.$nextTick();
-    this.articleHTML = this.$refs.contentsEls
-      .map(comp => comp.$el.outerHTML)
-      .join("\n\n");
   },
   methods: {
     async copy(kind) {
@@ -122,24 +121,31 @@ export default {
       </div>
     </div>
 
-    <div v-if="!viewHTML" class="message height-50vh">
-      <div class="message-body">
-        <div
-          ref="richtextEl"
-          class="content"
-          contenteditable
-          @focus="selectContent"
-        >
-          <component
-            :is="block.component"
-            v-for="(block, i) of article.contentComponents"
-            ref="contentsEls"
-            :key="i"
-            :block="block.block"
-          ></component>
-        </div>
+    <div
+      v-if="!viewHTML"
+      class="textarea height-50vh"
+      contenteditable
+      @focus="selectContent"
+    >
+      <div ref="richtextEl" class="content">
+        <component
+          :is="block.component"
+          v-for="(block, i) of article.contentComponents"
+          ref="contentsEls"
+          :key="i"
+          :block="block.block"
+        ></component>
       </div>
     </div>
+
+    <DOMInnerHTML @mounted="articleHTML = $event">
+      <component
+        :is="block.component"
+        v-for="(block, i) of article.contentComponents"
+        :key="i"
+        :block="block.block"
+      ></component>
+    </DOMInnerHTML>
 
     <textarea
       v-if="viewHTML"
