@@ -1,15 +1,17 @@
 <script>
-import DOMInnerHTML from "./DOMInnerHTML.vue";
 import APIArticleSlugLine from "./APIArticleSlugLine.vue";
 import CopyTextarea from "./CopyTextarea.vue";
 import CopyWithButton from "./CopyWithButton.vue";
+import DOMInnerHTML from "./DOMInnerHTML.vue";
+import ImageThumbnail from "./ImageThumbnail.vue";
 
 export default {
   components: {
-    DOMInnerHTML,
     APIArticleSlugLine,
     CopyTextarea,
     CopyWithButton,
+    DOMInnerHTML,
+    ImageThumbnail,
   },
   props: {
     article: { type: Object, required: true },
@@ -48,13 +50,27 @@ export default {
     </template>
 
     <h2 class="title">Suggested Hed</h2>
-    <CopyWithButton :value="article.headline" :rows="2"></CopyWithButton>
+    <CopyWithButton :value="article.headline" label="hed"></CopyWithButton>
 
     <h2 class="title">Suggested Description</h2>
-    <CopyWithButton :value="article.description" :rows="2"></CopyWithButton>
+    <CopyWithButton
+      :value="article.description"
+      label="description"
+    ></CopyWithButton>
 
     <h2 class="title">Byline</h2>
-    <CopyWithButton :value="article.byline"></CopyWithButton>
+    <CopyWithButton :value="article.byline" label="byline"></CopyWithButton>
+
+    <template v-if="article.featuredImage">
+      <h2 class="title">Featured Image</h2>
+      <ImageThumbnail
+        v-if="article.featuredImage"
+        :url="article.featuredImage"
+        :caption="article.featuredImageCaption"
+        :credits="article.featuredImageCredits"
+        class="block"
+      ></ImageThumbnail>
+    </template>
 
     <h2 v-if="embeds.length === 1" class="title">
       Embed

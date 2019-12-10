@@ -31,6 +31,7 @@ export default {
       <div class="control">
         <CopyTextarea
           ref="copier"
+          :size="size"
           @copied="copied = $event"
           v-text="value"
         ></CopyTextarea>

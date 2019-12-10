@@ -33,20 +33,22 @@ class Article {
     const getter = pathStr =>
       pathStr
         .split(".")
-        .reduce((xs, x) => (xs && xs[x] ? xs[x] : null), rawData);
+        .reduce((xs, x) => (xs && xs[x] !== null ? xs[x] : null), rawData);
 
     let props = {
-      note: "planning.internal_note",
+      actualInchCount: "planning.story_length.inch_count_actual",
+      actualLineCount: "planning.story_length.line_count_actual",
+      actualWordCount: "planning.story_length.word_count_actual",
       budgetLine: "planning.budget_line",
       description: "description.basic",
       headline: "headlines.basic",
+      id: "_id",
+      note: "planning.internal_note",
       plannedDate: "planning.scheduling.planned_publish_date",
       plannedWordCount: "planning.story_length.word_count_planned",
-      actualWordCount: "planning.story_length.word_count_actual",
-      actualLineCount: "planning.story_length.line_count_actual",
-      actualInchCount: "planning.story_length.inch_count_actual",
       slug: "slug",
-      id: "_id",
+      featuredImage: "promo_items.basic.url",
+      featuredImageCaption: "promo_items.basic.caption",
     };
 
     let article = new Article();
@@ -76,6 +78,11 @@ class Article {
   }
   get isPublished() {
     return this.status === "published";
+  }
+  get featuredImageCredits() {
+    return this.rawData.promo_items.basic.credits.by.map(
+      item => item.byline || item.name
+    );
   }
 
   get contentComponents() {
