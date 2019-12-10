@@ -1,7 +1,5 @@
 <script>
-function cmp(a, b) {
-  return a === b ? 0 : a < b ? -1 : 1;
-}
+import { Article } from "./APIArticle.js";
 
 export default {
   name: "TheAPI",
@@ -19,24 +17,12 @@ export default {
       if (this.loading || this.error) {
         return [];
       }
-      return (
-        this.feed &&
-        Array.from(this.feed.contents).sort(
-          (a, b) =>
-            -cmp(
-              a.planning.scheduling.planned_publish_date,
-              b.planning.scheduling.planned_publish_date
-            )
-        )
-      );
+      return this.feed && Article.from(this.feed);
     },
   },
   methods: {
     getByID(id) {
-      return this.contents.find(article => article._id === id);
-    },
-    getBySlug(slug) {
-      return this.contents.find(article => article.slug === slug);
+      return this.contents.find(article => article.id === id);
     },
     async load() {
       if (!this.loading) {

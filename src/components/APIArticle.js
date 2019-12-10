@@ -1,4 +1,3 @@
-<script>
 import { commaAndJoiner } from "@/filters/commaand.js";
 
 import APIArticleContentImage from "./APIArticleContentImage.vue";
@@ -9,27 +8,43 @@ import APIArticleContentText from "./APIArticleContentText.vue";
 import APIArticleContentPlaceholder from "./APIArticleContentPlaceholder.vue";
 import APIArticleContentOEmbed from "./APIArticleContentOEmbed.vue";
 
+function cmp(a, b) {
+  return a === b ? 0 : a < b ? -1 : 1;
+}
+
 let contentComponentsTypes = {
-  text: APIArticleContentText,
   header: APIArticleContentHeader,
   list: APIArticleContentList,
+  text: APIArticleContentText,
 };
 
 let embedComponentsTypes = {
-  image: APIArticleContentImage,
   code: APIArticleContentHTML,
-  raw_html: APIArticleContentHTML,
+  image: APIArticleContentImage,
   oembed_response: APIArticleContentOEmbed,
+  raw_html: APIArticleContentHTML,
 };
 
 let htmlComponentsTypes = {
   code: block => block.content,
-  raw_html: block => block.content,
   oembed_response: block => block.raw_oembed.html,
+  raw_html: block => block.content,
 };
 
-class Article {
-  static from(rawData) {
+export class Article {
+  static from(data) {
+    return Array.from(data.contents)
+      .sort(
+        (a, b) =>
+          -cmp(
+            a.planning.scheduling.planned_publish_date,
+            b.planning.scheduling.planned_publish_date
+          )
+      )
+      .map(a => new Article(a));
+  }
+
+  constructor(rawData) {
     const getter = pathStr =>
       pathStr
         .split(".")
@@ -51,12 +66,10 @@ class Article {
       featuredImageCaption: "promo_items.basic.caption",
     };
 
-    let article = new Article();
-    article.rawData = rawData;
+    this.rawData = rawData;
     for (let [key, val] of Object.entries(props)) {
-      article[key] = getter(val);
+      this[key] = getter(val);
     }
-    return article;
   }
 
   get pubURL() {
@@ -167,20 +180,3 @@ class Article {
     });
   }
 }
-
-export default {
-  name: "APIArticle",
-  props: {
-    data: { type: Object, required: true },
-  },
-  data() {
-    return { article: Article.from(this.data) };
-  },
-};
-</script>
-
-<template>
-  <div>
-    <slot :article="article"></slot>
-  </div>
-</template>

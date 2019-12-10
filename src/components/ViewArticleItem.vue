@@ -1,20 +1,18 @@
 <script>
 import APILoader from "./APILoader.vue";
-import APIArticle from "./APIArticle.vue";
 import ArticleDetails from "./ArticleDetails.vue";
 
 export default {
   name: "ViewArticleItem",
   components: {
     APILoader,
-    APIArticle,
     ArticleDetails,
   },
   props: {
     id: String,
   },
   computed: {
-    articleData() {
+    article() {
       return this.$api.getByID(this.id);
     },
   },
@@ -23,7 +21,7 @@ export default {
 
 <template>
   <APILoader role="editor">
-    <div v-if="!articleData" class="message is-warning">
+    <div v-if="!article" class="message is-warning">
       <p class="message-header">
         Not found
       </p>
@@ -32,8 +30,6 @@ export default {
         <router-link :to="{ name: 'home' }">Go home</router-link>?
       </p>
     </div>
-    <APIArticle v-else v-slot="{ article }" :data="articleData">
-      <ArticleDetails :article="article"></ArticleDetails>
-    </APIArticle>
+    <ArticleDetails v-else :article="article"></ArticleDetails>
   </APILoader>
 </template>

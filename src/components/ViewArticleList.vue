@@ -1,12 +1,10 @@
 <script>
-import APIArticle from "./APIArticle.vue";
 import APIArticleSlugLine from "./APIArticleSlugLine.vue";
 import APILoader from "./APILoader.vue";
 
 export default {
   name: "ViewArticleList",
   components: {
-    APIArticle,
     APIArticleSlugLine,
     APILoader,
   },
@@ -27,62 +25,60 @@ export default {
           Spotlight PA Articles
         </h1>
         <article
-          v-for="articleData of $api.contents"
-          :key="articleData._id"
+          v-for="article of $api.contents"
+          :key="article.id"
           class="panel-block"
         >
-          <APIArticle v-slot="{ article }" :data="articleData">
-            <div class="control">
-              <h2 class="title is-spaced is-3">
-                <APIArticleSlugLine :article="article"></APIArticleSlugLine>
-              </h2>
+          <div class="control">
+            <h2 class="title is-spaced is-3">
+              <APIArticleSlugLine :article="article"></APIArticleSlugLine>
+            </h2>
 
-              <p class="has-margin-top-negative">
-                <strong>Byline:</strong>
-                {{ article.authors | commaand }}
-              </p>
-              <p>
-                <strong>Planned for:</strong>
-                {{ article.plannedDate | formatDate }}
-              </p>
-              <p class="has-margin-top-thin content is-small">
-                {{ article.budgetLine }}
-              </p>
+            <p class="has-margin-top-negative">
+              <strong>Byline:</strong>
+              {{ article.authors | commaand }}
+            </p>
+            <p>
+              <strong>Planned for:</strong>
+              {{ article.plannedDate | formatDate }}
+            </p>
+            <p class="has-margin-top-thin content is-small">
+              {{ article.budgetLine }}
+            </p>
 
-              <div class="level is-mobile is-clipped">
-                <div class="level-left">
-                  <p v-if="article.plannedWordCount" class="level-item">
-                    <span>
-                      <strong>Planned Word Count:</strong>
-                      {{ article.plannedWordCount | intcomma }}
-                    </span>
-                  </p>
+            <div class="level is-mobile is-clipped">
+              <div class="level-left">
+                <p v-if="article.plannedWordCount" class="level-item">
+                  <span>
+                    <strong>Planned Word Count:</strong>
+                    {{ article.plannedWordCount | intcomma }}
+                  </span>
+                </p>
 
-                  <p
-                    v-if="article.actualWordCount"
-                    class="level-item is-hidden-mobile"
-                  >
-                    <span>
-                      <strong>Word Count:</strong>
-                      {{ article.actualWordCount | intcomma }}
-                    </span>
-                  </p>
-                  <p class="level-item is-hidden-mobile">
-                    <span>
-                      <strong>Lines:</strong>
-                      {{ article.actualLineCount }}
-                    </span>
-                  </p>
-                  <p class="level-item is-hidden-mobile">
-                    <span>
-                      <strong>Column inches:</strong>
-                      {{ article.actualInchCount }}
-                    </span>
-                  </p>
-                </div>
+                <p
+                  v-if="article.actualWordCount"
+                  class="level-item is-hidden-mobile"
+                >
+                  <span>
+                    <strong>Word Count:</strong>
+                    {{ article.actualWordCount | intcomma }}
+                  </span>
+                </p>
+                <p class="level-item is-hidden-mobile">
+                  <span>
+                    <strong>Lines:</strong>
+                    {{ article.actualLineCount }}
+                  </span>
+                </p>
+                <p class="level-item is-hidden-mobile">
+                  <span>
+                    <strong>Column inches:</strong>
+                    {{ article.actualInchCount }}
+                  </span>
+                </p>
               </div>
             </div>
-          </APIArticle>
+          </div>
         </article>
       </nav>
     </APILoader>
