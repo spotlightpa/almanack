@@ -23,7 +23,11 @@ export default {
   <div>
     <PageNav id="top-nav" />
     <main class="section container">
-      <router-view />
+      <div class="columns is-centered">
+        <div class="column is-four-fifths">
+          <router-view />
+        </div>
+      </div>
     </main>
   </div>
 </template>
