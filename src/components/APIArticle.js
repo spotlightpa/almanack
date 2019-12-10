@@ -64,6 +64,7 @@ export class Article {
       slug: "slug",
       featuredImage: "promo_items.basic.url",
       featuredImageCaption: "promo_items.basic.caption",
+      _featuredImageCredits: "promo_items.basic.credits.by",
     };
 
     this.rawData = rawData;
@@ -93,7 +94,7 @@ export class Article {
     return this.status === "published";
   }
   get featuredImageCredits() {
-    return this.rawData.promo_items.basic.credits.by.map(
+    return (this._featuredImageCredits || []).map(
       item => item.byline || item.name
     );
   }
