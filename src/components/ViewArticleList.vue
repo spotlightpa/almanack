@@ -19,6 +19,9 @@ export default {
         (<span v-for="role of $auth.roles" :key="role" v-text="role"></span>)
       </small>
     </h2>
+    <p class="content">
+      TKTK lorem ipsum.
+    </p>
     <APILoader role="editor">
       <nav class="panel is-black">
         <h1 class="panel-heading">

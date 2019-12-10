@@ -37,12 +37,14 @@ export default {
       <APIArticleSlugLine :article="article"></APIArticleSlugLine>
     </h1>
     <h2 class="title">
-      Planned for
-      {{ article.plannedDate | formatDate }}
+      Planned time
     </h2>
+    <p class="content has-margin-top-negative">
+      {{ article.plannedDate | formatDate }}
+    </p>
     <template v-if="article.note">
       <h2 class="title is-stacked">
-        Internal Note
+        Publication Notes
       </h2>
       <p class="content has-margin-top-negative">
         {{ article.note }}

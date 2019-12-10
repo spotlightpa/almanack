@@ -14,7 +14,7 @@ export default {
 
 <template>
   <figure class="block">
-    <h2 class="subtitle is-4">
+    <h2 class="subtitle is-4 has-text-weight-semibold">
       Embed #{{ n }}: {{ block.raw_oembed.provider_name }} Embed
     </h2>
     <h3 class="subtitle is-5">

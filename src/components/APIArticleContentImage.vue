@@ -19,7 +19,9 @@ export default {
 
 <template>
   <div class="block">
-    <h2 class="subtitle is-4">Embed #{{ n }}: Inline Image</h2>
+    <h2 class="subtitle is-4 has-text-weight-semibold">
+      Embed #{{ n }}: Inline Image
+    </h2>
     <ImageThumbnail
       :url="block.url"
       :caption="block.caption"

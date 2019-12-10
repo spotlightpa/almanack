@@ -14,7 +14,9 @@ export default {
 
 <template>
   <figure class="block">
-    <h2 class="subtitle is-4">Embed #{{ n }}: Raw HTML</h2>
+    <h2 class="subtitle is-4 has-text-weight-semibold">
+      Embed #{{ n }}: Raw HTML
+    </h2>
     <CopyWithButton
       :value="block.content"
       :rows="4"
