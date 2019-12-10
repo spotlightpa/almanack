@@ -1,18 +1,14 @@
 <script>
 import APILoader from "./APILoader.vue";
 import APIArticle from "./APIArticle.vue";
-import APIArticleSlugLine from "./APIArticleSlugLine.vue";
-import APIArticleContents from "./APIArticleContents.vue";
-import BulmaCopyInput from "./BulmaCopyInput.vue";
+import ArticleDetails from "./ArticleDetails.vue";
 
 export default {
   name: "ViewArticleItem",
   components: {
     APILoader,
     APIArticle,
-    APIArticleContents,
-    APIArticleSlugLine,
-    BulmaCopyInput,
+    ArticleDetails,
   },
   props: {
     id: String,
@@ -37,43 +33,7 @@ export default {
       </p>
     </div>
     <APIArticle v-else v-slot="{ article }" :data="articleData">
-      <h1 class="title has-text-grey">
-        <APIArticleSlugLine :article="article"></APIArticleSlugLine>
-      </h1>
-      <h2 class="title">
-        Planned for
-        {{ article.plannedDate | formatDate }}
-      </h2>
-      <template v-if="article.note">
-        <h2 class="title is-stacked">
-          Internal Note
-        </h2>
-        <p class="content has-margin-top-negative">
-          {{ article.note }}
-        </p>
-      </template>
-
-      <h2 class="title">Suggested Hed</h2>
-      <BulmaCopyInput :value="article.headline" :rows="2"></BulmaCopyInput>
-
-      <h2 class="title">Suggested Description</h2>
-      <BulmaCopyInput :value="article.description" :rows="2"></BulmaCopyInput>
-
-      <h2 class="title">Byline</h2>
-      <BulmaCopyInput :value="article.byline"></BulmaCopyInput>
-
-      <APIArticleContents :article="article"></APIArticleContents>
-
-      <details class="block">
-        <summary class="title">Budget details</summary>
-        <p class="content">
-          {{ article.budgetLine }}
-        </p>
-      </details>
-      <details class="block">
-        <summary class="title">Raw JSON</summary>
-        <pre class="code">{{ article.rawData | json }}</pre>
-      </details>
+      <ArticleDetails :article="article"></ArticleDetails>
     </APIArticle>
   </APILoader>
 </template>

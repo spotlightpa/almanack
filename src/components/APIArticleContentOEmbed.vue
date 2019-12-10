@@ -1,9 +1,9 @@
 <script>
-import BulmaCopyInput from "./BulmaCopyInput.vue";
+import CopyWithButton from "./CopyWithButton.vue";
 
 export default {
   components: {
-    BulmaCopyInput,
+    CopyWithButton,
   },
   props: {
     block: Object,
@@ -26,11 +26,11 @@ export default {
         {{ block.raw_oembed.url }}</a
       >
     </h3>
-    <BulmaCopyInput
+    <CopyWithButton
       :value="block.raw_oembed.html"
       :rows="4"
       size="is-small"
       label="Code"
-    ></BulmaCopyInput>
+    ></CopyWithButton>
   </figure>
 </template>

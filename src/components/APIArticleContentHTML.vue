@@ -1,9 +1,9 @@
 <script>
-import BulmaCopyInput from "./BulmaCopyInput.vue";
+import CopyWithButton from "./CopyWithButton.vue";
 
 export default {
   components: {
-    BulmaCopyInput,
+    CopyWithButton,
   },
   props: {
     block: Object,
@@ -15,11 +15,11 @@ export default {
 <template>
   <figure class="block">
     <h2 class="subtitle is-4">Embed #{{ n }}: Raw HTML</h2>
-    <BulmaCopyInput
+    <CopyWithButton
       :value="block.content"
       :rows="4"
       size="is-small"
       label="Code"
-    ></BulmaCopyInput>
+    ></CopyWithButton>
   </figure>
 </template>

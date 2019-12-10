@@ -1,9 +1,15 @@
 <script>
 import DOMInnerHTML from "./DOMInnerHTML.vue";
+import APIArticleSlugLine from "./APIArticleSlugLine.vue";
+import CopyTextarea from "./CopyTextarea.vue";
+import CopyWithButton from "./CopyWithButton.vue";
 
 export default {
   components: {
     DOMInnerHTML,
+    APIArticleSlugLine,
+    CopyTextarea,
+    CopyWithButton,
   },
   props: {
     article: { type: Object, required: true },
@@ -20,41 +26,36 @@ export default {
       return this.article.embedComponents;
     },
   },
-  methods: {
-    async copy(kind) {
-      let doHTML = kind === "html";
-      if (doHTML != this.viewHTML) {
-        this.viewHTML = !this.viewHTML;
-        await this.$nextTick();
-      }
-      if (doHTML) {
-        this.selectHTML();
-      } else {
-        this.selectContent();
-      }
-      if (document.execCommand("copy")) {
-        this.copied = true;
-        window.setTimeout(() => {
-          this.copied = false;
-        }, 5000); // 5s
-      }
-    },
-    selectHTML() {
-      this.$refs.htmlEl.select();
-    },
-    selectContent() {
-      let range = document.createRange();
-      range.selectNodeContents(this.$refs.richtextEl);
-      let selection = window.getSelection();
-      selection.removeAllRanges();
-      selection.addRange(range);
-    },
-  },
 };
 </script>
 
 <template>
-  <div class="block">
+  <div>
+    <h1 class="title has-text-grey">
+      <APIArticleSlugLine :article="article"></APIArticleSlugLine>
+    </h1>
+    <h2 class="title">
+      Planned for
+      {{ article.plannedDate | formatDate }}
+    </h2>
+    <template v-if="article.note">
+      <h2 class="title is-stacked">
+        Internal Note
+      </h2>
+      <p class="content has-margin-top-negative">
+        {{ article.note }}
+      </p>
+    </template>
+
+    <h2 class="title">Suggested Hed</h2>
+    <CopyWithButton :value="article.headline" :rows="2"></CopyWithButton>
+
+    <h2 class="title">Suggested Description</h2>
+    <CopyWithButton :value="article.description" :rows="2"></CopyWithButton>
+
+    <h2 class="title">Byline</h2>
+    <CopyWithButton :value="article.byline"></CopyWithButton>
+
     <h2 v-if="embeds.length === 1" class="title">
       Embed
     </h2>
@@ -87,7 +88,10 @@ export default {
             <button
               class="button is-primary has-text-weight-semibold"
               type="button"
-              @click="copy('richtext')"
+              @click="
+                viewHTML = false;
+                $refs.copyRichText.copy();
+              "
             >
               <span class="icon">
                 <font-awesome-icon :icon="['far', 'copy']" />
@@ -115,7 +119,10 @@ export default {
             <button
               class="button is-primary has-text-weight-semibold"
               type="button"
-              @click="copy('html')"
+              @click="
+                viewHTML = true;
+                $refs.copyHTML.copy();
+              "
             >
               <span class="icon">
                 <font-awesome-icon :icon="['far', 'copy']" />
@@ -139,22 +146,19 @@ export default {
       </div>
     </div>
 
-    <div
-      v-if="!viewHTML"
-      class="textarea height-50vh"
-      contenteditable
-      @focus="selectContent"
+    <CopyTextarea
+      v-show="!viewHTML"
+      ref="copyRichText"
+      size="content height-50vh"
     >
-      <div ref="richtextEl" class="content">
-        <component
-          :is="block.component"
-          v-for="(block, i) of article.contentComponents"
-          ref="contentsEls"
-          :key="i"
-          :block="block.block"
-        ></component>
-      </div>
-    </div>
+      <component
+        :is="block.component"
+        v-for="(block, i) of article.contentComponents"
+        ref="contentsEls"
+        :key="i"
+        :block="block.block"
+      ></component>
+    </CopyTextarea>
 
     <DOMInnerHTML @mounted="articleHTML = $event">
       <component
@@ -165,21 +169,29 @@ export default {
       ></component>
     </DOMInnerHTML>
 
-    <textarea
-      v-if="viewHTML"
-      ref="htmlEl"
-      class="textarea is-small height-50vh"
-      @click.once="selectHTML"
-      @focus="selectHTML"
+    <CopyTextarea
+      v-show="viewHTML"
+      ref="copyHTML"
+      size="is-small height-50vh"
       v-text="articleHTML"
-    >
-    </textarea>
+    ></CopyTextarea>
+
+    <details class="block">
+      <summary class="title">Budget details</summary>
+      <p class="content">
+        {{ article.budgetLine }}
+      </p>
+    </details>
+    <details class="block">
+      <summary class="title">Raw JSON</summary>
+      <pre class="code">{{ article.rawData | json }}</pre>
+    </details>
   </div>
 </template>
 
 <style>
 .height-50vh {
-  height: 50vh;
+  height: 50vh !important;
   overflow-y: scroll;
 }
 </style>

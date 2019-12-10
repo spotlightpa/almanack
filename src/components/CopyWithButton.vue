@@ -1,9 +1,13 @@
 <script>
+import CopyTextarea from "./CopyTextarea.vue";
+
 export default {
-  name: "BulmaCopyInput",
+  name: "CopyWithButton",
+  components: {
+    CopyTextarea,
+  },
   props: {
     value: String,
-    rows: { type: Number, default: 1 },
     label: {
       type: String,
       default: "text",
@@ -15,33 +19,8 @@ export default {
   },
   data() {
     return {
-      isFocused: false,
       copied: false,
     };
-  },
-  methods: {
-    click() {
-      if (!this.isFocused) {
-        this.isFocused = true;
-        this.select();
-      }
-    },
-    select() {
-      let range = document.createRange();
-      range.selectNodeContents(this.$refs.textarea);
-      let selection = window.getSelection();
-      selection.removeAllRanges();
-      selection.addRange(range);
-    },
-    copy() {
-      this.select();
-      if (document.execCommand("copy")) {
-        this.copied = true;
-        window.setTimeout(() => {
-          this.copied = false;
-        }, 5000); // 5s
-      }
-    },
   },
 };
 </script>
@@ -50,17 +29,11 @@ export default {
   <div class="has-margin-bottom">
     <div class="field">
       <div class="control">
-        <div
-          ref="textarea"
-          class="textarea pre-wrap"
-          rows="bulmaoverride"
-          :class="size"
-          contenteditable
-          @click="click"
-          @blur="isFocused = false"
-          @focus="select"
+        <CopyTextarea
+          ref="copier"
+          @copied="copied = $event"
           v-text="value"
-        ></div>
+        ></CopyTextarea>
       </div>
     </div>
     <div class="field">
@@ -69,7 +42,7 @@ export default {
           type="button"
           class="button is-primary has-text-weight-semibold"
           title="Copy"
-          @click="copy"
+          @click="$refs.copier.copy()"
         >
           <span class="icon">
             <font-awesome-icon :icon="['far', 'copy']" />
@@ -92,13 +65,5 @@ export default {
 <style scoped>
 .fade {
   transition: all 0.5s ease;
-}
-
-.is-invisible {
-  opacity: 0;
-}
-
-.pre-wrap {
-  white-space: pre-wrap;
 }
 </style>
