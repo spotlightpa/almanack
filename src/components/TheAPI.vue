@@ -1,4 +1,8 @@
 <script>
+function cmp(a, b) {
+  return a === b ? 0 : a < b ? -1 : 1;
+}
+
 export default {
   name: "TheAPI",
   props: {
@@ -19,8 +23,10 @@ export default {
         this.feed &&
         Array.from(this.feed.contents).sort(
           (a, b) =>
-            a.planning.scheduling.planned_publish_date <=
-            b.planning.scheduling.planned_publish_date
+            -cmp(
+              a.planning.scheduling.planned_publish_date,
+              b.planning.scheduling.planned_publish_date
+            )
         )
       );
     },
