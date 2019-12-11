@@ -267,17 +267,5 @@ func (a *app) upcoming(w http.ResponseWriter, r *http.Request) {
 		a.errorResponse(w, err)
 		return
 	}
-
-	// Filter out sub-drafts
-	if userinfo := getNetlifyID(r); a.isLambda && !userinfo.HasRole("admin") {
-		i := 0
-		for _, c := range feed.Contents {
-			if c.Workflow.StatusCode >= statusReady {
-				feed.Contents[i] = c
-				i++
-			}
-		}
-		feed.Contents = feed.Contents[:i]
-	}
 	a.jsonResponse(http.StatusOK, w, feed)
 }

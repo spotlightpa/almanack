@@ -14,13 +14,19 @@ export default {
         "not ready": "is-danger",
       }[this.article.status];
     },
+    linkTag() {
+      if (this.$auth.hasRole("Spotlight PA")) {
+        return "router-link";
+      }
+      return this.article.status !== "not ready" ? "router-link" : "span";
+    },
   },
 };
 </script>
 
 <template>
   <span>
-    <router-link :to="article.detailsRoute" class="middle">
+    <router-link :is="linkTag" :to="article.detailsRoute" class="middle">
       <font-awesome-icon :icon="['far', 'newspaper']" />
       {{ article.slug }}
     </router-link>
