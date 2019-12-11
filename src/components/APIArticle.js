@@ -1,28 +1,28 @@
 import { commaAndJoiner } from "@/filters/commaand.js";
 
-import APIArticleContentImage from "./APIArticleContentImage.vue";
-import APIArticleContentList from "./APIArticleContentList.vue";
-import APIArticleContentHTML from "./APIArticleContentHTML.vue";
-import APIArticleContentHeader from "./APIArticleContentHeader.vue";
-import APIArticleContentText from "./APIArticleContentText.vue";
-import APIArticleContentPlaceholder from "./APIArticleContentPlaceholder.vue";
-import APIArticleContentOEmbed from "./APIArticleContentOEmbed.vue";
+import APIArticleImage from "./APIArticleImage.vue";
+import APIArticleList from "./APIArticleList.vue";
+import APIArticleHTML from "./APIArticleHTML.vue";
+import APIArticleHeader from "./APIArticleHeader.vue";
+import APIArticleText from "./APIArticleText.vue";
+import APIArticlePlaceholder from "./APIArticlePlaceholder.vue";
+import APIArticleOEmbed from "./APIArticleOEmbed.vue";
 
 function cmp(a, b) {
   return a === b ? 0 : a < b ? -1 : 1;
 }
 
 let contentComponentsTypes = {
-  header: APIArticleContentHeader,
-  list: APIArticleContentList,
-  text: APIArticleContentText,
+  header: APIArticleHeader,
+  list: APIArticleList,
+  text: APIArticleText,
 };
 
 let embedComponentsTypes = {
-  code: APIArticleContentHTML,
-  image: APIArticleContentImage,
-  oembed_response: APIArticleContentOEmbed,
-  raw_html: APIArticleContentHTML,
+  code: APIArticleHTML,
+  image: APIArticleImage,
+  oembed_response: APIArticleOEmbed,
+  raw_html: APIArticleHTML,
 };
 
 let htmlComponentsTypes = {
@@ -114,7 +114,7 @@ export class Article {
         embedcount++;
         let n = embedcount;
         return {
-          component: APIArticleContentPlaceholder,
+          component: APIArticlePlaceholder,
           block: { n },
         };
       }
@@ -171,7 +171,7 @@ export class Article {
       if (embedComponentsTypes[block.type]) {
         let n = embedcount;
         return {
-          component: APIArticleContentPlaceholder,
+          component: APIArticlePlaceholder,
           block: { n },
         };
       }
