@@ -21,7 +21,7 @@ export default {
       Source:
       <a :href="block.raw_oembed.url" target="_blank">
         <span class="is-size-6">
-          <font-awesome-icon class="" :icon="['fas', 'link']" />
+          <font-awesome-icon :icon="['fas', 'link']" />
         </span>
         {{ block.raw_oembed.url }}</a
       >

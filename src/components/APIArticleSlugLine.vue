@@ -35,8 +35,8 @@ export default {
           target="_blank"
           :title="`${article.slug} on SpotlightPA.org`"
         >
-          <span class="is-size-6">
-            <font-awesome-icon class="" :icon="['fas', 'link']" />
+          <span class="icon is-size-6">
+            <font-awesome-icon :icon="['fas', 'link']" />
           </span>
           {{ article.status | capfirst }}
         </a>
@@ -49,8 +49,8 @@ export default {
           :href="article.arcURL"
           target="_blank"
         >
-          <span class="is-size-6">
-            <font-awesome-icon class="" :icon="['fas', 'link']" />
+          <span class="icon is-size-6">
+            <font-awesome-icon :icon="['fas', 'link']" />
           </span>
           <span>
             View in Arc
