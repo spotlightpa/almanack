@@ -17,9 +17,7 @@ export default {
   <div>
     <h2 class="title">
       Welcome, {{ $auth.fullName }}
-      <small v-if="$auth.roles.length">
-        (<span v-for="role of $auth.roles" :key="role" v-text="role"></span>)
-      </small>
+      <small v-if="$auth.roles.length"> ({{ $auth.roles | commaand }}) </small>
     </h2>
     <p class="content">
       Please note that this is an internal content distribution system, not
