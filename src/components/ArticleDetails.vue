@@ -1,5 +1,6 @@
 <script>
 import APIArticleSlugLine from "./APIArticleSlugLine.vue";
+import APIArticleWordCount from "./APIArticleWordCount.vue";
 import CopyTextarea from "./CopyTextarea.vue";
 import CopyWithButton from "./CopyWithButton.vue";
 import DOMInnerHTML from "./DOMInnerHTML.vue";
@@ -8,6 +9,7 @@ import ImageThumbnail from "./ImageThumbnail.vue";
 export default {
   components: {
     APIArticleSlugLine,
+    APIArticleWordCount,
     CopyTextarea,
     CopyWithButton,
     DOMInnerHTML,
@@ -199,10 +201,7 @@ export default {
       <p class="content">
         {{ article.budgetLine }}
       </p>
-    </details>
-    <details class="block">
-      <summary class="title">Raw JSON</summary>
-      <pre class="code">{{ article.rawData | json }}</pre>
+      <APIArticleWordCount :article="article"></APIArticleWordCount>
     </details>
   </div>
 </template>

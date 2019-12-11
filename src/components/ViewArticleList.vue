@@ -1,11 +1,13 @@
 <script>
 import APIArticleSlugLine from "./APIArticleSlugLine.vue";
+import APIArticleWordCount from "./APIArticleWordCount.vue";
 import APILoader from "./APILoader.vue";
 
 export default {
   name: "ViewArticleList",
   components: {
     APIArticleSlugLine,
+    APIArticleWordCount,
     APILoader,
   },
 };
@@ -50,45 +52,14 @@ export default {
               {{ article.authors | commaand }}
             </p>
             <p>
-              <strong>Planned for:</strong>
+              <strong>Planned time:</strong>
               {{ article.plannedDate | formatDate }}
             </p>
             <p class="has-margin-top-thin content is-small">
               {{ article.budgetLine }}
             </p>
 
-            <div class="level is-mobile is-clipped">
-              <div class="level-left">
-                <p v-if="article.plannedWordCount" class="level-item">
-                  <span>
-                    <strong>Planned Word Count:</strong>
-                    {{ article.plannedWordCount | intcomma }}
-                  </span>
-                </p>
-
-                <p
-                  v-if="article.actualWordCount"
-                  class="level-item is-hidden-mobile"
-                >
-                  <span>
-                    <strong>Word Count:</strong>
-                    {{ article.actualWordCount | intcomma }}
-                  </span>
-                </p>
-                <p class="level-item is-hidden-mobile">
-                  <span>
-                    <strong>Lines:</strong>
-                    {{ article.actualLineCount }}
-                  </span>
-                </p>
-                <p class="level-item is-hidden-mobile">
-                  <span>
-                    <strong>Column inches:</strong>
-                    {{ article.actualInchCount }}
-                  </span>
-                </p>
-              </div>
-            </div>
+            <APIArticleWordCount :article="article"></APIArticleWordCount>
           </div>
         </article>
       </nav>
