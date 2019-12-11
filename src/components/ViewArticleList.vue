@@ -20,7 +20,15 @@ export default {
       </small>
     </h2>
     <p class="content">
-      TKTK lorem ipsum.
+      Please note that this is an internal content distribution system, not
+      intended for public use. Please
+      <strong>do not share this URL</strong> with anyone besides the appointed
+      contacts at your organization and please be mindful of the notes and
+      embargos attached to each story. For assistance or if you have any
+      questions, please contact Joanna Bernstein (<a
+        href="mailto:joanna@spotlightpa.org"
+        >joanna@spotlightpa.org</a
+      >).
     </p>
     <APILoader role="editor">
       <nav class="panel is-black">
