@@ -30,9 +30,9 @@ func SetRounderTripper(c *http.Client, l *log.Logger) {
 
 func (rc *requestCache) Get(req *http.Request) (*http.Response, bool) {
 	rc.l.RLock()
-	defer rc.l.RUnlock()
-
 	b, ok := rc.m[[...]string{req.Method, req.URL.String()}]
+	rc.l.RUnlock()
+
 	if !ok {
 		return nil, false
 	}
