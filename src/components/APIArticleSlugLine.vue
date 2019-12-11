@@ -20,12 +20,12 @@ export default {
 
 <template>
   <span>
-    <router-link :to="article.detailsRoute">
+    <router-link :to="article.detailsRoute" class="middle">
       <font-awesome-icon :icon="['far', 'newspaper']" />
       {{ article.slug }}
     </router-link>
 
-    <span class="is-inline-flex">
+    <span class="is-inline-flex middle">
       <span class="tags has-addons">
         <span class="tag is-light">Status</span>
         <a
@@ -38,14 +38,16 @@ export default {
           <span class="icon is-size-6">
             <font-awesome-icon :icon="['fas', 'link']" />
           </span>
-          {{ article.status | capfirst }}
+          <span>
+            {{ article.status | capfirst }}
+          </span>
         </a>
         <span v-else class="tag is-small" :class="tagStyle">{{
           article.status | capfirst
         }}</span>
         <a
           v-if="$auth.hasRole('arc user')"
-          class="tag is-link"
+          class="tag is-primary"
           :href="article.arcURL"
           target="_blank"
         >
