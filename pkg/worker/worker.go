@@ -19,6 +19,7 @@ import (
 	"github.com/peterbourgon/ff"
 
 	"github.com/spotlightpa/almanack/internal/jsonschema"
+	"github.com/spotlightpa/almanack/internal/redisflag"
 )
 
 const AppName = "almanack-worker"
@@ -39,10 +40,9 @@ func parseArgs(args []string) (*app, error) {
 	var a app
 	fl := flag.NewFlagSet(AppName, flag.ContinueOnError)
 	fl.StringVar(&a.srcFeedURL, "src-feed", "", "source URL for Arc feed")
-	fl.StringVar(&a.mcapi, "mc-api-key", "", "API key for MailChimp")
-	fl.StringVar(&a.mclistid, "mc-list-id", "", "List ID MailChimp campaign")
-	redaddr := fl.String("redis-address", "", `Address for Redis connection pool`)
-	redpassword := fl.String("redis-password", "", `Password for Redis connection pool`)
+	fl.StringVar(&a.mcapi, "mc-api-key", "", "API `key` for MailChimp")
+	fl.StringVar(&a.mclistid, "mc-list-id", "", "List `ID` MailChimp campaign")
+	fl.Var(redisflag.Value(&a.rp), "redis-url", "`URL` connection string for Redis")
 	a.Logger = log.New(nil, AppName+" ", log.LstdFlags)
 	fl.Var(
 		flagext.Logger(a.Logger, flagext.LogSilent),
@@ -60,8 +60,6 @@ func parseArgs(args []string) (*app, error) {
 		return nil, err
 	}
 
-	a.rp = newPool(*redaddr, *redpassword)
-
 	return &a, nil
 }
 
@@ -69,33 +67,8 @@ type app struct {
 	srcFeedURL string
 	mcapi      string
 	mclistid   string
-	rp         *redis.Pool
+	rp         redis.Pool
 	*log.Logger
-}
-
-func newPool(addr, password string) *redis.Pool {
-	if addr == "" {
-		return nil
-	}
-	dialer := func() (redis.Conn, error) { return redis.Dial("tcp", addr) }
-	if password != "" {
-		dialer = func() (redis.Conn, error) {
-			c, err := redis.Dial("tcp", addr)
-			if err != nil {
-				return nil, err
-			}
-			if _, err := c.Do("AUTH", password); err != nil {
-				c.Close()
-				return nil, err
-			}
-			return c, nil
-		}
-	}
-	return &redis.Pool{
-		MaxIdle:     3,
-		IdleTimeout: 240 * time.Second,
-		Dial:        dialer,
-	}
 }
 
 func (a *app) exec() error {
@@ -108,8 +81,6 @@ func (a *app) exec() error {
 	if err := a.fetchJSON(a.srcFeedURL, &newfeed); err != nil {
 		return err
 	}
-
-	// newfeed.Contents[2].Workflow.StatusCode = 0
 
 	a.Println("checking redis")
 	err := a.GetSet("almanack-worker.feed", &oldfeed, &newfeed)
