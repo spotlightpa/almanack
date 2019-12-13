@@ -5,6 +5,11 @@ import (
 	"time"
 )
 
+const (
+	StatusReady     = 5
+	StatusPublished = 6
+)
+
 type API struct {
 	Version  string     `json:"apiVersion"`
 	Contents []Contents `json:"contents"`
