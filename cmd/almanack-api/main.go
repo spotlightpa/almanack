@@ -4,9 +4,9 @@ import (
 	"os"
 
 	"github.com/carlmjohnson/exitcode"
-	"github.com/spotlightpa/almanack/pkg/almanack"
+	"github.com/spotlightpa/almanack/pkg/api"
 )
 
 func main() {
-	exitcode.Exit(almanack.CLI(os.Args[1:]))
+	exitcode.Exit(api.CLI(os.Args[1:]))
 }

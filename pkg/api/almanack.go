@@ -1,4 +1,4 @@
-package almanack
+package api
 
 import (
 	"context"
@@ -253,11 +253,6 @@ func (a *app) fetchJSON(ctx context.Context, method, url string, v interface{}) 
 
 	return nil
 }
-
-const (
-	statusReady     = 5
-	statusPublished = 6
-)
 
 func (a *app) upcoming(w http.ResponseWriter, r *http.Request) {
 	a.Println("start upcoming")

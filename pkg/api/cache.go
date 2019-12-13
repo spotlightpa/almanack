@@ -1,4 +1,4 @@
-package almanack
+package api
 
 import (
 	"bufio"
@@ -10,8 +10,7 @@ import (
 )
 
 type requestCache struct {
-	m map[[2]string][]byte
-	l sync.RWMutex
+	m sync.Map
 	r http.RoundTripper
 	*log.Logger
 }
@@ -22,20 +21,18 @@ func SetRounderTripper(c *http.Client, l *log.Logger) {
 		r = http.DefaultTransport
 	}
 	c.Transport = &requestCache{
-		m:      make(map[[2]string][]byte),
 		r:      r,
 		Logger: l,
 	}
 }
 
 func (rc *requestCache) Get(req *http.Request) (*http.Response, bool) {
-	rc.l.RLock()
-	b, ok := rc.m[[...]string{req.Method, req.URL.String()}]
-	rc.l.RUnlock()
-
+	key := [...]string{req.Method, req.URL.String()}
+	v, ok := rc.m.Load(key)
 	if !ok {
 		return nil, false
 	}
+	b := v.([]byte)
 	resp, err := http.ReadResponse(bufio.NewReader(bytes.NewReader(b)), req)
 	if err != nil {
 		rc.Printf("unexpected cache get error: %v", err)
@@ -45,14 +42,12 @@ func (rc *requestCache) Get(req *http.Request) (*http.Response, bool) {
 }
 
 func (rc *requestCache) Set(req *http.Request, resp *http.Response) error {
-	rc.l.Lock()
-	defer rc.l.Unlock()
-
 	b, err := httputil.DumpResponse(resp, true)
 	if err != nil {
 		return err
 	}
-	rc.m[[...]string{req.Method, req.URL.String()}] = b
+	key := [...]string{req.Method, req.URL.String()}
+	rc.m.Store(key, b)
 	fullresp, err := http.ReadResponse(bufio.NewReader(bytes.NewReader(b)), req)
 	*resp = *fullresp
 	return err
