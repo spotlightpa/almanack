@@ -59,7 +59,11 @@ func parseArgs(args []string) (*app, error) {
 	if err := ff.Parse(fl, args, ff.WithEnvVarPrefix("ALMANACK")); err != nil {
 		return nil, err
 	}
-
+	if a.rp.Dial == nil {
+		fmt.Fprint(fl.Output(), "Must set -redis-url\n\n")
+		fl.Usage()
+		return nil, flag.ErrHelp
+	}
 	return &a, nil
 }
 
