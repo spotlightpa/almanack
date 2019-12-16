@@ -12,9 +12,7 @@ import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 
 import App from "./components/TheApp.vue";
 import router from "./router.js";
-import { AuthPlugin } from "./plugins/auth.js";
-import { APIPlugin } from "./plugins/api.js";
-
+import APIPlugin from "./api/plugin.js";
 import "./filters/index.js";
 
 library.add(
@@ -27,7 +25,6 @@ library.add(
 );
 
 Vue.component("font-awesome-icon", FontAwesomeIcon);
-Vue.use(AuthPlugin);
 Vue.use(APIPlugin);
 
 Vue.config.ignoredElements = ["raw-html"];

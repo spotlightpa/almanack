@@ -1,10 +1,12 @@
 <script>
 export default {
   name: "ViewLogin",
-  mounted() {
-    if (this.$auth.isSignedIn) {
-      this.$router.push({ name: "home" });
-    }
+  beforeRouteEnter(to, from, next) {
+    next(vm => {
+      if (vm.$auth.isSignedIn.value) {
+        next({ name: "home" });
+      }
+    });
   },
 };
 </script>

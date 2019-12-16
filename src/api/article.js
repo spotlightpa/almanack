@@ -1,12 +1,12 @@
 import { commaAndJoiner } from "@/filters/commaand.js";
 
-import APIArticleImage from "./APIArticleImage.vue";
-import APIArticleList from "./APIArticleList.vue";
-import APIArticleHTML from "./APIArticleHTML.vue";
-import APIArticleHeader from "./APIArticleHeader.vue";
-import APIArticleText from "./APIArticleText.vue";
-import APIArticlePlaceholder from "./APIArticlePlaceholder.vue";
-import APIArticleOEmbed from "./APIArticleOEmbed.vue";
+import APIArticleImage from "@/components/APIArticleImage.vue";
+import APIArticleList from "@/components/APIArticleList.vue";
+import APIArticleHTML from "@/components/APIArticleHTML.vue";
+import APIArticleHeader from "@/components/APIArticleHeader.vue";
+import APIArticleText from "@/components/APIArticleText.vue";
+import APIArticlePlaceholder from "@/components/APIArticlePlaceholder.vue";
+import APIArticleOEmbed from "@/components/APIArticleOEmbed.vue";
 
 function cmp(a, b) {
   return a === b ? 0 : a < b ? -1 : 1;
@@ -31,7 +31,7 @@ let htmlComponentsTypes = {
   raw_html: block => block.content,
 };
 
-export class Article {
+export default class Article {
   static from(data) {
     return data.contents
       .map(a => new Article(a))

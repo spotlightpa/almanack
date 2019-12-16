@@ -47,21 +47,21 @@ export default {
         <div class="navbar-item">
           <div class="buttons">
             <button
-              v-if="!$auth.isSignedIn"
+              v-if="!$auth.isSignedIn.value"
               class="button is-primary has-text-weight-semibold"
               @click="$auth.login"
             >
               Login
             </button>
             <button
-              v-if="!$auth.isSignedIn"
+              v-if="!$auth.isSignedIn.value"
               class="button is-success has-text-weight-semibold"
               @click="$auth.signup"
             >
               Sign up
             </button>
             <button
-              v-if="$auth.isSignedIn"
+              v-if="$auth.isSignedIn.value"
               class="button is-warning has-text-weight-semibold"
               @click="$auth.logout"
             >

@@ -1,4 +1,4 @@
-import TheAPI from "../components/TheAPI.vue";
+import { $auth } from "./auth.js";
 
 const tryTo = promise =>
   promise
@@ -11,7 +11,7 @@ export const endpoints = {
   upcoming: `/api/upcoming`,
 };
 
-function createAPIService($auth) {
+export function createAPIService() {
   async function request(url, options = {}) {
     let headers = await $auth.headers();
     let defaultOpts = {
@@ -36,12 +36,3 @@ function createAPIService($auth) {
     },
   };
 }
-
-export const APIPlugin = {
-  install(Vue) {
-    let APIComp = Vue.extend(TheAPI);
-    Vue.prototype.$api = new APIComp({
-      propsData: { createAPIService },
-    });
-  },
-};

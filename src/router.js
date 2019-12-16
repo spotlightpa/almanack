@@ -5,7 +5,8 @@ import ViewArticleList from "./components/ViewArticleList.vue";
 import ViewError from "./components/ViewError.vue";
 import ViewLogin from "./components/ViewLogin.vue";
 
-import { authComponent } from "./plugins/auth.js";
+import { $auth } from "@/api/auth.js";
+import { watch } from "@vue/composition-api";
 
 Vue.use(Router);
 
@@ -45,15 +46,26 @@ let router = new Router({
 
 router.beforeEach((to, from, next) => {
   if (to.matched.some(record => record.meta.requiresAuth)) {
-    if (!authComponent.isSignedIn) {
+    if (!$auth.isSignedIn.value) {
       next({
         name: "login",
         hash: to.hash, // For verifying tokens etc.
       });
-      return;
+      return false;
     }
   }
   next();
 });
+
+watch(
+  () => $auth.isSignedIn.value,
+  (newStatus, oldStatus) => {
+    if (oldStatus === undefined || newStatus === oldStatus) {
+      return;
+    }
+    let name = newStatus ? "articles" : "login";
+    router.push({ name });
+  }
+);
 
 export default router;

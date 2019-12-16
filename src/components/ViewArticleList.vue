@@ -16,8 +16,10 @@ export default {
 <template>
   <div>
     <h2 class="title">
-      Welcome, {{ $auth.fullName }}
-      <small v-if="$auth.roles.length"> ({{ $auth.roles | commaand }}) </small>
+      Welcome, {{ $auth.fullName.value }}
+      <small v-if="$auth.roles.value.length">
+        ({{ $auth.roles.value | commaand }})
+      </small>
     </h2>
     <p class="content">
       Please note that this is an internal content distribution system, not
@@ -36,7 +38,7 @@ export default {
           Spotlight PA Articles
         </h1>
         <article
-          v-for="article of $api.contents"
+          v-for="article of $api.contents.value"
           :key="article.id"
           class="panel-block"
         >

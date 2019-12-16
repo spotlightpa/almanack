@@ -25,13 +25,13 @@ export default {
       </p>
     </div>
     <progress
-      v-if="$api.loading"
+      v-if="$api.loadingRef.value"
       class="progress is-large is-warning"
       max="100"
     >
       Loading…
     </progress>
-    <div v-if="$api.error" class="message is-danger ">
+    <div v-if="$api.errorRef.value" class="message is-danger ">
       <div class="message-body">
         <p>{{ $api.error }}</p>
         <div class="buttons">
@@ -44,7 +44,7 @@ export default {
         </div>
       </div>
     </div>
-    <div v-if="$auth.hasRole(role) && !$api.loading">
+    <div v-if="$auth.hasRole(role) && !$api.loadingRef.value">
       <slot></slot>
     </div>
   </div>
