@@ -131,8 +131,19 @@ func (a *app) fetchJSON(url string, v interface{}) error {
 	return nil
 }
 
+// Ping Redis
+func (a *app) Ping() (err error) {
+	a.Println("Ping Redis")
+	conn := a.rp.Get()
+	defer errutil.Defer(&err, conn.Close)
+
+	_, err = conn.Do("PING")
+	return
+}
+
 // GetSet converts values to JSON bytes and calls GETSET in Redis
 func (a *app) GetSet(key string, getv, setv interface{}) (err error) {
+	a.Printf("Redis GETSET %q", key)
 	conn := a.rp.Get()
 	defer errutil.Defer(&err, conn.Close)
 
