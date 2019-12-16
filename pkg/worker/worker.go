@@ -204,7 +204,7 @@ const messageTemplate = `
 {{- range . -}}
 {{ .Slug }} now available
 
-https://spotlightpa-almanack.netlify.com/articles/{{ .ID }}
+https://almanack.data.spotlightpa.org/articles/{{ .ID }}
 
 Planned for {{ .Planning.Scheduling.PlannedPublishDate.Format "January 2, 2006" }}
 
