@@ -45,11 +45,6 @@ export class Article {
   }
 
   constructor(rawData) {
-    const getter = pathStr =>
-      pathStr
-        .split(".")
-        .reduce((xs, x) => (xs && xs[x] !== null ? xs[x] : null), rawData);
-
     let props = {
       actualInchCount: "planning.story_length.inch_count_actual",
       actualLineCount: "planning.story_length.line_count_actual",
@@ -64,13 +59,23 @@ export class Article {
       slug: "slug",
       featuredImage: "promo_items.basic.url",
       featuredImageCaption: "promo_items.basic.caption",
-      _featuredImageCredits: "promo_items.basic.credits.by",
     };
 
     this.rawData = rawData;
     for (let [key, val] of Object.entries(props)) {
-      this[key] = getter(val);
+      this[key] = this.getProp(val);
     }
+  }
+
+  getProp(pathStr, { isArray = false } = {}) {
+    let obj = this.rawData;
+    for (let prop of pathStr.split(".")) {
+      obj = obj && obj[prop] !== null ? obj[prop] : null;
+    }
+    if (isArray && !obj) {
+      return [];
+    }
+    return obj;
   }
 
   get pubURL() {
@@ -83,24 +88,25 @@ export class Article {
     return { name: "article", params: { id: this.id } };
   }
   get authors() {
-    return this.rawData.credits.by.map(item => item.name);
+    return this.getProp("credits.by", { isArray: true }).map(item => item.name);
   }
   get byline() {
     return commaAndJoiner(this.authors);
   }
   get status() {
+    let statusCode = this.getProp("workflow.status_code");
     return (
       {
         5: "ready",
         6: "published",
-      }[this.rawData.workflow.status_code] || "not ready"
+      }[statusCode] || "not ready"
     );
   }
   get isPublished() {
     return this.status === "published";
   }
   get featuredImageCredits() {
-    return (this._featuredImageCredits || []).map(
+    return this.getProp("promo_items.basic.credits.by", { isArray: true }).map(
       item => item.byline || item.name
     );
   }
