@@ -4,20 +4,23 @@ import (
 	"flag"
 	"fmt"
 	"net/url"
-	"time"
+	"strconv"
+	"strings"
 
 	"github.com/gomodule/redigo/redis"
 )
 
-func Value(pool *redis.Pool) flag.Getter {
-	return &getter{pool}
+type Dialer = func() (redis.Conn, error)
+
+func Value(dialer *Dialer) flag.Getter {
+	return &getter{dialer}
 }
 
 type getter struct {
-	pool *redis.Pool
+	dialer *Dialer
 }
 
-func (g *getter) Get() interface{} { return g.pool }
+func (g *getter) Get() interface{} { return g.dialer }
 
 func (g *getter) String() string { return "Redis URL" }
 
@@ -30,25 +33,30 @@ func (g *getter) Set(connURL string) error {
 		return fmt.Errorf("invalid redis URL scheme: %q", u.Scheme)
 	}
 	password, _ := u.User.Password()
-
-	dialer := func() (redis.Conn, error) { return redis.Dial("tcp", u.Host) }
-	if password != "" {
-		dialer = func() (redis.Conn, error) {
-			c, err := redis.Dial("tcp", u.Host)
-			if err != nil {
-				return nil, err
-			}
+	db := 0
+	if path := strings.TrimPrefix(u.Path, "/"); path != "" {
+		if db, err = strconv.Atoi(path); err != nil {
+			return err
+		}
+	}
+	*g.dialer = func() (redis.Conn, error) {
+		c, err := redis.Dial("tcp", u.Host)
+		if err != nil {
+			return nil, err
+		}
+		if password != "" {
 			if _, err := c.Do("AUTH", password); err != nil {
 				c.Close()
 				return nil, err
 			}
-			return c, nil
 		}
-	}
-	*g.pool = redis.Pool{
-		MaxIdle:     3,
-		IdleTimeout: 240 * time.Second,
-		Dial:        dialer,
+		if db != 0 {
+			if _, err := c.Do("SELECT", db); err != nil {
+				c.Close()
+				return nil, err
+			}
+		}
+		return c, nil
 	}
 	return nil
 }

@@ -38,11 +38,15 @@ func CLI(args []string) error {
 
 func parseArgs(args []string) (*app, error) {
 	var a app
+	rp := redis.Pool{
+		MaxIdle:     3,
+		IdleTimeout: 240 * time.Second,
+	}
 	fl := flag.NewFlagSet(AppName, flag.ContinueOnError)
 	fl.StringVar(&a.srcFeedURL, "src-feed", "", "source URL for Arc feed")
 	fl.StringVar(&a.mcapi, "mc-api-key", "", "API `key` for MailChimp")
 	fl.StringVar(&a.mclistid, "mc-list-id", "", "List `ID` MailChimp campaign")
-	fl.Var(redisflag.Value(&a.rp), "redis-url", "`URL` connection string for Redis")
+	fl.Var(redisflag.Value(&rp.Dial), "redis-url", "`URL` connection string for Redis")
 	a.Logger = log.New(nil, AppName+" ", log.LstdFlags)
 	fl.Var(
 		flagext.Logger(a.Logger, flagext.LogSilent),
@@ -52,18 +56,19 @@ func parseArgs(args []string) (*app, error) {
 	fl.Usage = func() {
 		fmt.Fprintf(fl.Output(), `almanack-worker help
 
-	Options:
+Options:
 `)
 		fl.PrintDefaults()
 	}
 	if err := ff.Parse(fl, args, ff.WithEnvVarPrefix("ALMANACK")); err != nil {
 		return nil, err
 	}
-	if a.rp.Dial == nil {
+	if rp.Dial == nil {
 		fmt.Fprint(fl.Output(), "Must set -redis-url\n\n")
 		fl.Usage()
 		return nil, flag.ErrHelp
 	}
+	a.rp = &rp
 	return &a, nil
 }
 
@@ -71,7 +76,7 @@ type app struct {
 	srcFeedURL string
 	mcapi      string
 	mclistid   string
-	rp         redis.Pool
+	rp         *redis.Pool
 	*log.Logger
 }
 
