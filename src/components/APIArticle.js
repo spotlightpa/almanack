@@ -33,15 +33,9 @@ let htmlComponentsTypes = {
 
 export class Article {
   static from(data) {
-    return Array.from(data.contents)
-      .sort(
-        (a, b) =>
-          -cmp(
-            a.planning.scheduling.planned_publish_date,
-            b.planning.scheduling.planned_publish_date
-          )
-      )
-      .map(a => new Article(a));
+    return data.contents
+      .map(a => new Article(a))
+      .sort((a, b) => cmp(b.plannedDate, a.plannedDate));
   }
 
   constructor(rawData) {
