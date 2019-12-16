@@ -51,7 +51,6 @@ export class Article {
       plannedDate: "planning.scheduling.planned_publish_date",
       plannedWordCount: "planning.story_length.word_count_planned",
       slug: "slug",
-      featuredImage: "promo_items.basic.url",
       featuredImageCaption: "promo_items.basic.caption",
     };
 
@@ -61,19 +60,22 @@ export class Article {
     }
   }
 
-  getProp(pathStr, { isArray = false } = {}) {
+  getProp(pathStr, { fallback = null } = {}) {
     let obj = this.rawData;
     for (let prop of pathStr.split(".")) {
-      obj = obj && obj[prop] !== null ? obj[prop] : null;
+      if (!obj) {
+        break;
+      }
+      obj = obj[prop];
     }
-    if (isArray && !obj) {
-      return [];
+    if (fallback !== null) {
+      return obj || fallback;
     }
     return obj;
   }
 
   get pubURL() {
-    return "https://www.spotlightpa.org" + this.rawData.website_url;
+    return `https://www.spotlightpa.org${this.rawData.website_url}`;
   }
   get arcURL() {
     return `https://pmn.arcpublishing.com/composer/#!/edit/${this.id}/`;
@@ -82,7 +84,7 @@ export class Article {
     return { name: "article", params: { id: this.id } };
   }
   get authors() {
-    return this.getProp("credits.by", { isArray: true }).map(item => item.name);
+    return this.getProp("credits.by", { fallback: [] }).map(item => item.name);
   }
   get byline() {
     return commaAndJoiner(this.authors);
@@ -99,8 +101,18 @@ export class Article {
   get isPublished() {
     return this.status === "published";
   }
+  get featuredImage() {
+    let url = this.getProp("promo_items.basic.url", { fallback: "" });
+    // Some images haven't been published and can't be used
+    if (url.match(/\/public\//)) {
+      return url;
+    }
+    return this.getProp("promo_items.basic.additional_properties.resizeUrl", {
+      fallback: "",
+    });
+  }
   get featuredImageCredits() {
-    return this.getProp("promo_items.basic.credits.by", { isArray: true }).map(
+    return this.getProp("promo_items.basic.credits.by", { fallback: [] }).map(
       item => item.byline || item.name
     );
   }
