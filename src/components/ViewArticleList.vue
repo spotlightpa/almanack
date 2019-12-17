@@ -2,8 +2,7 @@
 import APIArticleSlugLine from "./APIArticleSlugLine.vue";
 import APIArticleWordCount from "./APIArticleWordCount.vue";
 import APILoader from "./APILoader.vue";
-import { useAuth } from "@/api/auth.js";
-import { useAPI } from "@/api/store.js";
+import { useAuth, useAPI } from "@/api/hooks.js";
 
 export default {
   name: "ViewArticleList",

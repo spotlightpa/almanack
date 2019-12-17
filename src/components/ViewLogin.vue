@@ -1,5 +1,5 @@
 <script>
-import { useAuth } from "@/api/auth.js";
+import { useAuth } from "@/api/hooks.js";
 
 export default {
   name: "ViewLogin",

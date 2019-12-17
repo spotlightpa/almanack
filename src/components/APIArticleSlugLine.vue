@@ -1,6 +1,6 @@
 <script>
 import { computed } from "@vue/composition-api";
-import { useAuth } from "@/api/auth.js";
+import { useAuth } from "@/api/hooks.js";
 
 export default {
   props: {
