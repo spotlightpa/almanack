@@ -1,5 +1,4 @@
 import Vue from "vue";
-
 import { library } from "@fortawesome/fontawesome-svg-core";
 import {
   faCopy,
@@ -9,11 +8,6 @@ import {
 } from "@fortawesome/free-regular-svg-icons";
 import { faFileDownload, faLink } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
-
-import App from "./components/TheApp.vue";
-import router from "./router.js";
-import APIPlugin from "./api/plugin.js";
-import "./filters/index.js";
 
 library.add(
   faCopy,
@@ -25,7 +19,11 @@ library.add(
 );
 
 Vue.component("font-awesome-icon", FontAwesomeIcon);
-Vue.use(APIPlugin);
+
+import router from "./router.js";
+import "./filters/index.js";
+
+import App from "./components/TheApp.vue";
 
 Vue.config.ignoredElements = ["raw-html"];
 

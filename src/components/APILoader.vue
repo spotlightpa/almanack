@@ -1,14 +1,25 @@
 <script>
+import { useAuth } from "@/api/auth.js";
+import { useAPI } from "@/api/store.js";
+
 export default {
   name: "APILoader",
   props: {
     role: String,
   },
+  setup() {
+    let $auth = useAuth();
+    let $api = useAPI();
+    return {
+      $auth,
+      $api,
+    };
+  },
   created() {
     if (this.$auth.hasRole(this.role)) {
       this.$api.load();
     } else {
-      this.$api.loading = false;
+      this.$api.loadingRef.value = false;
     }
   },
 };

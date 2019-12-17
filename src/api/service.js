@@ -1,4 +1,4 @@
-import { $auth } from "./auth.js";
+import { useAuth } from "./auth.js";
 
 const tryTo = promise =>
   promise
@@ -11,7 +11,9 @@ export const endpoints = {
   upcoming: `/api/upcoming`,
 };
 
-export function createAPIService() {
+function makeService() {
+  let $auth = useAuth();
+
   async function request(url, options = {}) {
     let headers = await $auth.headers();
     let defaultOpts = {
@@ -35,4 +37,13 @@ export function createAPIService() {
       return await tryTo(request(endpoints.upcoming));
     },
   };
+}
+
+let service;
+
+export function useService() {
+  if (!service) {
+    service = makeService();
+  }
+  return service;
 }

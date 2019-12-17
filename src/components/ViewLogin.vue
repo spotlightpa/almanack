@@ -1,9 +1,19 @@
 <script>
+import { useAuth } from "@/api/auth.js";
+
 export default {
   name: "ViewLogin",
+  setup() {
+    let { login, signup, isSignedIn } = useAuth();
+    return {
+      login,
+      signup,
+      isSignedIn,
+    };
+  },
   beforeRouteEnter(to, from, next) {
     next(vm => {
-      if (vm.$auth.isSignedIn.value) {
+      if (vm.isSignedIn) {
         next({ name: "home" });
       }
     });
@@ -35,9 +45,9 @@ export default {
     </p>
     <p>
       To use the <strong>Spotlight PA Almanack</strong>, please
-      <a class="has-text-weight-semibold" @click="$auth.login">Login</a>
+      <a class="has-text-weight-semibold" @click="login">Login</a>
       or
-      <a class="has-text-weight-semibold" @click="$auth.signup">Sign up</a>.
+      <a class="has-text-weight-semibold" @click="signup">Sign up</a>.
     </p>
   </div>
 </template>

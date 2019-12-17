@@ -1,10 +1,21 @@
 <script>
+import { computed } from "@vue/composition-api";
+import { useAuth } from "@/api/auth.js";
+
 export default {
   props: {
     article: {
       type: Object,
       required: true,
     },
+  },
+  setup() {
+    let { hasRole } = useAuth();
+
+    return {
+      isSpotlightPAUser: computed(() => hasRole("Spotlight PA")),
+      isArcUser: computed(() => hasRole("arc user")),
+    };
   },
   computed: {
     tagStyle() {
@@ -15,7 +26,7 @@ export default {
       }[this.article.status];
     },
     linkTag() {
-      if (this.$auth.hasRole("Spotlight PA")) {
+      if (this.isSpotlightPAUser) {
         return "router-link";
       }
       return this.article.status !== "not ready" ? "router-link" : "span";
@@ -52,7 +63,7 @@ export default {
           article.status | capfirst
         }}</span>
         <a
-          v-if="$auth.hasRole('arc user')"
+          v-if="isArcUser"
           class="tag is-primary"
           :href="article.arcURL"
           target="_blank"

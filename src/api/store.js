@@ -1,7 +1,10 @@
 import { ref, computed } from "@vue/composition-api";
 import Article from "./article.js";
+import { useService } from "./service.js";
 
-export function useAPI(service) {
+function makeAPI() {
+  let service = useService();
+
   const loadingRef = ref(true);
   const feedRef = ref(null);
   const errorRef = ref(null);
@@ -32,4 +35,13 @@ export function useAPI(service) {
       loadingRef.value = false;
     },
   };
+}
+
+let $api;
+
+export function useAPI() {
+  if (!$api) {
+    $api = makeAPI();
+  }
+  return $api;
 }
