@@ -3,77 +3,72 @@ import { reactive, computed, toRefs } from "@vue/composition-api";
 import netlifyIdentity from "netlify-identity-widget";
 
 function makeAuth() {
-  let data = reactive({
+  let authState = reactive({
     user: null,
     error: null,
   });
 
   netlifyIdentity.on("init", async user => {
-    data.user = user;
+    authState.user = user;
     try {
       await user.jwt();
     } catch (err) {
-      data.error = err;
-      logout();
+      authState.error = err;
+      methods.logout();
     }
   });
   netlifyIdentity.on("login", user => {
-    data.user = user;
+    authState.user = user;
     netlifyIdentity.close();
   });
   netlifyIdentity.on("logout", () => {
-    data.user = null;
+    authState.user = null;
   });
   netlifyIdentity.on("error", err => {
-    data.error = err;
+    authState.error = err;
   });
-  netlifyIdentity.init({ logo: false });
 
   let token = computed(
-    () => (data.user && data.user.token && data.user.token.access_token) || null
+    () =>
+      (authState.user &&
+        authState.user.token &&
+        authState.user.token.access_token) ||
+      null
   );
   let isSignedIn = computed(() => !!token.value);
   let roles = computed(
     () =>
       (isSignedIn.value &&
-        data.user.app_metadata &&
-        data.user.app_metadata.roles) ||
+        authState.user.app_metadata &&
+        authState.user.app_metadata.roles) ||
       []
   );
 
   let fullName = computed(
     () =>
-      (data.user &&
-        data.user.user_metadata &&
-        data.user.user_metadata.full_name) ||
+      (authState.user &&
+        authState.user.user_metadata &&
+        authState.user.user_metadata.full_name) ||
       ""
   );
 
-  function logout() {
-    data.user = null;
-    netlifyIdentity.logout();
-  }
-
-  return {
-    ...toRefs(data),
-
-    isSignedIn,
-    roles,
-    fullName,
-    logout,
-
+  let methods = {
     signup() {
       netlifyIdentity.open("signup");
     },
     login() {
       netlifyIdentity.open("login");
     },
+    logout() {
+      authState.user = null;
+      netlifyIdentity.logout();
+    },
     async headers() {
       let token;
       try {
-        token = await data.user.jwt(true);
+        token = await authState.user.jwt(true);
       } catch (e) {
-        logout();
+        methods.logout();
         throw e;
       }
       return {
@@ -81,8 +76,22 @@ function makeAuth() {
       };
     },
     hasRole(name) {
-      return roles.value.some(role => role === name || role === "admin");
+      return computed(() =>
+        roles.value.some(role => role === name || role === "admin")
+      );
     },
+  };
+
+  netlifyIdentity.init({ logo: false });
+
+  return {
+    ...toRefs(authState),
+
+    isSignedIn,
+    roles,
+    fullName,
+
+    ...methods,
   };
 }
 

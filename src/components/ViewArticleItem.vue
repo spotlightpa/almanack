@@ -1,7 +1,7 @@
 <script>
 import APILoader from "./APILoader.vue";
 import ArticleDetails from "./ArticleDetails.vue";
-import { useAuth, useAPI } from "@/api/hooks.js";
+import { useAPI } from "@/api/hooks.js";
 
 export default {
   name: "ViewArticleItem",
@@ -13,10 +13,8 @@ export default {
     id: String,
   },
   setup() {
-    let $auth = useAuth();
     let $api = useAPI();
     return {
-      $auth,
       $api,
     };
   },

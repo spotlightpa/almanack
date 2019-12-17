@@ -12,10 +12,11 @@ export default {
     APILoader,
   },
   setup() {
-    let $auth = useAuth();
+    let { fullName, roles } = useAuth();
     let $api = useAPI();
     return {
-      $auth,
+      fullName,
+      roles,
       $api,
     };
   },
@@ -25,10 +26,8 @@ export default {
 <template>
   <div>
     <h2 class="title">
-      Welcome, {{ $auth.fullName.value }}
-      <small v-if="$auth.roles.value.length">
-        ({{ $auth.roles.value | commaand }})
-      </small>
+      Welcome, {{ fullName }}
+      <small v-if="roles.length"> ({{ roles | commaand }}) </small>
     </h2>
     <p class="content">
       Please note that this is an internal content distribution system, not

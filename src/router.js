@@ -44,11 +44,11 @@ let router = new Router({
   },
 });
 
-let $auth = useAuth();
+let { isSignedIn } = useAuth();
 
 router.beforeEach((to, from, next) => {
   if (to.matched.some(record => record.meta.requiresAuth)) {
-    if (!$auth.isSignedIn.value) {
+    if (!isSignedIn.value) {
       next({
         name: "login",
         hash: to.hash, // For verifying tokens etc.
@@ -60,7 +60,7 @@ router.beforeEach((to, from, next) => {
 });
 
 watch(
-  () => $auth.isSignedIn.value,
+  () => isSignedIn.value,
   (newStatus, oldStatus) => {
     if (oldStatus === undefined || newStatus === oldStatus) {
       return;

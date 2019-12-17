@@ -1,5 +1,4 @@
 <script>
-import { computed } from "@vue/composition-api";
 import { useAuth } from "@/api/hooks.js";
 
 export default {
@@ -13,8 +12,8 @@ export default {
     let { hasRole } = useAuth();
 
     return {
-      isSpotlightPAUser: computed(() => hasRole("Spotlight PA")),
-      isArcUser: computed(() => hasRole("arc user")),
+      isSpotlightPAUser: hasRole("Spotlight PA"),
+      isArcUser: hasRole("arc user"),
     };
   },
   computed: {

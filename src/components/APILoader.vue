@@ -6,16 +6,16 @@ export default {
   props: {
     role: String,
   },
-  setup() {
-    let $auth = useAuth();
+  setup({ role }) {
+    let { getRole } = useAuth();
     let $api = useAPI();
     return {
-      $auth,
+      hasRole: getRole(role),
       $api,
     };
   },
   created() {
-    if (this.$auth.hasRole(this.role)) {
+    if (this.hasRole) {
       this.$api.load();
     } else {
       this.$api.loadingRef.value = false;
@@ -26,7 +26,7 @@ export default {
 
 <template>
   <div>
-    <div v-if="!$auth.hasRole(role)" class="message is-warning">
+    <div v-if="!hasRole" class="message is-warning">
       <p class="message-body">
         You don't have permission to view upcoming articles, sorry. Please
         contact
@@ -54,7 +54,7 @@ export default {
         </div>
       </div>
     </div>
-    <div v-if="$auth.hasRole(role) && !$api.loadingRef.value">
+    <div v-if="hasRole && !$api.loadingRef.value">
       <slot></slot>
     </div>
   </div>
