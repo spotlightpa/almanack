@@ -18,10 +18,11 @@ function makeAPI() {
   });
 
   let methods = {
-    articleFromID(id) {
-      return computed(() =>
-        apiState.articles.find(article => article.id === id)
-      );
+    articleFromID(idFn) {
+      return computed(() => {
+        let id = idFn();
+        return apiState.articles.find(article => article.id === id);
+      });
     },
     async load() {
       if (!apiState.isLoading) {

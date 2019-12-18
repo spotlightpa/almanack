@@ -12,10 +12,10 @@ export default {
   props: {
     id: String,
   },
-  setup({ id }) {
+  setup(props) {
     let { articleFromID } = useAPI();
     return {
-      article: articleFromID(id),
+      article: articleFromID(() => props.id),
     };
   },
 };

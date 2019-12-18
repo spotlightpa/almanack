@@ -1,4 +1,5 @@
 <script>
+import { watch } from "@vue/composition-api";
 import { useAuth, useAPI } from "@/api/hooks.js";
 
 export default {
@@ -6,31 +7,33 @@ export default {
   props: {
     role: String,
   },
-  setup({ role }) {
+  setup(props) {
     let { hasRole } = useAuth();
     let { isLoading, error, load, reload } = useAPI();
+
+    let roleOK = hasRole(() => props.role);
+    watch(() => {
+      if (roleOK.value) {
+        load();
+      } else {
+        isLoading.value = false;
+      }
+    });
 
     return {
       load,
       isLoading,
       reload,
       error,
-      hasRole: hasRole(role),
+      roleOK,
     };
-  },
-  created() {
-    if (this.hasRole) {
-      this.load();
-    } else {
-      this.isLoading = false;
-    }
   },
 };
 </script>
 
 <template>
   <div>
-    <div v-if="!hasRole" class="message is-warning">
+    <div v-if="!roleOK" class="message is-warning">
       <p class="message-body">
         You don't have permission to view upcoming articles, sorry. Please
         contact
@@ -54,7 +57,7 @@ export default {
         </div>
       </div>
     </div>
-    <div v-if="hasRole && !isLoading">
+    <div v-if="roleOK && !isLoading">
       <slot></slot>
     </div>
   </div>

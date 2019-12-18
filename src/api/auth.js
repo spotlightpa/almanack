@@ -75,10 +75,11 @@ function makeAuth() {
         Authorization: `Bearer ${token}`,
       };
     },
-    hasRole(name) {
-      return computed(() =>
-        roles.value.some(role => role === name || role === "admin")
-      );
+    hasRole(nameFn) {
+      return computed(() => {
+        let name = nameFn();
+        return roles.value.some(role => role === name || role === "admin");
+      });
     },
   };
 

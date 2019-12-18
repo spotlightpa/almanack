@@ -12,8 +12,8 @@ export default {
     let { hasRole } = useAuth();
 
     return {
-      isSpotlightPAUser: hasRole("Spotlight PA"),
-      isArcUser: hasRole("arc user"),
+      isSpotlightPAUser: hasRole(() => "Spotlight PA"),
+      isArcUser: hasRole(() => "arc user"),
     };
   },
   computed: {
