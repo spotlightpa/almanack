@@ -11,7 +11,9 @@ function makeAPI() {
     isLoading: true,
     error: null,
     articles: computed(() =>
-      apiState.isLoading || apiState.error ? [] : Article.from(feed.value)
+      apiState.isLoading || apiState.error || !feed.value
+        ? []
+        : Article.from(feed.value)
     ),
   });
 
