@@ -7,18 +7,22 @@ export default {
     role: String,
   },
   setup({ role }) {
-    let { getRole } = useAuth();
-    let $api = useAPI();
+    let { hasRole } = useAuth();
+    let { isLoading, error, load, reload } = useAPI();
+
     return {
-      hasRole: getRole(role),
-      $api,
+      load,
+      isLoading,
+      reload,
+      error,
+      hasRole: hasRole(role),
     };
   },
   created() {
     if (this.hasRole) {
-      this.$api.load();
+      this.load();
     } else {
-      this.$api.loadingRef.value = false;
+      this.isLoading = false;
     }
   },
 };
@@ -34,27 +38,23 @@ export default {
         to request access.
       </p>
     </div>
-    <progress
-      v-if="$api.loadingRef.value"
-      class="progress is-large is-warning"
-      max="100"
-    >
+    <progress v-if="isLoading" class="progress is-large is-warning" max="100">
       Loading…
     </progress>
-    <div v-if="$api.errorRef.value" class="message is-danger ">
+    <div v-if="error" class="message is-danger ">
       <div class="message-body">
-        <p>{{ $api.error }}</p>
+        <p>{{ error }}</p>
         <div class="buttons">
           <button
             class="button is-danger has-text-weight-semibold"
-            @click="$api.reload"
+            @click="reload"
           >
             Reload?
           </button>
         </div>
       </div>
     </div>
-    <div v-if="hasRole && !$api.loadingRef.value">
+    <div v-if="hasRole && !isLoading">
       <slot></slot>
     </div>
   </div>

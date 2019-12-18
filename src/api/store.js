@@ -1,39 +1,43 @@
-import { ref, computed } from "@vue/composition-api";
+import { reactive, computed, ref, toRefs } from "@vue/composition-api";
 import Article from "./article.js";
 import { useService } from "./service.js";
 
 function makeAPI() {
   let service = useService();
 
-  const loadingRef = ref(true);
-  const feedRef = ref(null);
-  const errorRef = ref(null);
+  const feed = ref(null);
 
-  let contents = computed(() =>
-    loadingRef.value || errorRef.value ? [] : Article.from(feedRef.value)
-  );
+  const apiState = reactive({
+    isLoading: true,
+    error: null,
+    articles: computed(() =>
+      apiState.isLoading || apiState.error ? [] : Article.from(feed.value)
+    ),
+  });
 
-  return {
-    loadingRef,
-    errorRef,
-
-    contents,
-
-    getByID(id) {
-      return contents.value.find(article => article.id === id);
+  let methods = {
+    articleFromID(id) {
+      return computed(() =>
+        apiState.articles.find(article => article.id === id)
+      );
     },
     async load() {
-      if (!loadingRef.value) {
+      if (!apiState.isLoading) {
         return;
       }
-      [feedRef.value, errorRef.value] = await service.upcoming();
-      loadingRef.value = false;
+      [feed.value, apiState.error] = await service.upcoming();
+      apiState.isLoading = false;
     },
     async reload() {
-      loadingRef.value = true;
-      [feedRef.value, errorRef.value] = await service.upcoming();
-      loadingRef.value = false;
+      apiState.isLoading = true;
+      [feed.value, apiState.error] = await service.upcoming();
+      apiState.isLoading = false;
     },
+  };
+
+  return {
+    ...toRefs(apiState),
+    ...methods,
   };
 }
 

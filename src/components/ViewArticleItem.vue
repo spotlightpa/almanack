@@ -12,16 +12,11 @@ export default {
   props: {
     id: String,
   },
-  setup() {
-    let $api = useAPI();
+  setup({ id }) {
+    let { articleFromID } = useAPI();
     return {
-      $api,
+      article: articleFromID(id),
     };
-  },
-  computed: {
-    article() {
-      return this.$api.getByID(this.id);
-    },
   },
 };
 </script>

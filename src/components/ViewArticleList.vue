@@ -13,11 +13,11 @@ export default {
   },
   setup() {
     let { fullName, roles } = useAuth();
-    let $api = useAPI();
+    let { articles } = useAPI();
     return {
       fullName,
       roles,
-      $api,
+      articles,
     };
   },
 };
@@ -46,7 +46,7 @@ export default {
           Spotlight PA Articles
         </h1>
         <article
-          v-for="article of $api.contents.value"
+          v-for="article of articles"
           :key="article.id"
           class="panel-block"
         >
