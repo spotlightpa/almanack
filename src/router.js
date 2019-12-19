@@ -53,7 +53,7 @@ router.beforeEach((to, from, next) => {
         name: "login",
         hash: to.hash, // For verifying tokens etc.
       });
-      return false;
+      return;
     }
   }
   next();
