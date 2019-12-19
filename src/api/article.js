@@ -78,7 +78,7 @@ export default class Article {
     return `https://www.spotlightpa.org${this.rawData.website_url}`;
   }
   get arcURL() {
-    return `https://pmn.arcpublishing.com/composer/#!/edit/${this.id}/`;
+    return `https://pmn.arcpublishing.com/composer/edit/${this.id}/`;
   }
   get detailsRoute() {
     return { name: "article", params: { id: this.id } };
