@@ -1,5 +1,3 @@
-import { useAuth } from "./auth.js";
-
 const tryTo = promise =>
   promise
     // Wrap data/errors
@@ -11,9 +9,7 @@ export const endpoints = {
   upcoming: `/api/upcoming`,
 };
 
-function makeService() {
-  let $auth = useAuth();
-
+export function makeService($auth) {
   async function request(url, options = {}) {
     let headers = await $auth.headers();
     let defaultOpts = {
@@ -37,13 +33,4 @@ function makeService() {
       return await tryTo(request(endpoints.upcoming));
     },
   };
-}
-
-let service;
-
-export function useService() {
-  if (!service) {
-    service = makeService();
-  }
-  return service;
 }

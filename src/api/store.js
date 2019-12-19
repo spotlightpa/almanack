@@ -1,10 +1,7 @@
 import { reactive, computed, ref, toRefs } from "@vue/composition-api";
 import Article from "./article.js";
-import { useService } from "./service.js";
 
-function makeAPI() {
-  let service = useService();
-
+export function makeAPI(service) {
   const feed = ref(null);
 
   const apiState = reactive({
@@ -42,13 +39,4 @@ function makeAPI() {
     ...toRefs(apiState),
     ...methods,
   };
-}
-
-let $api;
-
-export function useAPI() {
-  if (!$api) {
-    $api = makeAPI();
-  }
-  return $api;
 }
