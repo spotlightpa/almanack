@@ -1,5 +1,3 @@
-import TheAPI from "../components/TheAPI.vue";
-
 const tryTo = promise =>
   promise
     // Wrap data/errors
@@ -11,7 +9,7 @@ export const endpoints = {
   upcoming: `/api/upcoming`,
 };
 
-function createAPIService($auth) {
+export function makeService($auth) {
   async function request(url, options = {}) {
     let headers = await $auth.headers();
     let defaultOpts = {
@@ -36,12 +34,3 @@ function createAPIService($auth) {
     },
   };
 }
-
-export const APIPlugin = {
-  install(Vue) {
-    let APIComp = Vue.extend(TheAPI);
-    Vue.prototype.$api = new APIComp({
-      propsData: { createAPIService },
-    });
-  },
-};

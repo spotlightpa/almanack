@@ -1,9 +1,20 @@
 <script>
+import { useAuth } from "@/api/hooks.js";
+
 export default {
   name: "PageNav",
   data() {
     return {
       isOpen: false,
+    };
+  },
+  setup() {
+    let { isSignedIn, login, logout, signup } = useAuth();
+    return {
+      isSignedIn,
+      login,
+      logout,
+      signup,
     };
   },
   methods: {
@@ -46,27 +57,28 @@ export default {
       <div class="navbar-end">
         <div class="navbar-item">
           <div class="buttons">
-            <button
-              v-if="!$auth.isSignedIn"
-              class="button is-primary has-text-weight-semibold"
-              @click="$auth.login"
-            >
-              Login
-            </button>
-            <button
-              v-if="!$auth.isSignedIn"
-              class="button is-success has-text-weight-semibold"
-              @click="$auth.signup"
-            >
-              Sign up
-            </button>
-            <button
-              v-if="$auth.isSignedIn"
-              class="button is-warning has-text-weight-semibold"
-              @click="$auth.logout"
-            >
-              Logout
-            </button>
+            <template v-if="!isSignedIn">
+              <button
+                class="button is-primary has-text-weight-semibold"
+                @click="login"
+              >
+                Login
+              </button>
+              <button
+                class="button is-success has-text-weight-semibold"
+                @click="signup"
+              >
+                Sign up
+              </button>
+            </template>
+            <template v-else>
+              <button
+                class="button is-warning has-text-weight-semibold"
+                @click="logout"
+              >
+                Logout
+              </button>
+            </template>
           </div>
         </div>
       </div>

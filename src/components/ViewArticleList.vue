@@ -2,6 +2,7 @@
 import APIArticleSlugLine from "./APIArticleSlugLine.vue";
 import APIArticleWordCount from "./APIArticleWordCount.vue";
 import APILoader from "./APILoader.vue";
+import { useAuth, useAPI } from "@/api/hooks.js";
 
 export default {
   name: "ViewArticleList",
@@ -10,14 +11,23 @@ export default {
     APIArticleWordCount,
     APILoader,
   },
+  setup() {
+    let { fullName, roles } = useAuth();
+    let { articles } = useAPI();
+    return {
+      fullName,
+      roles,
+      articles,
+    };
+  },
 };
 </script>
 
 <template>
   <div>
     <h2 class="title">
-      Welcome, {{ $auth.fullName }}
-      <small v-if="$auth.roles.length"> ({{ $auth.roles | commaand }}) </small>
+      Welcome, {{ fullName }}
+      <small v-if="roles.length"> ({{ roles | commaand }}) </small>
     </h2>
     <p class="content">
       Please note that this is an internal content distribution system, not
@@ -36,7 +46,7 @@ export default {
           Spotlight PA Articles
         </h1>
         <article
-          v-for="article of $api.contents"
+          v-for="article of articles"
           :key="article.id"
           class="panel-block"
         >

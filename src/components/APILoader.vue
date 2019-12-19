@@ -1,22 +1,39 @@
 <script>
+import { watch } from "@vue/composition-api";
+import { useAuth, useAPI } from "@/api/hooks.js";
+
 export default {
   name: "APILoader",
   props: {
     role: String,
   },
-  created() {
-    if (this.$auth.hasRole(this.role)) {
-      this.$api.load();
-    } else {
-      this.$api.loading = false;
-    }
+  setup(props) {
+    let { hasRole } = useAuth();
+    let { isLoading, error, load, reload } = useAPI();
+
+    let roleOK = hasRole(() => props.role);
+    watch(() => {
+      if (roleOK.value) {
+        load();
+      } else {
+        isLoading.value = false;
+      }
+    });
+
+    return {
+      load,
+      isLoading,
+      reload,
+      error,
+      roleOK,
+    };
   },
 };
 </script>
 
 <template>
   <div>
-    <div v-if="!$auth.hasRole(role)" class="message is-warning">
+    <div v-if="!roleOK" class="message is-warning">
       <p class="message-body">
         You don't have permission to view upcoming articles, sorry. Please
         contact
@@ -24,27 +41,23 @@ export default {
         to request access.
       </p>
     </div>
-    <progress
-      v-if="$api.loading"
-      class="progress is-large is-warning"
-      max="100"
-    >
+    <progress v-if="isLoading" class="progress is-large is-warning" max="100">
       Loading…
     </progress>
-    <div v-if="$api.error" class="message is-danger ">
+    <div v-if="error" class="message is-danger ">
       <div class="message-body">
-        <p>{{ $api.error }}</p>
+        <p>{{ error }}</p>
         <div class="buttons">
           <button
             class="button is-danger has-text-weight-semibold"
-            @click="$api.reload"
+            @click="reload"
           >
             Reload?
           </button>
         </div>
       </div>
     </div>
-    <div v-if="$auth.hasRole(role) && !$api.loading">
+    <div v-if="roleOK && !isLoading">
       <slot></slot>
     </div>
   </div>

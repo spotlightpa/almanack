@@ -1,10 +1,20 @@
 <script>
+import { useAuth } from "@/api/hooks.js";
+
 export default {
   props: {
     article: {
       type: Object,
       required: true,
     },
+  },
+  setup() {
+    let { hasRole } = useAuth();
+
+    return {
+      isSpotlightPAUser: hasRole(() => "Spotlight PA"),
+      isArcUser: hasRole(() => "arc user"),
+    };
   },
   computed: {
     tagStyle() {
@@ -15,7 +25,7 @@ export default {
       }[this.article.status];
     },
     linkTag() {
-      if (this.$auth.hasRole("Spotlight PA")) {
+      if (this.isSpotlightPAUser) {
         return "router-link";
       }
       return this.article.status !== "not ready" ? "router-link" : "span";
@@ -52,7 +62,7 @@ export default {
           article.status | capfirst
         }}</span>
         <a
-          v-if="$auth.hasRole('arc user')"
+          v-if="isArcUser"
           class="tag is-primary"
           :href="article.arcURL"
           target="_blank"

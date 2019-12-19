@@ -1,6 +1,7 @@
 <script>
 import APILoader from "./APILoader.vue";
 import ArticleDetails from "./ArticleDetails.vue";
+import { useAPI } from "@/api/hooks.js";
 
 export default {
   name: "ViewArticleItem",
@@ -11,10 +12,11 @@ export default {
   props: {
     id: String,
   },
-  computed: {
-    article() {
-      return this.$api.getByID(this.id);
-    },
+  setup(props) {
+    let { articleFromID } = useAPI();
+    return {
+      article: articleFromID(() => props.id),
+    };
   },
 };
 </script>
