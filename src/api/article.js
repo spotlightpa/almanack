@@ -31,6 +31,10 @@ let htmlComponentsTypes = {
   raw_html: block => block.content,
 };
 
+let ignoreComponentTypes = {
+  interstitial_link: true,
+};
+
 export default class Article {
   static from(data) {
     return data.contents
@@ -136,6 +140,9 @@ export default class Article {
           block: { n },
         };
       }
+      if (ignoreComponentTypes[block.type]) {
+        return [];
+      }
       // eslint-disable-next-line no-console
       console.warn("unknown block type", block.type, block);
       return [];
@@ -192,6 +199,9 @@ export default class Article {
           component: APIArticlePlaceholder,
           block: { n },
         };
+      }
+      if (ignoreComponentTypes[block.type]) {
+        return [];
       }
       // eslint-disable-next-line no-console
       console.warn("unknown block type", block.type, block);
