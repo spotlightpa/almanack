@@ -106,12 +106,35 @@ export default class Article {
     return commaAndJoiner(this.authors);
   }
   get status() {
+    let published =
+      this.getProp("additional_properties.is_published") ||
+      this.getProp("additional_properties.has_published_copy");
+    if (published) {
+      return "published";
+    }
     let statusCode = this.getProp("workflow.status_code");
     return (
       {
-        5: "ready",
-        6: "published",
-      }[statusCode] || "not ready"
+        1: "notReadyWorking",
+        2: "notReadyAssigning",
+        3: "notReadySecondEdit",
+        4: "notReadyRim",
+        5: "readySlot",
+        6: "readyDone",
+      }[statusCode] || "unknown"
+    );
+  }
+  get statusVerbose() {
+    return (
+      {
+        notReadyWorking: "Working",
+        notReadyAssigning: "Assigning",
+        notReadySecondEdit: "Second Edit",
+        notReadyRim: "Rim",
+        readySlot: "Slot",
+        readyDone: "Done",
+        published: "Published",
+      }[this.status] || "Unknown"
     );
   }
   get isPublished() {

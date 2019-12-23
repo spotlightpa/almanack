@@ -18,17 +18,21 @@ export default {
   },
   computed: {
     tagStyle() {
-      return {
-        published: "is-success",
-        ready: "is-warning",
-        "not ready": "is-danger",
-      }[this.article.status];
+      if (this.article.status === "published") {
+        return "is-success";
+      }
+      if (this.article.status.startsWith("ready")) {
+        return "is-warning";
+      }
+      return "is-danger";
     },
     linkTag() {
       if (this.isSpotlightPAUser) {
         return "router-link";
       }
-      return this.article.status !== "not ready" ? "router-link" : "span";
+      return this.article.status.startsWith("notReady")
+        ? "span"
+        : "router-link";
     },
   },
 };
@@ -55,11 +59,11 @@ export default {
             <font-awesome-icon :icon="['fas', 'link']" />
           </span>
           <span>
-            {{ article.status | capfirst }}
+            {{ article.statusVerbose }}
           </span>
         </a>
         <span v-else class="tag is-small" :class="tagStyle">{{
-          article.status | capfirst
+          article.statusVerbose
         }}</span>
         <a
           v-if="isArcUser"

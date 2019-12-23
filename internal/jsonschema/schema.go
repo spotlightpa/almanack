@@ -6,8 +6,12 @@ import (
 )
 
 const (
-	StatusReady     = 5
-	StatusPublished = 6
+	StatusWorking    = 1
+	StatusAssigning  = 2
+	StatusSecondEdit = 3
+	StatusRim        = 4
+	StatusSlot       = 5
+	StatusDone       = 6
 )
 
 type API struct {
@@ -16,36 +20,43 @@ type API struct {
 }
 
 type Contents struct {
-	CanonicalURL     string             `json:"canonical_url"`
-	CanonicalWebsite string             `json:"canonical_website"`
-	Comments         Comments           `json:"comments"`
-	ContentElements  []*json.RawMessage `json:"content_elements"`
-	CreatedDate      time.Time          `json:"created_date"`
-	Credits          Credits            `json:"credits"`
-	Description      Description        `json:"description"`
-	DisplayDate      time.Time          `json:"display_date,omitempty"`
-	Distributor      Distributor        `json:"distributor"`
-	FirstPublishDate time.Time          `json:"first_publish_date,omitempty"`
-	Headlines        Headlines          `json:"headlines"`
-	ID               string             `json:"_id"`
-	Label            Label              `json:"label"`
-	Language         string             `json:"language"`
-	LastUpdatedDate  time.Time          `json:"last_updated_date"`
-	Owner            Owner              `json:"owner"`
-	Planning         Planning           `json:"planning"`
-	PromoItems       PromoItems         `json:"promo_items"`
-	PublishDate      time.Time          `json:"publish_date,omitempty"`
-	Publishing       Publishing         `json:"publishing"`
-	Slug             string             `json:"slug"`
-	Source           Source             `json:"source"`
-	Subheadlines     Subheadlines       `json:"subheadlines"`
-	Subtype          string             `json:"subtype"`
-	Syndication      Syndication        `json:"syndication"`
-	Type             string             `json:"type"`
-	Version          string             `json:"version"`
-	Website          string             `json:"website"`
-	WebsiteURL       string             `json:"website_url,omitempty"`
-	Workflow         Workflow           `json:"workflow,omitempty"`
+	AdditionalProperties ContentProperties  `json:"additional_properties"`
+	CanonicalURL         string             `json:"canonical_url"`
+	CanonicalWebsite     string             `json:"canonical_website"`
+	Comments             Comments           `json:"comments"`
+	ContentElements      []*json.RawMessage `json:"content_elements"`
+	CreatedDate          time.Time          `json:"created_date"`
+	Credits              Credits            `json:"credits"`
+	Description          Description        `json:"description"`
+	DisplayDate          time.Time          `json:"display_date,omitempty"`
+	Distributor          Distributor        `json:"distributor"`
+	FirstPublishDate     time.Time          `json:"first_publish_date,omitempty"`
+	Headlines            Headlines          `json:"headlines"`
+	ID                   string             `json:"_id"`
+	Label                Label              `json:"label"`
+	Language             string             `json:"language"`
+	LastUpdatedDate      time.Time          `json:"last_updated_date"`
+	Owner                Owner              `json:"owner"`
+	Planning             Planning           `json:"planning"`
+	PromoItems           PromoItems         `json:"promo_items"`
+	PublishDate          time.Time          `json:"publish_date,omitempty"`
+	Publishing           Publishing         `json:"publishing"`
+	Slug                 string             `json:"slug"`
+	Source               Source             `json:"source"`
+	Subheadlines         Subheadlines       `json:"subheadlines"`
+	Subtype              string             `json:"subtype"`
+	Syndication          Syndication        `json:"syndication"`
+	Type                 string             `json:"type"`
+	Version              string             `json:"version"`
+	Website              string             `json:"website"`
+	WebsiteURL           string             `json:"website_url,omitempty"`
+	Workflow             Workflow           `json:"workflow,omitempty"`
+}
+
+type ContentProperties struct {
+	HasPublishedCopy bool            `json:"has_published_copy"`
+	IsPublished      bool            `json:"is_published"`
+	PublishDate      json.RawMessage `json:"publish_date"`
 }
 
 type _contentElement struct {
