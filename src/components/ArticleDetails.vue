@@ -1,4 +1,6 @@
 <script>
+import { useAuth } from "@/api/hooks.js";
+
 import APIArticleSlugLine from "./APIArticleSlugLine.vue";
 import APIArticleWordCount from "./APIArticleWordCount.vue";
 import CopyTextarea from "./CopyTextarea.vue";
@@ -25,10 +27,13 @@ export default {
       articleHTML: "",
     };
   },
-  computed: {
-    embeds() {
-      return this.article.embedComponents;
-    },
+  setup(props) {
+    let { hasRole } = useAuth();
+
+    return {
+      isSpotlightPAUser: hasRole(() => "Spotlight PA"),
+      embeds: props.article.embedComponents,
+    };
   },
 };
 </script>
@@ -51,6 +56,13 @@ export default {
       <p class="content has-margin-top-negative">
         {{ article.note }}
       </p>
+    </template>
+
+    <template v-if="isSpotlightPAUser && article.slugURL">
+      <h1 class="title">
+        Slug
+      </h1>
+      <CopyWithButton :value="article.slugURL" label="slug"></CopyWithButton>
     </template>
 
     <h2 class="title">Suggested Hed</h2>

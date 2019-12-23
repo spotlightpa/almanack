@@ -78,6 +78,18 @@ export default class Article {
     return obj;
   }
 
+  get slugURL() {
+    let slug = this.getProp("canonical_url", { fallback: "" });
+    let stop = slug.lastIndexOf("-");
+    if (stop === -1) {
+      return "";
+    }
+    let start = slug.lastIndexOf("/", stop);
+    if (start === -1) {
+      return "";
+    }
+    return slug.slice(start + 1, stop);
+  }
   get pubURL() {
     return `https://www.spotlightpa.org${this.rawData.website_url}`;
   }
