@@ -161,13 +161,13 @@ func (a *app) GetSet(key string, getv, setv interface{}) (err error) {
 func diffFeed(newfeed, oldfeed jsonschema.API) []jsonschema.Contents {
 	readyids := make(map[string]bool, len(oldfeed.Contents))
 	for _, story := range oldfeed.Contents {
-		if story.Workflow.StatusCode >= jsonschema.StatusReady {
+		if story.Workflow.StatusCode >= jsonschema.StatusSlot {
 			readyids[story.ID] = true
 		}
 	}
 	var newstories []jsonschema.Contents
 	for _, story := range newfeed.Contents {
-		if story.Workflow.StatusCode >= jsonschema.StatusReady &&
+		if story.Workflow.StatusCode >= jsonschema.StatusSlot &&
 			!readyids[story.ID] {
 			newstories = append(newstories, story)
 		}
