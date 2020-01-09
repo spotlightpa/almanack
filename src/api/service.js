@@ -25,12 +25,28 @@ export function makeService($auth) {
     return await resp.json();
   }
 
+  let requestBuffer = {};
+  async function bufferRequest(key, cb) {
+    if (requestBuffer[key]) {
+      return await requestBuffer[key];
+    }
+    let promise = cb();
+    requestBuffer[key] = promise;
+    let r = await promise;
+    requestBuffer[key] = null;
+    return r;
+  }
+
   return {
     async userInfo() {
-      return await tryTo(request(endpoints.userInfo));
+      return await bufferRequest("userInfo", () =>
+        tryTo(request(endpoints.userInfo))
+      );
     },
     async upcoming() {
-      return await tryTo(request(endpoints.upcoming));
+      return await bufferRequest("upcoming", () =>
+        tryTo(request(endpoints.upcoming))
+      );
     },
   };
 }
