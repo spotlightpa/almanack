@@ -13,5 +13,20 @@
     </noscript>
     <div id="app"></div>
     <!-- built files will be auto injected -->
+    <script>
+      if (window.location.host.match(/spotlightpa\.org$/)) {
+        window.ga = function() {
+          (ga.q = ga.q || []).push(arguments);
+        };
+        ga.l = +new Date();
+        ga("create", "UA-141126362-2", "auto");
+        ga("send", "pageview");
+
+        let script = document.createElement("script");
+        script.src = "https:////www.google-analytics.com/analytics.js";
+        script.async = true;
+        document.head.append(script);
+      }
+    </script>
   </body>
 </html>
