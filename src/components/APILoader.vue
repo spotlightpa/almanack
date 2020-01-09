@@ -9,21 +9,20 @@ export default {
   },
   setup(props) {
     let { hasRole } = useAuth();
-    let { isLoading, error, load, reload } = useAPI();
+    let { isLoading, error, loadFeed } = useAPI();
 
     let roleOK = hasRole(() => props.role);
+    let didInitialLoad = false;
     watch(() => {
-      if (roleOK.value) {
-        load();
-      } else {
-        isLoading.value = false;
+      if (roleOK.value && !didInitialLoad) {
+        didInitialLoad = true;
+        loadFeed();
       }
     });
 
     return {
-      load,
       isLoading,
-      reload,
+      loadFeed,
       error,
       roleOK,
     };
@@ -50,7 +49,7 @@ export default {
         <div class="buttons">
           <button
             class="button is-danger has-text-weight-semibold"
-            @click="reload"
+            @click="loadFeed"
           >
             Reload?
           </button>

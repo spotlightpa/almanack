@@ -5,7 +5,7 @@ export function makeAPI(service) {
   const feed = ref(null);
 
   const apiState = reactive({
-    isLoading: true,
+    isLoading: false,
     error: null,
     articles: computed(() =>
       apiState.isLoading || apiState.error || !feed.value
@@ -21,14 +21,10 @@ export function makeAPI(service) {
         return apiState.articles.find(article => article.id === id);
       });
     },
-    async load() {
-      if (!apiState.isLoading) {
+    async loadFeed() {
+      if (apiState.isLoading) {
         return;
       }
-      [feed.value, apiState.error] = await service.upcoming();
-      apiState.isLoading = false;
-    },
-    async reload() {
       apiState.isLoading = true;
       [feed.value, apiState.error] = await service.upcoming();
       apiState.isLoading = false;
