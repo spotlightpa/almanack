@@ -14,6 +14,8 @@ import (
 
 	"github.com/apex/gateway"
 	"github.com/carlmjohnson/flagext"
+	"github.com/go-chi/chi"
+	"github.com/go-chi/chi/middleware"
 	"github.com/peterbourgon/ff"
 	"golang.org/x/xerrors"
 
@@ -85,15 +87,20 @@ func (a *appEnv) exec() error {
 }
 
 func (a *appEnv) routes() http.Handler {
-	mux := http.NewServeMux()
-	mux.HandleFunc("/api/healthcheck", a.hello)
-	mux.Handle("/api/user-info",
-		a.netlifyIdentityMiddleware(http.HandlerFunc(a.userInfo)),
-	)
-	mux.Handle("/api/upcoming",
-		a.netlifyPermissionMiddleware("editor", http.HandlerFunc(a.upcoming)),
-	)
-	return a.loggingMiddleware(mux)
+	r := chi.NewRouter()
+	r.Use(middleware.RequestID)
+	r.Use(middleware.RealIP)
+	r.Use(middleware.RequestLogger(&middleware.DefaultLogFormatter{Logger: a.Logger}))
+	r.Use(middleware.Recoverer)
+	r.Get("/api/healthcheck", a.hello)
+	r.Route("/api", func(r chi.Router) {
+		r.Use(a.netlifyIdentityMiddleware)
+		r.Get("/user-info", a.userInfo)
+		r.With(
+			a.netlifyPermissionMiddleware("editor"),
+		).Get("/upcoming", a.upcoming)
+	})
+	return r
 }
 
 func (a *appEnv) loggingMiddleware(h http.Handler) http.HandlerFunc {
@@ -154,8 +161,8 @@ func getNetlifyID(r *http.Request) *netlifyid.JWT {
 	return val.(*netlifyid.JWT)
 }
 
-func (a *appEnv) netlifyIdentityMiddleware(h http.Handler) http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
+func (a *appEnv) netlifyIdentityMiddleware(h http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		a.Println("start netlifyIdentityMiddleware")
 		if !a.isLambda {
 			a.Println("skip netlifyIdentityMiddleware")
@@ -169,7 +176,7 @@ func (a *appEnv) netlifyIdentityMiddleware(h http.Handler) http.HandlerFunc {
 		}
 		r = setNetlifyID(r, netID)
 		h.ServeHTTP(w, r)
-	}
+	})
 }
 
 func (a *appEnv) userInfo(w http.ResponseWriter, r *http.Request) {
@@ -178,42 +185,43 @@ func (a *appEnv) userInfo(w http.ResponseWriter, r *http.Request) {
 	a.jsonResponse(http.StatusOK, w, userinfo)
 }
 
-func (a *appEnv) netlifyPermissionMiddleware(role string, next http.Handler) http.HandlerFunc {
-	var inner http.HandlerFunc = func(w http.ResponseWriter, r *http.Request) {
-		a.Println("starting permission middleware")
-		if !a.isLambda {
-			a.Println("skipping permission middleware")
-			next.ServeHTTP(w, r)
-			return
-		}
+func (a *appEnv) netlifyPermissionMiddleware(role string) func(next http.Handler) http.Handler {
+	return func(next http.Handler) http.Handler {
+		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			a.Println("starting permission middleware")
+			if !a.isLambda {
+				a.Println("skipping permission middleware")
+				next.ServeHTTP(w, r)
+				return
+			}
 
-		userinfo := getNetlifyID(r)
-		if userinfo == nil {
-			err := errutil.Response{
-				StatusCode: http.StatusInternalServerError,
-				Message:    "user info not set",
-				Log:        "no user info: is this localhost?",
+			userinfo := getNetlifyID(r)
+			if userinfo == nil {
+				err := errutil.Response{
+					StatusCode: http.StatusInternalServerError,
+					Message:    "user info not set",
+					Log:        "no user info: is this localhost?",
+				}
+				a.errorResponse(w, err)
+				return
 			}
-			a.errorResponse(w, err)
-			return
-		}
-		hasRole := userinfo.HasRole(role)
-		a.Printf("permission middleware: %s has role %s == %t",
-			userinfo.User.Email, role, hasRole)
-		if !hasRole {
-			err := errutil.Response{
-				StatusCode: http.StatusForbidden,
-				Message:    http.StatusText(http.StatusForbidden),
-				Log: fmt.Sprintf(
-					"unauthorized user only had roles: %v",
-					userinfo.User.AppMetadata.Roles),
+			hasRole := userinfo.HasRole(role)
+			a.Printf("permission middleware: %s has role %s == %t",
+				userinfo.User.Email, role, hasRole)
+			if !hasRole {
+				err := errutil.Response{
+					StatusCode: http.StatusForbidden,
+					Message:    http.StatusText(http.StatusForbidden),
+					Log: fmt.Sprintf(
+						"unauthorized user only had roles: %v",
+						userinfo.User.AppMetadata.Roles),
+				}
+				a.errorResponse(w, err)
+				return
 			}
-			a.errorResponse(w, err)
-			return
-		}
-		next.ServeHTTP(w, r)
+			next.ServeHTTP(w, r)
+		})
 	}
-	return a.netlifyIdentityMiddleware(inner)
 }
 
 func (a *appEnv) fetchJSON(ctx context.Context, method, url string, v interface{}) error {
