@@ -12,6 +12,7 @@ export function makeAPI(service) {
         ? []
         : Article.from(feed.value)
     ),
+    didLoad: computed(() => !!apiState.articles.length),
   });
 
   let methods = {

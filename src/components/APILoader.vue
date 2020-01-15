@@ -9,13 +9,11 @@ export default {
   },
   setup(props) {
     let { hasRole } = useAuth();
-    let { isLoading, error, loadFeed } = useAPI();
+    let { isLoading, error, loadFeed, didLoad } = useAPI();
 
     let roleOK = hasRole(() => props.role);
-    let didInitialLoad = false;
     watch(() => {
-      if (roleOK.value && !didInitialLoad) {
-        didInitialLoad = true;
+      if (roleOK.value && !didLoad.value) {
         loadFeed();
       }
     });
