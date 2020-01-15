@@ -13,6 +13,13 @@ export default {
     credits() {
       return this.block.credits.by.map(v => v.name);
     },
+    imageURL() {
+      // Some images haven't been published and can't be used
+      if (this.block.url.match(/\/public\//)) {
+        return this.block.url;
+      }
+      return this.block.additional_properties.resizeUrl;
+    },
   },
 };
 </script>
@@ -22,11 +29,7 @@ export default {
     <h2 class="subtitle is-4 has-text-weight-semibold">
       Embed #{{ n }}: Inline Image
     </h2>
-    <ImageThumbnail
-      :url="block.url"
-      :caption="block.caption"
-      :credits="credits"
-    >
+    <ImageThumbnail :url="imageURL" :caption="block.caption" :credits="credits">
     </ImageThumbnail>
   </div>
 </template>
