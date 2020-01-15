@@ -36,8 +36,8 @@ func CLI(args []string) error {
 	return nil
 }
 
-func parseArgs(args []string) (*app, error) {
-	var a app
+func parseArgs(args []string) (*appEnv, error) {
+	var a appEnv
 	fl := flag.NewFlagSet(AppName, flag.ContinueOnError)
 	fl.BoolVar(&a.isLambda, "lambda", false, "use AWS Lambda rather than HTTP")
 	cache := fl.Bool("cache", false, "use in-memory cache for fetched JSON")
@@ -65,7 +65,7 @@ func parseArgs(args []string) (*app, error) {
 	return &a, nil
 }
 
-type app struct {
+type appEnv struct {
 	isLambda   bool
 	port       string
 	srcFeedURL string
@@ -73,7 +73,7 @@ type app struct {
 	*log.Logger
 }
 
-func (a *app) exec() error {
+func (a *appEnv) exec() error {
 	listener := http.ListenAndServe
 	if a.isLambda {
 		a.Printf("starting on AWS Lambda")
@@ -84,7 +84,7 @@ func (a *app) exec() error {
 	return listener(a.port, a.routes())
 }
 
-func (a *app) routes() http.Handler {
+func (a *appEnv) routes() http.Handler {
 	mux := http.NewServeMux()
 	mux.HandleFunc("/api/healthcheck", a.hello)
 	mux.Handle("/api/user-info",
@@ -96,7 +96,7 @@ func (a *app) routes() http.Handler {
 	return a.loggingMiddleware(mux)
 }
 
-func (a *app) loggingMiddleware(h http.Handler) http.HandlerFunc {
+func (a *appEnv) loggingMiddleware(h http.Handler) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		start := time.Now()
 		h.ServeHTTP(w, r)
@@ -104,7 +104,7 @@ func (a *app) loggingMiddleware(h http.Handler) http.HandlerFunc {
 	}
 }
 
-func (a *app) jsonResponse(statusCode int, w http.ResponseWriter, data interface{}) {
+func (a *appEnv) jsonResponse(statusCode int, w http.ResponseWriter, data interface{}) {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(statusCode)
 	enc := json.NewEncoder(w)
@@ -113,7 +113,7 @@ func (a *app) jsonResponse(statusCode int, w http.ResponseWriter, data interface
 	}
 }
 
-func (a *app) errorResponse(w http.ResponseWriter, err error) {
+func (a *appEnv) errorResponse(w http.ResponseWriter, err error) {
 	var errResp errutil.Response
 	if !xerrors.As(err, &errResp) {
 		errResp.StatusCode = http.StatusInternalServerError
@@ -124,7 +124,7 @@ func (a *app) errorResponse(w http.ResponseWriter, err error) {
 	a.jsonResponse(errResp.StatusCode, w, errResp)
 }
 
-func (a *app) hello(w http.ResponseWriter, r *http.Request) {
+func (a *appEnv) hello(w http.ResponseWriter, r *http.Request) {
 	a.Println("start hello")
 	w.Header().Set("Content-Type", "text/plain")
 	w.Header().Set("Cache-Control", "public, max-age=60")
@@ -154,7 +154,7 @@ func getNetlifyID(r *http.Request) *netlifyid.JWT {
 	return val.(*netlifyid.JWT)
 }
 
-func (a *app) netlifyIdentityMiddleware(h http.Handler) http.HandlerFunc {
+func (a *appEnv) netlifyIdentityMiddleware(h http.Handler) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		a.Println("start netlifyIdentityMiddleware")
 		if !a.isLambda {
@@ -172,13 +172,13 @@ func (a *app) netlifyIdentityMiddleware(h http.Handler) http.HandlerFunc {
 	}
 }
 
-func (a *app) userInfo(w http.ResponseWriter, r *http.Request) {
+func (a *appEnv) userInfo(w http.ResponseWriter, r *http.Request) {
 	a.Println("start userInfo")
 	userinfo := getNetlifyID(r)
 	a.jsonResponse(http.StatusOK, w, userinfo)
 }
 
-func (a *app) netlifyPermissionMiddleware(role string, next http.Handler) http.HandlerFunc {
+func (a *appEnv) netlifyPermissionMiddleware(role string, next http.Handler) http.HandlerFunc {
 	var inner http.HandlerFunc = func(w http.ResponseWriter, r *http.Request) {
 		a.Println("starting permission middleware")
 		if !a.isLambda {
@@ -216,7 +216,7 @@ func (a *app) netlifyPermissionMiddleware(role string, next http.Handler) http.H
 	return a.netlifyIdentityMiddleware(inner)
 }
 
-func (a *app) fetchJSON(ctx context.Context, method, url string, v interface{}) error {
+func (a *appEnv) fetchJSON(ctx context.Context, method, url string, v interface{}) error {
 	req, err := http.NewRequestWithContext(ctx, method, url, nil)
 	if err != nil {
 		return errutil.Response{
@@ -254,7 +254,7 @@ func (a *app) fetchJSON(ctx context.Context, method, url string, v interface{}) 
 	return nil
 }
 
-func (a *app) upcoming(w http.ResponseWriter, r *http.Request) {
+func (a *appEnv) upcoming(w http.ResponseWriter, r *http.Request) {
 	a.Println("start upcoming")
 	a.Printf("fetching %s", a.srcFeedURL)
 	var feed jsonschema.API
