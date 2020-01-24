@@ -12,34 +12,26 @@ import (
 
 type Dialer = func() (redis.Conn, error)
 
-func Value(dialer *Dialer) flag.Getter {
-	return &getter{dialer}
-}
-
-type getter struct {
-	dialer *Dialer
-}
-
-func (g *getter) Get() interface{} { return g.dialer }
-
-func (g *getter) String() string { return "Redis URL" }
-
-func (g *getter) Set(connURL string) error {
+// Parse creates a Dialer by parsing the connection URL.
+//
+// URLs should have the format redis://user:password@host:port/db
+// where db is an integer and username is ignored.
+func Parse(connURL string) (Dialer, error) {
 	u, err := url.Parse(connURL)
 	if err != nil {
-		return err
+		return nil, err
 	}
 	if u.Scheme != "redis" {
-		return fmt.Errorf("invalid redis URL scheme: %q", u.Scheme)
+		return nil, fmt.Errorf("invalid redis URL scheme: %q", u.Scheme)
 	}
 	password, _ := u.User.Password()
 	db := 0
 	if path := strings.TrimPrefix(u.Path, "/"); path != "" {
 		if db, err = strconv.Atoi(path); err != nil {
-			return err
+			return nil, err
 		}
 	}
-	*g.dialer = func() (redis.Conn, error) {
+	return func() (redis.Conn, error) {
 		c, err := redis.Dial("tcp", u.Host)
 		if err != nil {
 			return nil, err
@@ -57,6 +49,35 @@ func (g *getter) Set(connURL string) error {
 			}
 		}
 		return c, nil
+	}, nil
+}
+
+type getter struct {
+	dialer Dialer
+}
+
+func (g *getter) Get() interface{} { return g.dialer }
+
+func (g *getter) String() string { return "Redis URL" }
+
+func (g *getter) Set(connURL string) error {
+	var err error
+	g.dialer, err = Parse(connURL)
+	return err
+}
+
+// Var adds an option to the specified FlagSet (or flag.CommandLine if nil)
+// that creates a Redis dialer for the specified URL.
+// URLs should have the format redis://user:password@host:port/db
+// where db is an integer and username is ignored.
+// Use the callback after parsing options to retrieve the dialer.
+func Var(fl *flag.FlagSet, name, usage string) func() Dialer {
+	if fl == nil {
+		fl = flag.CommandLine
 	}
-	return nil
+	var g getter
+	fl.Var(&g, name, usage)
+	return func() Dialer {
+		return g.dialer
+	}
 }

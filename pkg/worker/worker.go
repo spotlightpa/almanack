@@ -12,13 +12,12 @@ import (
 	"text/template"
 	"time"
 
-	"github.com/carlmjohnson/errutil"
 	"github.com/carlmjohnson/flagext"
-	"github.com/gomodule/redigo/redis"
 	"github.com/mattbaird/gochimp"
 	"github.com/peterbourgon/ff"
 
 	"github.com/spotlightpa/almanack/internal/jsonschema"
+	"github.com/spotlightpa/almanack/internal/redis"
 	"github.com/spotlightpa/almanack/internal/redisflag"
 )
 
@@ -36,17 +35,13 @@ func CLI(args []string) error {
 	return nil
 }
 
-func parseArgs(args []string) (*app, error) {
-	var a app
-	rp := redis.Pool{
-		MaxIdle:     3,
-		IdleTimeout: 240 * time.Second,
-	}
+func parseArgs(args []string) (*appEnv, error) {
+	var a appEnv
 	fl := flag.NewFlagSet(AppName, flag.ContinueOnError)
 	fl.StringVar(&a.srcFeedURL, "src-feed", "", "source URL for Arc feed")
 	fl.StringVar(&a.mcapi, "mc-api-key", "", "API `key` for MailChimp")
 	fl.StringVar(&a.mclistid, "mc-list-id", "", "List `ID` MailChimp campaign")
-	fl.Var(redisflag.Value(&rp.Dial), "redis-url", "`URL` connection string for Redis")
+	getDialer := redisflag.Var(fl, "redis-url", "`URL` connection string for Redis")
 	a.Logger = log.New(nil, AppName+" ", log.LstdFlags)
 	fl.Var(
 		flagext.Logger(a.Logger, flagext.LogSilent),
@@ -63,24 +58,28 @@ Options:
 	if err := ff.Parse(fl, args, ff.WithEnvVarPrefix("ALMANACK")); err != nil {
 		return nil, err
 	}
-	if rp.Dial == nil {
+	if d := getDialer(); d == nil {
 		fmt.Fprint(fl.Output(), "Must set -redis-url\n\n")
 		fl.Usage()
 		return nil, flag.ErrHelp
+	} else {
+		var err error
+		if a.rs, err = redis.New(d, a.Logger); err != nil {
+			return nil, err
+		}
 	}
-	a.rp = &rp
 	return &a, nil
 }
 
-type app struct {
+type appEnv struct {
 	srcFeedURL string
 	mcapi      string
 	mclistid   string
-	rp         *redis.Pool
+	rs         *redis.Store
 	*log.Logger
 }
 
-func (a *app) exec() error {
+func (a *appEnv) exec() error {
 	a.Println("starting", AppName)
 	start := time.Now()
 	defer func() { a.Println("finished in", time.Since(start)) }()
@@ -92,7 +91,7 @@ func (a *app) exec() error {
 	}
 
 	a.Println("checking redis")
-	err := a.GetSet("almanack-worker.feed", &oldfeed, &newfeed)
+	err := a.rs.GetSet("almanack-worker.feed", &oldfeed, &newfeed)
 	if err == redis.ErrNil {
 		a.Println("cache miss for old feed")
 		return nil
@@ -112,7 +111,7 @@ func (a *app) exec() error {
 	return nil
 }
 
-func (a *app) fetchJSON(url string, v interface{}) error {
+func (a *appEnv) fetchJSON(url string, v interface{}) error {
 	resp, err := http.Get(url)
 	if err != nil {
 		return err
@@ -129,33 +128,6 @@ func (a *app) fetchJSON(url string, v interface{}) error {
 	}
 
 	return nil
-}
-
-// Ping Redis
-func (a *app) Ping() (err error) {
-	a.Println("Ping Redis")
-	conn := a.rp.Get()
-	defer errutil.Defer(&err, conn.Close)
-
-	_, err = conn.Do("PING")
-	return
-}
-
-// GetSet converts values to JSON bytes and calls GETSET in Redis
-func (a *app) GetSet(key string, getv, setv interface{}) (err error) {
-	a.Printf("Redis GETSET %q", key)
-	conn := a.rp.Get()
-	defer errutil.Defer(&err, conn.Close)
-
-	setb, err := json.Marshal(setv)
-	if err != nil {
-		return err
-	}
-	getb, err := redis.Bytes(conn.Do("GETSET", key, setb))
-	if err != nil {
-		return err
-	}
-	return json.Unmarshal(getb, getv)
 }
 
 func diffFeed(newfeed, oldfeed jsonschema.API) []jsonschema.Contents {
@@ -175,7 +147,7 @@ func diffFeed(newfeed, oldfeed jsonschema.API) []jsonschema.Contents {
 	return newstories
 }
 
-func (a *app) SendCampaign(subject, body string) error {
+func (a *appEnv) SendCampaign(subject, body string) error {
 	// Using MC APIv2 because in v3 they decided REST means
 	// not being able to create and send a campign in any efficient way
 	chimp := gochimp.NewChimp(a.mcapi, true)
@@ -227,7 +199,7 @@ Column inches: {{ .Planning.StoryLength.InchCountActual}}
 {{ end -}}
 `
 
-func (a *app) makeMessage(diff []jsonschema.Contents) (subject, body string) {
+func (a *appEnv) makeMessage(diff []jsonschema.Contents) (subject, body string) {
 	slugs := make([]string, len(diff))
 	for i := range diff {
 		slugs[i] = diff[i].Slug
