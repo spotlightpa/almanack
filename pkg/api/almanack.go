@@ -12,11 +12,11 @@ import (
 	"os"
 	"time"
 
-	"github.com/apex/gateway"
 	"github.com/carlmjohnson/flagext"
 	"github.com/go-chi/chi"
 	"github.com/go-chi/chi/middleware"
 	"github.com/peterbourgon/ff"
+	"github.com/piotrkubisa/apigo"
 	"golang.org/x/xerrors"
 
 	"github.com/spotlightpa/almanack/internal/errutil"
@@ -79,10 +79,11 @@ func (a *appEnv) exec() error {
 	listener := http.ListenAndServe
 	if a.isLambda {
 		a.Printf("starting on AWS Lambda")
-		listener = gateway.ListenAndServe
-	} else {
-		a.Printf("starting on port %s", a.port)
+		apigo.ListenAndServe("", a.routes())
+		panic("unreachable")
 	}
+
+	a.Printf("starting on port %s", a.port)
 	return listener(a.port, a.routes())
 }
 
