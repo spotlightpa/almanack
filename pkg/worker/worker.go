@@ -17,6 +17,7 @@ import (
 	"github.com/peterbourgon/ff"
 
 	"github.com/spotlightpa/almanack/internal/errutil"
+	"github.com/spotlightpa/almanack/internal/filestore"
 	"github.com/spotlightpa/almanack/internal/jsonschema"
 	"github.com/spotlightpa/almanack/internal/redis"
 	"github.com/spotlightpa/almanack/internal/redisflag"
@@ -59,15 +60,13 @@ Options:
 	if err := ff.Parse(fl, args, ff.WithEnvVarPrefix("ALMANACK")); err != nil {
 		return nil, err
 	}
-	if d := getDialer(); d == nil {
-		fmt.Fprint(fl.Output(), "Must set -redis-url\n\n")
-		fl.Usage()
-		return nil, flag.ErrHelp
-	} else {
+	if d := getDialer(); d != nil {
 		var err error
-		if a.rs, err = redis.New(d, a.Logger); err != nil {
+		if a.store, err = redis.New(d, a.Logger); err != nil {
 			return nil, err
 		}
+	} else {
+		a.store = filestore.New("", AppName, a.Logger)
 	}
 	return &a, nil
 }
@@ -76,8 +75,12 @@ type appEnv struct {
 	srcFeedURL string
 	mcapi      string
 	mclistid   string
-	rs         *redis.Store
+	store      getsetter
 	*log.Logger
+}
+
+type getsetter interface {
+	GetSet(key string, getv, setv interface{}) (err error)
 }
 
 func (a *appEnv) exec() error {
@@ -92,7 +95,7 @@ func (a *appEnv) exec() error {
 	}
 
 	a.Println("checking redis")
-	err := a.rs.GetSet("almanack-worker.feed", &oldfeed, &newfeed)
+	err := a.store.GetSet("almanack-worker.feed", &oldfeed, &newfeed)
 	if errutil.Is(err, errutil.NotFound) {
 		a.Println("cache miss for old feed")
 		return nil
