@@ -9,7 +9,6 @@ import (
 	"log"
 	"net/http"
 	"net/http/httputil"
-	"net/url"
 	"os"
 	"time"
 
@@ -79,12 +78,8 @@ type appEnv struct {
 func (a *appEnv) exec() error {
 	listener := http.ListenAndServe
 	if a.isLambda {
-		host := "example.com"
-		if u, _ := url.Parse(os.Getenv("DEPLOY_URL")); u != nil {
-			host = u.Hostname()
-		}
-		a.Printf("starting on AWS Lambda on %s", host)
-		apigo.ListenAndServe(host, a.routes())
+		a.Printf("starting on AWS Lambda")
+		apigo.ListenAndServe("", a.routes())
 		panic("unreachable")
 	}
 
