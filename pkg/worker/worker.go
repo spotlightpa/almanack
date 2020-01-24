@@ -16,6 +16,7 @@ import (
 	"github.com/mattbaird/gochimp"
 	"github.com/peterbourgon/ff"
 
+	"github.com/spotlightpa/almanack/internal/errutil"
 	"github.com/spotlightpa/almanack/internal/jsonschema"
 	"github.com/spotlightpa/almanack/internal/redis"
 	"github.com/spotlightpa/almanack/internal/redisflag"
@@ -92,7 +93,7 @@ func (a *appEnv) exec() error {
 
 	a.Println("checking redis")
 	err := a.rs.GetSet("almanack-worker.feed", &oldfeed, &newfeed)
-	if err == redis.ErrNil {
+	if errutil.Is(err, errutil.NotFound) {
 		a.Println("cache miss for old feed")
 		return nil
 	}
