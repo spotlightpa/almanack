@@ -1,28 +1,23 @@
 <script>
 import { watch } from "@vue/composition-api";
-import { useAuth, useAPI } from "@/api/hooks.js";
+import { useAPI } from "@/api/hooks.js";
 
 export default {
   name: "APILoader",
-  props: {
-    role: String,
-  },
-  setup(props) {
-    let { hasRole } = useAuth();
-    let { isLoading, error, loadFeed, didLoad } = useAPI();
+  setup() {
+    let { canLoadFeed, didLoad, error, isLoading, loadFeed } = useAPI();
 
-    let roleOK = hasRole(() => props.role);
     watch(() => {
-      if (roleOK.value && !didLoad.value) {
+      if (canLoadFeed.value && !didLoad.value) {
         loadFeed();
       }
     });
 
     return {
+      canLoadFeed,
+      error,
       isLoading,
       loadFeed,
-      error,
-      roleOK,
     };
   },
 };
@@ -30,7 +25,7 @@ export default {
 
 <template>
   <div>
-    <div v-if="!roleOK" class="message is-warning">
+    <div v-if="!canLoadFeed" class="message is-warning">
       <p class="message-body">
         You don't have permission to view upcoming articles, sorry. Please
         contact
@@ -54,7 +49,7 @@ export default {
         </div>
       </div>
     </div>
-    <div v-if="roleOK && !isLoading">
+    <div v-if="canLoadFeed && !isLoading">
       <slot></slot>
     </div>
   </div>

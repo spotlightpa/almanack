@@ -28,10 +28,10 @@ export default {
     };
   },
   setup(props) {
-    let { hasRole } = useAuth();
+    let { isSpotlightPAUser } = useAuth();
 
     return {
-      isSpotlightPAUser: hasRole(() => "Spotlight PA"),
+      isSpotlightPAUser,
       embeds: props.article.embedComponents,
     };
   },

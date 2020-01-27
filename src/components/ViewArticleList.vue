@@ -40,7 +40,7 @@ export default {
         >joanna@spotlightpa.org</a
       >).
     </p>
-    <APILoader role="editor">
+    <APILoader>
       <nav class="panel is-black">
         <h1 class="panel-heading">
           Spotlight PA Articles

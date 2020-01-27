@@ -52,6 +52,12 @@ export function makeAuth() {
       ""
   );
 
+  function hasRole(name) {
+    return computed(() => {
+      return roles.value.some(role => role === name || role === "admin");
+    });
+  }
+
   let methods = {
     signup() {
       netlifyIdentity.open("signup");
@@ -75,12 +81,6 @@ export function makeAuth() {
         Authorization: `Bearer ${token}`,
       };
     },
-    hasRole(nameFn) {
-      return computed(() => {
-        let name = nameFn();
-        return roles.value.some(role => role === name || role === "admin");
-      });
-    },
   };
 
   netlifyIdentity.init({ logo: false });
@@ -91,6 +91,10 @@ export function makeAuth() {
     isSignedIn,
     roles,
     fullName,
+
+    isEditor: hasRole("editor"),
+    isSpotlightPAUser: hasRole("Spotlight PA"),
+    isArcUser: hasRole("arc user"),
 
     ...methods,
   };

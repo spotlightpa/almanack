@@ -48,5 +48,8 @@ export function makeService($auth) {
         tryTo(request(endpoints.upcoming))
       );
     },
+    hasAuthUpcoming() {
+      return $auth.isEditor;
+    },
   };
 }
