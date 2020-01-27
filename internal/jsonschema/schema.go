@@ -2,7 +2,10 @@ package jsonschema
 
 import (
 	"encoding/json"
+	"fmt"
 	"time"
+
+	"github.com/spotlightpa/almanack/internal/errutil"
 )
 
 const (
@@ -296,4 +299,20 @@ type PromoCredit struct {
 		Name   string `json:"name"`
 		Type   string `json:"type"`
 	} `json:"by"`
+}
+
+func (feed API) Get(id string) (*Contents, error) {
+	found := -1
+	for i, article := range feed.Contents {
+		if article.ID == id {
+			if found != -1 {
+				return nil, fmt.Errorf("multiple matching IDs found")
+			}
+			found = i
+		}
+	}
+	if found == -1 {
+		return nil, errutil.NotFound
+	}
+	return &feed.Contents[found], nil
 }

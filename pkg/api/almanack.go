@@ -20,6 +20,7 @@ import (
 	"golang.org/x/xerrors"
 
 	"github.com/spotlightpa/almanack/internal/errutil"
+	"github.com/spotlightpa/almanack/internal/feed"
 	"github.com/spotlightpa/almanack/internal/filestore"
 	"github.com/spotlightpa/almanack/internal/jsonschema"
 	"github.com/spotlightpa/almanack/internal/netlifyid"
@@ -111,6 +112,9 @@ func (a *appEnv) routes() http.Handler {
 		r.With(
 			a.netlifyPermissionMiddleware("editor"),
 		).Get("/upcoming", a.upcoming)
+		r.With(
+			a.netlifyPermissionMiddleware("Spotlight PA"),
+		).Get("/articles/{id}", a.getArticle)
 	})
 	return r
 }
@@ -285,4 +289,48 @@ func (a *appEnv) upcoming(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	a.jsonResponse(http.StatusOK, w, feed)
+}
+
+func (a *appEnv) getArticle(w http.ResponseWriter, r *http.Request) {
+	a.Println("start getArticle")
+
+	type getArticleResponse struct {
+		Body    string
+		PubDate *time.Time
+	}
+
+	articleID := chi.URLParam(r, "id")
+
+	var data getArticleResponse
+	err := a.store.Get("almanack.feed."+articleID, &data)
+	switch {
+	case errutil.Is(err, errutil.NotFound):
+		// continue
+	case err == nil:
+		a.jsonResponse(http.StatusOK, w, &data)
+		return
+	default:
+		a.errorResponse(w, err)
+		return
+	}
+
+	var f jsonschema.API
+	if err := a.store.Get(feedKey, &f); err != nil {
+		a.errorResponse(w, err)
+		return
+	}
+
+	content, err := f.Get(articleID)
+	if err != nil {
+		a.errorResponse(w, err)
+		return
+	}
+	story := feed.ContentToStory(*content)
+	toml, err := story.ToTOML()
+	if err != nil {
+		a.errorResponse(w, err)
+		return
+	}
+	data.Body = toml
+	a.jsonResponse(http.StatusOK, w, &data)
 }

@@ -6,6 +6,7 @@ module github.com/spotlightpa/almanack
 go 1.13
 
 require (
+	github.com/BurntSushi/toml v0.3.1
 	github.com/aws/aws-lambda-go v1.13.3
 	github.com/carlmjohnson/errutil v0.0.9
 	github.com/carlmjohnson/exitcode v0.0.3
