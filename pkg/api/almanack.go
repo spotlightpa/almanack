@@ -20,8 +20,11 @@ import (
 	"golang.org/x/xerrors"
 
 	"github.com/spotlightpa/almanack/internal/errutil"
+	"github.com/spotlightpa/almanack/internal/filestore"
 	"github.com/spotlightpa/almanack/internal/jsonschema"
 	"github.com/spotlightpa/almanack/internal/netlifyid"
+	"github.com/spotlightpa/almanack/internal/redis"
+	"github.com/spotlightpa/almanack/internal/redisflag"
 )
 
 const AppName = "almanack-api"
@@ -42,9 +45,8 @@ func parseArgs(args []string) (*appEnv, error) {
 	var a appEnv
 	fl := flag.NewFlagSet(AppName, flag.ContinueOnError)
 	fl.BoolVar(&a.isLambda, "lambda", false, "use AWS Lambda rather than HTTP")
-	cache := fl.Bool("cache", false, "use in-memory cache for fetched JSON")
 	fl.StringVar(&a.port, "port", ":3001", "listen on port (HTTP only)")
-	fl.StringVar(&a.srcFeedURL, "src-feed", "", "source URL for Arc feed")
+	getDialer := redisflag.Var(fl, "redis-url", "`URL` connection string for Redis")
 	a.Logger = log.New(nil, AppName+" ", log.LstdFlags)
 	fl.Var(
 		flagext.Logger(a.Logger, flagext.LogSilent),
@@ -52,26 +54,35 @@ func parseArgs(args []string) (*appEnv, error) {
 		`don't log debug output`,
 	)
 	fl.Usage = func() {
-		fmt.Fprintf(fl.Output(), `almanack-api help`)
+		fmt.Fprintf(fl.Output(), "almanack-api help\n\n")
 		fl.PrintDefaults()
 	}
 	if err := ff.Parse(fl, args, ff.WithEnvVarPrefix("ALMANACK")); err != nil {
 		return nil, err
 	}
+	if d := getDialer(); d != nil {
+		var err error
+		if a.store, err = redis.New(d, a.Logger); err != nil {
+			return nil, err
+		}
+	} else {
+		a.store = filestore.New("", "almanack", a.Logger)
+	}
 
 	a.c = http.DefaultClient
-	if *cache {
-		SetRounderTripper(a.c, a.Logger)
-	}
 
 	return &a, nil
 }
 
+type store interface {
+	Get(key string, v interface{}) error
+}
+
 type appEnv struct {
-	isLambda   bool
-	port       string
-	srcFeedURL string
-	c          *http.Client
+	isLambda bool
+	port     string
+	c        *http.Client
+	store    store
 	*log.Logger
 }
 
@@ -263,11 +274,13 @@ func (a *appEnv) fetchJSON(ctx context.Context, method, url string, v interface{
 	return nil
 }
 
+const feedKey = "almanack-worker.feed"
+
 func (a *appEnv) upcoming(w http.ResponseWriter, r *http.Request) {
 	a.Println("start upcoming")
-	a.Printf("fetching %s", a.srcFeedURL)
+
 	var feed jsonschema.API
-	if err := a.fetchJSON(r.Context(), http.MethodGet, a.srcFeedURL, &feed); err != nil {
+	if err := a.store.Get(feedKey, &feed); err != nil {
 		a.errorResponse(w, err)
 		return
 	}

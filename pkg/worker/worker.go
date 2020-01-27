@@ -66,7 +66,7 @@ Options:
 			return nil, err
 		}
 	} else {
-		a.store = filestore.New("", AppName, a.Logger)
+		a.store = filestore.New("", "almanack", a.Logger)
 	}
 	return &a, nil
 }
