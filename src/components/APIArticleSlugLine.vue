@@ -9,11 +9,11 @@ export default {
     },
   },
   setup() {
-    let { hasRole } = useAuth();
+    let { isArcUser, isSpotlightPAUser } = useAuth();
 
     return {
-      isSpotlightPAUser: hasRole(() => "Spotlight PA"),
-      isArcUser: hasRole(() => "arc user"),
+      isSpotlightPAUser,
+      isArcUser,
     };
   },
   computed: {

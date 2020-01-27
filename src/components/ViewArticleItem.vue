@@ -22,7 +22,7 @@ export default {
 </script>
 
 <template>
-  <APILoader role="editor">
+  <APILoader>
     <div v-if="!article" class="message is-warning">
       <p class="message-header">
         Not found
