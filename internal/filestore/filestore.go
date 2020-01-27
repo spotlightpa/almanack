@@ -5,7 +5,8 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
-	"path"
+	"path/filepath"
+	"strings"
 
 	"github.com/spotlightpa/almanack/internal/errutil"
 )
@@ -27,7 +28,7 @@ func New(base, ns string, l Logger) Loc {
 		}
 		base = dir
 	}
-	return Loc{path.Join(base, ns), l}
+	return Loc{filepath.Join(base, ns), l}
 }
 
 func (loc Loc) ensure() error {
@@ -38,7 +39,9 @@ func (loc Loc) ensure() error {
 }
 
 func (loc Loc) name(key string) string {
-	return path.Join(loc.dir, fmt.Sprintf("%s.json", key))
+	key = filepath.Clean(key)
+	key = strings.ReplaceAll(key, string(filepath.Separator), "@")
+	return filepath.Join(loc.dir, fmt.Sprintf("%s.json", key))
 }
 
 func (loc Loc) printf(format string, v ...interface{}) {
