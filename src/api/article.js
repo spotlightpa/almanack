@@ -78,7 +78,7 @@ export default class Article {
     return obj;
   }
 
-  get slugURL() {
+  pubslug() {
     let slug = this.getProp("canonical_url", { fallback: "" });
     let stop = slug.lastIndexOf("-");
     if (stop === -1) {
@@ -90,8 +90,16 @@ export default class Article {
     }
     return slug.slice(start + 1, stop);
   }
+
   get pubURL() {
-    return `https://www.spotlightpa.org${this.rawData.website_url}`;
+    let slug = this.pubslug();
+    if (!slug) {
+      return "";
+    }
+    let date = new Date(this.plannedDate);
+    let year = date.getFullYear();
+    let month = (date.getMonth() + 1).toString().padStart(2, "0");
+    return `https://www.spotlightpa.org/news/${year}/${month}/${slug}/`;
   }
   get arcURL() {
     return `https://pmn.arcpublishing.com/composer/edit/${this.id}/`;
