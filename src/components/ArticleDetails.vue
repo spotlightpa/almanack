@@ -58,11 +58,11 @@ export default {
       </p>
     </template>
 
-    <template v-if="isSpotlightPAUser && article.slugURL">
+    <template v-if="isSpotlightPAUser && article.pubURL">
       <h1 class="title">
-        Slug
+        Spotlight PA URL
       </h1>
-      <CopyWithButton :value="article.slugURL" label="slug"></CopyWithButton>
+      <CopyWithButton :value="article.pubURL" label="URL"></CopyWithButton>
     </template>
 
     <h2 class="title">Suggested Hed</h2>
