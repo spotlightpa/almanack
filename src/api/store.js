@@ -13,7 +13,7 @@ export function makeAPI(service) {
         : Article.from(feed.value)
     ),
     didLoad: computed(() => !!apiState.articles.length),
-    canLoadFeed: service.hasAuthUpcoming(),
+    canLoad: service.hasAuthUpcoming(),
   });
 
   let methods = {
@@ -23,13 +23,18 @@ export function makeAPI(service) {
         return apiState.articles.find(article => article.id === id);
       });
     },
-    async loadFeed() {
-      if (apiState.isLoading) {
+    async reload({ force = false } = {}) {
+      if (apiState.isLoading && !force) {
         return;
       }
       apiState.isLoading = true;
       [feed.value, apiState.error] = await service.upcoming();
       apiState.isLoading = false;
+    },
+    async initLoad() {
+      if (apiState.canLoad && !apiState.didLoad) {
+        await methods.reload();
+      }
     },
   };
 

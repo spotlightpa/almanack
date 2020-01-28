@@ -13,8 +13,15 @@ export default {
   },
   setup() {
     let { fullName, roles } = useAuth();
-    let { articles } = useAPI();
+    let { articles, canLoad, isLoading, initLoad, reload, error } = useAPI();
+
+    initLoad();
+
     return {
+      canLoad,
+      isLoading,
+      reload,
+      error,
       fullName,
       roles,
       articles,
@@ -40,7 +47,12 @@ export default {
         >joanna@spotlightpa.org</a
       >).
     </p>
-    <APILoader>
+    <APILoader
+      :can-load="canLoad"
+      :is-loading="isLoading"
+      :reload="reload"
+      :error="error"
+    >
       <nav class="panel is-black">
         <h1 class="panel-heading">
           Spotlight PA Articles

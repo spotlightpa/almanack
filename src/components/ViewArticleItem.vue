@@ -13,8 +13,22 @@ export default {
     id: String,
   },
   setup(props) {
-    let { articleFromID } = useAPI();
+    let {
+      articleFromID,
+      canLoad,
+      isLoading,
+      initLoad,
+      reload,
+      error,
+    } = useAPI();
+
+    initLoad();
+
     return {
+      canLoad,
+      isLoading,
+      reload,
+      error,
       article: articleFromID(() => props.id),
     };
   },
@@ -22,7 +36,12 @@ export default {
 </script>
 
 <template>
-  <APILoader>
+  <APILoader
+    :can-load="canLoad"
+    :is-loading="isLoading"
+    :reload="reload"
+    :error="error"
+  >
     <div v-if="!article" class="message is-warning">
       <p class="message-header">
         Not found

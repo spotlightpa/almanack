@@ -1,34 +1,20 @@
 <script>
-import { watch } from "@vue/composition-api";
-import { useAPI } from "@/api/hooks.js";
-
 export default {
   name: "APILoader",
-  setup() {
-    let { canLoadFeed, didLoad, error, isLoading, loadFeed } = useAPI();
-
-    watch(() => {
-      if (canLoadFeed.value && !didLoad.value) {
-        loadFeed();
-      }
-    });
-
-    return {
-      canLoadFeed,
-      error,
-      isLoading,
-      loadFeed,
-    };
+  props: {
+    canLoad: Boolean,
+    isLoading: Boolean,
+    reload: Function,
+    error: Error,
   },
 };
 </script>
 
 <template>
   <div>
-    <div v-if="!canLoadFeed" class="message is-warning">
+    <div v-if="!canLoad" class="message is-warning">
       <p class="message-body">
-        You don't have permission to view upcoming articles, sorry. Please
-        contact
+        You don't have permission to view this page. Please contact
         <a href="mailto:cjohnson@spotlightpa.org">cjohnson@spotlightpa.org</a>
         to request access.
       </p>
@@ -37,19 +23,20 @@ export default {
       Loading…
     </progress>
     <div v-if="error" class="message is-danger ">
+      <div class="message-header">{{ error.name }}</div>
       <div class="message-body">
-        <p>{{ error }}</p>
+        <p class="content">{{ error.message }}</p>
         <div class="buttons">
           <button
             class="button is-danger has-text-weight-semibold"
-            @click="loadFeed"
+            @click="reload"
           >
             Reload?
           </button>
         </div>
       </div>
     </div>
-    <div v-if="canLoadFeed && !isLoading">
+    <div v-if="canLoad && !isLoading">
       <slot></slot>
     </div>
   </div>

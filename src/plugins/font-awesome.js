@@ -10,6 +10,8 @@ import {
   faFileDownload,
   faLink,
   faFileUpload,
+  faSyncAlt,
+  faUserClock,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 
@@ -20,7 +22,9 @@ library.add(
   faNewspaper,
   faFileDownload,
   faLink,
-  faFileUpload
+  faFileUpload,
+  faSyncAlt,
+  faUserClock
 );
 
 Vue.component("font-awesome-icon", FontAwesomeIcon);

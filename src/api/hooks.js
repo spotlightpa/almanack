@@ -25,11 +25,6 @@ function useService() {
   return $service;
 }
 
-let $api;
-
 export function useAPI() {
-  if (!$api) {
-    $api = makeAPI(useService());
-  }
-  return $api;
+  return makeAPI(useService());
 }
