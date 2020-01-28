@@ -5,7 +5,7 @@ Vue.use(VueCompositionAPI);
 
 import { makeAuth } from "./auth.js";
 import { makeService } from "./service.js";
-import { makeAPI } from "./store.js";
+import { makeFeed } from "./feed.js";
 
 let $auth;
 
@@ -25,6 +25,8 @@ function useService() {
   return $service;
 }
 
-export function useAPI() {
-  return makeAPI(useService());
+export function useFeed() {
+  let feed = makeFeed(useService());
+  feed.initLoad();
+  return feed;
 }

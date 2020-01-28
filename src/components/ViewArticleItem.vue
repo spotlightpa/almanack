@@ -1,7 +1,7 @@
 <script>
 import { watch } from "@vue/composition-api";
 
-import { useAPI } from "@/api/hooks.js";
+import { useFeed } from "@/api/hooks.js";
 import APILoader from "./APILoader.vue";
 import ArticleDetails from "./ArticleDetails.vue";
 
@@ -15,16 +15,8 @@ export default {
     id: String,
   },
   setup(props) {
-    let {
-      articleFromID,
-      canLoad,
-      isLoading,
-      initLoad,
-      reload,
-      error,
-    } = useAPI();
+    let { articleFromID, canLoad, isLoading, reload, error } = useFeed();
 
-    initLoad();
     let article = articleFromID(() => props.id);
 
     watch(() => {

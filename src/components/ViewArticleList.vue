@@ -2,7 +2,7 @@
 import APIArticleSlugLine from "./APIArticleSlugLine.vue";
 import APIArticleWordCount from "./APIArticleWordCount.vue";
 import APILoader from "./APILoader.vue";
-import { useAuth, useAPI } from "@/api/hooks.js";
+import { useAuth, useFeed } from "@/api/hooks.js";
 
 export default {
   name: "ViewArticleList",
@@ -13,10 +13,7 @@ export default {
   },
   setup() {
     let { fullName, roles } = useAuth();
-    let { articles, canLoad, isLoading, initLoad, reload, error } = useAPI();
-
-    initLoad();
-    document.title = `Spotlight PA Almanack`;
+    let { articles, canLoad, isLoading, reload, error } = useFeed();
 
     return {
       canLoad,
