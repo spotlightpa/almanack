@@ -83,7 +83,10 @@ export function makeAuth() {
     },
   };
 
-  netlifyIdentity.init({ logo: false });
+  let APIUrl = window.location.hostname.match(/localhost/)
+    ? "https://almanack.data.spotlightpa.org/.netlify/identity"
+    : null;
+  netlifyIdentity.init({ logo: false, APIUrl });
 
   return {
     ...toRefs(authState),
