@@ -16,6 +16,7 @@ export default {
     let { articles, canLoad, isLoading, initLoad, reload, error } = useAPI();
 
     initLoad();
+    document.title = `Spotlight PA Almanack`;
 
     return {
       canLoad,

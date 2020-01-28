@@ -1,7 +1,9 @@
 <script>
+import { watch } from "@vue/composition-api";
+
+import { useAPI } from "@/api/hooks.js";
 import APILoader from "./APILoader.vue";
 import ArticleDetails from "./ArticleDetails.vue";
-import { useAPI } from "@/api/hooks.js";
 
 export default {
   name: "ViewArticleItem",
@@ -23,13 +25,20 @@ export default {
     } = useAPI();
 
     initLoad();
+    let article = articleFromID(() => props.id);
+
+    watch(() => {
+      if (article.value?.slug) {
+        document.title = `Spotlight PA Almanack - ${article.value?.slug}`;
+      }
+    });
 
     return {
       canLoad,
       isLoading,
       reload,
       error,
-      article: articleFromID(() => props.id),
+      article,
     };
   },
 };
