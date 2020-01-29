@@ -36,7 +36,7 @@ export default {
         </div>
       </div>
     </div>
-    <div v-if="canLoad && !isLoading">
+    <div v-if="canLoad && !isLoading && !error">
       <slot></slot>
     </div>
   </div>
