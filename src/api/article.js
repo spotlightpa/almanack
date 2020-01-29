@@ -1,3 +1,5 @@
+import getProp from "@/utils/getter.js";
+import cmp from "@/utils/cmp.js";
 import { commaAndJoiner } from "@/filters/commaand.js";
 
 import APIArticleImage from "@/components/APIArticleImage.vue";
@@ -7,10 +9,6 @@ import APIArticleHeader from "@/components/APIArticleHeader.vue";
 import APIArticleText from "@/components/APIArticleText.vue";
 import APIArticlePlaceholder from "@/components/APIArticlePlaceholder.vue";
 import APIArticleOEmbed from "@/components/APIArticleOEmbed.vue";
-
-function cmp(a, b) {
-  return a === b ? 0 : a < b ? -1 : 1;
-}
 
 let contentComponentsTypes = {
   header: APIArticleHeader,
@@ -65,17 +63,7 @@ export default class Article {
   }
 
   getProp(pathStr, { fallback = null } = {}) {
-    let obj = this.rawData;
-    for (let prop of pathStr.split(".")) {
-      if (!obj) {
-        break;
-      }
-      obj = obj[prop];
-    }
-    if (fallback !== null) {
-      return obj || fallback;
-    }
-    return obj;
+    return getProp(this.rawData, pathStr, { fallback });
   }
 
   pubslug() {
