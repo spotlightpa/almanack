@@ -6,6 +6,7 @@ Vue.use(VueCompositionAPI);
 import { makeAuth } from "./auth.js";
 import { makeService } from "./service.js";
 import { makeFeed } from "./feed.js";
+import { getScheduledArticle } from "./scheduler.js";
 
 let $auth;
 
@@ -29,4 +30,10 @@ export function useFeed() {
   let feed = makeFeed(useService());
   feed.initLoad();
   return feed;
+}
+
+export function useScheduler(id) {
+  let obj = getScheduledArticle({ service: useService(), id });
+  obj.initLoad();
+  return obj;
 }

@@ -64,7 +64,19 @@ export default {
       </h1>
       <CopyWithButton :value="article.pubURL" label="URL"></CopyWithButton>
     </template>
-
+    <div v-if="isSpotlightPAUser" class="block">
+      <router-link
+        :to="article.scheduleRoute"
+        class="button is-success has-text-weight-semibold"
+      >
+        <span class="icon">
+          <font-awesome-icon :icon="['fas', 'user-clock']" />
+        </span>
+        <span>
+          Schedule
+        </span>
+      </router-link>
+    </div>
     <h2 class="title">Suggested Hed</h2>
     <CopyWithButton :value="article.headline" label="hed"></CopyWithButton>
 

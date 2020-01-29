@@ -7,6 +7,9 @@ const toWeekday = new Intl.DateTimeFormat("en-US", {
 });
 
 export function dateFormatter(d) {
+  if (!d) {
+    return "";
+  }
   if (typeof d === "string") {
     d = new Date(d);
   }

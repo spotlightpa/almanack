@@ -95,6 +95,9 @@ export default class Article {
   get detailsRoute() {
     return { name: "article", params: { id: this.id } };
   }
+  get scheduleRoute() {
+    return { name: "schedule", params: { id: this.id } };
+  }
   get authors() {
     return this.getProp("credits.by", { fallback: [] }).map(item => item.name);
   }

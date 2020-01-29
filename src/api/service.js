@@ -7,6 +7,9 @@ const tryTo = promise =>
 export const endpoints = {
   userInfo: `/api/user-info`,
   upcoming: `/api/upcoming`,
+  getArticle(id) {
+    return `/api/articles/${id}`;
+  },
 };
 
 export function makeService($auth) {
@@ -28,6 +31,7 @@ export function makeService($auth) {
   let requestBuffer = {};
   async function bufferRequest(key, cb) {
     if (requestBuffer[key]) {
+      console.warning("buffer", key);
       return await requestBuffer[key];
     }
     let promise = cb();
@@ -50,6 +54,12 @@ export function makeService($auth) {
     },
     hasAuthUpcoming() {
       return $auth.isEditor;
+    },
+    async article(id) {
+      return await tryTo(request(endpoints.getArticle(id)));
+    },
+    hasAuthArticle() {
+      return $auth.isSpotlightPAUser;
     },
   };
 }

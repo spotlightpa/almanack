@@ -2,6 +2,7 @@ import Vue from "vue";
 import Router from "vue-router";
 import ViewArticleItem from "./components/ViewArticleItem.vue";
 import ViewArticleList from "./components/ViewArticleList.vue";
+import ViewArticleSchedule from "./components/ViewArticleSchedule.vue";
 import ViewError from "./components/ViewError.vue";
 import ViewLogin from "./components/ViewLogin.vue";
 
@@ -19,12 +20,18 @@ let router = new Router({
       path: "/login",
       name: "login",
       component: ViewLogin,
+      meta: {
+        title: "Spotlight PA Almanack - Login",
+      },
     },
     {
       path: "/articles",
       name: "articles",
       component: ViewArticleList,
-      meta: { requiresAuth: true },
+      meta: {
+        requiresAuth: true,
+        title: "Spotlight PA Almanack - List",
+      },
     },
     {
       path: "/articles/:id",
@@ -32,6 +39,16 @@ let router = new Router({
       component: ViewArticleItem,
       props: true,
       meta: { requiresAuth: true },
+    },
+    {
+      path: "/articles/:id/schedule",
+      name: "schedule",
+      component: ViewArticleSchedule,
+      props: true,
+      meta: {
+        requiresAuth: true,
+        title: "Spotlight PA Almanack - Scheduler",
+      },
     },
     {
       path: "/*",
@@ -47,6 +64,10 @@ let router = new Router({
 let { isSignedIn } = useAuth();
 
 router.beforeEach((to, from, next) => {
+  if (to?.meta?.title) {
+    document.title = to.meta.title;
+  }
+
   if (to.matched.some(record => record.meta.requiresAuth)) {
     if (!isSignedIn.value) {
       next({
