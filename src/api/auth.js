@@ -72,7 +72,7 @@ export function makeAuth() {
     async headers() {
       let token;
       try {
-        token = await authState.user.jwt(true);
+        token = await authState.user.jwt();
       } catch (e) {
         methods.logout();
         throw e;
