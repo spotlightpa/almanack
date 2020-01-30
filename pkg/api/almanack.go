@@ -3,6 +3,7 @@ package api
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"flag"
 	"fmt"
 	"io/ioutil"
@@ -17,7 +18,6 @@ import (
 	"github.com/go-chi/chi/middleware"
 	"github.com/peterbourgon/ff"
 	"github.com/piotrkubisa/apigo"
-	"golang.org/x/xerrors"
 
 	"github.com/spotlightpa/almanack/internal/errutil"
 	"github.com/spotlightpa/almanack/internal/feed"
@@ -77,6 +77,8 @@ func parseArgs(args []string) (*appEnv, error) {
 
 type store interface {
 	Get(key string, v interface{}) error
+	Set(key string, v interface{}) error
+	GetLock(key string) (unlock func(), err error)
 }
 
 type appEnv struct {
@@ -114,7 +116,10 @@ func (a *appEnv) routes() http.Handler {
 		).Get("/upcoming", a.upcoming)
 		r.With(
 			a.netlifyPermissionMiddleware("Spotlight PA"),
-		).Get("/articles/{id}", a.getArticle)
+		).Group(func(r chi.Router) {
+			r.Get("/articles/{id}", a.getArticle)
+			r.Post("/articles/{id}", a.postArticle)
+		})
 	})
 	return r
 }
@@ -138,7 +143,7 @@ func (a *appEnv) jsonResponse(statusCode int, w http.ResponseWriter, data interf
 
 func (a *appEnv) errorResponse(w http.ResponseWriter, err error) {
 	var errResp errutil.Response
-	if !xerrors.As(err, &errResp) {
+	if !errors.As(err, &errResp) {
 		errResp.StatusCode = http.StatusInternalServerError
 		errResp.Message = "internal error"
 		errResp.Log = err.Error()
@@ -291,18 +296,19 @@ func (a *appEnv) upcoming(w http.ResponseWriter, r *http.Request) {
 	a.jsonResponse(http.StatusOK, w, feed)
 }
 
+type getArticleResponse struct {
+	// TODO: Use feed.Story
+	Body    string
+	PubDate *time.Time
+}
+
 func (a *appEnv) getArticle(w http.ResponseWriter, r *http.Request) {
 	a.Println("start getArticle")
-
-	type getArticleResponse struct {
-		Body    string
-		PubDate *time.Time
-	}
 
 	articleID := chi.URLParam(r, "id")
 
 	var data getArticleResponse
-	err := a.store.Get("almanack.feed."+articleID, &data)
+	err := a.store.Get("almanack.scheduled-article."+articleID, &data)
 	switch {
 	case errutil.Is(err, errutil.NotFound):
 		// continue
@@ -333,4 +339,58 @@ func (a *appEnv) getArticle(w http.ResponseWriter, r *http.Request) {
 	}
 	data.Body = toml
 	a.jsonResponse(http.StatusOK, w, &data)
+}
+
+func (a *appEnv) postArticle(w http.ResponseWriter, r *http.Request) {
+	a.Println("start postArticle")
+
+	articleID := chi.URLParam(r, "id")
+
+	var userData getArticleResponse
+	if err := errutil.DecodeJSONBody(w, r, &userData); err != nil {
+		a.errorResponse(w, err)
+		return
+	}
+
+	// Get the lock
+	unlock, err := a.store.GetLock("almanack.scheduled-articles-lock")
+	defer unlock()
+	if err != nil {
+		a.errorResponse(w, err)
+		return
+	}
+
+	// Save the article
+	if err := a.store.Set("almanack.scheduled-article."+articleID, &userData); err != nil {
+		a.errorResponse(w, err)
+		return
+	}
+
+	// Get the existing list of scheduled articles
+	ids := map[string]bool{}
+	if err = a.store.Get("almanack.scheduled-articles-list", &ids); err != nil &&
+		!errutil.Is(err, errutil.NotFound) {
+		a.errorResponse(w, err)
+		return
+	}
+
+	// If the status of the article changed, update the list
+	shouldPub := userData.PubDate != nil
+	hasChanged := shouldPub != ids[articleID]
+
+	if hasChanged {
+		ids[articleID] = shouldPub
+		if err := a.store.Set("almanack.scheduled-articles-list", &ids); err != nil {
+			a.errorResponse(w, err)
+			return
+		}
+	}
+
+	a.jsonResponse(http.StatusAccepted, w, &struct {
+		Status  int    `json:"status"`
+		Message string `json:"message"`
+	}{
+		http.StatusAccepted,
+		http.StatusText(http.StatusAccepted),
+	})
 }

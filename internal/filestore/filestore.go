@@ -94,3 +94,11 @@ func (loc Loc) GetSet(key string, getv, setv interface{}) (err error) {
 	}
 	return geterr
 }
+
+func (loc Loc) GetLock(key string) (unlock func(), err error) {
+	// TODO: actual locking
+	loc.printf("noop getlock %q", key)
+	return func() {
+		loc.printf("noop unlock %q", key)
+	}, nil
+}
