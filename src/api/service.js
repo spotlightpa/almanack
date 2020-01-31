@@ -31,7 +31,8 @@ export function makeService($auth) {
   let requestBuffer = {};
   async function bufferRequest(key, cb) {
     if (requestBuffer[key]) {
-      console.warning("buffer", key);
+      // eslint-disable-next-line no-console
+      console.warning("buffering request", key);
       return await requestBuffer[key];
     }
     let promise = cb();
