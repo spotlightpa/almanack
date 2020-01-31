@@ -1,3 +1,5 @@
-> 1%
-last 2 versions
-not ie < 11
+last 2 Chrome version
+last 2 Firefox version
+last 2 Safari version
+last 1 ChromeAndroid version
+last 1 iOS version
