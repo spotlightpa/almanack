@@ -1,6 +1,7 @@
 package worker
 
 import (
+	"context"
 	"encoding/json"
 	"flag"
 	"fmt"
@@ -18,6 +19,7 @@ import (
 
 	"github.com/spotlightpa/almanack/internal/errutil"
 	"github.com/spotlightpa/almanack/internal/filestore"
+	"github.com/spotlightpa/almanack/internal/github"
 	"github.com/spotlightpa/almanack/internal/jsonschema"
 	"github.com/spotlightpa/almanack/internal/redis"
 	"github.com/spotlightpa/almanack/internal/redisflag"
@@ -40,7 +42,7 @@ func CLI(args []string) error {
 func parseArgs(args []string) (*appEnv, error) {
 	var a appEnv
 	fl := flag.NewFlagSet(AppName, flag.ContinueOnError)
-	fl.StringVar(&a.srcFeedURL, "src-feed", "", "source URL for Arc feed")
+	fl.StringVar(&a.srcFeedURL, "src-feed", "", "source `URL` for Arc feed")
 	fl.StringVar(&a.mcapi, "mc-api-key", "", "API `key` for MailChimp")
 	fl.StringVar(&a.mclistid, "mc-list-id", "", "List `ID` MailChimp campaign")
 	getDialer := redisflag.Var(fl, "redis-url", "`URL` connection string for Redis")
@@ -50,6 +52,7 @@ func parseArgs(args []string) (*appEnv, error) {
 		"silent",
 		`don't log debug output`,
 	)
+	getGithub := github.Var(fl)
 	fl.Usage = func() {
 		fmt.Fprintf(fl.Output(), `almanack-worker help
 
@@ -63,24 +66,35 @@ Options:
 	if d := getDialer(); d != nil {
 		var err error
 		if a.store, err = redis.New(d, a.Logger); err != nil {
+			a.Logger.Printf("could not connect to redis: %v", err)
 			return nil, err
 		}
 	} else {
 		a.store = filestore.New("", "almanack", a.Logger)
 	}
+	if gh, err := getGithub(a.Logger); err != nil {
+		a.Logger.Printf("could not connect to Github: %v", err)
+		return nil, err
+	} else {
+		a.gh = gh
+	}
 	return &a, nil
+}
+
+type store interface {
+	Get(key string, v interface{}) error
+	Set(key string, v interface{}) error
+	GetSet(key string, getv, setv interface{}) (err error)
+	GetLock(key string) (unlock func(), err error)
 }
 
 type appEnv struct {
 	srcFeedURL string
 	mcapi      string
 	mclistid   string
-	store      getsetter
+	store
+	gh *github.Client
 	*log.Logger
-}
-
-type getsetter interface {
-	GetSet(key string, getv, setv interface{}) (err error)
 }
 
 func (a *appEnv) exec() error {
@@ -88,6 +102,18 @@ func (a *appEnv) exec() error {
 	start := time.Now()
 	defer func() { a.Println("finished in", time.Since(start)) }()
 
+	return errutil.ExecParallel(
+		a.updateFeed,
+		a.publishStories,
+	)
+}
+
+func (a *appEnv) updateFeed() error {
+	a.Println("starting updateFeed")
+	if a.srcFeedURL == "" {
+		a.Println("aborting: no feed URL provided")
+		return nil
+	}
 	a.Println("fetching", a.srcFeedURL)
 	var newfeed, oldfeed jsonschema.API
 	if err := a.fetchJSON(a.srcFeedURL, &newfeed); err != nil {
@@ -152,6 +178,11 @@ func diffFeed(newfeed, oldfeed jsonschema.API) []jsonschema.Contents {
 }
 
 func (a *appEnv) SendCampaign(subject, body string) error {
+	if a.mcapi == "" {
+		a.Println("no MailChimp client, debugging output")
+		fmt.Println(body)
+		return nil
+	}
 	// Using MC APIv2 because in v3 they decided REST means
 	// not being able to create and send a campign in any efficient way
 	chimp := gochimp.NewChimp(a.mcapi, true)
@@ -188,6 +219,7 @@ Planned for {{ .Planning.Scheduling.PlannedPublishDate.Format "January 2, 2006" 
 Publication Notes:
 
 {{ . }}
+
 {{ end -}}
 
 Budget:
@@ -218,4 +250,69 @@ func (a *appEnv) makeMessage(diff []jsonschema.Contents) (subject, body string) 
 	}
 	body = buf.String()
 	return
+}
+
+type getArticleResponse struct {
+	// TODO: Use feed.Story, move to package
+	Body    string
+	PubDate *time.Time
+}
+
+func (a *appEnv) publishStories() error {
+	a.Println("starting publishStories")
+	if a.gh == nil {
+		a.Println("aborting: no Github client provided")
+		return nil
+	}
+
+	// Get the lock
+	unlock, err := a.store.GetLock("almanack.scheduled-articles-lock")
+	defer unlock()
+	if err != nil {
+		return err
+	}
+
+	// Get the existing list of scheduled articles
+	ids := map[string]bool{}
+	if err = a.store.Get("almanack.scheduled-articles-list", &ids); err != nil &&
+		!errutil.Is(err, errutil.NotFound) {
+		return err
+	}
+
+	var removeIDs []string
+	hasChanged := false
+
+	// Get the articles
+	for articleID, ok := range ids {
+		if !ok {
+			removeIDs = append(removeIDs, articleID)
+			continue
+		}
+		var article getArticleResponse
+		if err := a.store.Get("almanack.scheduled-article."+articleID, &article); err != nil {
+			return err
+		}
+		// If it's passed due, publish to Github
+		shouldPub := article.PubDate != nil && article.PubDate.Before(time.Now())
+		if shouldPub {
+			removeIDs = append(removeIDs, articleID)
+			ctx := context.Background()
+			msg := fmt.Sprintf("Content: publishing %q", articleID)
+			path := fmt.Sprintf("content/news/%s.md", articleID)
+			if err := a.gh.CreateFile(ctx, msg, path, []byte(article.Body)); err != nil {
+				return err
+			}
+		}
+	}
+
+	// If the status of the article changed, update the list
+	if hasChanged {
+		for _, id := range removeIDs {
+			delete(ids, id)
+		}
+		if err := a.store.Set("almanack.scheduled-articles-list", &ids); err != nil {
+			return err
+		}
+	}
+	return nil
 }

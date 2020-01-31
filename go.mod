@@ -16,8 +16,10 @@ require (
 	github.com/golang/gddo v0.0.0-20200127195332-7365cb292b8b
 	github.com/gomodule/redigo v2.0.0+incompatible
 	github.com/google/go-cmp v0.3.1 // indirect
+	github.com/google/go-github/v29 v29.0.2
 	github.com/mattbaird/gochimp v0.0.0-20180111040707-a267553896d1
 	github.com/peterbourgon/ff v1.6.0
 	github.com/piotrkubisa/apigo v1.1.2-0.20190907190536-6de39ca9cf97
 	github.com/pkg/errors v0.9.1 // indirect
+	golang.org/x/oauth2 v0.0.0-20180821212333-d2e6202438be
 )
