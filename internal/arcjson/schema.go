@@ -1,4 +1,4 @@
-package jsonschema
+package arcjson
 
 import (
 	"encoding/json"

@@ -19,10 +19,10 @@ import (
 	"github.com/peterbourgon/ff"
 	"github.com/piotrkubisa/apigo"
 
+	"github.com/spotlightpa/almanack/internal/arcjson"
 	"github.com/spotlightpa/almanack/internal/errutil"
 	"github.com/spotlightpa/almanack/internal/feed"
 	"github.com/spotlightpa/almanack/internal/filestore"
-	"github.com/spotlightpa/almanack/internal/jsonschema"
 	"github.com/spotlightpa/almanack/internal/netlifyid"
 	"github.com/spotlightpa/almanack/internal/redis"
 	"github.com/spotlightpa/almanack/internal/redisflag"
@@ -288,7 +288,7 @@ const feedKey = "almanack-worker.feed"
 func (a *appEnv) upcoming(w http.ResponseWriter, r *http.Request) {
 	a.Println("start upcoming")
 
-	var feed jsonschema.API
+	var feed arcjson.API
 	if err := a.store.Get(feedKey, &feed); err != nil {
 		a.errorResponse(w, err)
 		return
@@ -320,7 +320,7 @@ func (a *appEnv) getArticle(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var f jsonschema.API
+	var f arcjson.API
 	if err := a.store.Get(feedKey, &f); err != nil {
 		a.errorResponse(w, err)
 		return

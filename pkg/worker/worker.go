@@ -17,10 +17,10 @@ import (
 	"github.com/mattbaird/gochimp"
 	"github.com/peterbourgon/ff"
 
+	"github.com/spotlightpa/almanack/internal/arcjson"
 	"github.com/spotlightpa/almanack/internal/errutil"
 	"github.com/spotlightpa/almanack/internal/filestore"
 	"github.com/spotlightpa/almanack/internal/github"
-	"github.com/spotlightpa/almanack/internal/jsonschema"
 	"github.com/spotlightpa/almanack/internal/redis"
 	"github.com/spotlightpa/almanack/internal/redisflag"
 )
@@ -115,7 +115,7 @@ func (a *appEnv) updateFeed() error {
 		return nil
 	}
 	a.Println("fetching", a.srcFeedURL)
-	var newfeed, oldfeed jsonschema.API
+	var newfeed, oldfeed arcjson.API
 	if err := a.fetchJSON(a.srcFeedURL, &newfeed); err != nil {
 		return err
 	}
@@ -160,16 +160,16 @@ func (a *appEnv) fetchJSON(url string, v interface{}) error {
 	return nil
 }
 
-func diffFeed(newfeed, oldfeed jsonschema.API) []jsonschema.Contents {
+func diffFeed(newfeed, oldfeed arcjson.API) []arcjson.Contents {
 	readyids := make(map[string]bool, len(oldfeed.Contents))
 	for _, story := range oldfeed.Contents {
-		if story.Workflow.StatusCode >= jsonschema.StatusSlot {
+		if story.Workflow.StatusCode >= arcjson.StatusSlot {
 			readyids[story.ID] = true
 		}
 	}
-	var newstories []jsonschema.Contents
+	var newstories []arcjson.Contents
 	for _, story := range newfeed.Contents {
-		if story.Workflow.StatusCode >= jsonschema.StatusSlot &&
+		if story.Workflow.StatusCode >= arcjson.StatusSlot &&
 			!readyids[story.ID] {
 			newstories = append(newstories, story)
 		}
@@ -235,7 +235,7 @@ Column inches: {{ .Planning.StoryLength.InchCountActual}}
 {{ end -}}
 `
 
-func (a *appEnv) makeMessage(diff []jsonschema.Contents) (subject, body string) {
+func (a *appEnv) makeMessage(diff []arcjson.Contents) (subject, body string) {
 	slugs := make([]string, len(diff))
 	for i := range diff {
 		slugs[i] = diff[i].Slug

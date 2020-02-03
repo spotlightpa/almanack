@@ -10,8 +10,8 @@ import (
 
 	"github.com/BurntSushi/toml"
 
+	"github.com/spotlightpa/almanack/internal/arcjson"
 	"github.com/spotlightpa/almanack/internal/errutil"
-	"github.com/spotlightpa/almanack/internal/jsonschema"
 )
 
 type Feed struct {
@@ -35,7 +35,7 @@ func (feed Feed) Get(id string) (*Story, error) {
 }
 
 func (f *Feed) UnmarshalJSON(data []byte) error {
-	var v jsonschema.API
+	var v arcjson.API
 	err := json.Unmarshal(data, &v)
 	f.Stories = make([]*Story, 0, len(v.Contents))
 	for _, content := range v.Contents {
@@ -68,7 +68,7 @@ type Story struct {
 	LinkTitle    string    `toml:"linktitle"`
 }
 
-func ContentToStory(content jsonschema.Contents) *Story {
+func ContentToStory(content arcjson.Contents) *Story {
 	authors := make([]string, len(content.Credits.By))
 	for i := range content.Credits.By {
 		authors[i] = content.Credits.By[i].Name
@@ -119,32 +119,32 @@ func slugFromURL(s string) string {
 func readContentElements(rawels []*json.RawMessage, body *strings.Builder) {
 	for i, raw := range rawels {
 		var _type string
-		wrapper := jsonschema.ContentElementType{Type: &_type}
+		wrapper := arcjson.ContentElementType{Type: &_type}
 		if err := json.Unmarshal(*raw, &wrapper); err != nil {
 			log.Printf("runtime error: %v", err)
 		}
 		var graf string
 		switch _type {
 		case "text", "raw_html":
-			wrapper := jsonschema.ContentElementText{Content: &graf}
+			wrapper := arcjson.ContentElementText{Content: &graf}
 			if err := json.Unmarshal(*raw, &wrapper); err != nil {
 				log.Printf("runtime error: %v", err)
 			}
 
 		case "header":
-			var v jsonschema.ContentElementHeading
+			var v arcjson.ContentElementHeading
 			if err := json.Unmarshal(*raw, &v); err != nil {
 				log.Printf("runtime error: %v", err)
 			}
 			graf = strings.Repeat("#", v.Level) + " " + v.Content
 		case "oembed_response":
-			var v jsonschema.ContentElementOembed
+			var v arcjson.ContentElementOembed
 			if err := json.Unmarshal(*raw, &v); err != nil {
 				log.Printf("runtime error: %v", err)
 			}
 			graf = v.RawOembed.HTML
 		case "list":
-			var v jsonschema.ContentElementList
+			var v arcjson.ContentElementList
 			if err := json.Unmarshal(*raw, &v); err != nil {
 				log.Printf("runtime error: %v", err)
 			}
@@ -173,7 +173,7 @@ func readContentElements(rawels []*json.RawMessage, body *strings.Builder) {
 			}
 
 		case "image":
-			var v jsonschema.ContentElementImage
+			var v arcjson.ContentElementImage
 			if err := json.Unmarshal(*raw, &v); err != nil {
 				log.Printf("runtime error: %v", err)
 			}
@@ -199,7 +199,7 @@ type Image struct {
 	Credit, Caption, URL string
 }
 
-func imageFrom(p jsonschema.PromoItems) *Image {
+func imageFrom(p arcjson.PromoItems) *Image {
 	var credits []string
 	for i, credit := range p.Basic.Credits.By {
 		name := credit.Byline
