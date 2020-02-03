@@ -52,7 +52,7 @@ func parseArgs(args []string) (*appEnv, error) {
 		"silent",
 		`don't log debug output`,
 	)
-	getGithub := github.Var(fl)
+	getGithub := github.FlagVar(fl)
 	fl.Usage = func() {
 		fmt.Fprintf(fl.Output(), `almanack-worker help
 

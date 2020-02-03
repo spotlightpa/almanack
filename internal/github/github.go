@@ -12,7 +12,7 @@ type Logger interface {
 	Printf(format string, v ...interface{})
 }
 
-func Var(fl *flag.FlagSet) func(l Logger) (*Client, error) {
+func FlagVar(fl *flag.FlagSet) func(l Logger) (*Client, error) {
 	if fl == nil {
 		fl = flag.CommandLine
 	}
