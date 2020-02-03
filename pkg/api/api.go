@@ -21,11 +21,11 @@ import (
 
 	"github.com/spotlightpa/almanack/internal/arcjson"
 	"github.com/spotlightpa/almanack/internal/errutil"
-	"github.com/spotlightpa/almanack/internal/feed"
 	"github.com/spotlightpa/almanack/internal/filestore"
 	"github.com/spotlightpa/almanack/internal/netlifyid"
 	"github.com/spotlightpa/almanack/internal/redis"
 	"github.com/spotlightpa/almanack/internal/redisflag"
+	"github.com/spotlightpa/almanack/pkg/almanack"
 )
 
 const AppName = "almanack-api"
@@ -70,22 +70,18 @@ func parseArgs(args []string) (*appEnv, error) {
 		a.store = filestore.New("", "almanack", a.Logger)
 	}
 
+	a.auth = netlifyid.NewService(a.isLambda, a.Logger)
 	a.c = http.DefaultClient
 
 	return &a, nil
 }
 
-type store interface {
-	Get(key string, v interface{}) error
-	Set(key string, v interface{}) error
-	GetLock(key string) (unlock func(), err error)
-}
-
 type appEnv struct {
-	isLambda bool
 	port     string
+	isLambda bool
 	c        *http.Client
-	store    store
+	auth     almanack.AuthService
+	store    almanack.DataStore
 	*log.Logger
 }
 
@@ -109,13 +105,13 @@ func (a *appEnv) routes() http.Handler {
 	r.Use(middleware.Recoverer)
 	r.Get("/api/healthcheck", a.hello)
 	r.Route("/api", func(r chi.Router) {
-		r.Use(a.netlifyIdentityMiddleware)
+		r.Use(a.authMiddleware)
 		r.Get("/user-info", a.userInfo)
 		r.With(
-			a.netlifyPermissionMiddleware("editor"),
+			a.hasRoleMiddleware("editor"),
 		).Get("/upcoming", a.upcoming)
 		r.With(
-			a.netlifyPermissionMiddleware("Spotlight PA"),
+			a.hasRoleMiddleware("Spotlight PA"),
 		).Group(func(r chi.Router) {
 			r.Get("/articles/{id}", a.getArticle)
 			r.Post("/articles/{id}", a.postArticle)
@@ -164,79 +160,33 @@ func (a *appEnv) hello(w http.ResponseWriter, r *http.Request) {
 	w.Write(b)
 }
 
-type netlifyidContextType int
-
-const netlifyidContextKey = iota
-
-func setNetlifyID(r *http.Request, netID *netlifyid.JWT) *http.Request {
-	ctx := context.WithValue(r.Context(), netlifyidContextKey, netID)
-	return r.WithContext(ctx)
-}
-
-func getNetlifyID(r *http.Request) *netlifyid.JWT {
-	ctx := r.Context()
-	val := ctx.Value(netlifyidContextKey)
-	if val == nil { // interface nil
-		return nil // *JWT nil
-	}
-	return val.(*netlifyid.JWT)
-}
-
-func (a *appEnv) netlifyIdentityMiddleware(h http.Handler) http.Handler {
+func (a *appEnv) authMiddleware(h http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		a.Println("start netlifyIdentityMiddleware")
-		if !a.isLambda {
-			a.Println("skip netlifyIdentityMiddleware")
-			h.ServeHTTP(w, r)
-			return
-		}
-		netID, err := netlifyid.FromRequest(r)
+		a.Println("start authMiddleware")
+		r, err := a.auth.AddToRequest(r)
 		if err != nil {
 			a.errorResponse(w, err)
 			return
 		}
-		r = setNetlifyID(r, netID)
 		h.ServeHTTP(w, r)
 	})
 }
 
 func (a *appEnv) userInfo(w http.ResponseWriter, r *http.Request) {
 	a.Println("start userInfo")
-	userinfo := getNetlifyID(r)
+	userinfo, err := netlifyid.FromRequest(r)
+	if err != nil {
+		a.errorResponse(w, err)
+		return
+	}
 	a.jsonResponse(http.StatusOK, w, userinfo)
 }
 
-func (a *appEnv) netlifyPermissionMiddleware(role string) func(next http.Handler) http.Handler {
+func (a *appEnv) hasRoleMiddleware(role string) func(next http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			a.Println("starting permission middleware")
-			if !a.isLambda {
-				a.Println("skipping permission middleware")
-				next.ServeHTTP(w, r)
-				return
-			}
-
-			userinfo := getNetlifyID(r)
-			if userinfo == nil {
-				err := errutil.Response{
-					StatusCode: http.StatusInternalServerError,
-					Message:    "user info not set",
-					Log:        "no user info: is this localhost?",
-				}
-				a.errorResponse(w, err)
-				return
-			}
-			hasRole := userinfo.HasRole(role)
-			a.Printf("permission middleware: %s has role %s == %t",
-				userinfo.User.Email, role, hasRole)
-			if !hasRole {
-				err := errutil.Response{
-					StatusCode: http.StatusForbidden,
-					Message:    http.StatusText(http.StatusForbidden),
-					Log: fmt.Sprintf(
-						"unauthorized user only had roles: %v",
-						userinfo.User.AppMetadata.Roles),
-				}
+			a.Println("starting hasRoleMiddleware")
+			if err := a.auth.HasRole(r, role); err != nil {
 				a.errorResponse(w, err)
 				return
 			}
@@ -331,7 +281,11 @@ func (a *appEnv) getArticle(w http.ResponseWriter, r *http.Request) {
 		a.errorResponse(w, err)
 		return
 	}
-	story := feed.ContentToStory(*content)
+	story, err := content.ToArticle()
+	if err != nil {
+		a.errorResponse(w, err)
+		return
+	}
 	toml, err := story.ToTOML()
 	if err != nil {
 		a.errorResponse(w, err)
