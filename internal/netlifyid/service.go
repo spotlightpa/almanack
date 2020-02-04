@@ -2,7 +2,6 @@ package netlifyid
 
 import (
 	"context"
-	"fmt"
 	"net/http"
 
 	"github.com/spotlightpa/almanack/internal/errutil"
@@ -13,6 +12,7 @@ func NewService(isLambda bool, l almanack.Logger) almanack.AuthService {
 	if isLambda {
 		return AuthService{l}
 	}
+	l.Printf("mocking auth")
 	return MockAuthService{l}
 }
 
@@ -49,14 +49,11 @@ func (as AuthService) HasRole(r *http.Request, role string) error {
 		if hasRole {
 			return nil
 		}
-		err := errutil.Response{
-			StatusCode: http.StatusForbidden,
-			Message:    http.StatusText(http.StatusForbidden),
-			Log: fmt.Sprintf(
-				"unauthorized user only had roles: %v",
-				jwt.User.AppMetadata.Roles),
-		}
-		return err
+
+		as.Logger.Printf("unauthorized user only had roles: %v",
+			jwt.User.AppMetadata.Roles)
+
+		return errutil.Unauthorized
 	}
 	as.Logger.Printf("no identity found: running on AWS?")
 	err := errutil.Response{

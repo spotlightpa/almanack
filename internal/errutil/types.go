@@ -1,42 +1,29 @@
 package errutil
 
 import (
-	"errors"
 	"net/http"
 	"reflect"
-
-	"github.com/spotlightpa/almanack/internal/redis"
 )
 
 type Type int8
 
 const (
 	NotFound Type = iota
+	Unauthorized
 )
 
 var names = []string{
-	NotFound: "Not Found",
+	NotFound:     "Not Found",
+	Unauthorized: "Unauthorized",
 }
 
 func (t Type) Error() string {
 	return names[int(t)]
 }
 
-func Is(err error, t Type) bool {
-	switch t {
-	case NotFound:
-		if errors.Is(err, redis.ErrNil) {
-			return true
-		}
-	}
-	if errors.Is(err, t) {
-		return true
-	}
-	return false
-}
-
 var codes = []int{
-	NotFound: http.StatusNotFound,
+	NotFound:     http.StatusNotFound,
+	Unauthorized: http.StatusForbidden,
 }
 
 func (t Type) As(v interface{}) bool {

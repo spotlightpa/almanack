@@ -6,7 +6,10 @@ import (
 	"github.com/carlmjohnson/errutil"
 )
 
-var Merge = errutil.Merge
+var (
+	Merge = errutil.Merge
+	Defer = errutil.Defer
+)
 
 type Slice = errutil.Slice
 

@@ -4,9 +4,9 @@ import (
 	"encoding/json"
 	"time"
 
-	"github.com/carlmjohnson/errutil"
 	"github.com/go-redsync/redsync"
 	"github.com/gomodule/redigo/redis"
+	"github.com/spotlightpa/almanack/internal/errutil"
 )
 
 var ErrNil = redis.ErrNil
@@ -40,6 +40,13 @@ func New(d Dialer, l Logger) (*Store, error) {
 	return &c, nil
 }
 
+func wrapErr(err error) error {
+	if err == redis.ErrNil {
+		return errutil.NotFound
+	}
+	return err
+}
+
 func (rs *Store) printf(format string, v ...interface{}) {
 	if rs.l != nil {
 		rs.l.Printf(format, v...)
@@ -53,7 +60,7 @@ func (rs *Store) Ping() (err error) {
 	defer errutil.Defer(&err, conn.Close)
 
 	_, err = conn.Do("PING")
-	return
+	return wrapErr(err)
 }
 
 // Get calls GET in Redis and converts values from JSON bytes
@@ -64,7 +71,7 @@ func (rs *Store) Get(key string, getv interface{}) (err error) {
 
 	getb, err := redis.Bytes(conn.Do("GET", key))
 	if err != nil {
-		return err
+		return wrapErr(err)
 	}
 	return json.Unmarshal(getb, getv)
 }
@@ -81,7 +88,7 @@ func (rs *Store) Set(key string, setv interface{}) (err error) {
 	}
 
 	_, err = conn.Do("SET", key, setb)
-	return err
+	return wrapErr(err)
 }
 
 // GetSet converts values to JSON bytes and calls GETSET in Redis
@@ -96,7 +103,7 @@ func (rs *Store) GetSet(key string, getv, setv interface{}) (err error) {
 	}
 	getb, err := redis.Bytes(conn.Do("GETSET", key, setb))
 	if err != nil {
-		return err
+		return wrapErr(err)
 	}
 	return json.Unmarshal(getb, getv)
 }
