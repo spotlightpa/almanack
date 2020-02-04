@@ -3,6 +3,7 @@ package worker
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"flag"
 	"fmt"
 	"io/ioutil"
@@ -122,7 +123,7 @@ func (a *appEnv) updateFeed() error {
 
 	a.Println("checking redis")
 	err := a.store.GetSet("almanack-worker.feed", &oldfeed, &newfeed)
-	if errutil.Is(err, errutil.NotFound) {
+	if errors.Is(err, errutil.NotFound) {
 		a.Println("cache miss for old feed")
 		return nil
 	}
@@ -275,7 +276,7 @@ func (a *appEnv) publishStories() error {
 	// Get the existing list of scheduled articles
 	ids := map[string]bool{}
 	if err = a.store.Get("almanack.scheduled-articles-list", &ids); err != nil &&
-		!errutil.Is(err, errutil.NotFound) {
+		!errors.Is(err, errutil.NotFound) {
 		return err
 	}
 

@@ -260,7 +260,7 @@ func (a *appEnv) getArticle(w http.ResponseWriter, r *http.Request) {
 	var data getArticleResponse
 	err := a.store.Get("almanack.scheduled-article."+articleID, &data)
 	switch {
-	case errutil.Is(err, errutil.NotFound):
+	case errors.Is(err, errutil.NotFound):
 		// continue
 	case err == nil:
 		a.jsonResponse(http.StatusOK, w, &data)
@@ -323,7 +323,7 @@ func (a *appEnv) postArticle(w http.ResponseWriter, r *http.Request) {
 	// Get the existing list of scheduled articles
 	ids := map[string]bool{}
 	if err = a.store.Get("almanack.scheduled-articles-list", &ids); err != nil &&
-		!errutil.Is(err, errutil.NotFound) {
+		!errors.Is(err, errutil.NotFound) {
 		a.errorResponse(w, err)
 		return
 	}
