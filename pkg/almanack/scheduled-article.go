@@ -7,5 +7,6 @@ type ScheduledArticleService struct {
 
 type ScheduledArticle struct {
 	Article
-	PubTime *time.Time
+	Body        string
+	ScheduleFor *time.Time
 }

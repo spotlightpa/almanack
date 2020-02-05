@@ -115,7 +115,6 @@ func (a *appEnv) updateFeed() error {
 		return err
 	}
 
-	a.Println("checking redis")
 	err := a.store.GetSet("almanack-worker.feed", &oldfeed, &newfeed)
 	if errors.Is(err, errutil.NotFound) {
 		a.Println("cache miss for old feed")
@@ -125,6 +124,7 @@ func (a *appEnv) updateFeed() error {
 		return err
 	}
 
+	// TODO: Better status checking, save mail sent with GETSET
 	newstories := diffFeed(newfeed, oldfeed)
 	a.Printf("got %d newly ready stories", len(newstories))
 	if len(newstories) > 0 {
@@ -217,12 +217,6 @@ func (a *appEnv) makeMessage(diff []arcjson.Contents) (subject, body string) {
 	return
 }
 
-type getArticleResponse struct {
-	// TODO: Use feed.Story, move to package
-	Body    string
-	PubDate *time.Time
-}
-
 func (a *appEnv) publishStories() error {
 	a.Println("starting publishStories")
 	if a.gh == nil {
@@ -253,20 +247,21 @@ func (a *appEnv) publishStories() error {
 			removeIDs = append(removeIDs, articleID)
 			continue
 		}
-		var article getArticleResponse
+		var article almanack.ScheduledArticle
 		if err := a.store.Get("almanack.scheduled-article."+articleID, &article); err != nil {
 			return err
 		}
 		// If it's passed due, publish to Github
-		shouldPub := article.PubDate != nil && article.PubDate.Before(time.Now())
-		if shouldPub {
-			removeIDs = append(removeIDs, articleID)
-			ctx := context.Background()
-			msg := fmt.Sprintf("Content: publishing %q", articleID)
-			path := fmt.Sprintf("content/news/%s.md", articleID)
-			if err := a.gh.CreateFile(ctx, msg, path, []byte(article.Body)); err != nil {
-				return err
-			}
+		shouldPub := article.ScheduleFor != nil && article.ScheduleFor.Before(time.Now())
+		if !shouldPub {
+			continue
+		}
+		removeIDs = append(removeIDs, articleID)
+		ctx := context.Background()
+		msg := fmt.Sprintf("Content: publishing %q", articleID)
+		path := fmt.Sprintf("content/news/%s.md", articleID)
+		if err := a.gh.CreateFile(ctx, msg, path, []byte(article.Body)); err != nil {
+			return err
 		}
 	}
 

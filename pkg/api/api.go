@@ -206,18 +206,12 @@ func (a *appEnv) upcoming(w http.ResponseWriter, r *http.Request) {
 	a.jsonResponse(http.StatusOK, w, feed)
 }
 
-type getArticleResponse struct {
-	// TODO: Use feed.Story
-	Body    string
-	PubDate *time.Time
-}
-
 func (a *appEnv) getArticle(w http.ResponseWriter, r *http.Request) {
 	a.Println("start getArticle")
 
 	articleID := chi.URLParam(r, "id")
 
-	var data getArticleResponse
+	var data almanack.ScheduledArticle
 	err := a.store.Get("almanack.scheduled-article."+articleID, &data)
 	switch {
 	case errors.Is(err, errutil.NotFound):
@@ -251,6 +245,7 @@ func (a *appEnv) getArticle(w http.ResponseWriter, r *http.Request) {
 		a.errorResponse(w, err)
 		return
 	}
+	data.Article = *story
 	data.Body = toml
 	a.jsonResponse(http.StatusOK, w, &data)
 }
@@ -260,7 +255,7 @@ func (a *appEnv) postArticle(w http.ResponseWriter, r *http.Request) {
 
 	articleID := chi.URLParam(r, "id")
 
-	var userData getArticleResponse
+	var userData almanack.ScheduledArticle
 	if err := errutil.DecodeJSONBody(w, r, &userData); err != nil {
 		a.errorResponse(w, err)
 		return
@@ -289,7 +284,7 @@ func (a *appEnv) postArticle(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// If the status of the article changed, update the list
-	shouldPub := userData.PubDate != nil
+	shouldPub := userData.ScheduleFor != nil
 	hasChanged := shouldPub != ids[articleID]
 
 	if hasChanged {
