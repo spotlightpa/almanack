@@ -15,15 +15,16 @@ import (
 	"time"
 
 	"github.com/carlmjohnson/flagext"
-	"github.com/mattbaird/gochimp"
 	"github.com/peterbourgon/ff"
 
 	"github.com/spotlightpa/almanack/internal/arcjson"
 	"github.com/spotlightpa/almanack/internal/errutil"
 	"github.com/spotlightpa/almanack/internal/filestore"
 	"github.com/spotlightpa/almanack/internal/github"
+	"github.com/spotlightpa/almanack/internal/mailchimp"
 	"github.com/spotlightpa/almanack/internal/redis"
 	"github.com/spotlightpa/almanack/internal/redisflag"
+	"github.com/spotlightpa/almanack/pkg/almanack"
 )
 
 const AppName = "almanack-worker"
@@ -44,8 +45,8 @@ func parseArgs(args []string) (*appEnv, error) {
 	var a appEnv
 	fl := flag.NewFlagSet(AppName, flag.ContinueOnError)
 	fl.StringVar(&a.srcFeedURL, "src-feed", "", "source `URL` for Arc feed")
-	fl.StringVar(&a.mcapi, "mc-api-key", "", "API `key` for MailChimp")
-	fl.StringVar(&a.mclistid, "mc-list-id", "", "List `ID` MailChimp campaign")
+	mcAPIKey := fl.String("mc-api-key", "", "API `key` for MailChimp")
+	mcListID := fl.String("mc-list-id", "", "List `ID` MailChimp campaign")
 	getDialer := redisflag.Var(fl, "redis-url", "`URL` connection string for Redis")
 	a.Logger = log.New(nil, AppName+" ", log.LstdFlags)
 	fl.Var(
@@ -64,6 +65,7 @@ Options:
 	if err := ff.Parse(fl, args, ff.WithEnvVarPrefix("ALMANACK")); err != nil {
 		return nil, err
 	}
+	a.email = mailchimp.NewMailService(*mcAPIKey, *mcListID, a.Logger)
 	if d := getDialer(); d != nil {
 		var err error
 		if a.store, err = redis.New(d, a.Logger); err != nil {
@@ -82,19 +84,11 @@ Options:
 	return &a, nil
 }
 
-type store interface {
-	Get(key string, v interface{}) error
-	Set(key string, v interface{}) error
-	GetSet(key string, getv, setv interface{}) (err error)
-	GetLock(key string) (unlock func(), err error)
-}
-
 type appEnv struct {
 	srcFeedURL string
-	mcapi      string
-	mclistid   string
-	store
-	gh *github.Client
+	store      almanack.DataStore
+	email      almanack.EmailService
+	gh         *github.Client
 	*log.Logger
 }
 
@@ -136,7 +130,7 @@ func (a *appEnv) updateFeed() error {
 	if len(newstories) > 0 {
 		subject, body := a.makeMessage(newstories)
 		a.Printf("sending %q", subject)
-		return a.SendCampaign(subject, body)
+		return a.email.SendEmail(subject, body)
 	}
 
 	return nil
@@ -176,36 +170,6 @@ func diffFeed(newfeed, oldfeed arcjson.API) []arcjson.Contents {
 		}
 	}
 	return newstories
-}
-
-func (a *appEnv) SendCampaign(subject, body string) error {
-	if a.mcapi == "" {
-		a.Println("no MailChimp client, debugging output")
-		fmt.Println(body)
-		return nil
-	}
-	// Using MC APIv2 because in v3 they decided REST means
-	// not being able to create and send a campign in any efficient way
-	chimp := gochimp.NewChimp(a.mcapi, true)
-	resp, err := chimp.CampaignCreate(gochimp.CampaignCreate{
-		Type: "plaintext",
-		Options: gochimp.CampaignCreateOptions{
-			Subject:   subject,
-			ListID:    a.mclistid,
-			FromEmail: "press@spotlightpa.org",
-			FromName:  "Spotlight PA",
-		},
-		Content: gochimp.CampaignCreateContent{
-			Text: body,
-		},
-	})
-	if err != nil {
-		return err
-	}
-	a.Printf("created campaign %q", resp.Id)
-	resp2, err := chimp.CampaignSend(resp.Id)
-	a.Printf("sent %v", resp2.Complete)
-	return err
 }
 
 const messageTemplate = `

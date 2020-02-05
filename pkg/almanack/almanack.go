@@ -18,6 +18,10 @@ type ContentStore interface {
 	CreateFile(ctx context.Context, msg, path string, content []byte) error
 }
 
+type EmailService interface {
+	SendEmail(subject, body string) error
+}
+
 type ImageStore interface{}
 
 type DataStore interface {
