@@ -27,6 +27,10 @@ func whitelistEmails(request events.APIGatewayProxyRequest) (events.APIGatewayPr
 		return events.APIGatewayProxyResponse{}, err
 	}
 
+	if strings.HasSuffix(data.User.Email, "@spotlightpa.org") {
+		fmt.Printf("%s has domain %s", data.User.Email, suffix)
+		data.User.AppMetadata.Roles = append(data.User.AppMetadata.Roles, "Spotlight PA")
+	}
 	suffixes := strings.FieldsFunc(os.Getenv("ALMANACK_WHITELIST_DOMAINS"),
 		func(r rune) bool { return r == ',' || r == ' ' })
 	for _, suffix := range suffixes {
