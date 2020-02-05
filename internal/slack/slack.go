@@ -25,6 +25,6 @@ func (sc Client) Post(msg Message) error {
 		sc.l.Printf("no slack client; skipping posting message")
 		return nil
 	}
-	sc.l.Printf("posting Slack message %.10q...")
+	sc.l.Printf("posting Slack message")
 	return sc.Client.Post(msg)
 }
