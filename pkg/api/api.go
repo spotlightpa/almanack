@@ -1,12 +1,10 @@
 package api
 
 import (
-	"context"
 	"encoding/json"
 	"errors"
 	"flag"
 	"fmt"
-	"io/ioutil"
 	"log"
 	"net/http"
 	"net/http/httputil"
@@ -103,7 +101,7 @@ func (a *appEnv) routes() http.Handler {
 	r.Use(middleware.RealIP)
 	r.Use(middleware.RequestLogger(&middleware.DefaultLogFormatter{Logger: a.Logger}))
 	r.Use(middleware.Recoverer)
-	r.Get("/api/healthcheck", a.hello)
+	r.Get("/api/healthcheck", a.ping)
 	r.Route("/api", func(r chi.Router) {
 		r.Use(a.authMiddleware)
 		r.Get("/user-info", a.userInfo)
@@ -148,8 +146,8 @@ func (a *appEnv) errorResponse(w http.ResponseWriter, err error) {
 	a.jsonResponse(errResp.StatusCode, w, errResp)
 }
 
-func (a *appEnv) hello(w http.ResponseWriter, r *http.Request) {
-	a.Println("start hello")
+func (a *appEnv) ping(w http.ResponseWriter, r *http.Request) {
+	a.Println("start ping")
 	w.Header().Set("Content-Type", "text/plain")
 	w.Header().Set("Cache-Control", "public, max-age=60")
 	b, err := httputil.DumpRequest(r, true)
@@ -193,44 +191,6 @@ func (a *appEnv) hasRoleMiddleware(role string) func(next http.Handler) http.Han
 			next.ServeHTTP(w, r)
 		})
 	}
-}
-
-func (a *appEnv) fetchJSON(ctx context.Context, method, url string, v interface{}) error {
-	req, err := http.NewRequestWithContext(ctx, method, url, nil)
-	if err != nil {
-		return errutil.Response{
-			StatusCode: http.StatusInternalServerError,
-			Message:    "internal error",
-			Log:        fmt.Sprintf("bad downstream request: %v", err),
-		}
-	}
-	resp, err := a.c.Do(req)
-	if err != nil {
-		return errutil.Response{
-			StatusCode: http.StatusBadGateway,
-			Message:    "could not contact Inquirer server",
-			Log:        fmt.Sprintf("bad downstream connect: %v", err),
-		}
-	}
-	defer resp.Body.Close()
-	b, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		return errutil.Response{
-			StatusCode: http.StatusBadGateway,
-			Message:    "could not read from Inquirer server",
-			Log:        fmt.Sprintf("bad downstream read: %v", err),
-		}
-	}
-
-	if err = json.Unmarshal(b, v); err != nil {
-		return errutil.Response{
-			StatusCode: http.StatusBadGateway,
-			Message:    "could not decode from Inquirer server",
-			Log:        fmt.Sprintf("bad downstream decode: %v", err),
-		}
-	}
-
-	return nil
 }
 
 const feedKey = "almanack-worker.feed"
