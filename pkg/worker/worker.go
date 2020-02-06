@@ -124,9 +124,37 @@ func (a *appEnv) updateFeed() error {
 		return err
 	}
 
-	// TODO: Better status checking, save mail sent with GETSET
+	// TODO: Better status checking
 	newstories := diffFeed(newfeed, oldfeed)
 	a.Printf("got %d newly ready stories", len(newstories))
+	// Check if the story has been sent before
+	{
+		sentStories := make([]bool, len(newstories))
+		getters := make([]func() error, len(newstories))
+		for i := range newstories {
+			j := i // Fix closure value
+			story := newstories[j]
+			getters[i] = func() error {
+				err := a.store.GetSet("almanack.sent-campaigns."+story.ID,
+					&sentStories[j], true)
+				if err == errutil.NotFound {
+					return nil
+				}
+				return err
+			}
+		}
+		if err = errutil.ExecParallel(getters...); err != nil {
+			return err
+		}
+		filteredStories := newstories[:0]
+		for i, story := range newstories {
+			if !sentStories[i] {
+				filteredStories = append(filteredStories, story)
+			}
+		}
+		newstories = filteredStories
+	}
+	a.Printf("got %d stories previously unsent", len(newstories))
 	if len(newstories) > 0 {
 		subject, body := a.makeMessage(newstories)
 		a.Printf("sending %q", subject)
