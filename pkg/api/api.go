@@ -20,6 +20,7 @@ import (
 	"github.com/spotlightpa/almanack/internal/arcjson"
 	"github.com/spotlightpa/almanack/internal/errutil"
 	"github.com/spotlightpa/almanack/internal/filestore"
+	"github.com/spotlightpa/almanack/internal/herokuapi"
 	"github.com/spotlightpa/almanack/internal/netlifyid"
 	"github.com/spotlightpa/almanack/internal/redis"
 	"github.com/spotlightpa/almanack/internal/redisflag"
@@ -31,6 +32,7 @@ const AppName = "almanack-api"
 func CLI(args []string) error {
 	a, err := parseArgs(args)
 	if err != nil {
+		fmt.Fprintf(os.Stderr, "Startup error: %v\n", err)
 		return err
 	}
 	if err := a.exec(); err != nil {
@@ -52,6 +54,7 @@ func parseArgs(args []string) (*appEnv, error) {
 		"silent",
 		`don't log debug output`,
 	)
+	checkHeroku := herokuapi.FlagVar(fl)
 	fl.Usage = func() {
 		fmt.Fprintf(fl.Output(), "almanack-api help\n\n")
 		fl.PrintDefaults()
@@ -59,13 +62,29 @@ func parseArgs(args []string) (*appEnv, error) {
 	if err := ff.Parse(fl, args, ff.WithEnvVarPrefix("ALMANACK")); err != nil {
 		return nil, err
 	}
-	if d := getDialer(); d != nil {
-		var err error
-		if a.store, err = redis.New(d, a.Logger); err != nil {
+	// Get Redis URL from Heroku if possible, else get it from config, else use files
+	if connURL, err := checkHeroku(); err != nil {
+		return nil, err
+	} else if connURL != "" {
+		a.Logger.Printf("got credentials from Heroku")
+		dialer, err := redisflag.Parse(connURL)
+		if err != nil {
+			return nil, err
+		}
+		if a.store, err = redis.New(dialer, a.Logger); err != nil {
 			return nil, err
 		}
 	} else {
-		a.store = filestore.New("", "almanack", a.Logger)
+		if d := getDialer(); d != nil {
+			a.Logger.Printf("got Redis URL directly")
+			var err error
+			if a.store, err = redis.New(d, a.Logger); err != nil {
+				return nil, err
+			}
+		} else {
+			a.Logger.Printf("using filestore")
+			a.store = filestore.New("", "almanack", a.Logger)
+		}
 	}
 
 	a.auth = netlifyid.NewService(a.isLambda, a.Logger)
