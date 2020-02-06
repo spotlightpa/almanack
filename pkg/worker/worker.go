@@ -284,6 +284,7 @@ func (a *appEnv) publishStories() error {
 		if !shouldPub {
 			continue
 		}
+		hasChanged = true
 		removeIDs = append(removeIDs, articleID)
 		ctx := context.Background()
 		msg := fmt.Sprintf("Content: publishing %q", articleID)
