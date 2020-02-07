@@ -8,6 +8,8 @@ go 1.13
 require (
 	github.com/BurntSushi/toml v0.3.1
 	github.com/aws/aws-lambda-go v1.13.3
+	github.com/aws/aws-sdk-go-v2 v0.19.0
+	github.com/carlmjohnson/crockford v0.0.3
 	github.com/carlmjohnson/errutil v0.0.9
 	github.com/carlmjohnson/exitcode v0.0.3
 	github.com/carlmjohnson/flagext v0.0.6
@@ -16,7 +18,6 @@ require (
 	github.com/go-redsync/redsync v1.3.1
 	github.com/golang/gddo v0.0.0-20200127195332-7365cb292b8b
 	github.com/gomodule/redigo v2.0.0+incompatible
-	github.com/google/go-cmp v0.3.1 // indirect
 	github.com/google/go-github/v29 v29.0.2
 	github.com/mattbaird/gochimp v0.0.0-20180111040707-a267553896d1
 	github.com/peterbourgon/ff v1.6.0
