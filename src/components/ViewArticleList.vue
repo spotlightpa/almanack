@@ -12,7 +12,7 @@ export default {
     APILoader,
   },
   setup() {
-    let { fullName, roles } = useAuth();
+    let { fullName, roles, isSpotlightPAUser } = useAuth();
     let { articles, canLoad, isLoading, reload, error } = useFeed();
 
     return {
@@ -23,6 +23,7 @@ export default {
       fullName,
       roles,
       articles,
+      isSpotlightPAUser,
     };
   },
 };
@@ -45,6 +46,21 @@ export default {
         >joanna@spotlightpa.org</a
       >).
     </p>
+
+    <div v-if="isSpotlightPAUser" class="block">
+      <router-link
+        :to="{ name: 'uploader' }"
+        class="button is-success has-text-weight-semibold"
+      >
+        <span class="icon">
+          <font-awesome-icon :icon="['fa', 'file-upload']" />
+        </span>
+        <span>
+          Upload images
+        </span>
+      </router-link>
+    </div>
+
     <APILoader
       :can-load="canLoad"
       :is-loading="isLoading"

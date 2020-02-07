@@ -5,6 +5,7 @@ import ViewArticleList from "./components/ViewArticleList.vue";
 import ViewArticleSchedule from "./components/ViewArticleSchedule.vue";
 import ViewError from "./components/ViewError.vue";
 import ViewLogin from "./components/ViewLogin.vue";
+import ViewUploader from "./components/ViewUploader.vue";
 
 import { useAuth } from "@/api/hooks.js";
 import { watch } from "@vue/composition-api";
@@ -48,6 +49,15 @@ let router = new Router({
       meta: {
         requiresAuth: true,
         title: "Spotlight PA Almanack - Scheduler",
+      },
+    },
+    {
+      path: "/admin/uploader",
+      name: "uploader",
+      component: ViewUploader,
+      meta: {
+        requiresAuth: true,
+        title: "Spotlight PA Almanack - Image Uploader",
       },
     },
     {

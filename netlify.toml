@@ -21,6 +21,12 @@
   force = false
 
 [[redirects]]
+  from = "/admin/*"
+  to = "/index.html"
+  status = 200
+  force = false
+
+[[redirects]]
   from = "/articles/*"
   to = "/index.html"
   status = 200

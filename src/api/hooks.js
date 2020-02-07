@@ -19,7 +19,7 @@ export function useAuth() {
 
 let $service;
 
-function useService() {
+export function useService() {
   if (!$service) {
     $service = makeService(useAuth());
   }

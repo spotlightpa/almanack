@@ -10,6 +10,7 @@ export const endpoints = {
   getArticle(id) {
     return `/api/articles/${id}`;
   },
+  getSignedUpload: `/api/get-signed-upload`,
 };
 
 export function makeService($auth) {
@@ -18,7 +19,7 @@ export function makeService($auth) {
     let defaultOpts = {
       headers,
     };
-    options = { ...defaultOpts, options };
+    options = { ...defaultOpts, ...options };
     let resp = await fetch(url, options);
     if (!resp.ok) {
       throw new Error(
@@ -61,6 +62,25 @@ export function makeService($auth) {
     },
     hasAuthArticle() {
       return $auth.isSpotlightPAUser;
+    },
+    async uploadFile(body) {
+      let [data, err] = await tryTo(
+        request(endpoints.getSignedUpload, { method: "POST" })
+      );
+      if (err) {
+        return ["", err];
+      }
+      let { "signed-url": signedURL, filename } = data;
+      let rsp;
+      [rsp, err] = await tryTo(fetch(signedURL, { method: "PUT", body }));
+      if (err ?? !rsp.ok) {
+        return [
+          "",
+          err ??
+            new Error(`Unexpected response: ${rsp.status} ${rsp.statusText}`),
+        ];
+      }
+      return [filename, null];
     },
   };
 }

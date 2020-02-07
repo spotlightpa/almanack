@@ -18,6 +18,7 @@ import (
 	"github.com/piotrkubisa/apigo"
 
 	"github.com/spotlightpa/almanack/internal/arcjson"
+	"github.com/spotlightpa/almanack/internal/aws"
 	"github.com/spotlightpa/almanack/internal/errutil"
 	"github.com/spotlightpa/almanack/internal/filestore"
 	"github.com/spotlightpa/almanack/internal/herokuapi"
@@ -55,6 +56,7 @@ func parseArgs(args []string) (*appEnv, error) {
 		`don't log debug output`,
 	)
 	checkHeroku := herokuapi.FlagVar(fl)
+	getImageStore := aws.FlagVar(fl)
 	fl.Usage = func() {
 		fmt.Fprintf(fl.Output(), "almanack-api help\n\n")
 		fl.PrintDefaults()
@@ -86,7 +88,7 @@ func parseArgs(args []string) (*appEnv, error) {
 			a.store = filestore.New("", "almanack", a.Logger)
 		}
 	}
-
+	a.imageStore = getImageStore(a.Logger)
 	a.auth = netlifyid.NewService(a.isLambda, a.Logger)
 	a.c = http.DefaultClient
 
@@ -94,11 +96,12 @@ func parseArgs(args []string) (*appEnv, error) {
 }
 
 type appEnv struct {
-	port     string
-	isLambda bool
-	c        *http.Client
-	auth     almanack.AuthService
-	store    almanack.DataStore
+	port       string
+	isLambda   bool
+	c          *http.Client
+	auth       almanack.AuthService
+	store      almanack.DataStore
+	imageStore almanack.ImageStore
 	*log.Logger
 }
 
@@ -132,6 +135,7 @@ func (a *appEnv) routes() http.Handler {
 		).Group(func(r chi.Router) {
 			r.Get("/articles/{id}", a.getArticle)
 			r.Post("/articles/{id}", a.postArticle)
+			r.Post("/get-signed-upload", a.getSignedUpload)
 		})
 	})
 	return r
@@ -320,5 +324,20 @@ func (a *appEnv) postArticle(w http.ResponseWriter, r *http.Request) {
 	}{
 		http.StatusAccepted,
 		http.StatusText(http.StatusAccepted),
+	})
+}
+
+func (a *appEnv) getSignedUpload(w http.ResponseWriter, r *http.Request) {
+	signedURL, filename, err := a.imageStore.GetSignedUpload()
+	if err != nil {
+		a.errorResponse(w, err)
+		return
+	}
+	a.jsonResponse(http.StatusOK, w, &struct {
+		SignedURL string `json:"signed-url"`
+		FileName  string `json:"filename"`
+	}{
+		signedURL,
+		filename,
 	})
 }
