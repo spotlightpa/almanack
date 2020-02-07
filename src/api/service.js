@@ -70,12 +70,15 @@ export function makeService($auth) {
       if (err) {
         return ["", err];
       }
-      let postURL = data["signed-url"];
-      let filename = data.filename;
-
-      [, err] = await tryTo(fetch(postURL, { method: "PUT", body }));
-      if (err) {
-        return ["", err];
+      let { "signed-url": signedURL, filename } = data;
+      let rsp;
+      [rsp, err] = await tryTo(fetch(signedURL, { method: "PUT", body }));
+      if (err ?? !rsp.ok) {
+        return [
+          "",
+          err ??
+            new Error(`Unexpected response: ${rsp.status} ${rsp.statusText}`),
+        ];
       }
       return [filename, null];
     },
