@@ -24,9 +24,12 @@ export default {
       }
       let [body] = ev.target.files;
       isUploading.value = true;
+      error.value = null;
       [filename.value, error.value] = await uploadFile(body);
       isUploading.value = false;
     }
+
+    let isDragging = ref(false);
 
     return {
       isSpotlightPAUser,
@@ -34,6 +37,21 @@ export default {
       uploadFileInput,
       filename,
       error,
+
+      isDragging,
+      dropFile(e) {
+        isDragging.value = false;
+        let { files = [] } = e.dataTransfer;
+        if (files.length !== 1) {
+          error.value = new Error("Can only upload one file at a time");
+          return;
+        }
+        if (files[0].type !== "image/jpeg") {
+          error.value = new Error("Only JPEG is supported");
+          return;
+        }
+        uploadFileInput({ target: { files } });
+      },
 
       imageURL: computed(() => {
         if (!filename.value) {
@@ -77,8 +95,13 @@ export default {
             <div class="is-inline-block">
               <fieldset
                 class="file"
-                :class="{ 'is-warning': isUploading }"
+                :class="
+                  isUploading ? 'is-warning' : isDragging ? 'is-success' : ''
+                "
                 :disabled="isUploading"
+                @dragover.prevent="isDragging = true"
+                @dragleave.prevent="isDragging = false"
+                @drop.prevent="dropFile"
               >
                 <label class="file-label">
                   <input
