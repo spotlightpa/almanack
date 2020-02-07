@@ -10,6 +10,7 @@ export const endpoints = {
   getArticle(id) {
     return `/api/articles/${id}`;
   },
+  getSignedUpload: `/api/get-signed-upload`,
 };
 
 export function makeService($auth) {
@@ -18,7 +19,7 @@ export function makeService($auth) {
     let defaultOpts = {
       headers,
     };
-    options = { ...defaultOpts, options };
+    options = { ...defaultOpts, ...options };
     let resp = await fetch(url, options);
     if (!resp.ok) {
       throw new Error(
@@ -61,6 +62,22 @@ export function makeService($auth) {
     },
     hasAuthArticle() {
       return $auth.isSpotlightPAUser;
+    },
+    async uploadFile(body) {
+      let [data, err] = await tryTo(
+        request(endpoints.getSignedUpload, { method: "POST" })
+      );
+      if (err) {
+        return ["", err];
+      }
+      let postURL = data["signed-url"];
+      let filename = data.filename;
+
+      [, err] = await tryTo(fetch(postURL, { method: "PUT", body }));
+      if (err) {
+        return ["", err];
+      }
+      return [filename, null];
     },
   };
 }

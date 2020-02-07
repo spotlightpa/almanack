@@ -1,7 +1,7 @@
 <script>
 import { ref, computed } from "@vue/composition-api";
 
-import { useAuth } from "@/api/hooks.js";
+import { useAuth, useService } from "@/api/hooks.js";
 
 import CopyWithButton from "./CopyWithButton.vue";
 
@@ -12,35 +12,26 @@ export default {
   },
   setup() {
     let { isSpotlightPAUser } = useAuth();
+    let { uploadFile } = useService();
+
     let isUploading = ref(false);
     let filename = ref("");
     let error = ref(null);
-    async function uploadFile(ev) {
+
+    async function uploadFileInput(ev) {
       if (isUploading.value) {
         return;
       }
       let [body] = ev.target.files;
       isUploading.value = true;
-      error.value = null;
-      try {
-        let data = await fetch("/api/get-signed-upload", {
-          method: "POST",
-        }).then(rsp => rsp.json());
-        let postURL = data["signed-url"];
-        filename.value = data.filename;
-
-        await fetch(postURL, { method: "PUT", body });
-      } catch (e) {
-        error.value = e;
-      } finally {
-        isUploading.value = false;
-      }
+      [filename.value, error.value] = await uploadFile(body);
+      isUploading.value = false;
     }
 
     return {
       isSpotlightPAUser,
       isUploading,
-      uploadFile,
+      uploadFileInput,
       filename,
       error,
 
@@ -94,7 +85,7 @@ export default {
                     type="file"
                     accept="image/jpeg"
                     class="file-input"
-                    @change="uploadFile"
+                    @change="uploadFileInput"
                   />
 
                   <span class="file-cta" :disabled="isUploading">
