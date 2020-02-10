@@ -234,43 +234,20 @@ func (a *appEnv) getArticle(w http.ResponseWriter, r *http.Request) {
 
 	articleID := chi.URLParam(r, "id")
 
-	var data almanack.ScheduledArticle
-	err := a.store.Get("almanack.scheduled-article."+articleID, &data)
-	switch {
-	case errors.Is(err, errutil.NotFound):
-		// continue
-	case err == nil:
-		a.jsonResponse(http.StatusOK, w, &data)
-		return
-	default:
+	arcsvc := arcjson.FeedService{DataStore: a.store, Logger: a.Logger}
+	sas := almanack.ScheduledArticleService{
+		ArticleService: arcsvc,
+		DataStore:      a.store,
+		Logger:         a.Logger,
+	}
+
+	article, err := sas.Get(articleID)
+	if err != nil {
 		a.errorResponse(w, err)
 		return
 	}
 
-	var f arcjson.API
-	if err := a.store.Get(feedKey, &f); err != nil {
-		a.errorResponse(w, err)
-		return
-	}
-
-	content, err := f.Get(articleID)
-	if err != nil {
-		a.errorResponse(w, err)
-		return
-	}
-	story, err := content.ToArticle()
-	if err != nil {
-		a.errorResponse(w, err)
-		return
-	}
-	toml, err := story.ToTOML()
-	if err != nil {
-		a.errorResponse(w, err)
-		return
-	}
-	data.Article = *story
-	data.Body = toml
-	a.jsonResponse(http.StatusOK, w, &data)
+	a.jsonResponse(http.StatusOK, w, article)
 }
 
 func (a *appEnv) postArticle(w http.ResponseWriter, r *http.Request) {
