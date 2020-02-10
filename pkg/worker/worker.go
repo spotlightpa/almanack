@@ -110,49 +110,23 @@ func (a *appEnv) updateFeed() error {
 		return nil
 	}
 	a.Println("fetching", a.srcFeedURL)
-	var newfeed, oldfeed arcjson.API
+	var newfeed arcjson.API
 	if err := a.fetchJSON(a.srcFeedURL, &newfeed); err != nil {
 		return err
 	}
 
-	err := a.store.GetSet("almanack-worker.feed", &oldfeed, &newfeed)
-	if errors.Is(err, errutil.NotFound) {
-		a.Println("cache miss for old feed")
-		return nil
-	}
+	svc := arcjson.FeedService{DataStore: a.store, Logger: a.Logger}
+
+	// TODO: Better status checking
+	newstories, err := svc.UpdateFeed(newfeed)
 	if err != nil {
 		return err
 	}
-
-	// TODO: Better status checking
-	newstories := diffFeed(newfeed, oldfeed)
 	a.Printf("got %d newly ready stories", len(newstories))
 	// Check if the story has been sent before
-	{
-		sentStories := make([]bool, len(newstories))
-		getters := make([]func() error, len(newstories))
-		for i := range newstories {
-			j := i // Fix closure value
-			story := newstories[j]
-			getters[i] = func() error {
-				err := a.store.GetSet("almanack.sent-campaigns."+story.ID,
-					&sentStories[j], true)
-				if err == errutil.NotFound {
-					return nil
-				}
-				return err
-			}
-		}
-		if err = errutil.ExecParallel(getters...); err != nil {
-			return err
-		}
-		filteredStories := newstories[:0]
-		for i, story := range newstories {
-			if !sentStories[i] {
-				filteredStories = append(filteredStories, story)
-			}
-		}
-		newstories = filteredStories
+	newstories, err = svc.UpdateMailStatus(newstories)
+	if err != nil {
+		return err
 	}
 	a.Printf("got %d stories previously unsent", len(newstories))
 	if len(newstories) > 0 {
@@ -181,23 +155,6 @@ func (a *appEnv) fetchJSON(url string, v interface{}) error {
 	}
 
 	return nil
-}
-
-func diffFeed(newfeed, oldfeed arcjson.API) []arcjson.Contents {
-	readyids := make(map[string]bool, len(oldfeed.Contents))
-	for _, story := range oldfeed.Contents {
-		if story.Workflow.StatusCode >= arcjson.StatusSlot {
-			readyids[story.ID] = true
-		}
-	}
-	var newstories []arcjson.Contents
-	for _, story := range newfeed.Contents {
-		if story.Workflow.StatusCode >= arcjson.StatusSlot &&
-			!readyids[story.ID] {
-			newstories = append(newstories, story)
-		}
-	}
-	return newstories
 }
 
 const messageTemplate = `
