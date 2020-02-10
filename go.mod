@@ -1,7 +1,7 @@
 module github.com/spotlightpa/almanack
 
 // +heroku goVersion go1.13
-// +heroku install ./...
+// +heroku install ./cmd/...
 
 go 1.13
 

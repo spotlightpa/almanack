@@ -9,5 +9,5 @@ cd "$THIS_DIR"
 
 [[ -n "$(command -v gimme)" ]] && eval "$(gimme stable)"
 go version
-GOBIN=$THIS_DIR/functions go install ./cmd/...
+GOBIN=$THIS_DIR/functions go install ./funcs/...
 yarn run build
