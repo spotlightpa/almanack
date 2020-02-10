@@ -23,6 +23,7 @@ import (
 	"github.com/spotlightpa/almanack/internal/mailchimp"
 	"github.com/spotlightpa/almanack/internal/redis"
 	"github.com/spotlightpa/almanack/internal/redisflag"
+	"github.com/spotlightpa/almanack/internal/slack"
 	"github.com/spotlightpa/almanack/pkg/almanack"
 	"github.com/spotlightpa/almanack/pkg/errutil"
 )
@@ -36,6 +37,16 @@ func CLI(args []string) error {
 	}
 	if err := a.exec(); err != nil {
 		fmt.Fprintf(os.Stderr, "Runtime error: %v\n", err)
+		a.sc.Post(
+			slack.Message{
+				Attachments: []slack.Attachment{
+					{
+						Title: "Almanack Worker Error",
+						Text:  err.Error(),
+						Color: "#da291c",
+					}}},
+		)
+
 		return err
 	}
 	return nil
@@ -48,6 +59,7 @@ func parseArgs(args []string) (*appEnv, error) {
 	mcAPIKey := fl.String("mc-api-key", "", "API `key` for MailChimp")
 	mcListID := fl.String("mc-list-id", "", "List `ID` MailChimp campaign")
 	getDialer := redisflag.Var(fl, "redis-url", "`URL` connection string for Redis")
+	slackURL := fl.String("slack-hook-url", "", "Slack hook endpoint `URL`")
 	a.Logger = log.New(nil, AppName+" ", log.LstdFlags)
 	fl.Var(
 		flagext.Logger(a.Logger, flagext.LogSilent),
@@ -75,6 +87,7 @@ Options:
 	} else {
 		a.store = filestore.New("", "almanack", a.Logger)
 	}
+	a.sc = slack.New(*slackURL, a.Logger)
 	if gh, err := getGithub(a.Logger); err != nil {
 		a.Logger.Printf("could not connect to Github: %v", err)
 		return nil, err
@@ -89,6 +102,7 @@ type appEnv struct {
 	store      almanack.DataStore
 	email      almanack.EmailService
 	gh         *github.Client
+	sc         slack.Client
 	*log.Logger
 }
 
