@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/spotlightpa/almanack/internal/errutil"
+	"github.com/spotlightpa/almanack/pkg/errutil"
 )
 
 const (

@@ -8,7 +8,7 @@ import (
 
 	"github.com/aws/aws-lambda-go/lambdacontext"
 
-	"github.com/spotlightpa/almanack/internal/errutil"
+	"github.com/spotlightpa/almanack/pkg/errutil"
 )
 
 type JWT struct {
