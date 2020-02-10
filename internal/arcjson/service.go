@@ -3,8 +3,8 @@ package arcjson
 import (
 	"errors"
 
-	"github.com/spotlightpa/almanack/internal/errutil"
 	"github.com/spotlightpa/almanack/pkg/almanack"
+	"github.com/spotlightpa/almanack/pkg/errutil"
 )
 
 type FeedService struct {

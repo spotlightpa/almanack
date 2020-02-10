@@ -19,13 +19,13 @@ import (
 
 	"github.com/spotlightpa/almanack/internal/arcjson"
 	"github.com/spotlightpa/almanack/internal/aws"
-	"github.com/spotlightpa/almanack/internal/errutil"
 	"github.com/spotlightpa/almanack/internal/filestore"
 	"github.com/spotlightpa/almanack/internal/herokuapi"
 	"github.com/spotlightpa/almanack/internal/netlifyid"
 	"github.com/spotlightpa/almanack/internal/redis"
 	"github.com/spotlightpa/almanack/internal/redisflag"
 	"github.com/spotlightpa/almanack/pkg/almanack"
+	"github.com/spotlightpa/almanack/pkg/errutil"
 )
 
 const AppName = "almanack-api"

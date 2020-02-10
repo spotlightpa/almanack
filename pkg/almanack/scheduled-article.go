@@ -4,7 +4,7 @@ import (
 	"errors"
 	"time"
 
-	"github.com/spotlightpa/almanack/internal/errutil"
+	"github.com/spotlightpa/almanack/pkg/errutil"
 )
 
 type ScheduledArticle struct {

@@ -4,8 +4,8 @@ import (
 	"context"
 	"net/http"
 
-	"github.com/spotlightpa/almanack/internal/errutil"
 	"github.com/spotlightpa/almanack/pkg/almanack"
+	"github.com/spotlightpa/almanack/pkg/errutil"
 )
 
 func NewService(isLambda bool, l almanack.Logger) almanack.AuthService {

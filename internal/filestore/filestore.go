@@ -8,7 +8,7 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/spotlightpa/almanack/internal/errutil"
+	"github.com/spotlightpa/almanack/pkg/errutil"
 )
 
 type Logger interface {

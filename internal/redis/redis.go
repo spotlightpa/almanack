@@ -6,7 +6,7 @@ import (
 
 	"github.com/go-redsync/redsync"
 	"github.com/gomodule/redigo/redis"
-	"github.com/spotlightpa/almanack/internal/errutil"
+	"github.com/spotlightpa/almanack/pkg/errutil"
 )
 
 var ErrNil = redis.ErrNil

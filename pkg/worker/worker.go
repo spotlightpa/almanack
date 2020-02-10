@@ -18,13 +18,13 @@ import (
 	"github.com/peterbourgon/ff"
 
 	"github.com/spotlightpa/almanack/internal/arcjson"
-	"github.com/spotlightpa/almanack/internal/errutil"
 	"github.com/spotlightpa/almanack/internal/filestore"
 	"github.com/spotlightpa/almanack/internal/github"
 	"github.com/spotlightpa/almanack/internal/mailchimp"
 	"github.com/spotlightpa/almanack/internal/redis"
 	"github.com/spotlightpa/almanack/internal/redisflag"
 	"github.com/spotlightpa/almanack/pkg/almanack"
+	"github.com/spotlightpa/almanack/pkg/errutil"
 )
 
 const AppName = "almanack-worker"
