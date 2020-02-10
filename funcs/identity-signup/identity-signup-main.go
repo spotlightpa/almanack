@@ -35,19 +35,21 @@ func whitelistEmails(request events.APIGatewayProxyRequest) (events.APIGatewayPr
 		return events.APIGatewayProxyResponse{}, err
 	}
 
-	if strings.HasSuffix(data.User.Email, "@spotlightpa.org") {
+	email := strings.ToLower(data.User.Email)
+
+	if strings.HasSuffix(email, "@spotlightpa.org") {
 		data.User.AppMetadata.Roles = append(data.User.AppMetadata.Roles,
 			"Spotlight PA", "arc user")
 	}
-	if strings.HasSuffix(data.User.Email, "@inquirer.com") {
+	if strings.HasSuffix(email, "@inquirer.com") {
 		data.User.AppMetadata.Roles = append(data.User.AppMetadata.Roles,
 			"arc user")
 	}
 	suffixes := strings.FieldsFunc(whitelisted_domains,
 		func(r rune) bool { return r == ',' || r == ' ' })
 	for _, suffix := range suffixes {
-		if strings.HasSuffix(data.User.Email, suffix) {
-			logger.Printf("%s has domain %s", data.User.Email, suffix)
+		if strings.HasSuffix(email, suffix) {
+			logger.Printf("%s has domain %s", email, suffix)
 			data.User.AppMetadata.Roles = append(data.User.AppMetadata.Roles, "editor")
 			break
 		}
