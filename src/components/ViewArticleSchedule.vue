@@ -2,13 +2,13 @@
 import { useScheduler, useAuth } from "@/api/hooks.js";
 
 import APILoader from "./APILoader.vue";
-import CopyWithButton from "./CopyWithButton.vue";
+import ScheduledArticleDetail from "./ScheduledArticleDetail.vue";
 
 export default {
   name: "ViewArticleSchedule",
   components: {
     APILoader,
-    CopyWithButton,
+    ScheduledArticleDetail,
   },
   props: {
     id: String,
@@ -58,9 +58,7 @@ export default {
         </p>
       </div>
       <div v-else>
-        <h2 class="title is-spaced">TKTK Scheduler View</h2>
-        <h2 class="title is-spaced">Article TOML</h2>
-        <CopyWithButton :value="article.body"></CopyWithButton>
+        <ScheduledArticleDetail :article="article"></ScheduledArticleDetail>
       </div>
     </APILoader>
   </div>
