@@ -11,18 +11,6 @@ export default class ScheduledArticle {
     this.saveError = null;
 
     this.init(data);
-    // Date getters
-    for (let prop of ["scheduleFor", "lastArcSync", "pubDate"]) {
-      Object.defineProperty(this, prop, {
-        get() {
-          let val = this["_" + prop];
-          if (!val) {
-            return null;
-          }
-          return new Date(val);
-        },
-      });
-    }
 
     Vue.observable(this);
   }
@@ -33,6 +21,7 @@ export default class ScheduledArticle {
       arcID: ["ArcID", ""],
       body: ["Body", ""],
       blurb: ["Blurb", ""],
+      byline: ["Byline", ""],
       hed: ["Hed", ""],
       imageCaption: ["ImageCaption", ""],
       imageCredit: ["ImageCredit", ""],
@@ -41,22 +30,28 @@ export default class ScheduledArticle {
       slug: ["Slug", ""],
       subhead: ["Subhead", ""],
       summary: ["Summary", ""],
+      kicker: ["Kicker", ""],
+      suppressFeatured: ["SuppressFeatured", false],
 
       authors: ["Authors", []],
       _scheduleFor: ["ScheduleFor", null],
-      _lastArcSync: ["LastArcSync", ""],
-      _pubDate: ["PubDate", ""],
+      _lastArcSync: ["LastArcSync", null],
+      _pubDate: ["PubDate", null],
     };
 
     for (let [key, [val, fallback]] of Object.entries(props)) {
       this[key] = getProp(data, val, { fallback });
     }
 
-    let [kicker] = getProp(data, "Kicker", { fallback: [""] });
-    this.kicker = kicker;
+    // Date getters
+    for (let prop of ["scheduleFor", "lastArcSync", "pubDate"]) {
+      let val = this["_" + prop];
+      this[prop] = val ? new Date(val) : null;
+    }
   }
 
   reset() {
+    this.saveError = null;
     this.init(JSON.parse(this._reset));
   }
 
@@ -69,6 +64,7 @@ export default class ScheduledArticle {
       ID: this.id,
       ArcID: this.arcID,
       Body: this.body,
+      Byline: this.byline,
       Blurb: this.blurb,
       Hed: this.hed,
       ImageCaption: this.imageCaption,
@@ -79,15 +75,36 @@ export default class ScheduledArticle {
       Subhead: this.subhead,
       Summary: this.summary,
       Authors: this.authors,
-      ScheduleFor: this._scheduleFor,
-      LastArcSync: this._lastArcSync,
-      PubDate: this._pubDate,
-      Kicker: [this.kicker],
+      ScheduleFor: this.scheduleFor,
+      LastArcSync: this.lastArcSync,
+      PubDate: this.pubDate,
+      Kicker: this.kicker,
+      SuppressFeatured: this.suppressFeatured,
     };
   }
 
-  async save() {
+  validate() {
+    if (!this.kicker) {
+      this.saveError = new Error("Kicker must not be blank");
+      this.saveError.name = "Validation Error";
+      return false;
+    }
+    if (this.imageURL.match(/^http/)) {
+      this.saveError = new Error(
+        "Image must be uploaded to Spotlight first (for now)."
+      );
+      this.saveError.name = "Validation Error";
+      return false;
+    }
+    return true;
+  }
+
+  async schedule() {
+    if (!this.validate()) {
+      return;
+    }
     this.isSaving = true;
+    this.scheduleFor = this.pubDate;
     this.saveError = await this._service.saveArticle(this._url_id, this);
     this.isSaving = false;
   }

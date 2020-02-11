@@ -13,9 +13,43 @@ import {
   faSyncAlt,
   faUserClock,
 } from "@fortawesome/free-solid-svg-icons";
+
+// Buefy internal icons
+import {
+  faCalendarAlt,
+  faCheck,
+  faCheckCircle,
+  faInfoCircle,
+  faExclamationTriangle,
+  faExclamationCircle,
+  faArrowUp,
+  faAngleRight,
+  faAngleLeft,
+  faAngleDown,
+  faEye,
+  faEyeSlash,
+  faCaretDown,
+  faCaretUp,
+  faUpload,
+} from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 
 library.add(
+  faCalendarAlt,
+  faCheck,
+  faCheckCircle,
+  faInfoCircle,
+  faExclamationTriangle,
+  faExclamationCircle,
+  faArrowUp,
+  faAngleRight,
+  faAngleLeft,
+  faAngleDown,
+  faEye,
+  faEyeSlash,
+  faCaretDown,
+  faCaretUp,
+  faUpload,
   faCopy,
   faFileCode,
   faFileWord,
@@ -27,4 +61,5 @@ library.add(
   faUserClock
 );
 
+Vue.component("vue-fontawesome", FontAwesomeIcon);
 Vue.component("font-awesome-icon", FontAwesomeIcon);

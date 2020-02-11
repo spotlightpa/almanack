@@ -3,6 +3,12 @@ import router from "./router.js";
 import "./filters/index.js";
 import "./plugins/font-awesome.js";
 
+import Buefy from "buefy";
+Vue.use(Buefy, {
+  defaultIconComponent: "vue-fontawesome",
+  defaultIconPack: "fas",
+});
+
 import App from "./components/TheApp.vue";
 
 Vue.config.ignoredElements = ["raw-html"];
