@@ -13,7 +13,7 @@ export function makeFeed(service) {
         : Article.from(feed.value)
     ),
     didLoad: computed(() => !!apiState.articles.length),
-    canLoad: computed(() => service.hasAuthUpcoming()),
+    canLoad: service.hasAuthUpcoming(),
   });
 
   let methods = {

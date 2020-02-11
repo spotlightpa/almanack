@@ -8,7 +8,7 @@ export function getScheduledArticle({ service, id }) {
     didLoad: false,
     isLoading: false,
     error: null,
-    canLoad: computed(() => service.hasAuthArticle()),
+    canLoad: service.hasAuthArticle(),
     article: computed(() =>
       apiState.articleData ? new ScheduledArticle(apiState.articleData) : null
     ),
