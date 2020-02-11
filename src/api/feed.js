@@ -1,5 +1,5 @@
 import { reactive, computed, ref, toRefs } from "@vue/composition-api";
-import Article from "./article.js";
+import ArcArticle from "./arc-article.js";
 
 export function makeFeed(service) {
   const feed = ref(null);
@@ -10,7 +10,7 @@ export function makeFeed(service) {
     articles: computed(() =>
       apiState.isLoading || apiState.error || !feed.value
         ? []
-        : Article.from(feed.value)
+        : ArcArticle.from(feed.value)
     ),
     didLoad: computed(() => !!apiState.articles.length),
     canLoad: service.hasAuthUpcoming(),

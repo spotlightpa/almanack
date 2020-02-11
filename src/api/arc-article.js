@@ -33,10 +33,10 @@ let ignoreComponentTypes = {
   interstitial_link: true,
 };
 
-export default class Article {
+export default class ArcArticle {
   static from(data) {
     return data.contents
-      .map(a => new Article(a))
+      .map(a => new ArcArticle(a))
       .sort((a, b) => cmp(b.plannedDate, a.plannedDate));
   }
 
