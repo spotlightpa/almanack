@@ -7,7 +7,7 @@ const tryTo = promise =>
 export const endpoints = {
   userInfo: `/api/user-info`,
   upcoming: `/api/upcoming`,
-  getArticle(id) {
+  scheduledArticle(id) {
     return `/api/articles/${id}`;
   },
   getSignedUpload: `/api/get-signed-upload`,
@@ -16,6 +16,9 @@ export const endpoints = {
 export function makeService($auth) {
   async function request(url, options = {}) {
     let headers = await $auth.headers();
+    if (options.headers) {
+      headers = { ...headers, ...options.headers };
+    }
     let defaultOpts = {
       headers,
     };
@@ -58,10 +61,21 @@ export function makeService($auth) {
       return $auth.isEditor;
     },
     async article(id) {
-      return await tryTo(request(endpoints.getArticle(id)));
+      return await tryTo(request(endpoints.scheduledArticle(id)));
     },
     hasAuthArticle() {
       return $auth.isSpotlightPAUser;
+    },
+    async saveArticle(id, data) {
+      let body = JSON.stringify(data);
+      let [, err] = await tryTo(
+        request(endpoints.scheduledArticle(id), {
+          headers: { "Content-Type": "application/json" },
+          method: "POST",
+          body,
+        })
+      );
+      return err;
     },
     async uploadFile(body) {
       let [data, err] = await tryTo(

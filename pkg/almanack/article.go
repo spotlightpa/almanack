@@ -50,6 +50,7 @@ type Article struct {
 	Authors      []string  `toml:"authors"`
 	Body         string    `toml:"-"`
 	LinkTitle    string    `toml:"linktitle"`
+	Kicker       []string  `toml:"kicker"`
 }
 
 func (article *Article) String() string {

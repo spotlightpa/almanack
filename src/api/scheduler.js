@@ -10,7 +10,9 @@ export function getScheduledArticle({ service, id }) {
     error: null,
     canLoad: service.hasAuthArticle(),
     article: computed(() =>
-      apiState.articleData ? new ScheduledArticle(apiState.articleData) : null
+      apiState.articleData
+        ? new ScheduledArticle({ service, id, data: apiState.articleData })
+        : null
     ),
   });
 
@@ -23,6 +25,9 @@ export function getScheduledArticle({ service, id }) {
       apiState.isLoading = true;
       [apiState.articleData, apiState.error] = await service.article(id);
       apiState.isLoading = false;
+      if (apiState.articleData && apiState.error) {
+        apiState.didLoad = true;
+      }
     },
     async initLoad() {
       if (apiState.canLoad && !apiState.didLoad) {
