@@ -5,7 +5,7 @@ import "./plugins/font-awesome.js";
 
 import Buefy from "buefy";
 Vue.use(Buefy, {
-  defaultIconComponent: "vue-fontawesome",
+  defaultIconComponent: "font-awesome-icon",
   defaultIconPack: "fas",
 });
 

@@ -61,5 +61,4 @@ library.add(
   faUserClock
 );
 
-Vue.component("vue-fontawesome", FontAwesomeIcon);
 Vue.component("font-awesome-icon", FontAwesomeIcon);
