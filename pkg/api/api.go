@@ -260,48 +260,19 @@ func (a *appEnv) postArticle(w http.ResponseWriter, r *http.Request) {
 		a.errorResponse(w, err)
 		return
 	}
+	arcsvc := arcjson.FeedService{DataStore: a.store, Logger: a.Logger}
+	sas := almanack.ScheduledArticleService{
+		ArticleService: arcsvc,
+		DataStore:      a.store,
+		Logger:         a.Logger,
+	}
 
-	// Get the lock
-	unlock, err := a.store.GetLock("almanack.scheduled-articles-lock")
-	defer unlock()
-	if err != nil {
+	if err := sas.Save(articleID, &userData); err != nil {
 		a.errorResponse(w, err)
 		return
 	}
 
-	// Save the article
-	if err := a.store.Set("almanack.scheduled-article."+articleID, &userData); err != nil {
-		a.errorResponse(w, err)
-		return
-	}
-
-	// Get the existing list of scheduled articles
-	ids := map[string]bool{}
-	if err = a.store.Get("almanack.scheduled-articles-list", &ids); err != nil &&
-		!errors.Is(err, errutil.NotFound) {
-		a.errorResponse(w, err)
-		return
-	}
-
-	// If the status of the article changed, update the list
-	shouldPub := userData.ScheduleFor != nil
-	hasChanged := shouldPub != ids[articleID]
-
-	if hasChanged {
-		ids[articleID] = shouldPub
-		if err := a.store.Set("almanack.scheduled-articles-list", &ids); err != nil {
-			a.errorResponse(w, err)
-			return
-		}
-	}
-
-	a.jsonResponse(http.StatusAccepted, w, &struct {
-		Status  int    `json:"status"`
-		Message string `json:"message"`
-	}{
-		http.StatusAccepted,
-		http.StatusText(http.StatusAccepted),
-	})
+	a.jsonResponse(http.StatusAccepted, w, &userData)
 }
 
 func (a *appEnv) getSignedUpload(w http.ResponseWriter, r *http.Request) {
