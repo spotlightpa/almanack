@@ -11,6 +11,7 @@ type ScheduledArticle struct {
 	Article
 	ScheduleFor *time.Time
 	LastArcSync time.Time
+	LastSaved   *time.Time
 }
 
 type ScheduledArticleService struct {
@@ -42,7 +43,7 @@ func (sas ScheduledArticleService) Get(articleID string) (*ScheduledArticle, err
 	return &data, nil
 }
 
-func (sas ScheduledArticleService) Save(articleID string, article ScheduledArticle) error {
+func (sas ScheduledArticleService) Save(articleID string, article *ScheduledArticle) error {
 	// Get the lock
 	unlock, err := sas.DataStore.GetLock("almanack.scheduled-articles-lock")
 	defer unlock()
@@ -51,7 +52,9 @@ func (sas ScheduledArticleService) Save(articleID string, article ScheduledArtic
 	}
 
 	// Save the article
-	if err := sas.DataStore.Set("almanack.scheduled-article."+articleID, &article); err != nil {
+	now := time.Now()
+	article.LastSaved = &now
+	if err := sas.DataStore.Set("almanack.scheduled-article."+articleID, article); err != nil {
 		return err
 	}
 
