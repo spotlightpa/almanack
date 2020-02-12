@@ -2,6 +2,7 @@
 import { ref, computed } from "@vue/composition-api";
 
 import { useAuth, useService } from "@/api/hooks.js";
+import imgproxyURL from "@/api/imgproxy-url.js";
 
 import CopyWithButton from "./CopyWithButton.vue";
 
@@ -53,23 +54,7 @@ export default {
         uploadFileInput({ target: { files } });
       },
 
-      imageURL: computed(() => {
-        if (!filename.value) {
-          return "";
-        }
-        let baseURL = "https://images.data.spotlightpa.org";
-        let signature = "insecure";
-        let resizing_type = "auto";
-        let width = 400;
-        let height = 300;
-        let gravity = "sm";
-        let enlarge = "1";
-        let quality = "75";
-        let encoded_source_url = btoa(filename.value);
-        let extension = "jpeg";
-
-        return `${baseURL}/${signature}/rs:${resizing_type}:${width}:${height}/g:${gravity}/el:${enlarge}/q:${quality}/${encoded_source_url}.${extension}`;
-      }),
+      imageURL: computed(() => imgproxyURL(filename.value)),
     };
   },
 };

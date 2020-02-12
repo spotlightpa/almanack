@@ -142,6 +142,9 @@ export default {
       v-model="article.imageURL"
       label="Image URL"
     ></BulmaFieldInput>
+    <picture v-if="article.imagePreviewURL" class="has-ratio">
+      <img :src="article.imagePreviewURL" class="is-3x4" width="200" />
+    </picture>
     <BulmaFieldInput
       v-model="article.imageCaption"
       label="Image caption"
