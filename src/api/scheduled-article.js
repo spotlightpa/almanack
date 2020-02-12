@@ -83,6 +83,25 @@ export default class ScheduledArticle {
     };
   }
 
+  deriveSlug() {
+    this.slug = this.hed
+      .toLowerCase()
+      .replace(/\W+/g, " ")
+      .replace(/\b(the|an?)\b/g, " ")
+      .replace(/\bpa\b/g, "pennsylvania")
+      .trim()
+      .replace(/ /g, "-");
+  }
+
+  get pubURL() {
+    if (!this.slug) {
+      return "";
+    }
+    let year = this.pubDate.getFullYear();
+    let month = (this.pubDate.getMonth() + 1).toString().padStart(2, "0");
+    return `https://www.spotlightpa.org/news/${year}/${month}/${this.slug}/`;
+  }
+
   validate() {
     if (!this.kicker) {
       this.saveError = new Error("Kicker must not be blank");

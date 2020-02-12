@@ -3,11 +3,13 @@ import { computed, watch } from "@vue/composition-api";
 
 import BulmaField from "./BulmaField.vue";
 import BulmaFieldInput from "./BulmaFieldInput.vue";
+import CopyWithButton from "./CopyWithButton.vue";
 
 export default {
   components: {
     BulmaField,
     BulmaFieldInput,
+    CopyWithButton,
   },
   props: {
     article: { type: Object, required: true },
@@ -46,7 +48,7 @@ export default {
       <b-datetimepicker
         :id="idForLabel"
         v-model="article.pubDate"
-        icon="calendar-alt"
+        icon="user-clock"
         :timepicker="{ hourFormat: '12' }"
       >
       </b-datetimepicker>
@@ -73,7 +75,6 @@ export default {
       v-model="article.hed"
       label="Hed"
       help="Title as it appears at top of page"
-      :required="true"
     ></BulmaFieldInput>
     <BulmaFieldInput
       v-model="article.subhead"
@@ -100,17 +101,42 @@ export default {
       label="Link to as"
       help="When linking to this page from another page, use this as the link title instead of hed"
     ></BulmaFieldInput>
-    <BulmaFieldInput
-      v-model="article.summary"
+
+    <BulmaField
+      v-slot="{ idForLabel }"
       label="Summary"
+      required
       help="Shown in social share previews and search results"
-      :required="true"
-    ></BulmaFieldInput>
-    <BulmaFieldInput
-      v-model="article.blurb"
+    >
+      <textarea
+        :id="idForLabel"
+        v-model="article.summary"
+        class="textarea"
+        rows="2"
+      ></textarea>
+    </BulmaField>
+
+    <BulmaField
+      v-slot="{ idForLabel }"
       label="Blurb"
       help="Short summary to appear in article rivers"
-    ></BulmaFieldInput>
+    >
+      <textarea
+        :id="idForLabel"
+        v-model="article.blurb"
+        class="textarea"
+        rows="2"
+      ></textarea>
+      <p class="content is-small">
+        <a
+          href="#"
+          class="has-text-info"
+          @click.prevent="article.blurb = article.summary"
+        >
+          Copy from summary
+        </a>
+      </p>
+    </BulmaField>
 
     <BulmaFieldInput
       v-model="article.imageURL"
@@ -128,6 +154,19 @@ export default {
     TK Image type <br />
 
     <BulmaFieldInput v-model="article.slug" label="Slug"></BulmaFieldInput>
+    <button
+      class="block button is-small is-light has-text-weight-semibold"
+      @click.prevent="article.deriveSlug"
+    >
+      Derive slug from title
+    </button>
+
+    <CopyWithButton
+      v-if="article.pubURL"
+      :value="article.pubURL"
+      label="planned URL"
+    ></CopyWithButton>
+
     <BulmaField label="Suppress in featured slot">
       <div>
         <label class="checkbox">
