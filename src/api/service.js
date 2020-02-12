@@ -17,7 +17,7 @@ export function makeService($auth) {
   async function request(url, options = {}) {
     let headers = await $auth.headers();
     if (options.headers) {
-      headers = { ...headers, ...options.headers };
+      options.headers = { ...headers, ...options.headers };
     }
     let defaultOpts = {
       headers,
