@@ -1,5 +1,6 @@
 import Vue from "vue";
 import { library } from "@fortawesome/fontawesome-svg-core";
+import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 import {
   faCopy,
   faFileCode,
@@ -14,50 +15,47 @@ import {
   faUserClock,
 } from "@fortawesome/free-solid-svg-icons";
 
-// Buefy internal icons
+// Buefy icons
 import {
-  faCalendarAlt,
-  faCheck,
-  faCheckCircle,
-  faInfoCircle,
-  faExclamationTriangle,
-  faExclamationCircle,
-  faArrowUp,
-  faAngleRight,
-  faAngleLeft,
   faAngleDown,
-  faEye,
-  faEyeSlash,
+  faAngleLeft,
+  faAngleRight,
+  faArrowUp,
   faCaretDown,
   faCaretUp,
+  faCheck,
+  faCheckCircle,
+  faExclamationCircle,
+  faExclamationTriangle,
+  faEye,
+  faEyeSlash,
+  faInfoCircle,
   faUpload,
 } from "@fortawesome/free-solid-svg-icons";
-import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 
 library.add(
-  faCalendarAlt,
-  faCheck,
-  faCheckCircle,
-  faInfoCircle,
-  faExclamationTriangle,
-  faExclamationCircle,
-  faArrowUp,
-  faAngleRight,
-  faAngleLeft,
   faAngleDown,
-  faEye,
-  faEyeSlash,
+  faAngleLeft,
+  faAngleRight,
+  faArrowUp,
   faCaretDown,
   faCaretUp,
-  faUpload,
+  faCheck,
+  faCheckCircle,
   faCopy,
+  faExclamationCircle,
+  faExclamationTriangle,
+  faEye,
+  faEyeSlash,
   faFileCode,
-  faFileWord,
-  faNewspaper,
   faFileDownload,
-  faLink,
   faFileUpload,
+  faFileWord,
+  faInfoCircle,
+  faLink,
+  faNewspaper,
   faSyncAlt,
+  faUpload,
   faUserClock
 );
 
