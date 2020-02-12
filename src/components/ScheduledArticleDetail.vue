@@ -218,6 +218,9 @@ export default {
         </button>
       </div>
     </div>
+    <p v-if="article.lastSaved" class="content">
+      <b>Article last saved at {{ article.lastSaved }}</b>
+    </p>
     <p v-if="article.scheduleFor" class="content">
       <b>Article is scheduled to publish at {{ article.scheduleFor }}</b>
     </p>

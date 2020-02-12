@@ -7,16 +7,20 @@ export default class ScheduledArticle {
   constructor({ id, data, service }) {
     this._url_id = id;
     this._service = service;
-    this._reset = JSON.stringify(data);
-    this.isSaving = false;
-    this.saveError = null;
 
     this.init(data);
 
     Vue.observable(this);
   }
 
-  init(data) {
+  init(data, { save_reset = true } = {}) {
+    this.isSaving = false;
+    this.saveError = null;
+
+    if (save_reset) {
+      this._reset = JSON.stringify(data);
+    }
+
     let props = {
       id: ["ID", ""],
       arcID: ["ArcID", ""],
@@ -35,9 +39,6 @@ export default class ScheduledArticle {
       suppressFeatured: ["SuppressFeatured", false],
 
       authors: ["Authors", []],
-      _scheduleFor: ["ScheduleFor", null],
-      _lastArcSync: ["LastArcSync", null],
-      _pubDate: ["PubDate", null],
     };
 
     for (let [key, [val, fallback]] of Object.entries(props)) {
@@ -45,15 +46,27 @@ export default class ScheduledArticle {
     }
 
     // Date getters
-    for (let prop of ["scheduleFor", "lastArcSync", "pubDate"]) {
-      let val = this["_" + prop];
+    props = {
+      scheduleFor: "ScheduleFor",
+      lastArcSync: "LastArcSync",
+      pubDate: "PubDate",
+      lastSaved: "LastSaved",
+    };
+
+    let dateObj = {};
+
+    for (let [key, val] of Object.entries(props)) {
+      dateObj[key] = getProp(data, val, { fallback: null });
+    }
+
+    for (let [prop] of Object.entries(props)) {
+      let val = dateObj[prop];
       this[prop] = val ? new Date(val) : null;
     }
   }
 
   reset() {
-    this.saveError = null;
-    this.init(JSON.parse(this._reset));
+    this.init(JSON.parse(this._reset), { save_reset: false });
   }
 
   toString() {
@@ -132,7 +145,14 @@ export default class ScheduledArticle {
     }
     this.isSaving = true;
     this.scheduleFor = this.pubDate;
-    this.saveError = await this._service.saveArticle(this._url_id, this);
+    let data;
+    [data, this.saveError] = await this._service.saveArticle(
+      this._url_id,
+      this
+    );
     this.isSaving = false;
+    if (!this.saveError) {
+      this.init(data);
+    }
   }
 }
