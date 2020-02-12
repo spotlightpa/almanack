@@ -1,6 +1,7 @@
 import Vue from "vue";
 
 import getProp from "@/utils/getter.js";
+import imgproxyURL from "@/api/imgproxy-url.js";
 
 export default class ScheduledArticle {
   constructor({ id, data, service }) {
@@ -100,6 +101,13 @@ export default class ScheduledArticle {
     let year = this.pubDate.getFullYear();
     let month = (this.pubDate.getMonth() + 1).toString().padStart(2, "0");
     return `https://www.spotlightpa.org/news/${year}/${month}/${this.slug}/`;
+  }
+
+  get imagePreviewURL() {
+    if (!this.imageURL || this.imageURL.match(/^http/)) {
+      return "";
+    }
+    return imgproxyURL(this.imageURL);
   }
 
   validate() {
