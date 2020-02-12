@@ -66,16 +66,16 @@ export function makeService($auth) {
     hasAuthArticle() {
       return $auth.isSpotlightPAUser;
     },
-    async saveArticle(id, data) {
-      let body = JSON.stringify(data);
-      let [, err] = await tryTo(
+    async saveArticle(id, obj) {
+      let body = JSON.stringify(obj);
+      let [data, err] = await tryTo(
         request(endpoints.scheduledArticle(id), {
           headers: { "Content-Type": "application/json" },
           method: "POST",
           body,
         })
       );
-      return err;
+      return [data, err];
     },
     async uploadFile(body) {
       let [data, err] = await tryTo(
