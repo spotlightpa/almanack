@@ -3,7 +3,6 @@ package worker
 import (
 	"context"
 	"encoding/json"
-	"errors"
 	"flag"
 	"fmt"
 	"io/ioutil"
@@ -218,58 +217,26 @@ func (a *appEnv) makeMessage(diff []arcjson.Contents) (subject, body string) {
 
 func (a *appEnv) publishStories() error {
 	a.Println("starting publishStories")
-
-	// Get the lock
-	unlock, err := a.store.GetLock("almanack.scheduled-articles-lock")
-	defer unlock()
-	if err != nil {
-		return err
+	sas := almanack.ScheduledArticleService{
+		DataStore: a.store,
+		Logger:    a.Logger,
 	}
 
-	// Get the existing list of scheduled articles
-	ids := map[string]bool{}
-	if err = a.store.Get("almanack.scheduled-articles-list", &ids); err != nil &&
-		!errors.Is(err, errutil.NotFound) {
-		return err
-	}
+	return sas.PopScheduledArticles(func(articles []*almanack.ScheduledArticle) error {
+		for _, article := range articles {
+			ctx := context.Background()
+			msg := fmt.Sprintf("Content: publishing %q", article.ID)
+			path := article.ContentFilepath()
+			data, err := article.ToTOML()
+			if err != nil {
+				return err
+			}
+			if err = a.gh.CreateFile(ctx, msg, path, []byte(data)); err != nil {
+				return err
+			}
+		}
+		return nil
+	})
 
-	var removeIDs []string
-	hasChanged := false
-
-	// Get the articles
-	for articleID, ok := range ids {
-		if !ok {
-			removeIDs = append(removeIDs, articleID)
-			continue
-		}
-		var article almanack.ScheduledArticle
-		if err := a.store.Get("almanack.scheduled-article."+articleID, &article); err != nil {
-			return err
-		}
-		// If it's passed due, publish to Github
-		shouldPub := article.ScheduleFor != nil && article.ScheduleFor.Before(time.Now())
-		if !shouldPub {
-			continue
-		}
-		hasChanged = true
-		removeIDs = append(removeIDs, articleID)
-		ctx := context.Background()
-		msg := fmt.Sprintf("Content: publishing %q", articleID)
-		// TODO: Use real path
-		path := fmt.Sprintf("content/news/%s.md", articleID)
-		if err := a.gh.CreateFile(ctx, msg, path, []byte(article.Body)); err != nil {
-			return err
-		}
-	}
-
-	// If the status of the article changed, update the list
-	if hasChanged {
-		for _, id := range removeIDs {
-			delete(ids, id)
-		}
-		if err := a.store.Set("almanack.scheduled-articles-list", &ids); err != nil {
-			return err
-		}
-	}
 	return nil
 }

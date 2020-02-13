@@ -62,6 +62,11 @@ func (article *Article) String() string {
 	return fmt.Sprintf("%#v", *article)
 }
 
+func (article *Article) ContentFilepath() string {
+	date := article.PubDate.Format("2006-01-02")
+	return fmt.Sprintf("content/news/%s-%s.md", date, article.ID)
+}
+
 func (article *Article) ToTOML() (string, error) {
 	var buf strings.Builder
 	buf.WriteString("+++\n")
