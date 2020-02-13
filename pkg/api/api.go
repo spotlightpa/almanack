@@ -253,7 +253,7 @@ func (a *appEnv) getArticle(w http.ResponseWriter, r *http.Request) {
 func (a *appEnv) postArticle(w http.ResponseWriter, r *http.Request) {
 	a.Println("start postArticle")
 
-	articleID := chi.URLParam(r, "id")
+	// articleID := chi.URLParam(r, "id")
 
 	var userData almanack.ScheduledArticle
 	if err := errutil.DecodeJSONBody(w, r, &userData); err != nil {
@@ -267,7 +267,7 @@ func (a *appEnv) postArticle(w http.ResponseWriter, r *http.Request) {
 		Logger:         a.Logger,
 	}
 
-	if err := sas.Save(articleID, &userData); err != nil {
+	if err := sas.Save(&userData); err != nil {
 		a.errorResponse(w, err)
 		return
 	}
