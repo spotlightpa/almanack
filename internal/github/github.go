@@ -5,14 +5,11 @@ import (
 	"flag"
 
 	"github.com/google/go-github/v29/github"
+	"github.com/spotlightpa/almanack/pkg/almanack"
 	"golang.org/x/oauth2"
 )
 
-type Logger interface {
-	Printf(format string, v ...interface{})
-}
-
-func FlagVar(fl *flag.FlagSet) func(l Logger) (*Client, error) {
+func FlagVar(fl *flag.FlagSet) func(l almanack.Logger) (almanack.ContentStore, error) {
 	if fl == nil {
 		fl = flag.CommandLine
 	}
@@ -22,9 +19,9 @@ func FlagVar(fl *flag.FlagSet) func(l Logger) (*Client, error) {
 	repo := fl.String("github-repo", "", "name of Github `repo`")
 	branch := fl.String("github-branch", "", "Github `branch` to use")
 
-	return func(l Logger) (*Client, error) {
+	return func(l almanack.Logger) (almanack.ContentStore, error) {
 		if *token == "" || *owner == "" || *repo == "" || *branch == "" {
-			return nil, nil
+			return NewMockClient(l)
 		}
 		ctx := context.Background()
 		ts := oauth2.StaticTokenSource(
@@ -44,7 +41,7 @@ func FlagVar(fl *flag.FlagSet) func(l Logger) (*Client, error) {
 type Client struct {
 	client              *github.Client
 	owner, repo, branch string
-	l                   Logger
+	l                   almanack.Logger
 }
 
 func (cl *Client) printf(format string, v ...interface{}) {

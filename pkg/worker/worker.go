@@ -101,7 +101,7 @@ type appEnv struct {
 	srcFeedURL string
 	store      almanack.DataStore
 	email      almanack.EmailService
-	gh         *github.Client
+	gh         almanack.ContentStore
 	sc         slack.Client
 	*log.Logger
 }
@@ -218,10 +218,6 @@ func (a *appEnv) makeMessage(diff []arcjson.Contents) (subject, body string) {
 
 func (a *appEnv) publishStories() error {
 	a.Println("starting publishStories")
-	if a.gh == nil {
-		a.Println("aborting: no Github client provided")
-		return nil
-	}
 
 	// Get the lock
 	unlock, err := a.store.GetLock("almanack.scheduled-articles-lock")
@@ -259,6 +255,7 @@ func (a *appEnv) publishStories() error {
 		removeIDs = append(removeIDs, articleID)
 		ctx := context.Background()
 		msg := fmt.Sprintf("Content: publishing %q", articleID)
+		// TODO: Use real path
 		path := fmt.Sprintf("content/news/%s.md", articleID)
 		if err := a.gh.CreateFile(ctx, msg, path, []byte(article.Body)); err != nil {
 			return err
