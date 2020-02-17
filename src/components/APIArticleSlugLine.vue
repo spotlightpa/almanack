@@ -78,6 +78,18 @@ export default {
             View in Arc
           </span>
         </a>
+        <router-link
+          v-if="isSpotlightPAUser"
+          :to="article.scheduleRoute"
+          class="tag is-light"
+        >
+          <span class="icon">
+            <font-awesome-icon :icon="['fas', 'user-clock']" />
+          </span>
+          <span>
+            Scheduler
+          </span>
+        </router-link>
       </span>
     </span>
   </span>
