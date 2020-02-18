@@ -85,10 +85,6 @@ export default {
 
     <template v-if="article.featuredImage">
       <h2 class="title is-spaced">Featured Image</h2>
-      <h3 class="subtitle is-italic">
-        Note: Please confirm that your organization has permission to use the
-        credit source for each image.
-      </h3>
       <ImageThumbnail
         v-if="article.featuredImage"
         :url="article.featuredImage"
