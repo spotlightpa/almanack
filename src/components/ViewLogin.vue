@@ -38,9 +38,9 @@ export default {
       <strong>do not share this URL</strong> with anyone besides the appointed
       contacts at your organization and please be mindful of the notes and
       embargos attached to each story. For assistance or if you have any
-      questions, please contact Joanna Bernstein (<a
-        href="mailto:joanna@spotlightpa.org"
-        >joanna@spotlightpa.org</a
+      questions, please contact Sarah Anne Hughes (<a
+        href="mailto:shughes@spotlightpa.org"
+        >shughes@spotlightpa.org</a
       >).
     </p>
     <p>
