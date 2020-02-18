@@ -58,12 +58,6 @@ export default {
       </p>
     </template>
 
-    <template v-if="isSpotlightPAUser && article.pubURL">
-      <h1 class="title">
-        Spotlight PA URL
-      </h1>
-      <CopyWithButton :value="article.pubURL" label="URL"></CopyWithButton>
-    </template>
     <div v-if="isSpotlightPAUser" class="block">
       <router-link
         :to="article.scheduleRoute"
@@ -73,7 +67,7 @@ export default {
           <font-awesome-icon :icon="['fas', 'user-clock']" />
         </span>
         <span>
-          Schedule
+          Scheduler
         </span>
       </router-link>
     </div>
