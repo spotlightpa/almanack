@@ -33,7 +33,8 @@ export default {
   <div>
     <h2 class="title">
       Welcome, {{ fullName }}
-      <small v-if="roles.length"> ({{ roles | commaand }}) </small>
+      <small v-if="roles.length > 1"> ({{ roles | commaand }}) </small>
+      <small v-if="roles.length === 0"> (Not Authorized) </small>
     </h2>
     <p class="content">
       Please note that this is an internal content distribution system, not
