@@ -349,16 +349,18 @@ func (a *appEnv) postScheduledArticle(w http.ResponseWriter, r *http.Request) {
 }
 
 func (a *appEnv) getSignedUpload(w http.ResponseWriter, r *http.Request) {
-	signedURL, filename, err := a.imageStore.GetSignedUpload()
+	type response struct {
+		SignedURL string `json:"signed-url"`
+		FileName  string `json:"filename"`
+	}
+	var (
+		res response
+		err error
+	)
+	res.SignedURL, res.FileName, err = a.imageStore.GetSignedUpload()
 	if err != nil {
 		a.errorResponse(w, err)
 		return
 	}
-	a.jsonResponse(http.StatusOK, w, &struct {
-		SignedURL string `json:"signed-url"`
-		FileName  string `json:"filename"`
-	}{
-		signedURL,
-		filename,
-	})
+	a.jsonResponse(http.StatusOK, w, &res)
 }
