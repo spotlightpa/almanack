@@ -305,9 +305,8 @@ func (a *appEnv) postMessage(w http.ResponseWriter, r *http.Request) {
 }
 
 func (a *appEnv) getScheduledArticle(w http.ResponseWriter, r *http.Request) {
-	a.Println("start getScheduledArticle")
-
 	articleID := chi.URLParam(r, "id")
+	a.Printf("start getScheduledArticle %s", articleID)
 
 	arcsvc := arcjson.FeedService{DataStore: a.store, Logger: a.Logger}
 	sas := almanack.ScheduledArticleService{
