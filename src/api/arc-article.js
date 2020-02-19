@@ -2,25 +2,25 @@ import getProp from "@/utils/getter.js";
 import cmp from "@/utils/cmp.js";
 import { commaAndJoiner } from "@/filters/commaand.js";
 
-import APIArticleImage from "@/components/APIArticleImage.vue";
-import APIArticleList from "@/components/APIArticleList.vue";
-import APIArticleHTML from "@/components/APIArticleHTML.vue";
-import APIArticleHeader from "@/components/APIArticleHeader.vue";
-import APIArticleText from "@/components/APIArticleText.vue";
-import APIArticlePlaceholder from "@/components/APIArticlePlaceholder.vue";
-import APIArticleOEmbed from "@/components/APIArticleOEmbed.vue";
+import ArcArticleImage from "@/components/ArcArticleImage.vue";
+import ArcArticleList from "@/components/ArcArticleList.vue";
+import ArcArticleHTML from "@/components/ArcArticleHTML.vue";
+import ArcArticleHeader from "@/components/ArcArticleHeader.vue";
+import ArcArticleText from "@/components/ArcArticleText.vue";
+import ArcArticlePlaceholder from "@/components/ArcArticlePlaceholder.vue";
+import ArcArticleOEmbed from "@/components/ArcArticleOEmbed.vue";
 
 let contentComponentsTypes = {
-  header: APIArticleHeader,
-  list: APIArticleList,
-  text: APIArticleText,
+  header: ArcArticleHeader,
+  list: ArcArticleList,
+  text: ArcArticleText,
 };
 
 let embedComponentsTypes = {
-  code: APIArticleHTML,
-  image: APIArticleImage,
-  oembed_response: APIArticleOEmbed,
-  raw_html: APIArticleHTML,
+  code: ArcArticleHTML,
+  image: ArcArticleImage,
+  oembed_response: ArcArticleOEmbed,
+  raw_html: ArcArticleHTML,
 };
 
 let htmlComponentsTypes = {
@@ -170,7 +170,7 @@ export default class ArcArticle {
         embedcount++;
         let n = embedcount;
         return {
-          component: APIArticlePlaceholder,
+          component: ArcArticlePlaceholder,
           block: { n },
         };
       }
@@ -230,7 +230,7 @@ export default class ArcArticle {
       if (embedComponentsTypes[block.type]) {
         let n = embedcount;
         return {
-          component: APIArticlePlaceholder,
+          component: ArcArticlePlaceholder,
           block: { n },
         };
       }

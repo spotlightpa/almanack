@@ -1,8 +1,8 @@
 <script>
 import { useAuth } from "@/api/hooks.js";
 
-import APIArticleSlugLine from "./APIArticleSlugLine.vue";
-import APIArticleWordCount from "./APIArticleWordCount.vue";
+import ArticleSlugLine from "./ArticleSlugLine.vue";
+import ArticleWordCount from "./ArticleWordCount.vue";
 import CopyTextarea from "./CopyTextarea.vue";
 import CopyWithButton from "./CopyWithButton.vue";
 import DOMInnerHTML from "./DOMInnerHTML.vue";
@@ -10,8 +10,8 @@ import ImageThumbnail from "./ImageThumbnail.vue";
 
 export default {
   components: {
-    APIArticleSlugLine,
-    APIArticleWordCount,
+    ArticleSlugLine,
+    ArticleWordCount,
     CopyTextarea,
     CopyWithButton,
     DOMInnerHTML,
@@ -41,7 +41,7 @@ export default {
 <template>
   <div>
     <h1 class="title has-text-grey">
-      <APIArticleSlugLine :article="article"></APIArticleSlugLine>
+      <ArticleSlugLine :article="article"></ArticleSlugLine>
     </h1>
     <h2 class="title">
       Planned time
@@ -219,7 +219,7 @@ export default {
       <p class="content">
         {{ article.budgetLine }}
       </p>
-      <APIArticleWordCount :article="article"></APIArticleWordCount>
+      <ArticleWordCount :article="article"></ArticleWordCount>
     </details>
   </div>
 </template>

@@ -1,14 +1,14 @@
 <script>
-import APIArticleSlugLine from "./APIArticleSlugLine.vue";
-import APIArticleWordCount from "./APIArticleWordCount.vue";
+import ArticleSlugLine from "./ArticleSlugLine.vue";
+import ArticleWordCount from "./ArticleWordCount.vue";
 import APILoader from "./APILoader.vue";
 import { useAuth, useFeed } from "@/api/hooks.js";
 
 export default {
   name: "ViewArticleList",
   components: {
-    APIArticleSlugLine,
-    APIArticleWordCount,
+    ArticleSlugLine,
+    ArticleWordCount,
     APILoader,
   },
   setup() {
@@ -79,7 +79,7 @@ export default {
         >
           <div class="control">
             <h2 class="title is-spaced is-3">
-              <APIArticleSlugLine :article="article"></APIArticleSlugLine>
+              <ArticleSlugLine :article="article"></ArticleSlugLine>
             </h2>
 
             <p class="has-margin-top-negative">
@@ -94,7 +94,7 @@ export default {
               {{ article.budgetLine }}
             </p>
 
-            <APIArticleWordCount :article="article"></APIArticleWordCount>
+            <ArticleWordCount :article="article"></ArticleWordCount>
           </div>
         </article>
       </nav>
