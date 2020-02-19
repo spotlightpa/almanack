@@ -23,6 +23,7 @@ import (
 	"github.com/spotlightpa/almanack/internal/herokuapi"
 	"github.com/spotlightpa/almanack/internal/httpcache"
 	"github.com/spotlightpa/almanack/internal/httpjson"
+	"github.com/spotlightpa/almanack/internal/mailchimp"
 	"github.com/spotlightpa/almanack/internal/netlifyid"
 	"github.com/spotlightpa/almanack/internal/redis"
 	"github.com/spotlightpa/almanack/internal/redisflag"
@@ -61,6 +62,8 @@ func parseArgs(args []string) (*appEnv, error) {
 	)
 	checkHeroku := herokuapi.FlagVar(fl)
 	getImageStore := aws.FlagVar(fl)
+	mcAPIKey := fl.String("mc-api-key", "", "API `key` for MailChimp")
+	mcListID := fl.String("mc-list-id", "", "List `ID` MailChimp campaign")
 	fl.Usage = func() {
 		fmt.Fprintf(fl.Output(), "almanack-api help\n\n")
 		fl.PrintDefaults()
@@ -92,6 +95,7 @@ func parseArgs(args []string) (*appEnv, error) {
 			a.store = filestore.New("", "almanack", a.Logger)
 		}
 	}
+	a.email = mailchimp.NewMailService(*mcAPIKey, *mcListID, a.Logger)
 	a.imageStore = getImageStore(a.Logger)
 	a.auth = netlifyid.NewService(a.isLambda, a.Logger)
 	a.c = http.DefaultClient
@@ -109,6 +113,7 @@ type appEnv struct {
 	auth       almanack.AuthService
 	store      almanack.DataStore
 	imageStore almanack.ImageStore
+	email      almanack.EmailService
 	*log.Logger
 }
 
@@ -282,7 +287,20 @@ func (a *appEnv) getMessageFor(w http.ResponseWriter, r *http.Request) {
 
 func (a *appEnv) postMessage(w http.ResponseWriter, r *http.Request) {
 	a.Printf("starting postMessage")
-	// TODO
+	type request struct {
+		Subject string `json:"subject"`
+		Body    string `json:"body"`
+	}
+
+	var req request
+	if err := httpjson.DecodeRequest(w, r, &req); err != nil {
+		a.errorResponse(w, err)
+		return
+	}
+	if err := a.email.SendEmail(req.Subject, req.Body); err != nil {
+		a.errorResponse(w, err)
+		return
+	}
 	a.jsonResponse(http.StatusOK, w, nil)
 }
 
