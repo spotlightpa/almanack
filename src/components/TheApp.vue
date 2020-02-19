@@ -11,7 +11,7 @@ export default {
 </script>
 
 <template>
-  <div class="body">
+  <div>
     <PageNav id="top-nav" />
     <main class="section container">
       <div class="columns is-centered is-multiline">
