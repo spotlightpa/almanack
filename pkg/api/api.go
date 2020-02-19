@@ -301,7 +301,7 @@ func (a *appEnv) postMessage(w http.ResponseWriter, r *http.Request) {
 		a.errorResponse(w, err)
 		return
 	}
-	a.jsonResponse(http.StatusOK, w, nil)
+	a.jsonResponse(http.StatusAccepted, w, http.StatusText(http.StatusAccepted))
 }
 
 func (a *appEnv) getScheduledArticle(w http.ResponseWriter, r *http.Request) {

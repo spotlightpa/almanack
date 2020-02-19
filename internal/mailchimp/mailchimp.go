@@ -52,6 +52,8 @@ type Mock struct {
 
 func (mock Mock) SendEmail(subject, body string) error {
 	mock.l.Printf("no MailChimp client, debugging output\n")
+	fmt.Println(subject)
+	fmt.Println("----")
 	fmt.Println(body)
 	return nil
 }
