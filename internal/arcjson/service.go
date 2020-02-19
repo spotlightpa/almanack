@@ -1,8 +1,6 @@
 package arcjson
 
 import (
-	"errors"
-
 	"github.com/spotlightpa/almanack/pkg/almanack"
 	"github.com/spotlightpa/almanack/pkg/errutil"
 )
@@ -36,21 +34,25 @@ func (fs FeedService) GetArticle(articleID string) (*almanack.Article, error) {
 	return article, nil
 }
 
-func (fs FeedService) UpdateFeed(newfeed API) (newcontents []Contents, err error) {
-	var oldfeed API
-	err = fs.DataStore.GetSet(feedKey, &oldfeed, &newfeed)
-	if errors.Is(err, errutil.NotFound) {
-		fs.Logger.Printf("warning: no old feed data")
-		return nil, nil
-	}
-	if err != nil {
-		return nil, err
-	}
-
-	// TODO: Better status checking
-	newcontents = diffFeed(newfeed, oldfeed)
-	return newcontents, nil
+func (fs FeedService) StoreFeed(newfeed API) (err error) {
+	return fs.DataStore.Set(feedKey, &newfeed)
 }
+
+// func (fs FeedService) UpdateFeed(newfeed API) (newcontents []Contents, err error) {
+// 	var oldfeed API
+// 	err = fs.DataStore.GetSet(feedKey, &oldfeed, &newfeed)
+// 	if errors.Is(err, errutil.NotFound) {
+// 		fs.Logger.Printf("warning: no old feed data")
+// 		return nil, nil
+// 	}
+// 	if err != nil {
+// 		return nil, err
+// 	}
+
+// 	// TODO: Better status checking
+// 	newcontents = diffFeed(newfeed, oldfeed)
+// 	return newcontents, nil
+// }
 
 func diffFeed(newfeed, oldfeed API) []Contents {
 	readyids := make(map[string]bool, len(oldfeed.Contents))

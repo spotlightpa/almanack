@@ -21,6 +21,7 @@ import (
 	"github.com/spotlightpa/almanack/internal/aws"
 	"github.com/spotlightpa/almanack/internal/filestore"
 	"github.com/spotlightpa/almanack/internal/herokuapi"
+	"github.com/spotlightpa/almanack/internal/httpcache"
 	"github.com/spotlightpa/almanack/internal/httpjson"
 	"github.com/spotlightpa/almanack/internal/netlifyid"
 	"github.com/spotlightpa/almanack/internal/redis"
@@ -47,6 +48,8 @@ func CLI(args []string) error {
 func parseArgs(args []string) (*appEnv, error) {
 	var a appEnv
 	fl := flag.NewFlagSet(AppName, flag.ContinueOnError)
+	fl.StringVar(&a.srcFeedURL, "src-feed", "", "source `URL` for Arc feed")
+	cache := fl.Bool("cache", false, "use in-memory cache for fetched JSON")
 	fl.BoolVar(&a.isLambda, "lambda", false, "use AWS Lambda rather than HTTP")
 	fl.StringVar(&a.port, "port", ":3001", "listen on port (HTTP only)")
 	getDialer := redisflag.Var(fl, "redis-url", "`URL` connection string for Redis")
@@ -92,11 +95,14 @@ func parseArgs(args []string) (*appEnv, error) {
 	a.imageStore = getImageStore(a.Logger)
 	a.auth = netlifyid.NewService(a.isLambda, a.Logger)
 	a.c = http.DefaultClient
-
+	if *cache {
+		httpcache.SetRounderTripper(a.c, a.Logger)
+	}
 	return &a, nil
 }
 
 type appEnv struct {
+	srcFeedURL string
 	port       string
 	isLambda   bool
 	c          *http.Client
@@ -130,12 +136,16 @@ func (a *appEnv) routes() http.Handler {
 		r.Get("/user-info", a.userInfo)
 		r.With(
 			a.hasRoleMiddleware("editor"),
-		).Get("/upcoming", a.upcoming)
+		).Get("/available-articles", a.listAvailable)
 		r.With(
 			a.hasRoleMiddleware("Spotlight PA"),
 		).Group(func(r chi.Router) {
-			r.Get("/articles/{id}", a.getArticle)
-			r.Post("/articles/{id}", a.postArticle)
+			r.Get("/upcoming-articles", a.listUpcoming)
+			r.Post("/available-articles", a.postAvailable)
+			r.Get("/message/{id}", a.getMessageFor)
+			r.Post("/message", a.postMessage)
+			r.Get("/scheduled-articles/{id}", a.getScheduledArticle)
+			r.Post("/scheduled-articles", a.postScheduledArticle)
 			r.Post("/get-signed-upload", a.getSignedUpload)
 		})
 	})
@@ -184,7 +194,6 @@ func (a *appEnv) ping(w http.ResponseWriter, r *http.Request) {
 
 func (a *appEnv) authMiddleware(h http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		a.Println("start authMiddleware")
 		r, err := a.auth.AddToRequest(r)
 		if err != nil {
 			a.errorResponse(w, err)
@@ -207,7 +216,6 @@ func (a *appEnv) userInfo(w http.ResponseWriter, r *http.Request) {
 func (a *appEnv) hasRoleMiddleware(role string) func(next http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			a.Println("starting hasRoleMiddleware")
 			if err := a.auth.HasRole(r, role); err != nil {
 				a.errorResponse(w, err)
 				return
@@ -217,21 +225,50 @@ func (a *appEnv) hasRoleMiddleware(role string) func(next http.Handler) http.Han
 	}
 }
 
-const feedKey = "almanack-worker.feed"
-
-func (a *appEnv) upcoming(w http.ResponseWriter, r *http.Request) {
-	a.Println("start upcoming")
+func (a *appEnv) listUpcoming(w http.ResponseWriter, r *http.Request) {
+	a.Println("start listUpcoming")
 
 	var feed arcjson.API
-	if err := a.store.Get(feedKey, &feed); err != nil {
+	if err := httpjson.Get(r.Context(), a.c, a.srcFeedURL, &feed); err != nil {
 		a.errorResponse(w, err)
 		return
 	}
+
+	arcsvc := arcjson.FeedService{DataStore: a.store, Logger: a.Logger}
+	if err := arcsvc.StoreFeed(feed); err != nil {
+		// Log failure but soldier on?
+		a.Printf("DANGER: did not store feed: %v", err)
+	}
+
 	a.jsonResponse(http.StatusOK, w, feed)
 }
 
-func (a *appEnv) getArticle(w http.ResponseWriter, r *http.Request) {
-	a.Println("start getArticle")
+func (a *appEnv) postAvailable(w http.ResponseWriter, r *http.Request) {
+	a.Printf("starting postAvailable")
+	// TODO
+	a.jsonResponse(http.StatusOK, w, nil)
+}
+
+func (a *appEnv) listAvailable(w http.ResponseWriter, r *http.Request) {
+	a.Printf("starting listAvailable")
+	// TODO
+	a.jsonResponse(http.StatusOK, w, nil)
+}
+
+func (a *appEnv) getMessageFor(w http.ResponseWriter, r *http.Request) {
+	a.Printf("starting getMessageFor")
+	// TODO
+	a.jsonResponse(http.StatusOK, w, nil)
+}
+
+func (a *appEnv) postMessage(w http.ResponseWriter, r *http.Request) {
+	a.Printf("starting postMessage")
+	// TODO
+	a.jsonResponse(http.StatusOK, w, nil)
+}
+
+func (a *appEnv) getScheduledArticle(w http.ResponseWriter, r *http.Request) {
+	a.Println("start getScheduledArticle")
 
 	articleID := chi.URLParam(r, "id")
 
@@ -251,10 +288,8 @@ func (a *appEnv) getArticle(w http.ResponseWriter, r *http.Request) {
 	a.jsonResponse(http.StatusOK, w, article)
 }
 
-func (a *appEnv) postArticle(w http.ResponseWriter, r *http.Request) {
-	a.Println("start postArticle")
-
-	// articleID := chi.URLParam(r, "id")
+func (a *appEnv) postScheduledArticle(w http.ResponseWriter, r *http.Request) {
+	a.Println("start postScheduledArticle")
 
 	var userData almanack.ScheduledArticle
 	if err := httpjson.DecodeRequest(w, r, &userData); err != nil {
