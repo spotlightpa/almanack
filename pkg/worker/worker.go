@@ -154,6 +154,4 @@ func (a *appEnv) publishStories() error {
 		}
 		return nil
 	})
-
-	return nil
 }
