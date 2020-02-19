@@ -60,6 +60,10 @@ func (cl *Client) CreateFile(ctx context.Context, msg, path string, content []by
 		Message: github.String(msg),
 		Content: content,
 		Branch:  github.String(cl.branch),
+		Author: &github.CommitAuthor{
+			Name:  github.String("Almanack"),
+			Email: github.String("webmaster@spotlightpa.org"),
+		},
 	}
 	_, _, err := cl.client.Repositories.CreateFile(ctx, cl.owner, cl.repo, path, opts)
 	return err
