@@ -1,4 +1,4 @@
-package errutil
+package httpjson
 
 import (
 	"encoding/json"
@@ -9,18 +9,20 @@ import (
 	"strings"
 
 	"github.com/golang/gddo/httputil/header"
+
+	"github.com/spotlightpa/almanack/pkg/errutil"
 )
 
-func errorf(status int, format string, v ...interface{}) Response {
+func errorf(status int, format string, v ...interface{}) errutil.Response {
 	message := fmt.Sprintf(format, v...)
-	return Response{
+	return errutil.Response{
 		StatusCode: status,
 		Message:    message,
 		Log:        message,
 	}
 }
 
-func DecodeJSONBody(w http.ResponseWriter, r *http.Request, dst interface{}) error {
+func DecodeRequest(w http.ResponseWriter, r *http.Request, dst interface{}) error {
 	// Thanks to https://www.alexedwards.net/blog/how-to-properly-parse-a-json-request-body
 	if r.Header.Get("Content-Type") != "" {
 		value, _ := header.ParseValueAndParams(r.Header, "Content-Type")
@@ -71,7 +73,7 @@ func DecodeJSONBody(w http.ResponseWriter, r *http.Request, dst interface{}) err
 				"Request body must not be larger than %d bytes", maxSize)
 
 		default:
-			return Response{
+			return errutil.Response{
 				StatusCode: http.StatusBadRequest,
 				Message:    http.StatusText(http.StatusBadRequest),
 				Log:        err.Error(),

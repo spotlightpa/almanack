@@ -21,6 +21,7 @@ import (
 	"github.com/spotlightpa/almanack/internal/aws"
 	"github.com/spotlightpa/almanack/internal/filestore"
 	"github.com/spotlightpa/almanack/internal/herokuapi"
+	"github.com/spotlightpa/almanack/internal/httpjson"
 	"github.com/spotlightpa/almanack/internal/netlifyid"
 	"github.com/spotlightpa/almanack/internal/redis"
 	"github.com/spotlightpa/almanack/internal/redisflag"
@@ -256,7 +257,7 @@ func (a *appEnv) postArticle(w http.ResponseWriter, r *http.Request) {
 	// articleID := chi.URLParam(r, "id")
 
 	var userData almanack.ScheduledArticle
-	if err := errutil.DecodeJSONBody(w, r, &userData); err != nil {
+	if err := httpjson.DecodeRequest(w, r, &userData); err != nil {
 		a.errorResponse(w, err)
 		return
 	}

@@ -2,12 +2,9 @@ package worker
 
 import (
 	"context"
-	"encoding/json"
 	"flag"
 	"fmt"
-	"io/ioutil"
 	"log"
-	"net/http"
 	"os"
 	"strings"
 	"text/template"
@@ -19,6 +16,7 @@ import (
 	"github.com/spotlightpa/almanack/internal/arcjson"
 	"github.com/spotlightpa/almanack/internal/filestore"
 	"github.com/spotlightpa/almanack/internal/github"
+	"github.com/spotlightpa/almanack/internal/httpjson"
 	"github.com/spotlightpa/almanack/internal/mailchimp"
 	"github.com/spotlightpa/almanack/internal/redis"
 	"github.com/spotlightpa/almanack/internal/redisflag"
@@ -124,7 +122,7 @@ func (a *appEnv) updateFeed() error {
 	}
 	a.Println("fetching", a.srcFeedURL)
 	var newfeed arcjson.API
-	if err := a.fetchJSON(a.srcFeedURL, &newfeed); err != nil {
+	if err := httpjson.Get(nil, a.srcFeedURL, &newfeed); err != nil {
 		return err
 	}
 
@@ -146,25 +144,6 @@ func (a *appEnv) updateFeed() error {
 		subject, body := a.makeMessage(newstories)
 		a.Printf("sending %q", subject)
 		return a.email.SendEmail(subject, body)
-	}
-
-	return nil
-}
-
-func (a *appEnv) fetchJSON(url string, v interface{}) error {
-	resp, err := http.Get(url)
-	if err != nil {
-		return err
-	}
-	defer resp.Body.Close()
-
-	b, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		return err
-	}
-
-	if err = json.Unmarshal(b, v); err != nil {
-		return err
 	}
 
 	return nil
