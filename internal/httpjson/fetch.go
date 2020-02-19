@@ -1,16 +1,23 @@
 package httpjson
 
 import (
+	"context"
 	"encoding/json"
 	"io/ioutil"
 	"net/http"
 )
 
-func Get(c *http.Client, url string, v interface{}) error {
+func Get(ctx context.Context, c *http.Client, url string, v interface{}) error {
 	if c == nil {
 		c = http.DefaultClient
 	}
-	resp, err := c.Get(url)
+
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
+	if err != nil {
+		return err
+	}
+
+	resp, err := c.Do(req)
 	if err != nil {
 		return err
 	}

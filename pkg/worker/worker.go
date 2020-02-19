@@ -6,8 +6,6 @@ import (
 	"fmt"
 	"log"
 	"os"
-	"strings"
-	"text/template"
 	"time"
 
 	"github.com/carlmjohnson/flagext"
@@ -122,76 +120,16 @@ func (a *appEnv) updateFeed() error {
 	}
 	a.Println("fetching", a.srcFeedURL)
 	var newfeed arcjson.API
-	if err := httpjson.Get(nil, a.srcFeedURL, &newfeed); err != nil {
+	if err := httpjson.Get(context.Background(), nil, a.srcFeedURL, &newfeed); err != nil {
 		return err
 	}
 
 	svc := arcjson.FeedService{DataStore: a.store, Logger: a.Logger}
-
-	// TODO: Better status checking
-	newstories, err := svc.UpdateFeed(newfeed)
-	if err != nil {
+	if err := svc.StoreFeed(newfeed); err != nil {
 		return err
-	}
-	a.Printf("got %d newly ready stories", len(newstories))
-	// Check if the story has been sent before
-	newstories, err = svc.UpdateMailStatus(newstories)
-	if err != nil {
-		return err
-	}
-	a.Printf("got %d stories previously unsent", len(newstories))
-	if len(newstories) > 0 {
-		subject, body := a.makeMessage(newstories)
-		a.Printf("sending %q", subject)
-		return a.email.SendEmail(subject, body)
 	}
 
 	return nil
-}
-
-const messageTemplate = `
-{{- range . -}}
-{{ .Slug }} now available
-
-https://almanack.data.spotlightpa.org/articles/{{ .ID }}
-
-Planned for {{ .Planning.Scheduling.PlannedPublishDate.Format "January 2, 2006" }}
-
-{{ with .Planning.InternalNote -}}
-Publication Notes:
-
-{{ . }}
-
-{{ end -}}
-
-Budget:
-
-{{ .Planning.BudgetLine }}
-
-Word count planned: {{ .Planning.StoryLength.WordCountPlanned}}
-Word count actual: {{ .Planning.StoryLength.WordCountActual}}
-Lines: {{ .Planning.StoryLength.LineCountActual}}
-Column inches: {{ .Planning.StoryLength.InchCountActual}}
-
-
-{{ end -}}
-`
-
-func (a *appEnv) makeMessage(diff []arcjson.Contents) (subject, body string) {
-	slugs := make([]string, len(diff))
-	for i := range diff {
-		slugs[i] = diff[i].Slug
-	}
-	subject = fmt.Sprintf(
-		"%s now available on Spotlight PA Almanack",
-		strings.Join(slugs, ", "))
-	t := template.Must(template.New("").Parse(messageTemplate))
-	var buf strings.Builder
-	if err := t.Execute(&buf, diff); err != nil {
-		panic(err)
-	}
-	body = buf.String()
-	return
 }
 
 func (a *appEnv) publishStories() error {
