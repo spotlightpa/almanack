@@ -256,9 +256,28 @@ func (a *appEnv) listAvailable(w http.ResponseWriter, r *http.Request) {
 }
 
 func (a *appEnv) getMessageFor(w http.ResponseWriter, r *http.Request) {
-	a.Printf("starting getMessageFor")
-	// TODO
-	a.jsonResponse(http.StatusOK, w, nil)
+	articleID := chi.URLParam(r, "id")
+	a.Printf("starting getMessageFor %s", articleID)
+
+	arcsvc := arcjson.FeedService{DataStore: a.store, Logger: a.Logger}
+	feed, err := arcsvc.GetFeed()
+	if err != nil {
+		a.errorResponse(w, err)
+		return
+	}
+
+	art, err := feed.Get(articleID)
+	if err != nil {
+		a.errorResponse(w, err)
+		return
+	}
+	type response struct {
+		Subject string `json:"subject"`
+		Body    string `json:"body"`
+	}
+	var res response
+	res.Subject, res.Body = art.Message()
+	a.jsonResponse(http.StatusOK, w, &res)
 }
 
 func (a *appEnv) postMessage(w http.ResponseWriter, r *http.Request) {
