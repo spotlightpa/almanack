@@ -11,6 +11,7 @@ import {
   faFileDownload,
   faLink,
   faFileUpload,
+  faPenNib,
   faSyncAlt,
   faUserClock,
 } from "@fortawesome/free-solid-svg-icons";
@@ -54,6 +55,7 @@ library.add(
   faInfoCircle,
   faLink,
   faNewspaper,
+  faPenNib,
   faSyncAlt,
   faUpload,
   faUserClock

@@ -1,14 +1,12 @@
 <script>
-import ArticleSlugLine from "./ArticleSlugLine.vue";
-import ArticleWordCount from "./ArticleWordCount.vue";
+import ArticleList from "./ArticleList.vue";
 import APILoader from "./APILoader.vue";
 import { useAuth, useFeed } from "@/api/hooks.js";
 
 export default {
   name: "ViewArticleList",
   components: {
-    ArticleSlugLine,
-    ArticleWordCount,
+    ArticleList,
     APILoader,
   },
   setup() {
@@ -68,36 +66,18 @@ export default {
       :reload="reload"
       :error="error"
     >
-      <nav class="panel is-black">
-        <h1 class="panel-heading">
-          Spotlight PA Articles
-        </h1>
-        <article
-          v-for="article of articles"
-          :key="article.id"
-          class="panel-block"
-        >
-          <div class="control">
-            <h2 class="title is-spaced is-3">
-              <ArticleSlugLine :article="article"></ArticleSlugLine>
-            </h2>
-
-            <p class="has-margin-top-negative">
-              <strong>Byline:</strong>
-              {{ article.authors | commaand }}
-            </p>
-            <p>
-              <strong>Planned time:</strong>
-              {{ article.plannedDate | formatDate }}
-            </p>
-            <p class="has-margin-top-thin content is-small">
-              {{ article.budgetLine }}
-            </p>
-
-            <ArticleWordCount :article="article"></ArticleWordCount>
-          </div>
-        </article>
-      </nav>
+      <ArticleList
+        v-if="articles.planned.length"
+        :articles="articles.planned"
+        title="Planned Articles"
+        class="is-primary"
+      ></ArticleList>
+      <ArticleList
+        v-if="articles.available.length"
+        :articles="articles.available"
+        title="Available Articles"
+        class="is-black"
+      ></ArticleList>
     </APILoader>
   </div>
 </template>

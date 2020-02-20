@@ -34,13 +34,20 @@ let ignoreComponentTypes = {
 };
 
 export default class ArcArticle {
-  static from(data) {
-    return data.contents
-      .map(a => new ArcArticle(a))
+  static for(items, options) {
+    return items
+      .map(a => new ArcArticle(a, options))
       .sort((a, b) => cmp(b.plannedDate, a.plannedDate));
   }
 
-  constructor(rawData) {
+  static from(data) {
+    return {
+      planned: ArcArticle.for(data.planned, { isAvailable: false }),
+      available: ArcArticle.for(data.available, { isAvailable: true }),
+    };
+  }
+
+  constructor(rawData, { isAvailable }) {
     let props = {
       actualInchCount: "planning.story_length.inch_count_actual",
       actualLineCount: "planning.story_length.line_count_actual",
@@ -60,6 +67,7 @@ export default class ArcArticle {
     for (let [key, val] of Object.entries(props)) {
       this[key] = this.getProp(val);
     }
+    this.isAvailable = isAvailable;
   }
 
   getProp(pathStr, { fallback = null } = {}) {
@@ -132,7 +140,7 @@ export default class ArcArticle {
         notReadyRim: "Rim",
         readySlot: "Slot",
         readyDone: "Done",
-        published: "Published",
+        published: "Ready",
       }[this.status] || "Unknown"
     );
   }

@@ -30,9 +30,7 @@ export default {
       if (this.isSpotlightPAUser) {
         return "router-link";
       }
-      return this.article.status.startsWith("notReady")
-        ? "span"
-        : "router-link";
+      return this.article.isAvailable ? "router-link" : "span";
     },
   },
 };
@@ -48,23 +46,18 @@ export default {
     <span class="is-inline-flex middle">
       <span class="tags has-addons">
         <span class="tag is-light">Status</span>
-        <a
-          v-if="article.isPublished"
-          :href="article.pubURL"
-          class="tag is-success"
-          target="_blank"
-          :title="`${article.slug} on SpotlightPA.org`"
-        >
+        <span class="tag is-small" :class="tagStyle">
           <span class="icon is-size-6">
-            <font-awesome-icon :icon="['fas', 'link']" />
+            <font-awesome-icon
+              :icon="
+                article.isPublished
+                  ? ['fas', 'check-circle']
+                  : ['fas', 'pen-nib']
+              "
+            />
           </span>
-          <span>
-            {{ article.statusVerbose }}
-          </span>
-        </a>
-        <span v-else class="tag is-small" :class="tagStyle">{{
-          article.statusVerbose
-        }}</span>
+          <span v-text="article.statusVerbose"></span>
+        </span>
         <a
           v-if="isArcUser"
           class="tag is-primary"
