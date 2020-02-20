@@ -9,10 +9,10 @@ export function makeFeed(service) {
     error: null,
     articles: computed(() =>
       apiState.isLoading || apiState.error || !feed.value
-        ? []
+        ? { planned: [], available: [] }
         : ArcArticle.from(feed.value)
     ),
-    didLoad: computed(() => !!apiState.articles.length),
+    didLoad: false,
     canLoad: service.hasAuthAvailable(),
   });
 
@@ -30,6 +30,7 @@ export function makeFeed(service) {
       apiState.isLoading = true;
       [feed.value, apiState.error] = await service.listAvailable();
       apiState.isLoading = false;
+      apiState.didLoad = true;
     },
     async initLoad() {
       if (apiState.canLoad && !apiState.didLoad) {
