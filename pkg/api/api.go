@@ -149,8 +149,9 @@ func (a *appEnv) routes() http.Handler {
 			a.hasRoleMiddleware("Spotlight PA"),
 		).Group(func(r chi.Router) {
 			r.Get("/upcoming-articles", a.listUpcoming)
-			r.Post("/available-articles/{id}", a.postAvailable)
-			r.Delete("/available-articles/{id}", a.deleteAvailable)
+			r.Post("/available-articles/{id}/available", a.postAvailable)
+			r.Post("/available-articles/{id}/planned", a.postPlanned)
+			r.Delete("/available-articles/{id}", a.deleteStatus)
 			r.Get("/message/{id}", a.getMessageFor)
 			r.Post("/message", a.postMessage)
 			r.Get("/scheduled-articles/{id}", a.getScheduledArticle)
@@ -256,18 +257,29 @@ func (a *appEnv) postAvailable(w http.ResponseWriter, r *http.Request) {
 	articleID := chi.URLParam(r, "id")
 	a.Printf("starting postAvailable %s", articleID)
 	arcsvc := arcjson.FeedService{DataStore: a.store, Logger: a.Logger}
-	if err := arcsvc.SetAvailablity(articleID, true); err != nil {
+	if err := arcsvc.SetStatus(articleID, arcjson.StatusAvailable); err != nil {
 		a.errorResponse(w, err)
 		return
 	}
 	a.jsonResponse(http.StatusAccepted, w, http.StatusText(http.StatusAccepted))
 }
 
-func (a *appEnv) deleteAvailable(w http.ResponseWriter, r *http.Request) {
+func (a *appEnv) postPlanned(w http.ResponseWriter, r *http.Request) {
 	articleID := chi.URLParam(r, "id")
-	a.Printf("starting deleteAvailable %s", articleID)
+	a.Printf("starting postPlanned %s", articleID)
 	arcsvc := arcjson.FeedService{DataStore: a.store, Logger: a.Logger}
-	if err := arcsvc.SetAvailablity(articleID, false); err != nil {
+	if err := arcsvc.SetStatus(articleID, arcjson.StatusPlanned); err != nil {
+		a.errorResponse(w, err)
+		return
+	}
+	a.jsonResponse(http.StatusAccepted, w, http.StatusText(http.StatusAccepted))
+}
+
+func (a *appEnv) deleteStatus(w http.ResponseWriter, r *http.Request) {
+	articleID := chi.URLParam(r, "id")
+	a.Printf("starting deleteStatus %s", articleID)
+	arcsvc := arcjson.FeedService{DataStore: a.store, Logger: a.Logger}
+	if err := arcsvc.SetStatus(articleID, arcjson.StatusUnset); err != nil {
 		a.errorResponse(w, err)
 		return
 	}
@@ -276,14 +288,21 @@ func (a *appEnv) deleteAvailable(w http.ResponseWriter, r *http.Request) {
 
 func (a *appEnv) listAvailable(w http.ResponseWriter, r *http.Request) {
 	a.Printf("starting listAvailable")
+	type response struct {
+		Planned   []arcjson.Contents `json:"planned"`
+		Available []arcjson.Contents `json:"available"`
+	}
+	var (
+		res response
+		err error
+	)
 	arcsvc := arcjson.FeedService{DataStore: a.store, Logger: a.Logger}
-	contents, err := arcsvc.GetAvailableFeed()
-	if err != nil {
+	if res.Planned, res.Available, err = arcsvc.GetAvailableFeed(); err != nil {
 		a.errorResponse(w, err)
 		return
 	}
 
-	a.jsonResponse(http.StatusOK, w, &arcjson.API{Contents: contents})
+	a.jsonResponse(http.StatusOK, w, res)
 }
 
 func (a *appEnv) getAvailable(w http.ResponseWriter, r *http.Request) {
@@ -295,13 +314,12 @@ func (a *appEnv) getAvailable(w http.ResponseWriter, r *http.Request) {
 		a.errorResponse(w, err)
 		return
 	}
-	// TODO: Could be simpler here. Maybe if I rewrite in Postgres
-	contents, err := arcsvc.GetAvailableFeed()
+
+	feed, err := arcsvc.GetFeed()
 	if err != nil {
 		a.errorResponse(w, err)
 		return
 	}
-	feed := arcjson.API{Contents: contents}
 	article, err := feed.Get(articleID)
 	if err != nil {
 		a.errorResponse(w, err)
