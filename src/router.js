@@ -1,14 +1,16 @@
 import Vue from "vue";
 import Router from "vue-router";
+import { watch } from "@vue/composition-api";
+
+import { useAuth } from "@/api/hooks.js";
+import { setDimensions, sendGAPageview } from "@/utils/google-analytics.js";
+
 import ViewArticleItem from "./components/ViewArticleItem.vue";
 import ViewArticleList from "./components/ViewArticleList.vue";
 import ViewArticleSchedule from "./components/ViewArticleSchedule.vue";
 import ViewError from "./components/ViewError.vue";
 import ViewLogin from "./components/ViewLogin.vue";
 import ViewUploader from "./components/ViewUploader.vue";
-
-import { useAuth } from "@/api/hooks.js";
-import { watch } from "@vue/composition-api";
 
 Vue.use(Router);
 
@@ -71,7 +73,7 @@ let router = new Router({
   },
 });
 
-let { isSignedIn } = useAuth();
+let { roles, fullName, email, isSignedIn } = useAuth();
 
 router.beforeEach((to, from, next) => {
   if (to?.meta?.title) {
@@ -88,6 +90,23 @@ router.beforeEach((to, from, next) => {
     }
   }
   next();
+});
+
+router.afterEach(to => {
+  let domain = /@(.*)$/.exec(email.value)?.[1].toLowerCase() ?? "None";
+  let name = fullName.value || "Not Signed In";
+  let role =
+    roles.value.find(r => r === "admin") ||
+    roles.value.find(r => r === "Spotlight PA") ||
+    roles.value.find(r => r === "editor") ||
+    "None";
+
+  setDimensions({
+    domain,
+    name,
+    role,
+  });
+  sendGAPageview(to.fullPath);
 });
 
 watch(
