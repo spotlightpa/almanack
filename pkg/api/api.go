@@ -289,15 +289,14 @@ func (a *appEnv) deleteStatus(w http.ResponseWriter, r *http.Request) {
 func (a *appEnv) listAvailable(w http.ResponseWriter, r *http.Request) {
 	a.Printf("starting listAvailable")
 	type response struct {
-		Planned   []arcjson.Contents `json:"planned"`
-		Available []arcjson.Contents `json:"available"`
+		Contents []arcjson.Contents `json:"contents"`
 	}
 	var (
 		res response
 		err error
 	)
 	arcsvc := arcjson.FeedService{DataStore: a.store, Logger: a.Logger}
-	if res.Planned, res.Available, err = arcsvc.GetAvailableFeed(); err != nil {
+	if res.Contents, err = arcsvc.GetAvailableFeed(); err != nil {
 		a.errorResponse(w, err)
 		return
 	}
@@ -310,24 +309,26 @@ func (a *appEnv) getAvailable(w http.ResponseWriter, r *http.Request) {
 	a.Printf("starting getAvailable %s", articleID)
 
 	arcsvc := arcjson.FeedService{DataStore: a.store, Logger: a.Logger}
-	// Let Spotlight PA users get article regardless of its status
-	if err := a.auth.HasRole(r, "Spotlight PA"); err != nil {
-		if err := arcsvc.IsAvailable(articleID); err != nil {
-			a.errorResponse(w, err)
-			return
-		}
-	}
-
 	feed, err := arcsvc.GetFeed()
 	if err != nil {
 		a.errorResponse(w, err)
 		return
 	}
+
 	article, err := feed.Get(articleID)
 	if err != nil {
 		a.errorResponse(w, err)
 		return
 	}
+
+	// Let Spotlight PA users get article regardless of its status
+	if err := a.auth.HasRole(r, "Spotlight PA"); err != nil {
+		if article.Status != arcjson.StatusAvailable {
+			a.errorResponse(w, errutil.NotFound)
+			return
+		}
+	}
+
 	a.jsonResponse(http.StatusOK, w, article)
 }
 

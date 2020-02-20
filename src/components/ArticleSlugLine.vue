@@ -50,7 +50,7 @@ export default {
           <span class="icon is-size-6">
             <font-awesome-icon
               :icon="
-                article.isPublished
+                article.isAvailable
                   ? ['fas', 'check-circle']
                   : ['fas', 'pen-nib']
               "

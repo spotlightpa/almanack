@@ -54,6 +54,8 @@ type Contents struct {
 	Website              string             `json:"website"`
 	WebsiteURL           string             `json:"website_url,omitempty"`
 	Workflow             Workflow           `json:"workflow,omitempty"`
+
+	Status Status `json:"almanack-status,omitempty"`
 }
 
 type ContentProperties struct {
