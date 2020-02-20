@@ -33,21 +33,17 @@ let ignoreComponentTypes = {
   interstitial_link: true,
 };
 
+const STATUS_PLANNED = 1;
+const STATUS_AVAILABLE = 2;
+
 export default class ArcArticle {
-  static for(items, options) {
-    return items
-      .map(a => new ArcArticle(a, options))
+  static from(data) {
+    return data.contents
+      .map(a => new ArcArticle(a))
       .sort((a, b) => cmp(b.plannedDate, a.plannedDate));
   }
 
-  static from(data) {
-    return {
-      planned: ArcArticle.for(data.planned, { isAvailable: false }),
-      available: ArcArticle.for(data.available, { isAvailable: true }),
-    };
-  }
-
-  constructor(rawData, { isAvailable = true } = {}) {
+  constructor(rawData) {
     let props = {
       actualInchCount: "planning.story_length.inch_count_actual",
       actualLineCount: "planning.story_length.line_count_actual",
@@ -67,7 +63,7 @@ export default class ArcArticle {
     for (let [key, val] of Object.entries(props)) {
       this[key] = this.getProp(val);
     }
-    this.isAvailable = isAvailable;
+    this._almanackStatus = this.getProp("almanack-status", { fallback: 0 });
   }
 
   getProp(pathStr, { fallback = null } = {}) {
@@ -85,6 +81,14 @@ export default class ArcArticle {
       return "";
     }
     return slug.slice(start + 1, stop);
+  }
+
+  get isPlanned() {
+    return this._almanackStatus >= STATUS_PLANNED;
+  }
+
+  get isAvailable() {
+    return this._almanackStatus >= STATUS_AVAILABLE;
   }
 
   get pubURL() {
@@ -113,11 +117,14 @@ export default class ArcArticle {
     return commaAndJoiner(this.authors);
   }
   get status() {
+    if (this.isAvailable) {
+      return "published";
+    }
     let published =
       this.getProp("additional_properties.is_published") ||
       this.getProp("additional_properties.has_published_copy");
     if (published) {
-      return "published";
+      return "readyPublished";
     }
     let statusCode = this.getProp("workflow.status_code");
     return (
@@ -140,12 +147,10 @@ export default class ArcArticle {
         notReadyRim: "Rim",
         readySlot: "Slot",
         readyDone: "Done",
+        readyPublished: "Released",
         published: "Ready",
       }[this.status] || "Unknown"
     );
-  }
-  get isPublished() {
-    return this.status === "published";
   }
   get featuredImage() {
     let url = this.getProp("promo_items.basic.url", { fallback: "" });

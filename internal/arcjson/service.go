@@ -29,6 +29,17 @@ const (
 func (fs FeedService) GetFeed() (API, error) {
 	var feed API
 	err := fs.DataStore.Get(feedKey, &feed)
+	if err != nil {
+		return feed, err
+	}
+	ids, err := fs.getStatusIDs()
+	if err != nil {
+		return feed, err
+	}
+	for i := range feed.Contents {
+		story := &feed.Contents[i]
+		story.Status = ids[story.ID]
+	}
 	return feed, err
 }
 
@@ -52,26 +63,19 @@ func (fs FeedService) IsAvailable(articleID string) error {
 	return errutil.NotFound
 }
 
-func (fs FeedService) GetAvailableFeed() (planned, available []Contents, err error) {
+func (fs FeedService) GetAvailableFeed() ([]Contents, error) {
 	feed, err := fs.GetFeed()
 	if err != nil {
-		return nil, nil, err
+		return nil, err
 	}
 
-	ids, err := fs.getStatusIDs()
-	if err != nil {
-		return nil, nil, err
-	}
-
+	filteredContents := feed.Contents[:0]
 	for _, item := range feed.Contents {
-		if ids[item.ID] == StatusAvailable {
-			available = append(available, item)
-		}
-		if ids[item.ID] == StatusPlanned {
-			planned = append(planned, item)
+		if item.Status == StatusPlanned || item.Status == StatusAvailable {
+			filteredContents = append(filteredContents, item)
 		}
 	}
-	return
+	return filteredContents, nil
 }
 
 func (fs FeedService) SetStatus(articleid string, status Status) error {

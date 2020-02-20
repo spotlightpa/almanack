@@ -14,7 +14,7 @@ export function listAvailable(service) {
       apiState.isLoading.value ||
       apiState.error.value ||
       !apiState.rawData.value
-        ? { planned: [], available: [] }
+        ? []
         : ArcArticle.from(apiState.rawData.value)
     ),
   };

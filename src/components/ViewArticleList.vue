@@ -67,16 +67,9 @@ export default {
       :error="error"
     >
       <ArticleList
-        v-if="articles.planned.length"
-        :articles="articles.planned"
-        title="Planned Articles"
-        class="is-primary"
-      ></ArticleList>
-      <ArticleList
-        v-if="articles.available.length"
-        :articles="articles.available"
-        title="Available Articles"
-        class="is-black"
+        v-if="articles.length"
+        :articles="articles"
+        title="Spotlight PA Articles"
       ></ArticleList>
     </APILoader>
   </div>
