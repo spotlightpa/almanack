@@ -13,9 +13,17 @@ type FeedService struct {
 }
 
 const (
-	feedKey       = "almanack.feed"
-	availableKey  = "almanack.feed-available"
-	availableLock = "almanack.feed-available.lock"
+	feedKey    = "almanack.feed"
+	statusKey  = "almanack.feed-status"
+	statusLock = "almanack.feed-status.lock"
+)
+
+type Status int8
+
+const (
+	StatusUnset Status = iota
+	StatusPlanned
+	StatusAvailable
 )
 
 func (fs FeedService) GetFeed() (API, error) {
@@ -24,9 +32,9 @@ func (fs FeedService) GetFeed() (API, error) {
 	return feed, err
 }
 
-func (fs FeedService) getAvailableIDs() (map[string]bool, error) {
-	ids := map[string]bool{}
-	if err := fs.DataStore.Get(availableKey, &ids); err != nil &&
+func (fs FeedService) getStatusIDs() (map[string]Status, error) {
+	ids := map[string]Status{}
+	if err := fs.DataStore.Get(statusKey, &ids); err != nil &&
 		!errors.Is(err, errutil.NotFound) {
 		return ids, err
 	}
@@ -34,58 +42,61 @@ func (fs FeedService) getAvailableIDs() (map[string]bool, error) {
 }
 
 func (fs FeedService) IsAvailable(articleID string) error {
-	ids, err := fs.getAvailableIDs()
+	ids, err := fs.getStatusIDs()
 	if err != nil {
 		return err
 	}
-	if ids[articleID] {
+	if ids[articleID] == StatusAvailable {
 		return nil
 	}
 	return errutil.NotFound
 }
 
-func (fs FeedService) GetAvailableFeed() ([]Contents, error) {
+func (fs FeedService) GetAvailableFeed() (planned, available []Contents, err error) {
 	feed, err := fs.GetFeed()
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
-	ids, err := fs.getAvailableIDs()
+	ids, err := fs.getStatusIDs()
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
-	filteredContents := feed.Contents[:0]
+
 	for _, item := range feed.Contents {
-		if ids[item.ID] {
-			filteredContents = append(filteredContents, item)
+		if ids[item.ID] == StatusAvailable {
+			available = append(available, item)
+		}
+		if ids[item.ID] == StatusPlanned {
+			planned = append(planned, item)
 		}
 	}
-	return filteredContents, nil
+	return
 }
 
-func (fs FeedService) SetAvailablity(articleid string, available bool) error {
-	unlock, err := fs.DataStore.GetLock(availableLock)
+func (fs FeedService) SetStatus(articleid string, status Status) error {
+	unlock, err := fs.DataStore.GetLock(statusLock)
 	if err != nil {
 		return err
 	}
 	defer unlock()
 
-	ids, err := fs.getAvailableIDs()
+	ids, err := fs.getStatusIDs()
 	if err != nil {
 		return err
 	}
 
-	ids[articleid] = available
+	ids[articleid] = status
 	prune(ids)
-	if err = fs.DataStore.Set(availableKey, &ids); err != nil {
+	if err = fs.DataStore.Set(statusKey, &ids); err != nil {
 		return err
 	}
 	return nil
 }
 
-func prune(ids map[string]bool) {
+func prune(ids map[string]Status) {
 	for k, v := range ids {
-		if !v {
+		if v == StatusUnset {
 			delete(ids, k)
 		}
 	}
