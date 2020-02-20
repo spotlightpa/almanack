@@ -33,6 +33,17 @@ func (fs FeedService) getAvailableIDs() (map[string]bool, error) {
 	return ids, nil
 }
 
+func (fs FeedService) IsAvailable(articleID string) error {
+	ids, err := fs.getAvailableIDs()
+	if err != nil {
+		return err
+	}
+	if ids[articleID] {
+		return nil
+	}
+	return errutil.NotFound
+}
+
 func (fs FeedService) GetAvailableFeed() ([]Contents, error) {
 	feed, err := fs.GetFeed()
 	if err != nil {
