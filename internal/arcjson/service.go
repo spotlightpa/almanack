@@ -1,6 +1,8 @@
 package arcjson
 
 import (
+	"errors"
+
 	"github.com/spotlightpa/almanack/pkg/almanack"
 	"github.com/spotlightpa/almanack/pkg/errutil"
 )
@@ -10,12 +12,72 @@ type FeedService struct {
 	almanack.Logger
 }
 
-const feedKey = "almanack-worker.feed"
+const (
+	feedKey       = "almanack.feed"
+	availableKey  = "almanack.feed-available"
+	availableLock = "almanack.feed-available.lock"
+)
 
 func (fs FeedService) GetFeed() (API, error) {
 	var feed API
 	err := fs.DataStore.Get(feedKey, &feed)
 	return feed, err
+}
+
+func (fs FeedService) getAvailableIDs() (map[string]bool, error) {
+	ids := map[string]bool{}
+	if err := fs.DataStore.Get(availableKey, &ids); err != nil &&
+		!errors.Is(err, errutil.NotFound) {
+		return ids, err
+	}
+	return ids, nil
+}
+
+func (fs FeedService) GetAvailableFeed() ([]Contents, error) {
+	feed, err := fs.GetFeed()
+	if err != nil {
+		return nil, err
+	}
+
+	ids, err := fs.getAvailableIDs()
+	if err != nil {
+		return nil, err
+	}
+	filteredContents := feed.Contents[:0]
+	for _, item := range feed.Contents {
+		if ids[item.ID] {
+			filteredContents = append(filteredContents, item)
+		}
+	}
+	return filteredContents, nil
+}
+
+func (fs FeedService) SetAvailablity(articleid string, available bool) error {
+	unlock, err := fs.DataStore.GetLock(availableLock)
+	if err != nil {
+		return err
+	}
+	defer unlock()
+
+	ids, err := fs.getAvailableIDs()
+	if err != nil {
+		return err
+	}
+
+	ids[articleid] = available
+	prune(ids)
+	if err = fs.DataStore.Set(availableKey, &ids); err != nil {
+		return err
+	}
+	return nil
+}
+
+func prune(ids map[string]bool) {
+	for k, v := range ids {
+		if !v {
+			delete(ids, k)
+		}
+	}
 }
 
 func (fs FeedService) GetArticle(articleID string) (*almanack.Article, error) {
@@ -36,64 +98,4 @@ func (fs FeedService) GetArticle(articleID string) (*almanack.Article, error) {
 
 func (fs FeedService) StoreFeed(newfeed API) (err error) {
 	return fs.DataStore.Set(feedKey, &newfeed)
-}
-
-// func (fs FeedService) UpdateFeed(newfeed API) (newcontents []Contents, err error) {
-// 	var oldfeed API
-// 	err = fs.DataStore.GetSet(feedKey, &oldfeed, &newfeed)
-// 	if errors.Is(err, errutil.NotFound) {
-// 		fs.Logger.Printf("warning: no old feed data")
-// 		return nil, nil
-// 	}
-// 	if err != nil {
-// 		return nil, err
-// 	}
-
-// 	// TODO: Better status checking
-// 	newcontents = diffFeed(newfeed, oldfeed)
-// 	return newcontents, nil
-// }
-
-func diffFeed(newfeed, oldfeed API) []Contents {
-	readyids := make(map[string]bool, len(oldfeed.Contents))
-	for _, story := range oldfeed.Contents {
-		if story.Workflow.StatusCode >= StatusSlot {
-			readyids[story.ID] = true
-		}
-	}
-	var newstories []Contents
-	for _, story := range newfeed.Contents {
-		if story.Workflow.StatusCode >= StatusSlot &&
-			!readyids[story.ID] {
-			newstories = append(newstories, story)
-		}
-	}
-	return newstories
-}
-
-func (fs FeedService) UpdateMailStatus(newstories []Contents) (filteredStories []Contents, err error) {
-	sentStories := make([]bool, len(newstories))
-	getters := make([]func() error, len(newstories))
-	for i := range newstories {
-		j := i // Fix closure value
-		story := newstories[j]
-		getters[j] = func() error {
-			err := fs.DataStore.GetSet("almanack.sent-campaigns."+story.ID,
-				&sentStories[j], true)
-			if err == errutil.NotFound {
-				return nil
-			}
-			return err
-		}
-	}
-	if err = errutil.ExecParallel(getters...); err != nil {
-		return nil, err
-	}
-	filteredStories = newstories[:0]
-	for i, story := range newstories {
-		if !sentStories[i] {
-			filteredStories = append(filteredStories, story)
-		}
-	}
-	return filteredStories, nil
 }

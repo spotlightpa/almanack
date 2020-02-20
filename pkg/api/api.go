@@ -146,7 +146,7 @@ func (a *appEnv) routes() http.Handler {
 			a.hasRoleMiddleware("Spotlight PA"),
 		).Group(func(r chi.Router) {
 			r.Get("/upcoming-articles", a.listUpcoming)
-			r.Post("/available-articles", a.postAvailable)
+			r.Post("/available-articles/{id}", a.postAvailable)
 			r.Get("/message/{id}", a.getMessageFor)
 			r.Post("/message", a.postMessage)
 			r.Get("/scheduled-articles/{id}", a.getScheduledArticle)
@@ -249,15 +249,26 @@ func (a *appEnv) listUpcoming(w http.ResponseWriter, r *http.Request) {
 }
 
 func (a *appEnv) postAvailable(w http.ResponseWriter, r *http.Request) {
-	a.Printf("starting postAvailable")
-	// TODO
-	a.jsonResponse(http.StatusOK, w, nil)
+	articleID := chi.URLParam(r, "id")
+	a.Printf("starting postAvailable %s", articleID)
+	arcsvc := arcjson.FeedService{DataStore: a.store, Logger: a.Logger}
+	if err := arcsvc.SetAvailablity(articleID, true); err != nil {
+		a.errorResponse(w, err)
+		return
+	}
+	a.jsonResponse(http.StatusAccepted, w, http.StatusText(http.StatusAccepted))
 }
 
 func (a *appEnv) listAvailable(w http.ResponseWriter, r *http.Request) {
 	a.Printf("starting listAvailable")
-	// TODO
-	a.jsonResponse(http.StatusOK, w, nil)
+	arcsvc := arcjson.FeedService{DataStore: a.store, Logger: a.Logger}
+	contents, err := arcsvc.GetAvailableFeed()
+	if err != nil {
+		a.errorResponse(w, err)
+		return
+	}
+
+	a.jsonResponse(http.StatusOK, w, &arcjson.API{Contents: contents})
 }
 
 func (a *appEnv) getMessageFor(w http.ResponseWriter, r *http.Request) {
