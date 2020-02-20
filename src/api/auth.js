@@ -28,29 +28,11 @@ export function makeAuth() {
     authState.error = err;
   });
 
-  let token = computed(
-    () =>
-      (authState.user &&
-        authState.user.token &&
-        authState.user.token.access_token) ||
-      null
-  );
+  let token = computed(() => authState.user?.token?.access_token ?? null);
   let isSignedIn = computed(() => !!token.value);
-  let roles = computed(
-    () =>
-      (isSignedIn.value &&
-        authState.user.app_metadata &&
-        authState.user.app_metadata.roles) ||
-      []
-  );
-
-  let fullName = computed(
-    () =>
-      (authState.user &&
-        authState.user.user_metadata &&
-        authState.user.user_metadata.full_name) ||
-      ""
-  );
+  let roles = computed(() => authState.user?.app_metadata?.roles ?? []);
+  let fullName = computed(() => authState.user?.user_metadata?.full_name ?? "");
+  let email = computed(() => authState.user?.email ?? "");
 
   function hasRole(name) {
     return computed(() => {
@@ -94,6 +76,7 @@ export function makeAuth() {
     isSignedIn,
     roles,
     fullName,
+    email,
 
     isEditor: hasRole("editor"),
     isSpotlightPAUser: hasRole("Spotlight PA"),
