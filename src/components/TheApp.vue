@@ -11,16 +11,18 @@ export default {
 </script>
 
 <template>
-  <div>
+  <div class="body">
     <PageNav id="top-nav" />
-    <main class="section container">
-      <div class="columns is-centered is-multiline">
-        <div class="column is-four-fifths">
-          <router-view />
+    <div>
+      <main class="section container">
+        <div class="columns is-centered is-multiline">
+          <div class="column is-four-fifths">
+            <router-view />
+          </div>
         </div>
-      </div>
-    </main>
-    <section class="footer is-size-4">
+      </main>
+    </div>
+    <footer class="footer is-size-4">
       <div class="columns is-centered is-multiline">
         <div class="column is-two-fifths has-text-centered is-size-5">
           <p>
@@ -41,6 +43,6 @@ export default {
           </p>
         </div>
       </div>
-    </section>
+    </footer>
   </div>
 </template>
