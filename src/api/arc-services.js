@@ -19,3 +19,21 @@ export function listAvailable(service) {
     ),
   };
 }
+
+export function available(service) {
+  let apiState = useService({
+    canLoad: service.hasAuthAvailable(),
+    serviceCall: id => service.available(id),
+  });
+
+  return {
+    ...apiState,
+    article: computed(() =>
+      apiState.isLoading.value ||
+      apiState.error.value ||
+      !apiState.rawData.value
+        ? null
+        : new ArcArticle(apiState.rawData.value)
+    ),
+  };
+}

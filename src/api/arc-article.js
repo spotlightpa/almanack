@@ -47,7 +47,7 @@ export default class ArcArticle {
     };
   }
 
-  constructor(rawData, { isAvailable }) {
+  constructor(rawData, { isAvailable = true } = {}) {
     let props = {
       actualInchCount: "planning.story_length.inch_count_actual",
       actualLineCount: "planning.story_length.line_count_actual",

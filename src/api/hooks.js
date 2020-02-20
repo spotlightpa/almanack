@@ -5,7 +5,7 @@ Vue.use(VueCompositionAPI);
 
 import { makeAuth } from "./auth.js";
 import { makeService } from "./service.js";
-import { listAvailable } from "./arc-services.js";
+import { listAvailable, available } from "./arc-services.js";
 import { getScheduledArticle } from "./scheduler.js";
 
 let $auth;
@@ -30,6 +30,10 @@ export function useFeed() {
   let feed = listAvailable(useService());
   feed.initLoad();
   return feed;
+}
+
+export function getAvailableArticle() {
+  return available(useService());
 }
 
 export function useScheduler(id) {
