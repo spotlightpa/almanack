@@ -141,12 +141,16 @@ func (a *appEnv) routes() http.Handler {
 		r.Get("/user-info", a.userInfo)
 		r.With(
 			a.hasRoleMiddleware("editor"),
-		).Get("/available-articles", a.listAvailable)
+		).Group(func(r chi.Router) {
+			r.Get("/available-articles", a.listAvailable)
+			r.Get("/available-articles/{id}", a.getAvailable)
+		})
 		r.With(
 			a.hasRoleMiddleware("Spotlight PA"),
 		).Group(func(r chi.Router) {
 			r.Get("/upcoming-articles", a.listUpcoming)
 			r.Post("/available-articles/{id}", a.postAvailable)
+			r.Delete("/available-articles/{id}", a.deleteAvailable)
 			r.Get("/message/{id}", a.getMessageFor)
 			r.Post("/message", a.postMessage)
 			r.Get("/scheduled-articles/{id}", a.getScheduledArticle)
@@ -259,6 +263,17 @@ func (a *appEnv) postAvailable(w http.ResponseWriter, r *http.Request) {
 	a.jsonResponse(http.StatusAccepted, w, http.StatusText(http.StatusAccepted))
 }
 
+func (a *appEnv) deleteAvailable(w http.ResponseWriter, r *http.Request) {
+	articleID := chi.URLParam(r, "id")
+	a.Printf("starting deleteAvailable %s", articleID)
+	arcsvc := arcjson.FeedService{DataStore: a.store, Logger: a.Logger}
+	if err := arcsvc.SetAvailablity(articleID, false); err != nil {
+		a.errorResponse(w, err)
+		return
+	}
+	a.jsonResponse(http.StatusAccepted, w, http.StatusText(http.StatusAccepted))
+}
+
 func (a *appEnv) listAvailable(w http.ResponseWriter, r *http.Request) {
 	a.Printf("starting listAvailable")
 	arcsvc := arcjson.FeedService{DataStore: a.store, Logger: a.Logger}
@@ -269,6 +284,30 @@ func (a *appEnv) listAvailable(w http.ResponseWriter, r *http.Request) {
 	}
 
 	a.jsonResponse(http.StatusOK, w, &arcjson.API{Contents: contents})
+}
+
+func (a *appEnv) getAvailable(w http.ResponseWriter, r *http.Request) {
+	articleID := chi.URLParam(r, "id")
+	a.Printf("starting getAvailable %s", articleID)
+
+	arcsvc := arcjson.FeedService{DataStore: a.store, Logger: a.Logger}
+	if err := arcsvc.IsAvailable(articleID); err != nil {
+		a.errorResponse(w, err)
+		return
+	}
+	// TODO: Could be simpler here. Maybe if I rewrite in Postgres
+	contents, err := arcsvc.GetAvailableFeed()
+	if err != nil {
+		a.errorResponse(w, err)
+		return
+	}
+	feed := arcjson.API{Contents: contents}
+	article, err := feed.Get(articleID)
+	if err != nil {
+		a.errorResponse(w, err)
+		return
+	}
+	a.jsonResponse(http.StatusOK, w, article)
 }
 
 func (a *appEnv) getMessageFor(w http.ResponseWriter, r *http.Request) {
