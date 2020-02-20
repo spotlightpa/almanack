@@ -310,9 +310,12 @@ func (a *appEnv) getAvailable(w http.ResponseWriter, r *http.Request) {
 	a.Printf("starting getAvailable %s", articleID)
 
 	arcsvc := arcjson.FeedService{DataStore: a.store, Logger: a.Logger}
-	if err := arcsvc.IsAvailable(articleID); err != nil {
-		a.errorResponse(w, err)
-		return
+	// Let Spotlight PA users get article regardless of its status
+	if err := a.auth.HasRole(r, "Spotlight PA"); err != nil {
+		if err := arcsvc.IsAvailable(articleID); err != nil {
+			a.errorResponse(w, err)
+			return
+		}
 	}
 
 	feed, err := arcsvc.GetFeed()
