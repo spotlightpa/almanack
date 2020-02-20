@@ -11,12 +11,12 @@ export default {
   },
   setup() {
     let { fullName, roles, isSpotlightPAUser } = useAuth();
-    let { articles, canLoad, isLoading, reload, error } = useFeed();
+    let { articles, canLoad, isLoading, fetch, error } = useFeed();
 
     return {
       canLoad,
       isLoading,
-      reload,
+      fetch,
       error,
       fullName,
       roles,
@@ -63,7 +63,7 @@ export default {
     <APILoader
       :can-load="canLoad"
       :is-loading="isLoading"
-      :reload="reload"
+      :reload="fetch"
       :error="error"
     >
       <ArticleList
