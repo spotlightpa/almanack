@@ -13,7 +13,7 @@ export function makeFeed(service) {
         : ArcArticle.from(feed.value)
     ),
     didLoad: computed(() => !!apiState.articles.length),
-    canLoad: service.hasAuthUpcoming(),
+    canLoad: service.hasAuthAvailable(),
   });
 
   let methods = {
@@ -28,7 +28,7 @@ export function makeFeed(service) {
         return;
       }
       apiState.isLoading = true;
-      [feed.value, apiState.error] = await service.upcoming();
+      [feed.value, apiState.error] = await service.listAvailable();
       apiState.isLoading = false;
     },
     async initLoad() {

@@ -5,11 +5,15 @@ const tryTo = promise =>
     .catch(error => [null, error]);
 
 export const endpoints = {
+  healthcheck: `/api/healthcheck`,
   userInfo: `/api/user-info`,
-  upcoming: `/api/upcoming`,
-  scheduledArticle(id) {
-    return `/api/articles/${id}`;
-  },
+  listAvailable: `/api/available-articles`,
+  available: id => `/api/available-articles/${id}`,
+  upcoming: `/api/upcoming-articles`,
+  getMessage: id => `/api/message/${id}`,
+  sendMessage: `/api/message/`,
+  scheduledArticle: id => `/api/scheduled-articles/${id}`,
+  scheduleArticle: `/api/scheduled-articles`,
   getSignedUpload: `/api/get-signed-upload`,
 };
 
@@ -32,6 +36,15 @@ export function makeService($auth) {
     return await resp.json();
   }
 
+  function post(url, obj) {
+    let body = JSON.stringify(obj);
+    return request(url, {
+      headers: { "Content-Type": "application/json" },
+      method: "POST",
+      body,
+    });
+  }
+
   let requestBuffer = {};
   async function bufferRequest(key, cb) {
     if (requestBuffer[key]) {
@@ -52,12 +65,10 @@ export function makeService($auth) {
         tryTo(request(endpoints.userInfo))
       );
     },
-    async upcoming() {
-      return await bufferRequest("upcoming", () =>
-        tryTo(request(endpoints.upcoming))
-      );
+    async listAvailable() {
+      return await tryTo(request(endpoints.listAvailable));
     },
-    hasAuthUpcoming() {
+    hasAuthAvailable() {
       return $auth.isEditor;
     },
     async article(id) {
@@ -67,15 +78,7 @@ export function makeService($auth) {
       return $auth.isSpotlightPAUser;
     },
     async saveArticle(id, obj) {
-      let body = JSON.stringify(obj);
-      let [data, err] = await tryTo(
-        request(endpoints.scheduledArticle(id), {
-          headers: { "Content-Type": "application/json" },
-          method: "POST",
-          body,
-        })
-      );
-      return [data, err];
+      return await tryTo(post(endpoints.scheduleArticle, obj));
     },
     async uploadFile(body) {
       let [data, err] = await tryTo(
