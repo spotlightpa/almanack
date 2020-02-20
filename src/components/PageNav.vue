@@ -11,6 +11,7 @@ export default {
   setup() {
     let { isSignedIn, login, logout, signup } = useAuth();
     return {
+      isProd: !!window.location.host.match(/spotlightpa\.org$/),
       isSignedIn,
       login,
       logout,
@@ -26,7 +27,12 @@ export default {
 </script>
 
 <template>
-  <nav class="navbar" role="navigation" aria-label="main navigation">
+  <nav
+    class="navbar"
+    :class="{ 'is-light': !isProd }"
+    role="navigation"
+    aria-label="main navigation"
+  >
     <div class="navbar-brand">
       <router-link
         to="/"
