@@ -1,3 +1,5 @@
+import { reactive, toRefs } from "@vue/composition-api";
+
 const tryTo = promise =>
   promise
     // Wrap data/errors
@@ -99,5 +101,42 @@ export function makeService($auth) {
       }
       return [filename, null];
     },
+  };
+}
+
+export function useService({ canLoad, serviceCall }) {
+  const apiState = reactive({
+    rawData: null,
+    isLoading: false,
+    error: null,
+    didLoad: false,
+    canLoad,
+  });
+
+  let methods = {
+    async fetch({ arg = null, force = false } = {}) {
+      if (!apiState.canLoad) {
+        apiState.error = new Error("Insufficient permissions");
+        apiState.error.name = "Unauthorized";
+        return;
+      }
+      if (apiState.isLoading && !force) {
+        return;
+      }
+      apiState.isLoading = true;
+      [apiState.rawData, apiState.error] = await serviceCall(arg);
+      apiState.isLoading = false;
+      apiState.didLoad = true;
+    },
+    async initLoad() {
+      if (apiState.canLoad && !apiState.didLoad) {
+        await methods.fetch();
+      }
+    },
+  };
+
+  return {
+    ...toRefs(apiState),
+    ...methods,
   };
 }
