@@ -1,7 +1,7 @@
 <script>
 import { watch } from "@vue/composition-api";
 
-import { useFeed } from "@/api/hooks.js";
+import { getAvailableArticle } from "@/api/hooks.js";
 import APILoader from "./APILoader.vue";
 import ArticleDetails from "./ArticleDetails.vue";
 
@@ -15,9 +15,22 @@ export default {
     id: String,
   },
   setup(props) {
-    let { articleFromID, canLoad, isLoading, reload, error } = useFeed();
+    let {
+      article,
+      canLoad,
+      didLoad,
+      isLoading,
+      fetch,
+      error,
+    } = getAvailableArticle();
 
-    let article = articleFromID(() => props.id);
+    const reload = () => fetch({ arg: props.id });
+
+    watch(() => {
+      if (canLoad.value && !isLoading.value && !didLoad.value) {
+        reload();
+      }
+    });
 
     watch(() => {
       if (article.value?.slug) {

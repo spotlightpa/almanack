@@ -73,6 +73,9 @@ export function makeService($auth) {
     hasAuthAvailable() {
       return $auth.isEditor;
     },
+    async available(id) {
+      return await tryTo(request(endpoints.available(id)));
+    },
     async article(id) {
       return await tryTo(request(endpoints.scheduledArticle(id)));
     },
