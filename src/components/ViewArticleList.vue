@@ -1,7 +1,7 @@
 <script>
 import ArticleList from "./ArticleList.vue";
 import APILoader from "./APILoader.vue";
-import { useAuth, useFeed } from "@/api/hooks.js";
+import { useAuth, useAvailableList } from "@/api/hooks.js";
 
 export default {
   name: "ViewArticleList",
@@ -11,7 +11,7 @@ export default {
   },
   setup() {
     let { fullName, roles, isSpotlightPAUser } = useAuth();
-    let { articles, canLoad, isLoading, fetch, error } = useFeed();
+    let { articles, canLoad, isLoading, fetch, error } = useAvailableList();
 
     return {
       canLoad,
@@ -46,7 +46,19 @@ export default {
       >).
     </p>
 
-    <div v-if="isSpotlightPAUser" class="block">
+    <div v-if="isSpotlightPAUser" class="buttons">
+      <router-link
+        :to="{ name: 'admin' }"
+        class="button is-success has-text-weight-semibold"
+      >
+        <span class="icon">
+          <font-awesome-icon :icon="['fas', 'user-circle']" />
+        </span>
+        <span>
+          Arc Import Admin
+        </span>
+      </router-link>
+
       <router-link
         :to="{ name: 'uploader' }"
         class="button is-success has-text-weight-semibold"

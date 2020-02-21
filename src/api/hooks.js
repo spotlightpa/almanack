@@ -26,14 +26,16 @@ export function useClient() {
   return $client;
 }
 
-export function useFeed() {
-  let feed = listAvailable(useClient());
-  feed.initLoad();
-  return feed;
+export function useAvailableList() {
+  let list = listAvailable(useClient());
+  list.initLoad();
+  return list;
 }
 
-export function getAvailableArticle() {
-  return available(useClient());
+export function getAvailableArticle(id) {
+  let loader = available({ client: useClient(), id });
+  loader.initLoad();
+  return loader;
 }
 
 export function useScheduler(id) {

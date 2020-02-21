@@ -15,22 +15,9 @@ export default {
     id: String,
   },
   setup(props) {
-    let {
-      article,
-      canLoad,
-      didLoad,
-      isLoading,
-      fetch,
-      error,
-    } = getAvailableArticle();
-
-    const reload = () => fetch({ arg: props.id });
-
-    watch(() => {
-      if (canLoad.value && !isLoading.value && !didLoad.value) {
-        reload();
-      }
-    });
+    let { article, canLoad, isLoading, fetch, error } = getAvailableArticle(
+      props.id
+    );
 
     watch(() => {
       if (article.value?.slug) {
@@ -41,7 +28,7 @@ export default {
     return {
       canLoad,
       isLoading,
-      reload,
+      fetch,
       error,
       article,
     };
@@ -53,7 +40,7 @@ export default {
   <APILoader
     :can-load="canLoad"
     :is-loading="isLoading"
-    :reload="reload"
+    :reload="fetch"
     :error="error"
   >
     <div v-if="!article" class="message is-warning">
