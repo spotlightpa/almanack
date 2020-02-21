@@ -31,6 +31,7 @@ export default {
       </p>
     </div>
     <div v-else>
+      <h1 class="title">Upload an image</h1>
       <ImageUploader />
     </div>
   </div>

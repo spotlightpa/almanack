@@ -1,7 +1,7 @@
 <script>
 import { ref, computed } from "@vue/composition-api";
 
-import { useService } from "@/api/hooks.js";
+import { useClient } from "@/api/hooks.js";
 import imgproxyURL from "@/api/imgproxy-url.js";
 
 import CopyWithButton from "./CopyWithButton.vue";
@@ -12,7 +12,7 @@ export default {
     CopyWithButton,
   },
   setup() {
-    let { uploadFile } = useService();
+    let { uploadFile } = useClient();
 
     let isUploading = ref(false);
     let filename = ref("");
@@ -60,7 +60,6 @@ export default {
 
 <template>
   <div>
-    <h1 class="title">Upload an image</h1>
     <div class="level">
       <div class="level-left">
         <div class="level-item">

@@ -5,6 +5,7 @@ import { watch } from "@vue/composition-api";
 import { useAuth } from "@/api/hooks.js";
 import { setDimensions, sendGAPageview } from "@/utils/google-analytics.js";
 
+import ViewAdmin from "./components/ViewAdmin.vue";
 import ViewArticleItem from "./components/ViewArticleItem.vue";
 import ViewArticleList from "./components/ViewArticleList.vue";
 import ViewArticleSchedule from "./components/ViewArticleSchedule.vue";
@@ -51,6 +52,15 @@ let router = new Router({
       meta: {
         requiresAuth: true,
         title: "Spotlight PA Almanack - Scheduler",
+      },
+    },
+    {
+      path: "/admin/",
+      name: "admin",
+      component: ViewAdmin,
+      meta: {
+        requiresAuth: true,
+        title: "Spotlight PA Almanack - Admin",
       },
     },
     {
