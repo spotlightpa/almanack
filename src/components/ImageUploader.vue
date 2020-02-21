@@ -22,7 +22,17 @@ export default {
       if (isUploading.value) {
         return;
       }
-      let [body] = ev.target.files;
+      let { files } = ev.target;
+      if (files.length !== 1) {
+        error.value = new Error("Can only upload one file at a time");
+        return;
+      }
+      if (files[0].type !== "image/jpeg") {
+        error.value = new Error("Only JPEG is supported");
+        return;
+      }
+
+      let [body] = files;
       isUploading.value = true;
       error.value = null;
       [filename.value, error.value] = await uploadFile(body);
@@ -41,14 +51,6 @@ export default {
       dropFile(e) {
         isDragging.value = false;
         let { files = [] } = e.dataTransfer;
-        if (files.length !== 1) {
-          error.value = new Error("Can only upload one file at a time");
-          return;
-        }
-        if (files[0].type !== "image/jpeg") {
-          error.value = new Error("Only JPEG is supported");
-          return;
-        }
         uploadFileInput({ target: { files } });
       },
 
