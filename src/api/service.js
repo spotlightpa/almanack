@@ -19,7 +19,7 @@ export const endpoints = {
   getSignedUpload: `/api/get-signed-upload`,
 };
 
-export function makeService($auth) {
+export function makeClient($auth) {
   async function request(url, options = {}) {
     let headers = await $auth.headers();
     if (options.headers) {
