@@ -2,10 +2,10 @@ import { computed } from "@vue/composition-api";
 import ArcArticle from "./arc-article.js";
 import { useService } from "./service.js";
 
-export function listAvailable(service) {
+export function listAvailable(client) {
   let apiState = useService({
-    canLoad: service.hasAuthAvailable(),
-    serviceCall: () => service.listAvailable(),
+    canLoad: client.hasAuthAvailable(),
+    serviceCall: () => client.listAvailable(),
   });
 
   return {
@@ -20,10 +20,10 @@ export function listAvailable(service) {
   };
 }
 
-export function available(service) {
+export function available({ client, id }) {
   let apiState = useService({
-    canLoad: service.hasAuthAvailable(),
-    serviceCall: id => service.available(id),
+    canLoad: client.hasAuthAvailable(),
+    serviceCall: () => client.available(id),
   });
 
   return {
