@@ -37,3 +37,21 @@ export function available({ client, id }) {
     ),
   };
 }
+
+export function upcoming(client) {
+  let apiState = useService({
+    canLoad: client.hasAuthUpcoming(),
+    serviceCall: () => client.upcoming(),
+  });
+
+  return {
+    ...apiState,
+    articles: computed(() =>
+      apiState.isLoading.value ||
+      apiState.error.value ||
+      !apiState.rawData.value
+        ? []
+        : ArcArticle.from(apiState.rawData.value)
+    ),
+  };
+}

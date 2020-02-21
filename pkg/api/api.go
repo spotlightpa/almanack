@@ -245,6 +245,10 @@ func (a *appEnv) listUpcoming(w http.ResponseWriter, r *http.Request) {
 	}
 
 	arcsvc := arcjson.FeedService{DataStore: a.store, Logger: a.Logger}
+	if err := arcsvc.PopulateStatuses(feed.Contents); err != nil {
+		a.errorResponse(w, err)
+		return
+	}
 	if err := arcsvc.StoreFeed(feed); err != nil {
 		// Log failure but soldier on?
 		a.Printf("DANGER: did not store feed: %v", err)

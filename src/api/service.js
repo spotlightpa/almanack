@@ -11,6 +11,8 @@ export const endpoints = {
   userInfo: `/api/user-info`,
   listAvailable: `/api/available-articles`,
   available: id => `/api/available-articles/${id}`,
+  makePlanned: id => `/api/available-articles/${id}/planned`,
+  makeAvailable: id => `/api/available-articles/${id}/available`,
   upcoming: `/api/upcoming-articles`,
   getMessage: id => `/api/message/${id}`,
   sendMessage: `/api/message/`,
@@ -75,6 +77,23 @@ export function makeClient($auth) {
     },
     async available(id) {
       return await tryTo(request(endpoints.available(id)));
+    },
+    async upcoming() {
+      return await tryTo(request(endpoints.upcoming));
+    },
+    hasAuthUpcoming() {
+      return $auth.isSpotlightPAUser;
+    },
+    async makePlanned(id) {
+      return await tryTo(post(endpoints.makePlanned(id), null));
+    },
+    async makeAvailable(id) {
+      return await tryTo(post(endpoints.makeAvailable(id), null));
+    },
+    async removedArticle(id) {
+      return await tryTo(
+        request(endpoints.available(id), { method: "DELETE" })
+      );
     },
     async article(id) {
       return await tryTo(request(endpoints.scheduledArticle(id)));

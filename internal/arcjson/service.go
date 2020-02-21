@@ -32,14 +32,7 @@ func (fs FeedService) GetFeed() (API, error) {
 	if err != nil {
 		return feed, err
 	}
-	ids, err := fs.getStatusIDs()
-	if err != nil {
-		return feed, err
-	}
-	for i := range feed.Contents {
-		story := &feed.Contents[i]
-		story.Status = ids[story.ID]
-	}
+	err = fs.PopulateStatuses(feed.Contents)
 	return feed, err
 }
 
@@ -124,4 +117,16 @@ func (fs FeedService) GetArticle(articleID string) (*almanack.Article, error) {
 
 func (fs FeedService) StoreFeed(newfeed API) (err error) {
 	return fs.DataStore.Set(feedKey, &newfeed)
+}
+
+func (fs FeedService) PopulateStatuses(stories []Contents) (err error) {
+	ids, err := fs.getStatusIDs()
+	if err != nil {
+		return err
+	}
+	for i := range stories {
+		story := &stories[i]
+		story.Status = ids[story.ID]
+	}
+	return nil
 }

@@ -13,6 +13,7 @@ import {
   faFileUpload,
   faPenNib,
   faSyncAlt,
+  faUserCircle,
   faUserClock,
 } from "@fortawesome/free-solid-svg-icons";
 
@@ -58,6 +59,7 @@ library.add(
   faPenNib,
   faSyncAlt,
   faUpload,
+  faUserCircle,
   faUserClock
 );
 
