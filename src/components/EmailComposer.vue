@@ -1,5 +1,5 @@
 <script>
-import { reactive, toRefs } from "@vue/composition-api";
+import { computed, reactive, toRefs } from "@vue/composition-api";
 import { useClient } from "@/api/hooks.js";
 
 export default {
@@ -30,6 +30,11 @@ export default {
 
       rows,
 
+      hasChanged: computed(
+        () =>
+          props.initialSubject !== emailStatus.subject ||
+          props.initialBody !== emailStatus.body
+      ),
       async send() {
         if (window.confirm("Are you sure you want to send this message?")) {
           emailStatus.isSending = true;
@@ -79,7 +84,7 @@ export default {
       </button>
       <button
         class="button has-text-weight-semibold is-danger"
-        :disabled="isSending"
+        :disabled="isSending || !hasChanged"
         @click="discard"
       >
         Discard Changes
