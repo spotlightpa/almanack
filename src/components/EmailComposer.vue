@@ -61,7 +61,7 @@ export default {
 };
 </script>
 <template>
-  <div>
+  <div class="box">
     <div class="field">
       <label class="label">Subject</label>
       <div class="control">
@@ -80,14 +80,24 @@ export default {
         :class="{ 'is-loading': isSending }"
         @click="send"
       >
-        Send Message
+        <span class="icon">
+          <font-awesome-icon :icon="['fas', 'paper-plane']" />
+        </span>
+        <span>
+          Send Message
+        </span>
       </button>
       <button
         class="button has-text-weight-semibold is-danger"
         :disabled="isSending || !hasChanged"
         @click="discard"
       >
-        Discard Changes
+        <span class="icon">
+          <font-awesome-icon :icon="['fas', 'trash-alt']" />
+        </span>
+        <span>
+          Discard Changes
+        </span>
       </button>
       <button
         class="button has-text-weight-semibold is-light"

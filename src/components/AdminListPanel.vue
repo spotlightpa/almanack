@@ -105,7 +105,12 @@ export default {
         :class="{ 'is-loading': isMakingPlanned }"
         @click="makePlanned(article.id)"
       >
-        Show as Planned
+        <span class="icon">
+          <font-awesome-icon :icon="['fas', 'pen-nib']" />
+        </span>
+        <span>
+          Show as Planned
+        </span>
       </button>
       <button
         v-if="!article.isAvailable"
@@ -114,7 +119,12 @@ export default {
         :class="{ 'is-loading': isMakingAvailable }"
         @click="makeAvailable(article.id)"
       >
-        Make Available
+        <span class="icon">
+          <font-awesome-icon :icon="['fas', 'check-circle']" />
+        </span>
+        <span>
+          Make Available
+        </span>
       </button>
       <button
         v-if="article.isPlanned || article.isAvailable"
@@ -123,14 +133,23 @@ export default {
         :class="{ 'is-loading': isRemoving }"
         @click="remove(article.id)"
       >
-        Remove from Almanack
+        <span class="icon">
+          <font-awesome-icon :icon="['fas', 'trash-alt']" />
+        </span>
+        <span>
+          Remove from Almanack
+        </span>
       </button>
       <button
         type="button"
         class="button is-primary has-text-weight-semibold"
         @click="showComposer = !showComposer"
-        v-text="!showComposer ? 'Compose Message' : 'Hide Message'"
-      />
+      >
+        <span class="icon">
+          <font-awesome-icon :icon="['fas', 'paper-plane']" />
+        </span>
+        <span v-text="!showComposer ? 'Compose Message' : 'Hide Message'" />
+      </button>
     </div>
     <keep-alive>
       <EmailComposer
