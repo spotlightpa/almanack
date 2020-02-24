@@ -10,9 +10,8 @@ export const endpoints = {
   healthcheck: `/api/healthcheck`,
   userInfo: `/api/user-info`,
   listAvailable: `/api/available-articles`,
-  available: id => `/api/available-articles/${id}`,
-  makePlanned: id => `/api/available-articles/${id}/planned`,
-  makeAvailable: id => `/api/available-articles/${id}/available`,
+  getAvailable: id => `/api/available-articles/${id}`,
+  postAvailable: `/api/available-articles`,
   upcoming: `/api/upcoming-articles`,
   getMessage: id => `/api/message/${id}`,
   sendMessage: `/api/message`,
@@ -75,8 +74,8 @@ export function makeClient($auth) {
     hasAuthAvailable() {
       return $auth.isEditor;
     },
-    async available(id) {
-      return await tryTo(request(endpoints.available(id)));
+    async getAvailable(id) {
+      return await tryTo(request(endpoints.getAvailable(id)));
     },
     async upcoming() {
       return await tryTo(request(endpoints.upcoming));
@@ -84,16 +83,8 @@ export function makeClient($auth) {
     hasAuthUpcoming() {
       return $auth.isSpotlightPAUser;
     },
-    async makePlanned(id) {
-      return await tryTo(post(endpoints.makePlanned(id), null));
-    },
-    async makeAvailable(id) {
-      return await tryTo(post(endpoints.makeAvailable(id), null));
-    },
-    async removedArticle(id) {
-      return await tryTo(
-        request(endpoints.available(id), { method: "DELETE" })
-      );
+    async postAvailable(obj) {
+      return await tryTo(post(endpoints.postAvailable, obj));
     },
     async article(id) {
       return await tryTo(request(endpoints.scheduledArticle(id)));
