@@ -37,7 +37,11 @@ export default {
   <div>
     <h2 class="title is-spaced">{{ article.id }} Scheduler</h2>
     <p class="content">
-      <b>Article last synchronized with Arc at {{ article.lastArcSync }}</b>
+      <b
+        >Article last synchronized with Arc at
+        {{ article.lastArcSync | formatDate }},
+        {{ article.lastArcSync | formatTime }}</b
+      >
     </p>
 
     <BulmaField
@@ -219,10 +223,17 @@ export default {
       </div>
     </div>
     <p v-if="article.lastSaved" class="content">
-      <b>Article last saved at {{ article.lastSaved }}</b>
+      <b
+        >Article last saved at {{ article.lastSaved | formatDate }},
+        {{ article.lastSaved | formatTime }}</b
+      >
     </p>
     <p v-if="article.scheduleFor" class="content">
-      <b>Article is scheduled to publish at {{ article.scheduleFor }}</b>
+      <b
+        >Article is scheduled to publish at
+        {{ article.scheduleFor | formatDate }},
+        {{ article.scheduleFor | formatTime }}</b
+      >
     </p>
   </div>
 </template>
