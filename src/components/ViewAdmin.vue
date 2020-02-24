@@ -1,6 +1,10 @@
 <script>
+import { ref } from "@vue/composition-api";
+
 import AdminList from "./AdminList.vue";
 import APILoader from "./APILoader.vue";
+import EmailComposer from "./EmailComposer.vue";
+
 import { useAuth, useUpcoming } from "@/api/hooks.js";
 
 import ImageUploader from "./ImageUploader.vue";
@@ -10,6 +14,7 @@ export default {
   components: {
     AdminList,
     APILoader,
+    EmailComposer,
     ImageUploader,
   },
   setup() {
@@ -17,6 +22,8 @@ export default {
     let { articles, rawData, canLoad, isLoading, fetch, error } = useUpcoming();
 
     return {
+      showComposer: ref(false),
+
       canLoad,
       isLoading,
       fetch,
@@ -39,10 +46,34 @@ export default {
       Spotlight Administrator
     </h1>
 
-    <div v-if="isSpotlightPAUser" class="block">
-      <h2 class="subtitle is-4 has-text-weight-semibold">Upload an image</h2>
-      <ImageUploader />
+    <div v-if="isSpotlightPAUser" class="field is-grouped">
+      <div class="control">
+        <label class="label">Upload an image</label>
+        <ImageUploader />
+      </div>
+      <div class="control">
+        <label class="label">Compose a message</label>
+        <button
+          type="button"
+          class="button is-primary has-text-weight-semibold"
+          @click="showComposer = !showComposer"
+        >
+          <span class="icon">
+            <font-awesome-icon :icon="['fas', 'paper-plane']" />
+          </span>
+          <span v-text="!showComposer ? 'Compose Message' : 'Hide Message'" />
+        </button>
+      </div>
     </div>
+
+    <keep-alive>
+      <EmailComposer
+        v-if="showComposer"
+        initial-subject="Subject"
+        initial-body="Email body"
+        @hide="showComposer = false"
+      />
+    </keep-alive>
 
     <APILoader
       :can-load="canLoad"
