@@ -55,7 +55,7 @@ let router = new Router({
       },
     },
     {
-      path: "/admin/",
+      path: "/admin",
       name: "admin",
       component: ViewAdmin,
       meta: {
