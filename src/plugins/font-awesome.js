@@ -11,8 +11,10 @@ import {
   faFileDownload,
   faLink,
   faFileUpload,
+  faPaperPlane,
   faPenNib,
   faSyncAlt,
+  faTrashAlt,
   faUserCircle,
   faUserClock,
 } from "@fortawesome/free-solid-svg-icons";
@@ -56,8 +58,10 @@ library.add(
   faInfoCircle,
   faLink,
   faNewspaper,
+  faPaperPlane,
   faPenNib,
   faSyncAlt,
+  faTrashAlt,
   faUpload,
   faUserCircle,
   faUserClock
