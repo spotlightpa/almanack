@@ -142,13 +142,7 @@ func (a *appEnv) publishStories() error {
 	return sas.PopScheduledArticles(func(articles []*almanack.ScheduledArticle) error {
 		for _, article := range articles {
 			ctx := context.Background()
-			msg := fmt.Sprintf("Content: publishing %q", article.ID)
-			path := article.ContentFilepath()
-			data, err := article.ToTOML()
-			if err != nil {
-				return err
-			}
-			if err = a.gh.CreateFile(ctx, msg, path, []byte(data)); err != nil {
+			if err := article.Publish(ctx, a.gh); err != nil {
 				return err
 			}
 		}
