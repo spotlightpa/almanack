@@ -1,6 +1,7 @@
 package almanack
 
 import (
+	"context"
 	"errors"
 	"time"
 
@@ -17,6 +18,7 @@ type ScheduledArticle struct {
 type ScheduledArticleService struct {
 	ArticleService
 	DataStore
+	ContentStore
 	Logger
 }
 
@@ -84,13 +86,21 @@ func (sas ScheduledArticleService) Get(articleID string) (*ScheduledArticle, err
 	return data, nil
 }
 
-func (sas ScheduledArticleService) Save(article *ScheduledArticle) error {
+func (sas ScheduledArticleService) Save(ctx context.Context, article *ScheduledArticle) error {
 	// Get the lock
 	unlock, err := sas.lock()
 	if err != nil {
 		return err
 	}
 	defer unlock()
+
+	if article.ScheduleFor != nil &&
+		article.ScheduleFor.Before(time.Now().Add(5*time.Minute)) {
+		article.ScheduleFor = nil
+		if err := article.Publish(ctx, sas.ContentStore); err != nil {
+			return err
+		}
+	}
 
 	// Save the article
 	now := time.Now()

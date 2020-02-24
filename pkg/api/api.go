@@ -20,6 +20,7 @@ import (
 	"github.com/spotlightpa/almanack/internal/arcjson"
 	"github.com/spotlightpa/almanack/internal/aws"
 	"github.com/spotlightpa/almanack/internal/filestore"
+	"github.com/spotlightpa/almanack/internal/github"
 	"github.com/spotlightpa/almanack/internal/herokuapi"
 	"github.com/spotlightpa/almanack/internal/httpcache"
 	"github.com/spotlightpa/almanack/internal/httpjson"
@@ -64,6 +65,7 @@ func parseArgs(args []string) (*appEnv, error) {
 	getImageStore := aws.FlagVar(fl)
 	mcAPIKey := fl.String("mc-api-key", "", "API `key` for MailChimp")
 	mcListID := fl.String("mc-list-id", "", "List `ID` MailChimp campaign")
+	getGithub := github.FlagVar(fl)
 	fl.Usage = func() {
 		fmt.Fprintf(fl.Output(), "almanack-api help\n\n")
 		fl.PrintDefaults()
@@ -102,6 +104,12 @@ func parseArgs(args []string) (*appEnv, error) {
 	if *cache {
 		httpcache.SetRounderTripper(a.c, a.Logger)
 	}
+	if gh, err := getGithub(a.Logger); err != nil {
+		a.Logger.Printf("could not connect to Github: %v", err)
+		return nil, err
+	} else {
+		a.gh = gh
+	}
 	return &a, nil
 }
 
@@ -111,6 +119,7 @@ type appEnv struct {
 	isLambda   bool
 	c          *http.Client
 	auth       almanack.AuthService
+	gh         almanack.ContentStore
 	store      almanack.DataStore
 	imageStore almanack.ImageStore
 	email      almanack.EmailService
@@ -413,9 +422,10 @@ func (a *appEnv) postScheduledArticle(w http.ResponseWriter, r *http.Request) {
 		ArticleService: arcsvc,
 		DataStore:      a.store,
 		Logger:         a.Logger,
+		ContentStore:   a.gh,
 	}
 
-	if err := sas.Save(&userData); err != nil {
+	if err := sas.Save(r.Context(), &userData); err != nil {
 		a.errorResponse(w, err)
 		return
 	}
