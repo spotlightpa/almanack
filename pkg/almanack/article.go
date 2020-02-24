@@ -1,6 +1,7 @@
 package almanack
 
 import (
+	"context"
 	"fmt"
 	"strings"
 	"time"
@@ -80,6 +81,15 @@ func (article *Article) ToTOML() (string, error) {
 	return buf.String(), nil
 }
 
-type Image struct {
-	Credit, Caption, URL string
+func (article *Article) Publish(ctx context.Context, gh ContentStore) error {
+	data, err := article.ToTOML()
+	if err != nil {
+		return err
+	}
+	msg := fmt.Sprintf("Content: publishing %q", article.ID)
+	path := article.ContentFilepath()
+	if err = gh.CreateFile(ctx, msg, path, []byte(data)); err != nil {
+		return err
+	}
+	return nil
 }
