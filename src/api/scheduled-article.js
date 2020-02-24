@@ -100,9 +100,9 @@ export default class ScheduledArticle {
   deriveSlug() {
     this.slug = this.hed
       .toLowerCase()
-      .replace(/\W+/g, " ")
       .replace(/\b(the|an?)\b/g, " ")
       .replace(/\bpa\b/g, "pennsylvania")
+      .replace(/\W+/g, " ")
       .trim()
       .replace(/ /g, "-");
   }
