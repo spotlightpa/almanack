@@ -5,7 +5,7 @@ Vue.use(VueCompositionAPI);
 
 import { makeAuth } from "./auth.js";
 import { makeClient } from "./service.js";
-import { listAvailable, available, upcoming } from "./arc-services.js";
+import { listAvailable, getAvailable, upcoming } from "./arc-services.js";
 import { getScheduledArticle } from "./scheduler.js";
 
 let $auth;
@@ -33,7 +33,7 @@ export function useAvailableList() {
 }
 
 export function getAvailableArticle(id) {
-  let loader = available({ client: useClient(), id });
+  let loader = getAvailable({ client: useClient(), id });
   loader.initLoad();
   return loader;
 }

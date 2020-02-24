@@ -37,6 +37,7 @@ let ignoreComponentTypes = {
   interstitial_link: true,
 };
 
+const STATUS_UNSET = 0;
 const STATUS_PLANNED = 1;
 const STATUS_AVAILABLE = 2;
 
@@ -56,7 +57,7 @@ export default class ArcArticle {
       description: "description.basic",
       headline: "headlines.basic",
       id: "_id",
-      note: "planning.internal_note",
+      note: "almanack-note",
       plannedDate: "planning.scheduling.planned_publish_date",
       plannedWordCount: "planning.story_length.word_count_planned",
       slug: "slug",
@@ -74,6 +75,14 @@ export default class ArcArticle {
     return getProp(this.rawData, pathStr, { fallback });
   }
 
+  toJSON() {
+    return {
+      _id: this.id,
+      "almanack-status": this._almanackStatus,
+      "almanack-note": this.note,
+    };
+  }
+
   pubslug() {
     let slug = this.getProp("canonical_url", { fallback: "" });
     let stop = slug.lastIndexOf("-");
@@ -85,6 +94,18 @@ export default class ArcArticle {
       return "";
     }
     return slug.slice(start + 1, stop);
+  }
+
+  unsetStatus() {
+    this._almanackStatus = STATUS_UNSET;
+  }
+
+  setStatusPlanned() {
+    this._almanackStatus = STATUS_PLANNED;
+  }
+
+  setStatusAvailable() {
+    this._almanackStatus = STATUS_AVAILABLE;
   }
 
   get isPlanned() {

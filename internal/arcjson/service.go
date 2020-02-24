@@ -13,9 +13,9 @@ type FeedService struct {
 }
 
 const (
-	feedKey    = "almanack.feed"
-	statusKey  = "almanack.feed-status"
-	statusLock = "almanack.feed-status.lock"
+	feedKey       = "almanack.feed"
+	suplementKey  = "almanack.feed-suplements"
+	suplementLock = "almanack.feed-suplements.lock"
 )
 
 type Status int8
@@ -32,28 +32,22 @@ func (fs FeedService) GetFeed() (API, error) {
 	if err != nil {
 		return feed, err
 	}
-	err = fs.PopulateStatuses(feed.Contents)
+	err = fs.PopulateSuplements(feed.Contents)
 	return feed, err
 }
 
-func (fs FeedService) getStatusIDs() (map[string]Status, error) {
-	ids := map[string]Status{}
-	if err := fs.DataStore.Get(statusKey, &ids); err != nil &&
-		!errors.Is(err, errutil.NotFound) {
-		return ids, err
-	}
-	return ids, nil
+type supplement struct {
+	Statuses map[string]Status
+	Notes    map[string]string
 }
 
-func (fs FeedService) IsAvailable(articleID string) error {
-	ids, err := fs.getStatusIDs()
-	if err != nil {
-		return err
+func (fs FeedService) getSuplements() (supplement, error) {
+	sups := supplement{map[string]Status{}, map[string]string{}}
+	if err := fs.DataStore.Get(suplementKey, &sups); err != nil &&
+		!errors.Is(err, errutil.NotFound) {
+		return sups, err
 	}
-	if ids[articleID] == StatusAvailable {
-		return nil
-	}
-	return errutil.NotFound
+	return sups, nil
 }
 
 func (fs FeedService) GetAvailableFeed() ([]Contents, error) {
@@ -71,27 +65,31 @@ func (fs FeedService) GetAvailableFeed() ([]Contents, error) {
 	return filteredContents, nil
 }
 
-func (fs FeedService) SetStatus(articleid string, status Status) error {
-	unlock, err := fs.DataStore.GetLock(statusLock)
+func (fs FeedService) SaveSupplements(article *Contents) error {
+	articleID := article.ID
+	unlock, err := fs.DataStore.GetLock(suplementLock)
 	if err != nil {
 		return err
 	}
 	defer unlock()
 
-	ids, err := fs.getStatusIDs()
+	sups, err := fs.getSuplements()
 	if err != nil {
 		return err
 	}
 
-	ids[articleid] = status
-	prune(ids)
-	if err = fs.DataStore.Set(statusKey, &ids); err != nil {
+	sups.Statuses[articleID] = article.Status
+	sups.Notes[articleID] = article.Note
+	pruneStatuses(sups.Statuses)
+	pruneStr(sups.Notes)
+
+	if err = fs.DataStore.Set(suplementKey, &sups); err != nil {
 		return err
 	}
 	return nil
 }
 
-func prune(ids map[string]Status) {
+func pruneStatuses(ids map[string]Status) {
 	for k, v := range ids {
 		if v == StatusUnset {
 			delete(ids, k)
@@ -99,6 +97,13 @@ func prune(ids map[string]Status) {
 	}
 }
 
+func pruneStr(ids map[string]string) {
+	for k, v := range ids {
+		if v == "" {
+			delete(ids, k)
+		}
+	}
+}
 func (fs FeedService) GetArticle(articleID string) (*almanack.Article, error) {
 	feed, err := fs.GetFeed()
 	if err != nil {
@@ -119,14 +124,15 @@ func (fs FeedService) StoreFeed(newfeed API) (err error) {
 	return fs.DataStore.Set(feedKey, &newfeed)
 }
 
-func (fs FeedService) PopulateStatuses(stories []Contents) (err error) {
-	ids, err := fs.getStatusIDs()
+func (fs FeedService) PopulateSuplements(stories []Contents) (err error) {
+	sups, err := fs.getSuplements()
 	if err != nil {
 		return err
 	}
 	for i := range stories {
 		story := &stories[i]
-		story.Status = ids[story.ID]
+		story.Status = sups.Statuses[story.ID]
+		story.Note = sups.Notes[story.ID]
 	}
 	return nil
 }

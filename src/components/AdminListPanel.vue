@@ -14,10 +14,11 @@ export default {
   props: {
     article: Object,
   },
-  setup() {
+  setup(props) {
     let client = useClient();
     let apiStatus = reactive({
       error: null,
+      isSavingNote: false,
       isMakingPlanned: false,
       isMakingAvailable: false,
       isRemoving: false,
@@ -25,55 +26,39 @@ export default {
 
     let showComposer = ref(false);
 
+    async function updateArticle(ref) {
+      apiStatus[ref] = true;
+      [, apiStatus.error] = await client.postAvailable(props.article);
+      if (apiStatus.error) {
+        apiStatus[ref] = false;
+        return;
+      }
+      [, apiStatus.error] = await client.upcoming();
+      apiStatus[ref] = false;
+      if (apiStatus.error) {
+        return;
+      }
+    }
+
     return {
       ...toRefs(apiStatus),
 
       showComposer,
 
-      async makePlanned(id) {
-        apiStatus.isMakingPlanned = true;
-        [, apiStatus.error] = await client.makePlanned(id);
-        if (apiStatus.error) {
-          apiStatus.isMakingPlanned = false;
-          return;
-        }
-        let data;
-        [data, apiStatus.error] = await client.upcoming();
-        apiStatus.isMakingPlanned = false;
-        if (apiStatus.error) {
-          return;
-        }
-        this.$emit("refresh", data);
+      async saveNote() {
+        await updateArticle("isSavingNote");
       },
-      async makeAvailable(id) {
-        apiStatus.isMakingAvailable = true;
-        let data;
-        [, apiStatus.error] = await client.makeAvailable(id);
-        if (apiStatus.error) {
-          apiStatus.isMakingAvailable = false;
-          return;
-        }
-        [data, apiStatus.error] = await client.upcoming();
-        apiStatus.isMakingAvailable = false;
-        if (apiStatus.error) {
-          return;
-        }
-        this.$emit("refresh", data);
+      async makePlanned() {
+        props.article.setStatusPlanned();
+        await updateArticle("isMakingPlanned");
       },
-      async remove(id) {
-        apiStatus.isRemoving = true;
-        let data;
-        [, apiStatus.error] = await client.removedArticle(id);
-        if (apiStatus.error) {
-          apiStatus.isRemoving = false;
-          return;
-        }
-        [data, apiStatus.error] = await client.upcoming();
-        apiStatus.isRemoving = false;
-        if (apiStatus.error) {
-          return;
-        }
-        this.$emit("refresh", data);
+      async makeAvailable() {
+        props.article.setStatusAvailable();
+        await updateArticle("isMakingAvailable");
+      },
+      async remove() {
+        props.article.unsetStatus();
+        await updateArticle("isRemoving");
       },
     };
   },
@@ -93,6 +78,25 @@ export default {
       <strong>Planned time:</strong>
       {{ article.plannedDate | formatDate }}
     </p>
+    <div class="field">
+      <label class="label">
+        Publication Note:
+      </label>
+    </div>
+    <div class="field has-addons">
+      <div class="control is-expanded">
+        <input v-model="article.note" class="input" />
+      </div>
+      <div class="control">
+        <button
+          class="button has-text-weight-semibold is-primary"
+          :class="{ 'is-loading': isSavingNote }"
+          @click="saveNote"
+        >
+          Save
+        </button>
+      </div>
+    </div>
     <div v-if="error" class="message is-danger ">
       <p class="message-header">{{ error.name }}</p>
       <p class="message-body">{{ error.message }}</p>
@@ -103,7 +107,7 @@ export default {
         type="button"
         class="button is-warning has-text-weight-semibold"
         :class="{ 'is-loading': isMakingPlanned }"
-        @click="makePlanned(article.id)"
+        @click="makePlanned"
       >
         <span class="icon">
           <font-awesome-icon :icon="['fas', 'pen-nib']" />
@@ -117,7 +121,7 @@ export default {
         type="button"
         class="button is-success has-text-weight-semibold"
         :class="{ 'is-loading': isMakingAvailable }"
-        @click="makeAvailable(article.id)"
+        @click="makeAvailable"
       >
         <span class="icon">
           <font-awesome-icon :icon="['fas', 'check-circle']" />
@@ -131,7 +135,7 @@ export default {
         type="button"
         class="button is-light has-text-weight-semibold"
         :class="{ 'is-loading': isRemoving }"
-        @click="remove(article.id)"
+        @click="remove"
       >
         <span class="icon">
           <font-awesome-icon :icon="['fas', 'trash-alt']" />

@@ -20,10 +20,10 @@ export function listAvailable(client) {
   };
 }
 
-export function available({ client, id }) {
+export function getAvailable({ client, id }) {
   let apiState = useService({
     canLoad: client.hasAuthAvailable(),
-    serviceCall: () => client.available(id),
+    serviceCall: () => client.getAvailable(id),
   });
 
   return {
