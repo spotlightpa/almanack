@@ -1,6 +1,10 @@
+import { intcomma } from "journalize";
+
 import getProp from "@/utils/getter.js";
 import cmp from "@/utils/cmp.js";
+
 import { commaAndJoiner } from "@/filters/commaand.js";
+import { dateFormatter } from "@/filters/time.js";
 
 import ArcArticleImage from "@/components/ArcArticleImage.vue";
 import ArcArticleList from "@/components/ArcArticleList.vue";
@@ -254,5 +258,31 @@ export default class ArcArticle {
       console.warn("unknown block type", block.type, block);
       return [];
     });
+  }
+
+  get emailSubject() {
+    return `Update on ${this.slug}`;
+  }
+
+  get emailBody() {
+    let text = `
+Update on ${this.slug}
+
+https://almanack.data.spotlightpa.org/articles/${this.id}
+
+Planned for ${dateFormatter(this.plannedDate)}${
+      this.note ? `\n\nPublication Notes:\n\n${this.note}` : ""
+    }
+
+Budget:
+
+${this.budgetLine}
+
+Word count planned: ${intcomma(this.plannedWordCount)}
+Word count actual: ${intcomma(this.actualWordCount)}
+Lines: ${this.actualLineCount}
+Column inches: ${this.actualInchCount}
+`;
+    return text.trim();
   }
 }
