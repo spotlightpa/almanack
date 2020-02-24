@@ -1,13 +1,15 @@
 <script>
-import { reactive, toRefs } from "@vue/composition-api";
+import { reactive, ref, toRefs } from "@vue/composition-api";
 import { useClient } from "@/api/hooks.js";
 
 import ArticleSlugLine from "./ArticleSlugLine.vue";
+import EmailComposer from "./EmailComposer.vue";
 
 export default {
   name: "AdminListPanel",
   components: {
     ArticleSlugLine,
+    EmailComposer,
   },
   props: {
     article: Object,
@@ -21,8 +23,12 @@ export default {
       isRemoving: false,
     });
 
+    let showComposer = ref(false);
+
     return {
       ...toRefs(apiStatus),
+
+      showComposer,
 
       async makePlanned(id) {
         apiStatus.isMakingPlanned = true;
@@ -118,6 +124,20 @@ export default {
       >
         Remove from Almanack
       </button>
+      <button
+        type="button"
+        class="button is-primary has-text-weight-semibold"
+        @click="showComposer = !showComposer"
+        v-text="!showComposer ? 'Compose Message' : 'Hide Message'"
+      />
     </div>
+    <keep-alive>
+      <EmailComposer
+        v-if="showComposer"
+        :initial-subject="article.emailSubject"
+        :initial-body="article.emailBody"
+        @hide="showComposer = false"
+      />
+    </keep-alive>
   </div>
 </template>

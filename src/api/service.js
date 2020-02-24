@@ -15,7 +15,7 @@ export const endpoints = {
   makeAvailable: id => `/api/available-articles/${id}/available`,
   upcoming: `/api/upcoming-articles`,
   getMessage: id => `/api/message/${id}`,
-  sendMessage: `/api/message/`,
+  sendMessage: `/api/message`,
   scheduledArticle: id => `/api/scheduled-articles/${id}`,
   scheduleArticle: `/api/scheduled-articles`,
   getSignedUpload: `/api/get-signed-upload`,
@@ -103,6 +103,9 @@ export function makeClient($auth) {
     },
     async saveArticle(id, obj) {
       return await tryTo(post(endpoints.scheduleArticle, obj));
+    },
+    async sendMessage(obj) {
+      return await tryTo(post(endpoints.sendMessage, obj));
     },
     async uploadFile(body) {
       let [data, err] = await tryTo(
