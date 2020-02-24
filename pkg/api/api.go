@@ -424,6 +424,7 @@ func (a *appEnv) postScheduledArticle(w http.ResponseWriter, r *http.Request) {
 }
 
 func (a *appEnv) getSignedUpload(w http.ResponseWriter, r *http.Request) {
+	a.Printf("start getSignedUpload")
 	type response struct {
 		SignedURL string `json:"signed-url"`
 		FileName  string `json:"filename"`
