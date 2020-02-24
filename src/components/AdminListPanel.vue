@@ -93,8 +93,9 @@ export default {
       <strong>Planned time:</strong>
       {{ article.plannedDate | formatDate }}
     </p>
-    <div v-if="error">
-      <p>{{ error }}</p>
+    <div v-if="error" class="message is-danger ">
+      <p class="message-header">{{ error.name }}</p>
+      <p class="message-body">{{ error.message }}</p>
     </div>
     <div class="buttons has-margin-top-thin">
       <button
