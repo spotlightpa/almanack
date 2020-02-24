@@ -1,6 +1,4 @@
 <script>
-import { useAuth } from "@/api/hooks.js";
-
 import ArticleSlugLine from "./ArticleSlugLine.vue";
 import ArticleWordCount from "./ArticleWordCount.vue";
 import CopyTextarea from "./CopyTextarea.vue";
@@ -28,10 +26,7 @@ export default {
     };
   },
   setup(props) {
-    let { isSpotlightPAUser } = useAuth();
-
     return {
-      isSpotlightPAUser,
       embeds: props.article.embedComponents,
     };
   },
@@ -58,19 +53,6 @@ export default {
       </p>
     </template>
 
-    <div v-if="isSpotlightPAUser" class="block">
-      <router-link
-        :to="article.scheduleRoute"
-        class="button is-success has-text-weight-semibold"
-      >
-        <span class="icon">
-          <font-awesome-icon :icon="['fas', 'user-clock']" />
-        </span>
-        <span>
-          Scheduler
-        </span>
-      </router-link>
-    </div>
     <h2 class="title">Suggested Hed</h2>
     <CopyWithButton :value="article.headline" label="hed"></CopyWithButton>
 
