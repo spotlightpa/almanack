@@ -207,16 +207,39 @@ type SocialLinks struct {
 	URL  string `json:"url"`
 }
 
+type Original struct {
+	ID              string    `json:"_id"`
+	Byline          string    `json:"byline"`
+	Contributor     bool      `json:"contributor"`
+	Email           string    `json:"email"`
+	FirstName       string    `json:"firstName"`
+	Image           string    `json:"image"`
+	LastName        string    `json:"lastName"`
+	LastUpdatedDate time.Time `json:"last_updated_date"`
+	LongBio         string    `json:"longBio"`
+	Role            string    `json:"role"`
+	SecondLastName  string    `json:"secondLastName"`
+	Slug            string    `json:"slug"`
+	Status          bool      `json:"status"`
+	Type            string    `json:"type"`
+}
+
+type BylineProperties struct {
+	Original Original `json:"original"`
+}
+
 type By struct {
-	ID          string        `json:"_id"`
-	Type        string        `json:"type"`
-	Version     string        `json:"version"`
-	Name        string        `json:"name"`
-	Image       Image         `json:"image"`
-	Description string        `json:"description"`
-	URL         string        `json:"url"`
-	Slug        string        `json:"slug"`
-	SocialLinks []SocialLinks `json:"social_links"`
+	AdditionalProperties BylineProperties `json:"additional_properties"`
+	ID                   string           `json:"_id"`
+	Type                 string           `json:"type"`
+	Version              string           `json:"version"`
+	Name                 string           `json:"name"`
+	Image                Image            `json:"image"`
+	Description          string           `json:"description"`
+	URL                  string           `json:"url"`
+	Slug                 string           `json:"slug"`
+	SocialLinks          []SocialLinks    `json:"social_links"`
+	Org                  string           `json:"org,omitempty"`
 }
 
 type Credits struct {
