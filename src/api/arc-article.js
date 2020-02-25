@@ -136,7 +136,18 @@ export default class ArcArticle {
     return { name: "schedule", params: { id: this.id } };
   }
   get authors() {
-    return this.getProp("credits.by", { fallback: [] }).map(item => item.name);
+    return this.getProp("credits.by", { fallback: [] }).map(item => {
+      let byline = getProp(item, "additional_properties.original.byline");
+      if (byline) {
+        return byline;
+      }
+      let { name } = item;
+      let org = getProp(item, "org");
+      if (org) {
+        return `${name} of ${org}`;
+      }
+      return name;
+    });
   }
   get byline() {
     return commaAndJoiner(this.authors);
