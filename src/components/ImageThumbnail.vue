@@ -11,6 +11,13 @@ export default {
     caption: String,
     credits: Array,
   },
+  computed: {
+    correctedCredits() {
+      return this.credits.map(credit =>
+        credit.replace(/\b(staff( photographer)?)\b/gi, "Philadelphia Inquirer")
+      );
+    },
+  },
 };
 </script>
 
@@ -41,7 +48,7 @@ export default {
         <strong>Credit:</strong>
       </p>
       <CopyWithButton
-        :value="credits | commaand"
+        :value="correctedCredits | commaand"
         label="credit"
       ></CopyWithButton>
     </figcaption>
