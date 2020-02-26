@@ -5,6 +5,10 @@ import (
 	"net/http"
 )
 
+var (
+	BuildVersion string = "Development"
+)
+
 type Logger interface {
 	Printf(format string, v ...interface{})
 }
