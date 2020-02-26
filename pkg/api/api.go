@@ -54,6 +54,7 @@ func parseArgs(args []string) (*appEnv, error) {
 	cache := fl.Bool("cache", false, "use in-memory cache for fetched JSON")
 	fl.BoolVar(&a.isLambda, "lambda", false, "use AWS Lambda rather than HTTP")
 	fl.StringVar(&a.port, "port", ":3001", "listen on port (HTTP only)")
+	fl.StringVar(&a.mailchimpSignupURL, "mc-signup-url", "http://example.com", "`URL` to redirect users to for MailChimp signup")
 	getDialer := redisflag.Var(fl, "redis-url", "`URL` connection string for Redis")
 	a.Logger = log.New(nil, AppName+" ", log.LstdFlags)
 	fl.Var(
@@ -114,15 +115,16 @@ func parseArgs(args []string) (*appEnv, error) {
 }
 
 type appEnv struct {
-	srcFeedURL string
-	port       string
-	isLambda   bool
-	c          *http.Client
-	auth       almanack.AuthService
-	gh         almanack.ContentStore
-	store      almanack.DataStore
-	imageStore almanack.ImageStore
-	email      almanack.EmailService
+	srcFeedURL         string
+	port               string
+	isLambda           bool
+	mailchimpSignupURL string
+	c                  *http.Client
+	auth               almanack.AuthService
+	gh                 almanack.ContentStore
+	store              almanack.DataStore
+	imageStore         almanack.ImageStore
+	email              almanack.EmailService
 	*log.Logger
 }
 
@@ -153,6 +155,7 @@ func (a *appEnv) routes() http.Handler {
 		).Group(func(r chi.Router) {
 			r.Get("/available-articles", a.listAvailable)
 			r.Get("/available-articles/{id}", a.getAvailable)
+			r.Get("/mailchimp-signup-url", a.getSignupURL)
 		})
 		r.With(
 			a.hasRoleMiddleware("Spotlight PA"),
@@ -431,4 +434,9 @@ func (a *appEnv) getSignedUpload(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	a.jsonResponse(http.StatusOK, w, &res)
+}
+
+func (a *appEnv) getSignupURL(w http.ResponseWriter, r *http.Request) {
+	a.Println("start getSignupURL")
+	a.jsonResponse(http.StatusOK, w, a.mailchimpSignupURL)
 }

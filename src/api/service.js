@@ -18,6 +18,7 @@ export const endpoints = {
   scheduledArticle: id => `/api/scheduled-articles/${id}`,
   scheduleArticle: `/api/scheduled-articles`,
   getSignedUpload: `/api/get-signed-upload`,
+  getSignupURL: `/api/mailchimp-signup-url`,
 };
 
 export function makeClient($auth) {
@@ -116,6 +117,9 @@ export function makeClient($auth) {
         ];
       }
       return [filename, null];
+    },
+    async getSignupURL() {
+      return await tryTo(request(endpoints.getSignupURL));
     },
   };
 }

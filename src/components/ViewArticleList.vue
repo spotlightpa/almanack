@@ -1,7 +1,7 @@
 <script>
 import ArticleList from "./ArticleList.vue";
 import APILoader from "./APILoader.vue";
-import { useAuth, useAvailableList } from "@/api/hooks.js";
+import { useAuth, useAvailableList, useClient } from "@/api/hooks.js";
 
 export default {
   name: "ViewArticleList",
@@ -12,6 +12,7 @@ export default {
   setup() {
     let { fullName, roles, isSpotlightPAUser } = useAuth();
     let { articles, canLoad, isLoading, fetch, error } = useAvailableList();
+    let client = useClient();
 
     return {
       canLoad,
@@ -22,6 +23,15 @@ export default {
       roles,
       articles,
       isSpotlightPAUser,
+
+      async redirectToSignup() {
+        let [url, err] = await client.getSignupURL();
+        if (err) {
+          alert(`Something went wrong: ${err}`);
+          return;
+        }
+        window.location = url;
+      },
     };
   },
 };
@@ -44,6 +54,13 @@ export default {
         href="mailto:shughes@spotlightpa.org"
         >shughes@spotlightpa.org</a
       >).
+    </p>
+    <p class="content">
+      You should receive alerts about available stories from
+      press@spotlightpa.org. Please add this address to your contacts to ensure
+      that messages are not sent to spam. You can unsubscribe by following the
+      unsubscribe link in the footer of an email, and you can
+      <a href="#" @click.prevent="redirectToSignup">resubscribe here</a>.
     </p>
 
     <div v-if="isSpotlightPAUser" class="buttons">
