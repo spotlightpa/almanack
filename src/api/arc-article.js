@@ -200,7 +200,7 @@ export default class ArcArticle {
   }
   get featuredImageCredits() {
     return this.getProp("promo_items.basic.credits.by", { fallback: [] }).map(
-      item => item.byline || item.name
+      item => item.name || item.byline
     );
   }
 
