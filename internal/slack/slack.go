@@ -22,9 +22,15 @@ func New(hookURL string, l almanack.Logger) Client {
 
 func (sc Client) Post(msg Message) error {
 	if sc.Client == nil {
-		sc.l.Printf("no slack client; skipping posting message")
+		sc.printf("no slack client; skipping posting message")
 		return nil
 	}
-	sc.l.Printf("posting Slack message")
+	sc.printf("posting Slack message")
 	return sc.Client.Post(msg)
+}
+
+func (sc Client) printf(format string, args ...interface{}) {
+	if sc.l != nil {
+		sc.l.Printf(format, args...)
+	}
 }

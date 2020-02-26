@@ -26,13 +26,23 @@ import (
 const AppName = "almanack-worker"
 
 func CLI(args []string) error {
-	a, err := parseArgs(args)
+	var app appEnv
+	err := app.parseArgs(args)
 	if err != nil {
+		app.sc.Post(
+			slack.Message{
+				Attachments: []slack.Attachment{
+					{
+						Title: "Almanack Worker Error",
+						Text:  err.Error(),
+						Color: "#da291c",
+					}}},
+		)
 		return err
 	}
-	if err := a.exec(); err != nil {
+	if err := app.exec(); err != nil {
 		fmt.Fprintf(os.Stderr, "Runtime error: %v\n", err)
-		a.sc.Post(
+		app.sc.Post(
 			slack.Message{
 				Attachments: []slack.Attachment{
 					{
@@ -47,17 +57,16 @@ func CLI(args []string) error {
 	return nil
 }
 
-func parseArgs(args []string) (*appEnv, error) {
-	var a appEnv
+func (app *appEnv) parseArgs(args []string) error {
 	fl := flag.NewFlagSet(AppName, flag.ContinueOnError)
-	fl.StringVar(&a.srcFeedURL, "src-feed", "", "source `URL` for Arc feed")
+	fl.StringVar(&app.srcFeedURL, "src-feed", "", "source `URL` for Arc feed")
 	mcAPIKey := fl.String("mc-api-key", "", "API `key` for MailChimp")
 	mcListID := fl.String("mc-list-id", "", "List `ID` MailChimp campaign")
 	getDialer := redisflag.Var(fl, "redis-url", "`URL` connection string for Redis")
 	slackURL := fl.String("slack-hook-url", "", "Slack hook endpoint `URL`")
-	a.Logger = log.New(nil, AppName+" ", log.LstdFlags)
+	app.Logger = log.New(nil, AppName+" ", log.LstdFlags)
 	fl.Var(
-		flagext.Logger(a.Logger, flagext.LogSilent),
+		flagext.Logger(app.Logger, flagext.LogSilent),
 		"silent",
 		`don't log debug output`,
 	)
@@ -70,26 +79,29 @@ Options:
 		fl.PrintDefaults()
 	}
 	if err := ff.Parse(fl, args, ff.WithEnvVarPrefix("ALMANACK")); err != nil {
-		return nil, err
+		return err
 	}
-	a.email = mailchimp.NewMailService(*mcAPIKey, *mcListID, a.Logger)
+	app.sc = slack.New(*slackURL, app.Logger)
+
+	app.email = mailchimp.NewMailService(*mcAPIKey, *mcListID, app.Logger)
 	if d := getDialer(); d != nil {
 		var err error
-		if a.store, err = redis.New(d, a.Logger); err != nil {
-			a.Logger.Printf("could not connect to redis: %v", err)
-			return nil, err
+		if app.store, err = redis.New(d, app.Logger); err != nil {
+			app.Logger.Printf("could not connect to redis: %v", err)
+			return err
 		}
 	} else {
-		a.store = filestore.New("", "almanack", a.Logger)
+		app.store = filestore.New("", "almanack", app.Logger)
 	}
-	a.sc = slack.New(*slackURL, a.Logger)
-	if gh, err := getGithub(a.Logger); err != nil {
-		a.Logger.Printf("could not connect to Github: %v", err)
-		return nil, err
+
+	if gh, err := getGithub(app.Logger); err != nil {
+		app.Logger.Printf("could not connect to Github: %v", err)
+		return err
 	} else {
-		a.gh = gh
+		app.gh = gh
 	}
-	return &a, nil
+
+	return nil
 }
 
 type appEnv struct {
@@ -101,30 +113,30 @@ type appEnv struct {
 	*log.Logger
 }
 
-func (a *appEnv) exec() error {
-	a.Println("starting", AppName)
+func (app *appEnv) exec() error {
+	app.Println("starting", AppName)
 	start := time.Now()
-	defer func() { a.Println("finished in", time.Since(start)) }()
+	defer func() { app.Println("finished in", time.Since(start)) }()
 
 	return errutil.ExecParallel(
-		a.updateFeed,
-		a.publishStories,
+		app.updateFeed,
+		app.publishStories,
 	)
 }
 
-func (a *appEnv) updateFeed() error {
-	a.Println("starting updateFeed")
-	if a.srcFeedURL == "" {
-		a.Println("aborting: no feed URL provided")
+func (app *appEnv) updateFeed() error {
+	app.Println("starting updateFeed")
+	if app.srcFeedURL == "" {
+		app.Println("aborting: no feed URL provided")
 		return nil
 	}
-	a.Println("fetching", a.srcFeedURL)
+	app.Println("fetching", app.srcFeedURL)
 	var newfeed arcjson.API
-	if err := httpjson.Get(context.Background(), nil, a.srcFeedURL, &newfeed); err != nil {
+	if err := httpjson.Get(context.Background(), nil, app.srcFeedURL, &newfeed); err != nil {
 		return err
 	}
 
-	svc := arcjson.FeedService{DataStore: a.store, Logger: a.Logger}
+	svc := arcjson.FeedService{DataStore: app.store, Logger: app.Logger}
 	if err := svc.StoreFeed(newfeed); err != nil {
 		return err
 	}
@@ -132,17 +144,17 @@ func (a *appEnv) updateFeed() error {
 	return nil
 }
 
-func (a *appEnv) publishStories() error {
-	a.Println("starting publishStories")
+func (app *appEnv) publishStories() error {
+	app.Println("starting publishStories")
 	sas := almanack.ScheduledArticleService{
-		DataStore: a.store,
-		Logger:    a.Logger,
+		DataStore: app.store,
+		Logger:    app.Logger,
 	}
 
 	return sas.PopScheduledArticles(func(articles []*almanack.ScheduledArticle) error {
 		for _, article := range articles {
 			ctx := context.Background()
-			if err := article.Publish(ctx, a.gh); err != nil {
+			if err := article.Publish(ctx, app.gh); err != nil {
 				return err
 			}
 		}
