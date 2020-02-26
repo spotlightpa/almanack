@@ -114,7 +114,7 @@ type appEnv struct {
 }
 
 func (app *appEnv) exec() error {
-	app.Println("starting", AppName)
+	app.Printf("starting %s (%s)", AppName, almanack.BuildVersion)
 	start := time.Now()
 	defer func() { app.Println("finished in", time.Since(start)) }()
 

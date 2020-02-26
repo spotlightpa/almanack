@@ -9,7 +9,6 @@ import (
 	"net/http"
 	"net/http/httputil"
 	"os"
-	"time"
 
 	"github.com/carlmjohnson/flagext"
 	"github.com/go-chi/chi"
@@ -129,6 +128,8 @@ type appEnv struct {
 }
 
 func (a *appEnv) exec() error {
+	a.Printf("starting %s (%s)", AppName, almanack.BuildVersion)
+
 	listener := http.ListenAndServe
 	if a.isLambda {
 		a.Printf("starting on AWS Lambda")
@@ -146,6 +147,7 @@ func (a *appEnv) routes() http.Handler {
 	r.Use(middleware.RealIP)
 	r.Use(middleware.RequestLogger(&middleware.DefaultLogFormatter{Logger: a.Logger}))
 	r.Use(middleware.Recoverer)
+	r.Use(a.versionMiddleware)
 	r.Get("/api/healthcheck", a.ping)
 	r.Route("/api", func(r chi.Router) {
 		r.Use(a.authMiddleware)
@@ -172,12 +174,11 @@ func (a *appEnv) routes() http.Handler {
 	return r
 }
 
-func (a *appEnv) loggingMiddleware(h http.Handler) http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		start := time.Now()
+func (a *appEnv) versionMiddleware(h http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Almanack-App-Version", almanack.BuildVersion)
 		h.ServeHTTP(w, r)
-		a.Printf("request took %v", time.Since(start))
-	}
+	})
 }
 
 func (a *appEnv) jsonResponse(statusCode int, w http.ResponseWriter, data interface{}) {
