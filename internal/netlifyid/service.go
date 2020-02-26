@@ -25,7 +25,6 @@ type netlifyidContextType int
 const netlifyidContextKey = iota
 
 func (as AuthService) AddToRequest(r *http.Request) (*http.Request, error) {
-	as.Logger.Printf("auth wrapping request")
 	netID, err := FromRequest(r)
 	if err != nil {
 		as.Logger.Printf("could not wrap request: %v", err)
