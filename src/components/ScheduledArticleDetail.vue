@@ -28,6 +28,25 @@ export default {
           props.article.reset();
         }
       },
+      schedulerPrimaryButtonText() {
+        if (props.article.hasPublished) {
+          return "Published!";
+        }
+        if (isPostDated.value) {
+          return props.article.scheduleFor
+            ? "Update scheduled article"
+            : "Schedule";
+        }
+        return "Post now";
+      },
+      schedulerSecondaryButtonText() {
+        if (isPostDated.value) {
+          return props.article.scheduleFor
+            ? "Unschedule"
+            : "Save without scheduling";
+        }
+        return "Save without posting";
+      },
     };
   },
 };
@@ -202,11 +221,17 @@ export default {
         <button
           class="button is-success has-text-weight-semibold"
           :class="{ 'is-loading': article.isSaving }"
+          :disabled="article.isSaving || article.hasPublished"
+          @click.prevent="article.save({ schedule: true })"
+          v-text="schedulerPrimaryButtonText()"
+        />
+        <button
+          class="button is-primary has-text-weight-semibold"
+          :class="{ 'is-loading': article.isSaving }"
           :disabled="article.isSaving"
-          @click.prevent="article.schedule"
-        >
-          Schedule
-        </button>
+          @click.prevent="article.save({ schedule: false })"
+          v-text="schedulerSecondaryButtonText()"
+        />
         <button
           class="button is-light has-text-weight-semibold"
           :disabled="article.isSaving"
