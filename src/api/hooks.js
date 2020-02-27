@@ -44,7 +44,7 @@ export function useUpcoming() {
   return loader;
 }
 export function useScheduler(id) {
-  let obj = getScheduledArticle({ service: useClient(), id });
+  let obj = getScheduledArticle({ client: useClient(), id });
   obj.initLoad();
   return obj;
 }
