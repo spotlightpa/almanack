@@ -16,6 +16,7 @@ export default class ScheduledArticle {
   init(data, { save_reset = true } = {}) {
     this.isSaving = false;
     this.saveError = null;
+    this.hasPublished = this.hasPublished ?? false;
 
     if (save_reset) {
       this._reset = JSON.stringify(data);
@@ -132,17 +133,28 @@ export default class ScheduledArticle {
     return true;
   }
 
-  async schedule() {
+  async save({ schedule }) {
     if (!this.validate()) {
       return;
     }
     this.isSaving = true;
-    this.scheduleFor = this.pubDate;
+    if (schedule) {
+      this.scheduleFor = this.pubDate;
+    } else {
+      this.scheduleFor = null;
+    }
+    let willPubNow = false;
+    if (this.scheduleFor) {
+      willPubNow = new Date() - this.scheduleFor > 0;
+    }
     let data;
     [data, this.saveError] = await this._client.saveArticle(this._url_id, this);
     this.isSaving = false;
     if (!this.saveError) {
       this.init(data);
+      if (willPubNow) {
+        this.hasPublished = true;
+      }
     }
   }
 }
