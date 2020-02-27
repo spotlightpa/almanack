@@ -35,30 +35,29 @@ import (
 const AppName = "almanack-api"
 
 func CLI(args []string) error {
-	a, err := parseArgs(args)
-	if err != nil {
+	var app appEnv
+	if err := app.parseArgs(args); err != nil {
 		fmt.Fprintf(os.Stderr, "Startup error: %v\n", err)
 		return err
 	}
-	if err := a.exec(); err != nil {
+	if err := app.exec(); err != nil {
 		fmt.Fprintf(os.Stderr, "Runtime error: %v\n", err)
 		return err
 	}
 	return nil
 }
 
-func parseArgs(args []string) (*appEnv, error) {
-	var a appEnv
+func (app *appEnv) parseArgs(args []string) error {
 	fl := flag.NewFlagSet(AppName, flag.ContinueOnError)
-	fl.StringVar(&a.srcFeedURL, "src-feed", "", "source `URL` for Arc feed")
+	fl.StringVar(&app.srcFeedURL, "src-feed", "", "source `URL` for Arc feed")
 	cache := fl.Bool("cache", false, "use in-memory cache for fetched JSON")
-	fl.BoolVar(&a.isLambda, "lambda", false, "use AWS Lambda rather than HTTP")
-	fl.StringVar(&a.port, "port", ":3001", "listen on port (HTTP only)")
-	fl.StringVar(&a.mailchimpSignupURL, "mc-signup-url", "http://example.com", "`URL` to redirect users to for MailChimp signup")
+	fl.BoolVar(&app.isLambda, "lambda", false, "use AWS Lambda rather than HTTP")
+	fl.StringVar(&app.port, "port", ":3001", "listen on port (HTTP only)")
+	fl.StringVar(&app.mailchimpSignupURL, "mc-signup-url", "http://example.com", "`URL` to redirect users to for MailChimp signup")
 	getDialer := redisflag.Var(fl, "redis-url", "`URL` connection string for Redis")
-	a.Logger = log.New(nil, AppName+" ", log.LstdFlags)
+	app.Logger = log.New(nil, AppName+" ", log.LstdFlags)
 	fl.Var(
-		flagext.Logger(a.Logger, flagext.LogSilent),
+		flagext.Logger(app.Logger, flagext.LogSilent),
 		"silent",
 		`don't log debug output`,
 	)
@@ -72,46 +71,46 @@ func parseArgs(args []string) (*appEnv, error) {
 		fl.PrintDefaults()
 	}
 	if err := ff.Parse(fl, args, ff.WithEnvVarPrefix("ALMANACK")); err != nil {
-		return nil, err
+		return err
 	}
 	// Get Redis URL from Heroku if possible, else get it from config, else use files
 	if connURL, err := checkHeroku(); err != nil {
-		return nil, err
+		return err
 	} else if connURL != "" {
-		a.Logger.Printf("got credentials from Heroku")
+		app.Logger.Printf("got credentials from Heroku")
 		dialer, err := redisflag.Parse(connURL)
 		if err != nil {
-			return nil, err
+			return err
 		}
-		if a.store, err = redis.New(dialer, a.Logger); err != nil {
-			return nil, err
+		if app.store, err = redis.New(dialer, app.Logger); err != nil {
+			return err
 		}
 	} else {
 		if d := getDialer(); d != nil {
-			a.Logger.Printf("got Redis URL directly")
+			app.Logger.Printf("got Redis URL directly")
 			var err error
-			if a.store, err = redis.New(d, a.Logger); err != nil {
-				return nil, err
+			if app.store, err = redis.New(d, app.Logger); err != nil {
+				return err
 			}
 		} else {
-			a.Logger.Printf("using filestore")
-			a.store = filestore.New("", "almanack", a.Logger)
+			app.Logger.Printf("using filestore")
+			app.store = filestore.New("", "almanack", app.Logger)
 		}
 	}
-	a.email = mailchimp.NewMailService(*mcAPIKey, *mcListID, a.Logger)
-	a.imageStore = getImageStore(a.Logger)
-	a.auth = netlifyid.NewService(a.isLambda, a.Logger)
-	a.c = http.DefaultClient
+	app.email = mailchimp.NewMailService(*mcAPIKey, *mcListID, app.Logger)
+	app.imageStore = getImageStore(app.Logger)
+	app.auth = netlifyid.NewService(app.isLambda, app.Logger)
+	app.c = http.DefaultClient
 	if *cache {
-		httpcache.SetRounderTripper(a.c, a.Logger)
+		httpcache.SetRounderTripper(app.c, app.Logger)
 	}
-	if gh, err := getGithub(a.Logger); err != nil {
-		a.Logger.Printf("could not connect to Github: %v", err)
-		return nil, err
+	if gh, err := getGithub(app.Logger); err != nil {
+		app.Logger.Printf("could not connect to Github: %v", err)
+		return err
 	} else {
-		a.gh = gh
+		app.gh = gh
 	}
-	return &a, nil
+	return nil
 }
 
 type appEnv struct {
@@ -128,117 +127,117 @@ type appEnv struct {
 	*log.Logger
 }
 
-func (a *appEnv) exec() error {
-	a.Printf("starting %s (%s)", AppName, almanack.BuildVersion)
+func (app *appEnv) exec() error {
+	app.Printf("starting %s (%s)", AppName, almanack.BuildVersion)
 
 	listener := http.ListenAndServe
-	if a.isLambda {
-		a.Printf("starting on AWS Lambda")
-		apigo.ListenAndServe("", a.routes())
+	if app.isLambda {
+		app.Printf("starting on AWS Lambda")
+		apigo.ListenAndServe("", app.routes())
 		panic("unreachable")
 	}
 
-	a.Printf("starting on port %s", a.port)
-	return listener(a.port, a.routes())
+	app.Printf("starting on port %s", app.port)
+	return listener(app.port, app.routes())
 }
 
-func (a *appEnv) routes() http.Handler {
+func (app *appEnv) routes() http.Handler {
 	r := chi.NewRouter()
 	r.Use(middleware.RequestID)
 	r.Use(middleware.RealIP)
-	r.Use(middleware.RequestLogger(&middleware.DefaultLogFormatter{Logger: a.Logger}))
+	r.Use(middleware.RequestLogger(&middleware.DefaultLogFormatter{Logger: app.Logger}))
 	r.Use(middleware.Recoverer)
-	r.Use(a.versionMiddleware)
-	r.Get("/api/healthcheck", a.ping)
+	r.Use(app.versionMiddleware)
+	r.Get("/api/healthcheck", app.ping)
 	r.Route("/api", func(r chi.Router) {
-		r.Use(a.authMiddleware)
-		r.Get("/user-info", a.userInfo)
+		r.Use(app.authMiddleware)
+		r.Get("/user-info", app.userInfo)
 		r.With(
-			a.hasRoleMiddleware("editor"),
+			app.hasRoleMiddleware("editor"),
 		).Group(func(r chi.Router) {
-			r.Get("/available-articles", a.listAvailable)
-			r.Get("/available-articles/{id}", a.getAvailable)
-			r.Get("/mailchimp-signup-url", a.getSignupURL)
+			r.Get("/available-articles", app.listAvailable)
+			r.Get("/available-articles/{id}", app.getAvailable)
+			r.Get("/mailchimp-signup-url", app.getSignupURL)
 		})
 		r.With(
-			a.hasRoleMiddleware("Spotlight PA"),
+			app.hasRoleMiddleware("Spotlight PA"),
 		).Group(func(r chi.Router) {
-			r.Get("/upcoming-articles", a.listUpcoming)
-			r.Post("/available-articles", a.postAvailable)
-			r.Post("/message", a.postMessage)
-			r.Get("/scheduled-articles/{id}", a.getScheduledArticle)
-			r.Post("/scheduled-articles", a.postScheduledArticle)
-			r.Post("/get-signed-upload", a.getSignedUpload)
+			r.Get("/upcoming-articles", app.listUpcoming)
+			r.Post("/available-articles", app.postAvailable)
+			r.Post("/message", app.postMessage)
+			r.Get("/scheduled-articles/{id}", app.getScheduledArticle)
+			r.Post("/scheduled-articles", app.postScheduledArticle)
+			r.Post("/get-signed-upload", app.getSignedUpload)
 		})
 	})
 	return r
 }
 
-func (a *appEnv) versionMiddleware(h http.Handler) http.Handler {
+func (app *appEnv) versionMiddleware(h http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Almanack-App-Version", almanack.BuildVersion)
 		h.ServeHTTP(w, r)
 	})
 }
 
-func (a *appEnv) jsonResponse(statusCode int, w http.ResponseWriter, data interface{}) {
+func (app *appEnv) jsonResponse(statusCode int, w http.ResponseWriter, data interface{}) {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(statusCode)
 	enc := json.NewEncoder(w)
 	if err := enc.Encode(data); err != nil {
-		a.Printf("jsonResponse problem: %v", err)
+		app.Printf("jsonResponse problem: %v", err)
 	}
 }
 
-func (a *appEnv) errorResponse(w http.ResponseWriter, err error) {
+func (app *appEnv) errorResponse(w http.ResponseWriter, err error) {
 	var errResp errutil.Response
 	if !errors.As(err, &errResp) {
 		errResp.StatusCode = http.StatusInternalServerError
 		errResp.Message = "internal error"
 		errResp.Log = err.Error()
 	}
-	a.Println(errResp.Log)
-	a.jsonResponse(errResp.StatusCode, w, errResp)
+	app.Println(errResp.Log)
+	app.jsonResponse(errResp.StatusCode, w, errResp)
 }
 
-func (a *appEnv) ping(w http.ResponseWriter, r *http.Request) {
-	a.Println("start ping")
+func (app *appEnv) ping(w http.ResponseWriter, r *http.Request) {
+	app.Println("start ping")
 	w.Header().Set("Content-Type", "text/plain")
 	w.Header().Set("Cache-Control", "public, max-age=60")
 	b, err := httputil.DumpRequest(r, true)
 	if err != nil {
-		a.errorResponse(w, err)
+		app.errorResponse(w, err)
 		return
 	}
 	w.Write(b)
 }
 
-func (a *appEnv) authMiddleware(h http.Handler) http.Handler {
+func (app *appEnv) authMiddleware(h http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		r, err := a.auth.AddToRequest(r)
+		r, err := app.auth.AddToRequest(r)
 		if err != nil {
-			a.errorResponse(w, err)
+			app.errorResponse(w, err)
 			return
 		}
 		h.ServeHTTP(w, r)
 	})
 }
 
-func (a *appEnv) userInfo(w http.ResponseWriter, r *http.Request) {
-	a.Println("start userInfo")
+func (app *appEnv) userInfo(w http.ResponseWriter, r *http.Request) {
+	app.Println("start userInfo")
 	userinfo, err := netlifyid.FromRequest(r)
 	if err != nil {
-		a.errorResponse(w, err)
+		app.errorResponse(w, err)
 		return
 	}
-	a.jsonResponse(http.StatusOK, w, userinfo)
+	app.jsonResponse(http.StatusOK, w, userinfo)
 }
 
-func (a *appEnv) hasRoleMiddleware(role string) func(next http.Handler) http.Handler {
+func (app *appEnv) hasRoleMiddleware(role string) func(next http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			if err := a.auth.HasRole(r, role); err != nil {
-				a.errorResponse(w, err)
+			if err := app.auth.HasRole(r, role); err != nil {
+				app.errorResponse(w, err)
 				return
 			}
 			next.ServeHTTP(w, r)
@@ -246,47 +245,47 @@ func (a *appEnv) hasRoleMiddleware(role string) func(next http.Handler) http.Han
 	}
 }
 
-func (a *appEnv) listUpcoming(w http.ResponseWriter, r *http.Request) {
-	a.Println("start listUpcoming")
+func (app *appEnv) listUpcoming(w http.ResponseWriter, r *http.Request) {
+	app.Println("start listUpcoming")
 
 	var feed arcjson.API
-	if err := httpjson.Get(r.Context(), a.c, a.srcFeedURL, &feed); err != nil {
-		a.errorResponse(w, err)
+	if err := httpjson.Get(r.Context(), app.c, app.srcFeedURL, &feed); err != nil {
+		app.errorResponse(w, err)
 		return
 	}
 
-	arcsvc := arcjson.FeedService{DataStore: a.store, Logger: a.Logger}
+	arcsvc := arcjson.FeedService{DataStore: app.store, Logger: app.Logger}
 	if err := arcsvc.PopulateSuplements(feed.Contents); err != nil {
-		a.errorResponse(w, err)
+		app.errorResponse(w, err)
 		return
 	}
 	if err := arcsvc.StoreFeed(feed); err != nil {
 		// Log failure but soldier on?
-		a.Printf("DANGER: did not store feed: %v", err)
+		app.Printf("DANGER: did not store feed: %v", err)
 	}
 
-	a.jsonResponse(http.StatusOK, w, feed)
+	app.jsonResponse(http.StatusOK, w, feed)
 }
 
-func (a *appEnv) postAvailable(w http.ResponseWriter, r *http.Request) {
-	a.Printf("starting postAvailable")
+func (app *appEnv) postAvailable(w http.ResponseWriter, r *http.Request) {
+	app.Printf("starting postAvailable")
 
 	var userData arcjson.Contents
 	if err := httpjson.DecodeRequest(w, r, &userData); err != nil {
-		a.errorResponse(w, err)
+		app.errorResponse(w, err)
 		return
 	}
 
-	arcsvc := arcjson.FeedService{DataStore: a.store, Logger: a.Logger}
+	arcsvc := arcjson.FeedService{DataStore: app.store, Logger: app.Logger}
 	if err := arcsvc.SaveSupplements(&userData); err != nil {
-		a.errorResponse(w, err)
+		app.errorResponse(w, err)
 		return
 	}
-	a.jsonResponse(http.StatusAccepted, w, &userData)
+	app.jsonResponse(http.StatusAccepted, w, &userData)
 }
 
-func (a *appEnv) listAvailable(w http.ResponseWriter, r *http.Request) {
-	a.Printf("starting listAvailable")
+func (app *appEnv) listAvailable(w http.ResponseWriter, r *http.Request) {
+	app.Printf("starting listAvailable")
 	type response struct {
 		Contents []arcjson.Contents `json:"contents"`
 	}
@@ -294,45 +293,45 @@ func (a *appEnv) listAvailable(w http.ResponseWriter, r *http.Request) {
 		res response
 		err error
 	)
-	arcsvc := arcjson.FeedService{DataStore: a.store, Logger: a.Logger}
+	arcsvc := arcjson.FeedService{DataStore: app.store, Logger: app.Logger}
 	if res.Contents, err = arcsvc.GetAvailableFeed(); err != nil {
-		a.errorResponse(w, err)
+		app.errorResponse(w, err)
 		return
 	}
 
-	a.jsonResponse(http.StatusOK, w, res)
+	app.jsonResponse(http.StatusOK, w, res)
 }
 
-func (a *appEnv) getAvailable(w http.ResponseWriter, r *http.Request) {
+func (app *appEnv) getAvailable(w http.ResponseWriter, r *http.Request) {
 	articleID := chi.URLParam(r, "id")
-	a.Printf("starting getAvailable %s", articleID)
+	app.Printf("starting getAvailable %s", articleID)
 
-	arcsvc := arcjson.FeedService{DataStore: a.store, Logger: a.Logger}
+	arcsvc := arcjson.FeedService{DataStore: app.store, Logger: app.Logger}
 	feed, err := arcsvc.GetFeed()
 	if err != nil {
-		a.errorResponse(w, err)
+		app.errorResponse(w, err)
 		return
 	}
 
 	article, err := feed.Get(articleID)
 	if err != nil {
-		a.errorResponse(w, err)
+		app.errorResponse(w, err)
 		return
 	}
 
 	// Let Spotlight PA users get article regardless of its status
-	if err := a.auth.HasRole(r, "Spotlight PA"); err != nil {
+	if err := app.auth.HasRole(r, "Spotlight PA"); err != nil {
 		if article.Status != arcjson.StatusAvailable {
-			a.errorResponse(w, errutil.NotFound)
+			app.errorResponse(w, errutil.NotFound)
 			return
 		}
 	}
 
-	a.jsonResponse(http.StatusOK, w, article)
+	app.jsonResponse(http.StatusOK, w, article)
 }
 
-func (a *appEnv) postMessage(w http.ResponseWriter, r *http.Request) {
-	a.Printf("starting postMessage")
+func (app *appEnv) postMessage(w http.ResponseWriter, r *http.Request) {
+	app.Printf("starting postMessage")
 	type request struct {
 		Subject string `json:"subject"`
 		Body    string `json:"body"`
@@ -340,67 +339,67 @@ func (a *appEnv) postMessage(w http.ResponseWriter, r *http.Request) {
 
 	var req request
 	if err := httpjson.DecodeRequest(w, r, &req); err != nil {
-		a.errorResponse(w, err)
+		app.errorResponse(w, err)
 		return
 	}
-	if err := a.email.SendEmail(req.Subject, req.Body); err != nil {
-		a.errorResponse(w, err)
+	if err := app.email.SendEmail(req.Subject, req.Body); err != nil {
+		app.errorResponse(w, err)
 		return
 	}
-	a.jsonResponse(http.StatusAccepted, w, http.StatusText(http.StatusAccepted))
+	app.jsonResponse(http.StatusAccepted, w, http.StatusText(http.StatusAccepted))
 }
 
-func (a *appEnv) getScheduledArticle(w http.ResponseWriter, r *http.Request) {
+func (app *appEnv) getScheduledArticle(w http.ResponseWriter, r *http.Request) {
 	articleID := chi.URLParam(r, "id")
-	a.Printf("start getScheduledArticle %s", articleID)
+	app.Printf("start getScheduledArticle %s", articleID)
 
-	arcsvc := arcjson.FeedService{DataStore: a.store, Logger: a.Logger}
+	arcsvc := arcjson.FeedService{DataStore: app.store, Logger: app.Logger}
 	sas := almanack.ScheduledArticleService{
 		ArticleService: arcsvc,
-		DataStore:      a.store,
-		Logger:         a.Logger,
+		DataStore:      app.store,
+		Logger:         app.Logger,
 	}
 
 	article, err := sas.Get(articleID)
 	if err != nil {
-		a.errorResponse(w, err)
+		app.errorResponse(w, err)
 		return
 	}
 
-	a.jsonResponse(http.StatusOK, w, article)
+	app.jsonResponse(http.StatusOK, w, article)
 }
 
-func (a *appEnv) postScheduledArticle(w http.ResponseWriter, r *http.Request) {
-	a.Println("start postScheduledArticle")
+func (app *appEnv) postScheduledArticle(w http.ResponseWriter, r *http.Request) {
+	app.Println("start postScheduledArticle")
 
 	var userData almanack.ScheduledArticle
 	if err := httpjson.DecodeRequest(w, r, &userData); err != nil {
-		a.errorResponse(w, err)
+		app.errorResponse(w, err)
 		return
 	}
 
 	if strings.HasPrefix(userData.ImageURL, "http") {
-		//TODO
+
 	}
 
-	arcsvc := arcjson.FeedService{DataStore: a.store, Logger: a.Logger}
+	arcsvc := arcjson.FeedService{DataStore: app.store, Logger: app.Logger}
 	sas := almanack.ScheduledArticleService{
 		ArticleService: arcsvc,
-		DataStore:      a.store,
-		Logger:         a.Logger,
-		ContentStore:   a.gh,
+		DataStore:      app.store,
+		Logger:         app.Logger,
+		ContentStore:   app.gh,
 	}
 
 	if err := sas.Save(r.Context(), &userData); err != nil {
-		a.errorResponse(w, err)
+		app.errorResponse(w, err)
 		return
 	}
 
-	a.jsonResponse(http.StatusAccepted, w, &userData)
+	app.jsonResponse(http.StatusAccepted, w, &userData)
 }
 
-func (a *appEnv) getSignedUpload(w http.ResponseWriter, r *http.Request) {
-	a.Printf("start getSignedUpload")
+func (app *appEnv) getSignedUpload(w http.ResponseWriter, r *http.Request) {
+	app.Printf("start getSignedUpload")
 	type response struct {
 		SignedURL string `json:"signed-url"`
 		FileName  string `json:"filename"`
@@ -409,15 +408,15 @@ func (a *appEnv) getSignedUpload(w http.ResponseWriter, r *http.Request) {
 		res response
 		err error
 	)
-	res.SignedURL, res.FileName, err = almanack.GetSignedUpload(a.imageStore)
+	res.SignedURL, res.FileName, err = almanack.GetSignedUpload(app.imageStore)
 	if err != nil {
-		a.errorResponse(w, err)
+		app.errorResponse(w, err)
 		return
 	}
-	a.jsonResponse(http.StatusOK, w, &res)
+	app.jsonResponse(http.StatusOK, w, &res)
 }
 
-func (a *appEnv) getSignupURL(w http.ResponseWriter, r *http.Request) {
-	a.Println("start getSignupURL")
-	a.jsonResponse(http.StatusOK, w, a.mailchimpSignupURL)
+func (app *appEnv) getSignupURL(w http.ResponseWriter, r *http.Request) {
+	app.Println("start getSignupURL")
+	app.jsonResponse(http.StatusOK, w, app.mailchimpSignupURL)
 }
