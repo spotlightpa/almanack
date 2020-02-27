@@ -2,16 +2,16 @@ import { reactive, computed, toRefs } from "@vue/composition-api";
 
 import ScheduledArticle from "./scheduled-article.js";
 
-export function getScheduledArticle({ service, id }) {
+export function getScheduledArticle({ client, id }) {
   const apiState = reactive({
     articleData: null,
     didLoad: false,
     isLoading: false,
     error: null,
-    canLoad: service.hasAuthArticle(),
+    canLoad: client.hasAuthArticle(),
     article: computed(() =>
       apiState.articleData
-        ? new ScheduledArticle({ service, id, data: apiState.articleData })
+        ? new ScheduledArticle({ client, id, data: apiState.articleData })
         : null
     ),
   });
@@ -23,7 +23,7 @@ export function getScheduledArticle({ service, id }) {
       }
       apiState.didLoad = false;
       apiState.isLoading = true;
-      [apiState.articleData, apiState.error] = await service.article(id);
+      [apiState.articleData, apiState.error] = await client.article(id);
       apiState.isLoading = false;
       if (apiState.articleData && apiState.error) {
         apiState.didLoad = true;

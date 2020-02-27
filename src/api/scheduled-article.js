@@ -4,9 +4,9 @@ import getProp from "@/utils/getter.js";
 import imgproxyURL from "@/api/imgproxy-url.js";
 
 export default class ScheduledArticle {
-  constructor({ id, data, service }) {
+  constructor({ id, data, client }) {
     this._url_id = id;
-    this._service = service;
+    this._client = client;
 
     this.init(data);
 
@@ -139,10 +139,7 @@ export default class ScheduledArticle {
     this.isSaving = true;
     this.scheduleFor = this.pubDate;
     let data;
-    [data, this.saveError] = await this._service.saveArticle(
-      this._url_id,
-      this
-    );
+    [data, this.saveError] = await this._client.saveArticle(this._url_id, this);
     this.isSaving = false;
     if (!this.saveError) {
       this.init(data);
