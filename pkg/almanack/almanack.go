@@ -26,10 +26,6 @@ type EmailService interface {
 	SendEmail(subject, body string) error
 }
 
-type ImageStore interface {
-	GetSignedUpload() (signedURL, filename string, err error)
-}
-
 type DataStore interface {
 	Get(key string, v interface{}) error
 	Set(key string, v interface{}) error

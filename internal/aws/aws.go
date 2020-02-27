@@ -2,13 +2,11 @@ package aws
 
 import (
 	"flag"
-	"strings"
 	"time"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/aws/external"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
-	"github.com/carlmjohnson/crockford"
 
 	"github.com/spotlightpa/almanack/pkg/almanack"
 )
@@ -42,12 +40,11 @@ type ImageStore struct {
 	l      almanack.Logger
 }
 
-func (is ImageStore) GetSignedUpload() (signedURL, filename string, err error) {
-	filename = makeFilename()
-	is.l.Printf("creating presigned URL for %q", filename)
+func (is ImageStore) GetSignedURL(srcPath string) (signedURL string, err error) {
+	is.l.Printf("creating presigned URL for %q", srcPath)
 	input := &s3.PutObjectInput{
 		Bucket: &is.bucket,
-		Key:    &filename,
+		Key:    &srcPath,
 	}
 	req := is.svc.PutObjectRequest(input)
 	signedURL, err = req.Presign(15 * time.Minute)
@@ -55,21 +52,11 @@ func (is ImageStore) GetSignedUpload() (signedURL, filename string, err error) {
 	return
 }
 
-func makeFilename() string {
-	var sb strings.Builder
-	sb.Grow(len("2006/01/123456789abcdefg.jpeg"))
-	sb.WriteString(time.Now().Format("2006/01/"))
-	sb.Write(crockford.Time(crockford.Lower, time.Now()))
-	sb.Write(crockford.AppendRandom(crockford.Lower, nil))
-	sb.WriteString(".jpeg")
-	return sb.String()
-}
-
 type MockImageStore struct {
 	l almanack.Logger
 }
 
-func (mis MockImageStore) GetSignedUpload() (signedURL, filename string, err error) {
+func (mis MockImageStore) GetSignedURL(srcPath string) (signedURL string, err error) {
 	mis.l.Printf("returning mock signed URL")
-	return "https://invalid", makeFilename(), nil
+	return "https://invalid", nil
 }
