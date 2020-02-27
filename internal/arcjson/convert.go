@@ -3,10 +3,8 @@ package arcjson
 import (
 	"encoding/json"
 	"fmt"
-	"html/template"
 	"log"
 	"strings"
-	"sync"
 
 	"github.com/spotlightpa/almanack/pkg/almanack"
 )
@@ -145,53 +143,4 @@ func imageFrom(a *almanack.Article, p PromoItems) {
 	a.ImageCredit = strings.Join(credits, " / ")
 	a.ImageCaption = p.Basic.Caption
 	a.ImageURL = p.Basic.URL
-}
-
-const messageTemplate = `
-
-{{- .Slug }} now available
-
-https://almanack.data.spotlightpa.org/articles/{{ .ID }}
-
-Planned for {{ .Planning.Scheduling.PlannedPublishDate.Format "January 2, 2006" }}
-
-{{ with .Planning.InternalNote -}}
-Publication Notes:
-
-{{ . }}
-
-{{ end -}}
-
-Budget:
-
-{{ .Planning.BudgetLine }}
-
-Word count planned: {{ .Planning.StoryLength.WordCountPlanned}}
-Word count actual: {{ .Planning.StoryLength.WordCountActual}}
-Lines: {{ .Planning.StoryLength.LineCountActual}}
-Column inches: {{ .Planning.StoryLength.InchCountActual}}
-
-
-`
-
-var messageOnce sync.Once
-
-func getMessageTemplate() *template.Template {
-	var t *template.Template
-	messageOnce.Do(func() {
-		t = template.Must(template.New("").Parse(messageTemplate))
-	})
-	return t
-}
-
-func (content Contents) Message() (subject, body string) {
-	subject = fmt.Sprintf("%s now available on Spotlight PA Almanack", content.Slug)
-
-	t := getMessageTemplate()
-	var buf strings.Builder
-	if err := t.Execute(&buf, content); err != nil {
-		panic(err)
-	}
-	body = buf.String()
-	return
 }
