@@ -379,7 +379,14 @@ func (app *appEnv) postScheduledArticle(w http.ResponseWriter, r *http.Request) 
 	}
 
 	if strings.HasPrefix(userData.ImageURL, "http") {
-
+		if imageurl, err := almanack.UploadFromURL(
+			r.Context(), app.c, app.imageStore, userData.ImageURL,
+		); err != nil {
+			app.errorResponse(w, err)
+			return
+		} else {
+			userData.ImageURL = imageurl
+		}
 	}
 
 	arcsvc := arcjson.FeedService{DataStore: app.store, Logger: app.Logger}

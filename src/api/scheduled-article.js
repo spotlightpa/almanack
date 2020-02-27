@@ -129,13 +129,6 @@ export default class ScheduledArticle {
       this.saveError.name = "Validation Error";
       return false;
     }
-    if (this.imageURL.match(/^http/)) {
-      this.saveError = new Error(
-        "Image must be uploaded to Spotlight first (for now)."
-      );
-      this.saveError.name = "Validation Error";
-      return false;
-    }
     return true;
   }
 
