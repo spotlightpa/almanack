@@ -9,6 +9,7 @@ import (
 	"net/http"
 	"net/http/httputil"
 	"os"
+	"strings"
 
 	"github.com/carlmjohnson/flagext"
 	"github.com/go-chi/chi"
@@ -377,6 +378,11 @@ func (a *appEnv) postScheduledArticle(w http.ResponseWriter, r *http.Request) {
 		a.errorResponse(w, err)
 		return
 	}
+
+	if strings.HasPrefix(userData.ImageURL, "http") {
+		//TODO
+	}
+
 	arcsvc := arcjson.FeedService{DataStore: a.store, Logger: a.Logger}
 	sas := almanack.ScheduledArticleService{
 		ArticleService: arcsvc,
@@ -403,7 +409,7 @@ func (a *appEnv) getSignedUpload(w http.ResponseWriter, r *http.Request) {
 		res response
 		err error
 	)
-	res.SignedURL, res.FileName, err = a.imageStore.GetSignedUpload()
+	res.SignedURL, res.FileName, err = almanack.GetSignedUpload(a.imageStore)
 	if err != nil {
 		a.errorResponse(w, err)
 		return
