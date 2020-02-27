@@ -164,7 +164,6 @@ func (a *appEnv) routes() http.Handler {
 		).Group(func(r chi.Router) {
 			r.Get("/upcoming-articles", a.listUpcoming)
 			r.Post("/available-articles", a.postAvailable)
-			r.Get("/message/{id}", a.getMessageFor)
 			r.Post("/message", a.postMessage)
 			r.Get("/scheduled-articles/{id}", a.getScheduledArticle)
 			r.Post("/scheduled-articles", a.postScheduledArticle)
@@ -329,31 +328,6 @@ func (a *appEnv) getAvailable(w http.ResponseWriter, r *http.Request) {
 	}
 
 	a.jsonResponse(http.StatusOK, w, article)
-}
-
-func (a *appEnv) getMessageFor(w http.ResponseWriter, r *http.Request) {
-	articleID := chi.URLParam(r, "id")
-	a.Printf("starting getMessageFor %s", articleID)
-
-	arcsvc := arcjson.FeedService{DataStore: a.store, Logger: a.Logger}
-	feed, err := arcsvc.GetFeed()
-	if err != nil {
-		a.errorResponse(w, err)
-		return
-	}
-
-	art, err := feed.Get(articleID)
-	if err != nil {
-		a.errorResponse(w, err)
-		return
-	}
-	type response struct {
-		Subject string `json:"subject"`
-		Body    string `json:"body"`
-	}
-	var res response
-	res.Subject, res.Body = art.Message()
-	a.jsonResponse(http.StatusOK, w, &res)
 }
 
 func (a *appEnv) postMessage(w http.ResponseWriter, r *http.Request) {
