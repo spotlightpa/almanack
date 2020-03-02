@@ -25,6 +25,7 @@ var (
 )
 
 func whitelistEmails(request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
+	fmt.Printf("starting with whitelist: %s", whitelisted_domains)
 
 	var data struct {
 		EventType string         `json:"event"`
