@@ -24,8 +24,13 @@ var (
 	logger              = log.New(os.Stdout, "identity-signup ", log.LstdFlags)
 )
 
+const (
+	colorGreen = "#78bc20"
+	colorRed   = "#da291c"
+)
+
 func whitelistEmails(request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
-	fmt.Printf("starting with whitelist: %s", whitelisted_domains)
+	fmt.Printf("starting with whitelist: %s\n", whitelisted_domains)
 
 	var data struct {
 		EventType string         `json:"event"`
@@ -64,13 +69,17 @@ func whitelistEmails(request events.APIGatewayProxyRequest) (events.APIGatewayPr
 		data.User.UserMetadata.FullName,
 		data.User.Email,
 		len(data.User.AppMetadata.Roles))
+	color := colorGreen
+	if len(data.User.AppMetadata.Roles) < 1 {
+		color = colorRed
+	}
 	slack.New(slackHookURL, logger).Post(
 		slack.Message{
 			Attachments: []slack.Attachment{
 				{
 					Title: "New Almanack Registration",
 					Text:  msg,
-					Color: "#78bc20",
+					Color: color,
 					Fields: []slack.Field{
 						{
 							Title: "Roles",
