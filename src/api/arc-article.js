@@ -142,6 +142,10 @@ export default class ArcArticle {
         return byline;
       }
       let { name } = item;
+      // Hack for bad names with orgs in them
+      if (/ of /.test(name)) {
+        return name;
+      }
       let org = getProp(item, "org");
       if (org) {
         return `${name} of ${org}`;
