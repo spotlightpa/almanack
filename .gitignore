@@ -64,3 +64,6 @@ dist/
 # Local Netlify folder
 .netlify
 functions/
+
+# Tern
+prod.conf
