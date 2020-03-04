@@ -23,5 +23,10 @@ CREATE TRIGGER row_updated_at_on_domain_roles_trigger_
     FOR EACH ROW
     EXECUTE PROCEDURE update_row_updated_at_function_ ();
 
+INSERT INTO "domain_roles" ("domain", "roles")
+    VALUES
+    ('spotlightpa.org', '{"Spotlight PA","arc user",editor}'),
+    ('inquirer.com', '{"arc user",editor}');
+
 ---- create above / drop below ----
 DROP TABLE domain_roles;

@@ -4,4 +4,13 @@ SELECT
 FROM
     domain_roles
 WHERE
-    DOMAIN LIKE $1;
+    domain LIKE $1;
+
+-- name: SetRolesForDomain :one
+INSERT INTO domain_roles (domain, roles)
+    VALUES ($1, $2)
+ON CONFLICT (lower(domain))
+    DO UPDATE SET
+        roles = $2
+    RETURNING
+        *;

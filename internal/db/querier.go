@@ -8,6 +8,7 @@ import (
 
 type Querier interface {
 	GetRolesForDomain(ctx context.Context, domain string) ([]string, error)
+	SetRolesForDomain(ctx context.Context, arg SetRolesForDomainParams) (DomainRole, error)
 }
 
 var _ Querier = (*Queries)(nil)
