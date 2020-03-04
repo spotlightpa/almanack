@@ -15,7 +15,7 @@ SELECT
 FROM
     domain_roles
 WHERE
-    DOMAIN LIKE $1
+    domain LIKE $1
 `
 
 func (q *Queries) GetRolesForDomain(ctx context.Context, domain string) ([]string, error) {
@@ -23,4 +23,32 @@ func (q *Queries) GetRolesForDomain(ctx context.Context, domain string) ([]strin
 	var roles []string
 	err := row.Scan(pq.Array(&roles))
 	return roles, err
+}
+
+const setRolesForDomain = `-- name: SetRolesForDomain :one
+INSERT INTO domain_roles (domain, roles)
+    VALUES ($1, $2)
+ON CONFLICT (lower(domain))
+    DO UPDATE SET
+        roles = $2
+    RETURNING
+        id, domain, roles, created_at, updated_at
+`
+
+type SetRolesForDomainParams struct {
+	Domain string   `json:"domain"`
+	Roles  []string `json:"roles"`
+}
+
+func (q *Queries) SetRolesForDomain(ctx context.Context, arg SetRolesForDomainParams) (DomainRole, error) {
+	row := q.db.QueryRowContext(ctx, setRolesForDomain, arg.Domain, pq.Array(arg.Roles))
+	var i DomainRole
+	err := row.Scan(
+		&i.ID,
+		&i.Domain,
+		pq.Array(&i.Roles),
+		&i.CreatedAt,
+		&i.UpdatedAt,
+	)
+	return i, err
 }

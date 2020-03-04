@@ -1,7 +1,9 @@
 package main
 
 import (
+	"context"
 	"encoding/json"
+	"flag"
 	"fmt"
 	"log"
 	"os"
@@ -9,29 +11,61 @@ import (
 
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
+	"github.com/peterbourgon/ff"
 
+	"github.com/spotlightpa/almanack/internal/db"
+	"github.com/spotlightpa/almanack/internal/herokuapi"
 	"github.com/spotlightpa/almanack/internal/netlifyid"
 	"github.com/spotlightpa/almanack/internal/slack"
 )
 
 func main() {
+	if err := globalEnv.parseEnv(); err != nil {
+		globalEnv.sc.Post(slack.Message{
+			Attachments: []slack.Attachment{
+				{
+					Title: "Could not start identity-signup",
+					Text:  err.Error(),
+					Color: colorRed,
+				}}})
+		panic(err)
+	}
 	lambda.Start(whitelistEmails)
 }
 
-var (
-	whitelisted_domains = os.Getenv("ALMANACK_WHITELIST_DOMAINS")
-	slackHookURL        = os.Getenv("ALMANACK_SLACK_HOOK_URL")
-	logger              = log.New(os.Stdout, "identity-signup ", log.LstdFlags)
-)
+type appEnv struct {
+	db     db.Querier
+	sc     slack.Client
+	logger *log.Logger
+}
+
+func (app *appEnv) parseEnv() error {
+	app.logger = log.New(os.Stdout, "identity-signup ", log.LstdFlags)
+	fl := flag.NewFlagSet("identity-signup", flag.ContinueOnError)
+	slackHookURL := fl.String("slack-hook-url", "", "Slack hook endpoint `URL`")
+	checkHerokuPG := herokuapi.FlagVar(fl, "postgres")
+	if err := ff.Parse(fl, []string{}, ff.WithEnvVarPrefix("ALMANACK")); err != nil {
+		return err
+	}
+	app.sc = slack.New(*slackHookURL, app.logger)
+	if dbURL, err := checkHerokuPG(); err != nil {
+		return err
+	} else {
+		if app.db, err = db.Open(dbURL); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+var globalEnv appEnv
 
 const (
 	colorGreen = "#78bc20"
 	colorRed   = "#da291c"
 )
 
-func whitelistEmails(request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
-	fmt.Printf("starting with whitelist: %s\n", whitelisted_domains)
-
+func whitelistEmails(ctx context.Context, request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
 	var data struct {
 		EventType string         `json:"event"`
 		User      netlifyid.User `json:"user"`
@@ -41,25 +75,11 @@ func whitelistEmails(request events.APIGatewayProxyRequest) (events.APIGatewayPr
 		return events.APIGatewayProxyResponse{}, err
 	}
 
-	email := strings.ToLower(data.User.Email)
-
-	if strings.HasSuffix(email, "@spotlightpa.org") {
-		data.User.AppMetadata.Roles = append(data.User.AppMetadata.Roles,
-			"Spotlight PA", "arc user")
+	roles, err := db.GetRolesForEmailDomain(ctx, globalEnv.db, data.User.Email)
+	if err != nil {
+		return events.APIGatewayProxyResponse{}, err
 	}
-	if strings.HasSuffix(email, "@inquirer.com") {
-		data.User.AppMetadata.Roles = append(data.User.AppMetadata.Roles,
-			"arc user")
-	}
-	suffixes := strings.FieldsFunc(whitelisted_domains,
-		func(r rune) bool { return r == ',' || r == ' ' })
-	for _, suffix := range suffixes {
-		if strings.HasSuffix(email, suffix) {
-			logger.Printf("%s has domain %s", email, suffix)
-			data.User.AppMetadata.Roles = append(data.User.AppMetadata.Roles, "editor")
-			break
-		}
-	}
+	data.User.AppMetadata.Roles = append(data.User.AppMetadata.Roles, roles...)
 
 	body, err := json.Marshal(data.User)
 	if err != nil {
@@ -73,7 +93,7 @@ func whitelistEmails(request events.APIGatewayProxyRequest) (events.APIGatewayPr
 	if len(data.User.AppMetadata.Roles) < 1 {
 		color = colorRed
 	}
-	slack.New(slackHookURL, logger).Post(
+	globalEnv.sc.Post(
 		slack.Message{
 			Attachments: []slack.Attachment{
 				{
