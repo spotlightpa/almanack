@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
+	"regexp"
 	"strings"
 
 	"github.com/spotlightpa/almanack/pkg/almanack"
@@ -32,7 +33,7 @@ func (content Contents) ToArticle() (*almanack.Article, error) {
 		Body:      body.String(),
 		LinkTitle: content.Headlines.Web,
 	}
-	imageFrom(&story, content.PromoItems)
+	setArticleImage(&story, content.PromoItems)
 	return &story, nil
 }
 
@@ -128,8 +129,13 @@ func readContentElements(rawels []*json.RawMessage, body *strings.Builder) error
 	return nil
 }
 
-func imageFrom(a *almanack.Article, p PromoItems) {
+func setArticleImage(a *almanack.Article, p PromoItems) {
 	var credits []string
+	if strings.Contains(p.Basic.URL, "public") {
+		a.ImageURL = p.Basic.URL
+	} else {
+		a.ImageURL = p.Basic.AdditionalProperties.ResizeURL
+	}
 	for i, credit := range p.Basic.Credits.By {
 		name := credit.Byline
 		if name == "" {
@@ -142,5 +148,6 @@ func imageFrom(a *almanack.Article, p PromoItems) {
 	}
 	a.ImageCredit = strings.Join(credits, " / ")
 	a.ImageCaption = p.Basic.Caption
-	a.ImageURL = p.Basic.URL
+	re := regexp.MustCompile(`(?i)\b(staff( photographer)?)\b`)
+	a.ImageCaption = re.ReplaceAllLiteralString(p.Basic.Caption, "Philadelphia Inquirer")
 }
