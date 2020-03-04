@@ -61,7 +61,7 @@ func (app *appEnv) parseArgs(args []string) error {
 		"silent",
 		`don't log debug output`,
 	)
-	checkHeroku := herokuapi.FlagVar(fl)
+	checkHerokuRedis := herokuapi.FlagVar(fl, "redis")
 	getImageStore := aws.FlagVar(fl)
 	mcAPIKey := fl.String("mc-api-key", "", "API `key` for MailChimp")
 	mcListID := fl.String("mc-list-id", "", "List `ID` MailChimp campaign")
@@ -74,7 +74,7 @@ func (app *appEnv) parseArgs(args []string) error {
 		return err
 	}
 	// Get Redis URL from Heroku if possible, else get it from config, else use files
-	if connURL, err := checkHeroku(); err != nil {
+	if connURL, err := checkHerokuRedis(); err != nil {
 		return err
 	} else if connURL != "" {
 		app.Logger.Printf("got credentials from Heroku")

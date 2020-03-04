@@ -10,9 +10,9 @@ import (
 	"time"
 )
 
-func FlagVar(fl *flag.FlagSet) func() (connectionURL string, err error) {
+func FlagVar(fl *flag.FlagSet, connType string) func() (connectionURL string, err error) {
 	apiKey := fl.String("heroku-api-key", "", "`API key` for retreiving config from Heroku")
-	addOn := fl.String("heroku-add-on-id", "", "`ID` for Heroku Add-On to get config from")
+	addOn := fl.String("heroku-"+connType+"-add-on-id", "", "`ID` for Heroku Add-On to get config from")
 	return func() (connectionURL string, err error) {
 		if *apiKey == "" || *addOn == "" {
 			return "", nil
