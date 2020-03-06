@@ -38,21 +38,21 @@ func (feed Feed) Get(id string) (*Article, error) {
 type Article struct {
 	ArcID            string    `toml:"arc-id"`
 	ID               string    `toml:"internal-id"`
-	ImageCredit      string    `toml:"image-credit"`
-	ImageCaption     string    `toml:"image-description"`
-	ImageURL         string    `toml:"image"`
-	Slug             string    `toml:"slug"`
-	PubDate          time.Time `toml:"published"`
 	Budget           string    `toml:"internal-budget"`
+	ImageURL         string    `toml:"image"`
+	ImageCaption     string    `toml:"image-description"`
+	ImageCredit      string    `toml:"image-credit"`
+	PubDate          time.Time `toml:"published"`
+	Slug             string    `toml:"slug"`
+	Authors          []string  `toml:"authors"`
+	Byline           string    `toml:"byline"`
+	Kicker           string    `toml:"kicker"`
 	Hed              string    `toml:"title"`
 	Subhead          string    `toml:"subtitle"`
 	Summary          string    `toml:"description"`
 	Blurb            string    `toml:"blurb"`
-	Authors          []string  `toml:"authors"`
 	Body             string    `toml:"-"`
 	LinkTitle        string    `toml:"linktitle"`
-	Byline           string    `toml:"byline"`
-	Kicker           string    `toml:"kicker"`
 	SuppressFeatured bool      `toml:"suppress-featured"`
 }
 
