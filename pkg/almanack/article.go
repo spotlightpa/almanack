@@ -46,11 +46,11 @@ type Article struct {
 	Slug             string    `toml:"slug"`
 	Authors          []string  `toml:"authors"`
 	Byline           string    `toml:"byline"`
-	Kicker           string    `toml:"kicker"`
 	Hed              string    `toml:"title"`
 	Subhead          string    `toml:"subtitle"`
 	Summary          string    `toml:"description"`
 	Blurb            string    `toml:"blurb"`
+	Kicker           string    `toml:"kicker"`
 	Body             string    `toml:"-"`
 	LinkTitle        string    `toml:"linktitle"`
 	SuppressFeatured bool      `toml:"suppress-featured"`
