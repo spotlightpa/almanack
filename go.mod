@@ -1,9 +1,9 @@
 module github.com/spotlightpa/almanack
 
-// +heroku goVersion go1.13
+// +heroku goVersion go1.14
 // +heroku install ./cmd/...
 
-go 1.13
+go 1.14
 
 require (
 	github.com/BurntSushi/toml v0.3.1
