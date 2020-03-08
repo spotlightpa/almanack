@@ -43,7 +43,7 @@ func (app *appEnv) parseEnv() error {
 	app.logger = log.New(os.Stdout, "identity-signup ", log.LstdFlags)
 	fl := flag.NewFlagSet("identity-signup", flag.ContinueOnError)
 	slackHookURL := fl.String("slack-hook-url", "", "Slack hook endpoint `URL`")
-	openPG := db.FlagVar(fl, "postgres", "PostgreSQL database `URL`")
+	pg := db.FlagVar(fl, "postgres", "PostgreSQL database `URL`")
 	checkHerokuPG := herokuapi.FlagVar(fl, "postgres")
 	if err := ff.Parse(fl, []string{}, ff.WithEnvVarPrefix("ALMANACK")); err != nil {
 		return err
@@ -54,10 +54,10 @@ func (app *appEnv) parseEnv() error {
 	} else if usedHeroku {
 		app.logger.Printf("used Heroku")
 	}
-	var err error
-	if app.db, err = openPG(); err != nil {
-		return err
+	if pg == nil {
+		return fmt.Errorf("must set -postgres to database URL")
 	}
+	app.db = *pg
 	return nil
 }
 

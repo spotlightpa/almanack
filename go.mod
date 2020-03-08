@@ -12,7 +12,7 @@ require (
 	github.com/carlmjohnson/crockford v0.0.3
 	github.com/carlmjohnson/errutil v0.0.9
 	github.com/carlmjohnson/exitcode v0.0.3
-	github.com/carlmjohnson/flagext v0.0.6
+	github.com/carlmjohnson/flagext v0.0.8
 	github.com/carlmjohnson/slackhook v0.0.3
 	github.com/go-chi/chi v4.0.3+incompatible
 	github.com/go-redsync/redsync v1.3.1

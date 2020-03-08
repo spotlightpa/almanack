@@ -13,8 +13,8 @@ github.com/carlmjohnson/errutil v0.0.9 h1:yXt7hPUPZb9/ApOWOQSE7lHrMvsr7SAaV4Urhj
 github.com/carlmjohnson/errutil v0.0.9/go.mod h1:zbiOz7twV9EBHJ+6Yj+7MiHyFL383pqU+ULblUhtaKw=
 github.com/carlmjohnson/exitcode v0.0.3 h1:TI8znPyuJdilIlLHqotKizJXBCHp5rkGq6YuJVqyxd0=
 github.com/carlmjohnson/exitcode v0.0.3/go.mod h1:xF8lj5nU2WLjbHlSOQS1dCa8WjOP38cihHLRD3/fXMI=
-github.com/carlmjohnson/flagext v0.0.6 h1:JX3Qx+7hspQ1Lzlt2bLlg2Ezug3WK/oapgtQaGDGqz8=
-github.com/carlmjohnson/flagext v0.0.6/go.mod h1:Eenv0epIUAr4NuedNmkzI8WmBmjIxZC239XcKxYS2ac=
+github.com/carlmjohnson/flagext v0.0.8 h1:km3d/MC9+YNY6zKbe2ikdLUihjiO8viz7+6rGVb/t/g=
+github.com/carlmjohnson/flagext v0.0.8/go.mod h1:Eenv0epIUAr4NuedNmkzI8WmBmjIxZC239XcKxYS2ac=
 github.com/carlmjohnson/slackhook v0.0.3 h1:Qz0NTTXuwPuco7MS+NZBYmpvjBeflIEta0uujHqcOqc=
 github.com/carlmjohnson/slackhook v0.0.3/go.mod h1:1Knm3+QnVN1d2zkyT0wunjN/cy+Jw13vrl2zw8iIkiE=
 github.com/cpuguy83/go-md2man/v2 v2.0.0-20190314233015-f79a8a8ca69d/go.mod h1:maD7wRr/U5Z6m/iR4s+kqSMx2CaBsrgA7czyZG/E6dU=
