@@ -9,7 +9,7 @@ import (
 	"time"
 
 	"github.com/carlmjohnson/flagext"
-	"github.com/peterbourgon/ff"
+	"github.com/peterbourgon/ff/v2"
 
 	"github.com/spotlightpa/almanack/internal/arcjson"
 	"github.com/spotlightpa/almanack/internal/filestore"

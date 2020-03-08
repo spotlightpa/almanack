@@ -21,12 +21,11 @@ require (
 	github.com/google/go-github/v29 v29.0.2
 	github.com/lib/pq v1.3.0
 	github.com/mattbaird/gochimp v0.0.0-20180111040707-a267553896d1
-	github.com/peterbourgon/ff v1.6.0
+	github.com/peterbourgon/ff/v2 v2.0.0
 	github.com/piotrkubisa/apigo v1.1.2-0.20190907190536-6de39ca9cf97
 	github.com/pkg/errors v0.9.1 // indirect
 	golang.org/x/crypto v0.0.0-20191011191535-87dc89f01550 // indirect
 	golang.org/x/net v0.0.0-20200226121028-0de0cce0169b // indirect
 	golang.org/x/oauth2 v0.0.0-20180821212333-d2e6202438be
 	golang.org/x/xerrors v0.0.0-20191204190536-9bdfabe68543 // indirect
-	gopkg.in/yaml.v2 v2.2.4 // indirect
 )
