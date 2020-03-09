@@ -8,6 +8,7 @@ import (
 	"log"
 	"os"
 	"strings"
+	"time"
 
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
@@ -53,8 +54,9 @@ func (app *appEnv) parseEnv() error {
 		return err
 	}
 	if err := sentry.Init(sentry.ClientOptions{
-		Dsn:     *sentryDSN,
-		Release: almanack.BuildVersion,
+		Dsn:       *sentryDSN,
+		Release:   almanack.BuildVersion,
+		Transport: &sentry.HTTPSyncTransport{Timeout: 1 * time.Second},
 	}); err != nil {
 		return err
 	}
