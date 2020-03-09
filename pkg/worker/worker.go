@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/carlmjohnson/flagext"
+	"github.com/getsentry/sentry-go"
 	"github.com/peterbourgon/ff/v2"
 
 	"github.com/spotlightpa/almanack/internal/arcjson"
@@ -42,6 +43,7 @@ func CLI(args []string) error {
 	}
 	if err := app.exec(); err != nil {
 		fmt.Fprintf(os.Stderr, "Runtime error: %v\n", err)
+		sentry.CaptureException(err)
 		app.sc.Post(
 			slack.Message{
 				Attachments: []slack.Attachment{
@@ -78,10 +80,17 @@ Options:
 `)
 		fl.PrintDefaults()
 	}
+	sentryDSN := fl.String("sentry-dsn", "", "DSN `pseudo-URL` for Sentry")
 	if err := ff.Parse(fl, args, ff.WithEnvVarPrefix("ALMANACK")); err != nil {
 		return err
 	}
 	app.sc = slack.New(*slackURL, app.Logger)
+	if err := sentry.Init(sentry.ClientOptions{
+		Dsn:     *sentryDSN,
+		Release: almanack.BuildVersion,
+	}); err != nil {
+		return err
+	}
 
 	app.email = mailchimp.NewMailService(*mcAPIKey, *mcListID, app.Logger)
 	if d := getDialer(); d != nil {

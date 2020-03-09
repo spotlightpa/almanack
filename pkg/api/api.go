@@ -1,6 +1,7 @@
 package api
 
 import (
+	"context"
 	"encoding/json"
 	"errors"
 	"flag"
@@ -10,8 +11,11 @@ import (
 	"net/http/httputil"
 	"os"
 	"strings"
+	"time"
 
 	"github.com/carlmjohnson/flagext"
+	"github.com/getsentry/sentry-go"
+	sentryhttp "github.com/getsentry/sentry-go/http"
 	"github.com/go-chi/chi"
 	"github.com/go-chi/chi/middleware"
 	"github.com/peterbourgon/ff/v2"
@@ -65,6 +69,7 @@ func (app *appEnv) parseArgs(args []string) error {
 	getImageStore := aws.FlagVar(fl)
 	mcAPIKey := fl.String("mc-api-key", "", "API `key` for MailChimp")
 	mcListID := fl.String("mc-list-id", "", "List `ID` MailChimp campaign")
+	sentryDSN := fl.String("sentry-dsn", "", "DSN `pseudo-URL` for Sentry")
 	getGithub := github.FlagVar(fl)
 	fl.Usage = func() {
 		fmt.Fprintf(fl.Output(), "almanack-api help\n\n")
@@ -73,6 +78,11 @@ func (app *appEnv) parseArgs(args []string) error {
 	if err := ff.Parse(fl, args, ff.WithEnvVarPrefix("ALMANACK")); err != nil {
 		return err
 	}
+
+	if err := app.initSentry(*sentryDSN); err != nil {
+		return err
+	}
+
 	// Get Redis URL from Heroku if possible, else get it from config, else use files
 	if usedHeroku, err := checkHerokuRedis(); err != nil {
 		return err
@@ -135,12 +145,23 @@ func (app *appEnv) exec() error {
 	return listener(app.port, app.routes())
 }
 
+func (app *appEnv) initSentry(dsn string) error {
+	var transport sentry.Transport
+	if app.isLambda {
+		transport = &sentry.HTTPSyncTransport{Timeout: 1 * time.Second}
+	}
+	return sentry.Init(sentry.ClientOptions{
+		Dsn:       dsn,
+		Release:   almanack.BuildVersion,
+		Transport: transport,
+	})
+}
+
 func (app *appEnv) routes() http.Handler {
 	r := chi.NewRouter()
 	r.Use(middleware.RequestID)
 	r.Use(middleware.RealIP)
 	r.Use(middleware.RequestLogger(&middleware.DefaultLogFormatter{Logger: app.Logger}))
-	r.Use(middleware.Recoverer)
 	r.Use(app.versionMiddleware)
 	r.Get("/api/healthcheck", app.ping)
 	r.Route("/api", func(r chi.Router) {
@@ -164,7 +185,9 @@ func (app *appEnv) routes() http.Handler {
 			r.Post("/get-signed-upload", app.getSignedUpload)
 		})
 	})
-	return r
+
+	sentryHandler := sentryhttp.New(sentryhttp.Options{})
+	return sentryHandler.Handle(r)
 }
 
 func (app *appEnv) versionMiddleware(h http.Handler) http.Handler {
@@ -183,7 +206,7 @@ func (app *appEnv) jsonResponse(statusCode int, w http.ResponseWriter, data inte
 	}
 }
 
-func (app *appEnv) errorResponse(w http.ResponseWriter, err error) {
+func (app *appEnv) errorResponse(ctx context.Context, w http.ResponseWriter, err error) {
 	var errResp errutil.Response
 	if !errors.As(err, &errResp) {
 		errResp.StatusCode = http.StatusInternalServerError
@@ -191,6 +214,9 @@ func (app *appEnv) errorResponse(w http.ResponseWriter, err error) {
 		errResp.Log = err.Error()
 	}
 	app.Println(errResp.Log)
+	if hub := sentry.GetHubFromContext(ctx); hub != nil {
+		hub.CaptureException(errResp)
+	}
 	app.jsonResponse(errResp.StatusCode, w, errResp)
 }
 
@@ -200,7 +226,7 @@ func (app *appEnv) ping(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Cache-Control", "public, max-age=60")
 	b, err := httputil.DumpRequest(r, true)
 	if err != nil {
-		app.errorResponse(w, err)
+		app.errorResponse(r.Context(), w, err)
 		return
 	}
 	w.Write(b)
@@ -210,7 +236,7 @@ func (app *appEnv) authMiddleware(h http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		r, err := app.auth.AddToRequest(r)
 		if err != nil {
-			app.errorResponse(w, err)
+			app.errorResponse(r.Context(), w, err)
 			return
 		}
 		h.ServeHTTP(w, r)
@@ -221,7 +247,7 @@ func (app *appEnv) userInfo(w http.ResponseWriter, r *http.Request) {
 	app.Println("start userInfo")
 	userinfo, err := netlifyid.FromRequest(r)
 	if err != nil {
-		app.errorResponse(w, err)
+		app.errorResponse(r.Context(), w, err)
 		return
 	}
 	app.jsonResponse(http.StatusOK, w, userinfo)
@@ -231,7 +257,7 @@ func (app *appEnv) hasRoleMiddleware(role string) func(next http.Handler) http.H
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			if err := app.auth.HasRole(r, role); err != nil {
-				app.errorResponse(w, err)
+				app.errorResponse(r.Context(), w, err)
 				return
 			}
 			next.ServeHTTP(w, r)
@@ -244,13 +270,13 @@ func (app *appEnv) listUpcoming(w http.ResponseWriter, r *http.Request) {
 
 	var feed arcjson.API
 	if err := httpjson.Get(r.Context(), app.c, app.srcFeedURL, &feed); err != nil {
-		app.errorResponse(w, err)
+		app.errorResponse(r.Context(), w, err)
 		return
 	}
 
 	arcsvc := arcjson.FeedService{DataStore: app.store, Logger: app.Logger}
 	if err := arcsvc.PopulateSuplements(feed.Contents); err != nil {
-		app.errorResponse(w, err)
+		app.errorResponse(r.Context(), w, err)
 		return
 	}
 	if err := arcsvc.StoreFeed(feed); err != nil {
@@ -266,13 +292,13 @@ func (app *appEnv) postAvailable(w http.ResponseWriter, r *http.Request) {
 
 	var userData arcjson.Contents
 	if err := httpjson.DecodeRequest(w, r, &userData); err != nil {
-		app.errorResponse(w, err)
+		app.errorResponse(r.Context(), w, err)
 		return
 	}
 
 	arcsvc := arcjson.FeedService{DataStore: app.store, Logger: app.Logger}
 	if err := arcsvc.SaveSupplements(&userData); err != nil {
-		app.errorResponse(w, err)
+		app.errorResponse(r.Context(), w, err)
 		return
 	}
 	app.jsonResponse(http.StatusAccepted, w, &userData)
@@ -289,7 +315,7 @@ func (app *appEnv) listAvailable(w http.ResponseWriter, r *http.Request) {
 	)
 	arcsvc := arcjson.FeedService{DataStore: app.store, Logger: app.Logger}
 	if res.Contents, err = arcsvc.GetAvailableFeed(); err != nil {
-		app.errorResponse(w, err)
+		app.errorResponse(r.Context(), w, err)
 		return
 	}
 
@@ -303,20 +329,20 @@ func (app *appEnv) getAvailable(w http.ResponseWriter, r *http.Request) {
 	arcsvc := arcjson.FeedService{DataStore: app.store, Logger: app.Logger}
 	feed, err := arcsvc.GetFeed()
 	if err != nil {
-		app.errorResponse(w, err)
+		app.errorResponse(r.Context(), w, err)
 		return
 	}
 
 	article, err := feed.Get(articleID)
 	if err != nil {
-		app.errorResponse(w, err)
+		app.errorResponse(r.Context(), w, err)
 		return
 	}
 
 	// Let Spotlight PA users get article regardless of its status
 	if err := app.auth.HasRole(r, "Spotlight PA"); err != nil {
 		if article.Status != arcjson.StatusAvailable {
-			app.errorResponse(w, errutil.NotFound)
+			app.errorResponse(r.Context(), w, errutil.NotFound)
 			return
 		}
 	}
@@ -333,11 +359,11 @@ func (app *appEnv) postMessage(w http.ResponseWriter, r *http.Request) {
 
 	var req request
 	if err := httpjson.DecodeRequest(w, r, &req); err != nil {
-		app.errorResponse(w, err)
+		app.errorResponse(r.Context(), w, err)
 		return
 	}
 	if err := app.email.SendEmail(req.Subject, req.Body); err != nil {
-		app.errorResponse(w, err)
+		app.errorResponse(r.Context(), w, err)
 		return
 	}
 	app.jsonResponse(http.StatusAccepted, w, http.StatusText(http.StatusAccepted))
@@ -356,7 +382,7 @@ func (app *appEnv) getScheduledArticle(w http.ResponseWriter, r *http.Request) {
 
 	article, err := sas.Get(articleID)
 	if err != nil {
-		app.errorResponse(w, err)
+		app.errorResponse(r.Context(), w, err)
 		return
 	}
 
@@ -368,7 +394,7 @@ func (app *appEnv) postScheduledArticle(w http.ResponseWriter, r *http.Request) 
 
 	var userData almanack.ScheduledArticle
 	if err := httpjson.DecodeRequest(w, r, &userData); err != nil {
-		app.errorResponse(w, err)
+		app.errorResponse(r.Context(), w, err)
 		return
 	}
 
@@ -376,7 +402,7 @@ func (app *appEnv) postScheduledArticle(w http.ResponseWriter, r *http.Request) 
 		if imageurl, err := almanack.UploadFromURL(
 			r.Context(), app.c, app.imageStore, userData.ImageURL,
 		); err != nil {
-			app.errorResponse(w, err)
+			app.errorResponse(r.Context(), w, err)
 			return
 		} else {
 			userData.ImageURL = imageurl
@@ -392,7 +418,7 @@ func (app *appEnv) postScheduledArticle(w http.ResponseWriter, r *http.Request) 
 	}
 
 	if err := sas.Save(r.Context(), &userData); err != nil {
-		app.errorResponse(w, err)
+		app.errorResponse(r.Context(), w, err)
 		return
 	}
 
@@ -411,7 +437,7 @@ func (app *appEnv) getSignedUpload(w http.ResponseWriter, r *http.Request) {
 	)
 	res.SignedURL, res.FileName, err = almanack.GetSignedUpload(app.imageStore)
 	if err != nil {
-		app.errorResponse(w, err)
+		app.errorResponse(r.Context(), w, err)
 		return
 	}
 	app.jsonResponse(http.StatusOK, w, &res)
