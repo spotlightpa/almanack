@@ -54,8 +54,8 @@ func (app *appEnv) parseArgs(args []string) error {
 	fl.BoolVar(&app.isLambda, "lambda", false, "use AWS Lambda rather than HTTP")
 	fl.StringVar(&app.port, "port", ":3001", "listen on port (HTTP only)")
 	fl.StringVar(&app.mailchimpSignupURL, "mc-signup-url", "http://example.com", "`URL` to redirect users to for MailChimp signup")
-	getDialer := redisflag.Var(fl, "redis-url", "`URL` connection string for Redis")
-	checkHerokuRedis := herokuapi.FlagVar(fl, "redis-url")
+	getDialer := redisflag.Var(fl, "redis", "`URL` connection string for Redis")
+	checkHerokuRedis := herokuapi.FlagVar(fl, "redis")
 	app.Logger = log.New(nil, AppName+" ", log.LstdFlags)
 	fl.Var(
 		flagext.Logger(app.Logger, flagext.LogSilent),
