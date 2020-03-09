@@ -13,7 +13,6 @@ import (
 func FlagVar(fl *flag.FlagSet, flagName string) func() (used bool, err error) {
 	apiKey := fl.String("heroku-api-key", "", "`API key` for retreiving config from Heroku")
 	addOn := fl.String("heroku-"+flagName+"-add-on-id", "", "`ID` for Heroku Add-On to get config from")
-	connFlag := fl.Lookup(flagName)
 	return func() (used bool, err error) {
 		if *apiKey == "" || *addOn == "" {
 			return false, nil
@@ -22,7 +21,10 @@ func FlagVar(fl *flag.FlagSet, flagName string) func() (used bool, err error) {
 		if err != nil {
 			return true, err
 		}
-		return true, connFlag.Value.Set(connURL)
+		if connFlag := fl.Lookup(flagName); connFlag != nil {
+			return true, connFlag.Value.Set(connURL)
+		}
+		panic("misconfigured flag " + flagName)
 	}
 }
 

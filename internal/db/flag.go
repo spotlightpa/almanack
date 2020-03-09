@@ -15,7 +15,7 @@ func FlagVar(fl *flag.FlagSet, name, usage string) (q *Querier) {
 	if fl == nil {
 		fl = flag.CommandLine
 	}
-
+	q = new(Querier)
 	flagext.Callback(fl, name, "", usage, func(dbURL string) error {
 		var err error
 		*q, err = Open(dbURL)

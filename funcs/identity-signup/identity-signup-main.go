@@ -56,7 +56,7 @@ func (app *appEnv) parseEnv() error {
 	} else if usedHeroku {
 		app.logger.Printf("used Heroku")
 	}
-	if pg == nil {
+	if *pg == nil {
 		return fmt.Errorf("must set -postgres to database URL")
 	}
 	app.db = *pg
