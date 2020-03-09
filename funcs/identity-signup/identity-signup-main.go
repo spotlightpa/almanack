@@ -8,9 +8,11 @@ import (
 	"log"
 	"os"
 	"strings"
+	"time"
 
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
+	"github.com/getsentry/sentry-go"
 	"github.com/peterbourgon/ff/v2"
 
 	"github.com/spotlightpa/almanack/internal/db"
@@ -47,9 +49,18 @@ func (app *appEnv) parseEnv() error {
 	slackHookURL := fl.String("slack-hook-url", "", "Slack hook endpoint `URL`")
 	pg := db.FlagVar(fl, "postgres", "PostgreSQL database `URL`")
 	checkHerokuPG := herokuapi.FlagVar(fl, "postgres")
+	sentryDSN := fl.String("sentry-dsn", "", "DSN `pseudo-URL` for Sentry")
 	if err := ff.Parse(fl, []string{}, ff.WithEnvVarPrefix("ALMANACK")); err != nil {
 		return err
 	}
+	if err := sentry.Init(sentry.ClientOptions{
+		Dsn:       *sentryDSN,
+		Release:   almanack.BuildVersion,
+		Transport: &sentry.HTTPSyncTransport{Timeout: 1 * time.Second},
+	}); err != nil {
+		return err
+	}
+
 	app.sc = slack.New(*slackHookURL, app.logger)
 	if usedHeroku, err := checkHerokuPG(); err != nil {
 		return err
@@ -70,25 +81,31 @@ const (
 	colorRed   = "#da291c"
 )
 
-func whitelistEmails(ctx context.Context, request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
+func whitelistEmails(ctx context.Context, request events.APIGatewayProxyRequest) (resp events.APIGatewayProxyResponse, err error) {
+	defer func() {
+		if err != nil {
+			sentry.CaptureException(err)
+		}
+	}()
+
 	var data struct {
 		EventType string         `json:"event"`
 		User      netlifyid.User `json:"user"`
 	}
-	err := json.Unmarshal([]byte(request.Body), &data)
-	if err != nil {
-		return events.APIGatewayProxyResponse{}, err
+
+	if err = json.Unmarshal([]byte(request.Body), &data); err != nil {
+		return resp, err
 	}
 
 	roles, err := db.GetRolesForEmailDomain(ctx, globalEnv.db, data.User.Email)
 	if err != nil {
-		return events.APIGatewayProxyResponse{}, err
+		return resp, err
 	}
 	data.User.AppMetadata.Roles = append(data.User.AppMetadata.Roles, roles...)
 
 	body, err := json.Marshal(data.User)
 	if err != nil {
-		return events.APIGatewayProxyResponse{}, err
+		return resp, err
 	}
 	msg := fmt.Sprintf("%s <%s> with %d role(s)",
 		data.User.UserMetadata.FullName,

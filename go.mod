@@ -14,6 +14,7 @@ require (
 	github.com/carlmjohnson/exitcode v0.0.3
 	github.com/carlmjohnson/flagext v0.0.8
 	github.com/carlmjohnson/slackhook v0.0.3
+	github.com/getsentry/sentry-go v0.5.1
 	github.com/go-chi/chi v4.0.3+incompatible
 	github.com/go-redsync/redsync v1.3.1
 	github.com/golang/gddo v0.0.0-20200127195332-7365cb292b8b
@@ -27,5 +28,4 @@ require (
 	golang.org/x/crypto v0.0.0-20191011191535-87dc89f01550 // indirect
 	golang.org/x/net v0.0.0-20200226121028-0de0cce0169b // indirect
 	golang.org/x/oauth2 v0.0.0-20180821212333-d2e6202438be
-	golang.org/x/xerrors v0.0.0-20191204190536-9bdfabe68543 // indirect
 )
