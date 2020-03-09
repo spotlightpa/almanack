@@ -11,12 +11,13 @@ import (
 
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
-	"github.com/peterbourgon/ff"
+	"github.com/peterbourgon/ff/v2"
 
 	"github.com/spotlightpa/almanack/internal/db"
 	"github.com/spotlightpa/almanack/internal/herokuapi"
 	"github.com/spotlightpa/almanack/internal/netlifyid"
 	"github.com/spotlightpa/almanack/internal/slack"
+	"github.com/spotlightpa/almanack/pkg/almanack"
 )
 
 func main() {
@@ -30,6 +31,7 @@ func main() {
 				}}})
 		panic(err)
 	}
+	globalEnv.logger.Printf("starting identity-signup rev %s", almanack.BuildVersion)
 	lambda.Start(whitelistEmails)
 }
 
@@ -43,18 +45,21 @@ func (app *appEnv) parseEnv() error {
 	app.logger = log.New(os.Stdout, "identity-signup ", log.LstdFlags)
 	fl := flag.NewFlagSet("identity-signup", flag.ContinueOnError)
 	slackHookURL := fl.String("slack-hook-url", "", "Slack hook endpoint `URL`")
+	pg := db.FlagVar(fl, "postgres", "PostgreSQL database `URL`")
 	checkHerokuPG := herokuapi.FlagVar(fl, "postgres")
 	if err := ff.Parse(fl, []string{}, ff.WithEnvVarPrefix("ALMANACK")); err != nil {
 		return err
 	}
 	app.sc = slack.New(*slackHookURL, app.logger)
-	if dbURL, err := checkHerokuPG(); err != nil {
+	if usedHeroku, err := checkHerokuPG(); err != nil {
 		return err
-	} else {
-		if app.db, err = db.Open(dbURL); err != nil {
-			return err
-		}
+	} else if usedHeroku {
+		app.logger.Printf("used Heroku")
 	}
+	if *pg == nil {
+		return fmt.Errorf("must set -postgres to database URL")
+	}
+	app.db = *pg
 	return nil
 }
 

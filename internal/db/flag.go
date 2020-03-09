@@ -5,18 +5,23 @@ import (
 	"database/sql"
 	"flag"
 	"time"
+
+	"github.com/carlmjohnson/flagext"
 )
 
 // FlagVar adds an option to the specified FlagSet (or flag.CommandLine if nil)
 // that creates and tests a DB
-func FlagVar(fl *flag.FlagSet, name, usage string) func() (q Querier, err error) {
+func FlagVar(fl *flag.FlagSet, name, usage string) (q *Querier) {
 	if fl == nil {
 		fl = flag.CommandLine
 	}
-	dbURL := fl.String(name, "", usage)
-	return func() (q Querier, err error) {
-		return Open(*dbURL)
-	}
+	q = new(Querier)
+	flagext.Callback(fl, name, "", usage, func(dbURL string) error {
+		var err error
+		*q, err = Open(dbURL)
+		return err
+	})
+	return
 }
 
 func Open(dbURL string) (q Querier, err error) {

@@ -10,15 +10,21 @@ import (
 	"time"
 )
 
-func FlagVar(fl *flag.FlagSet, connType string) func() (connectionURL string, err error) {
+func FlagVar(fl *flag.FlagSet, flagName string) func() (used bool, err error) {
 	apiKey := fl.String("heroku-api-key", "", "`API key` for retreiving config from Heroku")
-	addOn := fl.String("heroku-"+connType+"-add-on-id", "", "`ID` for Heroku Add-On to get config from")
-	return func() (connectionURL string, err error) {
+	addOn := fl.String("heroku-"+flagName+"-add-on-id", "", "`ID` for Heroku Add-On to get config from")
+	return func() (used bool, err error) {
 		if *apiKey == "" || *addOn == "" {
-			return "", nil
+			return false, nil
 		}
-
-		return Request(*apiKey, *addOn)
+		connURL, err := Request(*apiKey, *addOn)
+		if err != nil {
+			return true, err
+		}
+		if connFlag := fl.Lookup(flagName); connFlag != nil {
+			return true, connFlag.Value.Set(connURL)
+		}
+		panic("misconfigured flag " + flagName)
 	}
 }
 

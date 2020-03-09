@@ -14,7 +14,7 @@ import (
 	"github.com/carlmjohnson/flagext"
 	"github.com/go-chi/chi"
 	"github.com/go-chi/chi/middleware"
-	"github.com/peterbourgon/ff"
+	"github.com/peterbourgon/ff/v2"
 	"github.com/piotrkubisa/apigo"
 
 	"github.com/spotlightpa/almanack/internal/arcjson"
@@ -54,14 +54,14 @@ func (app *appEnv) parseArgs(args []string) error {
 	fl.BoolVar(&app.isLambda, "lambda", false, "use AWS Lambda rather than HTTP")
 	fl.StringVar(&app.port, "port", ":3001", "listen on port (HTTP only)")
 	fl.StringVar(&app.mailchimpSignupURL, "mc-signup-url", "http://example.com", "`URL` to redirect users to for MailChimp signup")
-	getDialer := redisflag.Var(fl, "redis-url", "`URL` connection string for Redis")
+	getDialer := redisflag.Var(fl, "redis", "`URL` connection string for Redis")
+	checkHerokuRedis := herokuapi.FlagVar(fl, "redis")
 	app.Logger = log.New(nil, AppName+" ", log.LstdFlags)
 	fl.Var(
 		flagext.Logger(app.Logger, flagext.LogSilent),
 		"silent",
 		`don't log debug output`,
 	)
-	checkHerokuRedis := herokuapi.FlagVar(fl, "redis")
 	getImageStore := aws.FlagVar(fl)
 	mcAPIKey := fl.String("mc-api-key", "", "API `key` for MailChimp")
 	mcListID := fl.String("mc-list-id", "", "List `ID` MailChimp campaign")
@@ -74,29 +74,23 @@ func (app *appEnv) parseArgs(args []string) error {
 		return err
 	}
 	// Get Redis URL from Heroku if possible, else get it from config, else use files
-	if connURL, err := checkHerokuRedis(); err != nil {
+	if usedHeroku, err := checkHerokuRedis(); err != nil {
 		return err
-	} else if connURL != "" {
+	} else if usedHeroku {
 		app.Logger.Printf("got credentials from Heroku")
-		dialer, err := redisflag.Parse(connURL)
-		if err != nil {
-			return err
-		}
-		if app.store, err = redis.New(dialer, app.Logger); err != nil {
+	}
+
+	if d := getDialer(); d != nil {
+		app.Logger.Printf("got Redis URL")
+		var err error
+		if app.store, err = redis.New(d, app.Logger); err != nil {
 			return err
 		}
 	} else {
-		if d := getDialer(); d != nil {
-			app.Logger.Printf("got Redis URL directly")
-			var err error
-			if app.store, err = redis.New(d, app.Logger); err != nil {
-				return err
-			}
-		} else {
-			app.Logger.Printf("using filestore")
-			app.store = filestore.New("", "almanack", app.Logger)
-		}
+		app.Logger.Printf("using filestore")
+		app.store = filestore.New("", "almanack", app.Logger)
 	}
+
 	app.email = mailchimp.NewMailService(*mcAPIKey, *mcListID, app.Logger)
 	app.imageStore = getImageStore(app.Logger)
 	app.auth = netlifyid.NewService(app.isLambda, app.Logger)
