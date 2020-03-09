@@ -17,6 +17,7 @@ import (
 	"github.com/spotlightpa/almanack/internal/herokuapi"
 	"github.com/spotlightpa/almanack/internal/netlifyid"
 	"github.com/spotlightpa/almanack/internal/slack"
+	"github.com/spotlightpa/almanack/pkg/almanack"
 )
 
 func main() {
@@ -30,6 +31,7 @@ func main() {
 				}}})
 		panic(err)
 	}
+	globalEnv.logger.Printf("starting identity-signup rev %s", almanack.BuildVersion)
 	lambda.Start(whitelistEmails)
 }
 
