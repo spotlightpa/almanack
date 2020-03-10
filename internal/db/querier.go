@@ -4,11 +4,21 @@ package db
 
 import (
 	"context"
+	"database/sql"
+	"encoding/json"
 )
 
 type Querier interface {
+	GetArticle(ctx context.Context, arcID sql.NullString) (Article, error)
 	GetRolesForDomain(ctx context.Context, domain string) ([]string, error)
+	ListAllArticles(ctx context.Context) ([]Article, error)
+	ListAvailableArticles(ctx context.Context) ([]Article, error)
+	ListUpcoming(ctx context.Context) ([]Article, error)
+	PopScheduled(ctx context.Context) ([]Article, error)
 	SetRolesForDomain(ctx context.Context, arg SetRolesForDomainParams) (DomainRole, error)
+	UpdateAlmanackArticle(ctx context.Context, arg UpdateAlmanackArticleParams) (Article, error)
+	UpdateArcArticles(ctx context.Context, arcItems json.RawMessage) ([]Article, error)
+	UpdateSpotlightPAArticle(ctx context.Context, arg UpdateSpotlightPAArticleParams) (Article, error)
 }
 
 var _ Querier = (*Queries)(nil)
