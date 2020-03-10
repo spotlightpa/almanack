@@ -10,5 +10,9 @@
 			"schema": "../../sql/schema/"
 		}
 	],
+	"rename": {
+		"spotlightpa_data": "SpotlightPAData",
+		"spotlightpa_path": "SpotlightPAPath"
+	},
 	"version": "1"
 }
