@@ -279,7 +279,7 @@ func (app *appEnv) listUpcoming(w http.ResponseWriter, r *http.Request) {
 		app.errorResponse(r.Context(), w, err)
 		return
 	}
-	if err := arcsvc.StoreFeed(feed); err != nil {
+	if err := arcsvc.StoreFeed(r.Context(), feed); err != nil {
 		// Log failure but soldier on?
 		app.Printf("DANGER: did not store feed: %v", err)
 	}

@@ -13,12 +13,10 @@ import (
 	"github.com/peterbourgon/ff/v2"
 
 	"github.com/spotlightpa/almanack/internal/arcjson"
-	"github.com/spotlightpa/almanack/internal/filestore"
+	"github.com/spotlightpa/almanack/internal/db"
 	"github.com/spotlightpa/almanack/internal/github"
 	"github.com/spotlightpa/almanack/internal/httpjson"
 	"github.com/spotlightpa/almanack/internal/mailchimp"
-	"github.com/spotlightpa/almanack/internal/redis"
-	"github.com/spotlightpa/almanack/internal/redisflag"
 	"github.com/spotlightpa/almanack/internal/slack"
 	"github.com/spotlightpa/almanack/pkg/almanack"
 	"github.com/spotlightpa/almanack/pkg/errutil"
@@ -62,10 +60,11 @@ func CLI(args []string) error {
 func (app *appEnv) parseArgs(args []string) error {
 	fl := flag.NewFlagSet(AppName, flag.ContinueOnError)
 	fl.StringVar(&app.srcFeedURL, "src-feed", "", "source `URL` for Arc feed")
+	pg := db.FlagVar(fl, "postgres", "PostgreSQL database `URL`")
 	mcAPIKey := fl.String("mc-api-key", "", "API `key` for MailChimp")
 	mcListID := fl.String("mc-list-id", "", "List `ID` MailChimp campaign")
-	getDialer := redisflag.Var(fl, "redis-url", "`URL` connection string for Redis")
 	slackURL := fl.String("slack-hook-url", "", "Slack hook endpoint `URL`")
+	sentryDSN := fl.String("sentry-dsn", "", "DSN `pseudo-URL` for Sentry")
 	app.Logger = log.New(nil, AppName+" ", log.LstdFlags)
 	fl.Var(
 		flagext.Logger(app.Logger, flagext.LogSilent),
@@ -80,11 +79,15 @@ Options:
 `)
 		fl.PrintDefaults()
 	}
-	sentryDSN := fl.String("sentry-dsn", "", "DSN `pseudo-URL` for Sentry")
 	if err := ff.Parse(fl, args, ff.WithEnvVarPrefix("ALMANACK")); err != nil {
 		return err
 	}
+	if err := flagext.MustHave(fl, "postgres"); err != nil {
+		return err
+	}
+
 	app.sc = slack.New(*slackURL, app.Logger)
+
 	if err := sentry.Init(sentry.ClientOptions{
 		Dsn:     *sentryDSN,
 		Release: almanack.BuildVersion,
@@ -92,16 +95,9 @@ Options:
 		return err
 	}
 
+	app.db = *pg
+
 	app.email = mailchimp.NewMailService(*mcAPIKey, *mcListID, app.Logger)
-	if d := getDialer(); d != nil {
-		var err error
-		if app.store, err = redis.New(d, app.Logger); err != nil {
-			app.Logger.Printf("could not connect to redis: %v", err)
-			return err
-		}
-	} else {
-		app.store = filestore.New("", "almanack", app.Logger)
-	}
 
 	if gh, err := getGithub(app.Logger); err != nil {
 		app.Logger.Printf("could not connect to Github: %v", err)
@@ -115,9 +111,9 @@ Options:
 
 type appEnv struct {
 	srcFeedURL string
-	store      almanack.DataStore
 	email      almanack.EmailService
 	gh         almanack.ContentStore
+	db         db.Querier
 	sc         slack.Client
 	*log.Logger
 }
@@ -145,8 +141,11 @@ func (app *appEnv) updateFeed() error {
 		return err
 	}
 
-	svc := arcjson.FeedService{DataStore: app.store, Logger: app.Logger}
-	if err := svc.StoreFeed(newfeed); err != nil {
+	svc := arcjson.FeedService{
+		Querier: app.db,
+		Logger:  app.Logger,
+	}
+	if err := svc.StoreFeed(context.Background(), newfeed); err != nil {
 		return err
 	}
 
@@ -156,13 +155,13 @@ func (app *appEnv) updateFeed() error {
 func (app *appEnv) publishStories() error {
 	app.Println("starting publishStories")
 	sas := almanack.ScheduledArticleService{
-		DataStore: app.store,
-		Logger:    app.Logger,
+		Querier: app.db,
+		Logger:  app.Logger,
 	}
 
-	return sas.PopScheduledArticles(func(articles []*almanack.ScheduledArticle) error {
+	ctx := context.Background()
+	return sas.PopScheduledArticles(ctx, func(articles []*almanack.ScheduledArticle) error {
 		for _, article := range articles {
-			ctx := context.Background()
 			if err := article.Publish(ctx, app.gh); err != nil {
 				return err
 			}
