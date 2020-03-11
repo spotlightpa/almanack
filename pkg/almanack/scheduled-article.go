@@ -2,9 +2,11 @@ package almanack
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
 	"time"
 
+	"github.com/spotlightpa/almanack/internal/db"
 	"github.com/spotlightpa/almanack/pkg/errutil"
 )
 
@@ -20,6 +22,7 @@ type ScheduledArticleService struct {
 	DataStore
 	ContentStore
 	Logger
+	Querier db.Querier
 }
 
 func (sas ScheduledArticleService) get(articleID string) (*ScheduledArticle, error) {
@@ -128,47 +131,79 @@ func (sas ScheduledArticleService) Save(ctx context.Context, article *ScheduledA
 	return nil
 }
 
-func (sas ScheduledArticleService) PopScheduledArticles(callback func([]*ScheduledArticle) error) error {
-	unlock, err := sas.lock()
+func (sas ScheduledArticleService) PopScheduledArticles(ctx context.Context, callback func([]*ScheduledArticle) error) error {
+	poppedArts, err := sas.Querier.PopScheduled(ctx)
 	if err != nil {
 		return err
 	}
-	defer unlock()
-
-	// Get the existing list of scheduled articles
-	ids, err := sas.listIDs()
-	if err != nil {
-		return err
-	}
-
-	overdueArts := make([]*ScheduledArticle, 0, len(ids))
-
-	// Get the articles
-	for articleID := range ids {
-		article, err := sas.get(articleID)
+	overdueArts := make([]*ScheduledArticle, len(poppedArts))
+	for i := range overdueArts {
+		overdueArts[i], err = ScheduledArticleFromDB(poppedArts[i])
 		if err != nil {
 			return err
 		}
-		if article == nil {
-			// Weird, log it
-			sas.Logger.Printf("got unexpected nil article for ID %s", articleID)
-			continue
-		}
-		// If it's passed due, send to callback
-		shouldPub := article.ScheduleFor != nil && article.ScheduleFor.Before(time.Now())
-		if !shouldPub {
-			continue
-		}
-		overdueArts = append(overdueArts, article)
-		delete(ids, articleID)
 	}
-
 	// If the status of the article changed, fire callback then update the list
 	if len(overdueArts) > 0 {
 		if err := callback(overdueArts); err != nil {
+			// TODO rollback
 			return err
 		}
-		return sas.setIDs(ids)
 	}
 	return nil
+}
+
+func ScheduledArticleFromDB(srcArticle db.Article) (*ScheduledArticle, error) {
+	var sart ScheduledArticle
+	sart.ArcID = srcArticle.ArcID.String
+	if srcArticle.ScheduleFor.Valid {
+		t := srcArticle.ScheduleFor.Time
+		sart.ScheduleFor = &t
+	}
+	type spotlightPADataType struct {
+		ID               *string
+		Budget           *string
+		ImageURL         *string
+		ImageCaption     *string
+		ImageCredit      *string
+		PubDate          *time.Time
+		Slug             *string
+		Authors          *[]string
+		Byline           *string
+		Hed              *string
+		Subhead          *string
+		Summary          *string
+		Blurb            *string
+		Kicker           *string
+		Body             *string
+		LinkTitle        *string
+		SuppressFeatured *bool
+		LastArcSync      *time.Time
+		LastSaved        **time.Time
+	}
+	spotlightPADataVal := spotlightPADataType{
+		ID:               &sart.ID,
+		Budget:           &sart.Budget,
+		ImageURL:         &sart.ImageURL,
+		ImageCaption:     &sart.ImageCaption,
+		ImageCredit:      &sart.ImageCredit,
+		PubDate:          &sart.PubDate,
+		Slug:             &sart.Slug,
+		Authors:          &sart.Authors,
+		Byline:           &sart.Byline,
+		Hed:              &sart.Hed,
+		Subhead:          &sart.Subhead,
+		Summary:          &sart.Summary,
+		Blurb:            &sart.Blurb,
+		Kicker:           &sart.Kicker,
+		Body:             &sart.Body,
+		LinkTitle:        &sart.LinkTitle,
+		SuppressFeatured: &sart.SuppressFeatured,
+		LastArcSync:      &sart.LastArcSync,
+		LastSaved:        &sart.LastSaved,
+	}
+	if err := json.Unmarshal(srcArticle.SpotlightPAData, &spotlightPADataVal); err != nil {
+		return nil, err
+	}
+	return &sart, nil
 }

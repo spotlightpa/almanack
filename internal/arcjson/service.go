@@ -1,8 +1,12 @@
 package arcjson
 
 import (
+	"context"
+	"encoding/json"
 	"errors"
+	"time"
 
+	"github.com/spotlightpa/almanack/internal/db"
 	"github.com/spotlightpa/almanack/pkg/almanack"
 	"github.com/spotlightpa/almanack/pkg/errutil"
 )
@@ -10,6 +14,7 @@ import (
 type FeedService struct {
 	almanack.DataStore
 	almanack.Logger
+	Querier db.Querier
 }
 
 const (
@@ -120,8 +125,15 @@ func (fs FeedService) GetArticle(articleID string) (*almanack.Article, error) {
 	return article, nil
 }
 
-func (fs FeedService) StoreFeed(newfeed API) (err error) {
-	return fs.DataStore.Set(feedKey, &newfeed)
+func (fs FeedService) StoreFeed(ctx context.Context, newfeed API) (err error) {
+	arcItems, err := json.Marshal(&newfeed.Contents)
+	if err != nil {
+		return err
+	}
+	start := time.Now()
+	_, err = fs.Querier.UpdateArcArticles(ctx, arcItems)
+	fs.Printf("arcjson.StoreFeed query time: %v", time.Since(start))
+	return
 }
 
 func (fs FeedService) PopulateSuplements(stories []Contents) (err error) {
