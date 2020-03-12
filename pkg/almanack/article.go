@@ -7,33 +7,7 @@ import (
 	"time"
 
 	"github.com/BurntSushi/toml"
-
-	"github.com/spotlightpa/almanack/pkg/errutil"
 )
-
-type ArticleService interface {
-	GetArticle(id string) (*Article, error)
-}
-
-type Feed struct {
-	Articles []*Article
-}
-
-func (feed Feed) Get(id string) (*Article, error) {
-	found := -1
-	for i, article := range feed.Articles {
-		if article.ArcID == id {
-			if found != -1 {
-				return nil, fmt.Errorf("multiple matching IDs found")
-			}
-			found = i
-		}
-	}
-	if found == -1 {
-		return nil, errutil.NotFound
-	}
-	return feed.Articles[found], nil
-}
 
 type Article struct {
 	ArcID            string    `toml:"arc-id"`
