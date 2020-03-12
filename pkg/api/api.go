@@ -415,12 +415,10 @@ func (app *appEnv) postScheduledArticle(w http.ResponseWriter, r *http.Request) 
 		}
 	}
 
-	arcsvc := almanack.FeedService{DataStore: app.store, Logger: app.Logger}
 	sas := almanack.ScheduledArticleService{
-		ArticleService: arcsvc,
-		DataStore:      app.store,
-		Logger:         app.Logger,
-		ContentStore:   app.gh,
+		Logger:       app.Logger,
+		ContentStore: app.gh,
+		Querier:      app.db,
 	}
 
 	if err := sas.Save(r.Context(), &userData); err != nil {
