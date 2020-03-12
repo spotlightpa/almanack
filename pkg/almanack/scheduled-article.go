@@ -39,7 +39,7 @@ func (schArticle *ScheduledArticle) toSPLData() interface{} {
 		LastSaved        **time.Time `json:"last-saved"`
 	}
 	return &splDataType{
-		ID:               &schArticle.ID,
+		ID:               &schArticle.InternalID,
 		Budget:           &schArticle.Budget,
 		ImageURL:         &schArticle.ImageURL,
 		ImageCaption:     &schArticle.ImageCaption,

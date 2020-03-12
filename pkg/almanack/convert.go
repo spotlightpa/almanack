@@ -18,18 +18,18 @@ func (content ArcStory) ToArticle() (*Article, error) {
 		return nil, err
 	}
 	story := Article{
-		ArcID:     content.ID,
-		ID:        content.Slug,
-		Slug:      slugFromURL(content.CanonicalURL),
-		PubDate:   content.Planning.Scheduling.PlannedPublishDate,
-		Budget:    content.Planning.BudgetLine,
-		Hed:       content.Headlines.Basic,
-		Subhead:   content.Subheadlines.Basic,
-		Summary:   content.Description.Basic,
-		Blurb:     content.Description.Basic,
-		Authors:   authors,
-		Body:      body.String(),
-		LinkTitle: content.Headlines.Web,
+		ArcID:      content.ID,
+		InternalID: content.Slug,
+		Slug:       slugFromURL(content.CanonicalURL),
+		PubDate:    content.Planning.Scheduling.PlannedPublishDate,
+		Budget:     content.Planning.BudgetLine,
+		Hed:        content.Headlines.Basic,
+		Subhead:    content.Subheadlines.Basic,
+		Summary:    content.Description.Basic,
+		Blurb:      content.Description.Basic,
+		Authors:    authors,
+		Body:       body.String(),
+		LinkTitle:  content.Headlines.Web,
 	}
 	setArticleImage(&story, content.PromoItems)
 	return &story, nil

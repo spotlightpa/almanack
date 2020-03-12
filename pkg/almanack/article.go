@@ -37,7 +37,7 @@ func (feed Feed) Get(id string) (*Article, error) {
 
 type Article struct {
 	ArcID            string    `toml:"arc-id"`
-	ID               string    `toml:"internal-id"`
+	InternalID       string    `toml:"internal-id"`
 	Budget           string    `toml:"internal-budget"`
 	ImageURL         string    `toml:"image"`
 	ImageCaption     string    `toml:"image-description"`
@@ -65,7 +65,7 @@ func (article *Article) String() string {
 
 func (article *Article) ContentFilepath() string {
 	date := article.PubDate.Format("2006-01-02")
-	return fmt.Sprintf("content/news/%s-%s.md", date, article.ID)
+	return fmt.Sprintf("content/news/%s-%s.md", date, article.InternalID)
 }
 
 func (article *Article) ToTOML() (string, error) {
@@ -86,7 +86,7 @@ func (article *Article) Publish(ctx context.Context, gh ContentStore) error {
 	if err != nil {
 		return err
 	}
-	msg := fmt.Sprintf("Content: publishing %q", article.ID)
+	msg := fmt.Sprintf("Content: publishing %q", article.InternalID)
 	path := article.ContentFilepath()
 	if err = gh.CreateFile(ctx, msg, path, []byte(data)); err != nil {
 		return err
