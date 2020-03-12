@@ -136,7 +136,7 @@ func (app *appEnv) updateFeed() error {
 		return nil
 	}
 	app.Println("fetching", app.srcFeedURL)
-	var newfeed arcjson.API
+	var newfeed arcjson.ArcAPI
 	if err := httpjson.Get(context.Background(), nil, app.srcFeedURL, &newfeed); err != nil {
 		return err
 	}

@@ -10,7 +10,7 @@ import (
 	"github.com/spotlightpa/almanack/pkg/almanack"
 )
 
-func (content Contents) ToArticle() (*almanack.Article, error) {
+func (content ArcStory) ToArticle() (*almanack.Article, error) {
 	authors := make([]string, len(content.Credits.By))
 	for i := range content.Credits.By {
 		authors[i] = content.Credits.By[i].Name

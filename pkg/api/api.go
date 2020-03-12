@@ -277,7 +277,7 @@ func (app *appEnv) hasRoleMiddleware(role string) func(next http.Handler) http.H
 func (app *appEnv) listUpcoming(w http.ResponseWriter, r *http.Request) {
 	app.Println("start listUpcoming")
 
-	var feed arcjson.API
+	var feed arcjson.ArcAPI
 	if err := httpjson.Get(r.Context(), app.c, app.srcFeedURL, &feed); err != nil {
 		app.errorResponse(r.Context(), w, err)
 		return
@@ -299,7 +299,7 @@ func (app *appEnv) listUpcoming(w http.ResponseWriter, r *http.Request) {
 func (app *appEnv) postAvailable(w http.ResponseWriter, r *http.Request) {
 	app.Printf("starting postAvailable")
 
-	var userData arcjson.Contents
+	var userData arcjson.ArcStory
 	if err := httpjson.DecodeRequest(w, r, &userData); err != nil {
 		app.errorResponse(r.Context(), w, err)
 		return
@@ -316,7 +316,7 @@ func (app *appEnv) postAvailable(w http.ResponseWriter, r *http.Request) {
 func (app *appEnv) listAvailable(w http.ResponseWriter, r *http.Request) {
 	app.Printf("starting listAvailable")
 	type response struct {
-		Contents []arcjson.Contents `json:"contents"`
+		Contents []arcjson.ArcStory `json:"contents"`
 	}
 	var (
 		res response
