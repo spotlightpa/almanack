@@ -12,7 +12,6 @@ type MockAuthService struct{ almanack.Logger }
 var _ almanack.AuthService = MockAuthService{}
 
 func (mas MockAuthService) AddToRequest(r *http.Request) (*http.Request, error) {
-	mas.Logger.Printf("mock auth wrapping request")
 	return r, nil
 }
 
