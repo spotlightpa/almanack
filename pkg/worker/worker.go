@@ -12,7 +12,6 @@ import (
 	"github.com/getsentry/sentry-go"
 	"github.com/peterbourgon/ff/v2"
 
-	"github.com/spotlightpa/almanack/internal/arcjson"
 	"github.com/spotlightpa/almanack/internal/db"
 	"github.com/spotlightpa/almanack/internal/github"
 	"github.com/spotlightpa/almanack/internal/httpjson"
@@ -136,12 +135,12 @@ func (app *appEnv) updateFeed() error {
 		return nil
 	}
 	app.Println("fetching", app.srcFeedURL)
-	var newfeed arcjson.ArcAPI
+	var newfeed almanack.ArcAPI
 	if err := httpjson.Get(context.Background(), nil, app.srcFeedURL, &newfeed); err != nil {
 		return err
 	}
 
-	svc := arcjson.FeedService{
+	svc := almanack.FeedService{
 		Querier: app.db,
 		Logger:  app.Logger,
 	}

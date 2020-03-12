@@ -1,4 +1,4 @@
-package arcjson
+package almanack
 
 import (
 	"context"
@@ -7,13 +7,12 @@ import (
 	"time"
 
 	"github.com/spotlightpa/almanack/internal/db"
-	"github.com/spotlightpa/almanack/pkg/almanack"
 	"github.com/spotlightpa/almanack/pkg/errutil"
 )
 
 type FeedService struct {
-	almanack.DataStore
-	almanack.Logger
+	DataStore
+	Logger
 	Querier db.Querier
 }
 
@@ -109,7 +108,7 @@ func pruneStr(ids map[string]string) {
 		}
 	}
 }
-func (fs FeedService) GetArticle(articleID string) (*almanack.Article, error) {
+func (fs FeedService) GetArticle(articleID string) (*Article, error) {
 	feed, err := fs.GetFeed()
 	if err != nil {
 		return nil, err

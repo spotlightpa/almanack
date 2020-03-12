@@ -1,4 +1,4 @@
-package arcjson
+package almanack
 
 import (
 	"encoding/json"
@@ -6,11 +6,9 @@ import (
 	"log"
 	"regexp"
 	"strings"
-
-	"github.com/spotlightpa/almanack/pkg/almanack"
 )
 
-func (content ArcStory) ToArticle() (*almanack.Article, error) {
+func (content ArcStory) ToArticle() (*Article, error) {
 	authors := make([]string, len(content.Credits.By))
 	for i := range content.Credits.By {
 		authors[i] = content.Credits.By[i].Name
@@ -19,7 +17,7 @@ func (content ArcStory) ToArticle() (*almanack.Article, error) {
 	if err := readContentElements(content.ContentElements, &body); err != nil {
 		return nil, err
 	}
-	story := almanack.Article{
+	story := Article{
 		ArcID:     content.ID,
 		ID:        content.Slug,
 		Slug:      slugFromURL(content.CanonicalURL),
@@ -129,7 +127,7 @@ func readContentElements(rawels []*json.RawMessage, body *strings.Builder) error
 	return nil
 }
 
-func setArticleImage(a *almanack.Article, p PromoItems) {
+func setArticleImage(a *Article, p PromoItems) {
 	var credits []string
 	if strings.Contains(p.Basic.URL, "public") {
 		a.ImageURL = p.Basic.URL

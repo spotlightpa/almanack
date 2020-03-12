@@ -1,4 +1,4 @@
-package arcjson
+package almanack
 
 import (
 	"encoding/json"
