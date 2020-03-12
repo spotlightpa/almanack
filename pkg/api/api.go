@@ -321,8 +321,11 @@ func (app *appEnv) listAvailable(w http.ResponseWriter, r *http.Request) {
 		res response
 		err error
 	)
-	arcsvc := almanack.FeedService{DataStore: app.store, Logger: app.Logger}
-	if res.Contents, err = arcsvc.GetAvailableFeed(); err != nil {
+	arcsvc := almanack.FeedService{
+		Querier: app.db,
+		Logger:  app.Logger,
+	}
+	if res.Contents, err = arcsvc.GetAvailableFeed(r.Context()); err != nil {
 		app.errorResponse(r.Context(), w, err)
 		return
 	}
@@ -335,7 +338,7 @@ func (app *appEnv) getAvailable(w http.ResponseWriter, r *http.Request) {
 	app.Printf("starting getAvailable %s", articleID)
 
 	arcsvc := almanack.FeedService{DataStore: app.store, Logger: app.Logger}
-	feed, err := arcsvc.GetFeed()
+	feed, err := arcsvc.GetFeed(r.Context())
 	if err != nil {
 		app.errorResponse(r.Context(), w, err)
 		return

@@ -30,14 +30,26 @@ const (
 	StatusAvailable
 )
 
-func (fs FeedService) GetFeed() (ArcAPI, error) {
-	var feed ArcAPI
-	err := fs.DataStore.Get(feedKey, &feed)
+var dbStatusToStatus = map[string]Status{
+	"U": StatusUnset,
+	"P": StatusPlanned,
+	"A": StatusAvailable,
+}
+
+func (fs FeedService) GetFeed(ctx context.Context) (feed ArcAPI, err error) {
+	start := time.Now()
+	dbArts, err := fs.Querier.ListAllArticles(ctx)
 	if err != nil {
-		return feed, err
+		return
 	}
-	err = fs.PopulateSuplements(feed.Contents)
-	return feed, err
+	fs.Printf("ListAllArticles query time: %v", time.Since(start))
+	feed.Contents = make([]ArcStory, len(dbArts))
+	for i := range feed.Contents {
+		if err = feed.Contents[i].fromDB(&dbArts[i]); err != nil {
+			return
+		}
+	}
+	return
 }
 
 type supplement struct {
@@ -54,19 +66,32 @@ func (fs FeedService) getSuplements() (supplement, error) {
 	return sups, nil
 }
 
-func (fs FeedService) GetAvailableFeed() ([]ArcStory, error) {
-	feed, err := fs.GetFeed()
+func (fs FeedService) GetAvailableFeed(ctx context.Context) (stories []ArcStory, err error) {
+	start := time.Now()
+	var dbArts []db.Article
+	dbArts, err = fs.Querier.ListAvailableArticles(ctx)
+	fs.Printf("ListAvailableArticles query time: %v", time.Since(start))
 	if err != nil {
-		return nil, err
+		return
 	}
-
-	filteredContents := feed.Contents[:0]
-	for _, item := range feed.Contents {
-		if item.Status == StatusPlanned || item.Status == StatusAvailable {
-			filteredContents = append(filteredContents, item)
+	stories = make([]ArcStory, len(dbArts))
+	for i := range stories {
+		if err = stories[i].fromDB(&dbArts[i]); err != nil {
+			return
 		}
 	}
-	return filteredContents, nil
+	return
+}
+
+func (story *ArcStory) fromDB(dart *db.Article) error {
+	if err := json.Unmarshal(dart.ArcData, story); err != nil {
+		return err
+	}
+	var ok bool
+	if story.Status, ok = dbStatusToStatus[dart.Status]; !ok {
+		return errors.New("bad status flag in database")
+	}
+	return nil
 }
 
 func (fs FeedService) SaveSupplements(article *ArcStory) error {
@@ -109,7 +134,7 @@ func pruneStr(ids map[string]string) {
 	}
 }
 func (fs FeedService) GetArticle(articleID string) (*Article, error) {
-	feed, err := fs.GetFeed()
+	feed, err := fs.GetFeed(context.Background())
 	if err != nil {
 		return nil, err
 	}
