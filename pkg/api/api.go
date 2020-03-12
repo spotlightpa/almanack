@@ -21,7 +21,6 @@ import (
 	"github.com/peterbourgon/ff/v2"
 	"github.com/piotrkubisa/apigo"
 
-	"github.com/spotlightpa/almanack/internal/arcjson"
 	"github.com/spotlightpa/almanack/internal/aws"
 	"github.com/spotlightpa/almanack/internal/db"
 	"github.com/spotlightpa/almanack/internal/filestore"
@@ -277,13 +276,13 @@ func (app *appEnv) hasRoleMiddleware(role string) func(next http.Handler) http.H
 func (app *appEnv) listUpcoming(w http.ResponseWriter, r *http.Request) {
 	app.Println("start listUpcoming")
 
-	var feed arcjson.ArcAPI
+	var feed almanack.ArcAPI
 	if err := httpjson.Get(r.Context(), app.c, app.srcFeedURL, &feed); err != nil {
 		app.errorResponse(r.Context(), w, err)
 		return
 	}
 
-	arcsvc := arcjson.FeedService{DataStore: app.store, Logger: app.Logger}
+	arcsvc := almanack.FeedService{DataStore: app.store, Logger: app.Logger}
 	if err := arcsvc.PopulateSuplements(feed.Contents); err != nil {
 		app.errorResponse(r.Context(), w, err)
 		return
@@ -299,13 +298,13 @@ func (app *appEnv) listUpcoming(w http.ResponseWriter, r *http.Request) {
 func (app *appEnv) postAvailable(w http.ResponseWriter, r *http.Request) {
 	app.Printf("starting postAvailable")
 
-	var userData arcjson.ArcStory
+	var userData almanack.ArcStory
 	if err := httpjson.DecodeRequest(w, r, &userData); err != nil {
 		app.errorResponse(r.Context(), w, err)
 		return
 	}
 
-	arcsvc := arcjson.FeedService{DataStore: app.store, Logger: app.Logger}
+	arcsvc := almanack.FeedService{DataStore: app.store, Logger: app.Logger}
 	if err := arcsvc.SaveSupplements(&userData); err != nil {
 		app.errorResponse(r.Context(), w, err)
 		return
@@ -316,13 +315,13 @@ func (app *appEnv) postAvailable(w http.ResponseWriter, r *http.Request) {
 func (app *appEnv) listAvailable(w http.ResponseWriter, r *http.Request) {
 	app.Printf("starting listAvailable")
 	type response struct {
-		Contents []arcjson.ArcStory `json:"contents"`
+		Contents []almanack.ArcStory `json:"contents"`
 	}
 	var (
 		res response
 		err error
 	)
-	arcsvc := arcjson.FeedService{DataStore: app.store, Logger: app.Logger}
+	arcsvc := almanack.FeedService{DataStore: app.store, Logger: app.Logger}
 	if res.Contents, err = arcsvc.GetAvailableFeed(); err != nil {
 		app.errorResponse(r.Context(), w, err)
 		return
@@ -335,7 +334,7 @@ func (app *appEnv) getAvailable(w http.ResponseWriter, r *http.Request) {
 	articleID := chi.URLParam(r, "id")
 	app.Printf("starting getAvailable %s", articleID)
 
-	arcsvc := arcjson.FeedService{DataStore: app.store, Logger: app.Logger}
+	arcsvc := almanack.FeedService{DataStore: app.store, Logger: app.Logger}
 	feed, err := arcsvc.GetFeed()
 	if err != nil {
 		app.errorResponse(r.Context(), w, err)
@@ -350,7 +349,7 @@ func (app *appEnv) getAvailable(w http.ResponseWriter, r *http.Request) {
 
 	// Let Spotlight PA users get article regardless of its status
 	if err := app.auth.HasRole(r, "Spotlight PA"); err != nil {
-		if article.Status != arcjson.StatusAvailable {
+		if article.Status != almanack.StatusAvailable {
 			app.errorResponse(r.Context(), w, errutil.NotFound)
 			return
 		}
@@ -416,7 +415,7 @@ func (app *appEnv) postScheduledArticle(w http.ResponseWriter, r *http.Request) 
 		}
 	}
 
-	arcsvc := arcjson.FeedService{DataStore: app.store, Logger: app.Logger}
+	arcsvc := almanack.FeedService{DataStore: app.store, Logger: app.Logger}
 	sas := almanack.ScheduledArticleService{
 		ArticleService: arcsvc,
 		DataStore:      app.store,
