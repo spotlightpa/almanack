@@ -109,7 +109,6 @@ func (schArticle *ScheduledArticle) ToDB() (*db.Article, error) {
 }
 
 type ScheduledArticleService struct {
-	ArticleService
 	ContentStore
 	Logger
 	Querier db.Querier
