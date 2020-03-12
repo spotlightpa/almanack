@@ -17,12 +17,12 @@ const (
 	StatusDone       = 6
 )
 
-type API struct {
+type ArcAPI struct {
 	Version  string     `json:"apiVersion"`
-	Contents []Contents `json:"contents"`
+	Contents []ArcStory `json:"contents"`
 }
 
-type Contents struct {
+type ArcStory struct {
 	AdditionalProperties ContentProperties  `json:"additional_properties"`
 	CanonicalURL         string             `json:"canonical_url"`
 	CanonicalWebsite     string             `json:"canonical_website"`
@@ -327,7 +327,7 @@ type PromoCredit struct {
 	} `json:"by"`
 }
 
-func (feed API) Get(id string) (*Contents, error) {
+func (feed ArcAPI) Get(id string) (*ArcStory, error) {
 	found := -1
 	for i, article := range feed.Contents {
 		if article.ID == id {

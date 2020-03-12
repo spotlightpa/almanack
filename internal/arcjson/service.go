@@ -31,8 +31,8 @@ const (
 	StatusAvailable
 )
 
-func (fs FeedService) GetFeed() (API, error) {
-	var feed API
+func (fs FeedService) GetFeed() (ArcAPI, error) {
+	var feed ArcAPI
 	err := fs.DataStore.Get(feedKey, &feed)
 	if err != nil {
 		return feed, err
@@ -55,7 +55,7 @@ func (fs FeedService) getSuplements() (supplement, error) {
 	return sups, nil
 }
 
-func (fs FeedService) GetAvailableFeed() ([]Contents, error) {
+func (fs FeedService) GetAvailableFeed() ([]ArcStory, error) {
 	feed, err := fs.GetFeed()
 	if err != nil {
 		return nil, err
@@ -70,7 +70,7 @@ func (fs FeedService) GetAvailableFeed() ([]Contents, error) {
 	return filteredContents, nil
 }
 
-func (fs FeedService) SaveSupplements(article *Contents) error {
+func (fs FeedService) SaveSupplements(article *ArcStory) error {
 	articleID := article.ID
 	unlock, err := fs.DataStore.GetLock(suplementLock)
 	if err != nil {
@@ -125,7 +125,7 @@ func (fs FeedService) GetArticle(articleID string) (*almanack.Article, error) {
 	return article, nil
 }
 
-func (fs FeedService) StoreFeed(ctx context.Context, newfeed API) (err error) {
+func (fs FeedService) StoreFeed(ctx context.Context, newfeed ArcAPI) (err error) {
 	arcItems, err := json.Marshal(&newfeed.Contents)
 	if err != nil {
 		return err
@@ -136,7 +136,7 @@ func (fs FeedService) StoreFeed(ctx context.Context, newfeed API) (err error) {
 	return
 }
 
-func (fs FeedService) PopulateSuplements(stories []Contents) (err error) {
+func (fs FeedService) PopulateSuplements(stories []ArcStory) (err error) {
 	sups, err := fs.getSuplements()
 	if err != nil {
 		return err
