@@ -23,6 +23,7 @@ import (
 
 	"github.com/spotlightpa/almanack/internal/arcjson"
 	"github.com/spotlightpa/almanack/internal/aws"
+	"github.com/spotlightpa/almanack/internal/db"
 	"github.com/spotlightpa/almanack/internal/filestore"
 	"github.com/spotlightpa/almanack/internal/github"
 	"github.com/spotlightpa/almanack/internal/herokuapi"
@@ -53,6 +54,8 @@ func CLI(args []string) error {
 
 func (app *appEnv) parseArgs(args []string) error {
 	fl := flag.NewFlagSet(AppName, flag.ContinueOnError)
+
+	pg := db.FlagVar(fl, "postgres", "PostgreSQL database `URL`")
 	fl.StringVar(&app.srcFeedURL, "src-feed", "", "source `URL` for Arc feed")
 	cache := fl.Bool("cache", false, "use in-memory cache for fetched JSON")
 	fl.BoolVar(&app.isLambda, "lambda", false, "use AWS Lambda rather than HTTP")
@@ -78,6 +81,11 @@ func (app *appEnv) parseArgs(args []string) error {
 	if err := ff.Parse(fl, args, ff.WithEnvVarPrefix("ALMANACK")); err != nil {
 		return err
 	}
+	if err := flagext.MustHave(fl, "postgres"); err != nil {
+		return err
+	}
+
+	app.db = *pg
 
 	if err := app.initSentry(*sentryDSN); err != nil {
 		return err
@@ -128,6 +136,7 @@ type appEnv struct {
 	store              almanack.DataStore
 	imageStore         almanack.ImageStore
 	email              almanack.EmailService
+	db                 db.Querier
 	*log.Logger
 }
 
@@ -373,14 +382,12 @@ func (app *appEnv) getScheduledArticle(w http.ResponseWriter, r *http.Request) {
 	articleID := chi.URLParam(r, "id")
 	app.Printf("start getScheduledArticle %s", articleID)
 
-	arcsvc := arcjson.FeedService{DataStore: app.store, Logger: app.Logger}
 	sas := almanack.ScheduledArticleService{
-		ArticleService: arcsvc,
-		DataStore:      app.store,
-		Logger:         app.Logger,
+		Querier: app.db,
+		Logger:  app.Logger,
 	}
 
-	article, err := sas.Get(articleID)
+	article, err := sas.Get(r.Context(), articleID)
 	if err != nil {
 		app.errorResponse(r.Context(), w, err)
 		return

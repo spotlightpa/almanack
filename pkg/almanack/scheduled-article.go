@@ -2,6 +2,7 @@ package almanack
 
 import (
 	"context"
+	"database/sql"
 	"encoding/json"
 	"errors"
 	"time"
@@ -71,22 +72,14 @@ func prune(ids map[string]bool) {
 	}
 }
 
-func (sas ScheduledArticleService) Get(articleID string) (*ScheduledArticle, error) {
-	data, err := sas.get(articleID)
-	if data != nil || err != nil {
-		return data, err
-	}
-
-	sas.Logger.Printf("no article in datastore, falling back to article service")
-
-	article, err := sas.ArticleService.GetArticle(articleID)
+func (sas ScheduledArticleService) Get(ctx context.Context, articleID string) (*ScheduledArticle, error) {
+	start := time.Now()
+	dart, err := sas.Querier.GetArticle(ctx, nullString(articleID))
+	sas.Logger.Printf("queried GetArticle in %v", time.Since(start))
 	if err != nil {
-		return nil, err
+		return nil, db.StandardizeErr(err)
 	}
-	data = new(ScheduledArticle)
-	data.Article = *article
-	data.LastArcSync = time.Now()
-	return data, nil
+	return ScheduledArticleFromDB(dart)
 }
 
 func (sas ScheduledArticleService) Save(ctx context.Context, article *ScheduledArticle) error {
@@ -132,7 +125,9 @@ func (sas ScheduledArticleService) Save(ctx context.Context, article *ScheduledA
 }
 
 func (sas ScheduledArticleService) PopScheduledArticles(ctx context.Context, callback func([]*ScheduledArticle) error) error {
+	start := time.Now()
 	poppedArts, err := sas.Querier.PopScheduled(ctx)
+	sas.Logger.Printf("queried PopScheduled in %v", time.Since(start))
 	if err != nil {
 		return err
 	}
@@ -153,57 +148,82 @@ func (sas ScheduledArticleService) PopScheduledArticles(ctx context.Context, cal
 	return nil
 }
 
-func ScheduledArticleFromDB(srcArticle db.Article) (*ScheduledArticle, error) {
-	var sart ScheduledArticle
-	sart.ArcID = srcArticle.ArcID.String
-	if srcArticle.ScheduleFor.Valid {
-		t := srcArticle.ScheduleFor.Time
-		sart.ScheduleFor = &t
+func ScheduledArticleFromDB(dbArticle db.Article) (*ScheduledArticle, error) {
+	var schArticle ScheduledArticle
+	schArticle.ArcID = dbArticle.ArcID.String
+	if dbArticle.ScheduleFor.Valid {
+		t := dbArticle.ScheduleFor.Time
+		schArticle.ScheduleFor = &t
 	}
-	type spotlightPADataType struct {
-		ID               *string
-		Budget           *string
-		ImageURL         *string
-		ImageCaption     *string
-		ImageCredit      *string
-		PubDate          *time.Time
-		Slug             *string
-		Authors          *[]string
-		Byline           *string
-		Hed              *string
-		Subhead          *string
-		Summary          *string
-		Blurb            *string
-		Kicker           *string
-		Body             *string
-		LinkTitle        *string
-		SuppressFeatured *bool
-		LastArcSync      *time.Time
-		LastSaved        **time.Time
+	spotlightPADataVal := map[string]interface{}{
+		"ID":               &schArticle.ID,
+		"Budget":           &schArticle.Budget,
+		"ImageURL":         &schArticle.ImageURL,
+		"ImageCaption":     &schArticle.ImageCaption,
+		"ImageCredit":      &schArticle.ImageCredit,
+		"PubDate":          &schArticle.PubDate,
+		"Slug":             &schArticle.Slug,
+		"Authors":          &schArticle.Authors,
+		"Byline":           &schArticle.Byline,
+		"Hed":              &schArticle.Hed,
+		"Subhead":          &schArticle.Subhead,
+		"Summary":          &schArticle.Summary,
+		"Blurb":            &schArticle.Blurb,
+		"Kicker":           &schArticle.Kicker,
+		"Body":             &schArticle.Body,
+		"LinkTitle":        &schArticle.LinkTitle,
+		"SuppressFeatured": &schArticle.SuppressFeatured,
+		"LastArcSync":      &schArticle.LastArcSync,
+		"LastSaved":        &schArticle.LastSaved,
 	}
-	spotlightPADataVal := spotlightPADataType{
-		ID:               &sart.ID,
-		Budget:           &sart.Budget,
-		ImageURL:         &sart.ImageURL,
-		ImageCaption:     &sart.ImageCaption,
-		ImageCredit:      &sart.ImageCredit,
-		PubDate:          &sart.PubDate,
-		Slug:             &sart.Slug,
-		Authors:          &sart.Authors,
-		Byline:           &sart.Byline,
-		Hed:              &sart.Hed,
-		Subhead:          &sart.Subhead,
-		Summary:          &sart.Summary,
-		Blurb:            &sart.Blurb,
-		Kicker:           &sart.Kicker,
-		Body:             &sart.Body,
-		LinkTitle:        &sart.LinkTitle,
-		SuppressFeatured: &sart.SuppressFeatured,
-		LastArcSync:      &sart.LastArcSync,
-		LastSaved:        &sart.LastSaved,
-	}
-	if err := json.Unmarshal(srcArticle.SpotlightPAData, &spotlightPADataVal); err != nil {
+	if err := json.Unmarshal(dbArticle.SpotlightPAData, &spotlightPADataVal); err != nil {
 		return nil, err
 	}
-	return &sart, nil
+	// TODO populate with ArcJSON if necessary
+	return &schArticle, nil
+}
+
+func nullString(s string) sql.NullString {
+	return sql.NullString{String: s, Valid: true}
+}
+
+func nullTime(t *time.Time) sql.NullTime {
+	if t != nil {
+		return sql.NullTime{Time: *t, Valid: true}
+	}
+	return sql.NullTime{}
+}
+
+func ScheduledArticleToDB(schArticle *ScheduledArticle) (*db.Article, error) {
+	var dart db.Article
+	if schArticle.ArcID != "" {
+		dart.ArcID = nullString(schArticle.ArcID)
+	}
+	dart.ScheduleFor = nullTime(schArticle.ScheduleFor)
+	spotlightPADataVal := map[string]interface{}{
+		"ID":               &schArticle.ID,
+		"Budget":           &schArticle.Budget,
+		"ImageURL":         &schArticle.ImageURL,
+		"ImageCaption":     &schArticle.ImageCaption,
+		"ImageCredit":      &schArticle.ImageCredit,
+		"PubDate":          &schArticle.PubDate,
+		"Slug":             &schArticle.Slug,
+		"Authors":          &schArticle.Authors,
+		"Byline":           &schArticle.Byline,
+		"Hed":              &schArticle.Hed,
+		"Subhead":          &schArticle.Subhead,
+		"Summary":          &schArticle.Summary,
+		"Blurb":            &schArticle.Blurb,
+		"Kicker":           &schArticle.Kicker,
+		"Body":             &schArticle.Body,
+		"LinkTitle":        &schArticle.LinkTitle,
+		"SuppressFeatured": &schArticle.SuppressFeatured,
+		"LastArcSync":      &schArticle.LastArcSync,
+		"LastSaved":        &schArticle.LastSaved,
+	}
+	var err error
+	if dart.SpotlightPAData, err = json.Marshal(&spotlightPADataVal); err != nil {
+		return nil, err
+	}
+	return &dart, nil
 }
