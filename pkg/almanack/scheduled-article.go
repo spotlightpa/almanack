@@ -18,6 +18,20 @@ type ScheduledArticle struct {
 	LastSaved   *time.Time
 }
 
+func (schArticle *ScheduledArticle) ResetArcData(dbArticle db.Article) error {
+	schArticle.LastArcSync = time.Now()
+	var arcStory ArcStory
+	if err := json.Unmarshal(dbArticle.ArcData, &arcStory); err != nil {
+		return err
+	}
+	art, err := arcStory.ToArticle()
+	if err != nil {
+		return err
+	}
+	schArticle.Article = *art
+	return nil
+}
+
 type ScheduledArticleService struct {
 	ArticleService
 	DataStore
@@ -179,7 +193,12 @@ func ScheduledArticleFromDB(dbArticle db.Article) (*ScheduledArticle, error) {
 	if err := json.Unmarshal(dbArticle.SpotlightPAData, &spotlightPADataVal); err != nil {
 		return nil, err
 	}
-	// TODO populate with ArcJSON if necessary
+
+	if schArticle.LastArcSync.IsZero() {
+		if err := schArticle.ResetArcData(dbArticle); err != nil {
+			return nil, err
+		}
+	}
 	return &schArticle, nil
 }
 
