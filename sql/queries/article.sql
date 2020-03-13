@@ -29,9 +29,10 @@ RETURNING
 UPDATE
     article
 SET
-    spotlightpa_data = $2,
-    schedule_for = $3,
-    spotlightpa_path = $4
+    spotlightpa_path = $2,
+    spotlightpa_data = $3,
+    schedule_for = $4,
+    last_published = $5
 WHERE
     arc_id = $1
 RETURNING
