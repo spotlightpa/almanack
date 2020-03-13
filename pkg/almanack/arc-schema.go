@@ -87,6 +87,16 @@ var dbStatusToStatus = map[string]Status{
 	"A": StatusAvailable,
 }
 
+var statusToDBstring = map[Status]string{
+	StatusUnset:     "U",
+	StatusPlanned:   "P",
+	StatusAvailable: "A",
+}
+
+func (s Status) dbstring() string {
+	return statusToDBstring[s]
+}
+
 type ContentProperties struct {
 	HasPublishedCopy bool            `json:"has_published_copy"`
 	IsPublished      bool            `json:"is_published"`
