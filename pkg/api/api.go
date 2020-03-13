@@ -281,15 +281,13 @@ func (app *appEnv) listUpcoming(w http.ResponseWriter, r *http.Request) {
 		app.errorResponse(r.Context(), w, err)
 		return
 	}
-
-	arcsvc := almanack.FeedService{DataStore: app.store, Logger: app.Logger}
-	if err := arcsvc.PopulateSuplements(feed.Contents); err != nil {
+	svc := almanack.FeedService{
+		Querier: app.db,
+		Logger:  app.Logger,
+	}
+	if err := svc.StoreFeed(r.Context(), feed, true); err != nil {
 		app.errorResponse(r.Context(), w, err)
 		return
-	}
-	if err := arcsvc.StoreFeed(r.Context(), feed); err != nil {
-		// Log failure but soldier on?
-		app.Printf("DANGER: did not store feed: %v", err)
 	}
 
 	app.jsonResponse(http.StatusOK, w, feed)
