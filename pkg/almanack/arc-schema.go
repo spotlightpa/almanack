@@ -69,6 +69,7 @@ func (story *ArcStory) fromDB(dart *db.Article) error {
 	if story.Status, ok = dbStatusToStatus[dart.Status]; !ok {
 		return errors.New("bad status flag in database")
 	}
+	story.Note = dart.Note
 	return nil
 }
 
