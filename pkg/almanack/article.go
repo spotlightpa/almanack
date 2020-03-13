@@ -25,9 +25,10 @@ type Article struct {
 	Summary          string    `toml:"description"`
 	Blurb            string    `toml:"blurb"`
 	Kicker           string    `toml:"kicker"`
-	Body             string    `toml:"-"`
 	LinkTitle        string    `toml:"linktitle"`
 	SuppressFeatured bool      `toml:"suppress-featured"`
+	Body             string    `toml:"-"`
+	filepath         string    `toml:"-"`
 }
 
 func (article *Article) String() string {
@@ -38,6 +39,9 @@ func (article *Article) String() string {
 }
 
 func (article *Article) ContentFilepath() string {
+	if article.filepath != "" {
+		return article.filepath
+	}
 	date := article.PubDate.Format("2006-01-02")
 	return fmt.Sprintf("content/news/%s-%s.md", date, article.InternalID)
 }
