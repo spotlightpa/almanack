@@ -11,7 +11,7 @@ func IsNotFound(err error) bool {
 	return errors.Is(err, sql.ErrNoRows)
 }
 
-func StandardizeErr(err error) error {
+func ExpectNotFound(err error) error {
 	if IsNotFound(err) {
 		return errutil.NotFound
 	}
