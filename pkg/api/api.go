@@ -76,9 +76,6 @@ func (app *appEnv) parseArgs(args []string) error {
 	if err := ff.Parse(fl, args, ff.WithEnvVarPrefix("ALMANACK")); err != nil {
 		return err
 	}
-	if err := flagext.MustHave(fl, "postgres"); err != nil {
-		return err
-	}
 
 	if err := app.initSentry(*sentryDSN); err != nil {
 		return err
@@ -91,6 +88,12 @@ func (app *appEnv) parseArgs(args []string) error {
 		app.Logger.Printf("got credentials from Heroku")
 	} else {
 		app.Logger.Printf("did not get credentials Heroku")
+	}
+
+	if *pg == nil {
+		err := errors.New("must set postgres URL")
+		app.Logger.Printf("starting up: %v", err)
+		return err
 	}
 
 	app.email = mailchimp.NewMailService(*mcAPIKey, *mcListID, app.Logger)
