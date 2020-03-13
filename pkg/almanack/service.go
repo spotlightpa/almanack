@@ -9,12 +9,10 @@ import (
 )
 
 type FeedService struct {
-	DataStore
 	Logger
 	Querier db.Querier
 }
 
-// TODO
 func (fs FeedService) GetArcStory(ctx context.Context, articleID string) (story *ArcStory, err error) {
 	start := time.Now()
 	dart, err := fs.Querier.GetArticle(ctx, nullString(articleID))
@@ -49,8 +47,22 @@ func (fs FeedService) GetAvailableFeed(ctx context.Context) (stories []ArcStory,
 	return
 }
 
-// TODO
-func (fs FeedService) SaveSupplements(article *ArcStory) error {
+func (fs FeedService) SaveAlmanackArticle(ctx context.Context, article *ArcStory) error {
+	start := time.Now()
+	dart, err := fs.Querier.UpdateAlmanackArticle(ctx, db.UpdateAlmanackArticleParams{
+		ArcID:  nullString(article.ID),
+		Status: article.Status.dbstring(),
+		Note:   article.Note,
+	})
+	fs.Printf("UpdateAlmanackArticle query time: %v", time.Since(start))
+	if err != nil {
+		err = db.StandardizeErr(err)
+		return err
+	}
+	if err = article.fromDB(&dart); err != nil {
+		return err
+	}
+
 	return nil
 }
 
@@ -61,7 +73,7 @@ func (fs FeedService) StoreFeed(ctx context.Context, newfeed ArcAPI, update bool
 	}
 	start := time.Now()
 	dbarts, err := fs.Querier.UpdateArcArticles(ctx, arcItems)
-	fs.Printf("arcjson.StoreFeed query time: %v", time.Since(start))
+	fs.Printf("StoreFeed query time: %v", time.Since(start))
 	if err != nil {
 		return
 	}
@@ -76,9 +88,4 @@ func (fs FeedService) StoreFeed(ctx context.Context, newfeed ArcAPI, update bool
 		}
 	}
 	return
-}
-
-// TODO
-func (fs FeedService) PopulateSuplements(stories []ArcStory) (err error) {
-	return nil
 }

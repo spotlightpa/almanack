@@ -302,8 +302,8 @@ func (app *appEnv) postAvailable(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	arcsvc := almanack.FeedService{DataStore: app.store, Logger: app.Logger}
-	if err := arcsvc.SaveSupplements(&userData); err != nil {
+	arcsvc := almanack.FeedService{Querier: app.db, Logger: app.Logger}
+	if err := arcsvc.SaveAlmanackArticle(r.Context(), &userData); err != nil {
 		app.errorResponse(r.Context(), w, err)
 		return
 	}
