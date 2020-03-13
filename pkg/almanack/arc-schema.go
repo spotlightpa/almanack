@@ -2,9 +2,11 @@ package almanack
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"time"
 
+	"github.com/spotlightpa/almanack/internal/db"
 	"github.com/spotlightpa/almanack/pkg/errutil"
 )
 
@@ -57,6 +59,31 @@ type ArcStory struct {
 
 	Note   string `json:"almanack-note,omitempty"`
 	Status Status `json:"almanack-status,omitempty"`
+}
+
+func (story *ArcStory) fromDB(dart *db.Article) error {
+	if err := json.Unmarshal(dart.ArcData, story); err != nil {
+		return err
+	}
+	var ok bool
+	if story.Status, ok = dbStatusToStatus[dart.Status]; !ok {
+		return errors.New("bad status flag in database")
+	}
+	return nil
+}
+
+type Status int8
+
+const (
+	StatusUnset     Status = 0
+	StatusPlanned   Status = 1
+	StatusAvailable Status = 2
+)
+
+var dbStatusToStatus = map[string]Status{
+	"U": StatusUnset,
+	"P": StatusPlanned,
+	"A": StatusAvailable,
 }
 
 type ContentProperties struct {
