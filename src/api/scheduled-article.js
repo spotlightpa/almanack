@@ -16,14 +16,13 @@ export default class ScheduledArticle {
   init(data, { save_reset = true } = {}) {
     this.isSaving = false;
     this.saveError = null;
-    this.hasPublished = this.hasPublished ?? false;
 
     if (save_reset) {
       this._reset = JSON.stringify(data);
     }
 
     let props = {
-      id: ["ID", ""],
+      id: ["InternalID", ""],
       arcID: ["ArcID", ""],
       body: ["Body", ""],
       blurb: ["Blurb", ""],
@@ -52,6 +51,7 @@ export default class ScheduledArticle {
       lastArcSync: "LastArcSync",
       pubDate: "PubDate",
       lastSaved: "LastSaved",
+      lastPublished: "LastPublished",
     };
 
     let dateObj = {};
@@ -76,7 +76,7 @@ export default class ScheduledArticle {
 
   toJSON() {
     return {
-      ID: this.id,
+      InternalID: this.id,
       ArcID: this.arcID,
       Body: this.body,
       Byline: this.byline,
@@ -106,6 +106,10 @@ export default class ScheduledArticle {
       .replace(/\W+/g, " ")
       .trim()
       .replace(/ /g, "-");
+  }
+
+  get hasPublished() {
+    return !!this.lastPublished;
   }
 
   get pubURL() {
@@ -143,18 +147,12 @@ export default class ScheduledArticle {
     } else {
       this.scheduleFor = null;
     }
-    let willPubNow = false;
-    if (this.scheduleFor) {
-      willPubNow = new Date() - this.scheduleFor > 0;
-    }
+
     let data;
     [data, this.saveError] = await this._client.saveArticle(this._url_id, this);
     this.isSaving = false;
     if (!this.saveError) {
       this.init(data);
-      if (willPubNow) {
-        this.hasPublished = true;
-      }
     }
   }
 }

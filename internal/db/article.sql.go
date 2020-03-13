@@ -317,9 +317,10 @@ const updateSpotlightPAArticle = `-- name: UpdateSpotlightPAArticle :one
 UPDATE
     article
 SET
-    spotlightpa_data = $2,
-    schedule_for = $3,
-    spotlightpa_path = $4
+    spotlightpa_path = $2,
+    spotlightpa_data = $3,
+    schedule_for = $4,
+    last_published = $5
 WHERE
     arc_id = $1
 RETURNING
@@ -328,17 +329,19 @@ RETURNING
 
 type UpdateSpotlightPAArticleParams struct {
 	ArcID           sql.NullString  `json:"arc_id"`
+	SpotlightPAPath sql.NullString  `json:"spotlightpa_path"`
 	SpotlightPAData json.RawMessage `json:"spotlightpa_data"`
 	ScheduleFor     sql.NullTime    `json:"schedule_for"`
-	SpotlightPAPath sql.NullString  `json:"spotlightpa_path"`
+	LastPublished   sql.NullTime    `json:"last_published"`
 }
 
 func (q *Queries) UpdateSpotlightPAArticle(ctx context.Context, arg UpdateSpotlightPAArticleParams) (Article, error) {
 	row := q.db.QueryRowContext(ctx, updateSpotlightPAArticle,
 		arg.ArcID,
+		arg.SpotlightPAPath,
 		arg.SpotlightPAData,
 		arg.ScheduleFor,
-		arg.SpotlightPAPath,
+		arg.LastPublished,
 	)
 	var i Article
 	err := row.Scan(

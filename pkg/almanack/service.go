@@ -52,6 +52,7 @@ func (svc Service) GetScheduledArticle(ctx context.Context, articleID string) (*
 }
 
 func (svc Service) SaveScheduledArticle(ctx context.Context, article *ScheduledArticle) error {
+	now := time.Now()
 	// TODO: Make less racey
 	if article.ScheduleFor != nil &&
 		article.ScheduleFor.Before(time.Now().Add(5*time.Minute)) {
@@ -59,12 +60,10 @@ func (svc Service) SaveScheduledArticle(ctx context.Context, article *ScheduledA
 		if err := article.Publish(ctx, svc.ContentStore); err != nil {
 			return err
 		}
+		article.LastPublished = &now
 	}
 
-	// Save the article
-	now := time.Now()
 	article.LastSaved = &now
-
 	dart, err := article.toDB()
 	if err != nil {
 		return err
@@ -73,9 +72,10 @@ func (svc Service) SaveScheduledArticle(ctx context.Context, article *ScheduledA
 	start := time.Now()
 	*dart, err = svc.Querier.UpdateSpotlightPAArticle(ctx, db.UpdateSpotlightPAArticleParams{
 		ArcID:           dart.ArcID,
+		SpotlightPAPath: dart.SpotlightPAPath,
 		SpotlightPAData: dart.SpotlightPAData,
 		ScheduleFor:     dart.ScheduleFor,
-		SpotlightPAPath: dart.SpotlightPAPath,
+		LastPublished:   dart.LastPublished,
 	})
 	svc.Logger.Printf("queried UpdateSpotlightPAArticle in %v", time.Since(start))
 	if err != nil {
