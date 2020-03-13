@@ -281,7 +281,7 @@ func (app *appEnv) listUpcoming(w http.ResponseWriter, r *http.Request) {
 		app.errorResponse(r.Context(), w, err)
 		return
 	}
-	svc := almanack.FeedService{
+	svc := almanack.Service{
 		Querier: app.db,
 		Logger:  app.Logger,
 	}
@@ -302,7 +302,7 @@ func (app *appEnv) postAvailable(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	arcsvc := almanack.FeedService{Querier: app.db, Logger: app.Logger}
+	arcsvc := almanack.Service{Querier: app.db, Logger: app.Logger}
 	if err := arcsvc.SaveAlmanackArticle(r.Context(), &userData); err != nil {
 		app.errorResponse(r.Context(), w, err)
 		return
@@ -319,7 +319,7 @@ func (app *appEnv) listAvailable(w http.ResponseWriter, r *http.Request) {
 		res response
 		err error
 	)
-	arcsvc := almanack.FeedService{
+	arcsvc := almanack.Service{
 		Querier: app.db,
 		Logger:  app.Logger,
 	}
@@ -335,7 +335,7 @@ func (app *appEnv) getAvailable(w http.ResponseWriter, r *http.Request) {
 	articleID := chi.URLParam(r, "id")
 	app.Printf("starting getAvailable %s", articleID)
 
-	arcsvc := almanack.FeedService{
+	arcsvc := almanack.Service{
 		Querier: app.db,
 		Logger:  app.Logger,
 	}
@@ -380,12 +380,12 @@ func (app *appEnv) getScheduledArticle(w http.ResponseWriter, r *http.Request) {
 	articleID := chi.URLParam(r, "id")
 	app.Printf("start getScheduledArticle %s", articleID)
 
-	sas := almanack.ScheduledArticleService{
+	sas := almanack.Service{
 		Querier: app.db,
 		Logger:  app.Logger,
 	}
 
-	article, err := sas.Get(r.Context(), articleID)
+	article, err := sas.GetScheduledArticle(r.Context(), articleID)
 	if err != nil {
 		app.errorResponse(r.Context(), w, err)
 		return
@@ -414,13 +414,13 @@ func (app *appEnv) postScheduledArticle(w http.ResponseWriter, r *http.Request) 
 		}
 	}
 
-	sas := almanack.ScheduledArticleService{
+	sas := almanack.Service{
 		Logger:       app.Logger,
 		ContentStore: app.gh,
 		Querier:      app.db,
 	}
 
-	if err := sas.Save(r.Context(), &userData); err != nil {
+	if err := sas.SaveScheduledArticle(r.Context(), &userData); err != nil {
 		app.errorResponse(r.Context(), w, err)
 		return
 	}

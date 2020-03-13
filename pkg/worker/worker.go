@@ -140,7 +140,7 @@ func (app *appEnv) updateFeed() error {
 		return err
 	}
 
-	svc := almanack.FeedService{
+	svc := almanack.Service{
 		Querier: app.db,
 		Logger:  app.Logger,
 	}
@@ -153,7 +153,7 @@ func (app *appEnv) updateFeed() error {
 
 func (app *appEnv) publishStories() error {
 	app.Println("starting publishStories")
-	sas := almanack.ScheduledArticleService{
+	sas := almanack.Service{
 		Querier: app.db,
 		Logger:  app.Logger,
 	}
