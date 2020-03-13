@@ -337,22 +337,20 @@ func (app *appEnv) getAvailable(w http.ResponseWriter, r *http.Request) {
 	articleID := chi.URLParam(r, "id")
 	app.Printf("starting getAvailable %s", articleID)
 
-	arcsvc := almanack.FeedService{DataStore: app.store, Logger: app.Logger}
-	feed, err := arcsvc.GetFeed(r.Context())
+	arcsvc := almanack.FeedService{
+		Querier: app.db,
+		Logger:  app.Logger,
+	}
+
+	article, err := arcsvc.GetArcStory(r.Context(), articleID)
 	if err != nil {
 		app.errorResponse(r.Context(), w, err)
 		return
 	}
 
-	article, err := feed.Get(articleID)
-	if err != nil {
-		app.errorResponse(r.Context(), w, err)
-		return
-	}
-
-	// Let Spotlight PA users get article regardless of its status
-	if err := app.auth.HasRole(r, "Spotlight PA"); err != nil {
-		if article.Status != almanack.StatusAvailable {
+	if article.Status != almanack.StatusAvailable {
+		// Let Spotlight PA users get article regardless of its status
+		if err := app.auth.HasRole(r, "Spotlight PA"); err != nil {
 			app.errorResponse(r.Context(), w, errutil.NotFound)
 			return
 		}
