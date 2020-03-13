@@ -1,8 +1,6 @@
 package almanack
 
 import (
-	"context"
-	"database/sql"
 	"encoding/json"
 	"time"
 
@@ -61,8 +59,7 @@ func (schArticle *ScheduledArticle) toSPLData() interface{} {
 	}
 }
 
-func ScheduledArticleFromDB(dbArticle db.Article) (*ScheduledArticle, error) {
-	var schArticle ScheduledArticle
+func (schArticle *ScheduledArticle) fromDB(dbArticle db.Article) error {
 	schArticle.ArcID = dbArticle.ArcID.String
 	if dbArticle.ScheduleFor.Valid {
 		t := dbArticle.ScheduleFor.Time
@@ -70,15 +67,15 @@ func ScheduledArticleFromDB(dbArticle db.Article) (*ScheduledArticle, error) {
 	}
 
 	if err := json.Unmarshal(dbArticle.SpotlightPAData, schArticle.toSPLData()); err != nil {
-		return nil, err
+		return err
 	}
 
 	if schArticle.LastArcSync.IsZero() {
 		if err := schArticle.ResetArcData(dbArticle); err != nil {
-			return nil, err
+			return err
 		}
 	}
-	return &schArticle, nil
+	return nil
 }
 
 func (schArticle *ScheduledArticle) ResetArcData(dbArticle db.Article) error {
@@ -95,7 +92,7 @@ func (schArticle *ScheduledArticle) ResetArcData(dbArticle db.Article) error {
 	return nil
 }
 
-func (schArticle *ScheduledArticle) ToDB() (*db.Article, error) {
+func (schArticle *ScheduledArticle) toDB() (*db.Article, error) {
 	var dart db.Article
 
 	dart.ArcID = nullString(schArticle.ArcID)
@@ -106,96 +103,4 @@ func (schArticle *ScheduledArticle) ToDB() (*db.Article, error) {
 		return nil, err
 	}
 	return &dart, nil
-}
-
-type ScheduledArticleService struct {
-	ContentStore
-	Logger
-	Querier db.Querier
-}
-
-func (sas ScheduledArticleService) Get(ctx context.Context, articleID string) (*ScheduledArticle, error) {
-	start := time.Now()
-	dart, err := sas.Querier.GetArticle(ctx, nullString(articleID))
-	sas.Logger.Printf("queried GetArticle in %v", time.Since(start))
-	if err != nil {
-		return nil, db.StandardizeErr(err)
-	}
-	return ScheduledArticleFromDB(dart)
-}
-
-func (sas ScheduledArticleService) Save(ctx context.Context, article *ScheduledArticle) error {
-	// TODO: Make less racey
-	if article.ScheduleFor != nil &&
-		article.ScheduleFor.Before(time.Now().Add(5*time.Minute)) {
-		article.ScheduleFor = nil
-		if err := article.Publish(ctx, sas.ContentStore); err != nil {
-			return err
-		}
-	}
-
-	// Save the article
-	now := time.Now()
-	article.LastSaved = &now
-
-	dart, err := article.ToDB()
-	if err != nil {
-		return err
-	}
-
-	start := time.Now()
-	*dart, err = sas.Querier.UpdateSpotlightPAArticle(ctx, db.UpdateSpotlightPAArticleParams{
-		ArcID:           dart.ArcID,
-		SpotlightPAData: dart.SpotlightPAData,
-		ScheduleFor:     dart.ScheduleFor,
-		SpotlightPAPath: dart.SpotlightPAPath,
-	})
-	sas.Logger.Printf("queried UpdateSpotlightPAArticle in %v", time.Since(start))
-	if err != nil {
-		return err
-	}
-	updatedArticle, err := ScheduledArticleFromDB(*dart)
-	if err != nil {
-		return err
-	}
-	*article = *updatedArticle
-	return nil
-}
-
-func (sas ScheduledArticleService) PopScheduledArticles(ctx context.Context, callback func([]*ScheduledArticle) error) error {
-	start := time.Now()
-	poppedArts, err := sas.Querier.PopScheduled(ctx)
-	sas.Logger.Printf("queried PopScheduled in %v", time.Since(start))
-	if err != nil {
-		return err
-	}
-	overdueArts := make([]*ScheduledArticle, len(poppedArts))
-	for i := range overdueArts {
-		overdueArts[i], err = ScheduledArticleFromDB(poppedArts[i])
-		if err != nil {
-			return err
-		}
-	}
-	// If the status of the article changed, fire callback then update the list
-	if len(overdueArts) > 0 {
-		if err := callback(overdueArts); err != nil {
-			// TODO rollback
-			return err
-		}
-	}
-	return nil
-}
-
-func nullString(s string) sql.NullString {
-	if s == "" {
-		return sql.NullString{}
-	}
-	return sql.NullString{String: s, Valid: true}
-}
-
-func nullTime(t *time.Time) sql.NullTime {
-	if t != nil {
-		return sql.NullTime{Time: *t, Valid: true}
-	}
-	return sql.NullTime{}
 }
