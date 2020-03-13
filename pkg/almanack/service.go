@@ -15,8 +15,21 @@ type FeedService struct {
 }
 
 // TODO
-func (fs FeedService) GetArcStory(ctx context.Context, articleID string) (*ArcStory, error) {
-	return nil, nil
+func (fs FeedService) GetArcStory(ctx context.Context, articleID string) (story *ArcStory, err error) {
+	start := time.Now()
+	dart, err := fs.Querier.GetArticle(ctx, nullString(articleID))
+	fs.Printf("GetArticle query time: %v", time.Since(start))
+	if err != nil {
+		err = db.StandardizeErr(err)
+		return
+	}
+	var newstory ArcStory
+	if err = newstory.fromDB(&dart); err != nil {
+		return
+	}
+	story = &newstory
+	return
+
 }
 
 func (fs FeedService) GetAvailableFeed(ctx context.Context) (stories []ArcStory, err error) {
