@@ -2,6 +2,7 @@ package worker
 
 import (
 	"context"
+	"errors"
 	"flag"
 	"fmt"
 	"log"
@@ -81,7 +82,10 @@ Options:
 	if err := ff.Parse(fl, args, ff.WithEnvVarPrefix("ALMANACK")); err != nil {
 		return err
 	}
-	if err := flagext.MustHave(fl, "postgres"); err != nil {
+
+	if *pg == nil {
+		err := errors.New("must set postgres URL")
+		app.Logger.Printf("starting up: %v", err)
 		return err
 	}
 
