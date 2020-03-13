@@ -3,11 +3,9 @@ package almanack
 import (
 	"encoding/json"
 	"errors"
-	"fmt"
 	"time"
 
 	"github.com/spotlightpa/almanack/internal/db"
-	"github.com/spotlightpa/almanack/pkg/errutil"
 )
 
 const (
@@ -363,20 +361,4 @@ type PromoCredit struct {
 		Name   string `json:"name"`
 		Type   string `json:"type"`
 	} `json:"by"`
-}
-
-func (feed ArcAPI) Get(id string) (*ArcStory, error) {
-	found := -1
-	for i, article := range feed.Contents {
-		if article.ID == id {
-			if found != -1 {
-				return nil, fmt.Errorf("multiple matching IDs found")
-			}
-			found = i
-		}
-	}
-	if found == -1 {
-		return nil, errutil.NotFound
-	}
-	return &feed.Contents[found], nil
 }
