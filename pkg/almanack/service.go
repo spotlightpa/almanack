@@ -23,6 +23,14 @@ func nullTime(t *time.Time) sql.NullTime {
 	return sql.NullTime{}
 }
 
+func timeNull(nt sql.NullTime) *time.Time {
+	if nt.Valid {
+		t := nt.Time
+		return &t
+	}
+	return nil
+}
+
 type Service struct {
 	Logger
 	Querier db.Querier

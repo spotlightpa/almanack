@@ -9,9 +9,10 @@ import (
 
 type ScheduledArticle struct {
 	Article
-	ScheduleFor *time.Time
-	LastArcSync time.Time
-	LastSaved   *time.Time
+	LastArcSync   time.Time
+	ScheduleFor   *time.Time
+	LastSaved     *time.Time
+	LastPublished *time.Time
 }
 
 func (schArticle *ScheduledArticle) toSPLData() interface{} {
@@ -61,10 +62,9 @@ func (schArticle *ScheduledArticle) toSPLData() interface{} {
 
 func (schArticle *ScheduledArticle) fromDB(dbArticle db.Article) error {
 	schArticle.ArcID = dbArticle.ArcID.String
-	if dbArticle.ScheduleFor.Valid {
-		t := dbArticle.ScheduleFor.Time
-		schArticle.ScheduleFor = &t
-	}
+	schArticle.ScheduleFor = timeNull(dbArticle.ScheduleFor)
+	schArticle.LastPublished = timeNull(dbArticle.LastPublished)
+	schArticle.filepath = dbArticle.SpotlightPAPath.String
 
 	if err := json.Unmarshal(dbArticle.SpotlightPAData, schArticle.toSPLData()); err != nil {
 		return err
@@ -96,8 +96,10 @@ func (schArticle *ScheduledArticle) toDB() (*db.Article, error) {
 	var dart db.Article
 
 	dart.ArcID = nullString(schArticle.ArcID)
-	dart.SpotlightPAPath = nullString(schArticle.ContentFilepath())
 	dart.ScheduleFor = nullTime(schArticle.ScheduleFor)
+	dart.LastPublished = nullTime(schArticle.LastPublished)
+	dart.SpotlightPAPath = nullString(schArticle.ContentFilepath())
+
 	var err error
 	if dart.SpotlightPAData, err = json.Marshal(schArticle.toSPLData()); err != nil {
 		return nil, err
