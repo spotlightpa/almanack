@@ -24,17 +24,17 @@ func nullTime(t *time.Time) sql.NullTime {
 }
 
 type Service struct {
-	ContentStore
 	Logger
 	Querier db.Querier
+	ContentStore
 }
 
-func (sas Service) GetScheduledArticle(ctx context.Context, articleID string) (*ScheduledArticle, error) {
+func (svc Service) GetScheduledArticle(ctx context.Context, articleID string) (*ScheduledArticle, error) {
 	start := time.Now()
-	dart, err := sas.Querier.GetArticle(ctx, nullString(articleID))
-	sas.Logger.Printf("queried GetArticle in %v", time.Since(start))
+	dart, err := svc.Querier.GetArticle(ctx, nullString(articleID))
+	svc.Logger.Printf("queried GetArticle in %v", time.Since(start))
 	if err != nil {
-		return nil, db.StandardizeErr(err)
+		return nil, db.ExpectNotFound(err)
 	}
 	var schArticle ScheduledArticle
 	if err = schArticle.fromDB(dart); err != nil {
@@ -43,12 +43,12 @@ func (sas Service) GetScheduledArticle(ctx context.Context, articleID string) (*
 	return &schArticle, nil
 }
 
-func (sas Service) SaveScheduledArticle(ctx context.Context, article *ScheduledArticle) error {
+func (svc Service) SaveScheduledArticle(ctx context.Context, article *ScheduledArticle) error {
 	// TODO: Make less racey
 	if article.ScheduleFor != nil &&
 		article.ScheduleFor.Before(time.Now().Add(5*time.Minute)) {
 		article.ScheduleFor = nil
-		if err := article.Publish(ctx, sas.ContentStore); err != nil {
+		if err := article.Publish(ctx, svc.ContentStore); err != nil {
 			return err
 		}
 	}
@@ -63,15 +63,14 @@ func (sas Service) SaveScheduledArticle(ctx context.Context, article *ScheduledA
 	}
 
 	start := time.Now()
-	*dart, err = sas.Querier.UpdateSpotlightPAArticle(ctx, db.UpdateSpotlightPAArticleParams{
+	*dart, err = svc.Querier.UpdateSpotlightPAArticle(ctx, db.UpdateSpotlightPAArticleParams{
 		ArcID:           dart.ArcID,
 		SpotlightPAData: dart.SpotlightPAData,
 		ScheduleFor:     dart.ScheduleFor,
 		SpotlightPAPath: dart.SpotlightPAPath,
 	})
-	sas.Logger.Printf("queried UpdateSpotlightPAArticle in %v", time.Since(start))
+	svc.Logger.Printf("queried UpdateSpotlightPAArticle in %v", time.Since(start))
 	if err != nil {
-		err = db.StandardizeErr(err)
 		return err
 	}
 
@@ -81,10 +80,10 @@ func (sas Service) SaveScheduledArticle(ctx context.Context, article *ScheduledA
 	return nil
 }
 
-func (sas Service) PopScheduledArticles(ctx context.Context, callback func([]*ScheduledArticle) error) error {
+func (svc Service) PopScheduledArticles(ctx context.Context, callback func([]*ScheduledArticle) error) error {
 	start := time.Now()
-	poppedArts, err := sas.Querier.PopScheduled(ctx)
-	sas.Logger.Printf("queried PopScheduled in %v", time.Since(start))
+	poppedArts, err := svc.Querier.PopScheduled(ctx)
+	svc.Logger.Printf("queried PopScheduled in %v", time.Since(start))
 	if err != nil {
 		return err
 	}
@@ -105,12 +104,12 @@ func (sas Service) PopScheduledArticles(ctx context.Context, callback func([]*Sc
 	return nil
 }
 
-func (fs Service) GetArcStory(ctx context.Context, articleID string) (story *ArcStory, err error) {
+func (svc Service) GetArcStory(ctx context.Context, articleID string) (story *ArcStory, err error) {
 	start := time.Now()
-	dart, err := fs.Querier.GetArticle(ctx, nullString(articleID))
-	fs.Printf("GetArticle query time: %v", time.Since(start))
+	dart, err := svc.Querier.GetArticle(ctx, nullString(articleID))
+	svc.Printf("GetArticle query time: %v", time.Since(start))
 	if err != nil {
-		err = db.StandardizeErr(err)
+		err = db.ExpectNotFound(err)
 		return
 	}
 	var newstory ArcStory
@@ -122,11 +121,11 @@ func (fs Service) GetArcStory(ctx context.Context, articleID string) (story *Arc
 
 }
 
-func (fs Service) GetAvailableFeed(ctx context.Context) (stories []ArcStory, err error) {
+func (svc Service) GetAvailableFeed(ctx context.Context) (stories []ArcStory, err error) {
 	start := time.Now()
 	var dbArts []db.Article
-	dbArts, err = fs.Querier.ListAvailableArticles(ctx)
-	fs.Printf("ListAvailableArticles query time: %v", time.Since(start))
+	dbArts, err = svc.Querier.ListAvailableArticles(ctx)
+	svc.Printf("ListAvailableArticles query time: %v", time.Since(start))
 	if err != nil {
 		return
 	}
@@ -139,16 +138,15 @@ func (fs Service) GetAvailableFeed(ctx context.Context) (stories []ArcStory, err
 	return
 }
 
-func (fs Service) SaveAlmanackArticle(ctx context.Context, article *ArcStory) error {
+func (svc Service) SaveAlmanackArticle(ctx context.Context, article *ArcStory) error {
 	start := time.Now()
-	dart, err := fs.Querier.UpdateAlmanackArticle(ctx, db.UpdateAlmanackArticleParams{
+	dart, err := svc.Querier.UpdateAlmanackArticle(ctx, db.UpdateAlmanackArticleParams{
 		ArcID:  nullString(article.ID),
 		Status: article.Status.dbstring(),
 		Note:   article.Note,
 	})
-	fs.Printf("UpdateAlmanackArticle query time: %v", time.Since(start))
+	svc.Printf("UpdateAlmanackArticle query time: %v", time.Since(start))
 	if err != nil {
-		err = db.StandardizeErr(err)
 		return err
 	}
 	if err = article.fromDB(&dart); err != nil {
@@ -158,14 +156,14 @@ func (fs Service) SaveAlmanackArticle(ctx context.Context, article *ArcStory) er
 	return nil
 }
 
-func (fs Service) StoreFeed(ctx context.Context, newfeed ArcAPI, update bool) (err error) {
+func (svc Service) StoreFeed(ctx context.Context, newfeed *ArcAPI, update bool) (err error) {
 	arcItems, err := json.Marshal(&newfeed.Contents)
 	if err != nil {
 		return err
 	}
 	start := time.Now()
-	dbarts, err := fs.Querier.UpdateArcArticles(ctx, arcItems)
-	fs.Printf("StoreFeed query time: %v", time.Since(start))
+	dbarts, err := svc.Querier.UpdateArcArticles(ctx, arcItems)
+	svc.Printf("StoreFeed query time: %v", time.Since(start))
 	if err != nil {
 		return
 	}

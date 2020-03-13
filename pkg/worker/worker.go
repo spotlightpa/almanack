@@ -94,8 +94,6 @@ Options:
 		return err
 	}
 
-	app.db = *pg
-
 	app.email = mailchimp.NewMailService(*mcAPIKey, *mcListID, app.Logger)
 
 	if gh, err := getGithub(app.Logger); err != nil {
@@ -104,6 +102,11 @@ Options:
 	} else {
 		app.gh = gh
 	}
+	app.svc = almanack.Service{
+		Querier:      *pg,
+		Logger:       app.Logger,
+		ContentStore: app.gh,
+	}
 
 	return nil
 }
@@ -111,8 +114,8 @@ Options:
 type appEnv struct {
 	srcFeedURL string
 	email      almanack.EmailService
+	svc        almanack.Service
 	gh         almanack.ContentStore
-	db         db.Querier
 	sc         slack.Client
 	*log.Logger
 }
@@ -131,20 +134,18 @@ func (app *appEnv) exec() error {
 func (app *appEnv) updateFeed() error {
 	app.Println("starting updateFeed")
 	if app.srcFeedURL == "" {
-		app.Println("aborting: no feed URL provided")
+		app.Println("aborting updateFeed: no feed URL provided")
 		return nil
 	}
+	ctx := context.Background()
+
 	app.Println("fetching", app.srcFeedURL)
 	var newfeed almanack.ArcAPI
-	if err := httpjson.Get(context.Background(), nil, app.srcFeedURL, &newfeed); err != nil {
+	if err := httpjson.Get(ctx, nil, app.srcFeedURL, &newfeed); err != nil {
 		return err
 	}
 
-	svc := almanack.Service{
-		Querier: app.db,
-		Logger:  app.Logger,
-	}
-	if err := svc.StoreFeed(context.Background(), newfeed, false); err != nil {
+	if err := app.svc.StoreFeed(ctx, &newfeed, false); err != nil {
 		return err
 	}
 
@@ -153,13 +154,9 @@ func (app *appEnv) updateFeed() error {
 
 func (app *appEnv) publishStories() error {
 	app.Println("starting publishStories")
-	sas := almanack.Service{
-		Querier: app.db,
-		Logger:  app.Logger,
-	}
 
 	ctx := context.Background()
-	return sas.PopScheduledArticles(ctx, func(articles []*almanack.ScheduledArticle) error {
+	return app.svc.PopScheduledArticles(ctx, func(articles []*almanack.ScheduledArticle) error {
 		for _, article := range articles {
 			if err := article.Publish(ctx, app.gh); err != nil {
 				return err

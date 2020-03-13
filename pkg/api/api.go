@@ -23,15 +23,12 @@ import (
 
 	"github.com/spotlightpa/almanack/internal/aws"
 	"github.com/spotlightpa/almanack/internal/db"
-	"github.com/spotlightpa/almanack/internal/filestore"
 	"github.com/spotlightpa/almanack/internal/github"
 	"github.com/spotlightpa/almanack/internal/herokuapi"
 	"github.com/spotlightpa/almanack/internal/httpcache"
 	"github.com/spotlightpa/almanack/internal/httpjson"
 	"github.com/spotlightpa/almanack/internal/mailchimp"
 	"github.com/spotlightpa/almanack/internal/netlifyid"
-	"github.com/spotlightpa/almanack/internal/redis"
-	"github.com/spotlightpa/almanack/internal/redisflag"
 	"github.com/spotlightpa/almanack/pkg/almanack"
 	"github.com/spotlightpa/almanack/pkg/errutil"
 )
@@ -60,8 +57,7 @@ func (app *appEnv) parseArgs(args []string) error {
 	fl.BoolVar(&app.isLambda, "lambda", false, "use AWS Lambda rather than HTTP")
 	fl.StringVar(&app.port, "port", ":3001", "listen on port (HTTP only)")
 	fl.StringVar(&app.mailchimpSignupURL, "mc-signup-url", "http://example.com", "`URL` to redirect users to for MailChimp signup")
-	getDialer := redisflag.Var(fl, "redis", "`URL` connection string for Redis")
-	checkHerokuRedis := herokuapi.FlagVar(fl, "redis")
+	checkHerokuPG := herokuapi.FlagVar(fl, "postgres")
 	app.Logger = log.New(nil, AppName+" ", log.LstdFlags)
 	fl.Var(
 		flagext.Logger(app.Logger, flagext.LogSilent),
@@ -84,28 +80,17 @@ func (app *appEnv) parseArgs(args []string) error {
 		return err
 	}
 
-	app.db = *pg
-
 	if err := app.initSentry(*sentryDSN); err != nil {
 		return err
 	}
 
-	// Get Redis URL from Heroku if possible, else get it from config, else use files
-	if usedHeroku, err := checkHerokuRedis(); err != nil {
+	// Get PostgreSQL URL from Heroku if possible, else get it from flag
+	if usedHeroku, err := checkHerokuPG(); err != nil {
 		return err
 	} else if usedHeroku {
 		app.Logger.Printf("got credentials from Heroku")
-	}
-
-	if d := getDialer(); d != nil {
-		app.Logger.Printf("got Redis URL")
-		var err error
-		if app.store, err = redis.New(d, app.Logger); err != nil {
-			return err
-		}
 	} else {
-		app.Logger.Printf("using filestore")
-		app.store = filestore.New("", "almanack", app.Logger)
+		app.Logger.Printf("did not get credentials Heroku")
 	}
 
 	app.email = mailchimp.NewMailService(*mcAPIKey, *mcListID, app.Logger)
@@ -121,6 +106,12 @@ func (app *appEnv) parseArgs(args []string) error {
 	} else {
 		app.gh = gh
 	}
+	app.svc = almanack.Service{
+		Querier:      *pg,
+		Logger:       app.Logger,
+		ContentStore: app.gh,
+	}
+
 	return nil
 }
 
@@ -132,10 +123,9 @@ type appEnv struct {
 	c                  *http.Client
 	auth               almanack.AuthService
 	gh                 almanack.ContentStore
-	store              almanack.DataStore
 	imageStore         almanack.ImageStore
 	email              almanack.EmailService
-	db                 db.Querier
+	svc                almanack.Service
 	*log.Logger
 }
 
@@ -281,11 +271,7 @@ func (app *appEnv) listUpcoming(w http.ResponseWriter, r *http.Request) {
 		app.errorResponse(r.Context(), w, err)
 		return
 	}
-	svc := almanack.Service{
-		Querier: app.db,
-		Logger:  app.Logger,
-	}
-	if err := svc.StoreFeed(r.Context(), feed, true); err != nil {
+	if err := app.svc.StoreFeed(r.Context(), &feed, true); err != nil {
 		app.errorResponse(r.Context(), w, err)
 		return
 	}
@@ -302,8 +288,7 @@ func (app *appEnv) postAvailable(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	arcsvc := almanack.Service{Querier: app.db, Logger: app.Logger}
-	if err := arcsvc.SaveAlmanackArticle(r.Context(), &userData); err != nil {
+	if err := app.svc.SaveAlmanackArticle(r.Context(), &userData); err != nil {
 		app.errorResponse(r.Context(), w, err)
 		return
 	}
@@ -319,11 +304,7 @@ func (app *appEnv) listAvailable(w http.ResponseWriter, r *http.Request) {
 		res response
 		err error
 	)
-	arcsvc := almanack.Service{
-		Querier: app.db,
-		Logger:  app.Logger,
-	}
-	if res.Contents, err = arcsvc.GetAvailableFeed(r.Context()); err != nil {
+	if res.Contents, err = app.svc.GetAvailableFeed(r.Context()); err != nil {
 		app.errorResponse(r.Context(), w, err)
 		return
 	}
@@ -335,12 +316,7 @@ func (app *appEnv) getAvailable(w http.ResponseWriter, r *http.Request) {
 	articleID := chi.URLParam(r, "id")
 	app.Printf("starting getAvailable %s", articleID)
 
-	arcsvc := almanack.Service{
-		Querier: app.db,
-		Logger:  app.Logger,
-	}
-
-	article, err := arcsvc.GetArcStory(r.Context(), articleID)
+	article, err := app.svc.GetArcStory(r.Context(), articleID)
 	if err != nil {
 		app.errorResponse(r.Context(), w, err)
 		return
@@ -380,12 +356,7 @@ func (app *appEnv) getScheduledArticle(w http.ResponseWriter, r *http.Request) {
 	articleID := chi.URLParam(r, "id")
 	app.Printf("start getScheduledArticle %s", articleID)
 
-	sas := almanack.Service{
-		Querier: app.db,
-		Logger:  app.Logger,
-	}
-
-	article, err := sas.GetScheduledArticle(r.Context(), articleID)
+	article, err := app.svc.GetScheduledArticle(r.Context(), articleID)
 	if err != nil {
 		app.errorResponse(r.Context(), w, err)
 		return
@@ -414,13 +385,7 @@ func (app *appEnv) postScheduledArticle(w http.ResponseWriter, r *http.Request) 
 		}
 	}
 
-	sas := almanack.Service{
-		Logger:       app.Logger,
-		ContentStore: app.gh,
-		Querier:      app.db,
-	}
-
-	if err := sas.SaveScheduledArticle(r.Context(), &userData); err != nil {
+	if err := app.svc.SaveScheduledArticle(r.Context(), &userData); err != nil {
 		app.errorResponse(r.Context(), w, err)
 		return
 	}

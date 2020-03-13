@@ -10,6 +10,7 @@ import (
 
 func (content ArcStory) ToArticle() (*Article, error) {
 	authors := make([]string, len(content.Credits.By))
+	// TODO: Whatever is done in Vue
 	for i := range content.Credits.By {
 		authors[i] = content.Credits.By[i].Name
 	}
@@ -112,6 +113,7 @@ func readContentElements(rawels []*json.RawMessage, body *strings.Builder) error
 			for _, c := range v.Credits.By {
 				credits = append(credits, c.Name)
 			}
+			// TODO: Use {{<picture>}}
 			graf = fmt.Sprintf("## Image:\n\n%s\n\n%s (%s)\n",
 				v.URL, v.Caption, strings.Join(credits, " "),
 			)
