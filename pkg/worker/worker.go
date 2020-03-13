@@ -144,7 +144,7 @@ func (app *appEnv) updateFeed() error {
 		Querier: app.db,
 		Logger:  app.Logger,
 	}
-	if err := svc.StoreFeed(context.Background(), newfeed); err != nil {
+	if err := svc.StoreFeed(context.Background(), newfeed, false); err != nil {
 		return err
 	}
 

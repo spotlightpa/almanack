@@ -41,14 +41,27 @@ func (fs FeedService) SaveSupplements(article *ArcStory) error {
 	return nil
 }
 
-func (fs FeedService) StoreFeed(ctx context.Context, newfeed ArcAPI) (err error) {
+func (fs FeedService) StoreFeed(ctx context.Context, newfeed ArcAPI, update bool) (err error) {
 	arcItems, err := json.Marshal(&newfeed.Contents)
 	if err != nil {
 		return err
 	}
 	start := time.Now()
-	_, err = fs.Querier.UpdateArcArticles(ctx, arcItems)
+	dbarts, err := fs.Querier.UpdateArcArticles(ctx, arcItems)
 	fs.Printf("arcjson.StoreFeed query time: %v", time.Since(start))
+	if err != nil {
+		return
+	}
+	if update {
+		newfeed.Contents = newfeed.Contents[:0]
+		for i := range dbarts {
+			var story ArcStory
+			if err = story.fromDB(&dbarts[i]); err != nil {
+				return err
+			}
+			newfeed.Contents = append(newfeed.Contents, story)
+		}
+	}
 	return
 }
 
