@@ -149,7 +149,7 @@ func (app *appEnv) updateFeed() error {
 		return err
 	}
 
-	if err := app.svc.StoreFeed(ctx, &newfeed, false); err != nil {
+	if err := app.svc.StoreFeed(ctx, &newfeed); err != nil {
 		return err
 	}
 

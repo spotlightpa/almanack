@@ -269,16 +269,15 @@ func (app *appEnv) hasRoleMiddleware(role string) func(next http.Handler) http.H
 func (app *appEnv) listUpcoming(w http.ResponseWriter, r *http.Request) {
 	app.Println("start listUpcoming")
 
-	var feed almanack.ArcAPI
-	if err := httpjson.Get(r.Context(), app.c, app.srcFeedURL, &feed); err != nil {
+	var (
+		feed almanack.ArcAPI
+		err  error
+	)
+	feed.Contents, err = app.svc.ListAllArticles(r.Context())
+	if err != nil {
 		app.errorResponse(r.Context(), w, err)
 		return
 	}
-	if err := app.svc.StoreFeed(r.Context(), &feed, true); err != nil {
-		app.errorResponse(r.Context(), w, err)
-		return
-	}
-
 	app.jsonResponse(http.StatusOK, w, feed)
 }
 

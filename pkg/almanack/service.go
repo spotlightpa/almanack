@@ -137,13 +137,8 @@ func (svc Service) GetAvailableFeed(ctx context.Context) (stories []ArcStory, er
 	if err != nil {
 		return
 	}
-	stories = make([]ArcStory, len(dbArts))
-	for i := range stories {
-		if err = stories[i].fromDB(&dbArts[i]); err != nil {
-			return
-		}
-	}
-	return
+
+	return storiesFromDB(dbArts)
 }
 
 func (svc Service) SaveAlmanackArticle(ctx context.Context, article *ArcStory) error {
@@ -164,26 +159,25 @@ func (svc Service) SaveAlmanackArticle(ctx context.Context, article *ArcStory) e
 	return nil
 }
 
-func (svc Service) StoreFeed(ctx context.Context, newfeed *ArcAPI, update bool) (err error) {
+func (svc Service) StoreFeed(ctx context.Context, newfeed *ArcAPI) (err error) {
 	arcItems, err := json.Marshal(&newfeed.Contents)
 	if err != nil {
 		return err
 	}
 	start := time.Now()
-	dbarts, err := svc.Querier.UpdateArcArticles(ctx, arcItems)
+	err = svc.Querier.UpdateArcArticles(ctx, arcItems)
 	svc.Printf("StoreFeed query time: %v", time.Since(start))
+	return err
+}
+
+func (svc Service) ListAllArticles(ctx context.Context) (stories []ArcStory, err error) {
+	start := time.Now()
+	var dbArts []db.Article
+	dbArts, err = svc.Querier.ListAllArticles(ctx)
+	svc.Printf("ListAllArticles query time: %v", time.Since(start))
 	if err != nil {
 		return
 	}
-	if update {
-		newfeed.Contents = newfeed.Contents[:0]
-		for i := range dbarts {
-			var story ArcStory
-			if err = story.fromDB(&dbarts[i]); err != nil {
-				return err
-			}
-			newfeed.Contents = append(newfeed.Contents, story)
-		}
-	}
-	return
+
+	return storiesFromDB(dbArts)
 }
