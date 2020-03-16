@@ -22,9 +22,21 @@ export default {
       isMakingPlanned: false,
       isMakingAvailable: false,
       isRemoving: false,
+      isRefreshing: false,
     });
 
     let showComposer = ref(false);
+
+    async function refreshArc() {
+      apiStatus.isRefreshing = true;
+      let data;
+      [data, apiStatus.error] = await client.refreshArc(props.article.id);
+      apiStatus.isRefreshing = false;
+      if (apiStatus.error) {
+        return;
+      }
+      props.article.init(data);
+    }
 
     async function updateArticle(ref) {
       apiStatus[ref] = true;
@@ -60,6 +72,7 @@ export default {
         props.article.unsetStatus();
         await updateArticle("isRemoving");
       },
+      refreshArc,
     };
   },
 };
@@ -144,6 +157,21 @@ export default {
           Remove from Almanack
         </span>
       </button>
+      <button
+        v-if="article.isAvailable"
+        type="button"
+        class="button is-light has-text-weight-semibold"
+        :class="{ 'is-loading': isRefreshing }"
+        @click="refreshArc"
+      >
+        <span class="icon">
+          <font-awesome-icon :icon="['fas', 'sync-alt']" />
+        </span>
+        <span>
+          Refresh Arc Data
+        </span>
+      </button>
+
       <button
         type="button"
         class="button is-primary has-text-weight-semibold"
