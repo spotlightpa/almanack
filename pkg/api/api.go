@@ -179,6 +179,7 @@ func (app *appEnv) routes() http.Handler {
 			app.hasRoleMiddleware("Spotlight PA"),
 		).Group(func(r chi.Router) {
 			r.Get("/upcoming-articles", app.listUpcoming)
+			r.Post("/refresh-arc/{id}", app.postRefreshArc)
 			r.Post("/available-articles", app.postAvailable)
 			r.Post("/message", app.postMessage)
 			r.Get("/scheduled-articles/{id}", app.getScheduledArticle)
@@ -279,6 +280,34 @@ func (app *appEnv) listUpcoming(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	app.jsonResponse(http.StatusOK, w, feed)
+}
+
+func (app *appEnv) postRefreshArc(w http.ResponseWriter, r *http.Request) {
+	articleID := chi.URLParam(r, "id")
+	app.Printf("starting postRefreshArc %s", articleID)
+
+	var feed almanack.ArcAPI
+	if err := httpjson.Get(r.Context(), app.c, app.srcFeedURL, &feed); err != nil {
+		app.errorResponse(r.Context(), w, err)
+		return
+	}
+	var story *almanack.ArcStory
+	for i := range feed.Contents {
+		if feed.Contents[i].ID == articleID {
+			story = &feed.Contents[i]
+		}
+	}
+	if story == nil {
+		app.errorResponse(r.Context(), w, errutil.NotFound)
+		return
+	}
+	art, err := app.svc.UpdateArcArticle(r.Context(), articleID, story)
+	if err != nil {
+		app.errorResponse(r.Context(), w, err)
+		return
+	}
+
+	app.jsonResponse(http.StatusOK, w, art)
 }
 
 func (app *appEnv) postAvailable(w http.ResponseWriter, r *http.Request) {
