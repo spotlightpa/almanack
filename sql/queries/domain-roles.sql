@@ -4,7 +4,7 @@ SELECT
 FROM
     domain_roles
 WHERE
-    domain LIKE $1;
+    domain ILIKE $1;
 
 -- name: SetRolesForDomain :one
 INSERT INTO domain_roles (domain, roles)

@@ -15,7 +15,7 @@ SELECT
 FROM
     domain_roles
 WHERE
-    domain LIKE $1
+    domain ILIKE $1
 `
 
 func (q *Queries) GetRolesForDomain(ctx context.Context, domain string) ([]string, error) {
