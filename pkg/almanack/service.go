@@ -181,3 +181,24 @@ func (svc Service) ListAllArticles(ctx context.Context) (stories []ArcStory, err
 
 	return storiesFromDB(dbArts)
 }
+
+func (svc Service) UpdateArcArticle(ctx context.Context, articleID string, story *ArcStory) (*ArcStory, error) {
+	arcStory, err := json.Marshal(story)
+	if err != nil {
+		return nil, err
+	}
+	start := time.Now()
+	dart, err := svc.Querier.UpdateArcArticle(ctx, db.UpdateArcArticleParams{
+		ArcID:   nullString(articleID),
+		ArcData: arcStory,
+	})
+	svc.Printf("UpdateArcArticle query time: %v", time.Since(start))
+	if err != nil {
+		return nil, err
+	}
+	var s ArcStory
+	if err = s.fromDB(&dart); err != nil {
+		return nil, err
+	}
+	return &s, nil
+}
