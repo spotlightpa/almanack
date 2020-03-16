@@ -261,7 +261,42 @@ func (q *Queries) UpdateAlmanackArticle(ctx context.Context, arg UpdateAlmanackA
 	return i, err
 }
 
-const updateArcArticles = `-- name: UpdateArcArticles :many
+const updateArcArticle = `-- name: UpdateArcArticle :one
+UPDATE
+    article
+SET
+    arc_data = $2
+WHERE
+    arc_id = $1
+RETURNING
+    id, arc_id, arc_data, spotlightpa_path, spotlightpa_data, schedule_for, last_published, note, status, created_at, updated_at
+`
+
+type UpdateArcArticleParams struct {
+	ArcID   sql.NullString  `json:"arc_id"`
+	ArcData json.RawMessage `json:"arc_data"`
+}
+
+func (q *Queries) UpdateArcArticle(ctx context.Context, arg UpdateArcArticleParams) (Article, error) {
+	row := q.db.QueryRowContext(ctx, updateArcArticle, arg.ArcID, arg.ArcData)
+	var i Article
+	err := row.Scan(
+		&i.ID,
+		&i.ArcID,
+		&i.ArcData,
+		&i.SpotlightPAPath,
+		&i.SpotlightPAData,
+		&i.ScheduleFor,
+		&i.LastPublished,
+		&i.Note,
+		&i.Status,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+	)
+	return i, err
+}
+
+const updateArcArticles = `-- name: UpdateArcArticles :exec
 WITH arc_table AS (
     SELECT
         jsonb_array_elements($1::jsonb) AS article_data)
@@ -274,43 +309,13 @@ FROM
 ON CONFLICT (arc_id)
     DO UPDATE SET
         arc_data = excluded.arc_data
-RETURNING
-    id, arc_id, arc_data, spotlightpa_path, spotlightpa_data, schedule_for, last_published, note, status, created_at, updated_at
+    WHERE
+        article.status <> 'A'
 `
 
-func (q *Queries) UpdateArcArticles(ctx context.Context, arcItems json.RawMessage) ([]Article, error) {
-	rows, err := q.db.QueryContext(ctx, updateArcArticles, arcItems)
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-	var items []Article
-	for rows.Next() {
-		var i Article
-		if err := rows.Scan(
-			&i.ID,
-			&i.ArcID,
-			&i.ArcData,
-			&i.SpotlightPAPath,
-			&i.SpotlightPAData,
-			&i.ScheduleFor,
-			&i.LastPublished,
-			&i.Note,
-			&i.Status,
-			&i.CreatedAt,
-			&i.UpdatedAt,
-		); err != nil {
-			return nil, err
-		}
-		items = append(items, i)
-	}
-	if err := rows.Close(); err != nil {
-		return nil, err
-	}
-	if err := rows.Err(); err != nil {
-		return nil, err
-	}
-	return items, nil
+func (q *Queries) UpdateArcArticles(ctx context.Context, arcItems json.RawMessage) error {
+	_, err := q.db.ExecContext(ctx, updateArcArticles, arcItems)
+	return err
 }
 
 const updateSpotlightPAArticle = `-- name: UpdateSpotlightPAArticle :one

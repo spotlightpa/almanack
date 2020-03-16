@@ -1,4 +1,4 @@
--- name: UpdateArcArticles :many
+-- name: UpdateArcArticles :exec
 WITH arc_table AS (
     SELECT
         jsonb_array_elements(@arc_items::jsonb) AS article_data)
@@ -11,6 +11,16 @@ FROM
 ON CONFLICT (arc_id)
     DO UPDATE SET
         arc_data = excluded.arc_data
+    WHERE
+        article.status <> 'A';
+
+-- name: UpdateArcArticle :one
+UPDATE
+    article
+SET
+    arc_data = $2
+WHERE
+    arc_id = $1
 RETURNING
     *;
 

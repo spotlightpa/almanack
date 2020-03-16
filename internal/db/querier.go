@@ -17,7 +17,8 @@ type Querier interface {
 	PopScheduled(ctx context.Context) ([]Article, error)
 	SetRolesForDomain(ctx context.Context, arg SetRolesForDomainParams) (DomainRole, error)
 	UpdateAlmanackArticle(ctx context.Context, arg UpdateAlmanackArticleParams) (Article, error)
-	UpdateArcArticles(ctx context.Context, arcItems json.RawMessage) ([]Article, error)
+	UpdateArcArticle(ctx context.Context, arg UpdateArcArticleParams) (Article, error)
+	UpdateArcArticles(ctx context.Context, arcItems json.RawMessage) error
 	UpdateSpotlightPAArticle(ctx context.Context, arg UpdateSpotlightPAArticleParams) (Article, error)
 }
 

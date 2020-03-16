@@ -71,6 +71,16 @@ func (story *ArcStory) fromDB(dart *db.Article) error {
 	return nil
 }
 
+func storiesFromDB(dbArts []db.Article) ([]ArcStory, error) {
+	stories := make([]ArcStory, len(dbArts))
+	for i := range stories {
+		if err := stories[i].fromDB(&dbArts[i]); err != nil {
+			return nil, err
+		}
+	}
+	return stories, nil
+}
+
 type Status int8
 
 const (
