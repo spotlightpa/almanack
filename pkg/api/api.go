@@ -410,13 +410,12 @@ func (app *appEnv) postScheduledArticle(w http.ResponseWriter, r *http.Request) 
 			app.errorResponse(r.Context(), w, err)
 			return
 		}
-	}
-
-	if strings.HasPrefix(userData.ImageURL, "http") {
+	} else if strings.HasPrefix(userData.ImageURL, "http") {
 		if imageurl, err := almanack.UploadFromURL(
 			r.Context(), app.c, app.imageStore, userData.ImageURL,
 		); err != nil {
 			// Keep trucking, but don't publish
+			app.Printf("could not upload image: %v", err)
 			userData.ImageURL = ""
 			userData.ScheduleFor = nil
 		} else {

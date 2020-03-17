@@ -140,19 +140,25 @@ export default class ScheduledArticle {
       this.saveError.name = "Validation Error";
       return false;
     }
+    if (!this.imageURL) {
+      this.saveError = new Error("Featured image must not be blank");
+      this.saveError.name = "Featured image error";
+      return false;
+    }
     return true;
   }
 
   async save({ schedule = null, refresh_arc = false }) {
-    if (!this.validate()) {
-      return;
-    }
-    this.isSaving = true;
     if (schedule) {
       this.scheduleFor = this.pubDate;
     } else if (schedule !== null) {
       this.scheduleFor = null;
     }
+    if (this.scheduleFor && !this.validate() && !refresh_arc) {
+      alert("no");
+      return;
+    }
+    this.isSaving = true;
     this._refresh_arc = refresh_arc;
 
     let data;
@@ -161,6 +167,7 @@ export default class ScheduledArticle {
     this._refresh_arc = false;
     if (!this.saveError) {
       this.init(data);
+      this.validate();
     }
   }
 }
