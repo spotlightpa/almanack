@@ -396,10 +396,20 @@ func (app *appEnv) getScheduledArticle(w http.ResponseWriter, r *http.Request) {
 func (app *appEnv) postScheduledArticle(w http.ResponseWriter, r *http.Request) {
 	app.Println("start postScheduledArticle")
 
-	var userData almanack.SpotlightPAArticle
+	var userData struct {
+		almanack.SpotlightPAArticle
+		RefreshArc bool `json:"almanack-refresh-arc"`
+	}
 	if err := httpjson.DecodeRequest(w, r, &userData); err != nil {
 		app.errorResponse(r.Context(), w, err)
 		return
+	}
+
+	if userData.RefreshArc {
+		if err := app.svc.ResetSpotlightPAArticleArcData(r.Context(), &userData.SpotlightPAArticle); err != nil {
+			app.errorResponse(r.Context(), w, err)
+			return
+		}
 	}
 
 	if strings.HasPrefix(userData.ImageURL, "http") {
@@ -414,12 +424,12 @@ func (app *appEnv) postScheduledArticle(w http.ResponseWriter, r *http.Request) 
 		}
 	}
 
-	if err := app.svc.SaveScheduledArticle(r.Context(), &userData); err != nil {
+	if err := app.svc.SaveScheduledArticle(r.Context(), &userData.SpotlightPAArticle); err != nil {
 		app.errorResponse(r.Context(), w, err)
 		return
 	}
 
-	app.jsonResponse(http.StatusAccepted, w, &userData)
+	app.jsonResponse(http.StatusAccepted, w, &userData.SpotlightPAArticle)
 }
 
 func (app *appEnv) getSignedUpload(w http.ResponseWriter, r *http.Request) {
