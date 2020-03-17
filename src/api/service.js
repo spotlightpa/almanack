@@ -19,7 +19,6 @@ export const endpoints = {
   scheduleArticle: `/api/scheduled-articles`,
   getSignedUpload: `/api/get-signed-upload`,
   getSignupURL: `/api/mailchimp-signup-url`,
-  postRefreshArc: id => `/api/refresh-arc/${id}`,
 };
 
 export function makeClient($auth) {
@@ -121,11 +120,6 @@ export function makeClient($auth) {
     },
     async getSignupURL() {
       return await tryTo(request(endpoints.getSignupURL));
-    },
-    async refreshArc(id) {
-      return await tryTo(
-        request(endpoints.postRefreshArc(id), { method: "POST" })
-      );
     },
   };
 }

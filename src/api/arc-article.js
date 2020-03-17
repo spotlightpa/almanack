@@ -73,6 +73,7 @@ export default class ArcArticle {
       this[key] = this.getProp(val);
     }
     this._almanackStatus = this.getProp("almanack-status", { fallback: 0 });
+    this._refreshArcStatus = false;
   }
 
   getProp(pathStr, { fallback = null } = {}) {
@@ -84,6 +85,7 @@ export default class ArcArticle {
       _id: this.id,
       "almanack-status": this._almanackStatus,
       "almanack-note": this.note,
+      "almanack-refresh-arc": this._refreshArcStatus,
     };
   }
 
@@ -98,6 +100,10 @@ export default class ArcArticle {
       return "";
     }
     return slug.slice(start + 1, stop);
+  }
+
+  setRefreshArc() {
+    this._refreshArcStatus = true;
   }
 
   unsetStatus() {

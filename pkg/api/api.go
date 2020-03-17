@@ -179,7 +179,6 @@ func (app *appEnv) routes() http.Handler {
 			app.hasRoleMiddleware("Spotlight PA"),
 		).Group(func(r chi.Router) {
 			r.Get("/upcoming-articles", app.listUpcoming)
-			r.Post("/refresh-arc/{id}", app.postRefreshArc)
 			r.Post("/available-articles", app.postAvailable)
 			r.Post("/message", app.postMessage)
 			r.Get("/scheduled-articles/{id}", app.getScheduledArticle)
@@ -282,44 +281,42 @@ func (app *appEnv) listUpcoming(w http.ResponseWriter, r *http.Request) {
 	app.jsonResponse(http.StatusOK, w, feed)
 }
 
-func (app *appEnv) postRefreshArc(w http.ResponseWriter, r *http.Request) {
-	articleID := chi.URLParam(r, "id")
-	app.Printf("starting postRefreshArc %s", articleID)
-
-	var feed almanack.ArcAPI
-	if err := httpjson.Get(r.Context(), app.c, app.srcFeedURL, &feed); err != nil {
-		app.errorResponse(r.Context(), w, err)
-		return
-	}
-	var story *almanack.ArcStory
-	for i := range feed.Contents {
-		if feed.Contents[i].ID == articleID {
-			story = &feed.Contents[i]
-		}
-	}
-	if story == nil {
-		app.errorResponse(r.Context(), w, errutil.NotFound)
-		return
-	}
-	art, err := app.svc.UpdateArcArticle(r.Context(), articleID, story)
-	if err != nil {
-		app.errorResponse(r.Context(), w, err)
-		return
-	}
-
-	app.jsonResponse(http.StatusOK, w, art)
-}
-
 func (app *appEnv) postAvailable(w http.ResponseWriter, r *http.Request) {
 	app.Printf("starting postAvailable")
 
-	var userData almanack.ArcStory
+	var userData struct {
+		ID         string          `json:"_id"`
+		Note       string          `json:"almanack-note,omitempty"`
+		Status     almanack.Status `json:"almanack-status,omitempty"`
+		RefreshArc bool            `json:"almanack-refresh-arc"`
+	}
 	if err := httpjson.DecodeRequest(w, r, &userData); err != nil {
 		app.errorResponse(r.Context(), w, err)
 		return
 	}
 
-	if err := app.svc.SaveAlmanackArticle(r.Context(), &userData); err != nil {
+	var story almanack.ArcStory
+	if userData.RefreshArc {
+		var feed almanack.ArcAPI
+		if err := httpjson.Get(r.Context(), app.c, app.srcFeedURL, &feed); err != nil {
+			app.errorResponse(r.Context(), w, err)
+			return
+		}
+		if err := app.svc.StoreFeed(r.Context(), &feed); err != nil {
+			app.errorResponse(r.Context(), w, err)
+			return
+		}
+		for i := range feed.Contents {
+			if feed.Contents[i].ID == userData.ID {
+				story = feed.Contents[i]
+			}
+		}
+	}
+	story.ID = userData.ID
+	story.Note = userData.Note
+	story.Status = userData.Status
+
+	if err := app.svc.SaveAlmanackArticle(r.Context(), &story, userData.RefreshArc); err != nil {
 		app.errorResponse(r.Context(), w, err)
 		return
 	}

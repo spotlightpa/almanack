@@ -141,12 +141,23 @@ func (svc Service) GetAvailableFeed(ctx context.Context) (stories []ArcStory, er
 	return storiesFromDB(dbArts)
 }
 
-func (svc Service) SaveAlmanackArticle(ctx context.Context, article *ArcStory) error {
+func (svc Service) SaveAlmanackArticle(ctx context.Context, article *ArcStory, setArcData bool) error {
+	var (
+		arcData = json.RawMessage("{}")
+		err     error
+	)
+	if setArcData {
+		if arcData, err = json.Marshal(article); err != nil {
+			return err
+		}
+	}
 	start := time.Now()
 	dart, err := svc.Querier.UpdateAlmanackArticle(ctx, db.UpdateAlmanackArticleParams{
-		ArcID:  nullString(article.ID),
-		Status: article.Status.dbstring(),
-		Note:   article.Note,
+		ArcID:      nullString(article.ID),
+		Status:     article.Status.dbstring(),
+		Note:       article.Note,
+		SetArcData: setArcData,
+		ArcData:    arcData,
 	})
 	svc.Printf("UpdateAlmanackArticle query time: %v", time.Since(start))
 	if err != nil {
@@ -180,25 +191,4 @@ func (svc Service) ListAllArticles(ctx context.Context) (stories []ArcStory, err
 	}
 
 	return storiesFromDB(dbArts)
-}
-
-func (svc Service) UpdateArcArticle(ctx context.Context, articleID string, story *ArcStory) (*ArcStory, error) {
-	arcStory, err := json.Marshal(story)
-	if err != nil {
-		return nil, err
-	}
-	start := time.Now()
-	dart, err := svc.Querier.UpdateArcArticle(ctx, db.UpdateArcArticleParams{
-		ArcID:   nullString(articleID),
-		ArcData: arcStory,
-	})
-	svc.Printf("UpdateArcArticle query time: %v", time.Since(start))
-	if err != nil {
-		return nil, err
-	}
-	var s ArcStory
-	if err = s.fromDB(&dart); err != nil {
-		return nil, err
-	}
-	return &s, nil
 }
