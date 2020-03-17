@@ -186,6 +186,7 @@ func (app *appEnv) routes() http.Handler {
 			r.Post("/get-signed-upload", app.getSignedUpload)
 		})
 	})
+	r.NotFound(app.notFound)
 
 	sentryHandler := sentryhttp.New(sentryhttp.Options{})
 	return sentryHandler.Handle(r)
@@ -219,6 +220,14 @@ func (app *appEnv) logErr(ctx context.Context, err error) {
 	}
 
 	app.Printf("err: %v", err)
+}
+
+func (app *appEnv) notFound(w http.ResponseWriter, r *http.Request) {
+	app.errorResponse(r.Context(), w, errutil.Response{
+		StatusCode: http.StatusNotFound,
+		Message:    http.StatusText(http.StatusNotFound),
+		Log:        fmt.Sprintf("path not found: %s", r.URL.Path),
+	})
 }
 
 func (app *appEnv) ping(w http.ResponseWriter, r *http.Request) {
