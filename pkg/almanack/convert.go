@@ -10,9 +10,8 @@ import (
 
 func (arcStory *ArcStory) ToArticle(article *SpotlightPAArticle) error {
 	authors := make([]string, len(arcStory.Credits.By))
-	// TODO: Whatever is done in Vue
 	for i := range arcStory.Credits.By {
-		authors[i] = arcStory.Credits.By[i].Name
+		authors[i] = authorFrom(&arcStory.Credits.By[i])
 	}
 	var body strings.Builder
 	if err := readContentElements(arcStory.ContentElements, &body); err != nil {
@@ -34,6 +33,23 @@ func (arcStory *ArcStory) ToArticle(article *SpotlightPAArticle) error {
 
 	setArticleImage(article, arcStory.PromoItems)
 	return nil
+}
+
+// Must keep in sync with Vue's ArcArticle.authors
+func authorFrom(by *By) string {
+	byline := by.AdditionalProperties.Original.Byline
+	if byline != "" {
+		return byline
+	}
+	byline = by.Name
+	// Hack for bad names with orgs in them
+	if strings.Contains(byline, " of ") {
+		return byline
+	}
+	if org := strings.TrimSpace(by.Org); org != "" {
+		return byline + " of " + org
+	}
+	return byline
 }
 
 func slugFromURL(s string) string {
