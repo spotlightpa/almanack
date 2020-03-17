@@ -27,17 +27,6 @@ export default {
 
     let showComposer = ref(false);
 
-    async function refreshArc() {
-      apiStatus.isRefreshing = true;
-      let data;
-      [data, apiStatus.error] = await client.refreshArc(props.article.id);
-      apiStatus.isRefreshing = false;
-      if (apiStatus.error) {
-        return;
-      }
-      props.article.init(data);
-    }
-
     async function updateArticle(ref) {
       apiStatus[ref] = true;
       [, apiStatus.error] = await client.postAvailable(props.article);
@@ -72,7 +61,10 @@ export default {
         props.article.unsetStatus();
         await updateArticle("isRemoving");
       },
-      refreshArc,
+      async refreshArc() {
+        props.article.setRefreshArc();
+        await updateArticle("isRefreshing");
+      },
     };
   },
 };

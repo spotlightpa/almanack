@@ -14,24 +14,18 @@ ON CONFLICT (arc_id)
     WHERE
         article.status <> 'A';
 
--- name: UpdateArcArticle :one
-UPDATE
-    article
-SET
-    arc_data = $2
-WHERE
-    arc_id = $1
-RETURNING
-    *;
-
 -- name: UpdateAlmanackArticle :one
 UPDATE
     article
 SET
-    status = $2,
-    note = $3
+    status = @status,
+    note = @note,
+    arc_data = CASE WHEN @set_arc_data::bool
+    THEN @arc_data::jsonb
+    ELSE arc_data
+    END
 WHERE
-    arc_id = $1
+    arc_id = @arc_id
 RETURNING
     *;
 

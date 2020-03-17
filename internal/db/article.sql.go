@@ -228,57 +228,34 @@ const updateAlmanackArticle = `-- name: UpdateAlmanackArticle :one
 UPDATE
     article
 SET
-    status = $2,
-    note = $3
+    status = $1,
+    note = $2,
+    arc_data = CASE WHEN $3::bool
+    THEN $4::jsonb
+    ELSE arc_data
+    END
 WHERE
-    arc_id = $1
+    arc_id = $5
 RETURNING
     id, arc_id, arc_data, spotlightpa_path, spotlightpa_data, schedule_for, last_published, note, status, created_at, updated_at
 `
 
 type UpdateAlmanackArticleParams struct {
-	ArcID  sql.NullString `json:"arc_id"`
-	Status string         `json:"status"`
-	Note   string         `json:"note"`
+	Status     string          `json:"status"`
+	Note       string          `json:"note"`
+	SetArcData bool            `json:"set_arc_data"`
+	ArcData    json.RawMessage `json:"arc_data"`
+	ArcID      sql.NullString  `json:"arc_id"`
 }
 
 func (q *Queries) UpdateAlmanackArticle(ctx context.Context, arg UpdateAlmanackArticleParams) (Article, error) {
-	row := q.db.QueryRowContext(ctx, updateAlmanackArticle, arg.ArcID, arg.Status, arg.Note)
-	var i Article
-	err := row.Scan(
-		&i.ID,
-		&i.ArcID,
-		&i.ArcData,
-		&i.SpotlightPAPath,
-		&i.SpotlightPAData,
-		&i.ScheduleFor,
-		&i.LastPublished,
-		&i.Note,
-		&i.Status,
-		&i.CreatedAt,
-		&i.UpdatedAt,
+	row := q.db.QueryRowContext(ctx, updateAlmanackArticle,
+		arg.Status,
+		arg.Note,
+		arg.SetArcData,
+		arg.ArcData,
+		arg.ArcID,
 	)
-	return i, err
-}
-
-const updateArcArticle = `-- name: UpdateArcArticle :one
-UPDATE
-    article
-SET
-    arc_data = $2
-WHERE
-    arc_id = $1
-RETURNING
-    id, arc_id, arc_data, spotlightpa_path, spotlightpa_data, schedule_for, last_published, note, status, created_at, updated_at
-`
-
-type UpdateArcArticleParams struct {
-	ArcID   sql.NullString  `json:"arc_id"`
-	ArcData json.RawMessage `json:"arc_data"`
-}
-
-func (q *Queries) UpdateArcArticle(ctx context.Context, arg UpdateArcArticleParams) (Article, error) {
-	row := q.db.QueryRowContext(ctx, updateArcArticle, arg.ArcID, arg.ArcData)
 	var i Article
 	err := row.Scan(
 		&i.ID,
