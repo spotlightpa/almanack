@@ -12,5 +12,5 @@ export default {
 </script>
 
 <template>
-  <component :is="hlevel" v-text="block.content"> </component>
+  <component :is="hlevel" v-html="block.content"> </component>
 </template>
