@@ -12,29 +12,31 @@ import (
 )
 
 type SpotlightPAArticle struct {
-	ArcID            string    `toml:"arc-id"`
-	InternalID       string    `toml:"internal-id"`
-	Budget           string    `toml:"internal-budget"`
-	ImageURL         string    `toml:"image"`
-	ImageCaption     string    `toml:"image-description"`
-	ImageCredit      string    `toml:"image-credit"`
-	PubDate          time.Time `toml:"published"`
-	Slug             string    `toml:"slug"`
-	Authors          []string  `toml:"authors"`
-	Byline           string    `toml:"byline"`
-	Hed              string    `toml:"title"`
-	Subhead          string    `toml:"subtitle"`
-	Summary          string    `toml:"description"`
-	Blurb            string    `toml:"blurb"`
-	Kicker           string    `toml:"kicker"`
-	LinkTitle        string    `toml:"linktitle"`
-	SuppressFeatured bool      `toml:"suppress-featured"`
-	Body             string    `toml:"-"`
-	Filepath         string    `toml:"-"`
-	LastArcSync      time.Time
-	ScheduleFor      *time.Time
-	LastSaved        *time.Time
-	LastPublished    *time.Time
+	ArcID            string     `toml:"arc-id"`
+	InternalID       string     `toml:"internal-id"`
+	Budget           string     `toml:"internal-budget"`
+	ImageURL         string     `toml:"image"`
+	ImageCaption     string     `toml:"image-description"`
+	ImageCredit      string     `toml:"image-credit"`
+	PubDate          time.Time  `toml:"published"`
+	Slug             string     `toml:"slug"`
+	Authors          []string   `toml:"authors"`
+	Byline           string     `toml:"byline"`
+	Hed              string     `toml:"title"`
+	Subhead          string     `toml:"subtitle"`
+	Summary          string     `toml:"description"`
+	Blurb            string     `toml:"blurb"`
+	Kicker           string     `toml:"kicker"`
+	Topics           []string   `toml:"topics"`
+	Series           []string   `toml:"series"`
+	LinkTitle        string     `toml:"linktitle"`
+	SuppressFeatured bool       `toml:"suppress-featured"`
+	Body             string     `toml:"-"`
+	Filepath         string     `toml:"-"`
+	LastArcSync      time.Time  `toml:"-"`
+	ScheduleFor      *time.Time `toml:"-"`
+	LastSaved        *time.Time `toml:"-"`
+	LastPublished    *time.Time `toml:"-"`
 }
 
 func (splArt *SpotlightPAArticle) toSPLData() interface{} {
@@ -54,6 +56,8 @@ func (splArt *SpotlightPAArticle) toSPLData() interface{} {
 		Summary          string     `json:"summary"`
 		Blurb            string     `json:"blurb"`
 		Kicker           string     `json:"kicker"`
+		Topics           []string   `json:"topics"`
+		Series           []string   `json:"series"`
 		LinkTitle        string     `json:"link-title"`
 		SuppressFeatured bool       `json:"suppress-featured"`
 		Body             string     `json:"body"`
