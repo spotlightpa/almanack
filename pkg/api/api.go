@@ -399,7 +399,7 @@ func (app *appEnv) getScheduledArticle(w http.ResponseWriter, r *http.Request) {
 func (app *appEnv) postScheduledArticle(w http.ResponseWriter, r *http.Request) {
 	app.Println("start postScheduledArticle")
 
-	var userData almanack.ScheduledArticle
+	var userData almanack.SpotlightPAArticle
 	if err := httpjson.DecodeRequest(w, r, &userData); err != nil {
 		app.errorResponse(r.Context(), w, err)
 		return

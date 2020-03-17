@@ -37,21 +37,21 @@ type Service struct {
 	ContentStore
 }
 
-func (svc Service) GetScheduledArticle(ctx context.Context, articleID string) (*ScheduledArticle, error) {
+func (svc Service) GetScheduledArticle(ctx context.Context, articleID string) (*SpotlightPAArticle, error) {
 	start := time.Now()
 	dart, err := svc.Querier.GetArticle(ctx, nullString(articleID))
 	svc.Logger.Printf("queried GetArticle in %v", time.Since(start))
 	if err != nil {
 		return nil, db.ExpectNotFound(err)
 	}
-	var schArticle ScheduledArticle
+	var schArticle SpotlightPAArticle
 	if err = schArticle.fromDB(dart); err != nil {
 		return nil, err
 	}
 	return &schArticle, nil
 }
 
-func (svc Service) SaveScheduledArticle(ctx context.Context, article *ScheduledArticle) error {
+func (svc Service) SaveScheduledArticle(ctx context.Context, article *SpotlightPAArticle) error {
 	now := time.Now()
 	// TODO: Make less racey
 	if article.ScheduleFor != nil &&
@@ -88,16 +88,16 @@ func (svc Service) SaveScheduledArticle(ctx context.Context, article *ScheduledA
 	return nil
 }
 
-func (svc Service) PopScheduledArticles(ctx context.Context, callback func([]*ScheduledArticle) error) error {
+func (svc Service) PopScheduledArticles(ctx context.Context, callback func([]*SpotlightPAArticle) error) error {
 	start := time.Now()
 	poppedArts, err := svc.Querier.PopScheduled(ctx)
 	svc.Logger.Printf("queried PopScheduled in %v", time.Since(start))
 	if err != nil {
 		return err
 	}
-	overdueArts := make([]*ScheduledArticle, len(poppedArts))
+	overdueArts := make([]*SpotlightPAArticle, len(poppedArts))
 	for i := range overdueArts {
-		overdueArts[i] = new(ScheduledArticle)
+		overdueArts[i] = new(SpotlightPAArticle)
 		if err = overdueArts[i].fromDB(poppedArts[i]); err != nil {
 			return err
 		}

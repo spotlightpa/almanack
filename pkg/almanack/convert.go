@@ -8,32 +8,32 @@ import (
 	"strings"
 )
 
-func (content ArcStory) ToArticle() (*Article, error) {
-	authors := make([]string, len(content.Credits.By))
+func (arcStory *ArcStory) ToArticle(article *SpotlightPAArticle) error {
+	authors := make([]string, len(arcStory.Credits.By))
 	// TODO: Whatever is done in Vue
-	for i := range content.Credits.By {
-		authors[i] = content.Credits.By[i].Name
+	for i := range arcStory.Credits.By {
+		authors[i] = arcStory.Credits.By[i].Name
 	}
 	var body strings.Builder
-	if err := readContentElements(content.ContentElements, &body); err != nil {
-		return nil, err
+	if err := readContentElements(arcStory.ContentElements, &body); err != nil {
+		return err
 	}
-	story := Article{
-		ArcID:      content.ID,
-		InternalID: content.Slug,
-		Slug:       slugFromURL(content.CanonicalURL),
-		PubDate:    content.Planning.Scheduling.PlannedPublishDate,
-		Budget:     content.Planning.BudgetLine,
-		Hed:        content.Headlines.Basic,
-		Subhead:    content.Subheadlines.Basic,
-		Summary:    content.Description.Basic,
-		Blurb:      content.Description.Basic,
-		Authors:    authors,
-		Body:       body.String(),
-		LinkTitle:  content.Headlines.Web,
-	}
-	setArticleImage(&story, content.PromoItems)
-	return &story, nil
+
+	article.ArcID = arcStory.ID
+	article.InternalID = arcStory.Slug
+	article.Slug = slugFromURL(arcStory.CanonicalURL)
+	article.PubDate = arcStory.Planning.Scheduling.PlannedPublishDate
+	article.Budget = arcStory.Planning.BudgetLine
+	article.Hed = arcStory.Headlines.Basic
+	article.Subhead = arcStory.Subheadlines.Basic
+	article.Summary = arcStory.Description.Basic
+	article.Blurb = arcStory.Description.Basic
+	article.Authors = authors
+	article.Body = body.String()
+	article.LinkTitle = arcStory.Headlines.Web
+
+	setArticleImage(article, arcStory.PromoItems)
+	return nil
 }
 
 func slugFromURL(s string) string {
@@ -129,7 +129,7 @@ func readContentElements(rawels []*json.RawMessage, body *strings.Builder) error
 	return nil
 }
 
-func setArticleImage(a *Article, p PromoItems) {
+func setArticleImage(a *SpotlightPAArticle, p PromoItems) {
 	var credits []string
 	if strings.Contains(p.Basic.URL, "public") {
 		a.ImageURL = p.Basic.URL
