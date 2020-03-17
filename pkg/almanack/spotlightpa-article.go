@@ -30,7 +30,7 @@ type SpotlightPAArticle struct {
 	LinkTitle        string    `toml:"linktitle"`
 	SuppressFeatured bool      `toml:"suppress-featured"`
 	Body             string    `toml:"-"`
-	filepath         string    `toml:"-"`
+	Filepath         string    `toml:"-"`
 	LastArcSync      time.Time
 	ScheduleFor      *time.Time
 	LastSaved        *time.Time
@@ -57,7 +57,7 @@ func (splArt *SpotlightPAArticle) toSPLData() interface{} {
 		LinkTitle        string     `json:"link-title"`
 		SuppressFeatured bool       `json:"suppress-featured"`
 		Body             string     `json:"body"`
-		filepath         string     `json:"-"`
+		Filepath         string     `json:"-"`
 		LastArcSync      time.Time  `json:"last-arc-sync"`
 		ScheduleFor      *time.Time `json:"-"`
 		LastSaved        *time.Time `json:"last-saved"`
@@ -70,7 +70,7 @@ func (splArt *SpotlightPAArticle) fromDB(dbArticle db.Article) error {
 	splArt.ArcID = dbArticle.ArcID.String
 	splArt.ScheduleFor = timeNull(dbArticle.ScheduleFor)
 	splArt.LastPublished = timeNull(dbArticle.LastPublished)
-	splArt.filepath = dbArticle.SpotlightPAPath.String
+	splArt.Filepath = dbArticle.SpotlightPAPath.String
 
 	if err := json.Unmarshal(dbArticle.SpotlightPAData, splArt.toSPLData()); err != nil {
 		return err
@@ -120,8 +120,8 @@ func (splArt *SpotlightPAArticle) String() string {
 }
 
 func (splArt *SpotlightPAArticle) ContentFilepath() string {
-	if splArt.filepath != "" {
-		return splArt.filepath
+	if splArt.Filepath != "" {
+		return splArt.Filepath
 	}
 	date := splArt.PubDate.Format("2006-01-02")
 	return fmt.Sprintf("content/news/%s-%s.md", date, splArt.InternalID)
