@@ -208,17 +208,17 @@ func (app *appEnv) jsonResponse(statusCode int, w http.ResponseWriter, data inte
 }
 
 func (app *appEnv) errorResponse(ctx context.Context, w http.ResponseWriter, err error) {
-	var errResp errutil.Response
-	if !errors.As(err, &errResp) {
-		errResp.StatusCode = http.StatusInternalServerError
-		errResp.Message = "internal error"
-		errResp.Log = err.Error()
-	}
-	app.Println(errResp.Log)
-	if hub := sentry.GetHubFromContext(ctx); hub != nil {
-		hub.CaptureException(errResp)
-	}
+	app.logErr(ctx, err)
+	errResp := errutil.ResponseFrom(err)
 	app.jsonResponse(errResp.StatusCode, w, errResp)
+}
+
+func (app *appEnv) logErr(ctx context.Context, err error) {
+	if hub := sentry.GetHubFromContext(ctx); hub != nil {
+		hub.CaptureException(err)
+	}
+
+	app.Printf("err: %v", err)
 }
 
 func (app *appEnv) ping(w http.ResponseWriter, r *http.Request) {
@@ -415,7 +415,7 @@ func (app *appEnv) postScheduledArticle(w http.ResponseWriter, r *http.Request) 
 			r.Context(), app.c, app.imageStore, userData.ImageURL,
 		); err != nil {
 			// Keep trucking, but don't publish
-			app.Printf("could not upload image: %v", err)
+			app.logErr(r.Context(), fmt.Errorf("could not upload image: %w", err))
 			userData.ImageURL = ""
 			userData.ScheduleFor = nil
 		} else {
