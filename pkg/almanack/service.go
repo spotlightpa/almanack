@@ -51,6 +51,17 @@ func (svc Service) GetScheduledArticle(ctx context.Context, articleID string) (*
 	return &schArticle, nil
 }
 
+func (svc Service) ResetSpotlightPAArticleArcData(ctx context.Context, article *SpotlightPAArticle) error {
+	start := time.Now()
+	dart, err := svc.Querier.GetArticle(ctx, nullString(article.ArcID))
+	svc.Logger.Printf("queried GetArticle in %v", time.Since(start))
+	if err != nil {
+		return err
+	}
+
+	return article.ResetArcData(dart)
+}
+
 func (svc Service) SaveScheduledArticle(ctx context.Context, article *SpotlightPAArticle) error {
 	now := time.Now()
 	// TODO: Make less racey

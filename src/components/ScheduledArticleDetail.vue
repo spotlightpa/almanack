@@ -94,6 +94,11 @@ export default {
       help="Small text appearing above the page headline, e.g. Health"
       :required="true"
     ></BulmaFieldInput>
+    <b-field label="Topics">
+      <b-taginput :value="[]" attached allow-duplicates></b-taginput>
+      Topics, e.g. Coronavirus
+    </b-field>
+
     <BulmaFieldInput
       v-model="article.hed"
       label="Hed"
@@ -241,7 +246,8 @@ export default {
         </button>
         <button
           class="button is-light has-text-weight-semibold"
-          :disabled="true"
+          :disabled="article.isSaving"
+          @click.prevent="article.save({ refresh_arc: true })"
         >
           Replace with Arc version
         </button>
