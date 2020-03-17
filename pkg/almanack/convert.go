@@ -9,10 +9,21 @@ import (
 )
 
 func (arcStory *ArcStory) ToArticle(article *SpotlightPAArticle) error {
-	authors := make([]string, len(arcStory.Credits.By))
+	article.Authors = make([]string, len(arcStory.Credits.By))
+	needsByline := false
 	for i := range arcStory.Credits.By {
-		authors[i] = authorFrom(&arcStory.Credits.By[i])
+		article.Authors[i] = authorFrom(&arcStory.Credits.By[i])
+		if strings.HasSuffix(article.Authors[i], "of Spotlight PA") {
+			needsByline = true
+		}
 	}
+	if needsByline {
+		article.Byline = commaAndJoiner(article.Authors)
+		for i := range article.Authors {
+			article.Authors[i] = strings.TrimSuffix(article.Authors[i], "of Spotlight PA")
+		}
+	}
+
 	var body strings.Builder
 	if err := readContentElements(arcStory.ContentElements, &body); err != nil {
 		return err
@@ -27,7 +38,6 @@ func (arcStory *ArcStory) ToArticle(article *SpotlightPAArticle) error {
 	article.Subhead = arcStory.Subheadlines.Basic
 	article.Summary = arcStory.Description.Basic
 	article.Blurb = arcStory.Description.Basic
-	article.Authors = authors
 	article.Body = body.String()
 	article.LinkTitle = arcStory.Headlines.Web
 
@@ -50,6 +60,14 @@ func authorFrom(by *By) string {
 		return byline + " of " + org
 	}
 	return byline
+}
+
+func commaAndJoiner(ss []string) string {
+	if len(ss) < 3 {
+		return strings.Join(ss, " and ")
+	}
+	commaPart := strings.Join(ss[:len(ss)-1], ", ")
+	return commaPart + " and " + ss[len(ss)-1]
 }
 
 func slugFromURL(s string) string {
