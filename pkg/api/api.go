@@ -409,8 +409,9 @@ func (app *appEnv) postScheduledArticle(w http.ResponseWriter, r *http.Request) 
 		if imageurl, err := almanack.UploadFromURL(
 			r.Context(), app.c, app.imageStore, userData.ImageURL,
 		); err != nil {
-			app.errorResponse(r.Context(), w, err)
-			return
+			// Keep trucking, but don't publish
+			userData.ImageURL = ""
+			userData.ScheduleFor = nil
 		} else {
 			userData.ImageURL = imageurl
 		}
