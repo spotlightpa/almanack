@@ -258,7 +258,7 @@ export default {
         <button
           class="button is-light has-text-weight-semibold"
           :disabled="article.isSaving"
-          @click.prevent="article.save({ refresh_arc: true })"
+          @click.prevent="article.save({ refreshArc: true })"
         >
           Replace with Arc version
         </button>

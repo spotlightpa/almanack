@@ -16,7 +16,7 @@ export default class ScheduledArticle {
   init(data, { save_reset = true } = {}) {
     this.isSaving = false;
     this.saveError = null;
-    this._refresh_arc = false;
+    this._refreshArc = false;
 
     if (save_reset) {
       this._reset = JSON.stringify(data);
@@ -100,7 +100,7 @@ export default class ScheduledArticle {
       PubDate: this.pubDate,
       Kicker: this.kicker,
       SuppressFeatured: this.suppressFeatured,
-      "almanack-refresh-arc": this._refresh_arc,
+      "almanack-refresh-arc": this._refreshArc,
     };
   }
 
@@ -148,23 +148,23 @@ export default class ScheduledArticle {
     return true;
   }
 
-  async save({ schedule = null, refresh_arc = false }) {
+  async save({ schedule = null, refreshArc = false }) {
     if (schedule) {
       this.scheduleFor = this.pubDate;
     } else if (schedule !== null) {
       this.scheduleFor = null;
     }
-    if (this.scheduleFor && !this.validate() && !refresh_arc) {
+    if (this.scheduleFor && !this.validate() && !refreshArc) {
       alert("no");
       return;
     }
     this.isSaving = true;
-    this._refresh_arc = refresh_arc;
+    this._refreshArc = refreshArc;
 
     let data;
     [data, this.saveError] = await this._client.saveArticle(this._url_id, this);
     this.isSaving = false;
-    this._refresh_arc = false;
+    this._refreshArc = false;
     if (!this.saveError) {
       this.init(data);
       this.validate();
