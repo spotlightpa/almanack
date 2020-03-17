@@ -150,7 +150,6 @@ export default {
         </span>
       </button>
       <button
-        v-if="article.isAvailable"
         type="button"
         class="button is-light has-text-weight-semibold"
         :class="{ 'is-loading': isRefreshing }"
