@@ -95,10 +95,21 @@ export default {
       :required="true"
     ></BulmaFieldInput>
     <b-field label="Topics">
-      <b-taginput :value="[]" attached allow-duplicates></b-taginput>
+      <b-taginput
+        v-model="article.topics"
+        attached
+        allow-duplicates
+      ></b-taginput>
       Topics, e.g. Coronavirus
     </b-field>
-
+    <b-field label="Series">
+      <b-taginput
+        v-model="article.series"
+        attached
+        allow-duplicates
+      ></b-taginput>
+      Series, e.g. "Common Cause fine"
+    </b-field>
     <BulmaFieldInput
       v-model="article.hed"
       label="Hed"

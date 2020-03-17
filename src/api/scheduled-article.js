@@ -40,6 +40,8 @@ export default class ScheduledArticle {
       suppressFeatured: ["SuppressFeatured", false],
 
       authors: ["Authors", []],
+      series: ["Series", []],
+      topics: ["Topics", []],
     };
 
     for (let [key, [val, fallback]] of Object.entries(props)) {
@@ -91,6 +93,8 @@ export default class ScheduledArticle {
       Subhead: this.subhead,
       Summary: this.summary,
       Authors: this.authors,
+      Topics: this.topics,
+      Series: this.series,
       ScheduleFor: this.scheduleFor,
       LastArcSync: this.lastArcSync,
       PubDate: this.pubDate,
