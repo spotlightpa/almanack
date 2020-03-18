@@ -13,14 +13,14 @@ func (arcStory *ArcStory) ToArticle(article *SpotlightPAArticle) error {
 	needsByline := false
 	for i := range arcStory.Credits.By {
 		article.Authors[i] = authorFrom(&arcStory.Credits.By[i])
-		if strings.HasSuffix(article.Authors[i], "of Spotlight PA") {
+		if strings.HasSuffix(article.Authors[i], " of Spotlight PA") {
 			needsByline = true
 		}
 	}
 	if needsByline {
 		article.Byline = commaAndJoiner(article.Authors)
 		for i := range article.Authors {
-			article.Authors[i] = strings.TrimSuffix(article.Authors[i], "of Spotlight PA")
+			article.Authors[i] = strings.TrimSuffix(article.Authors[i], " of Spotlight PA")
 		}
 	}
 
