@@ -2,6 +2,7 @@ package netlifyid
 
 import (
 	"context"
+	"fmt"
 	"net/http"
 
 	"github.com/spotlightpa/almanack/pkg/almanack"
@@ -58,7 +59,7 @@ func (as AuthService) HasRole(r *http.Request, role string) error {
 	err := errutil.Response{
 		StatusCode: http.StatusInternalServerError,
 		Message:    "user info not set",
-		Log:        "no user info: is this localhost?",
+		Cause:      fmt.Errorf("no user info: is this localhost?"),
 	}
 	return err
 }

@@ -76,8 +76,7 @@ func UploadFromURL(ctx context.Context, c *http.Client, is ImageStore, srcurl st
 		return "", errutil.Response{
 			StatusCode: http.StatusBadRequest,
 			Message:    "URL must be an image",
-			Log: fmt.Sprintf("%q did not have proper MIME type",
-				srcurl),
+			Cause:      fmt.Errorf("%q did not have proper MIME type", srcurl),
 		}
 	}
 	slurp, err := ioutil.ReadAll(buf)
@@ -106,7 +105,7 @@ func UploadFromURL(ctx context.Context, c *http.Client, is ImageStore, srcurl st
 		return "", errutil.Response{
 			StatusCode: http.StatusBadGateway,
 			Message:    "Could not upload image from URL",
-			Log:        fmt.Sprintf("unexpected S3 status: %d", res.StatusCode),
+			Cause:      fmt.Errorf("unexpected S3 status: %d", res.StatusCode),
 		}
 	}
 	return filename, nil

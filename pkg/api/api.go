@@ -226,7 +226,7 @@ func (app *appEnv) notFound(w http.ResponseWriter, r *http.Request) {
 	app.errorResponse(r.Context(), w, errutil.Response{
 		StatusCode: http.StatusNotFound,
 		Message:    http.StatusText(http.StatusNotFound),
-		Log:        fmt.Sprintf("path not found: %s", r.URL.Path),
+		Cause:      fmt.Errorf("path not found: %s", r.URL.Path),
 	})
 }
 

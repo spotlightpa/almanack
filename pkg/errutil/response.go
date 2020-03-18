@@ -9,7 +9,7 @@ import (
 type Response struct {
 	StatusCode int    `json:"status"`
 	Message    string `json:"message"`
-	Log        string `json:"-"`
+	Cause      error  `json:"-"`
 }
 
 func ResponseFrom(err error) Response {
@@ -17,11 +17,15 @@ func ResponseFrom(err error) Response {
 	if !errors.As(err, &errResp) {
 		errResp.StatusCode = http.StatusInternalServerError
 		errResp.Message = "internal error"
-		errResp.Log = err.Error()
+		errResp.Cause = err
 	}
 	return errResp
 }
 
 func (resp Response) Error() string {
-	return fmt.Sprintf("[%d] %s: %q", resp.StatusCode, resp.Log, resp.Message)
+	return fmt.Sprintf("[%d] %v: %q", resp.StatusCode, resp.Cause, resp.Message)
+}
+
+func (resp Response) Unwrap() error {
+	return resp.Cause
 }

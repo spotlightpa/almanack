@@ -18,7 +18,7 @@ func errorf(status int, format string, v ...interface{}) errutil.Response {
 	return errutil.Response{
 		StatusCode: status,
 		Message:    message,
-		Log:        message,
+		Cause:      errors.New(message),
 	}
 }
 
@@ -76,7 +76,7 @@ func DecodeRequest(w http.ResponseWriter, r *http.Request, dst interface{}) erro
 			return errutil.Response{
 				StatusCode: http.StatusBadRequest,
 				Message:    http.StatusText(http.StatusBadRequest),
-				Log:        err.Error(),
+				Cause:      err,
 			}
 		}
 	}

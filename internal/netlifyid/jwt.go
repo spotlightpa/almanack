@@ -56,7 +56,7 @@ func FromRequest(r *http.Request) (*JWT, error) {
 		return nil, errutil.Response{
 			StatusCode: http.StatusInternalServerError,
 			Message:    "missing context",
-			Log:        "no context given: is this localhost?",
+			Cause:      fmt.Errorf("no context given: is this localhost?"),
 		}
 	}
 	encoded := lc.ClientContext.Custom["netlify"]
@@ -65,7 +65,7 @@ func FromRequest(r *http.Request) (*JWT, error) {
 		return nil, errutil.Response{
 			StatusCode: http.StatusInternalServerError,
 			Message:    "could not decode context",
-			Log:        fmt.Sprintf("could not decode context %q", encoded),
+			Cause:      fmt.Errorf("could not decode context %q: %v", encoded, err),
 		}
 	}
 	var netID JWT
@@ -73,7 +73,7 @@ func FromRequest(r *http.Request) (*JWT, error) {
 		return nil, errutil.Response{
 			StatusCode: http.StatusInternalServerError,
 			Message:    "could not decode identity",
-			Log:        fmt.Sprintf("could not decode identity %q: %v", encoded, err),
+			Cause:      fmt.Errorf("could not decode identity %q: %v", encoded, err),
 		}
 	}
 	return &netID, nil

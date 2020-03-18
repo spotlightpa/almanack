@@ -34,7 +34,7 @@ func (t Type) As(v interface{}) bool {
 		r := Response{
 			StatusCode: codes[int(t)],
 			Message:    t.Error(),
-			Log:        t.Error(),
+			Cause:      t,
 		}
 		reflect.ValueOf(v).Elem().Set(reflect.ValueOf(r))
 		return true
