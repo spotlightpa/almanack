@@ -9,10 +9,12 @@ import (
 )
 
 type Querier interface {
+	AppendRoleToDomain(ctx context.Context, arg AppendRoleToDomainParams) (DomainRole, error)
 	GetArticle(ctx context.Context, arcID sql.NullString) (Article, error)
 	GetRolesForDomain(ctx context.Context, domain string) ([]string, error)
 	ListAllArticles(ctx context.Context) ([]Article, error)
 	ListAvailableArticles(ctx context.Context) ([]Article, error)
+	ListDomainsWithRole(ctx context.Context, role string) ([]string, error)
 	ListUpcoming(ctx context.Context) ([]Article, error)
 	PopScheduled(ctx context.Context) ([]Article, error)
 	SetRolesForDomain(ctx context.Context, arg SetRolesForDomainParams) (DomainRole, error)
