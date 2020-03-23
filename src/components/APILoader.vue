@@ -22,7 +22,7 @@ export default {
     <progress v-if="isLoading" class="progress is-large is-warning" max="100">
       Loading…
     </progress>
-    <div v-if="error" class="message is-danger ">
+    <div v-if="error" class="message is-danger">
       <div class="message-header">{{ error.name }}</div>
       <div class="message-body">
         <p class="content">{{ error.message }}</p>

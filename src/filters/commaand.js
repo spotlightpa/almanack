@@ -4,7 +4,7 @@ export function commaAndJoiner(a) {
   if (!a || !a.length) {
     return "";
   }
-  let ss = a.map(item => item.toString());
+  let ss = a.map((item) => item.toString());
   if (ss.length < 3) {
     return ss.join(" and ");
   }

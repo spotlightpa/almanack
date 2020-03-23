@@ -11,7 +11,7 @@ export default {
   },
   computed: {
     credits() {
-      return this.block.credits.by.map(v => v.name);
+      return this.block.credits.by.map((v) => v.name);
     },
     imageURL() {
       // Some images haven't been published and can't be used

@@ -5,7 +5,7 @@ export default {
     this.$emit(
       "mounted",
       Array.from(this.$el.children)
-        .map(el =>
+        .map((el) =>
           el.tagName === "RAW-HTML" ? el.getAttribute("block") : el.outerHTML
         )
         .join("\n\n")

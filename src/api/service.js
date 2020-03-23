@@ -1,21 +1,21 @@
 import { reactive, toRefs } from "@vue/composition-api";
 
-const tryTo = promise =>
+const tryTo = (promise) =>
   promise
     // Wrap data/errors
-    .then(data => [data, null])
-    .catch(error => [null, error]);
+    .then((data) => [data, null])
+    .catch((error) => [null, error]);
 
 export const endpoints = {
   healthcheck: `/api/healthcheck`,
   userInfo: `/api/user-info`,
   listAvailable: `/api/available-articles`,
-  getAvailable: id => `/api/available-articles/${id}`,
+  getAvailable: (id) => `/api/available-articles/${id}`,
   postAvailable: `/api/available-articles`,
   upcoming: `/api/upcoming-articles`,
-  getMessage: id => `/api/message/${id}`,
+  getMessage: (id) => `/api/message/${id}`,
   sendMessage: `/api/message`,
-  scheduledArticle: id => `/api/scheduled-articles/${id}`,
+  scheduledArticle: (id) => `/api/scheduled-articles/${id}`,
   scheduleArticle: `/api/scheduled-articles`,
   getSignedUpload: `/api/get-signed-upload`,
   getSignupURL: `/api/mailchimp-signup-url`,

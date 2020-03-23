@@ -26,7 +26,7 @@ export function timeFormatter(d) {
   }
   let { value: tzname } = tzNameLookup
     .formatToParts(d)
-    .find(part => part.type === "timeZoneName") ?? { value: "" };
+    .find((part) => part.type === "timeZoneName") ?? { value: "" };
   if (tzname) {
     tzname = " " + tzname;
   }

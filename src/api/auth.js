@@ -8,7 +8,7 @@ export function makeAuth() {
     error: null,
   });
 
-  netlifyIdentity.on("init", async user => {
+  netlifyIdentity.on("init", async (user) => {
     authState.user = user;
     try {
       await user.jwt();
@@ -17,14 +17,14 @@ export function makeAuth() {
       methods.logout();
     }
   });
-  netlifyIdentity.on("login", user => {
+  netlifyIdentity.on("login", (user) => {
     authState.user = user;
     netlifyIdentity.close();
   });
   netlifyIdentity.on("logout", () => {
     authState.user = null;
   });
-  netlifyIdentity.on("error", err => {
+  netlifyIdentity.on("error", (err) => {
     authState.error = err;
   });
 
@@ -36,7 +36,7 @@ export function makeAuth() {
 
   function hasRole(name) {
     return computed(() => {
-      return roles.value.some(role => role === name || role === "admin");
+      return roles.value.some((role) => role === name || role === "admin");
     });
   }
 

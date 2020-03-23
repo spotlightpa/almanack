@@ -28,9 +28,9 @@ let embedComponentsTypes = {
 };
 
 let htmlComponentsTypes = {
-  code: block => block.content,
-  oembed_response: block => block.raw_oembed.html,
-  raw_html: block => block.content,
+  code: (block) => block.content,
+  oembed_response: (block) => block.raw_oembed.html,
+  raw_html: (block) => block.content,
 };
 
 let ignoreComponentTypes = {
@@ -44,7 +44,7 @@ const STATUS_AVAILABLE = 2;
 export default class ArcArticle {
   static from(data) {
     return data.contents
-      .map(a => new ArcArticle(a))
+      .map((a) => new ArcArticle(a))
       .sort((a, b) => cmp(b.plannedDate, a.plannedDate));
   }
 
@@ -146,7 +146,7 @@ export default class ArcArticle {
     return { name: "schedule", params: { id: this.id } };
   }
   get authors() {
-    return this.getProp("credits.by", { fallback: [] }).map(item => {
+    return this.getProp("credits.by", { fallback: [] }).map((item) => {
       let byline = getProp(item, "additional_properties.original.byline");
       if (byline) {
         return byline;
@@ -214,14 +214,14 @@ export default class ArcArticle {
   }
   get featuredImageCredits() {
     return this.getProp("promo_items.basic.credits.by", { fallback: [] }).map(
-      item => item.name || item.byline
+      (item) => item.name || item.byline
     );
   }
 
   get contentComponents() {
     let embedcount = 0;
 
-    return this.rawData.content_elements.flatMap(block => {
+    return this.rawData.content_elements.flatMap((block) => {
       let component = contentComponentsTypes[block.type];
       if (component) {
         return {
@@ -249,7 +249,7 @@ export default class ArcArticle {
   get embedComponents() {
     let embedcount = 0;
 
-    return this.rawData.content_elements.flatMap(block => {
+    return this.rawData.content_elements.flatMap((block) => {
       let component = embedComponentsTypes[block.type];
       if (!component) {
         return [];
@@ -267,7 +267,7 @@ export default class ArcArticle {
   get htmlComponents() {
     let embedcount = 0;
 
-    return this.rawData.content_elements.flatMap(block => {
+    return this.rawData.content_elements.flatMap((block) => {
       // Render code blocks but not use placeholder for images
       if (embedComponentsTypes[block.type]) {
         embedcount++;

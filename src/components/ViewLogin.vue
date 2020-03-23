@@ -12,7 +12,7 @@ export default {
     };
   },
   beforeRouteEnter(to, from, next) {
-    next(vm => {
+    next((vm) => {
       if (vm.isSignedIn) {
         next({ name: "home" });
       }

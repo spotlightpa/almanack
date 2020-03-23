@@ -90,7 +90,7 @@ router.beforeEach((to, from, next) => {
     document.title = to.meta.title;
   }
 
-  if (to.matched.some(record => record.meta.requiresAuth)) {
+  if (to.matched.some((record) => record.meta.requiresAuth)) {
     if (!isSignedIn.value) {
       next({
         name: "login",
@@ -102,13 +102,13 @@ router.beforeEach((to, from, next) => {
   next();
 });
 
-router.afterEach(to => {
+router.afterEach((to) => {
   let domain = /@(.*)$/.exec(email.value)?.[1].toLowerCase() ?? "None";
   let name = fullName.value || "Not Signed In";
   let role =
-    roles.value.find(r => r === "admin") ||
-    roles.value.find(r => r === "Spotlight PA") ||
-    roles.value.find(r => r === "editor") ||
+    roles.value.find((r) => r === "admin") ||
+    roles.value.find((r) => r === "Spotlight PA") ||
+    roles.value.find((r) => r === "editor") ||
     "None";
 
   setDimensions({

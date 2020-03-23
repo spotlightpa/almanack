@@ -13,7 +13,7 @@ export default {
   },
   computed: {
     correctedCredits() {
-      return this.credits.map(credit =>
+      return this.credits.map((credit) =>
         credit.replace(/\b(staff( photographer)?)\b/gi, "Philadelphia Inquirer")
       );
     },
@@ -24,7 +24,7 @@ export default {
 <template>
   <figure>
     <div class="image max-256 has-background-grey-lighter has-margin-bottom">
-      <a :href="url" target="_blank" download><img :src="url"/></a>
+      <a :href="url" target="_blank" download><img :src="url" /></a>
     </div>
     <figcaption>
       <p class="has-margin-bottom">

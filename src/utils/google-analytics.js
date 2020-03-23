@@ -1,6 +1,6 @@
 // Ensure a Google Analytics window func
 if (!window.ga) {
-  window.ga = function() {
+  window.ga = function () {
     (window.ga.q = window.ga.q || []).push(arguments);
   };
   window.ga.l = +new Date();

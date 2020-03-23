@@ -8,7 +8,7 @@ export default {
       return this.block.list_type === "unordered" ? "ul" : "ol";
     },
     items() {
-      return this.block.items.filter(item => item.type === "text");
+      return this.block.items.filter((item) => item.type === "text");
     },
   },
 };

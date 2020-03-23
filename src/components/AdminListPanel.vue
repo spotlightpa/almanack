@@ -102,7 +102,7 @@ export default {
         </button>
       </div>
     </div>
-    <div v-if="error" class="message is-danger ">
+    <div v-if="error" class="message is-danger">
       <p class="message-header">{{ error.name }}</p>
       <p class="message-body">{{ error.message }}</p>
     </div>
