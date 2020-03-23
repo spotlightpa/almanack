@@ -415,6 +415,15 @@ func (app *appEnv) postScheduledArticle(w http.ResponseWriter, r *http.Request) 
 	}
 
 	if userData.RefreshArc {
+		var feed almanack.ArcAPI
+		if err := httpjson.Get(r.Context(), app.c, app.srcFeedURL, &feed); err != nil {
+			app.errorResponse(r.Context(), w, err)
+			return
+		}
+		if err := app.svc.StoreFeed(r.Context(), &feed); err != nil {
+			app.errorResponse(r.Context(), w, err)
+			return
+		}
 		if err := app.svc.ResetSpotlightPAArticleArcData(r.Context(), &userData.SpotlightPAArticle); err != nil {
 			app.errorResponse(r.Context(), w, err)
 			return
