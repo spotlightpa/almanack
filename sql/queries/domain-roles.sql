@@ -14,3 +14,26 @@ ON CONFLICT (lower(domain))
         roles = $2
     RETURNING
         *;
+
+-- name: AppendRoleToDomain :one
+INSERT INTO domain_roles (domain, roles)
+    VALUES (@domain, ARRAY[@role::text])
+ON CONFLICT (lower(domain))
+    DO UPDATE SET
+        roles = CASE WHEN NOT (domain_roles.roles::text[] @> ARRAY[@role]) THEN
+            domain_roles.roles::text[] || ARRAY[@role]
+        ELSE
+            domain_roles.roles
+        END
+    RETURNING
+        *;
+
+-- name: ListDomainsWithRole :many
+SELECT
+    DOMAIN
+FROM
+    "domain_roles"
+WHERE
+    "roles" @> ARRAY[@role::text]
+ORDER BY
+    DOMAIN ASC;

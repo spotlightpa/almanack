@@ -9,6 +9,7 @@ import ViewAdmin from "./components/ViewAdmin.vue";
 import ViewArticleItem from "./components/ViewArticleItem.vue";
 import ViewArticleList from "./components/ViewArticleList.vue";
 import ViewArticleSchedule from "./components/ViewArticleSchedule.vue";
+import ViewAuthorizedDomains from "./components/ViewAuthorizedDomains.vue";
 import ViewError from "./components/ViewError.vue";
 import ViewLogin from "./components/ViewLogin.vue";
 import ViewUploader from "./components/ViewUploader.vue";
@@ -70,6 +71,15 @@ let router = new Router({
       meta: {
         requiresAuth: true,
         title: "Spotlight PA Almanack - Image Uploader",
+      },
+    },
+    {
+      path: "/admin/domains",
+      name: "domains",
+      component: ViewAuthorizedDomains,
+      meta: {
+        requiresAuth: true,
+        title: "Spotlight PA Almanack - Preapproved Domains",
       },
     },
     {

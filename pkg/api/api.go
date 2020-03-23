@@ -184,6 +184,8 @@ func (app *appEnv) routes() http.Handler {
 			r.Get("/scheduled-articles/{id}", app.getScheduledArticle)
 			r.Post("/scheduled-articles", app.postScheduledArticle)
 			r.Post("/get-signed-upload", app.getSignedUpload)
+			r.Get("/authorized-domains", app.listDomains)
+			r.Post("/authorized-domains", app.postDomain)
 		})
 	})
 	r.NotFound(app.notFound)
@@ -470,4 +472,55 @@ func (app *appEnv) getSignedUpload(w http.ResponseWriter, r *http.Request) {
 func (app *appEnv) getSignupURL(w http.ResponseWriter, r *http.Request) {
 	app.Println("start getSignupURL")
 	app.jsonResponse(http.StatusOK, w, app.mailchimpSignupURL)
+}
+
+func (app *appEnv) listDomains(w http.ResponseWriter, r *http.Request) {
+	app.Println("start listDomains")
+	type response struct {
+		Domains []string `json:"domains"`
+	}
+
+	domains, err := app.svc.Querier.ListDomainsWithRole(r.Context(), "editor")
+	if err != nil {
+		app.errorResponse(r.Context(), w, err)
+		return
+	}
+	app.jsonResponse(http.StatusOK, w, response{
+		domains,
+	})
+}
+
+func (app *appEnv) postDomain(w http.ResponseWriter, r *http.Request) {
+	app.Println("start postDomain")
+	type request struct {
+		Domain string `json:"domain"`
+	}
+	type response struct {
+		Domains []string `json:"domains"`
+	}
+	var req request
+	if err := httpjson.DecodeRequest(w, r, &req); err != nil {
+		app.errorResponse(r.Context(), w, err)
+		return
+	}
+
+	if _, err := app.svc.Querier.AppendRoleToDomain(
+		r.Context(),
+		db.AppendRoleToDomainParams{
+			Domain: req.Domain,
+			Role:   "editor",
+		},
+	); err != nil {
+		app.errorResponse(r.Context(), w, err)
+		return
+	}
+
+	domains, err := app.svc.Querier.ListDomainsWithRole(r.Context(), "editor")
+	if err != nil {
+		app.errorResponse(r.Context(), w, err)
+		return
+	}
+	app.jsonResponse(http.StatusOK, w, response{
+		domains,
+	})
 }
