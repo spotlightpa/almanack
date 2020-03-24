@@ -20,9 +20,10 @@ UPDATE
 SET
     status = @status,
     note = @note,
-    arc_data = CASE WHEN @set_arc_data::bool
-    THEN @arc_data::jsonb
-    ELSE arc_data
+    arc_data = CASE WHEN @set_arc_data::bool THEN
+        @arc_data::jsonb
+    ELSE
+        arc_data
     END
 WHERE
     arc_id = @arc_id
@@ -33,12 +34,20 @@ RETURNING
 UPDATE
     article
 SET
-    spotlightpa_path = $2,
-    spotlightpa_data = $3,
-    schedule_for = $4,
-    last_published = $5
+    spotlightpa_data = @spotlightpa_data,
+    schedule_for = @schedule_for,
+    spotlightpa_path = CASE WHEN spotlightpa_path IS NULL THEN
+        @spotlightpa_path
+    ELSE
+        spotlightpa_path
+    END,
+    last_published = CASE WHEN @set_last_published::bool THEN
+        CURRENT_TIMESTAMP
+    ELSE
+        last_published
+    END
 WHERE
-    arc_id = $1
+    arc_id = @arc_id
 RETURNING
     *;
 

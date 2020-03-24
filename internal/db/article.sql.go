@@ -230,9 +230,10 @@ UPDATE
 SET
     status = $1,
     note = $2,
-    arc_data = CASE WHEN $3::bool
-    THEN $4::jsonb
-    ELSE arc_data
+    arc_data = CASE WHEN $3::bool THEN
+        $4::jsonb
+    ELSE
+        arc_data
     END
 WHERE
     arc_id = $5
@@ -299,31 +300,39 @@ const updateSpotlightPAArticle = `-- name: UpdateSpotlightPAArticle :one
 UPDATE
     article
 SET
-    spotlightpa_path = $2,
-    spotlightpa_data = $3,
-    schedule_for = $4,
-    last_published = $5
+    spotlightpa_data = $1,
+    schedule_for = $2,
+    spotlightpa_path = CASE WHEN spotlightpa_path IS NULL THEN
+        $3
+    ELSE
+        spotlightpa_path
+    END,
+    last_published = CASE WHEN $4::bool THEN
+        CURRENT_TIMESTAMP
+    ELSE
+        last_published
+    END
 WHERE
-    arc_id = $1
+    arc_id = $5
 RETURNING
     id, arc_id, arc_data, spotlightpa_path, spotlightpa_data, schedule_for, last_published, note, status, created_at, updated_at
 `
 
 type UpdateSpotlightPAArticleParams struct {
-	ArcID           sql.NullString  `json:"arc_id"`
-	SpotlightPAPath sql.NullString  `json:"spotlightpa_path"`
-	SpotlightPAData json.RawMessage `json:"spotlightpa_data"`
-	ScheduleFor     sql.NullTime    `json:"schedule_for"`
-	LastPublished   sql.NullTime    `json:"last_published"`
+	SpotlightPAData  json.RawMessage `json:"spotlightpa_data"`
+	ScheduleFor      sql.NullTime    `json:"schedule_for"`
+	SpotlightPAPath  sql.NullString  `json:"spotlightpa_path"`
+	SetLastPublished bool            `json:"set_last_published"`
+	ArcID            sql.NullString  `json:"arc_id"`
 }
 
 func (q *Queries) UpdateSpotlightPAArticle(ctx context.Context, arg UpdateSpotlightPAArticleParams) (Article, error) {
 	row := q.db.QueryRowContext(ctx, updateSpotlightPAArticle,
-		arg.ArcID,
-		arg.SpotlightPAPath,
 		arg.SpotlightPAData,
 		arg.ScheduleFor,
-		arg.LastPublished,
+		arg.SpotlightPAPath,
+		arg.SetLastPublished,
+		arg.ArcID,
 	)
 	var i Article
 	err := row.Scan(

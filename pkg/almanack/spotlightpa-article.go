@@ -124,11 +124,11 @@ func (splArt *SpotlightPAArticle) String() string {
 }
 
 func (splArt *SpotlightPAArticle) ContentFilepath() string {
-	if splArt.Filepath != "" {
-		return splArt.Filepath
+	if splArt.Filepath == "" {
+		date := splArt.PubDate.Format("2006-01-02")
+		splArt.Filepath = fmt.Sprintf("content/news/%s-%s.md", date, splArt.InternalID)
 	}
-	date := splArt.PubDate.Format("2006-01-02")
-	return fmt.Sprintf("content/news/%s-%s.md", date, splArt.InternalID)
+	return splArt.Filepath
 }
 
 func (splArt *SpotlightPAArticle) ToTOML() (string, error) {
@@ -149,10 +149,11 @@ func (splArt *SpotlightPAArticle) Publish(ctx context.Context, gh ContentStore) 
 	if err != nil {
 		return err
 	}
-	msg := fmt.Sprintf("Content: publishing %q", splArt.InternalID)
 	path := splArt.ContentFilepath()
-	if err = gh.CreateFile(ctx, msg, path, []byte(data)); err != nil {
+	msg := fmt.Sprintf("Content: publishing %q", splArt.InternalID)
+	if err = gh.UpdateFile(ctx, msg, path, []byte(data)); err != nil {
 		return err
 	}
+
 	return nil
 }
