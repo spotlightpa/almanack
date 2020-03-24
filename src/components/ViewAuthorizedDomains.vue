@@ -30,7 +30,6 @@ export default {
     }
 
     async function addDomain(domain) {
-      console.log(domain);
       apiState.isLoading = true;
       [, apiState.error] = await addAuthorizedDomain(domain);
       if (apiState.error) {
@@ -74,13 +73,13 @@ export default {
         :error="error"
       >
         <h2 class="title">Authorized domains</h2>
-        <ul class="list is-hoverable">
+        <ul class="tags">
           <li
             v-for="domain of domains"
             :key="domain"
-            class="list-item"
+            class="tag"
             v-text="domain"
-          ></li>
+          />
         </ul>
         <div class="field has-addons">
           <div class="control is-expanded">
