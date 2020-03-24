@@ -34,6 +34,10 @@ export default {
       type: Boolean,
       default: false,
     },
+    readonly: {
+      type: Boolean,
+      default: false,
+    },
     autocomplete: {
       type: String,
       default: null,
@@ -100,6 +104,7 @@ export default {
       :required="required"
       :type="type"
       :value="value"
+      :readonly="readonly"
       @blur="updateValidationMessage"
       @invalid="updateValidationMessage"
       @input="updateValue"
