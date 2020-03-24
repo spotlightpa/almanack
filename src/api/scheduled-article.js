@@ -135,17 +135,23 @@ export default class ScheduledArticle {
   }
 
   validate() {
+    let valid = true;
     if (!this.kicker) {
       this.saveError = new Error("Kicker must not be blank");
       this.saveError.name = "Validation Error";
-      return false;
+      valid = false;
     }
     if (!this.imageURL) {
       this.saveError = new Error("Featured image must not be blank");
       this.saveError.name = "Featured image error";
-      return false;
+      valid = false;
     }
-    return true;
+    if (!this.slug) {
+      this.saveError = new Error("Article slug must not be blank");
+      this.saveError.name = "Validation Error";
+      valid = false;
+    }
+    return valid;
   }
 
   async save({ schedule = null, refreshArc = false }) {

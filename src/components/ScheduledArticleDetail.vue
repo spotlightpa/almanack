@@ -111,7 +111,7 @@ export default {
         attached
         allow-duplicates
       ></b-taginput>
-      Series, e.g. "Common Cause fine"
+      Series, e.g. "Top News"
     </b-field>
     <BulmaFieldInput
       v-model="article.hed"
@@ -198,7 +198,11 @@ export default {
 
     TK Image type <br />
 
-    <BulmaFieldInput v-model="article.slug" label="Slug"></BulmaFieldInput>
+    <BulmaFieldInput
+      v-model="article.slug"
+      :readonly="article.hasPublished"
+      label="Slug"
+    ></BulmaFieldInput>
     <button
       class="block button is-small is-light has-text-weight-semibold"
       @click.prevent="article.deriveSlug"
