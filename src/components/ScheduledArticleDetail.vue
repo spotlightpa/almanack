@@ -207,11 +207,24 @@ export default {
     </button>
 
     <CopyWithButton
-      v-if="article.pubURL"
       :value="article.pubURL"
       label="planned URL"
     ></CopyWithButton>
 
+    <div v-if="article.hasPublished && article.pubURL" class="buttons">
+      <a
+        :href="article.pubURL"
+        class="button is-success has-text-weight-semibold"
+        target="_blank"
+      >
+        <span class="icon is-size-6">
+          <font-awesome-icon :icon="['fas', 'link']" />
+        </span>
+        <span>
+          Open live URL
+        </span>
+      </a>
+    </div>
     <BulmaField label="Suppress in featured slot">
       <div>
         <label class="checkbox">
