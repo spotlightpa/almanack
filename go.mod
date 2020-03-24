@@ -19,7 +19,7 @@ require (
 	github.com/go-redsync/redsync v1.3.1
 	github.com/golang/gddo v0.0.0-20200127195332-7365cb292b8b
 	github.com/gomodule/redigo v2.0.0+incompatible
-	github.com/google/go-github/v29 v29.0.2
+	github.com/google/go-github/v30 v30.0.0
 	github.com/lib/pq v1.3.0
 	github.com/mattbaird/gochimp v0.0.0-20180111040707-a267553896d1
 	github.com/peterbourgon/ff/v2 v2.0.0
