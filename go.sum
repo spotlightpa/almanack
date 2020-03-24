@@ -22,8 +22,6 @@ github.com/carlmjohnson/errutil v0.0.9 h1:yXt7hPUPZb9/ApOWOQSE7lHrMvsr7SAaV4Urhj
 github.com/carlmjohnson/errutil v0.0.9/go.mod h1:zbiOz7twV9EBHJ+6Yj+7MiHyFL383pqU+ULblUhtaKw=
 github.com/carlmjohnson/exitcode v0.0.4 h1:C5c0GBs/1iuo5cKIHBHdBQVENeAmgPZcyXtqBKCe5i0=
 github.com/carlmjohnson/exitcode v0.0.4/go.mod h1:MZ6ThCDx517DQcrpYnnns1pLh8onjFl+B/AsrOrdmpc=
-github.com/carlmjohnson/flagext v0.0.8 h1:km3d/MC9+YNY6zKbe2ikdLUihjiO8viz7+6rGVb/t/g=
-github.com/carlmjohnson/flagext v0.0.8/go.mod h1:Eenv0epIUAr4NuedNmkzI8WmBmjIxZC239XcKxYS2ac=
 github.com/carlmjohnson/flagext v0.0.10 h1:H0ygwPjWtJ8JlPd+EPOG8YUGFnWuKSNHXiwd4DwT0mE=
 github.com/carlmjohnson/flagext v0.0.10/go.mod h1:Eenv0epIUAr4NuedNmkzI8WmBmjIxZC239XcKxYS2ac=
 github.com/carlmjohnson/slackhook v0.0.3 h1:Qz0NTTXuwPuco7MS+NZBYmpvjBeflIEta0uujHqcOqc=
@@ -72,6 +70,7 @@ github.com/golang/gddo v0.0.0-20200127195332-7365cb292b8b h1:KKTmZop33VljWc8Eahl
 github.com/golang/gddo v0.0.0-20200127195332-7365cb292b8b/go.mod h1:sam69Hju0uq+5uvLJUMDlsKlQ21Vrs1Kd/1YFPNYdOU=
 github.com/golang/lint v0.0.0-20170918230701-e5d664eb928e/go.mod h1:tluoj9z5200jBnyusfRPU2LqT6J+DAorxEvtC7LHB+E=
 github.com/golang/protobuf v1.2.0/go.mod h1:6lQm79b+lXiMfvg/cZm0SGofjICqVBUtrP5yJMmIC1U=
+github.com/golang/protobuf v1.3.1 h1:YF8+flBXS5eO826T4nzqPrxfhQThhXl0YzfuUPu4SBg=
 github.com/golang/protobuf v1.3.1/go.mod h1:6lQm79b+lXiMfvg/cZm0SGofjICqVBUtrP5yJMmIC1U=
 github.com/golang/protobuf v1.3.2 h1:6nsPYzhq5kReh6QImI3k5qWzO4PEbvbIW2cwSfR/6xs=
 github.com/golang/protobuf v1.3.2/go.mod h1:6lQm79b+lXiMfvg/cZm0SGofjICqVBUtrP5yJMmIC1U=
@@ -84,8 +83,8 @@ github.com/google/go-cmp v0.3.1 h1:Xye71clBPdm5HgqGwUkwhbynsUJZhDbS20FvLhQ2izg=
 github.com/google/go-cmp v0.3.1/go.mod h1:8QqcDgzrUqlUb/G2PQTWiueGozuR1884gddMywk6iLU=
 github.com/google/go-cmp v0.4.0 h1:xsAVV57WRhGj6kEIi8ReJzQlHHqcBYCElAvkovg3B/4=
 github.com/google/go-cmp v0.4.0/go.mod h1:v8dTdLbMG2kIc/vJvl+f65V22dbkXbowE6jgT/gNBxE=
-github.com/google/go-github/v29 v29.0.2 h1:opYN6Wc7DOz7Ku3Oh4l7prmkOMwEcQxpFtxdU8N8Pts=
-github.com/google/go-github/v29 v29.0.2/go.mod h1:CHKiKKPHJ0REzfwc14QMklvtHwCveD0PxlMjLlzAM5E=
+github.com/google/go-github/v30 v30.0.0 h1:5UgIxLcf4zolLP8QpFcrSku0G1Y/p5+WChWL11dFlnQ=
+github.com/google/go-github/v30 v30.0.0/go.mod h1:n8jBpHl45a/rlBUtRJMOG4GhNADUQFEufcolZ95JfU8=
 github.com/google/go-querystring v1.0.0 h1:Xkwi/a1rcvNg1PPYe5vI8GbeBY/jrVuDX5ASuANWTrk=
 github.com/google/go-querystring v1.0.0/go.mod h1:odCYkC5MyYFN7vkCjXpyrEuKhc/BUO6wN/zVPAxq5ck=
 github.com/googleapis/gax-go v2.0.0+incompatible/go.mod h1:SFVmujtThgffbyetf+mdk2eWhX2bMyUtNHzFKcPA9HY=
