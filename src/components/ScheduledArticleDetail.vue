@@ -30,7 +30,7 @@ export default {
       },
       schedulerPrimaryButtonText() {
         if (props.article.hasPublished) {
-          return "Published!";
+          return "Update live article";
         }
         if (isPostDated.value) {
           return props.article.scheduleFor
@@ -40,6 +40,9 @@ export default {
         return "Post now";
       },
       schedulerSecondaryButtonText() {
+        if (props.article.hasPublished) {
+          return "Save without publishing changes";
+        }
         if (isPostDated.value) {
           return props.article.scheduleFor
             ? "Unschedule"
@@ -237,7 +240,7 @@ export default {
         <button
           class="button is-success has-text-weight-semibold"
           :class="{ 'is-loading': article.isSaving }"
-          :disabled="article.isSaving || article.hasPublished"
+          :disabled="article.isSaving"
           @click.prevent="article.save({ schedule: true })"
           v-text="schedulerPrimaryButtonText()"
         />
