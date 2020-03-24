@@ -31,7 +31,10 @@ func (arcStory *ArcStory) ToArticle(article *SpotlightPAArticle) error {
 
 	article.ArcID = arcStory.ID
 	article.InternalID = arcStory.Slug
-	article.Slug = slugFromURL(arcStory.CanonicalURL)
+	// Don't reset slug on saved stories
+	if strings.TrimSpace(article.Slug) == "" {
+		article.Slug = slugFromURL(arcStory.CanonicalURL)
+	}
 	article.PubDate = arcStory.Planning.Scheduling.PlannedPublishDate
 	article.Budget = arcStory.Planning.BudgetLine
 	article.Hed = arcStory.Headlines.Basic
