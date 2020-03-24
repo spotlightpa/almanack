@@ -2,7 +2,9 @@ package github
 
 import (
 	"context"
+	"errors"
 	"flag"
+	"net/http"
 
 	"github.com/google/go-github/v30/github"
 	"github.com/spotlightpa/almanack/pkg/almanack"
@@ -100,15 +102,21 @@ func (cl *Client) UpdateFile(ctx context.Context, msg, path string, content []by
 		cl.repo,
 		path,
 		&github.RepositoryContentGetOptions{Ref: cl.branch})
-	if err != nil {
-		return err
+	var sha *string
+	if err == nil {
+		sha = fileInfo.SHA
+	} else {
+		resp := new(github.ErrorResponse)
+		if !errors.As(err, &resp) || resp.Response.StatusCode != http.StatusNotFound {
+			return err
+		}
 	}
 
 	opts := &github.RepositoryContentFileOptions{
 		Message: github.String(msg),
 		Content: content,
 		Branch:  github.String(cl.branch),
-		SHA:     fileInfo.SHA,
+		SHA:     sha,
 		Author: &github.CommitAuthor{
 			Name:  github.String("Almanack"),
 			Email: github.String("webmaster@spotlightpa.org"),

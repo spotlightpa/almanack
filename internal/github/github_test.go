@@ -42,7 +42,7 @@ func TestGithub(t *testing.T) {
 	// create
 	testFileContents := time.Now().Format(time.Stamp)
 	fname := time.Now().Format("test-" + time.RFC3339 + ".txt")
-	err = client.CreateFile(ctx, "test create", fname, []byte(testFileContents))
+	err = client.UpdateFile(ctx, "test create", fname, []byte(testFileContents))
 	check(t, err, "could not create file")
 	// get
 	returned, err := client.GetFile(ctx, fname)
