@@ -8,7 +8,7 @@ THIS_DIR=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
 cd "$THIS_DIR"
 
 function _default() {
-	help
+	start-api
 }
 
 function _die() {
@@ -18,7 +18,7 @@ function _die() {
 
 function help() {
 	SCRIPT=$0
-	printf "Usage\n\t$SCRIPT <task> <args>\nTasks:\n\n"
+	printf 'Usage\n\t%s <task> <args>\nTasks:\n\n' "$SCRIPT"
 	compgen -A function | grep -e '^_' -v | sort | xargs printf ' - %s\n'
 	exit 2
 }
@@ -48,9 +48,38 @@ function migrate:prod() {
 	tern migrate -c prod.conf
 }
 
-function build:prod(){
+function build:prod() {
 	./build.sh
 }
 
-TIMEFORMAT="Task completed in %3lR"
+function test() {
+	test:backend
+	test:frontend
+	test:misc
+}
+
+function test:frontend() {
+	yarn run test
+}
+
+function test:backend() {
+	go test ./... -v
+}
+
+function test:misc() {
+	shellcheck ./run.sh
+}
+
+function format() {
+	yarn run lint
+	gofmt -s -w .
+	shfmt -w ./run.sh
+}
+
+function start-api() {
+	set -x
+	go run ./funcs/almanack-api -src-feed "$ARC_FEED" -cache
+}
+
+TIMEFORMAT="Task completed in %1lR"
 time "${@:-_default}"
