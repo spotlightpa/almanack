@@ -25,13 +25,33 @@ func NewMockClient(l almanack.Logger) (*MockClient, error) {
 	return &MockClient{dir, l}, nil
 }
 
-func (mc *MockClient) CreateFile(ctx context.Context, msg, path string, content []byte) error {
-	tmpfn := filepath.Join(mc.basepath, path)
+func (mc *MockClient) abspath(path string) string {
+	return filepath.Join(mc.basepath, path)
+}
 
-	mc.l.Printf("creating file %s on mock Github", tmpfn)
-
-	tmppath := filepath.Dir(tmpfn)
+func (mc *MockClient) ensureParent(fn string) {
+	tmppath := filepath.Dir(fn)
 	os.MkdirAll(tmppath, os.ModePerm)
+}
 
+func (mc *MockClient) CreateFile(ctx context.Context, msg, path string, content []byte) error {
+	tmpfn := mc.abspath(path)
+	mc.l.Printf("creating file %s on mock Github", tmpfn)
+	mc.ensureParent(tmpfn)
+	return ioutil.WriteFile(tmpfn, content, 0644)
+}
+
+func (mc *MockClient) GetFile(ctx context.Context, path string) (contents string, err error) {
+	tmpfn := mc.abspath(path)
+	mc.l.Printf("getting file %s from mock Github", tmpfn)
+	var b []byte
+	b, err = ioutil.ReadFile(tmpfn)
+	return string(b), err
+}
+
+func (mc *MockClient) UpdateFile(ctx context.Context, msg, path string, content []byte) error {
+	tmpfn := mc.abspath(path)
+	mc.l.Printf("updating file %s on mock Github", tmpfn)
+	mc.ensureParent(tmpfn)
 	return ioutil.WriteFile(tmpfn, content, 0644)
 }
