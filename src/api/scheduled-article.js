@@ -155,7 +155,6 @@ export default class ScheduledArticle {
       this.scheduleFor = null;
     }
     if (this.scheduleFor && !this.validate() && !refreshArc) {
-      alert("no");
       return;
     }
     this.isSaving = true;

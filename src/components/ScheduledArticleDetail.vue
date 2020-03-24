@@ -1,5 +1,5 @@
 <script>
-import { computed, watch } from "@vue/composition-api";
+import { computed, watchEffect } from "@vue/composition-api";
 
 import BulmaField from "./BulmaField.vue";
 import BulmaFieldInput from "./BulmaFieldInput.vue";
@@ -15,7 +15,7 @@ export default {
     article: { type: Object, required: true },
   },
   setup(props) {
-    watch(() => {
+    watchEffect(() => {
       document.title = `Spotlight PA Almanack - ${props.article.id} Scheduler`;
     });
 
