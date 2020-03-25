@@ -34,6 +34,8 @@ import {
   faEye,
   faEyeSlash,
   faInfoCircle,
+  faMinus,
+  faPlus,
   faUpload,
 } from "@fortawesome/free-solid-svg-icons";
 
@@ -57,9 +59,11 @@ library.add(
   faFileWord,
   faInfoCircle,
   faLink,
+  faMinus,
   faNewspaper,
   faPaperPlane,
   faPenNib,
+  faPlus,
   faSyncAlt,
   faTrashAlt,
   faUpload,

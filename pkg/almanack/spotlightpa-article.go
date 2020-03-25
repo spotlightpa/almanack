@@ -18,6 +18,7 @@ type SpotlightPAArticle struct {
 	ImageURL         string     `toml:"image"`
 	ImageCaption     string     `toml:"image-description"`
 	ImageCredit      string     `toml:"image-credit"`
+	ImageSize        string     `toml:"image-size"`
 	PubDate          time.Time  `toml:"published"`
 	Slug             string     `toml:"slug"`
 	Authors          []string   `toml:"authors"`
@@ -31,6 +32,11 @@ type SpotlightPAArticle struct {
 	Series           []string   `toml:"series"`
 	LinkTitle        string     `toml:"linktitle"`
 	SuppressFeatured bool       `toml:"suppress-featured"`
+	Weight           int        `toml:"weight"`
+	OverrideURL      string     `toml:"url"`
+	Aliases          []string   `toml:"aliases"`
+	ModalExclude     bool       `toml:"modal-exclude"`
+	NoIndex          bool       `toml:"no-index"`
 	Body             string     `toml:"-"`
 	Filepath         string     `toml:"-"`
 	LastArcSync      time.Time  `toml:"-"`
@@ -47,6 +53,7 @@ func (splArt *SpotlightPAArticle) toSPLData() interface{} {
 		ImageURL         string     `json:"image-url"`
 		ImageCaption     string     `json:"image-caption"`
 		ImageCredit      string     `json:"image-credit"`
+		ImageSize        string     `json:"image-size"`
 		PubDate          time.Time  `json:"pub-date"`
 		Slug             string     `json:"slug"`
 		Authors          []string   `json:"authors"`
@@ -60,6 +67,11 @@ func (splArt *SpotlightPAArticle) toSPLData() interface{} {
 		Series           []string   `json:"series"`
 		LinkTitle        string     `json:"link-title"`
 		SuppressFeatured bool       `json:"suppress-featured"`
+		Weight           int        `json:"weight"`
+		OverrideURL      string     `json:"override-url"`
+		Aliases          []string   `json:"aliases"`
+		ModalExclude     bool       `json:"modal-exclude"`
+		NoIndex          bool       `json:"no-index"`
 		Body             string     `json:"body"`
 		Filepath         string     `json:"-"`
 		LastArcSync      time.Time  `json:"last-arc-sync"`
