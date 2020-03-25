@@ -102,6 +102,7 @@ router.beforeEach((to, from, next) => {
       next({
         name: "login",
         hash: to.hash, // For verifying tokens etc.
+        query: { redirect: to.fullPath },
       });
       return;
     }
@@ -131,6 +132,16 @@ watch(
   (newStatus, oldStatus) => {
     if (oldStatus === undefined || newStatus === oldStatus) {
       return;
+    }
+    if (newStatus && router.app.$route.query?.redirect) {
+      let path = router.app.$route.query.redirect;
+      let { route } = router.resolve({ path });
+      if (route) {
+        if (!route.meta.requiresAuth || route.meta.requiresAuth.value) {
+          router.push({ path });
+          return;
+        }
+      }
     }
     let name = newStatus ? "articles" : "login";
     router.push({ name });
