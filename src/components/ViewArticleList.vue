@@ -9,6 +9,9 @@ export default {
     ArticleList,
     APILoader,
   },
+  metaInfo: {
+    title: "Available Articles",
+  },
   setup() {
     let { fullName, roles, isSpotlightPAUser } = useAuth();
     let { articles, canLoad, isLoading, fetch, error } = useAvailableList();

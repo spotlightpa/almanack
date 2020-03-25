@@ -13,6 +13,11 @@ export default {
   props: {
     id: String,
   },
+  metaInfo() {
+    return {
+      title: this.article ? `Schedule ${this.article.id}` : "Schedule Article",
+    };
+  },
   setup(props) {
     let { isSpotlightPAUser } = useAuth();
     let { canLoad, isLoading, reload, error, article } = useScheduler(props.id);

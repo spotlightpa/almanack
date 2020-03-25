@@ -10,6 +10,9 @@ export default {
   components: {
     APILoader,
   },
+  metaInfo: {
+    title: "Authorized Domains",
+  },
   setup() {
     let { isSpotlightPAUser } = useAuth();
     let { listAuthorizedDomains, addAuthorizedDomain } = useClient();

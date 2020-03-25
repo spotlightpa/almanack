@@ -3,6 +3,9 @@ import router from "./router.js";
 import "./filters/index.js";
 import "./plugins/font-awesome.js";
 
+import VueMeta from "vue-meta";
+Vue.use(VueMeta);
+
 import Buefy from "buefy";
 Vue.use(Buefy, {
   defaultIconComponent: "font-awesome-icon",

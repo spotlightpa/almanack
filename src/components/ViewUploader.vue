@@ -8,6 +8,9 @@ export default {
   components: {
     ImageUploader,
   },
+  metaInfo: {
+    title: "Upload Image",
+  },
   setup() {
     let { isSpotlightPAUser } = useAuth();
 

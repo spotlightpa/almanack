@@ -34,9 +34,7 @@ let router = new Router({
       path: "/login",
       name: "login",
       component: ViewLogin,
-      meta: {
-        title: "Spotlight PA Almanack - Login",
-      },
+      meta: {},
     },
     {
       path: "/articles",
@@ -44,7 +42,6 @@ let router = new Router({
       component: ViewArticleList,
       meta: {
         requiresAuth: isEditor,
-        title: "Spotlight PA Almanack - List",
       },
     },
     {
@@ -61,7 +58,6 @@ let router = new Router({
       props: true,
       meta: {
         requiresAuth: isSpotlightPAUser,
-        title: "Spotlight PA Almanack - Scheduler",
       },
     },
     {
@@ -70,7 +66,6 @@ let router = new Router({
       component: ViewAdmin,
       meta: {
         requiresAuth: isSpotlightPAUser,
-        title: "Spotlight PA Almanack - Admin",
       },
     },
     {
@@ -79,7 +74,6 @@ let router = new Router({
       component: ViewUploader,
       meta: {
         requiresAuth: isSpotlightPAUser,
-        title: "Spotlight PA Almanack - Image Uploader",
       },
     },
     {
@@ -88,7 +82,6 @@ let router = new Router({
       component: ViewAuthorizedDomains,
       meta: {
         requiresAuth: isSpotlightPAUser,
-        title: "Spotlight PA Almanack - Preapproved Domains",
       },
     },
     {
@@ -103,10 +96,6 @@ let router = new Router({
 });
 
 router.beforeEach((to, from, next) => {
-  if (to?.meta?.title) {
-    document.title = to.meta.title;
-  }
-
   let record = to.matched.find((record) => record.meta.requiresAuth);
   if (record) {
     if (!record.meta.requiresAuth.value) {

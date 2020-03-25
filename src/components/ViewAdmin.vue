@@ -17,6 +17,9 @@ export default {
     EmailComposer,
     ImageUploader,
   },
+  metaInfo: {
+    title: "Admin",
+  },
   setup() {
     let { fullName, roles, isSpotlightPAUser } = useAuth();
     let { articles, rawData, canLoad, isLoading, fetch, error } = useUpcoming();

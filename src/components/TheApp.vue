@@ -7,6 +7,9 @@ export default {
   components: {
     PageNav,
   },
+  metaInfo: {
+    titleTemplate: "%s • Spotlight PA Almanack",
+  },
 };
 </script>
 

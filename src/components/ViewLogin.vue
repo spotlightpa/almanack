@@ -3,6 +3,9 @@ import { useAuth } from "@/api/hooks.js";
 
 export default {
   name: "ViewLogin",
+  metaInfo: {
+    title: "Log In",
+  },
   setup() {
     let { login, signup, isSignedIn } = useAuth();
     return {

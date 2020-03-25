@@ -1,6 +1,4 @@
 <script>
-import { watchEffect } from "@vue/composition-api";
-
 import { getAvailableArticle } from "@/api/hooks.js";
 import APILoader from "./APILoader.vue";
 import ArticleDetails from "./ArticleDetails.vue";
@@ -11,6 +9,11 @@ export default {
     APILoader,
     ArticleDetails,
   },
+  metaInfo() {
+    return {
+      title: this.article ? this.article.slug : "Article",
+    };
+  },
   props: {
     id: String,
   },
@@ -18,12 +21,6 @@ export default {
     let { article, canLoad, isLoading, fetch, error } = getAvailableArticle(
       props.id
     );
-
-    watchEffect(() => {
-      if (article.value?.slug) {
-        document.title = `Spotlight PA Almanack - ${article.value?.slug}`;
-      }
-    });
 
     return {
       canLoad,
