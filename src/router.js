@@ -16,6 +16,15 @@ import ViewUploader from "./components/ViewUploader.vue";
 
 Vue.use(Router);
 
+let {
+  roles,
+  fullName,
+  email,
+  isEditor,
+  isSpotlightPAUser,
+  isSignedIn,
+} = useAuth();
+
 let router = new Router({
   mode: "history",
   base: process.env.BASE_URL,
@@ -34,7 +43,7 @@ let router = new Router({
       name: "articles",
       component: ViewArticleList,
       meta: {
-        requiresAuth: true,
+        requiresAuth: isEditor,
         title: "Spotlight PA Almanack - List",
       },
     },
@@ -43,7 +52,7 @@ let router = new Router({
       name: "article",
       component: ViewArticleItem,
       props: true,
-      meta: { requiresAuth: true },
+      meta: { requiresAuth: isEditor },
     },
     {
       path: "/articles/:id/schedule",
@@ -51,7 +60,7 @@ let router = new Router({
       component: ViewArticleSchedule,
       props: true,
       meta: {
-        requiresAuth: true,
+        requiresAuth: isSpotlightPAUser,
         title: "Spotlight PA Almanack - Scheduler",
       },
     },
@@ -60,7 +69,7 @@ let router = new Router({
       name: "admin",
       component: ViewAdmin,
       meta: {
-        requiresAuth: true,
+        requiresAuth: isSpotlightPAUser,
         title: "Spotlight PA Almanack - Admin",
       },
     },
@@ -69,7 +78,7 @@ let router = new Router({
       name: "uploader",
       component: ViewUploader,
       meta: {
-        requiresAuth: true,
+        requiresAuth: isSpotlightPAUser,
         title: "Spotlight PA Almanack - Image Uploader",
       },
     },
@@ -78,7 +87,7 @@ let router = new Router({
       name: "domains",
       component: ViewAuthorizedDomains,
       meta: {
-        requiresAuth: true,
+        requiresAuth: isSpotlightPAUser,
         title: "Spotlight PA Almanack - Preapproved Domains",
       },
     },
@@ -93,15 +102,14 @@ let router = new Router({
   },
 });
 
-let { roles, fullName, email, isSignedIn } = useAuth();
-
 router.beforeEach((to, from, next) => {
   if (to?.meta?.title) {
     document.title = to.meta.title;
   }
 
-  if (to.matched.some((record) => record.meta.requiresAuth)) {
-    if (!isSignedIn.value) {
+  let record = to.matched.find((record) => record.meta.requiresAuth);
+  if (record) {
+    if (!record.meta.requiresAuth.value) {
       next({
         name: "login",
         hash: to.hash, // For verifying tokens etc.
