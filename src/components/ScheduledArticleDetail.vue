@@ -96,6 +96,7 @@ export default {
     <b-field label="Topics">
       <b-taginput
         v-model="article.topics"
+        :data="['Coronavirus']"
         attached
         allow-duplicates
       ></b-taginput>
@@ -104,6 +105,7 @@ export default {
     <b-field label="Series">
       <b-taginput
         v-model="article.series"
+        :data="['Top News']"
         attached
         allow-duplicates
       ></b-taginput>
@@ -192,15 +194,28 @@ export default {
       label="Image credit"
     ></BulmaFieldInput>
 
-    TK Image type <br />
+    <b-field label="Image size">
+      <b-select v-model="article.imageSize" expanded>
+        <option
+          v-for="size in ['inline', 'full', 'hidden']"
+          :key="size"
+          :value="size"
+        >
+          {{ size }}
+        </option>
+      </b-select>
+    </b-field>
 
-    <BulmaFieldInput
-      v-model="article.slug"
-      :readonly="article.hasPublished"
-      label="Slug"
-    ></BulmaFieldInput>
+    <b-field label="Slug">
+      <b-input
+        v-model="article.slug"
+        :disabled="article.hasPublished"
+        :readonly="article.hasPublished"
+      />
+    </b-field>
     <button
       class="block button is-small is-light has-text-weight-semibold"
+      :disabled="article.hasPublished"
       @click.prevent="article.deriveSlug"
     >
       Derive slug from title
@@ -234,6 +249,14 @@ export default {
       </div>
     </BulmaField>
 
+    <b-field label="Homepage override order number">
+      <b-numberinput
+        v-model="article.weight"
+        controls-position="compact"
+        type="is-light"
+      ></b-numberinput>
+    </b-field>
+
     <BulmaField v-slot="{ idForLabel }" label="Article text">
       <textarea
         :id="idForLabel"
@@ -242,6 +265,40 @@ export default {
         rows="8"
       ></textarea>
     </BulmaField>
+
+    <details class="field">
+      <summary class="has-text-weight-semibold">
+        Advanced options
+      </summary>
+
+      <BulmaField label="Hide newsletters pop-up">
+        <div>
+          <label class="checkbox">
+            <input v-model="article.modalExclude" type="checkbox" />
+            Don't show newsletters modal screen on this page
+          </label>
+        </div>
+      </BulmaField>
+
+      <BulmaField label="No index">
+        <div>
+          <label class="checkbox">
+            <input v-model="article.noIndex" type="checkbox" />
+            Hide page from Google search results
+          </label>
+        </div>
+      </BulmaField>
+
+      <BulmaFieldInput
+        v-model="article.overrideURL"
+        label="Override URL"
+      ></BulmaFieldInput>
+
+      <b-field label="URL Aliases">
+        <b-taginput v-model="article.aliases"></b-taginput>
+        Redirect these URLs to the story
+      </b-field>
+    </details>
 
     <div v-if="article.saveError" class="message is-danger">
       <p class="message-header">{{ article.saveError.name }}</p>
