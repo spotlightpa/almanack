@@ -143,7 +143,12 @@ watch(
         }
       }
     }
-    let name = newStatus ? "articles" : "login";
+    let name = "login";
+    if (isSpotlightPAUser.value) {
+      name = "admin";
+    } else if (newStatus) {
+      name = "articles";
+    }
     router.push({ name });
   }
 );
