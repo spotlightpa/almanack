@@ -45,6 +45,19 @@ export default {
 
 <template>
   <div>
+    <nav class="breadcrumb has-succeeds-separator" aria-label="breadcrumbs">
+      <ul>
+        <li>
+          <router-link :to="{ name: 'admin' }">Admin</router-link>
+        </li>
+        <li class="is-active">
+          <router-link exact :to="{ name: 'spotlightpa-articles' }">
+            Spotlight PA Articles
+          </router-link>
+        </li>
+      </ul>
+    </nav>
+
     <h1 class="title">
       Spotlight PA Articles
     </h1>
