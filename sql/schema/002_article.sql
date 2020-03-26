@@ -30,4 +30,6 @@ CREATE TRIGGER row_updated_at_on_article_trigger_
 
 ---- create above / drop below ----
 DROP TABLE article;
+
 DROP TABLE article_status;
+

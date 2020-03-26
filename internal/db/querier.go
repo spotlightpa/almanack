@@ -15,6 +15,7 @@ type Querier interface {
 	ListAllArticles(ctx context.Context) ([]Article, error)
 	ListAvailableArticles(ctx context.Context) ([]Article, error)
 	ListDomainsWithRole(ctx context.Context, role string) ([]string, error)
+	ListSpotlightPAArticles(ctx context.Context) ([]ListSpotlightPAArticlesRow, error)
 	ListUpcoming(ctx context.Context) ([]Article, error)
 	PopScheduled(ctx context.Context) ([]Article, error)
 	SetRolesForDomain(ctx context.Context, arg SetRolesForDomainParams) (DomainRole, error)
