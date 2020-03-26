@@ -4,7 +4,7 @@ let plugins = [require("autoprefixer")];
 if (process.env.NODE_ENV === "production") {
   plugins.push(
     purgecss({
-      content: ["./**/*.html", "./**/*.vue"],
+      content: ["src/**/*.html", "src/**/*.vue"],
     })
   );
 }
