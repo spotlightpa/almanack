@@ -12,13 +12,24 @@ function _default() {
 }
 
 function _die() {
-	echo "$@" 1>&2
+	>&2 echo "Fatal: ${@}"
 	exit 1
 }
 
+function _installed() {
+	which "$1" >/dev/null 2>&1;
+}
+
 function help() {
-	SCRIPT=$0
-	printf 'Usage\n\t%s <task> <args>\nTasks:\n\n' "$SCRIPT"
+	local SCRIPT=$0
+	cat <<EOF
+Usage
+
+	$SCRIPT <task> <args>
+
+Tasks:
+
+EOF
 	compgen -A function | grep -e '^_' -v | sort | xargs printf ' - %s\n'
 	exit 2
 }
@@ -34,7 +45,8 @@ function redis-cli() {
 		redis-cli -h redis -p 6379
 }
 
-function rebuild-sql() {
+function sql() {
+	_installed sqlc || _die "sqlc not installed"
 	go generate ./...
 }
 
