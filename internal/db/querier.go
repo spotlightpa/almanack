@@ -11,6 +11,7 @@ import (
 type Querier interface {
 	AppendRoleToDomain(ctx context.Context, arg AppendRoleToDomainParams) (DomainRole, error)
 	GetArticle(ctx context.Context, arcID sql.NullString) (Article, error)
+	GetArticleByDBID(ctx context.Context, id int32) (Article, error)
 	GetRolesForDomain(ctx context.Context, domain string) ([]string, error)
 	ListAllArticles(ctx context.Context) ([]Article, error)
 	ListAvailableArticles(ctx context.Context) ([]Article, error)

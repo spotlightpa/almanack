@@ -20,6 +20,7 @@ export const endpoints = {
   getSignedUpload: `/api/get-signed-upload`,
   getSignupURL: `/api/mailchimp-signup-url`,
   authorizedDomains: `/api/authorized-domains`,
+  listSpotlightPAArticles: `/api/spotlightpa-articles`,
 };
 
 export function makeClient($auth) {
@@ -128,6 +129,9 @@ export function makeClient($auth) {
     },
     async addAuthorizedDomain(domain) {
       return await tryTo(post(endpoints.authorizedDomains, { domain }));
+    },
+    async listSpotlightPAArticles() {
+      return await tryTo(request(endpoints.listSpotlightPAArticles));
     },
   };
 }

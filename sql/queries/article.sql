@@ -70,6 +70,14 @@ FROM
 WHERE
     arc_id = $1;
 
+-- name: GetArticleByDBID :one
+SELECT
+    *
+FROM
+    article
+WHERE
+    id = $1;
+
 -- name: ListUpcoming :many
 SELECT
     *
@@ -101,3 +109,23 @@ ORDER BY
         '1'
     END ASC,
     arc_data -> 'last_updated_date' DESC;
+
+-- name: ListSpotlightPAArticles :many
+SELECT
+    id,
+    arc_id::text,
+    (spotlightpa_data ->> 'internal-id')::text AS internal_id,
+    (spotlightpa_data ->> 'hed')::text AS hed,
+    ARRAY (
+        SELECT
+            jsonb_array_elements_text(spotlightpa_data -> 'authors'))::text[] AS authors,
+    to_timestamp(spotlightpa_data ->> 'pub-date'::text,
+        -- ISO date
+        'YYYY-MM-DD"T"HH24:MI:SS"Z"')::timestamp AS pub_date
+FROM
+    article
+WHERE
+    spotlightpa_path IS NOT NULL
+ORDER BY
+    pub_date DESC;
+
