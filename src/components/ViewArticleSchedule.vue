@@ -36,18 +36,20 @@ export default {
 
 <template>
   <div>
-    <div v-if="!isSpotlightPAUser" class="message is-danger">
-      <p class="message-header">Not Authorized</p>
+    <nav class="breadcrumb has-succeeds-separator" aria-label="breadcrumbs">
+      <ul>
+        <li>
+          <router-link :to="{ name: 'admin' }">Admin</router-link>
+        </li>
+        <li>
+          <router-link exact :to="{ name: 'spotlightpa-articles' }">
+            Spotlight PA Articles
+          </router-link>
+        </li>
+      </ul>
+    </nav>
 
-      <p class="message-body">
-        You do not have permission to use this page.
-        <strong
-          ><router-link :to="{ name: 'home' }">Go home</router-link>?</strong
-        >
-      </p>
-    </div>
     <APILoader
-      v-else
       :can-load="canLoad"
       :is-loading="isLoading"
       :reload="reload"

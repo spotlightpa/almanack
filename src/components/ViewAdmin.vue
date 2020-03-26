@@ -49,23 +49,42 @@ export default {
       Spotlight Administrator
     </h1>
 
-    <div v-if="isSpotlightPAUser" class="field is-grouped">
-      <div class="control">
-        <label class="label">Upload an image</label>
-        <ImageUploader />
-      </div>
-      <div class="control">
-        <label class="label">Compose a message</label>
-        <button
-          type="button"
-          class="button is-primary has-text-weight-semibold"
-          @click="showComposer = !showComposer"
-        >
-          <span class="icon">
-            <font-awesome-icon :icon="['fas', 'paper-plane']" />
-          </span>
-          <span v-text="!showComposer ? 'Compose Message' : 'Hide Message'" />
-        </button>
+    <div class="level">
+      <div class="level-left">
+        <div class="level-item">
+          <div class="control">
+            <label class="label">Upload an image</label>
+            <ImageUploader />
+          </div>
+        </div>
+        <div class="level-item">
+          <div class="control">
+            <label class="label">Compose a message</label>
+            <button
+              type="button"
+              class="button is-primary has-text-weight-semibold"
+              @click="showComposer = !showComposer"
+            >
+              <span class="icon">
+                <font-awesome-icon :icon="['fas', 'paper-plane']" />
+              </span>
+              <span
+                v-text="!showComposer ? 'Compose Message' : 'Hide Message'"
+              />
+            </button>
+          </div>
+        </div>
+        <div class="level-item">
+          <div class="control">
+            <label class="label">Manage Spotlight PA Articles</label>
+            <router-link
+              class="button is-success has-text-weight-semibold"
+              :to="{ name: 'spotlightpa-articles' }"
+            >
+              List Articles
+            </router-link>
+          </div>
+        </div>
       </div>
     </div>
 
