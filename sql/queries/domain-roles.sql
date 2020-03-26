@@ -4,21 +4,21 @@ SELECT
 FROM
     domain_roles
 WHERE
-    domain ILIKE $1;
+    "domain" ILIKE $1;
 
 -- name: SetRolesForDomain :one
-INSERT INTO domain_roles (domain, roles)
+INSERT INTO domain_roles ("domain", roles)
     VALUES ($1, $2)
-ON CONFLICT (lower(domain))
+ON CONFLICT (lower("domain"))
     DO UPDATE SET
         roles = $2
     RETURNING
         *;
 
 -- name: AppendRoleToDomain :one
-INSERT INTO domain_roles (domain, roles)
+INSERT INTO domain_roles ("domain", roles)
     VALUES (@domain, ARRAY[@role::text])
-ON CONFLICT (lower(domain))
+ON CONFLICT (lower("domain"))
     DO UPDATE SET
         roles = CASE WHEN NOT (domain_roles.roles::text[] @> ARRAY[@role]) THEN
             domain_roles.roles::text[] || ARRAY[@role]
@@ -30,10 +30,11 @@ ON CONFLICT (lower(domain))
 
 -- name: ListDomainsWithRole :many
 SELECT
-    DOMAIN
+    "domain"
 FROM
     "domain_roles"
 WHERE
     "roles" @> ARRAY[@role::text]
 ORDER BY
-    DOMAIN ASC;
+    "domain" ASC;
+

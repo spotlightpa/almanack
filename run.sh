@@ -12,12 +12,12 @@ function _default() {
 }
 
 function _die() {
-	>&2 echo "Fatal: ${@}"
+	echo >&2 "Fatal: ${@}"
 	exit 1
 }
 
 function _installed() {
-	which "$1" >/dev/null 2>&1;
+	which "$1" >/dev/null 2>&1
 }
 
 function help() {
@@ -85,7 +85,12 @@ function test:misc() {
 function format() {
 	yarn run lint
 	gofmt -s -w .
+	format:misc
+}
+
+function format:misc() {
 	shfmt -w ./run.sh
+	find sql -name '*.sql' -exec pg_format {} -o {} \;
 }
 
 function start-api() {

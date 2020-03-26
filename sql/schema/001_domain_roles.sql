@@ -6,7 +6,7 @@ CREATE TABLE domain_roles (
     updated_at timestamp WITH time zone NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE UNIQUE INDEX unique_domain_on_domain_roles ON domain_roles ((lower(domain)) text_ops);
+CREATE UNIQUE INDEX unique_domain_on_domain_roles ON domain_roles ((lower("domain")) text_ops);
 
 CREATE OR REPLACE FUNCTION update_row_updated_at_function_ ()
     RETURNS TRIGGER
@@ -25,8 +25,11 @@ CREATE TRIGGER row_updated_at_on_domain_roles_trigger_
 
 INSERT INTO "domain_roles" ("domain", "roles")
     VALUES
-    ('spotlightpa.org', '{"Spotlight PA","arc user",editor}'),
-    ('inquirer.com', '{"arc user",editor}');
+        -- Fixtures
+        ('spotlightpa.org', '{"Spotlight PA","arc user",editor}'),
+        --
+        ('inquirer.com', '{"arc user",editor}');
 
 ---- create above / drop below ----
 DROP TABLE domain_roles;
+
