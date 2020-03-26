@@ -12,6 +12,7 @@ import ViewArticleSchedule from "./components/ViewArticleSchedule.vue";
 import ViewAuthorizedDomains from "./components/ViewAuthorizedDomains.vue";
 import ViewError from "./components/ViewError.vue";
 import ViewLogin from "./components/ViewLogin.vue";
+import ViewSpotlightPAArticles from "./components/ViewSpotlightPAArticles.vue";
 import ViewUploader from "./components/ViewUploader.vue";
 
 Vue.use(Router);
@@ -72,6 +73,14 @@ let router = new Router({
       path: "/admin/uploader",
       name: "uploader",
       component: ViewUploader,
+      meta: {
+        requiresAuth: isSpotlightPAUser,
+      },
+    },
+    {
+      path: "/admin/spotlightpa",
+      name: "spotlightpa-articles",
+      component: ViewSpotlightPAArticles,
       meta: {
         requiresAuth: isSpotlightPAUser,
       },

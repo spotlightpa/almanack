@@ -7,6 +7,9 @@ import (
 	"context"
 	"database/sql"
 	"encoding/json"
+	"time"
+
+	"github.com/lib/pq"
 )
 
 const getArticle = `-- name: GetArticle :one
@@ -20,6 +23,34 @@ WHERE
 
 func (q *Queries) GetArticle(ctx context.Context, arcID sql.NullString) (Article, error) {
 	row := q.db.QueryRowContext(ctx, getArticle, arcID)
+	var i Article
+	err := row.Scan(
+		&i.ID,
+		&i.ArcID,
+		&i.ArcData,
+		&i.SpotlightPAPath,
+		&i.SpotlightPAData,
+		&i.ScheduleFor,
+		&i.LastPublished,
+		&i.Note,
+		&i.Status,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+	)
+	return i, err
+}
+
+const getArticleByDBID = `-- name: GetArticleByDBID :one
+SELECT
+    id, arc_id, arc_data, spotlightpa_path, spotlightpa_data, schedule_for, last_published, note, status, created_at, updated_at
+FROM
+    article
+WHERE
+    id = $1
+`
+
+func (q *Queries) GetArticleByDBID(ctx context.Context, id int32) (Article, error) {
+	row := q.db.QueryRowContext(ctx, getArticleByDBID, id)
 	var i Article
 	err := row.Scan(
 		&i.ID,
@@ -119,6 +150,65 @@ func (q *Queries) ListAvailableArticles(ctx context.Context) ([]Article, error) 
 			&i.Status,
 			&i.CreatedAt,
 			&i.UpdatedAt,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const listSpotlightPAArticles = `-- name: ListSpotlightPAArticles :many
+SELECT
+    id,
+    arc_id::text,
+    (spotlightpa_data ->> 'internal-id')::text AS internal_id,
+    (spotlightpa_data ->> 'hed')::text AS hed,
+    ARRAY (
+        SELECT
+            jsonb_array_elements_text(spotlightpa_data -> 'authors'))::text[] AS authors,
+    to_timestamp(spotlightpa_data ->> 'pub-date'::text,
+        -- ISO date
+        'YYYY-MM-DD"T"HH24:MI:SS"Z"')::timestamp AS pub_date
+FROM
+    article
+WHERE
+    spotlightpa_path IS NOT NULL
+ORDER BY
+    pub_date DESC
+`
+
+type ListSpotlightPAArticlesRow struct {
+	ID         int32     `json:"id"`
+	ArcID      string    `json:"arc_id"`
+	InternalID string    `json:"internal_id"`
+	Hed        string    `json:"hed"`
+	Authors    []string  `json:"authors"`
+	PubDate    time.Time `json:"pub_date"`
+}
+
+func (q *Queries) ListSpotlightPAArticles(ctx context.Context) ([]ListSpotlightPAArticlesRow, error) {
+	rows, err := q.db.QueryContext(ctx, listSpotlightPAArticles)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []ListSpotlightPAArticlesRow
+	for rows.Next() {
+		var i ListSpotlightPAArticlesRow
+		if err := rows.Scan(
+			&i.ID,
+			&i.ArcID,
+			&i.InternalID,
+			&i.Hed,
+			pq.Array(&i.Authors),
+			&i.PubDate,
 		); err != nil {
 			return nil, err
 		}

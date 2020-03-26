@@ -186,6 +186,7 @@ func (app *appEnv) routes() http.Handler {
 			r.Post("/get-signed-upload", app.getSignedUpload)
 			r.Get("/authorized-domains", app.listDomains)
 			r.Post("/authorized-domains", app.postDomain)
+			r.Get("/spotlightpa-articles", app.listSpotlightPAArticles)
 		})
 	})
 	r.NotFound(app.notFound)
@@ -523,4 +524,22 @@ func (app *appEnv) postDomain(w http.ResponseWriter, r *http.Request) {
 	app.jsonResponse(http.StatusOK, w, response{
 		domains,
 	})
+}
+
+func (app *appEnv) listSpotlightPAArticles(w http.ResponseWriter, r *http.Request) {
+	app.Printf("starting listSpotlightPAArticles")
+	type response struct {
+		Articles []db.ListSpotlightPAArticlesRow `json:"articles"`
+	}
+	var (
+		res response
+		err error
+	)
+
+	if res.Articles, err = app.svc.Querier.ListSpotlightPAArticles(r.Context()); err != nil {
+		app.errorResponse(r.Context(), w, err)
+		return
+	}
+
+	app.jsonResponse(http.StatusOK, w, res)
 }
