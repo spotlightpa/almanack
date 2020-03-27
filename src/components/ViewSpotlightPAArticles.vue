@@ -109,7 +109,7 @@ export default {
         </b-autocomplete>
       </b-field>
 
-      <table class="table">
+      <table class="table is-striped is-fullwidth">
         <thead>
           <tr>
             <th>Slug</th>
