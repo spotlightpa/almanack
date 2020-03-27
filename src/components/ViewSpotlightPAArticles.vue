@@ -1,5 +1,5 @@
 <script>
-import { reactive, toRefs } from "@vue/composition-api";
+import { reactive, computed, toRefs } from "@vue/composition-api";
 
 import APILoader from "./APILoader.vue";
 
@@ -14,29 +14,58 @@ export default {
     title: "Spotlight PA Articles",
   },
   setup() {
-    let apiState = reactive({
+    const articleProps = (article) => [
+      article.internal_id,
+      article.hed,
+      ...article.authors,
+    ];
+
+    const fuzzyMatch = (str, substr) =>
+      str.toLowerCase().indexOf(substr.toLowerCase()) >= 0;
+
+    let state = reactive({
       isLoading: false,
       articles: [],
+      filter: "",
+      rawFilter: "",
       error: null,
+
+      articleProps: computed(() =>
+        Array.from(
+          new Set(state.articles.flatMap((article) => articleProps(article)))
+        ).sort()
+      ),
+
+      filteredArticles: computed(() => {
+        if (!state.filter) {
+          return state.articles;
+        }
+        return state.articles.filter((article) =>
+          articleProps(article).some((prop) => fuzzyMatch(prop, state.filter))
+        );
+      }),
+      filterOptions: computed(() =>
+        state.articleProps.filter((prop) => fuzzyMatch(prop, state.rawFilter))
+      ),
     });
 
     let { listSpotlightPAArticles } = useClient();
 
     async function fetch() {
-      apiState.isLoading = true;
+      state.isLoading = true;
       let data;
-      [data, apiState.error] = await listSpotlightPAArticles();
-      apiState.isLoading = false;
-      if (apiState.error) {
+      [data, state.error] = await listSpotlightPAArticles();
+      state.isLoading = false;
+      if (state.error) {
         return;
       }
-      apiState.articles = data.articles;
+      state.articles = data.articles;
     }
 
     fetch();
 
     return {
-      ...toRefs(apiState),
+      ...toRefs(state),
       fetch,
     };
   },
@@ -68,6 +97,18 @@ export default {
       :reload="fetch"
       :error="error"
     >
+      <b-field label="">
+        <b-autocomplete
+          v-model="rawFilter"
+          :data="filterOptions"
+          placeholder="Filter articles"
+          clearable
+          @input="(option) => (filter = option)"
+        >
+          <template slot="empty">No results found</template>
+        </b-autocomplete>
+      </b-field>
+
       <table class="table">
         <thead>
           <tr>
@@ -78,7 +119,7 @@ export default {
           </tr>
         </thead>
         <tbody>
-          <tr v-for="article of articles" :key="article.id">
+          <tr v-for="article of filteredArticles" :key="article.id">
             <td>
               <router-link
                 :to="{ name: 'schedule', params: { id: article.arc_id } }"
