@@ -1,9 +1,10 @@
 <script>
 import { reactive, computed, toRefs } from "@vue/composition-api";
 
-import APILoader from "./APILoader.vue";
-
 import { useClient } from "@/api/hooks.js";
+import fuzzyMatch from "@/utils/fuzzy-match.js";
+
+import APILoader from "./APILoader.vue";
 
 export default {
   name: "ViewSpotlightPAArticles",
@@ -20,13 +21,9 @@ export default {
       ...article.authors,
     ];
 
-    const fuzzyMatch = (str, substr) =>
-      str.toLowerCase().indexOf(substr.toLowerCase()) >= 0;
-
     let state = reactive({
       isLoading: false,
       articles: [],
-      filter: "",
       rawFilter: "",
       error: null,
 
@@ -37,11 +34,13 @@ export default {
       ),
 
       filteredArticles: computed(() => {
-        if (!state.filter) {
+        if (!state.rawFilter) {
           return state.articles;
         }
         return state.articles.filter((article) =>
-          articleProps(article).some((prop) => fuzzyMatch(prop, state.filter))
+          articleProps(article).some((prop) =>
+            fuzzyMatch(prop, state.rawFilter)
+          )
         );
       }),
       filterOptions: computed(() =>
@@ -103,7 +102,6 @@ export default {
           :data="filterOptions"
           placeholder="Filter articles"
           clearable
-          @input="(option) => (filter = option)"
         >
           <template slot="empty">No results found</template>
         </b-autocomplete>
