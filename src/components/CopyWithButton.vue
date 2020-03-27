@@ -42,6 +42,7 @@ export default {
         <button
           type="button"
           class="button is-primary has-text-weight-semibold"
+          :class="size"
           title="Copy"
           @click="$refs.copier.copy()"
         >

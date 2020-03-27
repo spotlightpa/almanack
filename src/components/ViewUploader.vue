@@ -103,41 +103,52 @@ export default {
         </b-autocomplete>
       </b-field>
 
-      <figure v-for="image of filteredImages" :key="image.id">
-        <div class="max-128">
-          <picture
-            class="image is-square has-background-grey-lighter has-margin-bottom"
-          >
-            <img :src="image.url" width="256" height="256" />
-          </picture>
-        </div>
-        <figcaption>
-          <p class="has-text-weight-semibold">{{ image.date | formatDate }}</p>
-          <p class="has-margin-bottom-thin">
-            <strong>Path:</strong>
-          </p>
-          <CopyWithButton :value="image.path" label="path"></CopyWithButton>
-          <p class="has-margin-bottom-thin">
-            <strong>Description:</strong>
-          </p>
-          <CopyWithButton
-            :value="image.description"
-            label="description"
-          ></CopyWithButton>
-          <p class="has-margin-bottom-thin">
-            <strong>Credit:</strong>
-          </p>
-          <CopyWithButton :value="image.credit" label="credit"></CopyWithButton>
-        </figcaption>
-      </figure>
+      <table class="table is-striped is-fullwidth">
+        <tbody>
+          <tr v-for="image of filteredImages" :key="image.id">
+            <td>
+              <div class="max-128">
+                <picture
+                  class="image is-square has-background-grey-lighter has-margin-bottom"
+                >
+                  <img :src="image.url" width="256" height="256" />
+                </picture>
+              </div>
+            </td>
+            <td>
+              <p>
+                <strong>Description:</strong>
+                {{ image.description }}
+              </p>
+
+              <p>
+                <strong>Credit:</strong>
+                {{ image.credit }}
+              </p>
+              <p>
+                <strong>Date:</strong>
+                {{ image.date | formatDate }}
+              </p>
+              <p class="has-margin-top-thin">
+                <CopyWithButton
+                  :value="image.path"
+                  label="path"
+                  size="is-small"
+                ></CopyWithButton>
+              </p>
+            </td>
+            <td></td>
+          </tr>
+        </tbody>
+      </table>
     </APILoader>
   </div>
 </template>
 
 <style scoped>
 .max-128 {
-  max-height: 128px;
-  max-width: 128px;
+  height: 128px;
+  width: 128px;
   min-height: 1rem;
   min-width: 1rem;
 }
