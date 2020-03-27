@@ -34,3 +34,13 @@ type DomainRole struct {
 	CreatedAt time.Time `json:"created_at"`
 	UpdatedAt time.Time `json:"updated_at"`
 }
+
+type Image struct {
+	ID          int32     `json:"id"`
+	Path        string    `json:"path"`
+	Description string    `json:"description"`
+	Credit      string    `json:"credit"`
+	SrcUrl      string    `json:"src_url"`
+	CreatedAt   time.Time `json:"created_at"`
+	UpdatedAt   time.Time `json:"updated_at"`
+}

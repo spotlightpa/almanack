@@ -22,6 +22,7 @@ export const endpoints = {
   getSignupURL: `/api/mailchimp-signup-url`,
   authorizedDomains: `/api/authorized-domains`,
   listSpotlightPAArticles: `/api/spotlightpa-articles`,
+  listImages: `/api/images`,
 };
 
 export function makeClient($auth) {
@@ -136,6 +137,9 @@ export function makeClient($auth) {
     },
     async listRefreshArc() {
       return await tryTo(request(endpoints.listRefreshArc));
+    },
+    async listImages() {
+      return await tryTo(request(endpoints.listImages));
     },
   };
 }
