@@ -36,6 +36,7 @@ import {
   faInfoCircle,
   faMinus,
   faPlus,
+  faTimesCircle,
   faUpload,
 } from "@fortawesome/free-solid-svg-icons";
 
@@ -65,6 +66,7 @@ library.add(
   faPenNib,
   faPlus,
   faSyncAlt,
+  faTimesCircle,
   faTrashAlt,
   faUpload,
   faUserCircle,
