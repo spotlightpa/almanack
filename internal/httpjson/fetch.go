@@ -3,6 +3,7 @@ package httpjson
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"net/http"
 )
@@ -26,6 +27,10 @@ func Get(ctx context.Context, c *http.Client, url string, v interface{}) error {
 	b, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
 		return err
+	}
+
+	if resp.StatusCode >= 300 {
+		return fmt.Errorf("bad response: %d %s", resp.StatusCode, resp.Status)
 	}
 
 	if err = json.Unmarshal(b, v); err != nil {
