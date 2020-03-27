@@ -1,8 +1,9 @@
 <script>
-import { reactive, toRefs } from "@vue/composition-api";
+import { reactive, computed, toRefs } from "@vue/composition-api";
 
 import { useClient } from "@/api/hooks.js";
 import imgproxyURL from "@/api/imgproxy-url.js";
+import fuzzyMatch from "@/utils/fuzzy-match.js";
 
 import APILoader from "./APILoader.vue";
 import CopyWithButton from "./CopyWithButton.vue";
@@ -21,10 +22,30 @@ export default {
   setup() {
     let { listImages } = useClient();
 
+    const imageProps = (image) => [image.description, image.credit];
+
     let state = reactive({
       isLoading: false,
       images: [],
       error: null,
+      rawFilter: "",
+
+      imageProps: computed(() =>
+        Array.from(
+          new Set(state.images.flatMap((article) => imageProps(article)))
+        ).sort()
+      ),
+      filteredImages: computed(() => {
+        if (!state.rawFilter) {
+          return state.images;
+        }
+        return state.images.filter((article) =>
+          imageProps(article).some((prop) => fuzzyMatch(prop, state.rawFilter))
+        );
+      }),
+      filterOptions: computed(() =>
+        state.imageProps.filter((prop) => fuzzyMatch(prop, state.rawFilter))
+      ),
     });
 
     let actions = {
@@ -38,6 +59,7 @@ export default {
         }
         state.images = data.images.map((rawImage) => ({
           id: rawImage.id,
+          path: rawImage.path,
           url: imgproxyURL(rawImage.path, { width: 256, height: 256 }),
           description: rawImage.description,
           credit: rawImage.credit,
@@ -63,14 +85,25 @@ export default {
 
     <ImageUploader />
 
-    <h2 class="title has-margin-top">Images</h2>
+    <h2 class="title has-margin-top">Existing Images</h2>
     <APILoader
       :can-load="true"
       :is-loading="isLoading"
       :reload="fetch"
       :error="error"
     >
-      <figure v-for="image of images" :key="image.id">
+      <b-field label="">
+        <b-autocomplete
+          v-model="rawFilter"
+          :data="filterOptions"
+          placeholder="Filter images"
+          clearable
+        >
+          <template slot="empty">No results found</template>
+        </b-autocomplete>
+      </b-field>
+
+      <figure v-for="image of filteredImages" :key="image.id">
         <div class="max-128">
           <picture
             class="image is-square has-background-grey-lighter has-margin-bottom"
@@ -79,6 +112,11 @@ export default {
           </picture>
         </div>
         <figcaption>
+          <p class="has-text-weight-semibold">{{ image.date | formatDate }}</p>
+          <p class="has-margin-bottom-thin">
+            <strong>Path:</strong>
+          </p>
+          <CopyWithButton :value="image.path" label="path"></CopyWithButton>
           <p class="has-margin-bottom-thin">
             <strong>Description:</strong>
           </p>
