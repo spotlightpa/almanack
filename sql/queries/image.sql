@@ -5,22 +5,16 @@ FROM
     image
 ORDER BY
     created_at DESC
-LIMIT 100;
+LIMIT $1 OFFSET $2;
 
--- name: InsertImage :one
-INSERT INTO image (path, credit, description, src_url)
-    VALUES (@path, @credit, @description, @src_url)
+-- name: UpdateImage :one
+INSERT INTO image ("path", "credit", "description", "src_url", "type")
+    VALUES (@path, @credit, @description, @src_url, @type)
 ON CONFLICT (path)
     DO UPDATE SET
-        credit = CASE WHEN credit = '' THEN
-            excluded.credit
-        ELSE
-            credit
-        END, description = CASE WHEN description = '' THEN
-            excluded.description
-        ELSE
-            description
-        END, src_url = CASE WHEN src_url = '' THEN
+        credit = excluded.credit, --
+        description = excluded.description, --
+        src_url = CASE WHEN src_url = '' THEN
             excluded.src_url
         ELSE
             src_url

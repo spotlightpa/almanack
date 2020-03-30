@@ -392,7 +392,10 @@ func (app *appEnv) listImages(w http.ResponseWriter, r *http.Request) {
 		err error
 	)
 
-	if res.Images, err = app.svc.Querier.ListImages(r.Context()); err != nil {
+	if res.Images, err = app.svc.Querier.ListImages(r.Context(), db.ListImagesParams{
+		Offset: 0,
+		Limit:  100,
+	}); err != nil {
 		app.errorResponse(r.Context(), w, err)
 		return
 	}

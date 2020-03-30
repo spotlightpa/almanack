@@ -1,6 +1,20 @@
+CREATE TABLE image_type (
+    name text PRIMARY KEY,
+    mime text NOT NULL,
+    extensions text[]
+);
+
+INSERT INTO image_type (name, mime, extensions)
+    VALUES
+        --
+        ('jpeg', 'image/jpeg', '{jpg,jpeg}'),
+        --
+        ('png', 'image/png', '{png}');
+
 CREATE TABLE image (
     id serial PRIMARY KEY,
     path text NOT NULL UNIQUE,
+    type text NOT NULL DEFAULT 'jpeg' ::text REFERENCES image_type (name),
     description text NOT NULL DEFAULT '',
     credit text NOT NULL DEFAULT '',
     src_url text NOT NULL DEFAULT '',
@@ -15,4 +29,6 @@ CREATE TRIGGER row_updated_at_on_image_trigger_
 
 ---- create above / drop below ----
 DROP TABLE image;
+
+DROP TABLE image_type;
 

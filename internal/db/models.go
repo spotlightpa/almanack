@@ -38,9 +38,16 @@ type DomainRole struct {
 type Image struct {
 	ID          int32     `json:"id"`
 	Path        string    `json:"path"`
+	Type        string    `json:"type"`
 	Description string    `json:"description"`
 	Credit      string    `json:"credit"`
 	SrcUrl      string    `json:"src_url"`
 	CreatedAt   time.Time `json:"created_at"`
 	UpdatedAt   time.Time `json:"updated_at"`
+}
+
+type ImageType struct {
+	Name       string   `json:"name"`
+	Mime       string   `json:"mime"`
+	Extensions []string `json:"extensions"`
 }
