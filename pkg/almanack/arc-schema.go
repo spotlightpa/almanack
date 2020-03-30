@@ -18,11 +18,11 @@ const (
 )
 
 type ArcAPI struct {
-	Version  string     `json:"apiVersion"`
-	Contents []ArcStory `json:"contents"`
+	Version  string        `json:"apiVersion"`
+	Contents []ArcFeedItem `json:"contents"`
 }
 
-type ArcStory struct {
+type ArcFeedItem struct {
 	AdditionalProperties ContentProperties  `json:"additional_properties"`
 	CanonicalURL         string             `json:"canonical_url"`
 	CanonicalWebsite     string             `json:"canonical_website"`
@@ -54,6 +54,10 @@ type ArcStory struct {
 	Website              string             `json:"website"`
 	WebsiteURL           string             `json:"website_url,omitempty"`
 	Workflow             Workflow           `json:"workflow,omitempty"`
+}
+
+type ArcStory struct {
+	ArcFeedItem
 
 	Note   string `json:"almanack-note,omitempty"`
 	Status Status `json:"almanack-status,omitempty"`
