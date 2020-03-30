@@ -31,35 +31,48 @@ export default {
 </script>
 <template>
   <div>
-    <div class="buttons has-addons">
-      <button
-        type="button"
-        class="button has-text-weight-semibold"
-        :class="show === 'a' ? 'is-primary is-selected' : 'is-light'"
-        @click="show = 'a'"
-      >
-        Show all
-      </button>
-      <button
-        type="button"
-        class="button has-text-weight-semibold"
-        :class="show === 'u' ? 'is-primary is-selected' : 'is-light'"
-        @click="show = 'u'"
-      >
-        Unreleased
-      </button>
-      <button
-        type="button"
-        class="button has-text-weight-semibold"
-        :class="show === 'r' ? 'is-primary is-selected' : 'is-light'"
-        @click="show = 'r'"
-      >
-        Released
-      </button>
-    </div>
-
     <nav class="panel is-black">
-      <h1 class="panel-heading" v-text="title"></h1>
+      <div class="panel-heading">
+        <div class="level">
+          <div class="level-left">
+            <div class="level-item">
+              <h1 class="has-text-weight-semibold">
+                {{ title }}
+              </h1>
+            </div>
+          </div>
+          <div class="level-right">
+            <div class="level-item">
+              <div class="buttons has-addons">
+                <button
+                  type="button"
+                  class="button is-small has-text-weight-semibold"
+                  :class="show === 'a' ? 'is-primary is-selected' : 'is-light'"
+                  @click="show = 'a'"
+                >
+                  Show all
+                </button>
+                <button
+                  type="button"
+                  class="button is-small has-text-weight-semibold"
+                  :class="show === 'u' ? 'is-primary is-selected' : 'is-light'"
+                  @click="show = 'u'"
+                >
+                  Unreleased
+                </button>
+                <button
+                  type="button"
+                  class="button is-small has-text-weight-semibold"
+                  :class="show === 'r' ? 'is-primary is-selected' : 'is-light'"
+                  @click="show = 'r'"
+                >
+                  Released
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
       <article
         v-for="article of filteredArticles"
         :key="article.id"
