@@ -164,7 +164,7 @@ func (svc Service) SaveAlmanackArticle(ctx context.Context, article *ArcStory, s
 		err     error
 	)
 	if setArcData {
-		if arcData, err = json.Marshal(article); err != nil {
+		if arcData, err = json.Marshal(article.ArcFeedItem); err != nil {
 			return err
 		}
 	}

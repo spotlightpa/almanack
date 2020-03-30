@@ -86,21 +86,26 @@ func (app *appEnv) userInfo(w http.ResponseWriter, r *http.Request) {
 func (app *appEnv) listUpcoming(w http.ResponseWriter, r *http.Request) {
 	app.Println("start listUpcoming")
 
+	type response struct {
+		Contents []almanack.ArcStory `json:"contents"`
+	}
 	var (
-		feed almanack.ArcAPI
+		resp response
 		err  error
 	)
-	feed.Contents, err = app.svc.ListAllArticles(r.Context())
+	resp.Contents, err = app.svc.ListAllArticles(r.Context())
 	if err != nil {
 		app.errorResponse(r.Context(), w, err)
 		return
 	}
-	app.jsonResponse(http.StatusOK, w, feed)
+	app.jsonResponse(http.StatusOK, w, &resp)
 }
 
 func (app *appEnv) listWithArcRefresh(w http.ResponseWriter, r *http.Request) {
 	app.Printf("starting listWithArcRefresh")
-
+	type response struct {
+		Contents []almanack.ArcStory `json:"contents"`
+	}
 	var (
 		feed almanack.ArcAPI
 		err  error
@@ -113,12 +118,13 @@ func (app *appEnv) listWithArcRefresh(w http.ResponseWriter, r *http.Request) {
 		app.errorResponse(r.Context(), w, err)
 		return
 	}
-	feed.Contents, err = app.svc.ListAllArticles(r.Context())
+	var resp response
+	resp.Contents, err = app.svc.ListAllArticles(r.Context())
 	if err != nil {
 		app.errorResponse(r.Context(), w, err)
 		return
 	}
-	app.jsonResponse(http.StatusOK, w, feed)
+	app.jsonResponse(http.StatusOK, w, resp)
 }
 
 func (app *appEnv) postAvailable(w http.ResponseWriter, r *http.Request) {
@@ -151,7 +157,7 @@ func (app *appEnv) postAvailable(w http.ResponseWriter, r *http.Request) {
 		}
 		for i := range feed.Contents {
 			if feed.Contents[i].ID == userData.ID {
-				story = feed.Contents[i]
+				story.ArcFeedItem = feed.Contents[i]
 				refreshStory = true
 			}
 		}
