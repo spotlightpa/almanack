@@ -103,7 +103,7 @@ function format() {
 
 function format:misc() {
 	_git-xargs '*.sh' shfmt -w _
-	_git-xargs '*.sql' pg_format _ -o _
+	_git-xargs '*.sql' pg_format -w 80 -s 2 _ -o _
 }
 
 function start-api() {

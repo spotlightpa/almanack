@@ -9,11 +9,11 @@ import (
 
 const getImage = `-- name: GetImage :one
 SELECT
-    id, path, type, description, credit, src_url, created_at, updated_at
+  id, path, type, description, credit, src_url, created_at, updated_at
 FROM
-    image
+  image
 WHERE
-    path = $1
+  path = $1
 `
 
 func (q *Queries) GetImage(ctx context.Context, path string) (Image, error) {
@@ -34,11 +34,11 @@ func (q *Queries) GetImage(ctx context.Context, path string) (Image, error) {
 
 const listImages = `-- name: ListImages :many
 SELECT
-    id, path, type, description, credit, src_url, created_at, updated_at
+  id, path, type, description, credit, src_url, created_at, updated_at
 FROM
-    image
+  image
 ORDER BY
-    created_at DESC
+  created_at DESC
 LIMIT $1 OFFSET $2
 `
 
@@ -81,18 +81,18 @@ func (q *Queries) ListImages(ctx context.Context, arg ListImagesParams) ([]Image
 
 const updateImage = `-- name: UpdateImage :one
 INSERT INTO image ("path", "credit", "description", "src_url", "type")
-    VALUES ($1, $2, $3, $4, $5)
+  VALUES ($1, $2, $3, $4, $5)
 ON CONFLICT (path)
-    DO UPDATE SET
-        credit = excluded.credit, --
-        description = excluded.description, --
-        src_url = CASE WHEN src_url = '' THEN
-            excluded.src_url
-        ELSE
-            src_url
-        END
-    RETURNING
-        id, path, type, description, credit, src_url, created_at, updated_at
+  DO UPDATE SET
+    credit = excluded.credit, --
+    description = excluded.description, --
+    src_url = CASE WHEN src_url = '' THEN
+      excluded.src_url
+    ELSE
+      src_url
+    END
+  RETURNING
+    id, path, type, description, credit, src_url, created_at, updated_at
 `
 
 type UpdateImageParams struct {
