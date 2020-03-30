@@ -13,6 +13,7 @@ export const endpoints = {
   getAvailable: (id) => `/api/available-articles/${id}`,
   postAvailable: `/api/available-articles`,
   upcoming: `/api/upcoming-articles`,
+  listRefreshArc: `/api/list-arc-refresh`,
   getMessage: (id) => `/api/message/${id}`,
   sendMessage: `/api/message`,
   scheduledArticle: (id) => `/api/scheduled-articles/${id}`,
@@ -133,6 +134,9 @@ export function makeClient($auth) {
     async listSpotlightPAArticles() {
       return await tryTo(request(endpoints.listSpotlightPAArticles));
     },
+    async listRefreshArc() {
+      return await tryTo(request(endpoints.listRefreshArc));
+    },
   };
 }
 
@@ -146,7 +150,7 @@ export function useService({ canLoad, serviceCall }) {
   });
 
   let methods = {
-    async fetch({ arg = null, force = false } = {}) {
+    async do(callback, { force = false } = {}) {
       if (!apiState.canLoad) {
         apiState.error = new Error("Insufficient permissions");
         apiState.error.name = "Unauthorized";
@@ -156,9 +160,12 @@ export function useService({ canLoad, serviceCall }) {
         return;
       }
       apiState.isLoading = true;
-      [apiState.rawData, apiState.error] = await serviceCall(arg);
+      [apiState.rawData, apiState.error] = await callback();
       apiState.isLoading = false;
       apiState.didLoad = true;
+    },
+    async fetch({ arg = null, force = false } = {}) {
+      await methods.do(() => serviceCall(arg), { force });
     },
     async initLoad() {
       if (apiState.canLoad && !apiState.didLoad) {

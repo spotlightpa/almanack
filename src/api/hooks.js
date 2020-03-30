@@ -39,8 +39,9 @@ export function getAvailableArticle(id) {
 }
 
 export function useUpcoming() {
-  let loader = upcoming(useClient());
-  loader.initLoad();
+  let client = useClient();
+  let loader = upcoming(client);
+  loader.do(async () => await client.listRefreshArc());
   return loader;
 }
 export function useScheduler(id) {

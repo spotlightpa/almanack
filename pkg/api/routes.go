@@ -37,6 +37,7 @@ func (app *appEnv) routes() http.Handler {
 			app.hasRoleMiddleware("Spotlight PA"),
 		).Group(func(r chi.Router) {
 			r.Get("/upcoming-articles", app.listUpcoming)
+			r.Get("/list-arc-refresh", app.listWithArcRefresh)
 			r.Post("/available-articles", app.postAvailable)
 			r.Post("/message", app.postMessage)
 			r.Get("/scheduled-articles/{id}", app.getScheduledArticle)
@@ -89,6 +90,29 @@ func (app *appEnv) listUpcoming(w http.ResponseWriter, r *http.Request) {
 		feed almanack.ArcAPI
 		err  error
 	)
+	feed.Contents, err = app.svc.ListAllArticles(r.Context())
+	if err != nil {
+		app.errorResponse(r.Context(), w, err)
+		return
+	}
+	app.jsonResponse(http.StatusOK, w, feed)
+}
+
+func (app *appEnv) listWithArcRefresh(w http.ResponseWriter, r *http.Request) {
+	app.Printf("starting listWithArcRefresh")
+
+	var (
+		feed almanack.ArcAPI
+		err  error
+	)
+	if err = httpjson.Get(r.Context(), app.c, app.srcFeedURL, &feed); err != nil {
+		app.errorResponse(r.Context(), w, err)
+		return
+	}
+	if err := app.svc.StoreFeed(r.Context(), &feed); err != nil {
+		app.errorResponse(r.Context(), w, err)
+		return
+	}
 	feed.Contents, err = app.svc.ListAllArticles(r.Context())
 	if err != nil {
 		app.errorResponse(r.Context(), w, err)
