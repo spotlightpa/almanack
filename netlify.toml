@@ -1,5 +1,5 @@
 [build]
-  command = "./build.sh"
+  command = "./run.sh build:prod"
   functions = "functions"
   publish = "dist"
 

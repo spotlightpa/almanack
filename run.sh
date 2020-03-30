@@ -61,7 +61,14 @@ function migrate:prod() {
 }
 
 function build:prod() {
-	./build.sh
+	go version
+
+	GOPKG="github.com/spotlightpa/almanack/pkg/almanack"
+	BUILD_VERSION="$(git rev-parse --short HEAD)"
+	LDFLAGS="-X '$GOPKG.BuildVersion=$BUILD_VERSION'"
+
+	GOBIN=$THIS_DIR/functions go install -ldflags "$LDFLAGS" ./funcs/...
+	yarn run build
 }
 
 function test() {
