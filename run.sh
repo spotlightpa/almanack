@@ -12,12 +12,12 @@ function _default() {
 }
 
 function _die() {
-	echo >&2 "Fatal: ${@}"
+	echo >&2 "Fatal: ${*}"
 	exit 1
 }
 
 function _installed() {
-	which "$1" >/dev/null 2>&1
+	hash "$1" >/dev/null 2>&1
 }
 
 function help() {
@@ -97,7 +97,7 @@ function format() {
 
 function format:misc() {
 	shfmt -w ./run.sh
-	find sql -name '*.sql' -exec pg_format {} -o {} \;
+	find 'sql' -name '*.sql' -exec pg_format {} -o {} \;
 }
 
 function start-api() {
