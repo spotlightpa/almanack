@@ -73,12 +73,17 @@ export default {
         </div>
         <div class="level-item">
           <div class="control">
-            <label class="label">Manage Spotlight PA Articles</label>
+            <label class="label">Manage Spotlight PA</label>
             <router-link
               class="button is-success has-text-weight-semibold"
               :to="{ name: 'spotlightpa-articles' }"
             >
-              List Articles
+              <span class="icon">
+                <font-awesome-icon :icon="['far', 'newspaper']" />
+              </span>
+              <span>
+                List Articles
+              </span>
             </router-link>
           </div>
         </div>
