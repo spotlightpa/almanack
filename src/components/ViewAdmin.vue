@@ -5,7 +5,7 @@ import AdminList from "./AdminList.vue";
 import APILoader from "./APILoader.vue";
 import EmailComposer from "./EmailComposer.vue";
 
-import { useAuth, useUpcoming } from "@/api/hooks.js";
+import { useUpcoming } from "@/api/hooks.js";
 
 import ImageUploader from "./ImageUploader.vue";
 
@@ -21,7 +21,6 @@ export default {
     title: "Admin",
   },
   setup() {
-    let { fullName, roles, isSpotlightPAUser } = useAuth();
     let { articles, rawData, canLoad, isLoading, fetch, error } = useUpcoming();
 
     return {
@@ -31,10 +30,8 @@ export default {
       isLoading,
       fetch,
       error,
-      fullName,
-      roles,
       articles,
-      isSpotlightPAUser,
+
       refresh(newData) {
         rawData.value = newData;
       },
