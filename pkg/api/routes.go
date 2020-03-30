@@ -135,7 +135,10 @@ func (app *appEnv) postAvailable(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var story almanack.ArcStory
+	var (
+		story        almanack.ArcStory
+		refreshStory bool
+	)
 	if userData.RefreshArc {
 		var feed almanack.ArcAPI
 		if err := httpjson.Get(r.Context(), app.c, app.srcFeedURL, &feed); err != nil {
@@ -149,6 +152,7 @@ func (app *appEnv) postAvailable(w http.ResponseWriter, r *http.Request) {
 		for i := range feed.Contents {
 			if feed.Contents[i].ID == userData.ID {
 				story = feed.Contents[i]
+				refreshStory = true
 			}
 		}
 	}
@@ -156,7 +160,7 @@ func (app *appEnv) postAvailable(w http.ResponseWriter, r *http.Request) {
 	story.Note = userData.Note
 	story.Status = userData.Status
 
-	if err := app.svc.SaveAlmanackArticle(r.Context(), &story, userData.RefreshArc); err != nil {
+	if err := app.svc.SaveAlmanackArticle(r.Context(), &story, refreshStory); err != nil {
 		app.errorResponse(r.Context(), w, err)
 		return
 	}
