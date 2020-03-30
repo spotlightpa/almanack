@@ -8,7 +8,7 @@ import (
 	"net/http"
 )
 
-func Get(ctx context.Context, c *http.Client, url string, v interface{}) error {
+func Get(ctx context.Context, c *http.Client, url string, v interface{}, acceptStatuses ...int) error {
 	if c == nil {
 		c = http.DefaultClient
 	}
@@ -29,8 +29,8 @@ func Get(ctx context.Context, c *http.Client, url string, v interface{}) error {
 		return err
 	}
 
-	if resp.StatusCode >= 300 {
-		return fmt.Errorf("bad response: %d %s", resp.StatusCode, resp.Status)
+	if err = StatusCheck(resp, acceptStatuses...); err != nil {
+		return err
 	}
 
 	if err = json.Unmarshal(b, v); err != nil {
@@ -38,4 +38,25 @@ func Get(ctx context.Context, c *http.Client, url string, v interface{}) error {
 	}
 
 	return nil
+}
+
+var goodStatuses = []int{
+	http.StatusOK,
+	http.StatusCreated,
+	http.StatusAccepted,
+	http.StatusNonAuthoritativeInfo,
+	http.StatusNoContent,
+}
+
+func StatusCheck(resp *http.Response, acceptStatuses ...int) error {
+	if len(acceptStatuses) == 0 {
+		acceptStatuses = goodStatuses
+	}
+	for _, code := range acceptStatuses {
+		if resp.StatusCode == code {
+			return nil
+		}
+	}
+
+	return fmt.Errorf("unexpected status: %s", resp.Status)
 }
