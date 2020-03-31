@@ -111,10 +111,9 @@ func (app *appEnv) listWithArcRefresh(w http.ResponseWriter, r *http.Request) {
 		err  error
 	)
 	if err = httpjson.Get(r.Context(), app.c, app.srcFeedURL, &feed); err != nil {
-		app.errorResponse(r.Context(), w, err)
-		return
-	}
-	if err := app.svc.StoreFeed(r.Context(), &feed); err != nil {
+		// Keep trucking even if you can't load feed
+		app.logErr(r.Context(), err)
+	} else if err = app.svc.StoreFeed(r.Context(), &feed); err != nil {
 		app.errorResponse(r.Context(), w, err)
 		return
 	}
