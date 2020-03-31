@@ -30,7 +30,19 @@ let router = new Router({
   mode: "history",
   base: process.env.BASE_URL,
   routes: [
-    { path: "/", name: "home", redirect: { name: "articles" } },
+    {
+      path: "/",
+      name: "home",
+      redirect: () => {
+        if (isSpotlightPAUser.value) {
+          return { name: "admin" };
+        }
+        if (isSignedIn.value) {
+          return { name: "articles" };
+        }
+        return { name: "login" };
+      },
+    },
     {
       path: "/login",
       name: "login",
