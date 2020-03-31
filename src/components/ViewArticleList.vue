@@ -13,7 +13,7 @@ export default {
     title: "Available Articles",
   },
   setup() {
-    let { fullName, roles, isSpotlightPAUser } = useAuth();
+    let { fullName, roles } = useAuth();
     let { articles, canLoad, isLoading, fetch, error } = useAvailableList();
     let client = useClient();
 
@@ -25,7 +25,6 @@ export default {
       fullName,
       roles,
       articles,
-      isSpotlightPAUser,
 
       async redirectToSignup() {
         let [url, err] = await client.getSignupURL();
@@ -65,32 +64,6 @@ export default {
       unsubscribe link in the footer of an email, and you can
       <a href="#" @click.prevent="redirectToSignup">resubscribe here</a>.
     </p>
-
-    <div v-if="isSpotlightPAUser" class="buttons">
-      <router-link
-        :to="{ name: 'admin' }"
-        class="button is-success has-text-weight-semibold"
-      >
-        <span class="icon">
-          <font-awesome-icon :icon="['fas', 'user-circle']" />
-        </span>
-        <span>
-          Arc Import Admin
-        </span>
-      </router-link>
-
-      <router-link
-        :to="{ name: 'uploader' }"
-        class="button is-success has-text-weight-semibold"
-      >
-        <span class="icon">
-          <font-awesome-icon :icon="['fa', 'file-upload']" />
-        </span>
-        <span>
-          Upload images
-        </span>
-      </router-link>
-    </div>
 
     <APILoader
       :can-load="canLoad"

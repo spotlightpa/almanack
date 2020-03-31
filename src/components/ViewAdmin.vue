@@ -71,22 +71,6 @@ export default {
             </button>
           </div>
         </div>
-        <div class="level-item">
-          <div class="control">
-            <label class="label">Manage Spotlight PA</label>
-            <router-link
-              class="button is-success has-text-weight-semibold"
-              :to="{ name: 'spotlightpa-articles' }"
-            >
-              <span class="icon">
-                <font-awesome-icon :icon="['far', 'newspaper']" />
-              </span>
-              <span>
-                List Articles
-              </span>
-            </router-link>
-          </div>
-        </div>
       </div>
     </div>
 
@@ -98,6 +82,56 @@ export default {
         @hide="showComposer = false"
       />
     </keep-alive>
+
+    <div class="buttons">
+      <router-link
+        :to="{ name: 'articles' }"
+        class="button is-small is-success has-text-weight-semibold"
+      >
+        <span class="icon">
+          <font-awesome-icon :icon="['far', 'newspaper']" />
+        </span>
+        <span>
+          Editor Article List
+        </span>
+      </router-link>
+
+      <router-link
+        class="button is-small is-success has-text-weight-semibold"
+        :to="{ name: 'spotlightpa-articles' }"
+      >
+        <span class="icon">
+          <font-awesome-icon :icon="['far', 'newspaper']" />
+        </span>
+        <span>
+          Spotlight PA Articles
+        </span>
+      </router-link>
+
+      <router-link
+        :to="{ name: 'uploader' }"
+        class="button is-small is-success has-text-weight-semibold"
+      >
+        <span class="icon">
+          <font-awesome-icon :icon="['fa', 'file-upload']" />
+        </span>
+        <span>
+          Images
+        </span>
+      </router-link>
+
+      <router-link
+        :to="{ name: 'domains' }"
+        class="button is-small is-success has-text-weight-semibold"
+      >
+        <span class="icon">
+          <font-awesome-icon :icon="['fas', 'user-circle']" />
+        </span>
+        <span>
+          Approved User Domains
+        </span>
+      </router-link>
+    </div>
 
     <APILoader
       :can-load="canLoad"
