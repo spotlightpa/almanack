@@ -20,6 +20,12 @@ function _installed() {
 	hash "$1" >/dev/null 2>&1
 }
 
+function _git-xargs() {
+	local PATTERN=$1
+	shift
+	git ls-files --exclude="$PATTERN" --ignored -z | xargs -0 -I _ "$@"
+}
+
 function help() {
 	local SCRIPT=$0
 	cat <<EOF
@@ -86,7 +92,7 @@ function test:backend() {
 }
 
 function test:misc() {
-	shellcheck ./run.sh
+	_git-xargs '*.sh' shellcheck _
 }
 
 function format() {
@@ -96,8 +102,8 @@ function format() {
 }
 
 function format:misc() {
-	shfmt -w ./run.sh
-	find 'sql' -name '*.sql' -exec pg_format {} -o {} \;
+	_git-xargs '*.sh' shfmt -w _
+	_git-xargs '*.sql' pg_format _ -o _
 }
 
 function start-api() {
