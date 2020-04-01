@@ -4,7 +4,7 @@ export default function imageURL(filepath, { width = 400, height = 300 } = {}) {
   }
   let baseURL = "https://images.data.spotlightpa.org";
   let signature = "insecure";
-  let resizing_type = "auto";
+  let resizing_type = "fill";
   let gravity = "sm";
   let enlarge = "1";
   let quality = "75";
