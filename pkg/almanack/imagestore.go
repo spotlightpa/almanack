@@ -25,8 +25,8 @@ func GetSignedUpload(is ImageStore, ext string) (signedURL, filename string, err
 	return
 }
 
-func GetSignedHashedUrl(is ImageStore, srcurl string) (signedURL, filename string, err error) {
-	filename = hashURLpath(srcurl)
+func GetSignedHashedUrl(is ImageStore, srcurl, ext string) (signedURL, filename string, err error) {
+	filename = hashURLpath(srcurl, ext)
 	signedURL, err = is.GetSignedURL(filename)
 	return
 }
@@ -42,9 +42,11 @@ func makeFilename(ext string) string {
 	return sb.String()
 }
 
-func hashURLpath(srcPath string) string {
-	return fmt.Sprintf("external/%s.jpeg",
-		crockford.AppendMD5(crockford.Lower, nil, []byte(srcPath)))
+func hashURLpath(srcPath, ext string) string {
+	return fmt.Sprintf("external/%s.%s",
+		crockford.AppendMD5(crockford.Lower, nil, []byte(srcPath)),
+		ext,
+	)
 }
 
 func UploadFromURL(ctx context.Context, c *http.Client, is ImageStore, srcurl string) (filename string, err error) {
@@ -73,20 +75,26 @@ func UploadFromURL(ctx context.Context, c *http.Client, is ImageStore, srcurl st
 		return "", err
 	}
 
-	if ct := http.DetectContentType(peek); !strings.HasPrefix(ct, "image/jpeg") {
+	var ext string
+	if ct := http.DetectContentType(peek); strings.HasPrefix(ct, "image/jpeg") {
+		ext = "jpeg"
+	} else if strings.HasPrefix(ct, "image/png") {
+		ext = "png"
+	} else {
 		return "", errutil.Response{
 			StatusCode: http.StatusBadRequest,
 			Message:    "URL must be an image",
 			Cause:      fmt.Errorf("%q did not have proper MIME type", srcurl),
 		}
 	}
+
 	slurp, err := ioutil.ReadAll(buf)
 	if err != nil {
 		return "", err
 	}
 
 	var signedURL string
-	signedURL, filename, err = GetSignedHashedUrl(is, srcurl)
+	signedURL, filename, err = GetSignedHashedUrl(is, srcurl, ext)
 	if err != nil {
 		return "", err
 	}
