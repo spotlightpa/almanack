@@ -186,8 +186,8 @@ export default {
       <img :src="article.imagePreviewURL" class="is-3x4" width="200" />
     </picture>
     <BulmaFieldInput
-      v-model="article.imageCaption"
-      label="Image caption"
+      v-model="article.imageDescription"
+      label="Image description"
     ></BulmaFieldInput>
     <BulmaFieldInput
       v-model="article.imageCredit"

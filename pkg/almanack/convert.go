@@ -184,7 +184,7 @@ func setArticleImage(a *SpotlightPAArticle, p PromoItems) {
 		}
 	}
 	a.ImageCredit = strings.Join(credits, " / ")
-	a.ImageCaption = p.Basic.Caption
 	re := regexp.MustCompile(`(?i)\b(staff( photographer)?)\b`)
-	a.ImageCaption = re.ReplaceAllLiteralString(p.Basic.Caption, "Philadelphia Inquirer")
+	a.ImageCredit = re.ReplaceAllLiteralString(a.ImageCredit, "Philadelphia Inquirer")
+	a.ImageDescription = p.Basic.Caption
 }

@@ -1,3 +1,15 @@
+-- Fix bug with image-caption v. description
+UPDATE
+  article
+SET
+  spotlightpa_data = spotlightpa_data ||
+    jsonb_build_object('image-description', spotlightpa_data ->>
+    'image-caption')
+WHERE
+  spotlightpa_data ->> 'image-caption' IS NOT NULL
+RETURNING
+  *;
+
 CREATE TABLE image_type (
   name text PRIMARY KEY,
   mime text NOT NULL,
