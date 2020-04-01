@@ -60,7 +60,11 @@ export default {
         state.images = data.images.map((rawImage) => ({
           id: rawImage.id,
           path: rawImage.path,
-          url: imgproxyURL(rawImage.path, { width: 256, height: 256 }),
+          url: imgproxyURL(rawImage.path, {
+            width: 256,
+            height: 256,
+            extension: rawImage.type,
+          }),
           description: rawImage.description,
           credit: rawImage.credit,
           srcURL: rawImage.src_url,
