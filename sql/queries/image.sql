@@ -15,6 +15,25 @@ INSERT INTO image ("path", "type")
 ON CONFLICT (path)
   DO NOTHING;
 
+-- name: CreateImage :execrows
+INSERT INTO image ("path", "type", "description", "credit", "src_url", "is_uploaded")
+  VALUES (@path, @type, @description, @credit, @src_url, @is_uploaded)
+ON CONFLICT (path)
+  DO UPDATE SET
+    credit = CASE WHEN image.credit = '' THEN
+      excluded.credit
+    ELSE
+      image.credit
+    END, description = CASE WHEN image.description = '' THEN
+      excluded.description
+    ELSE
+      image.description
+    END, src_url = CASE WHEN image.src_url = '' THEN
+      excluded.src_url
+    ELSE
+      image.src_url
+    END;
+
 -- name: UpdateImage :one
 UPDATE
   image

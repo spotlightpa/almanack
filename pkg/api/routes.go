@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"net/http"
 	"net/http/httputil"
-	"strings"
 
 	"github.com/go-chi/chi"
 	"github.com/go-chi/chi/middleware"
@@ -270,17 +269,11 @@ func (app *appEnv) postScheduledArticle(w http.ResponseWriter, r *http.Request) 
 			app.errorResponse(r.Context(), w, err)
 			return
 		}
-	} else if strings.HasPrefix(userData.ImageURL, "http") {
-		if imageurl, err := almanack.UploadFromURL(
-			r.Context(), app.c, app.imageStore, userData.ImageURL,
-		); err != nil {
-			// Keep trucking, but don't publish
-			app.logErr(r.Context(), fmt.Errorf("could not upload image: %w", err))
-			userData.ImageURL = ""
-			userData.ScheduleFor = nil
-		} else {
-			userData.ImageURL = imageurl
-		}
+	} else if err := userData.ReplaceImageURLs(
+		r.Context(), app.c, app.imageStore, app.svc.Querier,
+	); err != nil {
+		// Keep trucking, but log the error
+		app.logErr(r.Context(), fmt.Errorf("could not upload image: %w", err))
 	}
 
 	if err := app.svc.SaveScheduledArticle(r.Context(), &userData.SpotlightPAArticle); err != nil {
