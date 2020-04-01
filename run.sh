@@ -58,7 +58,7 @@ function sql() {
 
 function migrate() {
 	cd sql/schema
-	tern migrate -c prod.conf
+	tern migrate
 }
 
 function migrate:prod() {
