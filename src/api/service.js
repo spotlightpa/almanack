@@ -27,7 +27,7 @@ export const endpoints = {
   sendMessage: `/api/message`,
   scheduledArticle: (id) => `/api/scheduled-articles/${id}`,
   scheduleArticle: `/api/scheduled-articles`,
-  getSignedUpload: `/api/get-signed-upload`,
+  createSignedUpload: `/api/create-signed-upload`,
   updateImage: `/api/image-update`,
   getSignupURL: `/api/mailchimp-signup-url`,
   authorizedDomains: `/api/authorized-domains`,
@@ -115,7 +115,7 @@ export function makeClient($auth) {
     },
     async uploadFile(body) {
       let [data, err] = await tryTo(
-        request(endpoints.getSignedUpload, { method: "POST" })
+        post(endpoints.createSignedUpload, { type: body.type })
       );
       if (err) {
         return ["", err];

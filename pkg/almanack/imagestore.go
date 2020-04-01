@@ -19,8 +19,8 @@ type ImageStore interface {
 	GetSignedURL(srcPath string) (signedURL string, err error)
 }
 
-func GetSignedUpload(is ImageStore) (signedURL, filename string, err error) {
-	filename = makeFilename()
+func GetSignedUpload(is ImageStore, ext string) (signedURL, filename string, err error) {
+	filename = makeFilename(ext)
 	signedURL, err = is.GetSignedURL(filename)
 	return
 }
@@ -31,13 +31,14 @@ func GetSignedHashedUrl(is ImageStore, srcurl string) (signedURL, filename strin
 	return
 }
 
-func makeFilename() string {
+func makeFilename(ext string) string {
 	var sb strings.Builder
-	sb.Grow(len("2006/01/123456789abcdefg.jpeg"))
+	sb.Grow(len("2006/01/123456789abcdefg." + ext))
 	sb.WriteString(time.Now().Format("2006/01/"))
 	sb.Write(crockford.Time(crockford.Lower, time.Now()))
 	sb.Write(crockford.AppendRandom(crockford.Lower, nil))
-	sb.WriteString(".jpeg")
+	sb.WriteString(".")
+	sb.WriteString(ext)
 	return sb.String()
 }
 

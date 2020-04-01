@@ -27,12 +27,12 @@ export default {
         error.value = new Error("Can only upload one file at a time");
         return;
       }
-      if (files[0].type !== "image/jpeg") {
-        error.value = new Error("Only JPEG is supported");
+      let [body] = files;
+      if (!["image/jpeg", "image/png"].includes(body.type)) {
+        error.value = new Error("Only JPEG and PNG are supported");
         return;
       }
 
-      let [body] = files;
       isUploading.value = true;
       error.value = null;
       [filename.value, error.value] = await uploadFile(body);
@@ -80,7 +80,7 @@ export default {
               <label class="file-label">
                 <input
                   type="file"
-                  accept="image/jpeg"
+                  accept="image/jpeg,image/png"
                   class="file-input"
                   @change="uploadFileInput"
                 />
