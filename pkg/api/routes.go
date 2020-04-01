@@ -43,6 +43,7 @@ func (app *appEnv) routes() http.Handler {
 			r.Get("/scheduled-articles/{id}", app.getScheduledArticle)
 			r.Post("/scheduled-articles", app.postScheduledArticle)
 			r.Post("/get-signed-upload", app.getSignedUpload)
+			r.Post("/image-update", app.postImageUpdate)
 			r.Get("/authorized-domains", app.listDomains)
 			r.Post("/authorized-domains", app.postDomain)
 			r.Get("/spotlightpa-articles", app.listSpotlightPAArticles)
@@ -302,6 +303,31 @@ func (app *appEnv) getSignedUpload(w http.ResponseWriter, r *http.Request) {
 	)
 	res.SignedURL, res.FileName, err = almanack.GetSignedUpload(app.imageStore)
 	if err != nil {
+		app.errorResponse(r.Context(), w, err)
+		return
+	}
+	if _, err = app.svc.Querier.CreateImage(r.Context(), db.CreateImageParams{
+		Path: res.FileName,
+	}); err != nil {
+		app.errorResponse(r.Context(), w, err)
+		return
+	}
+	app.jsonResponse(http.StatusOK, w, &res)
+}
+
+func (app *appEnv) postImageUpdate(w http.ResponseWriter, r *http.Request) {
+	app.Println("start postImageUpdate")
+
+	var userData db.UpdateImageParams
+	if err := httpjson.DecodeRequest(w, r, &userData); err != nil {
+		app.errorResponse(r.Context(), w, err)
+		return
+	}
+	var (
+		res db.Image
+		err error
+	)
+	if res, err = app.svc.Querier.UpdateImage(r.Context(), userData); err != nil {
 		app.errorResponse(r.Context(), w, err)
 		return
 	}

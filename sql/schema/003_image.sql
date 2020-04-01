@@ -18,6 +18,7 @@ CREATE TABLE image (
   description text NOT NULL DEFAULT '',
   credit text NOT NULL DEFAULT '',
   src_url text NOT NULL DEFAULT '',
+  is_uploaded boolean NOT NULL DEFAULT FALSE,
   created_at timestamp with time zone NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updated_at timestamp with time zone NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
