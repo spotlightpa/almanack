@@ -42,7 +42,7 @@ func (app *appEnv) routes() http.Handler {
 			r.Post("/message", app.postMessage)
 			r.Get("/scheduled-articles/{id}", app.getScheduledArticle)
 			r.Post("/scheduled-articles", app.postScheduledArticle)
-			r.Post("/get-signed-upload", app.getSignedUpload)
+			r.Post("/create-signed-upload", app.postSignedUpload)
 			r.Post("/image-update", app.postImageUpdate)
 			r.Get("/authorized-domains", app.listDomains)
 			r.Post("/authorized-domains", app.postDomain)
@@ -291,8 +291,29 @@ func (app *appEnv) postScheduledArticle(w http.ResponseWriter, r *http.Request) 
 	app.jsonResponse(http.StatusAccepted, w, &userData.SpotlightPAArticle)
 }
 
-func (app *appEnv) getSignedUpload(w http.ResponseWriter, r *http.Request) {
-	app.Printf("start getSignedUpload")
+var supportedContentTypes = map[string]string{
+	"image/jpeg": "jpeg",
+	"image/png":  "png",
+}
+
+func (app *appEnv) postSignedUpload(w http.ResponseWriter, r *http.Request) {
+	app.Printf("start postSignedUpload")
+	var userData struct {
+		Type string `json:"type"`
+	}
+	if err := httpjson.DecodeRequest(w, r, &userData); err != nil {
+		app.errorResponse(r.Context(), w, err)
+		return
+	}
+	ext, ok := supportedContentTypes[userData.Type]
+	if !ok {
+		app.errorResponse(r.Context(), w, errutil.Response{
+			StatusCode: http.StatusBadRequest,
+			Cause:      fmt.Errorf("unsupported content type: %q", ext),
+		})
+		return
+	}
+
 	type response struct {
 		SignedURL string `json:"signed-url"`
 		FileName  string `json:"filename"`
@@ -301,14 +322,14 @@ func (app *appEnv) getSignedUpload(w http.ResponseWriter, r *http.Request) {
 		res response
 		err error
 	)
-	res.SignedURL, res.FileName, err = almanack.GetSignedUpload(app.imageStore)
+	res.SignedURL, res.FileName, err = almanack.GetSignedUpload(app.imageStore, ext)
 	if err != nil {
 		app.errorResponse(r.Context(), w, err)
 		return
 	}
 	if n, err := app.svc.Querier.CreateImagePlaceholder(r.Context(), db.CreateImagePlaceholderParams{
 		Path: res.FileName,
-		Type: "jpeg", // TODO: png support
+		Type: ext,
 	}); err != nil {
 		app.errorResponse(r.Context(), w, err)
 		return
