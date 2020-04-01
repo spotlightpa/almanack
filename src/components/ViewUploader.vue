@@ -20,7 +20,7 @@ export default {
     title: "Images",
   },
   setup() {
-    let { listImages } = useClient();
+    let { listImages, updateImage } = useClient();
 
     const imageProps = (image) => [image.description, image.credit];
 
@@ -66,6 +66,26 @@ export default {
           srcURL: rawImage.src_url,
           date: new Date(rawImage.created_at),
         }));
+      },
+      updateDescription(image) {
+        let description = window.prompt(
+          "Update description",
+          image.description
+        );
+        if (description !== null && description !== image.description) {
+          actions.doUpdate(image, { description });
+        }
+      },
+      updateCredit(image) {
+        let credit = window.prompt("Update credit", image.credit);
+        if (credit !== null && credit !== image.credit) {
+          actions.doUpdate(image, { credit });
+        }
+      },
+      async doUpdate(image, opt) {
+        state.isLoading = true;
+        await updateImage(image.path, opt);
+        await actions.fetch();
       },
     };
 
@@ -117,12 +137,22 @@ export default {
             </td>
             <td>
               <p>
-                <strong>Description:</strong>
+                <a
+                  class="has-text-weight-semibold"
+                  @click="updateDescription(image)"
+                >
+                  Description:
+                </a>
                 {{ image.description }}
               </p>
 
               <p>
-                <strong>Credit:</strong>
+                <a
+                  class="has-text-weight-semibold"
+                  @click="updateCredit(image)"
+                >
+                  Credit:
+                </a>
                 {{ image.credit }}
               </p>
               <p>
