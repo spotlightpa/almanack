@@ -306,11 +306,16 @@ func (app *appEnv) getSignedUpload(w http.ResponseWriter, r *http.Request) {
 		app.errorResponse(r.Context(), w, err)
 		return
 	}
-	if _, err = app.svc.Querier.CreateImage(r.Context(), db.CreateImageParams{
+	if n, err := app.svc.Querier.CreateImagePlaceholder(r.Context(), db.CreateImagePlaceholderParams{
 		Path: res.FileName,
+		Type: "jpeg", // TODO: png support
 	}); err != nil {
 		app.errorResponse(r.Context(), w, err)
 		return
+	} else if n != 1 {
+		// Log and continue
+		app.logErr(r.Context(),
+			fmt.Errorf("creating image %q but it already exists", res.FileName))
 	}
 	app.jsonResponse(http.StatusOK, w, &res)
 }

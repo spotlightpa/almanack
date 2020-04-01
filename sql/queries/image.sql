@@ -9,13 +9,11 @@ ORDER BY
   updated_at DESC
 LIMIT $1 OFFSET $2;
 
--- name: CreateImage :one
-INSERT INTO image ("path", "src_url")
-  VALUES (@path, @src_url)
+-- name: CreateImagePlaceholder :execrows
+INSERT INTO image ("path", "type")
+  VALUES (@path, @type)
 ON CONFLICT (path)
-  DO NOTHING
-RETURNING
-  *;
+  DO NOTHING;
 
 -- name: UpdateImage :one
 UPDATE
