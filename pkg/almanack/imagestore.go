@@ -33,7 +33,7 @@ func GetSignedHashedUrl(is ImageStore, srcurl, ext string) (signedURL, filename 
 
 func makeFilename(ext string) string {
 	var sb strings.Builder
-	sb.Grow(len("2006/01/123456789abcdefg." + ext))
+	sb.Grow(len("2006/01/123456789abcdefg.") + len(ext))
 	sb.WriteString(time.Now().Format("2006/01/"))
 	sb.Write(crockford.Time(crockford.Lower, time.Now()))
 	sb.Write(crockford.AppendRandom(crockford.Lower, nil))
