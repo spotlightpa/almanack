@@ -11,7 +11,7 @@ export default {
   components: {
     CopyWithButton,
   },
-  setup() {
+  setup(props, { emit }) {
     let { uploadFile } = useClient();
 
     let isUploading = ref(false);
@@ -37,6 +37,7 @@ export default {
       error.value = null;
       [filename.value, error.value] = await uploadFile(body);
       isUploading.value = false;
+      emit("update-image-list");
     }
 
     let isDragging = ref(false);

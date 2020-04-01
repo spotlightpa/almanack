@@ -12,7 +12,8 @@
 	],
 	"rename": {
 		"spotlightpa_data": "SpotlightPAData",
-		"spotlightpa_path": "SpotlightPAPath"
+		"spotlightpa_path": "SpotlightPAPath",
+		"src_url": "SourceURL"
 	},
 	"version": "1"
 }

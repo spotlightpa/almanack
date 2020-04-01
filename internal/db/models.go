@@ -41,7 +41,8 @@ type Image struct {
 	Type        string    `json:"type"`
 	Description string    `json:"description"`
 	Credit      string    `json:"credit"`
-	SrcUrl      string    `json:"src_url"`
+	SourceURL   string    `json:"src_url"`
+	IsUploaded  bool      `json:"is_uploaded"`
 	CreatedAt   time.Time `json:"created_at"`
 	UpdatedAt   time.Time `json:"updated_at"`
 }

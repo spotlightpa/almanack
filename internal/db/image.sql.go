@@ -7,17 +7,22 @@ import (
 	"context"
 )
 
-const getImage = `-- name: GetImage :one
-SELECT
-  id, path, type, description, credit, src_url, created_at, updated_at
-FROM
-  image
-WHERE
-  path = $1
+const createImage = `-- name: CreateImage :one
+INSERT INTO image ("path", "src_url")
+  VALUES ($1, $2)
+ON CONFLICT (path)
+  DO NOTHING
+RETURNING
+  id, path, type, description, credit, src_url, is_uploaded, created_at, updated_at
 `
 
-func (q *Queries) GetImage(ctx context.Context, path string) (Image, error) {
-	row := q.db.QueryRowContext(ctx, getImage, path)
+type CreateImageParams struct {
+	Path      string `json:"path"`
+	SourceURL string `json:"src_url"`
+}
+
+func (q *Queries) CreateImage(ctx context.Context, arg CreateImageParams) (Image, error) {
+	row := q.db.QueryRowContext(ctx, createImage, arg.Path, arg.SourceURL)
 	var i Image
 	err := row.Scan(
 		&i.ID,
@@ -25,7 +30,37 @@ func (q *Queries) GetImage(ctx context.Context, path string) (Image, error) {
 		&i.Type,
 		&i.Description,
 		&i.Credit,
-		&i.SrcUrl,
+		&i.SourceURL,
+		&i.IsUploaded,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+	)
+	return i, err
+}
+
+const getImageBySourceURL = `-- name: GetImageBySourceURL :one
+SELECT
+  id, path, type, description, credit, src_url, is_uploaded, created_at, updated_at
+FROM
+  image
+WHERE
+  src_url = $1
+ORDER BY
+  updated_at DESC
+LIMIT 1
+`
+
+func (q *Queries) GetImageBySourceURL(ctx context.Context, srcUrl string) (Image, error) {
+	row := q.db.QueryRowContext(ctx, getImageBySourceURL, srcUrl)
+	var i Image
+	err := row.Scan(
+		&i.ID,
+		&i.Path,
+		&i.Type,
+		&i.Description,
+		&i.Credit,
+		&i.SourceURL,
+		&i.IsUploaded,
 		&i.CreatedAt,
 		&i.UpdatedAt,
 	)
@@ -34,11 +69,13 @@ func (q *Queries) GetImage(ctx context.Context, path string) (Image, error) {
 
 const listImages = `-- name: ListImages :many
 SELECT
-  id, path, type, description, credit, src_url, created_at, updated_at
+  id, path, type, description, credit, src_url, is_uploaded, created_at, updated_at
 FROM
   image
+WHERE
+  is_uploaded = TRUE
 ORDER BY
-  created_at DESC
+  updated_at DESC
 LIMIT $1 OFFSET $2
 `
 
@@ -62,7 +99,8 @@ func (q *Queries) ListImages(ctx context.Context, arg ListImagesParams) ([]Image
 			&i.Type,
 			&i.Description,
 			&i.Credit,
-			&i.SrcUrl,
+			&i.SourceURL,
+			&i.IsUploaded,
 			&i.CreatedAt,
 			&i.UpdatedAt,
 		); err != nil {
@@ -80,36 +118,48 @@ func (q *Queries) ListImages(ctx context.Context, arg ListImagesParams) ([]Image
 }
 
 const updateImage = `-- name: UpdateImage :one
-INSERT INTO image ("path", "credit", "description", "src_url", "type")
-  VALUES ($1, $2, $3, $4, $5)
-ON CONFLICT (path)
-  DO UPDATE SET
-    credit = excluded.credit, --
-    description = excluded.description, --
-    src_url = CASE WHEN src_url = '' THEN
-      excluded.src_url
-    ELSE
-      src_url
-    END
-  RETURNING
-    id, path, type, description, credit, src_url, created_at, updated_at
+UPDATE
+  image
+SET
+  credit = CASE WHEN $1::boolean THEN
+    $2
+  ELSE
+    credit
+  END,
+  description = CASE WHEN $3::boolean THEN
+    $4
+  ELSE
+    description
+  END,
+  src_url = CASE WHEN src_url = '' THEN
+    $5
+  ELSE
+    src_url
+  END,
+  is_uploaded = TRUE
+WHERE
+  path = $6
+RETURNING
+  id, path, type, description, credit, src_url, is_uploaded, created_at, updated_at
 `
 
 type UpdateImageParams struct {
-	Path        string `json:"path"`
-	Credit      string `json:"credit"`
-	Description string `json:"description"`
-	SrcUrl      string `json:"src_url"`
-	Type        string `json:"type"`
+	SetCredit      bool   `json:"set_credit"`
+	Credit         string `json:"credit"`
+	SetDescription bool   `json:"set_description"`
+	Description    string `json:"description"`
+	SourceURL      string `json:"src_url"`
+	Path           string `json:"path"`
 }
 
 func (q *Queries) UpdateImage(ctx context.Context, arg UpdateImageParams) (Image, error) {
 	row := q.db.QueryRowContext(ctx, updateImage,
-		arg.Path,
+		arg.SetCredit,
 		arg.Credit,
+		arg.SetDescription,
 		arg.Description,
-		arg.SrcUrl,
-		arg.Type,
+		arg.SourceURL,
+		arg.Path,
 	)
 	var i Image
 	err := row.Scan(
@@ -118,7 +168,8 @@ func (q *Queries) UpdateImage(ctx context.Context, arg UpdateImageParams) (Image
 		&i.Type,
 		&i.Description,
 		&i.Credit,
-		&i.SrcUrl,
+		&i.SourceURL,
+		&i.IsUploaded,
 		&i.CreatedAt,
 		&i.UpdatedAt,
 	)

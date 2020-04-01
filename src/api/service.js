@@ -6,6 +6,15 @@ const tryTo = (promise) =>
     .then((data) => [data, null])
     .catch((error) => [null, error]);
 
+const responseError = (rsp) => {
+  if (rsp.ok) {
+    return;
+  }
+  let err = new Error(`Unexpected response: ${rsp.status} ${rsp.statusText}`);
+  err.name = "Unexpected Response";
+  return err;
+};
+
 export const endpoints = {
   healthcheck: `/api/healthcheck`,
   userInfo: `/api/user-info`,
@@ -19,6 +28,7 @@ export const endpoints = {
   scheduledArticle: (id) => `/api/scheduled-articles/${id}`,
   scheduleArticle: `/api/scheduled-articles`,
   getSignedUpload: `/api/get-signed-upload`,
+  updateImage: `/api/image-update`,
   getSignupURL: `/api/mailchimp-signup-url`,
   authorizedDomains: `/api/authorized-domains`,
   listSpotlightPAArticles: `/api/spotlightpa-articles`,
@@ -67,7 +77,7 @@ export function makeClient($auth) {
     return r;
   }
 
-  return {
+  let actions = {
     async userInfo() {
       return await bufferRequest("userInfo", () =>
         tryTo(request(endpoints.userInfo))
@@ -114,18 +124,27 @@ export function makeClient($auth) {
       let rsp;
       [rsp, err] = await tryTo(fetch(signedURL, { method: "PUT", body }));
       if (err ?? !rsp.ok) {
-        return [
-          "",
-          err ??
-            new Error(`Unexpected response: ${rsp.status} ${rsp.statusText}`),
-        ];
+        return ["", err ?? responseError(rsp)];
+      }
+      [, err] = await actions.updateImage(filename);
+      if (err) {
+        return ["", err];
       }
       return [filename, null];
+    },
+    async updateImage(path, { credit = "", description = "" } = {}) {
+      let image = {
+        path,
+        credit,
+        set_credit: !!credit,
+        description,
+        set_description: !!description,
+      };
+      return await tryTo(post(endpoints.updateImage, image));
     },
     async getSignupURL() {
       return await tryTo(request(endpoints.getSignupURL));
     },
-
     async listAuthorizedDomains() {
       return await tryTo(request(endpoints.authorizedDomains));
     },
@@ -142,6 +161,7 @@ export function makeClient($auth) {
       return await tryTo(request(endpoints.listImages));
     },
   };
+  return actions;
 }
 
 export function useService({ canLoad, serviceCall }) {

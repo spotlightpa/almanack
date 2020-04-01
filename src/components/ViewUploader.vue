@@ -83,7 +83,7 @@ export default {
   <div>
     <h1 class="title">Upload an image</h1>
 
-    <ImageUploader />
+    <ImageUploader @update-image-list="fetch" />
 
     <h2 class="title has-margin-top">Existing Images</h2>
     <APILoader
