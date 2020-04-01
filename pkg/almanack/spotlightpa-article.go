@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"net/http"
 	"strings"
 	"time"
 
@@ -170,4 +171,38 @@ func (splArt *SpotlightPAArticle) Publish(ctx context.Context, gh ContentStore) 
 	}
 
 	return nil
+}
+
+func (splArt *SpotlightPAArticle) ReplaceImageURLs(ctx context.Context, cl *http.Client, is ImageStore, q db.Querier) error {
+	srcurl := splArt.ImageURL
+	if !strings.HasPrefix(srcurl, "http") {
+		return nil
+	}
+	image, err := q.GetImageBySourceURL(ctx, srcurl)
+	if err != nil && !db.IsNotFound(err) {
+		// Don't allow publishing, something has gone wrong
+		splArt.ImageURL = ""
+		splArt.ScheduleFor = nil
+		return err
+	}
+	if !db.IsNotFound(err) && image.IsUploaded {
+		splArt.ImageURL = image.Path
+		return nil
+	}
+	var ext string
+	if splArt.ImageURL, ext, err = UploadFromURL(ctx, cl, is, srcurl); err != nil {
+		// Don't allow publishing
+		splArt.ImageURL = ""
+		splArt.ScheduleFor = nil
+		return err
+	}
+	_, err = q.CreateImage(ctx, db.CreateImageParams{
+		Path:        splArt.ImageURL,
+		Type:        ext,
+		Description: splArt.ImageDescription,
+		Credit:      splArt.ImageCredit,
+		SourceURL:   srcurl,
+		IsUploaded:  true,
+	})
+	return err
 }
