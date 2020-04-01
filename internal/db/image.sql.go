@@ -7,35 +7,24 @@ import (
 	"context"
 )
 
-const createImage = `-- name: CreateImage :one
-INSERT INTO image ("path", "src_url")
+const createImagePlaceholder = `-- name: CreateImagePlaceholder :execrows
+INSERT INTO image ("path", "type")
   VALUES ($1, $2)
 ON CONFLICT (path)
   DO NOTHING
-RETURNING
-  id, path, type, description, credit, src_url, is_uploaded, created_at, updated_at
 `
 
-type CreateImageParams struct {
-	Path      string `json:"path"`
-	SourceURL string `json:"src_url"`
+type CreateImagePlaceholderParams struct {
+	Path string `json:"path"`
+	Type string `json:"type"`
 }
 
-func (q *Queries) CreateImage(ctx context.Context, arg CreateImageParams) (Image, error) {
-	row := q.db.QueryRowContext(ctx, createImage, arg.Path, arg.SourceURL)
-	var i Image
-	err := row.Scan(
-		&i.ID,
-		&i.Path,
-		&i.Type,
-		&i.Description,
-		&i.Credit,
-		&i.SourceURL,
-		&i.IsUploaded,
-		&i.CreatedAt,
-		&i.UpdatedAt,
-	)
-	return i, err
+func (q *Queries) CreateImagePlaceholder(ctx context.Context, arg CreateImagePlaceholderParams) (int64, error) {
+	result, err := q.db.ExecContext(ctx, createImagePlaceholder, arg.Path, arg.Type)
+	if err != nil {
+		return 0, err
+	}
+	return result.RowsAffected()
 }
 
 const getImageBySourceURL = `-- name: GetImageBySourceURL :one

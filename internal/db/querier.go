@@ -10,7 +10,7 @@ import (
 
 type Querier interface {
 	AppendRoleToDomain(ctx context.Context, arg AppendRoleToDomainParams) (DomainRole, error)
-	CreateImage(ctx context.Context, arg CreateImageParams) (Image, error)
+	CreateImagePlaceholder(ctx context.Context, arg CreateImagePlaceholderParams) (int64, error)
 	GetArticle(ctx context.Context, arcID sql.NullString) (Article, error)
 	GetArticleByDBID(ctx context.Context, id int32) (Article, error)
 	GetImageBySourceURL(ctx context.Context, srcUrl string) (Image, error)
