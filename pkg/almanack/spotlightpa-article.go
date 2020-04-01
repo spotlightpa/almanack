@@ -16,7 +16,8 @@ type SpotlightPAArticle struct {
 	InternalID       string     `toml:"internal-id"`
 	Budget           string     `toml:"internal-budget"`
 	ImageURL         string     `toml:"image"`
-	ImageCaption     string     `toml:"image-description"`
+	ImageDescription string     `toml:"image-description"`
+	ImageCaption     string     `toml:"image-caption"`
 	ImageCredit      string     `toml:"image-credit"`
 	ImageSize        string     `toml:"image-size"`
 	PubDate          time.Time  `toml:"published"`
@@ -51,6 +52,7 @@ func (splArt *SpotlightPAArticle) toSPLData() interface{} {
 		InternalID       string     `json:"internal-id"`
 		Budget           string     `json:"budget"`
 		ImageURL         string     `json:"image-url"`
+		ImageDescription string     `json:"image-description"`
 		ImageCaption     string     `json:"image-caption"`
 		ImageCredit      string     `json:"image-credit"`
 		ImageSize        string     `json:"image-size"`
