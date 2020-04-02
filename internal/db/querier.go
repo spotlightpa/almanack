@@ -24,6 +24,7 @@ type Querier interface {
 	ListUpcoming(ctx context.Context) ([]Article, error)
 	PopScheduled(ctx context.Context) ([]Article, error)
 	SetRolesForDomain(ctx context.Context, arg SetRolesForDomainParams) (DomainRole, error)
+	Test(ctx context.Context, dollar_1 interface{}) (interface{}, error)
 	UpdateAlmanackArticle(ctx context.Context, arg UpdateAlmanackArticleParams) (Article, error)
 	UpdateArcArticles(ctx context.Context, arcItems json.RawMessage) error
 	UpdateImage(ctx context.Context, arg UpdateImageParams) (Image, error)

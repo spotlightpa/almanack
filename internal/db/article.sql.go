@@ -274,7 +274,7 @@ SET
   last_published = CURRENT_TIMESTAMP
 WHERE
   last_published IS NULL
-  AND schedule_for < CURRENT_TIMESTAMP
+  AND schedule_for < (CURRENT_TIMESTAMP + '10 minutes'::interval)
 RETURNING
   id, arc_id, arc_data, spotlightpa_path, spotlightpa_data, schedule_for, last_published, note, status, created_at, updated_at
 `
@@ -312,6 +312,18 @@ func (q *Queries) PopScheduled(ctx context.Context) ([]Article, error) {
 		return nil, err
 	}
 	return items, nil
+}
+
+const test = `-- name: Test :one
+SELECT
+  $1::interval
+`
+
+func (q *Queries) Test(ctx context.Context, dollar_1 interface{}) (interface{}, error) {
+	row := q.db.QueryRowContext(ctx, test, dollar_1)
+	var column_1 interface{}
+	err := row.Scan(&column_1)
+	return column_1, err
 }
 
 const updateAlmanackArticle = `-- name: UpdateAlmanackArticle :one
