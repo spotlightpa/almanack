@@ -4,9 +4,11 @@ import (
 	"context"
 	"encoding/json"
 	"net/http"
+	"time"
 
 	"github.com/getsentry/sentry-go"
 
+	"github.com/spotlightpa/almanack/internal/httpjson"
 	"github.com/spotlightpa/almanack/pkg/almanack"
 	"github.com/spotlightpa/almanack/pkg/errutil"
 )
@@ -62,4 +64,17 @@ func (app *appEnv) hasRoleMiddleware(role string) func(next http.Handler) http.H
 			next.ServeHTTP(w, r)
 		})
 	}
+}
+
+func (app *appEnv) FetchFeed(ctx context.Context) (*almanack.ArcAPI, error) {
+	var feed almanack.ArcAPI
+	// Timeout needs to leave enough time to report errors to Sentry before
+	// AWS kills the Lambda…
+	ctx, cancel := context.WithTimeout(ctx, 6*time.Second)
+	defer cancel()
+
+	if err := httpjson.Get(ctx, app.c, app.srcFeedURL, &feed); err != nil {
+		return nil, err
+	}
+	return &feed, nil
 }
