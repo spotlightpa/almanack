@@ -108,13 +108,13 @@ func (app *appEnv) listWithArcRefresh(w http.ResponseWriter, r *http.Request) {
 		Contents []almanack.ArcStory `json:"contents"`
 	}
 	var (
-		feed almanack.ArcAPI
+		feed *almanack.ArcAPI
 		err  error
 	)
-	if err = httpjson.Get(r.Context(), app.c, app.srcFeedURL, &feed); err != nil {
+	if feed, err = app.FetchFeed(r.Context()); err != nil {
 		// Keep trucking even if you can't load feed
 		app.logErr(r.Context(), err)
-	} else if err = app.svc.StoreFeed(r.Context(), &feed); err != nil {
+	} else if err = app.svc.StoreFeed(r.Context(), feed); err != nil {
 		app.errorResponse(r.Context(), w, err)
 		return
 	}
@@ -146,12 +146,15 @@ func (app *appEnv) postAvailable(w http.ResponseWriter, r *http.Request) {
 		refreshStory bool
 	)
 	if userData.RefreshArc {
-		var feed almanack.ArcAPI
-		if err := httpjson.Get(r.Context(), app.c, app.srcFeedURL, &feed); err != nil {
+		var (
+			feed *almanack.ArcAPI
+			err  error
+		)
+		if feed, err = app.FetchFeed(r.Context()); err != nil {
 			app.errorResponse(r.Context(), w, err)
 			return
 		}
-		if err := app.svc.StoreFeed(r.Context(), &feed); err != nil {
+		if err := app.svc.StoreFeed(r.Context(), feed); err != nil {
 			app.errorResponse(r.Context(), w, err)
 			return
 		}
@@ -256,16 +259,19 @@ func (app *appEnv) postScheduledArticle(w http.ResponseWriter, r *http.Request) 
 	}
 
 	if userData.RefreshArc {
-		var feed almanack.ArcAPI
-		if err := httpjson.Get(r.Context(), app.c, app.srcFeedURL, &feed); err != nil {
+		var (
+			feed *almanack.ArcAPI
+			err  error
+		)
+		if feed, err = app.FetchFeed(r.Context()); err != nil {
 			app.errorResponse(r.Context(), w, err)
 			return
 		}
-		if err := app.svc.StoreFeed(r.Context(), &feed); err != nil {
+		if err = app.svc.StoreFeed(r.Context(), feed); err != nil {
 			app.errorResponse(r.Context(), w, err)
 			return
 		}
-		if err := app.svc.ResetSpotlightPAArticleArcData(r.Context(), &userData.SpotlightPAArticle); err != nil {
+		if err = app.svc.ResetSpotlightPAArticleArcData(r.Context(), &userData.SpotlightPAArticle); err != nil {
 			app.errorResponse(r.Context(), w, err)
 			return
 		}
