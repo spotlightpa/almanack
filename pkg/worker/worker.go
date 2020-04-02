@@ -19,7 +19,6 @@ import (
 	"github.com/spotlightpa/almanack/internal/mailchimp"
 	"github.com/spotlightpa/almanack/internal/slack"
 	"github.com/spotlightpa/almanack/pkg/almanack"
-	"github.com/spotlightpa/almanack/pkg/errutil"
 )
 
 const AppName = "almanack-worker"
@@ -129,10 +128,7 @@ func (app *appEnv) exec() error {
 	start := time.Now()
 	defer func() { app.Println("finished in", time.Since(start)) }()
 
-	return errutil.ExecParallel(
-		app.updateFeed,
-		app.publishStories,
-	)
+	return app.publishStories()
 }
 
 func (app *appEnv) updateFeed() error {
