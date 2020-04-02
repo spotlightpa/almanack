@@ -175,7 +175,7 @@ SELECT
       jsonb_array_elements_text(spotlightpa_data -> 'authors'))::text[] AS authors,
   to_timestamp(spotlightpa_data ->> 'pub-date'::text,
     -- ISO date
-    'YYYY-MM-DD"T"HH24:MI:SS"Z"')::timestamp AS pub_date
+    'YYYY-MM-DD"T"HH24:MI:SS"Z"')::timestamp WITH time zone AS pub_date
 FROM
   article
 WHERE
@@ -274,7 +274,7 @@ SET
   last_published = CURRENT_TIMESTAMP
 WHERE
   last_published IS NULL
-  AND schedule_for < (CURRENT_TIMESTAMP + '10 minutes'::interval)
+  AND schedule_for < (CURRENT_TIMESTAMP + '5 minutes'::interval)
 RETURNING
   id, arc_id, arc_data, spotlightpa_path, spotlightpa_data, schedule_for, last_published, note, status, created_at, updated_at
 `
@@ -312,18 +312,6 @@ func (q *Queries) PopScheduled(ctx context.Context) ([]Article, error) {
 		return nil, err
 	}
 	return items, nil
-}
-
-const test = `-- name: Test :one
-SELECT
-  $1::interval
-`
-
-func (q *Queries) Test(ctx context.Context, dollar_1 interface{}) (interface{}, error) {
-	row := q.db.QueryRowContext(ctx, test, dollar_1)
-	var column_1 interface{}
-	err := row.Scan(&column_1)
-	return column_1, err
 }
 
 const updateAlmanackArticle = `-- name: UpdateAlmanackArticle :one

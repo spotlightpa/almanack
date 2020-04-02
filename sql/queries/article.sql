@@ -121,7 +121,7 @@ SELECT
       jsonb_array_elements_text(spotlightpa_data -> 'authors'))::text[] AS authors,
   to_timestamp(spotlightpa_data ->> 'pub-date'::text,
     -- ISO date
-    'YYYY-MM-DD"T"HH24:MI:SS"Z"')::timestamp AS pub_date
+    'YYYY-MM-DD"T"HH24:MI:SS"Z"')::timestamp WITH time zone AS pub_date
 FROM
   article
 WHERE
