@@ -146,7 +146,7 @@ func (svc Service) GetArcStory(ctx context.Context, articleID string) (story *Ar
 
 }
 
-func (svc Service) GetAvailableFeed(ctx context.Context) (stories []ArcStory, err error) {
+func (svc Service) ListAvailableArcStories(ctx context.Context) (stories []ArcStory, err error) {
 	start := time.Now()
 	var dbArts []db.Article
 	dbArts, err = svc.Querier.ListAvailableArticles(ctx)
@@ -198,7 +198,7 @@ func (svc Service) StoreFeed(ctx context.Context, newfeed *ArcAPI) (err error) {
 	return err
 }
 
-func (svc Service) ListAllArticles(ctx context.Context) (stories []ArcStory, err error) {
+func (svc Service) ListAllArcStories(ctx context.Context) (stories []ArcStory, err error) {
 	start := time.Now()
 	var dbArts []db.Article
 	dbArts, err = svc.Querier.ListAllArticles(ctx)

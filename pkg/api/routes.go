@@ -28,16 +28,16 @@ func (app *appEnv) routes() http.Handler {
 		r.With(
 			app.hasRoleMiddleware("editor"),
 		).Group(func(r chi.Router) {
-			r.Get("/available-articles", app.listAvailable)
-			r.Get("/available-articles/{id}", app.getAvailable)
+			r.Get("/available-articles", app.listAvailableArcStories)
+			r.Get("/available-articles/{id}", app.getArcStory)
 			r.Get("/mailchimp-signup-url", app.getSignupURL)
 		})
 		r.With(
 			app.hasRoleMiddleware("Spotlight PA"),
 		).Group(func(r chi.Router) {
-			r.Get("/upcoming-articles", app.listUpcoming)
+			r.Get("/upcoming-articles", app.listAllArcStories)
 			r.Get("/list-arc-refresh", app.listWithArcRefresh)
-			r.Post("/available-articles", app.postAvailable)
+			r.Post("/available-articles", app.postAlmanackArcStory)
 			r.Post("/message", app.postMessage)
 			r.Get("/scheduled-articles/{id}", app.getScheduledArticle)
 			r.Post("/scheduled-articles", app.postScheduledArticle)
@@ -84,8 +84,8 @@ func (app *appEnv) userInfo(w http.ResponseWriter, r *http.Request) {
 	app.jsonResponse(http.StatusOK, w, userinfo)
 }
 
-func (app *appEnv) listUpcoming(w http.ResponseWriter, r *http.Request) {
-	app.Println("start listUpcoming")
+func (app *appEnv) listAllArcStories(w http.ResponseWriter, r *http.Request) {
+	app.Println("start listAllArcStories")
 
 	type response struct {
 		Contents []almanack.ArcStory `json:"contents"`
@@ -94,7 +94,7 @@ func (app *appEnv) listUpcoming(w http.ResponseWriter, r *http.Request) {
 		resp response
 		err  error
 	)
-	resp.Contents, err = app.svc.ListAllArticles(r.Context())
+	resp.Contents, err = app.svc.ListAllArcStories(r.Context())
 	if err != nil {
 		app.errorResponse(r.Context(), w, err)
 		return
@@ -119,7 +119,7 @@ func (app *appEnv) listWithArcRefresh(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	var resp response
-	resp.Contents, err = app.svc.ListAllArticles(r.Context())
+	resp.Contents, err = app.svc.ListAllArcStories(r.Context())
 	if err != nil {
 		app.errorResponse(r.Context(), w, err)
 		return
@@ -127,8 +127,8 @@ func (app *appEnv) listWithArcRefresh(w http.ResponseWriter, r *http.Request) {
 	app.jsonResponse(http.StatusOK, w, resp)
 }
 
-func (app *appEnv) postAvailable(w http.ResponseWriter, r *http.Request) {
-	app.Printf("starting postAvailable")
+func (app *appEnv) postAlmanackArcStory(w http.ResponseWriter, r *http.Request) {
+	app.Printf("starting postAlmanackArcStory")
 
 	var userData struct {
 		ID         string          `json:"_id"`
@@ -176,8 +176,8 @@ func (app *appEnv) postAvailable(w http.ResponseWriter, r *http.Request) {
 	app.jsonResponse(http.StatusAccepted, w, &userData)
 }
 
-func (app *appEnv) listAvailable(w http.ResponseWriter, r *http.Request) {
-	app.Printf("starting listAvailable")
+func (app *appEnv) listAvailableArcStories(w http.ResponseWriter, r *http.Request) {
+	app.Printf("starting listAvailableArcStories")
 	type response struct {
 		Contents []almanack.ArcStory `json:"contents"`
 	}
@@ -185,7 +185,7 @@ func (app *appEnv) listAvailable(w http.ResponseWriter, r *http.Request) {
 		res response
 		err error
 	)
-	if res.Contents, err = app.svc.GetAvailableFeed(r.Context()); err != nil {
+	if res.Contents, err = app.svc.ListAvailableArcStories(r.Context()); err != nil {
 		app.errorResponse(r.Context(), w, err)
 		return
 	}
@@ -193,9 +193,9 @@ func (app *appEnv) listAvailable(w http.ResponseWriter, r *http.Request) {
 	app.jsonResponse(http.StatusOK, w, res)
 }
 
-func (app *appEnv) getAvailable(w http.ResponseWriter, r *http.Request) {
+func (app *appEnv) getArcStory(w http.ResponseWriter, r *http.Request) {
 	articleID := chi.URLParam(r, "id")
-	app.Printf("starting getAvailable %s", articleID)
+	app.Printf("starting getArcStory %s", articleID)
 
 	article, err := app.svc.GetArcStory(r.Context(), articleID)
 	if err != nil {
