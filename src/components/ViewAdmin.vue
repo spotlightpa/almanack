@@ -49,11 +49,15 @@ export default {
       Tools:
       <a
         href="javascript:
-        if (window.location.host !== 'www.spotlightpa.org'){
-          alert('Not on Spotlight PA');
-        } else {
-          window.location = 'https://almanack.data.spotlightpa.org/api/bookmarklet?from='+encodeURIComponent(window.location.href);
-        }
+(()=>{
+  let match = location.href.match(/\/\d{4}\/\d\d\/([\w-]+)\/?$/);
+  if (!match) {
+    alert('Not on Spotlight PA article');
+    return;
+  }
+  let [, slug] = match;
+  window.location = 'https://almanack.data.spotlightpa.org/api/bookmarklet/' + slug;
+})();
         "
       >
         Jump to admin
