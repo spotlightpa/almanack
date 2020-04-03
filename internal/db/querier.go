@@ -14,6 +14,7 @@ type Querier interface {
 	CreateImagePlaceholder(ctx context.Context, arg CreateImagePlaceholderParams) (int64, error)
 	GetArticle(ctx context.Context, arcID sql.NullString) (Article, error)
 	GetArticleByDBID(ctx context.Context, id int32) (Article, error)
+	GetArticleIDFromSlug(ctx context.Context, slug string) (string, error)
 	GetImageBySourceURL(ctx context.Context, srcUrl string) (Image, error)
 	GetRolesForDomain(ctx context.Context, domain string) ([]string, error)
 	ListAllArticles(ctx context.Context) ([]Article, error)

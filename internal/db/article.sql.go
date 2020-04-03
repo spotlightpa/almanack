@@ -68,6 +68,29 @@ func (q *Queries) GetArticleByDBID(ctx context.Context, id int32) (Article, erro
 	return i, err
 }
 
+const getArticleIDFromSlug = `-- name: GetArticleIDFromSlug :one
+SELECT
+  arc_id::text
+FROM ( SELECT DISTINCT ON (slug)
+    arc_id,
+    spotlightpa_data ->> 'slug' AS slug,
+    created_at
+  FROM
+    article
+  ORDER BY
+    slug,
+    created_at DESC) AS t
+WHERE
+  slug = $1::text
+`
+
+func (q *Queries) GetArticleIDFromSlug(ctx context.Context, slug string) (string, error) {
+	row := q.db.QueryRowContext(ctx, getArticleIDFromSlug, slug)
+	var arc_id string
+	err := row.Scan(&arc_id)
+	return arc_id, err
+}
+
 const listAllArticles = `-- name: ListAllArticles :many
 SELECT
   id, arc_id, arc_data, spotlightpa_path, spotlightpa_data, schedule_for, last_published, note, status, created_at, updated_at
