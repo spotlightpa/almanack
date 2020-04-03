@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/http"
 	"net/http/httputil"
+	"regexp"
 
 	"github.com/go-chi/chi"
 	"github.com/go-chi/chi/middleware"
@@ -25,6 +26,7 @@ func (app *appEnv) routes() http.Handler {
 	r.Route("/api", func(r chi.Router) {
 		r.Use(app.authMiddleware)
 		r.Get("/user-info", app.userInfo)
+		r.Get("/bookmarklet", app.getBookmarklet)
 		r.With(
 			app.hasRoleMiddleware("editor"),
 		).Group(func(r chi.Router) {
@@ -452,4 +454,31 @@ func (app *appEnv) listImages(w http.ResponseWriter, r *http.Request) {
 	}
 
 	app.jsonResponse(http.StatusOK, w, res)
+}
+
+func (app *appEnv) getBookmarklet(w http.ResponseWriter, r *http.Request) {
+	from := r.URL.Query().Get("from")
+	var slug string
+	if matches := regexp.MustCompile(`/news/\d{4}/\d{2}/([\w-]+)/?$`).FindStringSubmatch(from); len(matches) == 2 {
+		slug = matches[1]
+	}
+	if slug == "" {
+		http.Error(w, fmt.Sprintf("could not follow link %q", from), http.StatusBadRequest)
+		return
+	}
+
+	app.Printf("got slug %q", slug)
+	arcid, err := app.svc.Querier.GetArticleIDFromSlug(r.Context(), slug)
+	if err != nil && !db.IsNotFound(err) {
+		app.logErr(r.Context(), err)
+		http.Error(w, "something went wrong", http.StatusInternalServerError)
+		return
+	}
+	if arcid == "" {
+		http.NotFound(w, r)
+		return
+	}
+	http.Redirect(w, r,
+		fmt.Sprintf("/articles/%s/schedule", arcid),
+		http.StatusTemporaryRedirect)
 }

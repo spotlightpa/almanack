@@ -45,6 +45,28 @@ export default {
     <h1 class="title">
       Spotlight Administrator
     </h1>
+    <p class="content">
+      Tools:
+      <a
+        href="javascript:
+        if (window.location.host !== 'www.spotlightpa.org'){
+          alert('Not on Spotlight PA');
+        } else {
+          window.location = 'https://almanack.data.spotlightpa.org/api/bookmarklet?from='+encodeURIComponent(window.location.href);
+        }
+        "
+      >
+        Jump to admin
+      </a>
+      bookmarklet
+      <sup
+        ><a
+          title="What's a bookmarklet?"
+          href="https://support.mozilla.org/en-US/kb/bookmarklets-perform-common-web-page-tasks"
+          >?</a
+        ></sup
+      >
+    </p>
 
     <div class="level">
       <div class="level-left">

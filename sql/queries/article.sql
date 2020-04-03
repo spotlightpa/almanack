@@ -128,3 +128,18 @@ WHERE
   spotlightpa_path IS NOT NULL
 ORDER BY
   pub_date DESC;
+
+-- name: GetArticleIDFromSlug :one
+SELECT
+  arc_id::text
+FROM ( SELECT DISTINCT ON (slug)
+    arc_id,
+    spotlightpa_data ->> 'slug' AS slug,
+    created_at
+  FROM
+    article
+  ORDER BY
+    slug,
+    created_at DESC) AS t
+WHERE
+  slug = @slug::text;
