@@ -276,11 +276,6 @@ func (app *appEnv) postScheduledArticle(w http.ResponseWriter, r *http.Request) 
 			app.errorResponse(r.Context(), w, err)
 			return
 		}
-	} else if err := userData.ReplaceImageURLs(
-		r.Context(), app.c, app.imageStore, app.svc.Querier,
-	); err != nil {
-		// Keep trucking, but log the error
-		app.logErr(r.Context(), fmt.Errorf("could not upload image: %w", err))
 	}
 
 	if err := app.svc.SaveScheduledArticle(r.Context(), &userData.SpotlightPAArticle); err != nil {

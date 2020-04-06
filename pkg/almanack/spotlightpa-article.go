@@ -4,7 +4,6 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"net/http"
 	"strings"
 	"time"
 
@@ -112,7 +111,8 @@ func (splArt *SpotlightPAArticle) ResetArcData(ctx context.Context, svc Service,
 	if err := arcStory.ToArticle(ctx, svc, splArt); err != nil {
 		return err
 	}
-	return nil
+
+	return splArt.ReplaceImageURLs(ctx, svc)
 }
 
 func (splArt *SpotlightPAArticle) toDB() (*db.Article, error) {
@@ -172,12 +172,12 @@ func (splArt *SpotlightPAArticle) Publish(ctx context.Context, gh ContentStore) 
 	return nil
 }
 
-func (splArt *SpotlightPAArticle) ReplaceImageURLs(ctx context.Context, cl *http.Client, is ImageStore, q db.Querier) error {
+func (splArt *SpotlightPAArticle) ReplaceImageURLs(ctx context.Context, svc Service) error {
 	srcurl := splArt.ImageURL
 	if !strings.HasPrefix(srcurl, "http") {
 		return nil
 	}
-	image, err := q.GetImageBySourceURL(ctx, srcurl)
+	image, err := svc.Querier.GetImageBySourceURL(ctx, srcurl)
 	if err != nil && !db.IsNotFound(err) {
 		// Don't allow publishing, something has gone wrong
 		splArt.ImageURL = ""
@@ -189,13 +189,13 @@ func (splArt *SpotlightPAArticle) ReplaceImageURLs(ctx context.Context, cl *http
 		return nil
 	}
 	var ext string
-	if splArt.ImageURL, ext, err = UploadFromURL(ctx, cl, is, srcurl); err != nil {
+	if splArt.ImageURL, ext, err = UploadFromURL(ctx, svc.Client, svc.ImageStore, srcurl); err != nil {
 		// Don't allow publishing
 		splArt.ImageURL = ""
 		splArt.ScheduleFor = nil
 		return err
 	}
-	_, err = q.CreateImage(ctx, db.CreateImageParams{
+	_, err = svc.Querier.CreateImage(ctx, db.CreateImageParams{
 		Path:        splArt.ImageURL,
 		Type:        ext,
 		Description: splArt.ImageDescription,
