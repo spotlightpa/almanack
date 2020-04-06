@@ -1,14 +1,16 @@
 package almanack
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
+	"html"
 	"log"
 	"regexp"
 	"strings"
 )
 
-func (arcStory *ArcStory) ToArticle(article *SpotlightPAArticle) error {
+func (arcStory *ArcStory) ToArticle(ctx context.Context, svc Service, article *SpotlightPAArticle) error {
 	article.Authors = make([]string, len(arcStory.Credits.By))
 	needsByline := false
 	for i := range arcStory.Credits.By {
@@ -25,7 +27,7 @@ func (arcStory *ArcStory) ToArticle(article *SpotlightPAArticle) error {
 	}
 
 	var body strings.Builder
-	if err := readContentElements(arcStory.ContentElements, &body); err != nil {
+	if err := readContentElements(ctx, svc, arcStory.ContentElements, &body); err != nil {
 		return err
 	}
 
@@ -85,7 +87,7 @@ func slugFromURL(s string) string {
 	return s[start+1 : stop]
 }
 
-func readContentElements(rawels []*json.RawMessage, body *strings.Builder) error {
+func readContentElements(ctx context.Context, svc Service, rawels []*json.RawMessage, body *strings.Builder) error {
 	for i, raw := range rawels {
 		var _type string
 		wrapper := ContentElementType{Type: &_type}
@@ -150,9 +152,19 @@ func readContentElements(rawels []*json.RawMessage, body *strings.Builder) error
 			for _, c := range v.Credits.By {
 				credits = append(credits, c.Name)
 			}
-			// TODO: Use {{<picture>}}
-			graf = fmt.Sprintf("## Image:\n\n%s\n\n%s (%s)\n",
-				v.URL, v.Caption, strings.Join(credits, " "),
+
+			credit := strings.Join(credits, " ")
+
+			u, err := svc.ReplaceImageURL(ctx, v.URL, v.Caption, credit)
+			if err != nil {
+				return err
+			}
+			u = html.EscapeString(u)
+			desc := html.EscapeString(v.Caption)
+			credit = html.EscapeString(credit)
+			graf = fmt.Sprintf(
+				`{{<picture src="%s" description="%s" caption="%s" credit="%s">}}`+"\n",
+				u, desc, desc, credit,
 			)
 
 		default:

@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"encoding/json"
+	"net/http"
 	"time"
 
 	"github.com/spotlightpa/almanack/internal/db"
@@ -35,6 +36,8 @@ type Service struct {
 	Logger
 	Querier db.Querier
 	ContentStore
+	ImageStore
+	Client *http.Client
 }
 
 func (svc Service) GetScheduledArticle(ctx context.Context, articleID string) (*SpotlightPAArticle, error) {
@@ -48,6 +51,11 @@ func (svc Service) GetScheduledArticle(ctx context.Context, articleID string) (*
 	if err = schArticle.fromDB(dart); err != nil {
 		return nil, err
 	}
+	if schArticle.Empty() {
+		if err = schArticle.ResetArcData(ctx, svc, dart); err != nil {
+			return nil, err
+		}
+	}
 	return &schArticle, nil
 }
 
@@ -59,7 +67,7 @@ func (svc Service) ResetSpotlightPAArticleArcData(ctx context.Context, article *
 		return err
 	}
 
-	return article.ResetArcData(dart)
+	return article.ResetArcData(ctx, svc, dart)
 }
 
 func (svc Service) SaveScheduledArticle(ctx context.Context, article *SpotlightPAArticle) error {
@@ -208,4 +216,27 @@ func (svc Service) ListAllArcStories(ctx context.Context) (stories []ArcStory, e
 	}
 
 	return storiesFromDB(dbArts)
+}
+
+func (svc Service) ReplaceImageURL(ctx context.Context, srcURL, description, credit string) (string, error) {
+	image, err := svc.Querier.GetImageBySourceURL(ctx, srcURL)
+	if err != nil && !db.IsNotFound(err) {
+		return "", err
+	}
+	if !db.IsNotFound(err) && image.IsUploaded {
+		return image.Path, nil
+	}
+	var path, ext string
+	if path, ext, err = UploadFromURL(ctx, svc.Client, svc.ImageStore, srcURL); err != nil {
+		return "", err
+	}
+	_, err = svc.Querier.CreateImage(ctx, db.CreateImageParams{
+		Path:        path,
+		Type:        ext,
+		Description: description,
+		Credit:      credit,
+		SourceURL:   srcURL,
+		IsUploaded:  true,
+	})
+	return path, err
 }
