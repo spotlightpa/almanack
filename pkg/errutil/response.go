@@ -1,6 +1,7 @@
 package errutil
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"net/http"
@@ -14,6 +15,14 @@ type Response struct {
 
 func ResponseFrom(err error) Response {
 	var errResp Response
+	switch {
+	case errors.Is(err, context.Canceled):
+		err = Response{
+			StatusCode: http.StatusServiceUnavailable,
+			Message:    "canceled",
+			Cause:      err,
+		}
+	}
 	if !errors.As(err, &errResp) {
 		errResp.StatusCode = http.StatusInternalServerError
 		errResp.Message = "internal error"
