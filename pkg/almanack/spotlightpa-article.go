@@ -177,31 +177,13 @@ func (splArt *SpotlightPAArticle) ReplaceImageURLs(ctx context.Context, svc Serv
 	if !strings.HasPrefix(srcurl, "http") {
 		return nil
 	}
-	image, err := svc.Querier.GetImageBySourceURL(ctx, srcurl)
-	if err != nil && !db.IsNotFound(err) {
+	var err error
+	splArt.ImageURL, err = svc.ReplaceImageURL(ctx, splArt.ImageURL, splArt.ImageDescription, splArt.ImageCredit)
+	if err != nil {
 		// Don't allow publishing, something has gone wrong
 		splArt.ImageURL = ""
 		splArt.ScheduleFor = nil
 		return err
 	}
-	if !db.IsNotFound(err) && image.IsUploaded {
-		splArt.ImageURL = image.Path
-		return nil
-	}
-	var ext string
-	if splArt.ImageURL, ext, err = UploadFromURL(ctx, svc.Client, svc.ImageStore, srcurl); err != nil {
-		// Don't allow publishing
-		splArt.ImageURL = ""
-		splArt.ScheduleFor = nil
-		return err
-	}
-	_, err = svc.Querier.CreateImage(ctx, db.CreateImageParams{
-		Path:        splArt.ImageURL,
-		Type:        ext,
-		Description: splArt.ImageDescription,
-		Credit:      splArt.ImageCredit,
-		SourceURL:   srcurl,
-		IsUploaded:  true,
-	})
 	return err
 }
