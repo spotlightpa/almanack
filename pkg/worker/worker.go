@@ -6,6 +6,7 @@ import (
 	"flag"
 	"fmt"
 	"log"
+	"net/http"
 	"os"
 	"time"
 
@@ -109,6 +110,7 @@ Options:
 		Querier:      *pg,
 		Logger:       app.Logger,
 		ContentStore: app.gh,
+		Client:       http.DefaultClient,
 	}
 
 	return nil

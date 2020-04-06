@@ -105,6 +105,8 @@ func (app *appEnv) parseArgs(args []string) error {
 		Querier:      *pg,
 		Logger:       app.Logger,
 		ContentStore: app.gh,
+		ImageStore:   app.imageStore,
+		Client:       app.c,
 	}
 
 	return nil

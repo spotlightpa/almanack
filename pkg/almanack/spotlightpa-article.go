@@ -95,22 +95,21 @@ func (splArt *SpotlightPAArticle) fromDB(dbArticle db.Article) error {
 		return err
 	}
 
-	if splArt.LastArcSync.IsZero() {
-		if err := splArt.ResetArcData(dbArticle); err != nil {
-			return err
-		}
-	}
 	return nil
 }
 
-func (splArt *SpotlightPAArticle) ResetArcData(dbArticle db.Article) error {
+func (splArt *SpotlightPAArticle) Empty() bool {
+	return splArt.LastArcSync.IsZero()
+}
+
+func (splArt *SpotlightPAArticle) ResetArcData(ctx context.Context, svc Service, dbArticle db.Article) error {
 	splArt.LastArcSync = dbArticle.UpdatedAt
 	var arcStory ArcStory
 	if err := json.Unmarshal(dbArticle.ArcData, &arcStory); err != nil {
 		return err
 	}
 
-	if err := arcStory.ToArticle(splArt); err != nil {
+	if err := arcStory.ToArticle(ctx, svc, splArt); err != nil {
 		return err
 	}
 	return nil
