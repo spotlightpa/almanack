@@ -22,10 +22,10 @@ jobs:
       env:
         CI: true
     - name: yarn test
-      run: yarn test
+      run: ./run.sh test:frontend
       env:
         CI: true
     - name: yarn build
-      run: yarn build
+      run: ./run.sh test:backend
       env:
         CI: true

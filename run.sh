@@ -66,7 +66,11 @@ function migrate:prod() {
 	tern migrate -c prod.conf
 }
 
-function build:prod() {
+function build:frontend() {
+	yarn run build
+}
+
+function build:backend() {
 	go version
 
 	GOPKG="github.com/spotlightpa/almanack/pkg/almanack"
@@ -74,7 +78,11 @@ function build:prod() {
 	LDFLAGS="-X '$GOPKG.BuildVersion=$BUILD_VERSION'"
 
 	GOBIN=$THIS_DIR/functions go install -ldflags "$LDFLAGS" ./funcs/...
-	yarn run build
+}
+
+function build:prod() {
+	build:backend
+	build:frontend
 }
 
 function test() {
