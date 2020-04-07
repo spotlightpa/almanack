@@ -2,15 +2,10 @@ import Vue from "vue";
 import router from "./router.js";
 import "./filters/index.js";
 import "./plugins/font-awesome.js";
+import "./plugins/buefy.js";
 
 import VueMeta from "vue-meta";
 Vue.use(VueMeta);
-
-import Buefy from "buefy";
-Vue.use(Buefy, {
-  defaultIconComponent: "font-awesome-icon",
-  defaultIconPack: "fas",
-});
 
 import App from "./components/TheApp.vue";
 
