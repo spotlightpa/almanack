@@ -1,4 +1,7 @@
 <script>
+import { reactive, toRefs } from "@vue/composition-api";
+import { sendGAEvent } from "@/utils/google-analytics.js";
+
 import ArticleSlugLine from "./ArticleSlugLine.vue";
 import ArticleWordCount from "./ArticleWordCount.vue";
 import CopyTextarea from "./CopyTextarea.vue";
@@ -18,16 +21,48 @@ export default {
   props: {
     article: { type: Object, required: true },
   },
-  data() {
-    return {
+  setup(props, { refs }) {
+    let data = reactive({
       copied: false,
       viewHTML: false,
       articleHTML: "",
-    };
-  },
-  setup(props) {
+    });
+
     return {
+      ...toRefs(data),
+
       embeds: props.article.embedComponents,
+
+      showRichText() {
+        data.viewHTML = false;
+        sendGAEvent({
+          eventCategory: "ArticleDetails interaction",
+          eventAction: "Show Rich Text",
+        });
+      },
+      copyRichText() {
+        data.viewHTML = false;
+        refs.copyRichText.copy();
+        sendGAEvent({
+          eventCategory: "ArticleDetails interaction",
+          eventAction: "Copy Rich Text",
+        });
+      },
+      showHTML() {
+        data.viewHTML = true;
+        sendGAEvent({
+          eventCategory: "ArticleDetails interaction",
+          eventAction: "Show HTML",
+        });
+      },
+      copyHTML() {
+        data.viewHTML = true;
+        refs.copyHTML.copy();
+        sendGAEvent({
+          eventCategory: "ArticleDetails interaction",
+          eventAction: "Copy HTML",
+        });
+      },
     };
   },
 };
@@ -96,7 +131,7 @@ export default {
             <button
               class="button is-light has-text-weight-semibold"
               type="button"
-              @click="viewHTML = false"
+              @click="showRichText"
             >
               <span class="icon">
                 <font-awesome-icon :icon="['far', 'file-word']" />
@@ -108,10 +143,7 @@ export default {
             <button
               class="button is-primary has-text-weight-semibold"
               type="button"
-              @click="
-                viewHTML = false;
-                $refs.copyRichText.copy();
-              "
+              @click="copyRichText"
             >
               <span class="icon">
                 <font-awesome-icon :icon="['far', 'copy']" />
@@ -127,7 +159,7 @@ export default {
             <button
               class="button is-light has-text-weight-semibold"
               type="button"
-              @click="viewHTML = true"
+              @click="showHTML"
             >
               <span class="icon">
                 <font-awesome-icon :icon="['far', 'file-code']" />
@@ -139,10 +171,7 @@ export default {
             <button
               class="button is-primary has-text-weight-semibold"
               type="button"
-              @click="
-                viewHTML = true;
-                $refs.copyHTML.copy();
-              "
+              @click="copyHTML"
             >
               <span class="icon">
                 <font-awesome-icon :icon="['far', 'copy']" />
