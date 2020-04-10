@@ -11,6 +11,17 @@ import (
 )
 
 func (arcStory *ArcStory) ToArticle(ctx context.Context, svc Service, article *SpotlightPAArticle) error {
+	var body strings.Builder
+	if err := readContentElements(ctx, svc, arcStory.ContentElements, &body); err != nil {
+		return err
+	}
+	article.Body = body.String()
+
+	// Don't process anything else if this has been saved before
+	if !article.LastArcSync.IsZero() {
+		return nil
+	}
+
 	article.Authors = make([]string, len(arcStory.Credits.By))
 	needsByline := false
 	for i := range arcStory.Credits.By {
@@ -26,24 +37,16 @@ func (arcStory *ArcStory) ToArticle(ctx context.Context, svc Service, article *S
 		}
 	}
 
-	var body strings.Builder
-	if err := readContentElements(ctx, svc, arcStory.ContentElements, &body); err != nil {
-		return err
-	}
-
 	article.ArcID = arcStory.ID
 	article.InternalID = arcStory.Slug
-	// Don't reset slug on saved stories
-	if strings.TrimSpace(article.Slug) == "" {
-		article.Slug = slugFromURL(arcStory.CanonicalURL)
-	}
+
+	article.Slug = slugFromURL(arcStory.CanonicalURL)
 	article.PubDate = arcStory.Planning.Scheduling.PlannedPublishDate
 	article.Budget = arcStory.Planning.BudgetLine
 	article.Hed = arcStory.Headlines.Basic
 	article.Subhead = arcStory.Subheadlines.Basic
 	article.Summary = arcStory.Description.Basic
 	article.Blurb = arcStory.Description.Basic
-	article.Body = body.String()
 	article.LinkTitle = arcStory.Headlines.Web
 
 	setArticleImage(article, arcStory.PromoItems)

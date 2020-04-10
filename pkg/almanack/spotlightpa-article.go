@@ -102,15 +102,15 @@ func (splArt *SpotlightPAArticle) Empty() bool {
 }
 
 func (splArt *SpotlightPAArticle) ResetArcData(ctx context.Context, svc Service, dbArticle db.Article) error {
-	splArt.LastArcSync = dbArticle.UpdatedAt
 	var arcStory ArcStory
-	if err := json.Unmarshal(dbArticle.ArcData, &arcStory); err != nil {
+	if err := arcStory.fromDB(&dbArticle); err != nil {
 		return err
 	}
 
 	if err := arcStory.ToArticle(ctx, svc, splArt); err != nil {
 		return err
 	}
+	splArt.LastArcSync = dbArticle.UpdatedAt
 
 	return splArt.ReplaceImageURLs(ctx, svc)
 }
