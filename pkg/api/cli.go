@@ -128,21 +128,21 @@ type appEnv struct {
 
 func (app *appEnv) exec() error {
 	app.Printf("starting %s (%s)", AppName, almanack.BuildVersion)
-
-	listener := http.ListenAndServe
-	if app.isLambda {
-		app.Printf("starting on AWS Lambda")
-		apigo.ListenAndServe("", app.routes())
-		panic("unreachable")
-	}
-
-	app.Printf("starting on port %s", app.port)
 	routes := sentryhttp.
 		New(sentryhttp.Options{
 			WaitForDelivery: true,
 			Timeout:         5 * time.Second,
 		}).
 		Handle(app.routes())
+
+	listener := http.ListenAndServe
+	if app.isLambda {
+		app.Printf("starting on AWS Lambda")
+		apigo.ListenAndServe("", routes)
+		panic("unreachable")
+	}
+
+	app.Printf("starting on port %s", app.port)
 
 	return listener(app.port, routes)
 }
