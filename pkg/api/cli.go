@@ -69,7 +69,7 @@ func (app *appEnv) parseArgs(args []string) error {
 		return err
 	}
 
-	if err := app.initSentry(*sentryDSN); err != nil {
+	if err := app.initSentry(*sentryDSN, app.Logger); err != nil {
 		return err
 	}
 
