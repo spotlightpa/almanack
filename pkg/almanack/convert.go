@@ -125,8 +125,10 @@ func readContentElements(ctx context.Context, svc Service, rawels []*json.RawMes
 			switch v.ListType {
 			case "unordered":
 				identifier = "- "
+			case "ordered":
+				identifier = "1. "
 			default:
-				return fmt.Errorf("unkown list type: %q", v.ListType)
+				return fmt.Errorf("unknown list type: %q", v.ListType)
 			}
 			for j, item := range v.Items {
 				var li string
