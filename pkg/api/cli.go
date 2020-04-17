@@ -140,17 +140,18 @@ func (app *appEnv) exec() error {
 	routes := sentryhttp.
 		New(sentryhttp.Options{
 			WaitForDelivery: true,
-			Timeout:         1 * time.Second,
+			Timeout:         5 * time.Second,
 		}).
 		Handle(app.routes())
 
 	return listener(app.port, routes)
 }
 
-func (app *appEnv) initSentry(dsn string) error {
+func (app *appEnv) initSentry(dsn string, l almanack.Logger) error {
 	var transport sentry.Transport
 	if app.isLambda {
-		transport = &sentry.HTTPSyncTransport{Timeout: 2 * time.Second}
+		l.Printf("setting sentry timeout %q", dsn)
+		transport = &sentry.HTTPSyncTransport{Timeout: 5 * time.Second}
 	}
 	return sentry.Init(sentry.ClientOptions{
 		Dsn:       dsn,
