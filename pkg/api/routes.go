@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/http"
 	"net/http/httputil"
+	"strconv"
 
 	"github.com/go-chi/chi"
 	"github.com/go-chi/chi/middleware"
@@ -22,6 +23,7 @@ func (app *appEnv) routes() http.Handler {
 	r.Use(middleware.RequestLogger(&middleware.DefaultLogFormatter{Logger: app.Logger}))
 	r.Use(app.versionMiddleware)
 	r.Get("/api/healthcheck", app.ping)
+	r.Get(`/api/healthcheck/{code:\d{3}}`, app.pingErr)
 	r.Route("/api", func(r chi.Router) {
 		r.Use(app.authMiddleware)
 		r.Get("/user-info", app.userInfo)
@@ -72,7 +74,21 @@ func (app *appEnv) ping(w http.ResponseWriter, r *http.Request) {
 		app.errorResponse(r.Context(), w, err)
 		return
 	}
+
 	w.Write(b)
+}
+
+func (app *appEnv) pingErr(w http.ResponseWriter, r *http.Request) {
+	code := chi.URLParam(r, "code")
+	statusCode, _ := strconv.Atoi(code)
+	app.Printf("start pingErr %q", code)
+
+	app.errorResponse(r.Context(), w, errutil.Response{
+		StatusCode: statusCode,
+		Message:    http.StatusText(statusCode),
+		Cause:      fmt.Errorf("got test ping %q", code),
+	})
+	return
 }
 
 func (app *appEnv) userInfo(w http.ResponseWriter, r *http.Request) {

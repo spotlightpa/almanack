@@ -69,7 +69,7 @@ func (app *appEnv) parseArgs(args []string) error {
 		return err
 	}
 
-	if err := app.initSentry(*sentryDSN); err != nil {
+	if err := app.initSentry(*sentryDSN, app.Logger); err != nil {
 		return err
 	}
 
@@ -128,26 +128,30 @@ type appEnv struct {
 
 func (app *appEnv) exec() error {
 	app.Printf("starting %s (%s)", AppName, almanack.BuildVersion)
+	routes := sentryhttp.
+		New(sentryhttp.Options{
+			WaitForDelivery: true,
+			Timeout:         5 * time.Second,
+		}).
+		Handle(app.routes())
 
 	listener := http.ListenAndServe
 	if app.isLambda {
 		app.Printf("starting on AWS Lambda")
-		apigo.ListenAndServe("", app.routes())
+		apigo.ListenAndServe("", routes)
 		panic("unreachable")
 	}
 
 	app.Printf("starting on port %s", app.port)
-	routes := sentryhttp.
-		New(sentryhttp.Options{}).
-		Handle(app.routes())
 
 	return listener(app.port, routes)
 }
 
-func (app *appEnv) initSentry(dsn string) error {
+func (app *appEnv) initSentry(dsn string, l almanack.Logger) error {
 	var transport sentry.Transport
 	if app.isLambda {
-		transport = &sentry.HTTPSyncTransport{Timeout: 1 * time.Second}
+		l.Printf("setting sentry sync with timeout")
+		transport = &sentry.HTTPSyncTransport{Timeout: 5 * time.Second}
 	}
 	return sentry.Init(sentry.ClientOptions{
 		Dsn:       dsn,
