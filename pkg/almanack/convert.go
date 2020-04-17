@@ -7,6 +7,7 @@ import (
 	"html"
 	"log"
 	"regexp"
+	"strconv"
 	"strings"
 )
 
@@ -121,30 +122,38 @@ func readContentElements(ctx context.Context, svc Service, rawels []*json.RawMes
 				return err
 			}
 
-			var identifier string
+			var buf strings.Builder
+			n := 0
 			switch v.ListType {
 			case "unordered":
-				identifier = "- "
+				n = -1
 			case "ordered":
-				identifier = "1. "
+				n = 1
 			default:
 				return fmt.Errorf("unknown list type: %q", v.ListType)
 			}
 			for j, item := range v.Items {
-				var li string
 				if j != 0 {
-					body.WriteString("\n\n")
+					buf.WriteString("\n\n")
 				}
+
+				var li string
 				switch item.Type {
 				case "text":
-					li = item.Content
+					li = strings.TrimSpace(item.Content)
 				default:
 					return fmt.Errorf("unknown item type: %q", item.Type)
 				}
-				body.WriteString(identifier)
-				body.WriteString(li)
-				body.WriteString("\n\n")
+				if n < 1 {
+					buf.WriteString("- ")
+				} else {
+					buf.WriteString(strconv.Itoa(n))
+					buf.WriteString(". ")
+					n++
+				}
+				buf.WriteString(li)
 			}
+			graf = buf.String()
 
 		case "image":
 			var v ContentElementImage
