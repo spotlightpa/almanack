@@ -152,6 +152,10 @@ func (app *appEnv) initSentry(dsn string, l almanack.Logger) error {
 	if app.isLambda {
 		l.Printf("setting sentry timeout %q", dsn)
 		transport = &sentry.HTTPSyncTransport{Timeout: 5 * time.Second}
+		transport.Configure(sentry.ClientOptions{
+			Dsn:     dsn,
+			Release: almanack.BuildVersion,
+		})
 	}
 	return sentry.Init(sentry.ClientOptions{
 		Dsn:       dsn,
