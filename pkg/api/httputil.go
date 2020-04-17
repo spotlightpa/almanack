@@ -38,6 +38,8 @@ func (app *appEnv) errorResponse(ctx context.Context, w http.ResponseWriter, err
 func (app *appEnv) logErr(ctx context.Context, err error) {
 	if hub := sentry.GetHubFromContext(ctx); hub != nil {
 		hub.CaptureException(err)
+	} else {
+		app.Printf("sentry not in context")
 	}
 
 	app.Printf("err: %v", err)
