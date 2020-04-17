@@ -1,10 +1,10 @@
 package api
 
 import (
-	"errors"
 	"fmt"
 	"net/http"
 	"net/http/httputil"
+	"strconv"
 
 	"github.com/go-chi/chi"
 	"github.com/go-chi/chi/middleware"
@@ -23,7 +23,7 @@ func (app *appEnv) routes() http.Handler {
 	r.Use(middleware.RequestLogger(&middleware.DefaultLogFormatter{Logger: app.Logger}))
 	r.Use(app.versionMiddleware)
 	r.Get("/api/healthcheck", app.ping)
-	r.Get("/api/healthcheck/{message}", app.pingErr)
+	r.Get(`/api/healthcheck/{code:\d{3}}`, app.pingErr)
 	r.Route("/api", func(r chi.Router) {
 		r.Use(app.authMiddleware)
 		r.Get("/user-info", app.userInfo)
@@ -79,13 +79,14 @@ func (app *appEnv) ping(w http.ResponseWriter, r *http.Request) {
 }
 
 func (app *appEnv) pingErr(w http.ResponseWriter, r *http.Request) {
-	message := chi.URLParam(r, "message")
-	app.Printf("start pingErr %q", message)
+	code := chi.URLParam(r, "code")
+	statusCode, _ := strconv.Atoi(code)
+	app.Printf("start pingErr %q", code)
 
 	app.errorResponse(r.Context(), w, errutil.Response{
-		StatusCode: http.StatusBadRequest,
-		Message:    message,
-		Cause:      errors.New(message),
+		StatusCode: statusCode,
+		Message:    http.StatusText(statusCode),
+		Cause:      fmt.Errorf("got test ping %q", code),
 	})
 	return
 }
