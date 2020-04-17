@@ -138,7 +138,10 @@ func (app *appEnv) exec() error {
 
 	app.Printf("starting on port %s", app.port)
 	routes := sentryhttp.
-		New(sentryhttp.Options{}).
+		New(sentryhttp.Options{
+			WaitForDelivery: true,
+			Timeout:         1 * time.Second,
+		}).
 		Handle(app.routes())
 
 	return listener(app.port, routes)
@@ -147,7 +150,7 @@ func (app *appEnv) exec() error {
 func (app *appEnv) initSentry(dsn string) error {
 	var transport sentry.Transport
 	if app.isLambda {
-		transport = &sentry.HTTPSyncTransport{Timeout: 1 * time.Second}
+		transport = &sentry.HTTPSyncTransport{Timeout: 2 * time.Second}
 	}
 	return sentry.Init(sentry.ClientOptions{
 		Dsn:       dsn,

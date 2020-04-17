@@ -1,6 +1,7 @@
 package api
 
 import (
+	"errors"
 	"fmt"
 	"net/http"
 	"net/http/httputil"
@@ -22,6 +23,7 @@ func (app *appEnv) routes() http.Handler {
 	r.Use(middleware.RequestLogger(&middleware.DefaultLogFormatter{Logger: app.Logger}))
 	r.Use(app.versionMiddleware)
 	r.Get("/api/healthcheck", app.ping)
+	r.Get("/api/healthcheck/{message}", app.pingErr)
 	r.Route("/api", func(r chi.Router) {
 		r.Use(app.authMiddleware)
 		r.Get("/user-info", app.userInfo)
@@ -72,7 +74,20 @@ func (app *appEnv) ping(w http.ResponseWriter, r *http.Request) {
 		app.errorResponse(r.Context(), w, err)
 		return
 	}
+
 	w.Write(b)
+}
+
+func (app *appEnv) pingErr(w http.ResponseWriter, r *http.Request) {
+	message := chi.URLParam(r, "message")
+	app.Printf("start pingErr %q", message)
+
+	app.errorResponse(r.Context(), w, errutil.Response{
+		StatusCode: http.StatusBadRequest,
+		Message:    message,
+		Cause:      errors.New(message),
+	})
+	return
 }
 
 func (app *appEnv) userInfo(w http.ResponseWriter, r *http.Request) {
