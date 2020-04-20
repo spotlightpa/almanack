@@ -179,6 +179,9 @@ func readContentElements(ctx context.Context, svc Service, rawels []*json.RawMes
 				u, desc, desc, credit,
 			)
 
+		case "gallery", "interstitial_link":
+			continue
+
 		default:
 			return fmt.Errorf("unknown element type - %q", _type)
 		}
