@@ -202,11 +202,8 @@ func setArticleImage(a *SpotlightPAArticle, p PromoItems) {
 		a.ImageURL = p.Basic.AdditionalProperties.ResizeURL
 	}
 	var credits []string
-	for i, credit := range p.Basic.Credits.By {
+	for _, credit := range p.Basic.Credits.By {
 		credits = append(credits, stringutils.First(credit.Name, credit.Byline))
-		if len(p.Basic.Credits.Affiliation) > i {
-			credits = append(credits, p.Basic.Credits.Affiliation[i].Name)
-		}
 	}
 	a.ImageCredit = strings.Join(credits, " / ")
 	re := regexp.MustCompile(`(?i)\b(staff( photographer)?)\b`)
