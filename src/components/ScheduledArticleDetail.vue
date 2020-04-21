@@ -62,6 +62,19 @@ export default {
       >
     </p>
 
+    <div v-if="article.warnings.length" class="message is-warning">
+      <div class="message-header">
+        Warnings
+      </div>
+      <div class="message-body">
+        <p
+          v-for="warning of article.warnings"
+          :key="warning"
+          v-text="warning"
+        ></p>
+      </div>
+    </div>
+
     <BulmaField
       v-slot="{ idForLabel }"
       label="Publication Date"
@@ -350,5 +363,18 @@ export default {
         {{ article.scheduleFor | formatTime }}</b
       >
     </p>
+
+    <div v-if="article.warnings.length" class="message is-warning">
+      <div class="message-header">
+        Warnings
+      </div>
+      <div class="message-body">
+        <p
+          v-for="warning of article.warnings"
+          :key="warning"
+          v-text="warning"
+        ></p>
+      </div>
+    </div>
   </div>
 </template>
