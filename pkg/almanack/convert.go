@@ -9,6 +9,8 @@ import (
 	"regexp"
 	"strconv"
 	"strings"
+
+	"github.com/spotlightpa/almanack/internal/stringutils"
 )
 
 func (arcStory *ArcStory) ToArticle(ctx context.Context, svc Service, article *SpotlightPAArticle) error {
@@ -194,18 +196,14 @@ func readContentElements(ctx context.Context, svc Service, rawels []*json.RawMes
 }
 
 func setArticleImage(a *SpotlightPAArticle, p PromoItems) {
-	var credits []string
 	if strings.Contains(p.Basic.URL, "public") {
 		a.ImageURL = p.Basic.URL
 	} else {
 		a.ImageURL = p.Basic.AdditionalProperties.ResizeURL
 	}
+	var credits []string
 	for i, credit := range p.Basic.Credits.By {
-		name := credit.Byline
-		if name == "" {
-			name = credit.Name
-		}
-		credits = append(credits, name)
+		credits = append(credits, stringutils.First(credit.Name, credit.Byline))
 		if len(p.Basic.Credits.Affiliation) > i {
 			credits = append(credits, p.Basic.Credits.Affiliation[i].Name)
 		}
