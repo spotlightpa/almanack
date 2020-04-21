@@ -188,7 +188,6 @@ func readContentElements(ctx context.Context, svc Service, rawels []*json.RawMes
 			}
 			credit := fixCredit(strings.Join(credits, " "))
 
-			// fix unpub??
 			u, imgerr := svc.ReplaceImageURL(ctx, v.URL, v.Caption, credit)
 			if imgerr != nil {
 				warnings = append(warnings, imgerr.Error())

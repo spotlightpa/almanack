@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"time"
 
@@ -219,6 +220,9 @@ func (svc Service) ListAllArcStories(ctx context.Context) (stories []ArcStory, e
 }
 
 func (svc Service) ReplaceImageURL(ctx context.Context, srcURL, description, credit string) (string, error) {
+	if srcURL == "" {
+		return "", fmt.Errorf("no image provided")
+	}
 	image, err := svc.Querier.GetImageBySourceURL(ctx, srcURL)
 	if err != nil && !db.IsNotFound(err) {
 		return "", err
