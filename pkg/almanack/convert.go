@@ -54,11 +54,13 @@ func (arcStory *ArcStory) ToArticle(ctx context.Context, svc Service, article *S
 	article.LinkTitle = arcStory.Headlines.Web
 
 	setArticleImage(article, arcStory.PromoItems)
-	var imgerr error
-	article.ImageURL, imgerr = svc.ReplaceImageURL(
-		ctx, article.ImageURL, article.ImageDescription, article.ImageCredit)
-	if imgerr != nil {
-		article.Warnings = append(article.Warnings, imgerr.Error())
+	if strings.HasPrefix(article.ImageURL, "http") {
+		var imgerr error
+		article.ImageURL, imgerr = svc.ReplaceImageURL(
+			ctx, article.ImageURL, article.ImageDescription, article.ImageCredit)
+		if imgerr != nil {
+			article.Warnings = append(article.Warnings, imgerr.Error())
+		}
 	}
 
 	if len(article.Warnings) > 0 {
@@ -216,10 +218,9 @@ func readContentElements(ctx context.Context, svc Service, rawels []*json.RawMes
 }
 
 func setArticleImage(a *SpotlightPAArticle, p PromoItems) {
-	if strings.Contains(p.Basic.URL, "public") {
+	a.ImageURL = p.Basic.AdditionalProperties.ResizeURL
+	if a.ImageURL == "" && strings.Contains(p.Basic.URL, "public") {
 		a.ImageURL = p.Basic.URL
-	} else {
-		a.ImageURL = p.Basic.AdditionalProperties.ResizeURL
 	}
 	var credits []string
 	for _, credit := range p.Basic.Credits.By {
