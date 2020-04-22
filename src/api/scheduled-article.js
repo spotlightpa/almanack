@@ -46,6 +46,7 @@ export default class ScheduledArticle {
       modalExclude: ["ModalExclude", false],
       noIndex: ["NoIndex", false],
 
+      warnings: ["Warnings", []],
       authors: ["Authors", []],
       series: ["Series", []],
       topics: ["Topics", []],

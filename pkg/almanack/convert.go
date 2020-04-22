@@ -9,18 +9,23 @@ import (
 	"regexp"
 	"strconv"
 	"strings"
+
+	"github.com/spotlightpa/almanack/internal/stringutils"
 )
 
-func (arcStory *ArcStory) ToArticle(ctx context.Context, svc Service, article *SpotlightPAArticle) error {
+func (arcStory *ArcStory) ToArticle(ctx context.Context, svc Service, article *SpotlightPAArticle) (err error) {
 	var body strings.Builder
-	if err := readContentElements(ctx, svc, arcStory.ContentElements, &body); err != nil {
-		return err
+	if article.Warnings, err = readContentElements(ctx, svc, arcStory.ContentElements, &body); err != nil {
+		return
 	}
 	article.Body = body.String()
+	if len(article.Warnings) > 0 {
+		article.ScheduleFor = nil
+	}
 
 	// Don't process anything else if this has been saved before
 	if !article.LastArcSync.IsZero() {
-		return nil
+		return
 	}
 
 	// Hacky: Add the of XX orgs then remove them
@@ -49,7 +54,20 @@ func (arcStory *ArcStory) ToArticle(ctx context.Context, svc Service, article *S
 	article.LinkTitle = arcStory.Headlines.Web
 
 	setArticleImage(article, arcStory.PromoItems)
-	return nil
+	if strings.HasPrefix(article.ImageURL, "http") {
+		var imgerr error
+		article.ImageURL, imgerr = svc.ReplaceImageURL(
+			ctx, article.ImageURL, article.ImageDescription, article.ImageCredit)
+		if imgerr != nil {
+			article.Warnings = append(article.Warnings, imgerr.Error())
+		}
+	}
+
+	if len(article.Warnings) > 0 {
+		article.ScheduleFor = nil
+	}
+
+	return
 }
 
 // Must keep in sync with Vue's ArcArticle.authors
@@ -89,7 +107,7 @@ func slugFromURL(s string) string {
 	return s[start+1 : stop]
 }
 
-func readContentElements(ctx context.Context, svc Service, rawels []*json.RawMessage, body *strings.Builder) error {
+func readContentElements(ctx context.Context, svc Service, rawels []*json.RawMessage, body *strings.Builder) (warnings []string, err error) {
 	for i, raw := range rawels {
 		var _type string
 		wrapper := ContentElementType{Type: &_type}
@@ -101,7 +119,7 @@ func readContentElements(ctx context.Context, svc Service, rawels []*json.RawMes
 		case "text", "raw_html":
 			wrapper := ContentElementText{Content: &graf}
 			if err := json.Unmarshal(*raw, &wrapper); err != nil {
-				return err
+				return nil, err
 			}
 
 		case "header":
@@ -113,13 +131,13 @@ func readContentElements(ctx context.Context, svc Service, rawels []*json.RawMes
 		case "oembed_response":
 			var v ContentElementOembed
 			if err := json.Unmarshal(*raw, &v); err != nil {
-				return err
+				return nil, err
 			}
 			graf = v.RawOembed.HTML
 		case "list":
 			var v ContentElementList
 			if err := json.Unmarshal(*raw, &v); err != nil {
-				return err
+				return nil, err
 			}
 
 			var buf strings.Builder
@@ -130,7 +148,9 @@ func readContentElements(ctx context.Context, svc Service, rawels []*json.RawMes
 			case "ordered":
 				n = 1
 			default:
-				return fmt.Errorf("unknown list type: %q", v.ListType)
+				warnings = append(warnings,
+					fmt.Sprintf("unknown list type: %q", v.ListType))
+				continue
 			}
 			for j, item := range v.Items {
 				if j != 0 {
@@ -142,7 +162,9 @@ func readContentElements(ctx context.Context, svc Service, rawels []*json.RawMes
 				case "text":
 					li = strings.TrimSpace(item.Content)
 				default:
-					return fmt.Errorf("unknown item type: %q", item.Type)
+					warnings = append(warnings,
+						fmt.Sprintf("unknown list type: %q", v.ListType))
+					continue
 				}
 				if n < 1 {
 					buf.WriteString("- ")
@@ -158,18 +180,17 @@ func readContentElements(ctx context.Context, svc Service, rawels []*json.RawMes
 		case "image":
 			var v ContentElementImage
 			if err := json.Unmarshal(*raw, &v); err != nil {
-				return err
+				return nil, err
 			}
 			var credits []string
 			for _, c := range v.Credits.By {
 				credits = append(credits, c.Name)
 			}
+			credit := fixCredit(strings.Join(credits, " "))
 
-			credit := strings.Join(credits, " ")
-
-			u, err := svc.ReplaceImageURL(ctx, v.URL, v.Caption, credit)
-			if err != nil {
-				return err
+			u, imgerr := svc.ReplaceImageURL(ctx, v.URL, v.Caption, credit)
+			if imgerr != nil {
+				warnings = append(warnings, imgerr.Error())
 			}
 			u = html.EscapeString(u)
 			desc := html.EscapeString(v.Caption)
@@ -183,35 +204,34 @@ func readContentElements(ctx context.Context, svc Service, rawels []*json.RawMes
 			continue
 
 		default:
-			return fmt.Errorf("unknown element type - %q", _type)
+			warnings = append(warnings,
+				fmt.Sprintf("unknown element type - %q", _type))
+			continue
 		}
 		if i != 0 {
 			body.WriteString("\n\n")
 		}
 		body.WriteString(graf)
 	}
-	return nil
+	return
 }
 
 func setArticleImage(a *SpotlightPAArticle, p PromoItems) {
-	var credits []string
-	if strings.Contains(p.Basic.URL, "public") {
+	a.ImageURL = p.Basic.AdditionalProperties.ResizeURL
+	if a.ImageURL == "" && strings.Contains(p.Basic.URL, "public") {
 		a.ImageURL = p.Basic.URL
-	} else {
-		a.ImageURL = p.Basic.AdditionalProperties.ResizeURL
 	}
-	for i, credit := range p.Basic.Credits.By {
-		name := credit.Byline
-		if name == "" {
-			name = credit.Name
-		}
-		credits = append(credits, name)
-		if len(p.Basic.Credits.Affiliation) > i {
-			credits = append(credits, p.Basic.Credits.Affiliation[i].Name)
-		}
+	var credits []string
+	for _, credit := range p.Basic.Credits.By {
+		credits = append(credits, stringutils.First(credit.Name, credit.Byline))
 	}
-	a.ImageCredit = strings.Join(credits, " / ")
-	re := regexp.MustCompile(`(?i)\b(staff( photographer)?)\b`)
-	a.ImageCredit = re.ReplaceAllLiteralString(a.ImageCredit, "Philadelphia Inquirer")
+	a.ImageCredit = fixCredit(strings.Join(credits, " / "))
 	a.ImageDescription = p.Basic.Caption
+}
+
+var fixcreditre = regexp.MustCompile(`(?i)\b(staff( photographer)?)\b`)
+
+// change staff to inky
+func fixCredit(s string) string {
+	return fixcreditre.ReplaceAllLiteralString(s, "Philadelphia Inquirer")
 }

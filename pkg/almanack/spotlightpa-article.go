@@ -44,6 +44,7 @@ type SpotlightPAArticle struct {
 	ScheduleFor      *time.Time `toml:"-"`
 	LastSaved        *time.Time `toml:"-"`
 	LastPublished    *time.Time `toml:"-"`
+	Warnings         []string   `toml:"-"`
 }
 
 func (splArt *SpotlightPAArticle) toSPLData() interface{} {
@@ -80,6 +81,7 @@ func (splArt *SpotlightPAArticle) toSPLData() interface{} {
 		ScheduleFor      *time.Time `json:"-"`
 		LastSaved        *time.Time `json:"last-saved"`
 		LastPublished    *time.Time `json:"-"`
+		Warnings         []string   `json:"-"`
 	}
 	return (*splDataType)(splArt)
 }
@@ -101,18 +103,16 @@ func (splArt *SpotlightPAArticle) Empty() bool {
 	return splArt.LastArcSync.IsZero()
 }
 
-func (splArt *SpotlightPAArticle) ResetArcData(ctx context.Context, svc Service, dbArticle db.Article) error {
+func (splArt *SpotlightPAArticle) ResetArcData(ctx context.Context, svc Service, dbArticle db.Article) (err error) {
 	var arcStory ArcStory
-	if err := arcStory.fromDB(&dbArticle); err != nil {
+	if err = arcStory.fromDB(&dbArticle); err != nil {
 		return err
 	}
 
-	if err := arcStory.ToArticle(ctx, svc, splArt); err != nil {
-		return err
+	if err = arcStory.ToArticle(ctx, svc, splArt); err == nil {
+		splArt.LastArcSync = dbArticle.UpdatedAt
 	}
-	splArt.LastArcSync = dbArticle.UpdatedAt
-
-	return splArt.ReplaceImageURLs(ctx, svc)
+	return nil
 }
 
 func (splArt *SpotlightPAArticle) toDB() (*db.Article, error) {
@@ -170,20 +170,4 @@ func (splArt *SpotlightPAArticle) Publish(ctx context.Context, gh ContentStore) 
 	}
 
 	return nil
-}
-
-func (splArt *SpotlightPAArticle) ReplaceImageURLs(ctx context.Context, svc Service) error {
-	srcurl := splArt.ImageURL
-	if !strings.HasPrefix(srcurl, "http") {
-		return nil
-	}
-	var err error
-	splArt.ImageURL, err = svc.ReplaceImageURL(ctx, splArt.ImageURL, splArt.ImageDescription, splArt.ImageCredit)
-	if err != nil {
-		// Don't allow publishing, something has gone wrong
-		splArt.ImageURL = ""
-		splArt.ScheduleFor = nil
-		return err
-	}
-	return err
 }
