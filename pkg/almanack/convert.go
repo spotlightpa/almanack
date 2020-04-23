@@ -188,7 +188,16 @@ func readContentElements(ctx context.Context, svc Service, rawels []*json.RawMes
 			}
 			credit := fixCredit(strings.Join(credits, " "))
 
-			u, imgerr := svc.ReplaceImageURL(ctx, v.URL, v.Caption, credit)
+			imageURL := v.AdditionalProperties.ResizeURL
+			if imageURL == "" && strings.Contains(v.URL, "public") {
+				imageURL = v.URL
+			}
+			if imageURL == "" {
+				warnings = append(warnings,
+					fmt.Sprintf("could not find public image for %q", v.URL))
+				continue
+			}
+			u, imgerr := svc.ReplaceImageURL(ctx, imageURL, v.Caption, credit)
 			if imgerr != nil {
 				warnings = append(warnings, imgerr.Error())
 			}

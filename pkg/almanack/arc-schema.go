@@ -143,10 +143,29 @@ type ContentElementHeading struct {
 }
 
 type ContentElementImage struct {
-	Credits Credits `json:"credits"`
-	Caption string  `json:"caption"`
-	URL     string  `json:"url"`
-	Width   int     `json:"width"`
+	AdditionalProperties ImageAdditionalProperties `json:"additional_properties"`
+	Credits              Credits                   `json:"credits"`
+	Caption              string                    `json:"caption"`
+	URL                  string                    `json:"url"`
+	Width                int                       `json:"width"`
+}
+
+type ImageAdditionalProperties struct {
+	ID                 string    `json:"_id"`
+	Expiry             string    `json:"expiry"`
+	TakenOn            time.Time `json:"takenOn"`
+	Version            int       `json:"version"`
+	ProxyURL           string    `json:"proxyUrl"`
+	MimeType           string    `json:"mime_type"`
+	Published          bool      `json:"published"`
+	ResizeURL          string    `json:"resizeUrl"`
+	Restricted         bool      `json:"restricted"`
+	OriginalURL        string    `json:"originalUrl"`
+	OriginalName       string    `json:"originalName"`
+	AdapterVersion     string    `json:"adapter_version"`
+	FullSizeResizeURL  string    `json:"fullSizeResizeUrl"`
+	VisibleToSearch    bool      `json:"visible_to_search"`
+	ThumbnailResizeURL string    `json:"thumbnailResizeUrl"`
 }
 
 type ContentElementList struct {
