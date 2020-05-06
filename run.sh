@@ -72,11 +72,11 @@ function build:frontend() {
 
 function build:backend() {
 	go version
-
+	set -x
 	GOPKG="github.com/spotlightpa/almanack/pkg/almanack"
 	BUILD_VERSION="$(git rev-parse --short HEAD)"
-	LDFLAGS="-X '$GOPKG.BuildVersion=$BUILD_VERSION'"
-
+	URL=${DEPLOY_PRIME_URL:-http://local.dev}
+	LDFLAGS="-X '$GOPKG.BuildVersion=$BUILD_VERSION' -X '$GOPKG.DeployURL=$URL'"
 	GOBIN=$THIS_DIR/functions go install -ldflags "$LDFLAGS" ./funcs/...
 }
 

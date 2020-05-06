@@ -7,6 +7,7 @@ import (
 
 var (
 	BuildVersion string = "Development"
+	DeployURL    string = "http://localhost"
 )
 
 type Logger interface {
