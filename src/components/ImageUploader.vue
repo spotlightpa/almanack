@@ -1,5 +1,5 @@
 <script>
-import { ref, computed } from "@vue/composition-api";
+import { reactive, toRefs, computed } from "@vue/composition-api";
 
 import { useClient } from "@/api/hooks.js";
 import imgproxyURL from "@/api/imgproxy-url.js";
@@ -14,48 +14,47 @@ export default {
   setup(props, { emit }) {
     let { uploadFile } = useClient();
 
-    let isUploading = ref(false);
-    let filename = ref("");
-    let error = ref(null);
+    let state = reactive({
+      isUploading: false,
+      filename: "",
+      error: null,
+      isDragging: false,
 
-    async function uploadFileInput(ev) {
-      if (isUploading.value) {
-        return;
-      }
-      let { files } = ev.target;
-      if (files.length !== 1) {
-        error.value = new Error("Can only upload one file at a time");
-        return;
-      }
-      let [body] = files;
-      if (!["image/jpeg", "image/png"].includes(body.type)) {
-        error.value = new Error("Only JPEG and PNG are supported");
-        return;
-      }
+      imageURL: computed(() => imgproxyURL(state.filename)),
+    });
 
-      isUploading.value = true;
-      error.value = null;
-      [filename.value, error.value] = await uploadFile(body);
-      isUploading.value = false;
-      emit("update-image-list");
-    }
+    let actions = {
+      async uploadFileInput(ev) {
+        if (state.isUploading) {
+          return;
+        }
+        let { files } = ev.target;
+        if (files.length !== 1) {
+          state.error = new Error("Can only upload one file at a time");
+          return;
+        }
+        let [body] = files;
+        if (!["image/jpeg", "image/png"].includes(body.type)) {
+          state.error = new Error("Only JPEG and PNG are supported");
+          return;
+        }
 
-    let isDragging = ref(false);
+        state.isUploading = true;
+        state.error = null;
+        [state.filename, state.error] = await uploadFile(body);
+        state.isUploading = false;
+        emit("update-image-list");
+      },
+      dropFile(ev) {
+        state.isDragging = false;
+        let { files = [] } = ev.dataTransfer;
+        return actions.uploadFileInput({ target: { files } });
+      },
+    };
 
     return {
-      isUploading,
-      uploadFileInput,
-      filename,
-      error,
-
-      isDragging,
-      dropFile(e) {
-        isDragging.value = false;
-        let { files = [] } = e.dataTransfer;
-        uploadFileInput({ target: { files } });
-      },
-
-      imageURL: computed(() => imgproxyURL(filename.value)),
+      ...toRefs(state),
+      ...actions,
     };
   },
 };
