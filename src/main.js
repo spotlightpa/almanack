@@ -6,7 +6,6 @@ let dsn =
     : "";
 
 Sentry.init({ dsn });
-Sentry.captureException(new Error("Test error"));
 
 import Vue from "vue";
 import router from "./router.js";
