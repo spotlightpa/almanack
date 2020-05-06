@@ -8,7 +8,7 @@ THIS_DIR=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
 cd "$THIS_DIR"
 
 function _default() {
-	start-api
+	api -src-feed "$ARC_FEED" -cache
 }
 
 function _die() {
@@ -114,9 +114,19 @@ function format:misc() {
 	_git-xargs '*.sql' pg_format -w 80 -s 2 _ -o _
 }
 
-function start-api() {
-	set -x
-	go run ./funcs/almanack-api -src-feed "$ARC_FEED" -cache
+function api() {
+	go run ./funcs/almanack-api "$@"
+}
+
+function frontend() {
+	yarn run serve
+}
+
+function check-deps() {
+	_installed sqlc || echo "install https://sqlc.dev"
+	_installed shfmt || echo "install https://github.com/mvdan/sh"
+	_installed shellcheck || echo "install https://www.shellcheck.net"
+	_installed shellcheck || echo "install https://github.com/darold/pgFormatter"
 }
 
 TIMEFORMAT="Task completed in %1lR"
