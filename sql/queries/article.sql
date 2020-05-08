@@ -114,6 +114,7 @@ ORDER BY
 SELECT
   id,
   arc_id::text,
+  spotlightpa_path,
   (spotlightpa_data ->> 'internal-id')::text AS internal_id,
   (spotlightpa_data ->> 'hed')::text AS hed,
   ARRAY (
