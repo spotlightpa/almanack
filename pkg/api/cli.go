@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"net/url"
 	"os"
 	"time"
 
@@ -137,8 +138,13 @@ func (app *appEnv) exec() error {
 
 	listener := http.ListenAndServe
 	if app.isLambda {
-		app.Printf("starting on AWS Lambda")
-		apigo.ListenAndServe("", routes)
+		var host string
+		{
+			u, _ := url.Parse(almanack.DeployURL)
+			host = u.Hostname()
+		}
+		app.Printf("starting on AWS Lambda for %s", host)
+		apigo.ListenAndServe(host, routes)
 		panic("unreachable")
 	}
 
