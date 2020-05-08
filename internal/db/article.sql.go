@@ -191,6 +191,7 @@ const listSpotlightPAArticles = `-- name: ListSpotlightPAArticles :many
 SELECT
   id,
   arc_id::text,
+  spotlightpa_path,
   (spotlightpa_data ->> 'internal-id')::text AS internal_id,
   (spotlightpa_data ->> 'hed')::text AS hed,
   ARRAY (
@@ -208,12 +209,13 @@ ORDER BY
 `
 
 type ListSpotlightPAArticlesRow struct {
-	ID         int32     `json:"id"`
-	ArcID      string    `json:"arc_id"`
-	InternalID string    `json:"internal_id"`
-	Hed        string    `json:"hed"`
-	Authors    []string  `json:"authors"`
-	PubDate    time.Time `json:"pub_date"`
+	ID              int32          `json:"id"`
+	ArcID           string         `json:"arc_id"`
+	SpotlightPAPath sql.NullString `json:"spotlightpa_path"`
+	InternalID      string         `json:"internal_id"`
+	Hed             string         `json:"hed"`
+	Authors         []string       `json:"authors"`
+	PubDate         time.Time      `json:"pub_date"`
 }
 
 func (q *Queries) ListSpotlightPAArticles(ctx context.Context) ([]ListSpotlightPAArticlesRow, error) {
@@ -228,6 +230,7 @@ func (q *Queries) ListSpotlightPAArticles(ctx context.Context) ([]ListSpotlightP
 		if err := rows.Scan(
 			&i.ID,
 			&i.ArcID,
+			&i.SpotlightPAPath,
 			&i.InternalID,
 			&i.Hed,
 			pq.Array(&i.Authors),
