@@ -49,7 +49,12 @@ export function makeAuth() {
     },
     logout() {
       authState.user = null;
-      netlifyIdentity.logout();
+      try {
+        netlifyIdentity.logout();
+      } catch (e) {
+        // eslint-disable-next-line no-console
+        console.warn(e);
+      }
     },
     async headers() {
       let token;
