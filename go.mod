@@ -14,7 +14,7 @@ require (
 	github.com/carlmjohnson/exitcode v0.0.4
 	github.com/carlmjohnson/flagext v0.0.10
 	github.com/carlmjohnson/slackhook v0.0.3
-	github.com/getsentry/sentry-go v0.5.1
+	github.com/getsentry/sentry-go v0.6.1
 	github.com/go-chi/chi v4.0.3+incompatible
 	github.com/go-redsync/redsync v1.3.1
 	github.com/golang/gddo v0.0.0-20200127195332-7365cb292b8b
