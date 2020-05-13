@@ -1,13 +1,20 @@
 package api
 
 import (
+	"bufio"
+	"context"
+	"encoding/base64"
 	"fmt"
+	"io"
+	"io/ioutil"
 	"net/http"
 	"net/http/httputil"
 	"strconv"
+	"strings"
 
 	"github.com/go-chi/chi"
 	"github.com/go-chi/chi/middleware"
+	"golang.org/x/net/context/ctxhttp"
 
 	"github.com/spotlightpa/almanack/internal/db"
 	"github.com/spotlightpa/almanack/internal/httpjson"
@@ -24,6 +31,7 @@ func (app *appEnv) routes() http.Handler {
 	r.Use(app.versionMiddleware)
 	r.Get("/api/healthcheck", app.ping)
 	r.Get(`/api/healthcheck/{code:\d{3}}`, app.pingErr)
+	r.Get(`/api/proxy-image/{encURL}`, app.getProxyImage)
 	r.Route("/api", func(r chi.Router) {
 		r.Use(app.authMiddleware)
 		r.Get("/user-info", app.userInfo)
@@ -99,6 +107,92 @@ func (app *appEnv) userInfo(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	app.jsonResponse(http.StatusOK, w, userinfo)
+}
+
+func (app *appEnv) getProxyImage(w http.ResponseWriter, r *http.Request) {
+	app.Println("start getProxyImage")
+
+	encURL := chi.URLParam(r, "encURL")
+	decURL, err := base64.URLEncoding.DecodeString(encURL)
+	if err != nil {
+		err = errutil.Response{
+			StatusCode: http.StatusBadRequest,
+			Cause:      err,
+		}
+		app.errorResponse(r.Context(), w, err)
+		return
+	}
+	u := string(decURL)
+	app.Printf("requested %q", u)
+	inWhitelist := false
+	for _, prefix := range []string{
+		"https://www.inquirer.com/resizer/",
+		"https://arc-anglerfish-arc2-prod-pmn.s3.amazonaws.com/public/",
+	} {
+		if strings.HasPrefix(u, prefix) {
+			inWhitelist = true
+			break
+		}
+	}
+	if !inWhitelist {
+		err = errutil.Response{
+			StatusCode: http.StatusBadRequest,
+			Cause:      err,
+		}
+		app.errorResponse(r.Context(), w, err)
+		return
+	}
+	ctype, body, err := getImage(r.Context(), app.c, u)
+	if err != nil {
+		app.errorResponse(r.Context(), w, err)
+		return
+	}
+	w.Header().Set("Content-Type", ctype)
+	ext := strings.TrimPrefix(ctype, "image/")
+	disposition := fmt.Sprintf(`attachment; filename="image.%s"`, ext)
+	w.Header().Set("Content-Disposition", disposition)
+	w.Header().Set("Cache-Control", "public, max-age=900")
+	if _, err = w.Write(body); err != nil {
+		app.logErr(r.Context(), err)
+	}
+}
+
+func getImage(ctx context.Context, c *http.Client, srcurl string) (ctype string, body []byte, err error) {
+	var res *http.Response
+	res, err = ctxhttp.Get(ctx, c, srcurl)
+	if err != nil {
+		return
+	}
+	defer res.Body.Close()
+
+	const (
+		megabyte = 1 << 20
+		maxSize  = 25 * megabyte
+	)
+	buf := bufio.NewReader(http.MaxBytesReader(nil, res.Body, maxSize))
+	// http.DetectContentType only uses first 512 bytes
+	peek, err := buf.Peek(512)
+	if err != nil && err != io.EOF {
+		return "", nil, err
+	}
+
+	if ct := http.DetectContentType(peek); strings.HasPrefix(ct, "image/jpeg") {
+		ctype = "image/jpeg"
+	} else if strings.HasPrefix(ct, "image/png") {
+		ctype = "image/png"
+	} else {
+		return "", nil, errutil.Response{
+			StatusCode: http.StatusBadRequest,
+			Message:    "URL must be an image",
+			Cause:      fmt.Errorf("%q did not have proper MIME type", srcurl),
+		}
+	}
+
+	body, err = ioutil.ReadAll(buf)
+	if err != nil {
+		return "", nil, err
+	}
+	return
 }
 
 func (app *appEnv) listAllArcStories(w http.ResponseWriter, r *http.Request) {

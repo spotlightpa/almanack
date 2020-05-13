@@ -28,6 +28,9 @@ func ResponseFrom(err error) Response {
 		errResp.Message = "internal error"
 		errResp.Cause = err
 	}
+	if errResp.Message == "" {
+		errResp.Message = http.StatusText(errResp.StatusCode)
+	}
 	return errResp
 }
 

@@ -203,14 +203,20 @@ export default class ArcArticle {
     );
   }
   get featuredImage() {
-    let url = this.getProp("promo_items.basic.url", { fallback: "" });
+    let srcURL = this.getProp("promo_items.basic.url", { fallback: "" });
     // Some images haven't been published and can't be used
-    if (url.match(/\/public\//)) {
-      return url;
+    if (!srcURL.match(/\/public\//)) {
+      srcURL = this.getProp(
+        "promo_items.basic.additional_properties.resizeUrl",
+        {
+          fallback: "",
+        }
+      );
     }
-    return this.getProp("promo_items.basic.additional_properties.resizeUrl", {
-      fallback: "",
-    });
+    if (!srcURL) {
+      return "";
+    }
+    return `/api/proxy-image/${window.btoa(srcURL)}`;
   }
   get featuredImageCredits() {
     return this.getProp("promo_items.basic.credits.by", { fallback: [] }).map(
