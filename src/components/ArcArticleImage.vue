@@ -14,11 +14,15 @@ export default {
       return this.block.credits.by.map((v) => v.name);
     },
     imageURL() {
+      let srcURL = this.block.url;
       // Some images haven't been published and can't be used
-      if (this.block.url.match(/\/public\//)) {
-        return this.block.url;
+      if (!this.block.url.match(/\/public\//)) {
+        srcURL = this.block.additional_properties.resizeUrl;
       }
-      return this.block.additional_properties.resizeUrl;
+      if (!srcURL) {
+        return "";
+      }
+      return `/api/proxy-image/${window.btoa(srcURL)}`;
     },
   },
 };
