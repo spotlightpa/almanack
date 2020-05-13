@@ -1,4 +1,7 @@
 import { computed } from "@vue/composition-api";
+
+import { loadItem, storeItem } from "@/utils/dom-utils.js";
+
 import ArcArticle from "./arc-article.js";
 import { useService } from "./service.js";
 
@@ -38,6 +41,8 @@ export function getAvailable({ client, id }) {
   };
 }
 
+const UPCOMING_KEY = "almanack:upcoming:cache";
+
 export function upcoming(client) {
   let apiState = useService({
     canLoad: client.hasAuthUpcoming(),
@@ -46,12 +51,19 @@ export function upcoming(client) {
 
   return {
     ...apiState,
-    articles: computed(() =>
-      apiState.isLoading.value ||
-      apiState.error.value ||
-      !apiState.rawData.value
-        ? []
-        : ArcArticle.from(apiState.rawData.value)
-    ),
+    articles: computed(() => {
+      let rawItems;
+      if (
+        apiState.isLoading.value ||
+        apiState.error.value ||
+        !apiState.rawData.value
+      ) {
+        rawItems = loadItem(UPCOMING_KEY) ?? [];
+      } else {
+        rawItems = apiState.rawData.value;
+        storeItem(UPCOMING_KEY, rawItems);
+      }
+      return ArcArticle.from(rawItems);
+    }),
   };
 }

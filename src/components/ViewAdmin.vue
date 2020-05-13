@@ -2,7 +2,6 @@
 import { ref } from "@vue/composition-api";
 
 import AdminList from "./AdminList.vue";
-import APILoader from "./APILoader.vue";
 import EmailComposer from "./EmailComposer.vue";
 
 import { useUpcoming } from "@/api/hooks.js";
@@ -13,7 +12,6 @@ export default {
   name: "ViewAdmin",
   components: {
     AdminList,
-    APILoader,
     EmailComposer,
     ImageUploader,
   },
@@ -159,20 +157,30 @@ export default {
       </router-link>
     </div>
 
-    <APILoader
-      :can-load="canLoad"
-      :is-loading="isLoading"
-      :reload="fetch"
-      :error="error"
-    >
-      <keep-alive>
-        <AdminList
-          v-if="articles.length"
-          :articles="articles"
-          title="Arc Articles"
-          @refresh="refresh"
-        />
-      </keep-alive>
-    </APILoader>
+    <progress v-if="isLoading" class="progress is-large is-warning" max="100">
+      Loading…
+    </progress>
+    <div v-if="error" class="message is-danger">
+      <div class="message-header">{{ error.name }}</div>
+      <div class="message-body">
+        <p class="content">{{ error.message }}</p>
+        <div class="buttons">
+          <button
+            class="button is-danger has-text-weight-semibold"
+            @click="fetch"
+          >
+            Reload?
+          </button>
+        </div>
+      </div>
+    </div>
+    <keep-alive>
+      <AdminList
+        v-if="articles.length"
+        :articles="articles"
+        title="Arc Articles"
+        @refresh="refresh"
+      />
+    </keep-alive>
   </div>
 </template>
