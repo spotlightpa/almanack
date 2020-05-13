@@ -58,6 +58,8 @@ func (app *appEnv) routes() http.Handler {
 			r.Post("/authorized-domains", app.postDomain)
 			r.Get("/spotlightpa-articles", app.listSpotlightPAArticles)
 			r.Get("/images", app.listImages)
+			r.Get("/editors-picks", app.getEditorsPicks)
+			r.Post("/editors-picks", app.postEditorsPicks)
 		})
 	})
 	r.NotFound(app.notFound)
@@ -577,4 +579,28 @@ func (app *appEnv) getBookmarklet(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r,
 		fmt.Sprintf("/articles/%s/schedule", arcid),
 		http.StatusTemporaryRedirect)
+}
+
+func (app *appEnv) getEditorsPicks(w http.ResponseWriter, r *http.Request) {
+	app.Printf("starting getEditorsPicks")
+	resp, err := almanack.GetEditorsPicks(r.Context(), app.svc.Querier)
+	if err != nil {
+		app.errorResponse(r.Context(), w, err)
+		return
+	}
+	app.jsonResponse(http.StatusOK, w, resp)
+}
+
+func (app *appEnv) postEditorsPicks(w http.ResponseWriter, r *http.Request) {
+	app.Printf("starting postEditorsPicks")
+	var req almanack.EditorsPicks
+	if err := httpjson.DecodeRequest(w, r, &req); err != nil {
+		app.errorResponse(r.Context(), w, err)
+		return
+	}
+	if err := almanack.SetEditorsPicks(r.Context(), app.svc.Querier, app.gh, &req); err != nil {
+		app.errorResponse(r.Context(), w, err)
+		return
+	}
+	app.jsonResponse(http.StatusAccepted, w, http.StatusText(http.StatusAccepted))
 }
