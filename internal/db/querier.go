@@ -17,6 +17,7 @@ type Querier interface {
 	GetArticleIDFromSlug(ctx context.Context, slug string) (string, error)
 	GetImageBySourceURL(ctx context.Context, srcUrl string) (Image, error)
 	GetRolesForDomain(ctx context.Context, domain string) ([]string, error)
+	GetSiteData(ctx context.Context, key string) (json.RawMessage, error)
 	ListAllArticles(ctx context.Context) ([]Article, error)
 	ListAvailableArticles(ctx context.Context) ([]Article, error)
 	ListDomainsWithRole(ctx context.Context, role string) ([]string, error)
@@ -25,6 +26,7 @@ type Querier interface {
 	ListUpcoming(ctx context.Context) ([]Article, error)
 	PopScheduled(ctx context.Context) ([]Article, error)
 	SetRolesForDomain(ctx context.Context, arg SetRolesForDomainParams) (DomainRole, error)
+	SetSiteData(ctx context.Context, arg SetSiteDataParams) error
 	UpdateAlmanackArticle(ctx context.Context, arg UpdateAlmanackArticleParams) (Article, error)
 	UpdateArcArticles(ctx context.Context, arcItems json.RawMessage) error
 	UpdateImage(ctx context.Context, arg UpdateImageParams) (Image, error)

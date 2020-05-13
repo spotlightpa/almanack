@@ -52,3 +52,11 @@ type ImageType struct {
 	Mime       string   `json:"mime"`
 	Extensions []string `json:"extensions"`
 }
+
+type SiteDatum struct {
+	ID        int32           `json:"id"`
+	Key       string          `json:"key"`
+	Data      json.RawMessage `json:"data"`
+	CreatedAt time.Time       `json:"created_at"`
+	UpdatedAt time.Time       `json:"updated_at"`
+}
