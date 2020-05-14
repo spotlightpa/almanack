@@ -53,7 +53,12 @@ export default {
 
 <template>
   <div>
-    <h2 class="title is-spaced">{{ article.id }} Scheduler</h2>
+    <h2 class="title is-spaced">
+      {{ article.id }} Scheduler (<router-link to="./"
+        ><small>Editor View</small></router-link
+      >
+      )
+    </h2>
     <p class="content">
       <b
         >Article last synchronized with Arc at

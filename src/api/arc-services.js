@@ -1,4 +1,4 @@
-import { computed } from "@vue/composition-api";
+import { computed, watch } from "@vue/composition-api";
 
 import { loadItem, storeItem } from "@/utils/dom-utils.js";
 
@@ -48,22 +48,26 @@ export function upcoming(client) {
     canLoad: client.hasAuthUpcoming(),
     serviceCall: () => client.upcoming(),
   });
-
+  watch(apiState.rawData, (newValue) => {
+    if (newValue) {
+      storeItem(UPCOMING_KEY, newValue);
+    }
+  });
   return {
     ...apiState,
     articles: computed(() => {
-      let rawItems;
       if (
-        apiState.isLoading.value ||
-        apiState.error.value ||
-        !apiState.rawData.value
+        !apiState.isLoading.value &&
+        !apiState.error.value &&
+        apiState.rawData.value
       ) {
-        rawItems = loadItem(UPCOMING_KEY) ?? [];
-      } else {
-        rawItems = apiState.rawData.value;
-        storeItem(UPCOMING_KEY, rawItems);
+        return ArcArticle.from(apiState.rawData.value);
       }
-      return ArcArticle.from(rawItems);
+      let cachedVal = loadItem(UPCOMING_KEY);
+      if (!cachedVal) {
+        return [];
+      }
+      return ArcArticle.from(cachedVal);
     }),
   };
 }

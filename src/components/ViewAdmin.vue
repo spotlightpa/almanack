@@ -43,8 +43,8 @@ export default {
     <h1 class="title">
       Spotlight Administrator
     </h1>
-    <p class="content">
-      Tools:
+    <details class="content">
+      <summary>Tools</summary>
       <a
         href="javascript:
 (()=>{
@@ -68,7 +68,7 @@ export default {
           >?</a
         ></sup
       >
-    </p>
+    </details>
 
     <div class="level">
       <div class="level-left">

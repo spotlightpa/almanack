@@ -14,7 +14,7 @@ export default {
   props: {
     article: Object,
   },
-  setup(props) {
+  setup(props, { emit }) {
     let client = useClient();
     let apiStatus = reactive({
       error: null,
@@ -34,11 +34,13 @@ export default {
         apiStatus[ref] = false;
         return;
       }
-      [, apiStatus.error] = await client.upcoming();
+      let data;
+      [data, apiStatus.error] = await client.upcoming();
       apiStatus[ref] = false;
       if (apiStatus.error) {
         return;
       }
+      emit("refresh", data);
     }
 
     return {
