@@ -10,6 +10,7 @@ import ViewArticleItem from "./components/ViewArticleItem.vue";
 import ViewArticleList from "./components/ViewArticleList.vue";
 import ViewArticleSchedule from "./components/ViewArticleSchedule.vue";
 import ViewAuthorizedDomains from "./components/ViewAuthorizedDomains.vue";
+import ViewEditorsPicks from "./components/ViewEditorsPicks.vue";
 import ViewError from "./components/ViewError.vue";
 import ViewLogin from "./components/ViewLogin.vue";
 import ViewSpotlightPAArticles from "./components/ViewSpotlightPAArticles.vue";
@@ -77,6 +78,14 @@ let router = new Router({
       path: "/admin",
       name: "admin",
       component: ViewAdmin,
+      meta: {
+        requiresAuth: isSpotlightPAUser,
+      },
+    },
+    {
+      path: "/admin/editors-picks",
+      name: "editors-picks",
+      component: ViewEditorsPicks,
       meta: {
         requiresAuth: isSpotlightPAUser,
       },

@@ -118,7 +118,19 @@ export default {
           <font-awesome-icon :icon="['far', 'newspaper']" />
         </span>
         <span>
-          Editor Article List
+          External Editor View
+        </span>
+      </router-link>
+
+      <router-link
+        class="button is-small is-success has-text-weight-semibold"
+        :to="{ name: 'editors-picks' }"
+      >
+        <span class="icon">
+          <font-awesome-icon :icon="['far', 'newspaper']" />
+        </span>
+        <span>
+          Homepage Editor
         </span>
       </router-link>
 
