@@ -18,6 +18,7 @@ export default {
       return {
         attrs: {
           rows: "bulmaoverride",
+          placeholder: "Drag text here",
         },
       };
     },
@@ -37,12 +38,15 @@ export default {
       {{ article.internal_id }}
       <button class="delete" @click="remove(i)"></button>
     </span>
+    <span v-if="!value.length" slot="header" class="has-text-grey-lighter">
+      Drag articles here
+    </span>
   </draggable>
 </template>
 
 <style scoped>
 .spacer {
   margin-right: 0.5rem;
-  margin-bottom: 0.5rem;
+  margin-bottom: 0.25rem;
 }
 </style>

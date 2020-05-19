@@ -11,11 +11,11 @@ export default {
   },
   props: {
     articles: Array,
+    editorsPicks: Object,
   },
   data() {
     return {
       filterText: "",
-      list1: [],
     };
   },
   computed: {
@@ -29,11 +29,8 @@ export default {
     },
   },
   methods: {
-    log: function (evt) {
-      window.console.log(evt);
-    },
     push(article) {
-      this.list1.push(article);
+      this.editorsPicks.featuredStories.push(article);
     },
   },
 };
@@ -57,7 +54,6 @@ export default {
         :group="{ name: 'articles', pull: 'clone', put: false }"
         ghost-class="is-info"
         chosen-class="is-active"
-        @change="log"
       >
         <a
           v-for="(article, i) of filteredArticles"
@@ -75,33 +71,32 @@ export default {
     </div>
     <div class="column is-half">
       <b-field label="Homepage featured article">
-        <EditorsPicksDraggable v-model="list1" />
+        <EditorsPicksDraggable v-model="editorsPicks.featuredStories" />
         Pin top story on homepage
       </b-field>
       <b-field label="Subfeatures stories">
-        <EditorsPicksDraggable v-model="list1" />
+        <EditorsPicksDraggable v-model="editorsPicks.subfeatures" />
 
         Bulleted items under the top story
       </b-field>
       <label class="checkbox">
-        <input :value="true" type="checkbox" />
+        <input v-model="editorsPicks.limitSubfeatures" type="checkbox" />
         Limit the number of subfeatured stories
       </label>
-      <b-field>
+      <b-field v-if="editorsPicks.limitSubfeatures">
         <b-numberinput
+          v-model="editorsPicks.subfeaturesLimit"
           class="has-margin-top-thin"
-          :value="2"
           controls-position="compact"
+          min="0"
           type="is-light"
         ></b-numberinput>
         Subfeatured story limit
       </b-field>
       <b-field label="Pinned stories">
-        <EditorsPicksDraggable v-model="list1" />
+        <EditorsPicksDraggable v-model="editorsPicks.topSlots" />
         Pin stories at the top of homepage
       </b-field>
-
-      <p>1: {{ list1 }}</p>
     </div>
   </div>
 </template>
