@@ -18,7 +18,6 @@ export default {
       return {
         attrs: {
           rows: "bulmaoverride",
-          placeholder: "Drag text here",
         },
       };
     },
