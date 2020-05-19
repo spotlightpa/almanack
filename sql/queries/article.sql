@@ -113,8 +113,8 @@ ORDER BY
 -- name: ListSpotlightPAArticles :many
 SELECT
   id,
-  arc_id::text,
-  spotlightpa_path,
+  coalesce(arc_id, '')::text AS arc_id,
+  spotlightpa_path::text,
   (spotlightpa_data ->> 'internal-id')::text AS internal_id,
   (spotlightpa_data ->> 'hed')::text AS hed,
   ARRAY (

@@ -190,8 +190,8 @@ func (q *Queries) ListAvailableArticles(ctx context.Context) ([]Article, error) 
 const listSpotlightPAArticles = `-- name: ListSpotlightPAArticles :many
 SELECT
   id,
-  arc_id::text,
-  spotlightpa_path,
+  coalesce(arc_id, '')::text AS arc_id,
+  spotlightpa_path::text,
   (spotlightpa_data ->> 'internal-id')::text AS internal_id,
   (spotlightpa_data ->> 'hed')::text AS hed,
   ARRAY (
@@ -209,13 +209,13 @@ ORDER BY
 `
 
 type ListSpotlightPAArticlesRow struct {
-	ID              int32          `json:"id"`
-	ArcID           string         `json:"arc_id"`
-	SpotlightPAPath sql.NullString `json:"spotlightpa_path"`
-	InternalID      string         `json:"internal_id"`
-	Hed             string         `json:"hed"`
-	Authors         []string       `json:"authors"`
-	PubDate         time.Time      `json:"pub_date"`
+	ID              int32     `json:"id"`
+	ArcID           string    `json:"arc_id"`
+	SpotlightPAPath string    `json:"spotlightpa_path"`
+	InternalID      string    `json:"internal_id"`
+	Hed             string    `json:"hed"`
+	Authors         []string  `json:"authors"`
+	PubDate         time.Time `json:"pub_date"`
 }
 
 func (q *Queries) ListSpotlightPAArticles(ctx context.Context) ([]ListSpotlightPAArticlesRow, error) {

@@ -12,5 +12,4 @@ UPDATE
 SET
   "data" = $2
 WHERE
-  "key" = $1
-;
+  "key" = $1;
