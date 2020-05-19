@@ -33,6 +33,7 @@ export const endpoints = {
   authorizedDomains: `/api/authorized-domains`,
   listSpotlightPAArticles: `/api/spotlightpa-articles`,
   listImages: `/api/images`,
+  editorsPicks: `/api/editors-picks`,
 };
 
 export function makeClient($auth) {
@@ -159,6 +160,12 @@ export function makeClient($auth) {
     },
     async listImages() {
       return await tryTo(request(endpoints.listImages));
+    },
+    async getEditorsPicks() {
+      return await tryTo(request(endpoints.editorsPicks));
+    },
+    async saveEditorsPicks(obj) {
+      return await tryTo(post(endpoints.editorsPicks, obj));
     },
   };
   return actions;
