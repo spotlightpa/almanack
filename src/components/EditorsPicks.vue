@@ -114,6 +114,7 @@ export default {
   display: block;
 }
 .select-all {
+  cursor: grab;
   user-select: all;
 }
 </style>

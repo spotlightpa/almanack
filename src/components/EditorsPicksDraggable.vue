@@ -53,6 +53,7 @@ export default {
   margin-bottom: 0.25rem;
 }
 .select-all {
+  cursor: grab;
   user-select: all;
 }
 </style>
