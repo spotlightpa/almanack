@@ -122,7 +122,7 @@ export default {
         attached
         allow-duplicates
       ></b-taginput>
-      Series, e.g. "Top News"
+      Series, e.g. “Legislative privilege 2020”
     </b-field>
     <BulmaFieldInput
       v-model="article.hed"
@@ -262,14 +262,6 @@ export default {
       </div>
     </BulmaField>
 
-    <b-field label="Homepage override order number">
-      <b-numberinput
-        v-model="article.weight"
-        controls-position="compact"
-        type="is-light"
-      ></b-numberinput>
-    </b-field>
-
     <BulmaField v-slot="{ idForLabel }" label="Article text">
       <textarea
         :id="idForLabel"
@@ -310,6 +302,14 @@ export default {
       <b-field label="URL Aliases">
         <b-taginput v-model="article.aliases"></b-taginput>
         Redirect these URLs to the story
+      </b-field>
+
+      <b-field label="Homepage override order number">
+        <b-numberinput
+          v-model="article.weight"
+          controls-position="compact"
+          type="is-light"
+        ></b-numberinput>
       </b-field>
     </details>
 
