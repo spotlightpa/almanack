@@ -123,10 +123,10 @@ function frontend() {
 }
 
 function check-deps() {
-	_installed sqlc || echo "install https://sqlc.dev"
-	_installed shfmt || echo "install https://github.com/mvdan/sh"
 	_installed shellcheck || echo "install https://www.shellcheck.net"
-	_installed shellcheck || echo "install https://github.com/darold/pgFormatter"
+	_installed shfmt || echo "install https://github.com/mvdan/sh"
+	_installed sqlc || echo "install https://sqlc.dev"
+	_installed tern || echo "install https://github.com/jackc/tern"
 }
 
 TIMEFORMAT="Task completed in %1lR"
