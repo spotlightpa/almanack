@@ -21,11 +21,11 @@ export default {
   computed: {
     filteredArticles() {
       if (!this.filterText) {
-        return this.articles.slice(0, 10);
+        return this.articles;
       }
-      return this.articles
-        .filter((a) => fuzzyMatch(a.filterableProps, this.filterText))
-        .slice(0, 10);
+      return this.articles.filter((a) =>
+        fuzzyMatch(a.filterableProps, this.filterText)
+      );
     },
   },
   methods: {
@@ -56,7 +56,7 @@ export default {
         chosen-class="is-active"
       >
         <a
-          v-for="(article, i) of filteredArticles"
+          v-for="(article, i) of filteredArticles.slice(0, 10)"
           :key="i"
           class="dropdown-item"
           @click="push(article)"
@@ -66,7 +66,13 @@ export default {
             >: {{ article.hed }}
           </span>
         </a>
-        <div slot="footer" class="dropdown-item">…</div>
+        <div
+          v-if="filteredArticles.length > 10"
+          slot="footer"
+          class="dropdown-item"
+        >
+          More results hidden…
+        </div>
       </draggable>
     </div>
     <div class="column is-half">
