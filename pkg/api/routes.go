@@ -602,5 +602,10 @@ func (app *appEnv) postEditorsPicks(w http.ResponseWriter, r *http.Request) {
 		app.errorResponse(r.Context(), w, err)
 		return
 	}
-	app.jsonResponse(http.StatusAccepted, w, http.StatusText(http.StatusAccepted))
+	resp, err := almanack.GetEditorsPicks(r.Context(), app.svc.Querier)
+	if err != nil {
+		app.errorResponse(r.Context(), w, err)
+		return
+	}
+	app.jsonResponse(http.StatusOK, w, resp)
 }
