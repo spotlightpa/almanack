@@ -118,7 +118,6 @@ export default {
     <b-field label="Series">
       <b-taginput
         v-model="article.series"
-        :data="['Top News']"
         attached
         allow-duplicates
       ></b-taginput>
