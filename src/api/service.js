@@ -18,11 +18,13 @@ const responseError = (rsp) => {
 export const endpoints = {
   getAvailable: (id) => `/api/available-articles/${id}`,
   scheduledArticle: (id) => `/api/scheduled-articles/${id}`,
-  authorizedDomains: `/api/authorized-domains`,
+  addAuthorizedDomain: `/api/authorized-domains`,
+  listAuthorizedDomains: `/api/authorized-domains`,
   listAvailable: `/api/available-articles`,
   postAvailable: `/api/available-articles`,
   createSignedUpload: `/api/create-signed-upload`,
-  editorsPicks: `/api/editors-picks`,
+  getEditorsPicks: `/api/editors-picks`,
+  saveEditorsPicks: `/api/editors-picks`,
   updateImage: `/api/image-update`,
   listImages: `/api/images`,
   listRefreshArc: `/api/list-arc-refresh`,
@@ -116,24 +118,24 @@ export function makeClient($auth) {
       return await tryTo(post(endpoints.updateImage, image));
     },
     async addAuthorizedDomain(domain) {
-      return await tryTo(post(endpoints.authorizedDomains, { domain }));
+      return await tryTo(post(endpoints.addAuthorizedDomains, { domain }));
     },
     async saveEditorsPicks(obj) {
-      return await tryTo(post(endpoints.editorsPicks, obj));
+      return await tryTo(post(endpoints.saveEditorsPicks, obj));
     },
   };
   let simpleActions = [
-    ["getEditorsPicks", "editorsPicks"],
-    ["getSignupURL", "getSignupURL"],
-    ["listAuthorizedDomains", "authorizedDomains"],
-    ["listAvailable", "listAvailable"],
-    ["listImages", "listImages"],
-    ["listRefreshArc", "listRefreshArc"],
-    ["listSpotlightPAArticles", "listSpotlightPAArticles"],
-    ["upcoming", "upcoming"],
+    "getEditorsPicks",
+    "getSignupURL",
+    "listAuthorizedDomains",
+    "listAvailable",
+    "listImages",
+    "listRefreshArc",
+    "listSpotlightPAArticles",
+    "upcoming",
   ];
-  for (let [name, endpoint] of simpleActions) {
-    actions[name] = () => tryTo(request(endpoints[endpoint]));
+  for (let action of simpleActions) {
+    actions[action] = () => tryTo(request(endpoints[action]));
   }
   return actions;
 }
