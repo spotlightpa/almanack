@@ -13,14 +13,14 @@ export default {
     title: "Available Articles",
   },
   setup() {
-    let { fullName, roles } = useAuth();
-    let { articles, canLoad, isLoading, fetch, error } = useAvailableList();
+    let { isEditor, fullName, roles } = useAuth();
+    let { articles, isLoading, load, error } = useAvailableList();
     let client = useClient();
 
     return {
-      canLoad,
+      isEditor,
       isLoading,
-      fetch,
+      load,
       error,
       fullName,
       roles,
@@ -66,9 +66,9 @@ export default {
     </p>
 
     <APILoader
-      :can-load="canLoad"
+      :can-load="isEditor"
       :is-loading="isLoading"
-      :reload="fetch"
+      :reload="load"
       :error="error"
     >
       <ArticleList
