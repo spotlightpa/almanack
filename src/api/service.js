@@ -16,21 +16,21 @@ const responseError = (rsp) => {
 };
 
 export const endpoints = {
-  listAvailable: `/api/available-articles`,
   getAvailable: (id) => `/api/available-articles/${id}`,
-  postAvailable: `/api/available-articles`,
-  upcoming: `/api/upcoming-articles`,
-  listRefreshArc: `/api/list-arc-refresh`,
-  sendMessage: `/api/message`,
   scheduledArticle: (id) => `/api/scheduled-articles/${id}`,
-  scheduleArticle: `/api/scheduled-articles`,
-  createSignedUpload: `/api/create-signed-upload`,
-  updateImage: `/api/image-update`,
-  getSignupURL: `/api/mailchimp-signup-url`,
   authorizedDomains: `/api/authorized-domains`,
-  listSpotlightPAArticles: `/api/spotlightpa-articles`,
-  listImages: `/api/images`,
+  listAvailable: `/api/available-articles`,
+  postAvailable: `/api/available-articles`,
+  createSignedUpload: `/api/create-signed-upload`,
   editorsPicks: `/api/editors-picks`,
+  updateImage: `/api/image-update`,
+  listImages: `/api/images`,
+  listRefreshArc: `/api/list-arc-refresh`,
+  getSignupURL: `/api/mailchimp-signup-url`,
+  sendMessage: `/api/message`,
+  scheduleArticle: `/api/scheduled-articles`,
+  listSpotlightPAArticles: `/api/spotlightpa-articles`,
+  upcoming: `/api/upcoming-articles`,
 };
 
 export function makeClient($auth) {
@@ -62,29 +62,23 @@ export function makeClient($auth) {
   }
 
   let actions = {
-    async listAvailable() {
-      return await tryTo(request(endpoints.listAvailable));
-    },
     hasAuthAvailable() {
       return $auth.isEditor;
     },
-    async getAvailable(id) {
-      return await tryTo(request(endpoints.getAvailable(id)));
-    },
-    async upcoming() {
-      return await tryTo(request(endpoints.upcoming));
-    },
     hasAuthUpcoming() {
       return $auth.isSpotlightPAUser;
+    },
+    hasAuthArticle() {
+      return $auth.isSpotlightPAUser;
+    },
+    async getAvailable(id) {
+      return await tryTo(request(endpoints.getAvailable(id)));
     },
     async postAvailable(obj) {
       return await tryTo(post(endpoints.postAvailable, obj));
     },
     async article(id) {
       return await tryTo(request(endpoints.scheduledArticle(id)));
-    },
-    hasAuthArticle() {
-      return $auth.isSpotlightPAUser;
     },
     async saveArticle(id, obj) {
       return await tryTo(post(endpoints.scheduleArticle, obj));
@@ -121,31 +115,26 @@ export function makeClient($auth) {
       };
       return await tryTo(post(endpoints.updateImage, image));
     },
-    async getSignupURL() {
-      return await tryTo(request(endpoints.getSignupURL));
-    },
-    async listAuthorizedDomains() {
-      return await tryTo(request(endpoints.authorizedDomains));
-    },
     async addAuthorizedDomain(domain) {
       return await tryTo(post(endpoints.authorizedDomains, { domain }));
-    },
-    async listSpotlightPAArticles() {
-      return await tryTo(request(endpoints.listSpotlightPAArticles));
-    },
-    async listRefreshArc() {
-      return await tryTo(request(endpoints.listRefreshArc));
-    },
-    async listImages() {
-      return await tryTo(request(endpoints.listImages));
-    },
-    async getEditorsPicks() {
-      return await tryTo(request(endpoints.editorsPicks));
     },
     async saveEditorsPicks(obj) {
       return await tryTo(post(endpoints.editorsPicks, obj));
     },
   };
+  let simpleActions = [
+    ["getEditorsPicks", "editorsPicks"],
+    ["getSignupURL", "getSignupURL"],
+    ["listAuthorizedDomains", "authorizedDomains"],
+    ["listAvailable", "listAvailable"],
+    ["listImages", "listImages"],
+    ["listRefreshArc", "listRefreshArc"],
+    ["listSpotlightPAArticles", "listSpotlightPAArticles"],
+    ["upcoming", "upcoming"],
+  ];
+  for (let [name, endpoint] of simpleActions) {
+    actions[name] = () => tryTo(request(endpoints[endpoint]));
+  }
   return actions;
 }
 
