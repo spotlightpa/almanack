@@ -36,7 +36,7 @@ export default {
     <span
       v-for="(article, i) of value"
       :key="i"
-      class="tag is-medium spacer select-all"
+      class="tag is-medium spacer select-none"
     >
       {{ article.internal_id }}
       <button class="delete" @click="remove(i)"></button>
@@ -52,8 +52,8 @@ export default {
   margin-right: 0.5rem;
   margin-bottom: 0.25rem;
 }
-.select-all {
+.select-none {
   cursor: grab;
-  user-select: all;
+  user-select: none;
 }
 </style>

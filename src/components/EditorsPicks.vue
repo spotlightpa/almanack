@@ -58,7 +58,7 @@ export default {
         <a
           v-for="(article, i) of filteredArticles.slice(0, 10)"
           :key="i"
-          class="dropdown-item select-all"
+          class="dropdown-item select-none"
           @click="push(article)"
         >
           <span class="overflow">
@@ -113,8 +113,8 @@ export default {
   overflow-x: hidden;
   display: block;
 }
-.select-all {
+.select-none {
   cursor: grab;
-  user-select: all;
+  user-select: none;
 }
 </style>
