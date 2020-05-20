@@ -23,7 +23,6 @@ export const endpoints = {
   postAvailable: `/api/available-articles`,
   upcoming: `/api/upcoming-articles`,
   listRefreshArc: `/api/list-arc-refresh`,
-  getMessage: (id) => `/api/message/${id}`,
   sendMessage: `/api/message`,
   scheduledArticle: (id) => `/api/scheduled-articles/${id}`,
   scheduleArticle: `/api/scheduled-articles`,
