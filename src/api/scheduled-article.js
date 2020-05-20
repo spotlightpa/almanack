@@ -181,7 +181,7 @@ export default class ScheduledArticle {
     this._refreshArc = refreshArc;
 
     let data;
-    [data, this.saveError] = await this._client.saveArticle(this._url_id, this);
+    [data, this.saveError] = await this._client.saveArticle(this);
     this.isSaving = false;
     this._refreshArc = false;
     if (!this.saveError) {
