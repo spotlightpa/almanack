@@ -1,57 +1,62 @@
-import { computed } from "@vue/composition-api";
+import { toRefs, computed } from "@vue/composition-api";
+
 import ArcArticle from "./arc-article.js";
-import { useService } from "./service.js";
+import { makeState } from "./service-util.js";
 
 export function listAvailable(client) {
-  let apiState = useService({
-    canLoad: client.hasAuthAvailable(),
-    serviceCall: () => client.listAvailable(),
-  });
+  let { apiState, exec } = makeState();
 
   return {
-    ...apiState,
+    ...toRefs(apiState),
+
     articles: computed(() =>
-      apiState.isLoading.value ||
-      apiState.error.value ||
-      !apiState.rawData.value
+      apiState.isLoading || apiState.error || !apiState.rawData
         ? []
-        : ArcArticle.from(apiState.rawData.value)
+        : ArcArticle.from(apiState.rawData)
     ),
+    load() {
+      return exec(() => client.listAvailable());
+    },
   };
 }
 
 export function getAvailable({ client, id }) {
-  let apiState = useService({
-    canLoad: client.hasAuthAvailable(),
-    serviceCall: () => client.getAvailable(id),
-  });
+  let { apiState, exec } = makeState();
 
   return {
-    ...apiState,
+    ...toRefs(apiState),
+
     article: computed(() =>
-      apiState.isLoading.value ||
-      apiState.error.value ||
-      !apiState.rawData.value
+      apiState.isLoading || apiState.error || !apiState.rawData
         ? null
-        : new ArcArticle(apiState.rawData.value)
+        : new ArcArticle(apiState.rawData)
     ),
+
+    canLoad: client.hasAuthAvailable(),
+    load() {
+      return exec(() => client.getAvailable(id));
+    },
   };
 }
 
 export function upcoming(client) {
-  let apiState = useService({
-    canLoad: client.hasAuthUpcoming(),
-    serviceCall: () => client.upcoming(),
-  });
+  let { apiState, exec } = makeState();
 
   return {
-    ...apiState,
+    ...toRefs(apiState),
+
     articles: computed(() =>
-      apiState.isLoading.value ||
-      apiState.error.value ||
-      !apiState.rawData.value
+      apiState.isLoading || apiState.error || !apiState.rawData
         ? []
-        : ArcArticle.from(apiState.rawData.value)
+        : ArcArticle.from(apiState.rawData)
     ),
+
+    canLoad: client.hasAuthUpcoming(),
+    load() {
+      return exec(() => client.upcoming());
+    },
+    loadAndRefresh() {
+      return exec(() => client.listRefreshArc());
+    },
   };
 }

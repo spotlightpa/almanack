@@ -28,24 +28,24 @@ export function useClient() {
 
 export function useAvailableList() {
   let list = listAvailable(useClient());
-  list.initLoad();
+  list.load();
   return list;
 }
 
 export function getAvailableArticle(id) {
   let loader = getAvailable({ client: useClient(), id });
-  loader.initLoad();
+  loader.load();
   return loader;
 }
 
 export function useUpcoming() {
   let client = useClient();
   let loader = upcoming(client);
-  loader.do(async () => await client.listRefreshArc());
+  loader.loadAndRefresh();
   return loader;
 }
 export function useScheduler(id) {
   let obj = getScheduledArticle({ client: useClient(), id });
-  obj.initLoad();
+  obj.load();
   return obj;
 }

@@ -18,14 +18,14 @@ export default {
     id: String,
   },
   setup(props) {
-    let { article, canLoad, isLoading, fetch, error } = getAvailableArticle(
+    let { article, canLoad, isLoading, load, error } = getAvailableArticle(
       props.id
     );
 
     return {
       canLoad,
       isLoading,
-      fetch,
+      load,
       error,
       article,
     };
@@ -37,7 +37,7 @@ export default {
   <APILoader
     :can-load="canLoad"
     :is-loading="isLoading"
-    :reload="fetch"
+    :reload="load"
     :error="error"
   >
     <div v-if="!article" class="message is-warning">

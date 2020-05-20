@@ -21,14 +21,14 @@ export default {
     title: "Admin",
   },
   setup() {
-    let { articles, rawData, canLoad, isLoading, fetch, error } = useUpcoming();
+    let { articles, rawData, canLoad, isLoading, load, error } = useUpcoming();
 
     return {
       showComposer: ref(false),
 
       canLoad,
       isLoading,
-      fetch,
+      load,
       error,
       articles,
 
@@ -174,7 +174,7 @@ export default {
     <APILoader
       :can-load="canLoad"
       :is-loading="isLoading"
-      :reload="fetch"
+      :reload="load"
       :error="error"
     >
       <keep-alive>

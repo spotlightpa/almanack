@@ -20,13 +20,12 @@ export default {
   },
   setup(props) {
     let { isSpotlightPAUser } = useAuth();
-    let { canLoad, isLoading, reload, error, article } = useScheduler(props.id);
+    let { isLoading, load, error, article } = useScheduler(props.id);
 
     return {
       isSpotlightPAUser,
-      canLoad,
       isLoading,
-      reload,
+      load,
       error,
       article,
     };
@@ -50,9 +49,9 @@ export default {
     </nav>
 
     <APILoader
-      :can-load="canLoad"
+      :can-load="isSpotlightPAUser"
       :is-loading="isLoading"
-      :reload="reload"
+      :reload="load"
       :error="error"
     >
       <div v-if="!article" class="message is-warning">
