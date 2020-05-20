@@ -16,8 +16,6 @@ const responseError = (rsp) => {
 };
 
 export const endpoints = {
-  healthcheck: `/api/healthcheck`,
-  userInfo: `/api/user-info`,
   listAvailable: `/api/available-articles`,
   getAvailable: (id) => `/api/available-articles/${id}`,
   postAvailable: `/api/available-articles`,
@@ -63,26 +61,7 @@ export function makeClient($auth) {
     });
   }
 
-  let requestBuffer = {};
-  async function bufferRequest(key, cb) {
-    if (requestBuffer[key]) {
-      // eslint-disable-next-line no-console
-      console.warning("buffering request", key);
-      return await requestBuffer[key];
-    }
-    let promise = cb();
-    requestBuffer[key] = promise;
-    let r = await promise;
-    requestBuffer[key] = null;
-    return r;
-  }
-
   let actions = {
-    async userInfo() {
-      return await bufferRequest("userInfo", () =>
-        tryTo(request(endpoints.userInfo))
-      );
-    },
     async listAvailable() {
       return await tryTo(request(endpoints.listAvailable));
     },
