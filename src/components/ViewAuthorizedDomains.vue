@@ -34,7 +34,7 @@ export default {
 
     async function addDomain(domain) {
       apiState.isLoading = true;
-      [, apiState.error] = await addAuthorizedDomain(domain);
+      [, apiState.error] = await addAuthorizedDomain({ domain });
       if (apiState.error) {
         apiState.isLoading = false;
         return;

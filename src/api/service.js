@@ -30,7 +30,7 @@ export const endpoints = {
   listRefreshArc: `/api/list-arc-refresh`,
   getSignupURL: `/api/mailchimp-signup-url`,
   sendMessage: `/api/message`,
-  scheduleArticle: `/api/scheduled-articles`,
+  saveArticle: `/api/scheduled-articles`,
   listSpotlightPAArticles: `/api/spotlightpa-articles`,
   upcoming: `/api/upcoming-articles`,
 };
@@ -76,17 +76,8 @@ export function makeClient($auth) {
     async getAvailable(id) {
       return await tryTo(request(endpoints.getAvailable(id)));
     },
-    async postAvailable(obj) {
-      return await tryTo(post(endpoints.postAvailable, obj));
-    },
     async article(id) {
       return await tryTo(request(endpoints.scheduledArticle(id)));
-    },
-    async saveArticle(id, obj) {
-      return await tryTo(post(endpoints.scheduleArticle, obj));
-    },
-    async sendMessage(obj) {
-      return await tryTo(post(endpoints.sendMessage, obj));
     },
     async uploadFile(body) {
       let [data, err] = await tryTo(
@@ -117,14 +108,8 @@ export function makeClient($auth) {
       };
       return await tryTo(post(endpoints.updateImage, image));
     },
-    async addAuthorizedDomain(domain) {
-      return await tryTo(post(endpoints.addAuthorizedDomains, { domain }));
-    },
-    async saveEditorsPicks(obj) {
-      return await tryTo(post(endpoints.saveEditorsPicks, obj));
-    },
   };
-  let simpleActions = [
+  let simpleGetActions = [
     "getEditorsPicks",
     "getSignupURL",
     "listAuthorizedDomains",
@@ -134,9 +119,20 @@ export function makeClient($auth) {
     "listSpotlightPAArticles",
     "upcoming",
   ];
-  for (let action of simpleActions) {
+  for (let action of simpleGetActions) {
     actions[action] = () => tryTo(request(endpoints[action]));
   }
+  let simplePostActions = [
+    "addAuthorizedDomain",
+    "postAvailable",
+    "saveArticle",
+    "saveEditorsPicks",
+    "sendMessage",
+  ];
+  for (let action of simplePostActions) {
+    actions[action] = (obj) => tryTo(post(endpoints[action], obj));
+  }
+
   return actions;
 }
 
