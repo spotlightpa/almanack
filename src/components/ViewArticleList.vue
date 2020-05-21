@@ -1,7 +1,7 @@
 <script>
 import ArticleList from "./ArticleList.vue";
 import APILoader from "./APILoader.vue";
-import { useAuth, useAvailableList, useClient } from "@/api/hooks.js";
+import { useAuth, useListAvailableArc, useClient } from "@/api/hooks.js";
 
 export default {
   name: "ViewArticleList",
@@ -14,7 +14,7 @@ export default {
   },
   setup() {
     let { fullName, roles } = useAuth();
-    let { articles, isLoading, load, error } = useAvailableList();
+    let { articles, isLoading, load, error } = useListAvailableArc();
     let client = useClient();
 
     return {
