@@ -4,78 +4,62 @@ import ArcArticle from "./arc-article.js";
 import { makeState } from "./service-util.js";
 import { useClient } from "./service.js";
 
-function listAvailable(client) {
+export function useAvailableList() {
+  let { listAvailable } = useClient();
   let { apiState, exec } = makeState();
+
+  const load = () => exec(listAvailable);
+  load();
 
   return {
     ...toRefs(apiState),
+    load,
 
     articles: computed(() =>
       apiState.isLoading || apiState.error || !apiState.rawData
         ? []
         : ArcArticle.from(apiState.rawData)
     ),
-    load() {
-      return exec(() => client.listAvailable());
-    },
   };
 }
 
-export function useAvailableList() {
-  let client = useClient();
-  let list = listAvailable(client);
-  list.load();
-  return list;
-}
-
-function getAvailable({ client, id }) {
+export function getAvailableArticle(id) {
+  let { getAvailable } = useClient();
   let { apiState, exec } = makeState();
+
+  const load = () => exec(() => getAvailable(id));
+  load();
 
   return {
     ...toRefs(apiState),
+    load,
 
     article: computed(() =>
       apiState.isLoading || apiState.error || !apiState.rawData
         ? null
         : new ArcArticle(apiState.rawData)
     ),
-
-    load() {
-      return exec(() => client.getAvailable(id));
-    },
   };
 }
 
-export function getAvailableArticle(id) {
-  let loader = getAvailable({ client: useClient(), id });
-  loader.load();
-  return loader;
-}
-
-function upcoming(client) {
+export function useUpcoming() {
+  let { upcoming, listRefreshArc } = useClient();
   let { apiState, exec } = makeState();
+
+  const actions = {
+    load: () => exec(upcoming),
+    loadAndRefresh: () => exec(listRefreshArc),
+  };
+  actions.loadAndRefresh();
 
   return {
     ...toRefs(apiState),
+    ...actions,
 
     articles: computed(() =>
       apiState.isLoading || apiState.error || !apiState.rawData
         ? []
         : ArcArticle.from(apiState.rawData)
     ),
-
-    load() {
-      return exec(() => client.upcoming());
-    },
-    loadAndRefresh() {
-      return exec(() => client.listRefreshArc());
-    },
   };
-}
-
-export function useUpcoming() {
-  let client = useClient();
-  let loader = upcoming(client);
-  loader.loadAndRefresh();
-  return loader;
 }
