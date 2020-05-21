@@ -8,7 +8,7 @@ export function useScheduler(id) {
   const { apiState, exec } = makeState();
   let client = useClient();
 
-  const load = () => exec(() => client.article(id));
+  const load = () => exec(() => client.getScheduledArticle(id));
   load();
 
   return {
