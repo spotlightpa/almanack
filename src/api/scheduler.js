@@ -1,9 +1,10 @@
 import { computed, toRefs } from "@vue/composition-api";
 
 import { makeState } from "./service-util.js";
+import { useClient } from "./service.js";
 import ScheduledArticle from "./scheduled-article.js";
 
-export function getScheduledArticle({ client, id }) {
+function getScheduledArticle({ client, id }) {
   const { apiState, exec } = makeState();
 
   return {
@@ -20,4 +21,10 @@ export function getScheduledArticle({ client, id }) {
       return exec(() => client.article(id));
     },
   };
+}
+
+export function useScheduler(id) {
+  let obj = getScheduledArticle({ client: useClient(), id });
+  obj.load();
+  return obj;
 }

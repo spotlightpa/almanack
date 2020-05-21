@@ -2,7 +2,7 @@ import { reactive, computed, toRefs } from "@vue/composition-api";
 
 import netlifyIdentity from "netlify-identity-widget";
 
-export function makeAuth() {
+function makeAuth() {
   let authState = reactive({
     user: null,
     error: null,
@@ -89,4 +89,13 @@ export function makeAuth() {
 
     ...methods,
   };
+}
+
+let $auth;
+
+export function useAuth() {
+  if (!$auth) {
+    $auth = makeAuth();
+  }
+  return $auth;
 }
