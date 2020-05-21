@@ -1,3 +1,5 @@
+import { useAuth } from "./auth.js";
+
 const tryTo = (promise) =>
   promise
     // Wrap data/errors
@@ -13,7 +15,7 @@ const responseError = (rsp) => {
   return err;
 };
 
-export const endpoints = {
+const endpoints = {
   getAvailable: (id) => `/api/available-articles/${id}`,
   scheduledArticle: (id) => `/api/scheduled-articles/${id}`,
   addAuthorizedDomain: `/api/authorized-domains`,
@@ -33,7 +35,7 @@ export const endpoints = {
   upcoming: `/api/upcoming-articles`,
 };
 
-export function makeClient($auth) {
+function makeClient($auth) {
   async function request(url, options = {}) {
     let headers = await $auth.headers();
     if (options.headers) {
@@ -132,4 +134,13 @@ export function makeClient($auth) {
   }
 
   return actions;
+}
+
+let $client;
+
+export function useClient() {
+  if (!$client) {
+    $client = makeClient(useAuth());
+  }
+  return $client;
 }
