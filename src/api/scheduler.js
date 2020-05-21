@@ -16,7 +16,6 @@ function getScheduledArticle({ client, id }) {
         : null
     ),
 
-    canLoad: client.hasAuthArticle(),
     load() {
       return exec(() => client.article(id));
     },

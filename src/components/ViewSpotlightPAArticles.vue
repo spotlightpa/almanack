@@ -83,12 +83,7 @@ export default {
       Spotlight PA Articles
     </h1>
 
-    <APILoader
-      :can-load="true"
-      :is-loading="isLoading"
-      :reload="fetch"
-      :error="error"
-    >
+    <APILoader :is-loading="isLoading" :reload="fetch" :error="error">
       <b-field label="">
         <b-autocomplete
           v-model="rawFilter"

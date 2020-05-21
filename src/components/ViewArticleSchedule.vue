@@ -1,5 +1,5 @@
 <script>
-import { useScheduler, useAuth } from "@/api/hooks.js";
+import { useScheduler } from "@/api/hooks.js";
 
 import APILoader from "./APILoader.vue";
 import ScheduledArticleDetail from "./ScheduledArticleDetail.vue";
@@ -19,11 +19,9 @@ export default {
     };
   },
   setup(props) {
-    let { isSpotlightPAUser } = useAuth();
     let { isLoading, load, error, article } = useScheduler(props.id);
 
     return {
-      isSpotlightPAUser,
       isLoading,
       load,
       error,
@@ -48,12 +46,7 @@ export default {
       </ul>
     </nav>
 
-    <APILoader
-      :can-load="isSpotlightPAUser"
-      :is-loading="isLoading"
-      :reload="load"
-      :error="error"
-    >
+    <APILoader :is-loading="isLoading" :reload="load" :error="error">
       <div v-if="!article" class="message is-warning">
         <p class="message-header">
           Not found

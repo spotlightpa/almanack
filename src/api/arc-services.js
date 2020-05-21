@@ -40,7 +40,6 @@ function getAvailable({ client, id }) {
         : new ArcArticle(apiState.rawData)
     ),
 
-    canLoad: client.hasAuthAvailable(),
     load() {
       return exec(() => client.getAvailable(id));
     },
@@ -65,7 +64,6 @@ function upcoming(client) {
         : ArcArticle.from(apiState.rawData)
     ),
 
-    canLoad: client.hasAuthUpcoming(),
     load() {
       return exec(() => client.upcoming());
     },

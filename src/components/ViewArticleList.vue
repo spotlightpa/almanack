@@ -13,12 +13,11 @@ export default {
     title: "Available Articles",
   },
   setup() {
-    let { isEditor, fullName, roles } = useAuth();
+    let { fullName, roles } = useAuth();
     let { articles, isLoading, load, error } = useAvailableList();
     let client = useClient();
 
     return {
-      isEditor,
       isLoading,
       load,
       error,
@@ -65,12 +64,7 @@ export default {
       <a href="#" @click.prevent="redirectToSignup">resubscribe here</a>.
     </p>
 
-    <APILoader
-      :can-load="isEditor"
-      :is-loading="isLoading"
-      :reload="load"
-      :error="error"
-    >
+    <APILoader :is-loading="isLoading" :reload="load" :error="error">
       <ArticleList
         v-if="articles.length"
         :articles="articles"

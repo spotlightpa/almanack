@@ -18,12 +18,9 @@ export default {
     id: String,
   },
   setup(props) {
-    let { article, canLoad, isLoading, load, error } = getAvailableArticle(
-      props.id
-    );
+    let { article, isLoading, load, error } = getAvailableArticle(props.id);
 
     return {
-      canLoad,
       isLoading,
       load,
       error,
@@ -34,12 +31,7 @@ export default {
 </script>
 
 <template>
-  <APILoader
-    :can-load="canLoad"
-    :is-loading="isLoading"
-    :reload="load"
-    :error="error"
-  >
+  <APILoader :is-loading="isLoading" :reload="load" :error="error">
     <div v-if="!article" class="message is-warning">
       <p class="message-header">
         Not found

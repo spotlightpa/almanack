@@ -21,12 +21,11 @@ export default {
     title: "Admin",
   },
   setup() {
-    let { articles, rawData, canLoad, isLoading, load, error } = useUpcoming();
+    let { articles, rawData, isLoading, load, error } = useUpcoming();
 
     return {
       showComposer: ref(false),
 
-      canLoad,
       isLoading,
       load,
       error,
@@ -171,12 +170,7 @@ export default {
       </router-link>
     </div>
 
-    <APILoader
-      :can-load="canLoad"
-      :is-loading="isLoading"
-      :reload="load"
-      :error="error"
-    >
+    <APILoader :is-loading="isLoading" :reload="load" :error="error">
       <keep-alive>
         <AdminList
           v-if="articles.length"
