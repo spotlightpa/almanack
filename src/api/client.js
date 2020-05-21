@@ -10,8 +10,9 @@ const responseError = (rsp) => {
   if (rsp.ok) {
     return;
   }
-  let err = new Error(`Unexpected response: ${rsp.status} ${rsp.statusText}`);
-  err.name = "Unexpected Response";
+  let msg = `${rsp.status} ${rsp.statusText}`;
+  let err = new Error("Unexpected response from server: " + msg);
+  err.name = msg;
   return err;
 };
 
@@ -48,11 +49,9 @@ function makeClient($auth) {
     };
     options = { ...defaultOpts, ...options };
     let resp = await fetch(url, options);
-    if (!resp.ok) {
-      throw new Error(
-        `Unexpected response from server (status ${resp.status})`
-      );
-    }
+    let err = responseError(resp);
+    if (err) throw err;
+
     return await resp.json();
   }
 
