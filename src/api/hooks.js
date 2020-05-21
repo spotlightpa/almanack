@@ -8,7 +8,7 @@ export { useClient } from "./client.js";
 export { makeState } from "./service-util.js";
 
 export {
-  useAvailableList,
+  useListAvailableArc,
   useUpcoming,
   getAvailableArticle,
 } from "./arc-services.js";

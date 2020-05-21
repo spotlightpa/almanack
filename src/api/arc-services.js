@@ -4,11 +4,11 @@ import ArcArticle from "./arc-article.js";
 import { makeState } from "./service-util.js";
 import { useClient } from "./client.js";
 
-export function useAvailableList() {
-  let { listAvailable } = useClient();
+export function useListAvailableArc() {
+  let { listAvailableArc } = useClient();
   let { apiState, exec } = makeState();
 
-  const load = () => exec(listAvailable);
+  const load = () => exec(listAvailableArc);
   load();
 
   return {
