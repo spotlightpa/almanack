@@ -2,7 +2,7 @@ import { toRefs, computed } from "@vue/composition-api";
 
 import ArcArticle from "./arc-article.js";
 import { makeState } from "./service-util.js";
-import { useClient } from "./service.js";
+import { useClient } from "./client.js";
 
 export function useAvailableList() {
   let { listAvailable } = useClient();

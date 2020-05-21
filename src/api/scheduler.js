@@ -1,7 +1,7 @@
 import { computed, toRefs } from "@vue/composition-api";
 
 import { makeState } from "./service-util.js";
-import { useClient } from "./service.js";
+import { useClient } from "./client.js";
 import ScheduledArticle from "./scheduled-article.js";
 
 export function useScheduler(id) {

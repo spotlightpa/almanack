@@ -4,7 +4,7 @@ Vue.use(VueCompositionAPI);
 
 export { useAuth } from "./auth.js";
 
-export { useClient } from "./service.js";
+export { useClient } from "./client.js";
 export { makeState } from "./service-util.js";
 
 export {
