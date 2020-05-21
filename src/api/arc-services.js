@@ -42,12 +42,12 @@ export function useAvailableArc(id) {
   };
 }
 
-export function useUpcoming() {
-  let { upcoming, listRefreshArc } = useClient();
+export function useListAnyArc() {
+  let { listAnyArc, listRefreshArc } = useClient();
   let { apiState, exec } = makeState();
 
   const actions = {
-    load: () => exec(upcoming),
+    load: () => exec(listAnyArc),
     loadAndRefresh: () => exec(listRefreshArc),
   };
   actions.loadAndRefresh();
