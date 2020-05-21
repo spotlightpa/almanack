@@ -64,12 +64,6 @@ function makeClient($auth) {
   }
 
   let actions = {
-    async getAvailableArc(id) {
-      return await tryTo(request(endpoints.getAvailableArc(id)));
-    },
-    async getScheduledArticle(id) {
-      return await tryTo(request(endpoints.getScheduledArticle(id)));
-    },
     async uploadFile(body) {
       let [data, err] = await tryTo(
         post(endpoints.createSignedUpload, { type: body.type })
@@ -100,6 +94,15 @@ function makeClient($auth) {
       return await tryTo(post(endpoints.updateImage, image));
     },
   };
+  let idGetActions = [
+    // does not include proxy images…
+    "getAvailableArc",
+    "getScheduledArticle",
+  ];
+  for (let action of idGetActions) {
+    let endpointFn = endpoints[action];
+    actions[action] = (id) => tryTo(request(endpointFn(id)));
+  }
   let simpleGetActions = [
     "getEditorsPicks",
     "getSignupURL",
@@ -111,7 +114,8 @@ function makeClient($auth) {
     "listAnyArc",
   ];
   for (let action of simpleGetActions) {
-    actions[action] = () => tryTo(request(endpoints[action]));
+    let endpoint = endpoints[action];
+    actions[action] = () => tryTo(request(endpoint));
   }
   let simplePostActions = [
     "addAuthorizedDomain",
@@ -121,7 +125,8 @@ function makeClient($auth) {
     "sendMessage",
   ];
   for (let action of simplePostActions) {
-    actions[action] = (obj) => tryTo(post(endpoints[action], obj));
+    let endpoint = endpoints[action];
+    actions[action] = (obj) => tryTo(post(endpoint, obj));
   }
 
   return actions;
