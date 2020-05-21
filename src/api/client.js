@@ -16,7 +16,7 @@ const responseError = (rsp) => {
 };
 
 const endpoints = {
-  getAvailable: (id) => `/api/available-articles/${id}`,
+  getAvailableArc: (id) => `/api/available-articles/${id}`,
   scheduledArticle: (id) => `/api/scheduled-articles/${id}`,
   addAuthorizedDomain: `/api/authorized-domains`,
   listAuthorizedDomains: `/api/authorized-domains`,
@@ -64,8 +64,8 @@ function makeClient($auth) {
   }
 
   let actions = {
-    async getAvailable(id) {
-      return await tryTo(request(endpoints.getAvailable(id)));
+    async getAvailableArc(id) {
+      return await tryTo(request(endpoints.getAvailableArc(id)));
     },
     async article(id) {
       return await tryTo(request(endpoints.scheduledArticle(id)));

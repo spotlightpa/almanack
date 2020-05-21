@@ -1,5 +1,5 @@
 <script>
-import { getAvailableArticle } from "@/api/hooks.js";
+import { useAvailableArc } from "@/api/hooks.js";
 import APILoader from "./APILoader.vue";
 import ArticleDetails from "./ArticleDetails.vue";
 
@@ -18,7 +18,7 @@ export default {
     id: String,
   },
   setup(props) {
-    let { article, isLoading, load, error } = getAvailableArticle(props.id);
+    let { article, isLoading, load, error } = useAvailableArc(props.id);
 
     return {
       isLoading,

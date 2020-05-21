@@ -23,11 +23,11 @@ export function useListAvailableArc() {
   };
 }
 
-export function getAvailableArticle(id) {
-  let { getAvailable } = useClient();
+export function useAvailableArc(id) {
+  let { getAvailableArc } = useClient();
   let { apiState, exec } = makeState();
 
-  const load = () => exec(() => getAvailable(id));
+  const load = () => exec(() => getAvailableArc(id));
   load();
 
   return {
