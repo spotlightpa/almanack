@@ -18,6 +18,8 @@ const responseError = (rsp) => {
 const endpoints = {
   getAvailableArc: (id) => `/api/available-articles/${id}`,
   getScheduledArticle: (id) => `/api/scheduled-articles/${id}`,
+  // Alphabetized by URL to show duplicates
+  // GET and POST listed as two endpoints
   addAuthorizedDomain: `/api/authorized-domains`,
   listAuthorizedDomains: `/api/authorized-domains`,
   listAvailableArc: `/api/available-articles`,
@@ -106,12 +108,12 @@ function makeClient($auth) {
   let simpleGetActions = [
     "getEditorsPicks",
     "getSignupURL",
+    "listAnyArc",
     "listAuthorizedDomains",
     "listAvailableArc",
     "listImages",
     "listRefreshArc",
     "listSpotlightPAArticles",
-    "listAnyArc",
   ];
   for (let action of simpleGetActions) {
     let endpoint = endpoints[action];
