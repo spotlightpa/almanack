@@ -34,7 +34,7 @@ export default {
         apiStatus[ref] = false;
         return;
       }
-      [, apiStatus.error] = await client.upcoming();
+      [, apiStatus.error] = await client.listAnyArc();
       apiStatus[ref] = false;
       if (apiStatus.error) {
         return;

@@ -32,7 +32,7 @@ const endpoints = {
   sendMessage: `/api/message`,
   saveArticle: `/api/scheduled-articles`,
   listSpotlightPAArticles: `/api/spotlightpa-articles`,
-  upcoming: `/api/upcoming-articles`,
+  listAnyArc: `/api/upcoming-articles`,
 };
 
 function makeClient($auth) {
@@ -108,7 +108,7 @@ function makeClient($auth) {
     "listImages",
     "listRefreshArc",
     "listSpotlightPAArticles",
-    "upcoming",
+    "listAnyArc",
   ];
   for (let action of simpleGetActions) {
     actions[action] = () => tryTo(request(endpoints[action]));

@@ -5,7 +5,7 @@ import AdminList from "./AdminList.vue";
 import APILoader from "./APILoader.vue";
 import EmailComposer from "./EmailComposer.vue";
 
-import { useUpcoming } from "@/api/hooks.js";
+import { useListAnyArc } from "@/api/hooks.js";
 
 import ImageUploader from "./ImageUploader.vue";
 
@@ -21,7 +21,7 @@ export default {
     title: "Admin",
   },
   setup() {
-    let { articles, rawData, isLoading, load, error } = useUpcoming();
+    let { articles, rawData, isLoading, load, error } = useListAnyArc();
 
     return {
       showComposer: ref(false),
