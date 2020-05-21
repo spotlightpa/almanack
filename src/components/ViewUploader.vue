@@ -110,12 +110,7 @@ export default {
     <ImageUploader @update-image-list="fetch" />
 
     <h2 class="title has-margin-top">Existing Images</h2>
-    <APILoader
-      :can-load="true"
-      :is-loading="isLoading"
-      :reload="fetch"
-      :error="error"
-    >
+    <APILoader :is-loading="isLoading" :reload="fetch" :error="error">
       <b-field label="">
         <b-autocomplete
           v-model="rawFilter"
