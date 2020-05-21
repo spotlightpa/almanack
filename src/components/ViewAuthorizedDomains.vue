@@ -1,7 +1,7 @@
 <script>
-import { reactive, ref, toRefs } from "@vue/composition-api";
+import { computed, reactive, ref, toRefs } from "@vue/composition-api";
 
-import { useAuth, useClient } from "@/api/hooks.js";
+import { useAuth, useClient, makeState } from "@/api/hooks.js";
 
 import APILoader from "./APILoader.vue";
 
@@ -16,29 +16,23 @@ export default {
   setup() {
     let { isSpotlightPAUser } = useAuth();
     let { listAuthorizedDomains, addAuthorizedDomain } = useClient();
+
+    let { apiState: listState, exec: listExec } = makeState();
+    let { apiState: addState, exec: addExec } = makeState();
+
     let apiState = reactive({
-      didLoad: false,
-      isLoading: false,
-      domains: [],
-      error: null,
+      didLoad: computed(() => listState.didLoad || addState.didLoad),
+      isLoading: computed(() => listState.isLoading || addState.isLoading),
+      error: computed(() => listState.error || addState.error),
+      domains: computed(() => listState.rawData?.domains || []),
     });
 
     async function list() {
-      apiState.isLoading = true;
-      let data;
-      [data, apiState.error] = await listAuthorizedDomains();
-      apiState.domains = data.domains;
-      apiState.didLoad = true;
-      apiState.isLoading = false;
+      await listExec(listAuthorizedDomains);
     }
 
     async function addDomain(domain) {
-      apiState.isLoading = true;
-      [, apiState.error] = await addAuthorizedDomain({ domain });
-      if (apiState.error) {
-        apiState.isLoading = false;
-        return;
-      }
+      await addExec(() => addAuthorizedDomain({ domain }));
       await list();
     }
 
@@ -84,7 +78,7 @@ export default {
             v-text="domain"
           />
         </ul>
-        <div class="field has-addons">
+        <form class="field has-addons" @submit.prevent="addDomain(name)">
           <div class="control is-expanded">
             <input v-model="name" class="input" />
           </div>
@@ -97,7 +91,7 @@ export default {
               Add domain
             </button>
           </div>
-        </div>
+        </form>
       </APILoader>
     </div>
   </div>
