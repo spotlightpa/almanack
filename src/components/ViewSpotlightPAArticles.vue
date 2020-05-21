@@ -1,10 +1,16 @@
 <script>
 import { reactive, computed, toRefs } from "@vue/composition-api";
 
-import { useClient } from "@/api/hooks.js";
+import { useClient, makeState } from "@/api/hooks.js";
 import fuzzyMatch from "@/utils/fuzzy-match.js";
 
 import APILoader from "./APILoader.vue";
+
+const articleProps = (article) => [
+  article.internal_id,
+  article.hed,
+  ...article.authors,
+];
 
 export default {
   name: "ViewSpotlightPAArticles",
@@ -15,17 +21,14 @@ export default {
     title: "Spotlight PA Articles",
   },
   setup() {
-    const articleProps = (article) => [
-      article.internal_id,
-      article.hed,
-      ...article.authors,
-    ];
+    let { listSpotlightPAArticles } = useClient();
+    let { apiState, exec } = makeState();
 
     let state = reactive({
-      isLoading: false,
-      articles: [],
+      articles: computed(() =>
+        apiState.rawData ? apiState.rawData.articles : []
+      ),
       rawFilter: "",
-      error: null,
 
       articleProps: computed(() =>
         Array.from(
@@ -48,22 +51,12 @@ export default {
       ),
     });
 
-    let { listSpotlightPAArticles } = useClient();
-
-    async function fetch() {
-      state.isLoading = true;
-      let data;
-      [data, state.error] = await listSpotlightPAArticles();
-      state.isLoading = false;
-      if (state.error) {
-        return;
-      }
-      state.articles = data.articles;
-    }
+    const fetch = () => exec(listSpotlightPAArticles);
 
     fetch();
 
     return {
+      ...toRefs(apiState),
       ...toRefs(state),
       fetch,
     };
