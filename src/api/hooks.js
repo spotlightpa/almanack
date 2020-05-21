@@ -10,7 +10,7 @@ export { makeState } from "./service-util.js";
 export {
   useListAvailableArc,
   useUpcoming,
-  getAvailableArticle,
+  useAvailableArc,
 } from "./arc-services.js";
 
 export { useScheduler } from "./scheduler.js";
