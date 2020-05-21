@@ -29,7 +29,7 @@ export default {
 
     async function updateArticle(ref) {
       apiStatus[ref] = true;
-      [, apiStatus.error] = await client.postAvailable(props.article);
+      [, apiStatus.error] = await client.saveArcArticle(props.article);
       if (apiStatus.error) {
         apiStatus[ref] = false;
         return;

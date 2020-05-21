@@ -21,7 +21,7 @@ const endpoints = {
   addAuthorizedDomain: `/api/authorized-domains`,
   listAuthorizedDomains: `/api/authorized-domains`,
   listAvailableArc: `/api/available-articles`,
-  postAvailable: `/api/available-articles`,
+  saveArcArticle: `/api/available-articles`,
   createSignedUpload: `/api/create-signed-upload`,
   getEditorsPicks: `/api/editors-picks`,
   saveEditorsPicks: `/api/editors-picks`,
@@ -119,7 +119,7 @@ function makeClient($auth) {
   }
   let simplePostActions = [
     "addAuthorizedDomain",
-    "postAvailable",
+    "saveArcArticle",
     "saveArticle",
     "saveEditorsPicks",
     "sendMessage",
