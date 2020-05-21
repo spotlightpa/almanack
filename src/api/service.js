@@ -64,15 +64,6 @@ function makeClient($auth) {
   }
 
   let actions = {
-    hasAuthAvailable() {
-      return $auth.isEditor;
-    },
-    hasAuthUpcoming() {
-      return $auth.isSpotlightPAUser;
-    },
-    hasAuthArticle() {
-      return $auth.isSpotlightPAUser;
-    },
     async getAvailable(id) {
       return await tryTo(request(endpoints.getAvailable(id)));
     },
