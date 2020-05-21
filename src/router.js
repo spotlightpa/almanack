@@ -14,6 +14,7 @@ import ViewEditorsPicks from "./components/ViewEditorsPicks.vue";
 import ViewError from "./components/ViewError.vue";
 import ViewLogin from "./components/ViewLogin.vue";
 import ViewSpotlightPAArticles from "./components/ViewSpotlightPAArticles.vue";
+import ViewUnauthorized from "./components/ViewUnauthorized.vue";
 import ViewUploader from "./components/ViewUploader.vue";
 
 Vue.use(Router);
@@ -38,8 +39,11 @@ let router = new Router({
         if (isSpotlightPAUser.value) {
           return { name: "admin" };
         }
-        if (isSignedIn.value) {
+        if (isEditor.value) {
           return { name: "articles" };
+        }
+        if (isSignedIn.value) {
+          return { name: "unauthorized" };
         }
         return { name: "login" };
       },
@@ -49,6 +53,14 @@ let router = new Router({
       name: "login",
       component: ViewLogin,
       meta: {},
+    },
+    {
+      path: "/unauthorized",
+      name: "unauthorized",
+      component: ViewUnauthorized,
+      meta: {
+        requiresAuth: isSignedIn,
+      },
     },
     {
       path: "/articles",
@@ -163,23 +175,17 @@ watch(
     if (oldStatus === undefined || newStatus === oldStatus) {
       return;
     }
+    let destination = { name: "home" };
     if (newStatus && router.app.$route.query?.redirect) {
       let path = router.app.$route.query.redirect;
       let { route } = router.resolve({ path });
       if (route) {
         if (!route.meta.requiresAuth || route.meta.requiresAuth.value) {
-          router.push({ path });
-          return;
+          destination = { path };
         }
       }
     }
-    let name = "login";
-    if (isSpotlightPAUser.value) {
-      name = "admin";
-    } else if (newStatus) {
-      name = "articles";
-    }
-    router.push({ name });
+    router.push(destination);
   }
 );
 
