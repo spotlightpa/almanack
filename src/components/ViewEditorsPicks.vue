@@ -2,7 +2,7 @@
 import Vue from "vue";
 import { reactive, computed, toRefs } from "@vue/composition-api";
 
-import { useClient } from "@/api/hooks.js";
+import { useClient, makeState } from "@/api/hooks.js";
 
 import EditorsPicks from "./EditorsPicks.vue";
 
@@ -36,6 +36,11 @@ class EditorsPicksData {
   }
 }
 
+const toArticle = (a) => ({
+  ...a,
+  filterableProps: `${a.internal_id} ${a.hed} ${a.authors.join(" ")}`,
+});
+
 export default {
   name: "ViewEditorsPicks",
   components: {
@@ -51,59 +56,35 @@ export default {
       saveEditorsPicks,
     } = useClient();
 
-    const toArticle = (a) => ({
-      ...a,
-      filterableProps: `${a.internal_id} ${a.hed} ${a.authors.join(" ")}`,
-    });
-
-    let listState = reactive({
-      isLoading: false,
-      data: { articles: [] },
-      error: null,
-    });
-
-    let edPicksState = reactive({
-      isLoading: false,
-      data: null,
-      error: null,
-    });
+    let { apiState: listState, exec: listExec } = makeState();
+    let { apiState: edPicksState, exec: edPickExec } = makeState();
 
     let state = reactive({
-      didLoad: false,
+      didLoad: computed(() => listState.didLoad && edPicksState.didLoad),
       isLoading: computed(() => listState.isLoading || edPicksState.isLoading),
       error: computed(() => listState.error ?? edPicksState.error),
-      articles: computed(() => listState.data.articles.map(toArticle)),
+      articles: computed(() =>
+        listState.rawData ? listState.rawData.articles.map(toArticle) : []
+      ),
       articlesByPath: computed(
         () => new Map(state.articles.map((a) => [a.spotlightpa_path, a]))
       ),
       edPicks: computed(
-        () => new EditorsPicksData(edPicksState.data, state.articlesByPath)
+        () =>
+          state.didLoad &&
+          new EditorsPicksData(edPicksState.rawData, state.articlesByPath)
       ),
     });
 
     let actions = {
-      async fetch(stateObj, cb) {
-        stateObj.isLoading = true;
-        let data;
-        [data, stateObj.error] = await cb();
-        stateObj.isLoading = false;
-        if (stateObj.error) {
-          return false;
-        }
-        stateObj.data = data;
-        return true;
-      },
-      async reload() {
-        let results = await Promise.all([
-          actions.fetch(listState, () => listSpotlightPAArticles()),
-          actions.fetch(edPicksState, () => getEditorsPicks()),
+      reload() {
+        return Promise.all([
+          listExec(listSpotlightPAArticles),
+          edPickExec(getEditorsPicks),
         ]);
-        state.didLoad = state.didLoad || results.every((r) => !!r);
       },
       save() {
-        return actions.fetch(edPicksState, () =>
-          saveEditorsPicks(state.edPicks)
-        );
+        return edPickExec(() => saveEditorsPicks(state.edPicks));
       },
     };
 
@@ -145,7 +126,7 @@ export default {
     </progress>
 
     <EditorsPicks
-      v-if="didLoad"
+      v-if="didLoad && edPicks"
       :articles="articles"
       :editors-picks="edPicks"
     />
