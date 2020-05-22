@@ -41,6 +41,11 @@ const endpoints = {
 function makeClient($auth) {
   async function request(url, options = {}) {
     let headers = await $auth.headers();
+    if (!headers) {
+      let err = new Error("Please log in again.");
+      err.name = "Login Error";
+      throw err;
+    }
     if (options.headers) {
       options.headers = { ...headers, ...options.headers };
     }

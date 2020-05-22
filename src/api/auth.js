@@ -5,7 +5,6 @@ import netlifyIdentity from "netlify-identity-widget";
 function makeAuth() {
   let authState = reactive({
     user: null,
-    error: null,
   });
 
   netlifyIdentity.on("init", async (user) => {
@@ -13,7 +12,6 @@ function makeAuth() {
     try {
       await user.jwt();
     } catch (err) {
-      authState.error = err;
       methods.logout();
     }
   });
@@ -25,7 +23,9 @@ function makeAuth() {
     authState.user = null;
   });
   netlifyIdentity.on("error", (err) => {
-    authState.error = err;
+    // eslint-disable-next-line no-console
+    console.warn(err);
+    authState.user = null;
   });
 
   let token = computed(() => authState.user?.token?.access_token ?? null);
@@ -54,15 +54,19 @@ function makeAuth() {
       } catch (e) {
         // eslint-disable-next-line no-console
         console.warn(e);
+        netlifyIdentity.store.user = null;
       }
     },
     async headers() {
+      if (!authState.user) {
+        return null;
+      }
       let token;
       try {
         token = await authState.user.jwt();
       } catch (e) {
         methods.logout();
-        throw e;
+        return null;
       }
       return {
         Authorization: `Bearer ${token}`,
