@@ -185,7 +185,8 @@ watch(
         }
       }
     }
-    router.push(destination);
+    // Use a timeout because isSpotlight, etc won't be updated yet when push runs
+    window.setTimeout(() => router.push(destination), 0);
   }
 );
 
