@@ -7,6 +7,7 @@ import (
 	"net/http"
 
 	"github.com/google/go-github/v30/github"
+	"github.com/spotlightpa/almanack/internal/netlifyid"
 	"github.com/spotlightpa/almanack/pkg/almanack"
 	"golang.org/x/oauth2"
 )
@@ -66,10 +67,7 @@ func (cl *Client) CreateFile(ctx context.Context, msg, path string, content []by
 		Message: github.String(msg),
 		Content: content,
 		Branch:  github.String(cl.branch),
-		Author: &github.CommitAuthor{
-			Name:  github.String("Almanack"),
-			Email: github.String("webmaster@spotlightpa.org"),
-		},
+		Author:  makeAuthor(ctx),
 	}
 	_, _, err := cl.client.Repositories.CreateFile(ctx, cl.owner, cl.repo, path, opts)
 	return err
@@ -117,10 +115,7 @@ func (cl *Client) UpdateFile(ctx context.Context, msg, path string, content []by
 		Content: content,
 		Branch:  github.String(cl.branch),
 		SHA:     sha,
-		Author: &github.CommitAuthor{
-			Name:  github.String("Almanack"),
-			Email: github.String("webmaster@spotlightpa.org"),
-		},
+		Author:  makeAuthor(ctx),
 	}
 
 	_, _, err = cl.client.Repositories.UpdateFile(ctx, cl.owner, cl.repo, path, opts)
@@ -132,4 +127,20 @@ func (cl *Client) Ping(ctx context.Context) error {
 	cl.printf("pinging Github %s/%s@%s", cl.owner, cl.repo, cl.branch)
 	_, _, err := cl.client.Repositories.GetBranch(ctx, cl.owner, cl.repo, cl.branch)
 	return err
+}
+
+func makeAuthor(ctx context.Context) *github.CommitAuthor {
+	jwt, _ := netlifyid.FromContext(ctx)
+	name := jwt.Username()
+	if name == "" {
+		name = "Almanack"
+	}
+	email := jwt.Email()
+	if email == "" {
+		email = "webmaster@spotlightpa.org"
+	}
+	return &github.CommitAuthor{
+		Name:  github.String(name),
+		Email: github.String(email),
+	}
 }

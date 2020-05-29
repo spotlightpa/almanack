@@ -1,6 +1,7 @@
 package netlifyid
 
 import (
+	"context"
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
@@ -31,6 +32,22 @@ func (jwt *JWT) HasRole(role string) bool {
 	return false
 }
 
+func (jwt *JWT) Email() string {
+	if jwt == nil {
+		return ""
+	}
+
+	return jwt.User.Email
+}
+
+func (jwt *JWT) Username() string {
+	if jwt == nil {
+		return ""
+	}
+
+	return jwt.User.UserMetadata.FullName
+}
+
 type Identity struct {
 	Token string `json:"token"`
 	URL   string `json:"url"`
@@ -51,7 +68,11 @@ type User struct {
 }
 
 func FromRequest(r *http.Request) (*JWT, error) {
-	lc, ok := lambdacontext.FromContext(r.Context())
+	return FromContext(r.Context())
+}
+
+func FromContext(ctx context.Context) (*JWT, error) {
+	lc, ok := lambdacontext.FromContext(ctx)
 	if !ok {
 		return nil, errutil.Response{
 			StatusCode: http.StatusInternalServerError,
