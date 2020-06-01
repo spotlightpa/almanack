@@ -135,6 +135,74 @@ func (q *Queries) ListAllArticles(ctx context.Context) ([]Article, error) {
 	return items, nil
 }
 
+const listAllSeries = `-- name: ListAllSeries :many
+SELECT
+  series::text
+FROM ( SELECT DISTINCT
+    jsonb_array_elements_text(spotlightpa_data -> 'series') AS series
+  FROM
+    article
+  WHERE
+    spotlightpa_data -> 'series' IS NOT NULL) AS series_t
+`
+
+func (q *Queries) ListAllSeries(ctx context.Context) ([]string, error) {
+	rows, err := q.db.QueryContext(ctx, listAllSeries)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []string
+	for rows.Next() {
+		var series string
+		if err := rows.Scan(&series); err != nil {
+			return nil, err
+		}
+		items = append(items, series)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const listAllTopics = `-- name: ListAllTopics :many
+SELECT
+  topic::text
+FROM ( SELECT DISTINCT
+    jsonb_array_elements_text(spotlightpa_data -> 'topics') AS topic
+  FROM
+    article
+  WHERE
+    spotlightpa_data -> 'topics' IS NOT NULL) AS topics
+`
+
+func (q *Queries) ListAllTopics(ctx context.Context) ([]string, error) {
+	rows, err := q.db.QueryContext(ctx, listAllTopics)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []string
+	for rows.Next() {
+		var topic string
+		if err := rows.Scan(&topic); err != nil {
+			return nil, err
+		}
+		items = append(items, topic)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const listAvailableArticles = `-- name: ListAvailableArticles :many
 SELECT
   id, arc_id, arc_data, spotlightpa_path, spotlightpa_data, schedule_for, last_published, note, status, created_at, updated_at

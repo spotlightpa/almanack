@@ -144,3 +144,23 @@ FROM ( SELECT DISTINCT ON (slug)
     created_at DESC) AS t
 WHERE
   slug = @slug::text;
+
+-- name: ListAllTopics :many
+SELECT
+  topic::text
+FROM ( SELECT DISTINCT
+    jsonb_array_elements_text(spotlightpa_data -> 'topics') AS topic
+  FROM
+    article
+  WHERE
+    spotlightpa_data -> 'topics' IS NOT NULL) AS topics;
+
+-- name: ListAllSeries :many
+SELECT
+  series::text
+FROM ( SELECT DISTINCT
+    jsonb_array_elements_text(spotlightpa_data -> 'series') AS series
+  FROM
+    article
+  WHERE
+    spotlightpa_data -> 'series' IS NOT NULL) AS series_t;

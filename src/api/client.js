@@ -21,6 +21,8 @@ const endpoints = {
   getScheduledArticle: (id) => `/api/scheduled-articles/${id}`,
   // Alphabetized by URL to show duplicates
   // GET and POST listed as two endpoints
+  listAllSeries: `/api/all-series`,
+  listAllTopics: `/api/all-topics`,
   addAuthorizedDomain: `/api/authorized-domains`,
   listAuthorizedDomains: `/api/authorized-domains`,
   listAvailableArc: `/api/available-articles`,
@@ -112,6 +114,8 @@ function makeClient($auth) {
   let simpleGetActions = [
     "getEditorsPicks",
     "getSignupURL",
+    "listAllSeries",
+    "listAllTopics",
     "listAnyArc",
     "listAuthorizedDomains",
     "listAvailableArc",
