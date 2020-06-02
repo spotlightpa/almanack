@@ -60,6 +60,8 @@ func (app *appEnv) routes() http.Handler {
 			r.Get("/images", app.listImages)
 			r.Get("/editors-picks", app.getEditorsPicks)
 			r.Post("/editors-picks", app.postEditorsPicks)
+			r.Get("/all-topics", app.listAllTopics)
+			r.Get("/all-series", app.listAllSeries)
 		})
 	})
 	r.NotFound(app.notFound)
@@ -608,4 +610,28 @@ func (app *appEnv) postEditorsPicks(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	app.jsonResponse(http.StatusOK, w, resp)
+}
+
+func (app *appEnv) listAllTopics(w http.ResponseWriter, r *http.Request) {
+	app.Printf("starting listAllTopics")
+	t, err := app.svc.Querier.ListAllTopics(r.Context())
+	if err != nil {
+		app.errorResponse(r.Context(), w, err)
+		return
+	}
+	app.jsonResponse(http.StatusOK, w, struct {
+		Topics []string `json:"topics"`
+	}{t})
+}
+
+func (app *appEnv) listAllSeries(w http.ResponseWriter, r *http.Request) {
+	app.Printf("starting listAllSeries")
+	s, err := app.svc.Querier.ListAllSeries(r.Context())
+	if err != nil {
+		app.errorResponse(r.Context(), w, err)
+		return
+	}
+	app.jsonResponse(http.StatusOK, w, struct {
+		Series []string `json:"series"`
+	}{s})
 }

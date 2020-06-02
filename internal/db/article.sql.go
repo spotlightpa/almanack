@@ -135,6 +135,112 @@ func (q *Queries) ListAllArticles(ctx context.Context) ([]Article, error) {
 	return items, nil
 }
 
+const listAllSeries = `-- name: ListAllSeries :many
+WITH series_dates AS (
+  SELECT
+    jsonb_array_elements_text(spotlightpa_data -> 'series') AS series,
+    spotlightpa_data ->> 'pub-date' AS pub_date
+  FROM
+    article
+  WHERE
+    spotlightpa_data -> 'series' IS NOT NULL
+  ORDER BY
+    pub_date DESC,
+    series DESC
+),
+distinct_series_dates AS (
+  SELECT DISTINCT ON (series)
+    series, pub_date
+  FROM
+    series_dates
+  ORDER BY
+    series DESC,
+    pub_date DESC
+)
+SELECT
+  series::text
+FROM
+  distinct_series_dates
+ORDER BY
+  pub_date DESC
+`
+
+func (q *Queries) ListAllSeries(ctx context.Context) ([]string, error) {
+	rows, err := q.db.QueryContext(ctx, listAllSeries)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []string
+	for rows.Next() {
+		var series string
+		if err := rows.Scan(&series); err != nil {
+			return nil, err
+		}
+		items = append(items, series)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const listAllTopics = `-- name: ListAllTopics :many
+WITH topic_dates AS (
+  SELECT
+    jsonb_array_elements_text(spotlightpa_data -> 'topics') AS topic,
+    spotlightpa_data ->> 'pub-date' AS pub_date
+  FROM
+    article
+  WHERE
+    spotlightpa_data -> 'topics' IS NOT NULL
+  ORDER BY
+    pub_date DESC,
+    topic DESC
+),
+distinct_topic_dates AS (
+  SELECT DISTINCT ON (topic)
+    topic, pub_date
+  FROM
+    topic_dates
+  ORDER BY
+    topic DESC,
+    pub_date DESC
+)
+SELECT
+  topic::text
+FROM
+  distinct_topic_dates
+ORDER BY
+  pub_date DESC
+`
+
+func (q *Queries) ListAllTopics(ctx context.Context) ([]string, error) {
+	rows, err := q.db.QueryContext(ctx, listAllTopics)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []string
+	for rows.Next() {
+		var topic string
+		if err := rows.Scan(&topic); err != nil {
+			return nil, err
+		}
+		items = append(items, topic)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const listAvailableArticles = `-- name: ListAvailableArticles :many
 SELECT
   id, arc_id, arc_data, spotlightpa_path, spotlightpa_data, schedule_for, last_published, note, status, created_at, updated_at

@@ -19,6 +19,8 @@ type Querier interface {
 	GetRolesForDomain(ctx context.Context, domain string) ([]string, error)
 	GetSiteData(ctx context.Context, key string) (json.RawMessage, error)
 	ListAllArticles(ctx context.Context) ([]Article, error)
+	ListAllSeries(ctx context.Context) ([]string, error)
+	ListAllTopics(ctx context.Context) ([]string, error)
 	ListAvailableArticles(ctx context.Context) ([]Article, error)
 	ListDomainsWithRole(ctx context.Context, role string) ([]string, error)
 	ListImages(ctx context.Context, arg ListImagesParams) ([]Image, error)

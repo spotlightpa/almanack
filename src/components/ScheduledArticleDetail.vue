@@ -1,5 +1,8 @@
 <script>
-import { computed } from "@vue/composition-api";
+import { computed, reactive } from "@vue/composition-api";
+
+import { useClient } from "@/api/hooks.js";
+import fuzzyMatch from "@/utils/fuzzy-match.js";
 
 import BulmaField from "./BulmaField.vue";
 import BulmaFieldInput from "./BulmaFieldInput.vue";
@@ -15,10 +18,51 @@ export default {
     article: { type: Object, required: true },
   },
   setup(props) {
+    let { listAllTopics, listAllSeries } = useClient();
     let isPostDated = computed(() => new Date() - props.article.pubDate < 0);
+    const autocomplete = reactive({
+      topicsRaw: [],
+      topicsFilter: "",
+      topics: computed(() =>
+        autocomplete.topicsFilter
+          ? autocomplete.topicsRaw.filter((s) =>
+              fuzzyMatch(s, autocomplete.topicsFilter)
+            )
+          : autocomplete.topicsRaw
+      ),
+
+      seriesRaw: [],
+      seriesFilter: "",
+      series: computed(() =>
+        autocomplete.seriesFilter
+          ? autocomplete.seriesRaw.filter((s) =>
+              fuzzyMatch(s, autocomplete.seriesFilter)
+            )
+          : autocomplete.seriesRaw
+      ),
+    });
+
+    listAllTopics().then(([data, err]) => {
+      if (!err) {
+        autocomplete.topicsRaw = data.topics || [];
+      } else {
+        // eslint-disable-next-line no-console
+        console.warn(err);
+      }
+    });
+    listAllSeries().then(([data, err]) => {
+      if (!err) {
+        autocomplete.seriesRaw = data.series || [];
+      } else {
+        // eslint-disable-next-line no-console
+        console.warn(err);
+      }
+    });
 
     return {
       isPostDated,
+      autocomplete,
+
       discardChanges() {
         if (window.confirm("Do you really want to discard all changes?")) {
           props.article.reset();
@@ -109,17 +153,20 @@ export default {
     <b-field label="Topics">
       <b-taginput
         v-model="article.topics"
-        :data="['Coronavirus']"
+        :open-on-focus="true"
+        :data="autocomplete.topics"
         attached
-        allow-duplicates
+        @typing="autocomplete.topicsFilter = $event"
       ></b-taginput>
       Topics, e.g. Coronavirus
     </b-field>
     <b-field label="Series">
       <b-taginput
         v-model="article.series"
+        :open-on-focus="true"
+        :data="autocomplete.series"
         attached
-        allow-duplicates
+        @typing="autocomplete.seriesFilter = $event"
       ></b-taginput>
       Series, e.g. “Legislative privilege 2020”
     </b-field>
