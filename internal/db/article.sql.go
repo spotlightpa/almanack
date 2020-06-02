@@ -136,14 +136,33 @@ func (q *Queries) ListAllArticles(ctx context.Context) ([]Article, error) {
 }
 
 const listAllSeries = `-- name: ListAllSeries :many
-SELECT
-  series::text
-FROM ( SELECT DISTINCT
-    jsonb_array_elements_text(spotlightpa_data -> 'series') AS series
+WITH series_dates AS (
+  SELECT
+    jsonb_array_elements_text(spotlightpa_data -> 'series') AS series,
+    spotlightpa_data ->> 'pub-date' AS pub_date
   FROM
     article
   WHERE
-    spotlightpa_data -> 'series' IS NOT NULL) AS series_t
+    spotlightpa_data -> 'series' IS NOT NULL
+  ORDER BY
+    pub_date DESC,
+    series DESC
+),
+distinct_series_dates AS (
+  SELECT DISTINCT ON (series)
+    series, pub_date
+  FROM
+    series_dates
+  ORDER BY
+    series DESC,
+    pub_date DESC
+)
+SELECT
+  series::text
+FROM
+  distinct_series_dates
+ORDER BY
+  pub_date DESC
 `
 
 func (q *Queries) ListAllSeries(ctx context.Context) ([]string, error) {
@@ -170,14 +189,33 @@ func (q *Queries) ListAllSeries(ctx context.Context) ([]string, error) {
 }
 
 const listAllTopics = `-- name: ListAllTopics :many
-SELECT
-  topic::text
-FROM ( SELECT DISTINCT
-    jsonb_array_elements_text(spotlightpa_data -> 'topics') AS topic
+WITH topic_dates AS (
+  SELECT
+    jsonb_array_elements_text(spotlightpa_data -> 'topics') AS topic,
+    spotlightpa_data ->> 'pub-date' AS pub_date
   FROM
     article
   WHERE
-    spotlightpa_data -> 'topics' IS NOT NULL) AS topics
+    spotlightpa_data -> 'topics' IS NOT NULL
+  ORDER BY
+    pub_date DESC,
+    topic DESC
+),
+distinct_topic_dates AS (
+  SELECT DISTINCT ON (topic)
+    topic, pub_date
+  FROM
+    topic_dates
+  ORDER BY
+    topic DESC,
+    pub_date DESC
+)
+SELECT
+  topic::text
+FROM
+  distinct_topic_dates
+ORDER BY
+  pub_date DESC
 `
 
 func (q *Queries) ListAllTopics(ctx context.Context) ([]string, error) {
