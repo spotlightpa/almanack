@@ -44,12 +44,13 @@ export default {
     <h1 class="title">
       Spotlight Administrator
     </h1>
-    <p class="content">
-      Tools:
-      <a
-        href="javascript:
+    <details class="content">
+      <summary>Tools</summary>
+      <p>
+        <a
+          href="javascript:
 (()=>{
-  let match = location.href.match(/\/\d{4}\/\d\d\/([\w-]+)\/?$/);
+  let match = location.href.match(/\/\d{4}\/\d\d\/([\w-.]+)\/?$/);
   if (!match) {
     alert('Not on Spotlight PA article');
     return;
@@ -58,18 +59,19 @@ export default {
   window.location = 'https://almanack.data.spotlightpa.org/api/bookmarklet/' + slug;
 })();
         "
-      >
-        Jump to admin
-      </a>
-      bookmarklet
-      <sup
-        ><a
-          title="What's a bookmarklet?"
-          href="https://support.mozilla.org/en-US/kb/bookmarklets-perform-common-web-page-tasks"
-          >?</a
-        ></sup
-      >
-    </p>
+        >
+          Jump to admin
+        </a>
+        bookmarklet
+        <sup
+          ><a
+            title="What's a bookmarklet?"
+            href="https://support.mozilla.org/en-US/kb/bookmarklets-perform-common-web-page-tasks"
+            >?</a
+          ></sup
+        >
+      </p>
+    </details>
 
     <div class="level">
       <div class="level-left">
