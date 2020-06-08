@@ -141,6 +141,14 @@ export default class ScheduledArticle {
     return `https://www.spotlightpa.org/news/${year}/${month}/${this.slug}/`;
   }
 
+  get detailsRoute() {
+    return { name: "article", params: { id: this.arcID } };
+  }
+
+  get scheduleRoute() {
+    return { name: "schedule", params: { id: this.arcID } };
+  }
+
   get imagePreviewURL() {
     if (!this.imageURL || this.imageURL.match(/^http/)) {
       return "";
