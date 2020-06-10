@@ -15,6 +15,7 @@ type EditorsPicks struct {
 	LimitSubfeatures bool     `json:"limitSubfeatures"`
 	SubfeaturesLimit int      `json:"subfeaturesLimit"`
 	TopSlots         []string `json:"topSlots"`
+	SidebarPicks     []string `json:"sidebarPicks"`
 }
 
 func GetEditorsPicks(ctx context.Context, q db.Querier) (picks *EditorsPicks, err error) {
