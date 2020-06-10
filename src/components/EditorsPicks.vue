@@ -103,6 +103,10 @@ export default {
         <EditorsPicksDraggable v-model="editorsPicks.topSlots" />
         Pin stories at the top of homepage
       </b-field>
+      <b-field label="Editor's Picks sidebar">
+        <EditorsPicksDraggable v-model="editorsPicks.sidebarPicks" />
+        Pin stories in the homepage sidebar under Most Popular
+      </b-field>
     </div>
   </div>
 </template>

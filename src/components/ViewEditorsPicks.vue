@@ -15,7 +15,12 @@ class EditorsPicksData {
 
   reset() {
     let { data, articlesByPath } = this._initialData;
-    for (let prop of ["featuredStories", "subfeatures", "topSlots"]) {
+    for (let prop of [
+      "featuredStories",
+      "subfeatures",
+      "topSlots",
+      "sidebarPicks",
+    ]) {
       let a = data?.[prop] ?? [];
       this[prop] = a.map((s) => articlesByPath.get(s)).filter((a) => a);
     }
@@ -30,6 +35,7 @@ class EditorsPicksData {
       featuredStories: this.featuredStories.map(getPath),
       subfeatures: this.subfeatures.map(getPath),
       topSlots: this.topSlots.map(getPath),
+      sidebarPicks: this.sidebarPicks.map(getPath),
       limitSubfeatures: !!this.limitSubfeatures,
       subfeaturesLimit: +this.subfeaturesLimit,
     };
