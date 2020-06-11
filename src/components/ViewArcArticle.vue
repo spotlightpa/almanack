@@ -4,7 +4,7 @@ import APILoader from "./APILoader.vue";
 import ArticleDetails from "./ArticleDetails.vue";
 
 export default {
-  name: "ViewArticleItem",
+  name: "ViewArcArticle",
   components: {
     APILoader,
     ArticleDetails,
