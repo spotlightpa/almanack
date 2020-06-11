@@ -1,4 +1,6 @@
 <script>
+import { intcomma } from "journalize";
+
 export default {
   props: {
     article: {
@@ -6,6 +8,7 @@ export default {
       required: true,
     },
   },
+  methods: { intcomma },
 };
 </script>
 
@@ -15,14 +18,14 @@ export default {
       <p v-if="article.plannedWordCount" class="level-item">
         <span>
           <strong>Planned Word Count:</strong>
-          {{ article.plannedWordCount | intcomma }}
+          {{ intcomma(article.plannedWordCount) }}
         </span>
       </p>
 
       <p v-if="article.actualWordCount" class="level-item is-hidden-mobile">
         <span>
           <strong>Word Count:</strong>
-          {{ article.actualWordCount | intcomma }}
+          {{ intcomma(article.actualWordCount) }}
         </span>
       </p>
       <p class="level-item is-hidden-mobile">

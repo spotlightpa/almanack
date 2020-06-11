@@ -2,9 +2,9 @@ import { intcomma } from "journalize";
 
 import getProp from "@/utils/getter.js";
 import cmp from "@/utils/cmp.js";
+import commaAnd from "@/utils/comma-and.js";
 
-import { commaAndJoiner } from "@/filters/commaand.js";
-import { dateFormatter } from "@/filters/time.js";
+import { formatDate } from "@/utils/time-format.js";
 
 import ArcArticleImage from "@/components/ArcArticleImage.vue";
 import ArcArticleList from "@/components/ArcArticleList.vue";
@@ -164,7 +164,7 @@ export default class ArcArticle {
     });
   }
   get byline() {
-    return commaAndJoiner(this.authors);
+    return commaAnd(this.authors);
   }
   get status() {
     if (this.isAvailable) {
@@ -322,7 +322,7 @@ Update on ${this.slug}
 
 https://almanack.data.spotlightpa.org/articles/${this.id}
 
-Planned for ${dateFormatter(this.plannedDate)}${
+Planned for ${formatDate(this.plannedDate)}${
       this.note ? `\n\nPublication Notes:\n\n${this.note}` : ""
     }
 

@@ -3,6 +3,7 @@ import { computed, reactive } from "@vue/composition-api";
 
 import { useClient } from "@/api/hooks.js";
 import fuzzyMatch from "@/utils/fuzzy-match.js";
+import { formatDate, formatTime } from "@/utils/time-format.js";
 
 import BulmaField from "./BulmaField.vue";
 import BulmaFieldInput from "./BulmaFieldInput.vue";
@@ -90,6 +91,9 @@ export default {
         }
         return "Save without posting";
       },
+
+      formatDate,
+      formatTime,
     };
   },
 };
@@ -101,8 +105,8 @@ export default {
     <p class="content">
       <b
         >Article last synchronized with Arc at
-        {{ article.lastArcSync | formatDate }},
-        {{ article.lastArcSync | formatTime }}</b
+        {{ formatDate(article.lastArcSync) }},
+        {{ formatTime(article.lastArcSync) }}</b
       >
     </p>
 
@@ -398,15 +402,15 @@ export default {
     </div>
     <p v-if="article.lastSaved" class="content">
       <b
-        >Article last saved at {{ article.lastSaved | formatDate }},
-        {{ article.lastSaved | formatTime }}</b
+        >Article last saved at {{ formatDate(article.lastSaved) }},
+        {{ formatTime(article.lastSaved) }}</b
       >
     </p>
     <p v-if="article.scheduleFor" class="content">
       <b
         >Article is scheduled to publish at
-        {{ article.scheduleFor | formatDate }},
-        {{ article.scheduleFor | formatTime }}</b
+        {{ formatDate(article.scheduleFor) }},
+        {{ formatTime(article.scheduleFor) }}</b
       >
     </p>
 

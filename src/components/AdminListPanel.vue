@@ -1,6 +1,7 @@
 <script>
 import { reactive, ref, toRefs } from "@vue/composition-api";
 import { useClient } from "@/api/hooks.js";
+import { formatDate } from "@/utils/time-format.js";
 
 import ArticleSlugLine from "./ArticleSlugLine.vue";
 import EmailComposer from "./EmailComposer.vue";
@@ -47,6 +48,7 @@ export default {
       ...toRefs(apiStatus),
 
       showComposer,
+      formatDate,
 
       async saveNote() {
         await updateArticle("isSavingNote");
@@ -79,11 +81,11 @@ export default {
 
     <p class="has-margin-top-negative">
       <strong>Byline:</strong>
-      {{ article.authors | commaand }}
+      {{ article.byline }}
     </p>
     <p>
       <strong>Planned time:</strong>
-      {{ article.plannedDate | formatDate }}
+      {{ formatDate(article.plannedDate) }}
     </p>
     <div class="field">
       <label class="label">

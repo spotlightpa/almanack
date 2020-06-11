@@ -1,6 +1,7 @@
 <script>
 import { reactive, toRefs } from "@vue/composition-api";
 import { sendGAEvent } from "@/utils/google-analytics.js";
+import { formatDate } from "@/utils/time-format.js";
 
 import ArticleSlugLine from "./ArticleSlugLine.vue";
 import ArticleWordCount from "./ArticleWordCount.vue";
@@ -63,6 +64,8 @@ export default {
           eventAction: "Copy HTML",
         });
       },
+
+      formatDate,
     };
   },
 };
@@ -77,7 +80,7 @@ export default {
       Planned time
     </h2>
     <p class="content has-margin-top-negative">
-      {{ article.plannedDate | formatDate }}
+      {{ formatDate(article.plannedDate) }}
     </p>
     <template v-if="article.note">
       <h2 class="title is-stacked">

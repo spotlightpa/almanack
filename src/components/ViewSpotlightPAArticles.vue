@@ -2,6 +2,8 @@
 import { reactive, computed, toRefs } from "@vue/composition-api";
 
 import { useClient, makeState } from "@/api/hooks.js";
+import commaAnd from "@/utils/comma-and.js";
+import { formatDate } from "@/utils/time-format.js";
 import fuzzyMatch from "@/utils/fuzzy-match.js";
 
 import APILoader from "./APILoader.vue";
@@ -59,6 +61,8 @@ export default {
       ...toRefs(apiState),
       ...toRefs(state),
       fetch,
+      commaAnd,
+      formatDate,
     };
   },
 };
@@ -114,8 +118,8 @@ export default {
               </router-link>
             </td>
             <td>{{ article.hed }}</td>
-            <td>{{ article.authors | commaand }}</td>
-            <td>{{ article.pub_date | formatDate }}</td>
+            <td>{{ commaAnd(article.authors) }}</td>
+            <td>{{ formatDate(article.pub_date) }}</td>
           </tr>
         </tbody>
       </table>
