@@ -6,7 +6,7 @@ import { useAuth } from "@/api/hooks.js";
 import { setDimensions, sendGAPageview } from "@/utils/google-analytics.js";
 
 import ViewAdmin from "./components/ViewAdmin.vue";
-import ViewArticleItem from "./components/ViewArticleItem.vue";
+import ViewArcArticle from "./components/ViewArcArticle.vue";
 import ViewArticleList from "./components/ViewArticleList.vue";
 import ViewArticleSchedule from "./components/ViewArticleSchedule.vue";
 import ViewAuthorizedDomains from "./components/ViewAuthorizedDomains.vue";
@@ -73,7 +73,7 @@ let router = new Router({
     {
       path: "/articles/:id",
       name: "article",
-      component: ViewArticleItem,
+      component: ViewArcArticle,
       props: true,
       meta: { requiresAuth: isEditor },
     },
