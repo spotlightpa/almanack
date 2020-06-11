@@ -136,7 +136,6 @@ func (app *appEnv) exec() error {
 		}).
 		Handle(app.routes())
 
-	listener := http.ListenAndServe
 	if app.isLambda {
 		var host string
 		{
@@ -150,7 +149,7 @@ func (app *appEnv) exec() error {
 
 	app.Printf("starting on port %s", app.port)
 
-	return listener(app.port, routes)
+	return http.ListenAndServe(app.port, routes)
 }
 
 func (app *appEnv) initSentry(dsn string, l almanack.Logger) error {

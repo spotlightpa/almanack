@@ -7,7 +7,7 @@ go 1.14
 
 require (
 	github.com/BurntSushi/toml v0.3.1
-	github.com/aws/aws-lambda-go v1.13.3
+	github.com/aws/aws-lambda-go v1.17.0
 	github.com/aws/aws-sdk-go-v2 v0.19.0
 	github.com/carlmjohnson/crockford v0.0.3
 	github.com/carlmjohnson/errutil v0.0.9
@@ -23,8 +23,8 @@ require (
 	github.com/lib/pq v1.3.0
 	github.com/mattbaird/gochimp v0.0.0-20180111040707-a267553896d1
 	github.com/peterbourgon/ff/v2 v2.0.0
-	github.com/piotrkubisa/apigo v1.1.2-0.20190907190536-6de39ca9cf97
-	github.com/pkg/errors v0.9.1 // indirect
+	github.com/piotrkubisa/apigo v2.0.0+incompatible
+	github.com/tj/assert v0.0.3 // indirect
 	golang.org/x/crypto v0.0.0-20191011191535-87dc89f01550 // indirect
 	golang.org/x/net v0.0.0-20200226121028-0de0cce0169b
 	golang.org/x/oauth2 v0.0.0-20180821212333-d2e6202438be
