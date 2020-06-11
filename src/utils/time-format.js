@@ -1,12 +1,10 @@
-import Vue from "vue";
-
 import { apdate, aptime } from "journalize";
 
 const toWeekday = new Intl.DateTimeFormat("en-US", {
   weekday: "long",
 });
 
-export function dateFormatter(d) {
+export function formatDate(d) {
   if (!d) {
     return "";
   }
@@ -20,7 +18,7 @@ const tzNameLookup = new Intl.DateTimeFormat("en-US", {
   timeZoneName: "short",
 });
 
-export function timeFormatter(d) {
+export function formatTime(d) {
   if (typeof d === "string") {
     d = new Date(d);
   }
@@ -32,6 +30,3 @@ export function timeFormatter(d) {
   }
   return aptime(d) + tzname;
 }
-
-Vue.filter("formatDate", dateFormatter);
-Vue.filter("formatTime", timeFormatter);

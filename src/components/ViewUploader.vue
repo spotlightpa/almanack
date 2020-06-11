@@ -4,6 +4,7 @@ import { reactive, computed, toRefs } from "@vue/composition-api";
 import { useClient } from "@/api/hooks.js";
 import imgproxyURL from "@/api/imgproxy-url.js";
 import fuzzyMatch from "@/utils/fuzzy-match.js";
+import { formatDate } from "@/utils/time-format.js";
 
 import APILoader from "./APILoader.vue";
 import CopyWithButton from "./CopyWithButton.vue";
@@ -98,6 +99,8 @@ export default {
     return {
       ...toRefs(state),
       ...actions,
+
+      formatDate,
     };
   },
 };
@@ -156,7 +159,7 @@ export default {
               </p>
               <p>
                 <strong>Date:</strong>
-                {{ image.date | formatDate }}
+                {{ formatDate(image.date) }}
               </p>
               <p class="has-margin-top-thin">
                 <CopyWithButton

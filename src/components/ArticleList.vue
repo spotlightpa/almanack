@@ -2,6 +2,8 @@
 import ArticleSlugLine from "./ArticleSlugLine.vue";
 import ArticleWordCount from "./ArticleWordCount.vue";
 
+import { formatDate } from "@/utils/time-format.js";
+
 export default {
   name: "ArticleList",
   components: {
@@ -12,6 +14,7 @@ export default {
     articles: Array,
     title: String,
   },
+  methods: { formatDate },
 };
 </script>
 <template>
@@ -25,11 +28,11 @@ export default {
 
         <p class="has-margin-top-negative">
           <strong>Byline:</strong>
-          {{ article.authors | commaand }}
+          {{ article.byline }}
         </p>
         <p>
           <strong>Planned time:</strong>
-          {{ article.plannedDate | formatDate }}
+          {{ formatDate(article.plannedDate) }}
         </p>
         <p class="has-margin-top-thin content is-small">
           {{ article.budgetLine }}

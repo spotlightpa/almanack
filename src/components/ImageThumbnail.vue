@@ -1,4 +1,5 @@
 <script>
+import commaAnd from "@/utils/comma-and.js";
 import CopyWithButton from "./CopyWithButton.vue";
 
 export default {
@@ -13,8 +14,13 @@ export default {
   },
   computed: {
     correctedCredits() {
-      return this.credits.map((credit) =>
-        credit.replace(/\b(staff( photographer)?)\b/gi, "Philadelphia Inquirer")
+      return commaAnd(
+        this.credits.map((credit) =>
+          credit.replace(
+            /\b(staff( photographer)?)\b/gi,
+            "Philadelphia Inquirer"
+          )
+        )
       );
     },
   },
@@ -47,10 +53,7 @@ export default {
       <p class="has-margin-bottom-thin">
         <strong>Credit:</strong>
       </p>
-      <CopyWithButton
-        :value="correctedCredits | commaand"
-        label="credit"
-      ></CopyWithButton>
+      <CopyWithButton :value="correctedCredits" label="credit"></CopyWithButton>
     </figcaption>
   </figure>
 </template>
