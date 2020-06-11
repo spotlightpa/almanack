@@ -318,7 +318,8 @@ func (app *appEnv) getArcStory(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if article.Status != almanack.StatusAvailable {
+	if article.Status != almanack.StatusAvailable &&
+		article.Status != almanack.StatusPlanned {
 		// Let Spotlight PA users get article regardless of its status
 		if err := app.auth.HasRole(r, "Spotlight PA"); err != nil {
 			app.errorResponse(r.Context(), w, errutil.NotFound)
