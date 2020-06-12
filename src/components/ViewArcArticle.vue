@@ -2,12 +2,14 @@
 import { useAvailableArc } from "@/api/hooks.js";
 import APILoader from "./APILoader.vue";
 import ArcArticleAvailable from "./ArcArticleAvailable.vue";
+import ArcArticlePlanned from "./ArcArticlePlanned.vue";
 
 export default {
   name: "ViewArcArticle",
   components: {
     APILoader,
     ArcArticleAvailable,
+    ArcArticlePlanned,
   },
   metaInfo() {
     return {
@@ -33,10 +35,8 @@ export default {
 <template>
   <APILoader :is-loading="isLoading" :reload="load" :error="error">
     <template v-if="article">
-      <ArcArticleAvailable
-        v-if="article.isAvailable"
-        :article="article"
-      ></ArcArticleAvailable>
+      <ArcArticleAvailable v-if="article.isAvailable" :article="article" />
+      <ArcArticlePlanned v-else :article="article" />
     </template>
   </APILoader>
 </template>
