@@ -26,19 +26,13 @@ export default {
       }
       return "is-danger";
     },
-    linkTag() {
-      if (this.isSpotlightPAUser) {
-        return "router-link";
-      }
-      return this.article.isAvailable ? "router-link" : "span";
-    },
   },
 };
 </script>
 
 <template>
   <span>
-    <router-link :is="linkTag" :to="article.detailsRoute" class="middle">
+    <router-link :to="article.detailsRoute" class="middle">
       <font-awesome-icon :icon="['far', 'newspaper']" />
       {{ article.slug }}
     </router-link>
