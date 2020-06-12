@@ -2,12 +2,15 @@ package slack
 
 import (
 	"github.com/carlmjohnson/slackhook"
-	"github.com/spotlightpa/almanack/pkg/almanack"
 )
+
+type Logger interface {
+	Printf(format string, v ...interface{})
+}
 
 type Client struct {
 	*slackhook.Client
-	l almanack.Logger
+	l Logger
 }
 
 type (
@@ -16,7 +19,7 @@ type (
 	Field      = slackhook.Field
 )
 
-func New(hookURL string, l almanack.Logger) Client {
+func New(hookURL string, l Logger) Client {
 	return Client{slackhook.New(hookURL, nil), l}
 }
 
