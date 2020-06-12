@@ -12,7 +12,7 @@ ON CONFLICT (arc_id)
   DO UPDATE SET
     arc_data = excluded.arc_data
   WHERE
-    article.status <> 'A';
+    article.status = 'U';
 
 -- name: UpdateAlmanackArticle :one
 UPDATE

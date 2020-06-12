@@ -502,15 +502,15 @@ WITH arc_table AS (
     jsonb_array_elements($1::jsonb) AS article_data)
 INSERT INTO article (arc_id, arc_data)
 SELECT
-  article_data ->> '_id',
-  article_data
+  article_data ->> '_id' AS arc_id,
+  article_data AS arc_data
 FROM
   arc_table
 ON CONFLICT (arc_id)
   DO UPDATE SET
     arc_data = excluded.arc_data
   WHERE
-    article.status <> 'A'
+    article.status = 'U'
 `
 
 func (q *Queries) UpdateArcArticles(ctx context.Context, arcItems json.RawMessage) error {
