@@ -160,7 +160,7 @@ func (app *appEnv) publishStories() error {
 	ctx := context.Background()
 	return app.svc.PopScheduledArticles(ctx, func(articles []*almanack.SpotlightPAArticle) error {
 		for _, article := range articles {
-			if err := article.Publish(ctx, app.gh); err != nil {
+			if err := article.Publish(ctx, app.svc); err != nil {
 				return err
 			}
 		}

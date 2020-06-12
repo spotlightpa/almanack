@@ -158,14 +158,14 @@ func (splArt *SpotlightPAArticle) ToTOML() (string, error) {
 	return buf.String(), nil
 }
 
-func (splArt *SpotlightPAArticle) Publish(ctx context.Context, gh ContentStore) error {
+func (splArt *SpotlightPAArticle) Publish(ctx context.Context, svc Service) error {
 	data, err := splArt.ToTOML()
 	if err != nil {
 		return err
 	}
 	path := splArt.ContentFilepath()
 	msg := fmt.Sprintf("Content: publishing %q", splArt.InternalID)
-	if err = gh.UpdateFile(ctx, msg, path, []byte(data)); err != nil {
+	if err = svc.ContentStore.UpdateFile(ctx, msg, path, []byte(data)); err != nil {
 		return err
 	}
 
