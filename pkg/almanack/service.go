@@ -105,7 +105,7 @@ func (svc Service) SaveScheduledArticle(ctx context.Context, article *SpotlightP
 	}
 
 	if setLastPublished {
-		if err = article.Publish(ctx, svc.ContentStore); err != nil {
+		if err = article.Publish(ctx, svc); err != nil {
 			// TODO rollback?
 			return err
 		}
