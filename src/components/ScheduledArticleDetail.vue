@@ -303,14 +303,6 @@ export default {
         </span>
       </a>
     </div>
-    <BulmaField label="Suppress in featured slot">
-      <div>
-        <label class="checkbox">
-          <input v-model="article.suppressFeatured" type="checkbox" />
-          Don't make this the top story on the homepage
-        </label>
-      </div>
-    </BulmaField>
 
     <BulmaField v-slot="{ idForLabel }" label="Article text">
       <textarea
