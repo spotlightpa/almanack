@@ -23,6 +23,7 @@ import (
 	"github.com/spotlightpa/almanack/internal/httpcache"
 	"github.com/spotlightpa/almanack/internal/mailchimp"
 	"github.com/spotlightpa/almanack/internal/netlifyid"
+	"github.com/spotlightpa/almanack/internal/slack"
 	"github.com/spotlightpa/almanack/pkg/almanack"
 )
 
@@ -47,6 +48,7 @@ func (app *appEnv) parseArgs(args []string) error {
 	pg := db.FlagVar(fl, "postgres", "PostgreSQL database `URL`")
 	fl.StringVar(&app.srcFeedURL, "src-feed", "", "source `URL` for Arc feed")
 	cache := fl.Bool("cache", false, "use in-memory cache for fetched JSON")
+	slackURL := fl.String("slack-social-url", "", "Slack hook endpoint `URL` for social")
 	fl.BoolVar(&app.isLambda, "lambda", false, "use AWS Lambda rather than HTTP")
 	fl.StringVar(&app.port, "port", ":3001", "listen on port (HTTP only)")
 	fl.StringVar(&app.mailchimpSignupURL, "mc-signup-url", "http://example.com", "`URL` to redirect users to for MailChimp signup")
@@ -108,6 +110,7 @@ func (app *appEnv) parseArgs(args []string) error {
 		ContentStore: app.gh,
 		ImageStore:   app.imageStore,
 		Client:       app.c,
+		SlackClient:  slack.New(*slackURL, app.Logger),
 	}
 
 	return nil

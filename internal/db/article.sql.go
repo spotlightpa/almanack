@@ -502,8 +502,8 @@ WITH arc_table AS (
     jsonb_array_elements($1::jsonb) AS article_data)
 INSERT INTO article (arc_id, arc_data)
 SELECT
-  article_data ->> '_id' AS arc_id,
-  article_data AS arc_data
+  article_data ->> '_id',
+  article_data
 FROM
   arc_table
 ON CONFLICT (arc_id)
@@ -520,55 +520,60 @@ func (q *Queries) UpdateArcArticles(ctx context.Context, arcItems json.RawMessag
 
 const updateSpotlightPAArticle = `-- name: UpdateSpotlightPAArticle :one
 UPDATE
-  article
+  article AS "new"
 SET
   spotlightpa_data = $1,
   schedule_for = $2,
-  spotlightpa_path = CASE WHEN spotlightpa_path IS NULL THEN
+  spotlightpa_path = CASE WHEN "new".spotlightpa_path IS NULL THEN
     $3
   ELSE
-    spotlightpa_path
-  END,
-  last_published = CASE WHEN $4::bool THEN
-    CURRENT_TIMESTAMP
-  ELSE
-    last_published
+    "new".spotlightpa_path
   END
+FROM
+  article AS "old"
 WHERE
-  arc_id = $5
+  "new".id = "old".id
+  AND "old".arc_id = $4
 RETURNING
-  id, arc_id, arc_data, spotlightpa_path, spotlightpa_data, schedule_for, last_published, note, status, created_at, updated_at
+  "old".schedule_for
 `
 
 type UpdateSpotlightPAArticleParams struct {
-	SpotlightPAData  json.RawMessage `json:"spotlightpa_data"`
-	ScheduleFor      sql.NullTime    `json:"schedule_for"`
-	SpotlightPAPath  sql.NullString  `json:"spotlightpa_path"`
-	SetLastPublished bool            `json:"set_last_published"`
-	ArcID            sql.NullString  `json:"arc_id"`
+	SpotlightPAData json.RawMessage `json:"spotlightpa_data"`
+	ScheduleFor     sql.NullTime    `json:"schedule_for"`
+	SpotlightPAPath sql.NullString  `json:"spotlightpa_path"`
+	ArcID           sql.NullString  `json:"arc_id"`
 }
 
-func (q *Queries) UpdateSpotlightPAArticle(ctx context.Context, arg UpdateSpotlightPAArticleParams) (Article, error) {
+func (q *Queries) UpdateSpotlightPAArticle(ctx context.Context, arg UpdateSpotlightPAArticleParams) (sql.NullTime, error) {
 	row := q.db.QueryRowContext(ctx, updateSpotlightPAArticle,
 		arg.SpotlightPAData,
 		arg.ScheduleFor,
 		arg.SpotlightPAPath,
-		arg.SetLastPublished,
 		arg.ArcID,
 	)
-	var i Article
-	err := row.Scan(
-		&i.ID,
-		&i.ArcID,
-		&i.ArcData,
-		&i.SpotlightPAPath,
-		&i.SpotlightPAData,
-		&i.ScheduleFor,
-		&i.LastPublished,
-		&i.Note,
-		&i.Status,
-		&i.CreatedAt,
-		&i.UpdatedAt,
-	)
-	return i, err
+	var schedule_for sql.NullTime
+	err := row.Scan(&schedule_for)
+	return schedule_for, err
+}
+
+const updateSpotlightPAArticleLastPublished = `-- name: UpdateSpotlightPAArticleLastPublished :one
+UPDATE
+  article AS "new"
+SET
+  last_published = CURRENT_TIMESTAMP
+FROM
+  article AS "old"
+WHERE
+  "new".id = "old".id
+  AND "old".arc_id = $1::text
+RETURNING
+  "old".last_published
+`
+
+func (q *Queries) UpdateSpotlightPAArticleLastPublished(ctx context.Context, arcID string) (sql.NullTime, error) {
+	row := q.db.QueryRowContext(ctx, updateSpotlightPAArticleLastPublished, arcID)
+	var last_published sql.NullTime
+	err := row.Scan(&last_published)
+	return last_published, err
 }

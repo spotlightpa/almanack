@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/spotlightpa/almanack/internal/db"
+	"github.com/spotlightpa/almanack/internal/slack"
 )
 
 func nullString(s string) sql.NullString {
@@ -33,12 +34,29 @@ func timeNull(nt sql.NullTime) *time.Time {
 	return nil
 }
 
+const timeWindow = 5 * time.Minute
+
+func diffTime(old, new sql.NullTime) bool {
+	if old.Valid != new.Valid {
+		return true
+	}
+	if !old.Valid {
+		return false
+	}
+	diff := old.Time.Sub(new.Time)
+	if diff < 0 {
+		diff = -diff
+	}
+	return diff > timeWindow
+}
+
 type Service struct {
 	Logger
 	Querier db.Querier
 	ContentStore
 	ImageStore
-	Client *http.Client
+	Client      *http.Client
+	SlackClient slack.Client
 }
 
 func (svc Service) GetScheduledArticle(ctx context.Context, articleID string) (*SpotlightPAArticle, error) {
@@ -73,14 +91,15 @@ func (svc Service) ResetSpotlightPAArticleArcData(ctx context.Context, article *
 
 func (svc Service) SaveScheduledArticle(ctx context.Context, article *SpotlightPAArticle) error {
 	now := time.Now()
-	setLastPublished := false
+	publishNow := false
+	shouldNotify := false
+
 	// TODO: Make less racey
 	if article.ScheduleFor != nil &&
 		article.ScheduleFor.Before(time.Now().Add(5*time.Minute)) {
 		article.ScheduleFor = nil
-		setLastPublished = true
+		publishNow = true
 	}
-
 	article.LastSaved = &now
 	dart, err := article.toDB()
 	if err != nil {
@@ -88,27 +107,53 @@ func (svc Service) SaveScheduledArticle(ctx context.Context, article *SpotlightP
 	}
 
 	start := time.Now()
-	*dart, err = svc.Querier.UpdateSpotlightPAArticle(ctx, db.UpdateSpotlightPAArticleParams{
-		ArcID:            dart.ArcID,
-		SpotlightPAPath:  dart.SpotlightPAPath,
-		SpotlightPAData:  dart.SpotlightPAData,
-		ScheduleFor:      dart.ScheduleFor,
-		SetLastPublished: setLastPublished,
+	var oldSchedule sql.NullTime
+	oldSchedule, err = svc.Querier.UpdateSpotlightPAArticle(ctx, db.UpdateSpotlightPAArticleParams{
+		ArcID:           dart.ArcID,
+		SpotlightPAPath: dart.SpotlightPAPath,
+		SpotlightPAData: dart.SpotlightPAData,
+		ScheduleFor:     dart.ScheduleFor,
 	})
 	svc.Logger.Printf("queried UpdateSpotlightPAArticle in %v", time.Since(start))
 	if err != nil {
 		return err
 	}
 
-	if err = article.fromDB(*dart); err != nil {
-		return err
+	// If it was scheduled for a new time, notify
+	if dart.ScheduleFor.Valid && diffTime(dart.ScheduleFor, oldSchedule) {
+		shouldNotify = true
 	}
 
-	if setLastPublished {
+	if publishNow {
 		if err = article.Publish(ctx, svc); err != nil {
 			// TODO rollback?
 			return err
 		}
+		var oldTime sql.NullTime
+		oldTime, err = svc.Querier.UpdateSpotlightPAArticleLastPublished(ctx, article.ArcID)
+		if err != nil {
+			return err
+		}
+		if !oldTime.Valid {
+			shouldNotify = true
+		}
+	}
+
+	if shouldNotify {
+		// TODO: Warning only?
+		if err = article.Notify(ctx, svc); err != nil {
+			return err
+		}
+	}
+
+	start = time.Now()
+	*dart, err = svc.Querier.GetArticle(ctx, dart.ArcID)
+	svc.Logger.Printf("queried GetArticle in %v", time.Since(start))
+	if err != nil {
+		return err
+	}
+	if err = article.fromDB(*dart); err != nil {
+		return err
 	}
 
 	return nil
