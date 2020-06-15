@@ -32,24 +32,35 @@ RETURNING
 
 -- name: UpdateSpotlightPAArticle :one
 UPDATE
-  article
+  article AS "new"
 SET
   spotlightpa_data = @spotlightpa_data,
   schedule_for = @schedule_for,
-  spotlightpa_path = CASE WHEN spotlightpa_path IS NULL THEN
+  spotlightpa_path = CASE WHEN "new".spotlightpa_path IS NULL THEN
     @spotlightpa_path
   ELSE
-    spotlightpa_path
-  END,
-  last_published = CASE WHEN @set_last_published::bool THEN
-    CURRENT_TIMESTAMP
-  ELSE
-    last_published
+    "new".spotlightpa_path
   END
+FROM
+  article AS "old"
 WHERE
-  arc_id = @arc_id
+  "new".id = "old".id
+  AND "old".arc_id = @arc_id
 RETURNING
-  *;
+  "old".schedule_for;
+
+-- name: UpdateSpotlightPAArticleLastPublished :one
+UPDATE
+  article AS "new"
+SET
+  last_published = CURRENT_TIMESTAMP
+FROM
+  article AS "old"
+WHERE
+  "new".id = "old".id
+  AND "old".arc_id = @arc_id::text
+RETURNING
+  "old".last_published;
 
 -- name: PopScheduled :many
 UPDATE

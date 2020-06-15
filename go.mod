@@ -13,7 +13,7 @@ require (
 	github.com/carlmjohnson/errutil v0.0.9
 	github.com/carlmjohnson/exitcode v0.0.4
 	github.com/carlmjohnson/flagext v0.0.10
-	github.com/carlmjohnson/slackhook v0.0.3
+	github.com/carlmjohnson/slackhook v0.20.2
 	github.com/getsentry/sentry-go v0.6.1
 	github.com/go-chi/chi v4.0.3+incompatible
 	github.com/go-redsync/redsync v1.3.1
@@ -26,6 +26,6 @@ require (
 	github.com/piotrkubisa/apigo v2.0.0+incompatible
 	github.com/tj/assert v0.0.3 // indirect
 	golang.org/x/crypto v0.0.0-20191011191535-87dc89f01550 // indirect
-	golang.org/x/net v0.0.0-20200226121028-0de0cce0169b
+	golang.org/x/net v0.0.0-20200602114024-627f9648deb9
 	golang.org/x/oauth2 v0.0.0-20180821212333-d2e6202438be
 )

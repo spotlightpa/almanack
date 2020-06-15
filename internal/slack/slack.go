@@ -1,6 +1,11 @@
 package slack
 
 import (
+	"context"
+	"encoding/json"
+	"fmt"
+	"os"
+
 	"github.com/carlmjohnson/slackhook"
 )
 
@@ -24,12 +29,19 @@ func New(hookURL string, l Logger) Client {
 }
 
 func (sc Client) Post(msg Message) error {
+	ctx := context.Background()
+	return sc.PostCtx(ctx, msg)
+}
+
+func (sc Client) PostCtx(ctx context.Context, msg Message) error {
 	if sc.Client == nil {
 		sc.printf("no slack client; skipping posting message")
+		b, _ := json.MarshalIndent(&msg, "", "  ")
+		fmt.Fprintf(os.Stderr, "%s\n", b)
 		return nil
 	}
 	sc.printf("posting Slack message")
-	return sc.Client.Post(msg)
+	return sc.Client.PostCtx(ctx, msg)
 }
 
 func (sc Client) printf(format string, args ...interface{}) {

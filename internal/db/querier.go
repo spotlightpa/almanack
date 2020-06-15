@@ -32,7 +32,8 @@ type Querier interface {
 	UpdateAlmanackArticle(ctx context.Context, arg UpdateAlmanackArticleParams) (Article, error)
 	UpdateArcArticles(ctx context.Context, arcItems json.RawMessage) error
 	UpdateImage(ctx context.Context, arg UpdateImageParams) (Image, error)
-	UpdateSpotlightPAArticle(ctx context.Context, arg UpdateSpotlightPAArticleParams) (Article, error)
+	UpdateSpotlightPAArticle(ctx context.Context, arg UpdateSpotlightPAArticleParams) (sql.NullTime, error)
+	UpdateSpotlightPAArticleLastPublished(ctx context.Context, arcID string) (sql.NullTime, error)
 }
 
 var _ Querier = (*Queries)(nil)

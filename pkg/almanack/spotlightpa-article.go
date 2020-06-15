@@ -9,6 +9,7 @@ import (
 
 	"github.com/BurntSushi/toml"
 	"github.com/spotlightpa/almanack/internal/db"
+	"github.com/spotlightpa/almanack/internal/slack"
 )
 
 type SpotlightPAArticle struct {
@@ -137,6 +138,18 @@ func (splArt *SpotlightPAArticle) String() string {
 	return fmt.Sprintf("%#v", *splArt)
 }
 
+func (splArt *SpotlightPAArticle) URL() string {
+	if splArt.Slug == "" || splArt.PubDate.IsZero() {
+		return ""
+	}
+	year := splArt.PubDate.Year()
+	month := splArt.PubDate.Month()
+	return fmt.Sprintf(
+		"https://www.spotlightpa.org/news/%d/%02d/%s/",
+		year, month, splArt.Slug,
+	)
+}
+
 func (splArt *SpotlightPAArticle) ContentFilepath() string {
 	if splArt.Filepath == "" {
 		date := splArt.PubDate.Format("2006-01-02")
@@ -168,6 +181,40 @@ func (splArt *SpotlightPAArticle) Publish(ctx context.Context, svc Service) erro
 	if err = svc.ContentStore.UpdateFile(ctx, msg, path, []byte(data)); err != nil {
 		return err
 	}
-
 	return nil
+}
+
+func (splArt *SpotlightPAArticle) Notify(ctx context.Context, svc Service) error {
+	const (
+		green  = "#78bc20"
+		yellow = "#ffcb05"
+	)
+	text := "New article publishing now…"
+	color := green
+
+	if splArt.ScheduleFor != nil {
+		t := splArt.ScheduleFor.Local()
+		newYork, err := time.LoadLocation("America/New_York")
+		if err == nil {
+			t = splArt.ScheduleFor.In(newYork)
+		}
+		text = t.Format("New article scheduled for Mon, Jan 2 at 3:04pm MST…")
+		color = yellow
+	}
+
+	return svc.SlackClient.PostCtx(ctx, slack.Message{
+		Text: text,
+		Attachments: []slack.Attachment{
+			{
+				Color: color,
+				Fallback: fmt.Sprintf("%s\n%s\n%s",
+					splArt.Hed, splArt.Summary, splArt.URL()),
+				Title:     splArt.Hed,
+				TitleLink: splArt.URL(),
+				Text: fmt.Sprintf(
+					"%s\n%s",
+					splArt.Summary, splArt.URL()),
+			},
+		},
+	})
 }
