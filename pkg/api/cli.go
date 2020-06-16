@@ -11,10 +11,10 @@ import (
 	"time"
 
 	"github.com/carlmjohnson/flagext"
+	"github.com/carlmjohnson/gateway"
 	"github.com/getsentry/sentry-go"
 	sentryhttp "github.com/getsentry/sentry-go/http"
 	"github.com/peterbourgon/ff/v2"
-	"github.com/piotrkubisa/apigo"
 
 	"github.com/spotlightpa/almanack/internal/aws"
 	"github.com/spotlightpa/almanack/internal/db"
@@ -146,8 +146,7 @@ func (app *appEnv) exec() error {
 			host = u.Hostname()
 		}
 		app.Printf("starting on AWS Lambda for %s", host)
-		apigo.ListenAndServe(host, routes)
-		panic("unreachable")
+		return gateway.ListenAndServe(host, routes)
 	}
 
 	app.Printf("starting on port %s", app.port)
