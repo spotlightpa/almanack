@@ -43,7 +43,7 @@ export default {
             Spotlight PA Articles
           </router-link>
 
-          (<router-link :to="article.detailsRoute"
+          (<router-link :to="article ? article.detailsRoute : ''"
             >Switch to Editor View</router-link
           >)
         </li>
