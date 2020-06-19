@@ -13,6 +13,7 @@ import (
 
 	"github.com/carlmjohnson/crockford"
 	"github.com/spotlightpa/almanack/pkg/errutil"
+	"golang.org/x/net/context/ctxhttp"
 )
 
 type ImageStore interface {
@@ -50,15 +51,7 @@ func hashURLpath(srcPath, ext string) string {
 }
 
 func UploadFromURL(ctx context.Context, c *http.Client, is ImageStore, srcurl string) (filename, ext string, err error) {
-	if c == nil {
-		c = http.DefaultClient
-	}
-	req, err := http.NewRequestWithContext(
-		ctx, "GET", srcurl, nil)
-	if err != nil {
-		return "", "", err
-	}
-	res, err := c.Do(req)
+	res, err := ctxhttp.Get(ctx, c, srcurl)
 	if err != nil {
 		return "", "", err
 	}
@@ -98,12 +91,11 @@ func UploadFromURL(ctx context.Context, c *http.Client, is ImageStore, srcurl st
 		return "", "", err
 	}
 
-	req, err = http.NewRequestWithContext(
-		ctx, "PUT", signedURL, bytes.NewReader(slurp))
+	req, err := http.NewRequest(http.MethodPut, signedURL, bytes.NewReader(slurp))
 	if err != nil {
 		return "", "", err
 	}
-	res, err = c.Do(req)
+	res, err = ctxhttp.Do(ctx, c, req)
 	if err != nil {
 		return "", "", err
 	}
