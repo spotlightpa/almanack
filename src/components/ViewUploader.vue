@@ -121,7 +121,7 @@ export default {
           placeholder="Filter images"
           clearable
         >
-          <template slot="empty">No results found</template>
+          <template v-slot:empty>No results found</template>
         </b-autocomplete>
       </b-field>
 

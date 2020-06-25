@@ -15,7 +15,7 @@ export default {
 </script>
 
 <template>
-  <div :is="listType">
+  <component :is="listType">
     <li v-for="(item, i) of items" :key="i" v-html="item.content"></li>
-  </div>
+  </component>
 </template>

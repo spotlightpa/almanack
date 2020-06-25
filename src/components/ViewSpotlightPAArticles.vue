@@ -95,7 +95,7 @@ export default {
           placeholder="Filter articles"
           clearable
         >
-          <template slot="empty">No results found</template>
+          <template v-slot:empty>No results found</template>
         </b-autocomplete>
       </b-field>
 
