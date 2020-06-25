@@ -66,13 +66,11 @@ export default {
             >: {{ article.hed }}
           </span>
         </a>
-        <div
-          v-if="filteredArticles.length > 10"
-          slot="footer"
-          class="dropdown-item"
-        >
-          More results hidden…
-        </div>
+        <template v-slot:footer>
+          <div v-if="filteredArticles.length > 10" class="dropdown-item">
+            More results hidden…
+          </div>
+        </template>
       </draggable>
     </div>
     <div class="column is-half">

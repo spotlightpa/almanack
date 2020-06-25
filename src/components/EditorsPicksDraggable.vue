@@ -41,9 +41,11 @@ export default {
       {{ article.internal_id }}
       <button class="delete" @click="remove(i)"></button>
     </span>
-    <span v-if="!value.length" slot="header" class="has-text-grey-lighter">
-      Drag articles here
-    </span>
+    <template v-slot:header>
+      <span v-if="!value.length" class="has-text-grey-lighter">
+        Drag articles here
+      </span></template
+    >
   </draggable>
 </template>
 
