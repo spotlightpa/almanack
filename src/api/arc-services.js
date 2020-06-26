@@ -45,10 +45,15 @@ export function useAvailableArc(id) {
 export function useListAnyArc() {
   let { listAnyArc, listRefreshArc } = useClient();
   let { apiState, exec } = makeState();
+  let page = 0;
 
   const actions = {
-    load: () => exec(listAnyArc),
+    load: () => exec(() => listAnyArc(page)),
     loadAndRefresh: () => exec(listRefreshArc),
+    loadNextPage: () => {
+      page = apiState.rawData.next_page;
+      return actions.load();
+    },
   };
   actions.loadAndRefresh();
 
@@ -56,6 +61,11 @@ export function useListAnyArc() {
     ...toRefs(apiState),
     ...actions,
 
+    hasNextPage: computed(() =>
+      apiState.isLoading || apiState.error || !apiState.rawData
+        ? false
+        : !!apiState.rawData.next_page
+    ),
     articles: computed(() =>
       apiState.isLoading || apiState.error || !apiState.rawData
         ? []

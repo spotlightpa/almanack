@@ -19,6 +19,7 @@ const responseError = (rsp) => {
 const endpoints = {
   getAvailableArc: (id) => `/api/available-articles/${id}`,
   getScheduledArticle: (id) => `/api/scheduled-articles/${id}`,
+  listAnyArc: (page) => `/api/list-arc-page/${page}`,
   // Alphabetized by URL to show duplicates
   // GET and POST listed as two endpoints
   listAllSeries: `/api/all-series`,
@@ -37,7 +38,6 @@ const endpoints = {
   sendMessage: `/api/message`,
   saveArticle: `/api/scheduled-articles`,
   listSpotlightPAArticles: `/api/spotlightpa-articles`,
-  listAnyArc: `/api/upcoming-articles`,
 };
 
 function makeClient($auth) {
@@ -106,6 +106,7 @@ function makeClient($auth) {
     // does not include proxy images…
     "getAvailableArc",
     "getScheduledArticle",
+    "listAnyArc",
   ];
   for (let action of idGetActions) {
     let endpointFn = endpoints[action];
@@ -116,7 +117,6 @@ function makeClient($auth) {
     "getSignupURL",
     "listAllSeries",
     "listAllTopics",
-    "listAnyArc",
     "listAuthorizedDomains",
     "listAvailableArc",
     "listImages",
