@@ -18,7 +18,7 @@ type Querier interface {
 	GetImageBySourceURL(ctx context.Context, srcUrl string) (Image, error)
 	GetRolesForDomain(ctx context.Context, domain string) ([]string, error)
 	GetSiteData(ctx context.Context, key string) (json.RawMessage, error)
-	ListAllArticles(ctx context.Context) ([]Article, error)
+	ListAllArticles(ctx context.Context, arg ListAllArticlesParams) ([]Article, error)
 	ListAllSeries(ctx context.Context) ([]string, error)
 	ListAllTopics(ctx context.Context) ([]string, error)
 	ListAvailableArticles(ctx context.Context) ([]Article, error)
