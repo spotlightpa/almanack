@@ -252,16 +252,25 @@ func (svc Service) StoreFeed(ctx context.Context, newfeed *ArcAPI) (err error) {
 	return err
 }
 
-func (svc Service) ListAllArcStories(ctx context.Context) (stories []ArcStory, err error) {
+func (svc Service) ListAllArcStories(ctx context.Context, page int) (stories []ArcStory, nextPage int, err error) {
+	const limit = 50
+	offset := int32(page) * limit
 	start := time.Now()
 	var dbArts []db.Article
-	dbArts, err = svc.Querier.ListAllArticles(ctx)
+	dbArts, err = svc.Querier.ListAllArticles(ctx, db.ListAllArticlesParams{
+		Limit:  limit + 1,
+		Offset: offset,
+	})
 	svc.Printf("ListAllArticles query time: %v", time.Since(start))
 	if err != nil {
 		return
 	}
-
-	return storiesFromDB(dbArts)
+	if len(dbArts) > limit {
+		dbArts = dbArts[:limit]
+		nextPage = page + 1
+	}
+	stories, err = storiesFromDB(dbArts)
+	return
 }
 
 func (svc Service) ReplaceImageURL(ctx context.Context, srcURL, description, credit string) (string, error) {

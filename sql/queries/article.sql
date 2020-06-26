@@ -103,7 +103,8 @@ SELECT
 FROM
   article
 ORDER BY
-  arc_data -> 'last_updated_date' DESC;
+  arc_data ->> 'last_updated_date' DESC
+LIMIT $1 OFFSET $2;
 
 -- name: ListAvailableArticles :many
 SELECT

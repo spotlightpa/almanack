@@ -47,6 +47,7 @@ func (app *appEnv) routes() http.Handler {
 			app.hasRoleMiddleware("Spotlight PA"),
 		).Group(func(r chi.Router) {
 			r.Get("/upcoming-articles", app.listAllArcStories)
+			r.Get(`/list-arc-page/{page:\d+}`, app.listAllArcStories)
 			r.Get("/list-arc-refresh", app.listWithArcRefresh)
 			r.Post("/available-articles", app.postAlmanackArcStory)
 			r.Post("/message", app.postMessage)
@@ -200,16 +201,31 @@ func getImage(ctx context.Context, c *http.Client, srcurl string) (ctype string,
 }
 
 func (app *appEnv) listAllArcStories(w http.ResponseWriter, r *http.Request) {
-	app.Println("start listAllArcStories")
+	pageStr := chi.URLParam(r, "page")
+	pageInt := 0
+	if pageStr != "" {
+		if parsed, err := strconv.Atoi(pageStr); err != nil {
+			app.errorResponse(r.Context(), w, err)
+			return
+		} else {
+			pageInt = parsed
+		}
+	}
+	app.listAllArcStoriesByPage(w, r, pageInt)
+}
+
+func (app *appEnv) listAllArcStoriesByPage(w http.ResponseWriter, r *http.Request, page int) {
+	app.Printf("start listAllArcStories page %d", page)
 
 	type response struct {
 		Contents []almanack.ArcStory `json:"contents"`
+		NextPage int                 `json:"next_page,omitempty"`
 	}
 	var (
 		resp response
 		err  error
 	)
-	resp.Contents, err = app.svc.ListAllArcStories(r.Context())
+	resp.Contents, resp.NextPage, err = app.svc.ListAllArcStories(r.Context(), page)
 	if err != nil {
 		app.errorResponse(r.Context(), w, err)
 		return
@@ -221,6 +237,7 @@ func (app *appEnv) listWithArcRefresh(w http.ResponseWriter, r *http.Request) {
 	app.Printf("starting listWithArcRefresh")
 	type response struct {
 		Contents []almanack.ArcStory `json:"contents"`
+		NextPage int                 `json:"next_page,omitempty"`
 	}
 	var (
 		feed *almanack.ArcAPI
@@ -234,7 +251,7 @@ func (app *appEnv) listWithArcRefresh(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	var resp response
-	resp.Contents, err = app.svc.ListAllArcStories(r.Context())
+	resp.Contents, resp.NextPage, err = app.svc.ListAllArcStories(r.Context(), 0)
 	if err != nil {
 		app.errorResponse(r.Context(), w, err)
 		return

@@ -97,11 +97,17 @@ SELECT
 FROM
   article
 ORDER BY
-  arc_data -> 'last_updated_date' DESC
+  arc_data ->> 'last_updated_date' DESC
+LIMIT $1 OFFSET $2
 `
 
-func (q *Queries) ListAllArticles(ctx context.Context) ([]Article, error) {
-	rows, err := q.db.QueryContext(ctx, listAllArticles)
+type ListAllArticlesParams struct {
+	Limit  int32 `json:"limit"`
+	Offset int32 `json:"offset"`
+}
+
+func (q *Queries) ListAllArticles(ctx context.Context, arg ListAllArticlesParams) ([]Article, error) {
+	rows, err := q.db.QueryContext(ctx, listAllArticles, arg.Limit, arg.Offset)
 	if err != nil {
 		return nil, err
 	}
