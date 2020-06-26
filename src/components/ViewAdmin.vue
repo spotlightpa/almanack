@@ -21,7 +21,15 @@ export default {
     title: "Admin",
   },
   setup() {
-    let { articles, rawData, isLoading, load, error } = useListAnyArc();
+    let {
+      articles,
+      rawData,
+      isLoading,
+      load,
+      hasNextPage,
+      loadNextPage,
+      error,
+    } = useListAnyArc();
 
     return {
       showComposer: ref(false),
@@ -30,6 +38,8 @@ export default {
       load,
       error,
       articles,
+      hasNextPage,
+      loadNextPage,
 
       refresh(newData) {
         rawData.value = newData;
@@ -182,5 +192,16 @@ export default {
         />
       </keep-alive>
     </APILoader>
+
+    <div class="buttons mt-5">
+      <button
+        v-if="hasNextPage"
+        type="button"
+        class="button is-primary has-text-weight-semibold"
+        @click="loadNextPage()"
+      >
+        Show Older Stories…
+      </button>
+    </div>
   </div>
 </template>
