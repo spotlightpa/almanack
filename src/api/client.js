@@ -19,7 +19,7 @@ const responseError = (rsp) => {
 const endpoints = {
   getAvailableArc: (id) => `/api/available-articles/${id}`,
   getScheduledArticle: (id) => `/api/scheduled-articles/${id}`,
-  listAnyArc: (page) => `/api/list-arc-page/${page || 0}`,
+  listAnyArc: (page = "0") => `/api/list-arc-page/${page}`,
   // Alphabetized by URL to show duplicates
   // GET and POST listed as two endpoints
   listAllSeries: `/api/all-series`,
