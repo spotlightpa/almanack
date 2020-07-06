@@ -262,10 +262,16 @@ ORDER BY
     '1'
   END ASC,
   arc_data -> 'last_updated_date' DESC
+LIMIT $1 OFFSET $2
 `
 
-func (q *Queries) ListAvailableArticles(ctx context.Context) ([]Article, error) {
-	rows, err := q.db.QueryContext(ctx, listAvailableArticles)
+type ListAvailableArticlesParams struct {
+	Limit  int32 `json:"limit"`
+	Offset int32 `json:"offset"`
+}
+
+func (q *Queries) ListAvailableArticles(ctx context.Context, arg ListAvailableArticlesParams) ([]Article, error) {
+	rows, err := q.db.QueryContext(ctx, listAvailableArticles, arg.Limit, arg.Offset)
 	if err != nil {
 		return nil, err
 	}

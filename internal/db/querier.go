@@ -21,7 +21,7 @@ type Querier interface {
 	ListAllArticles(ctx context.Context, arg ListAllArticlesParams) ([]Article, error)
 	ListAllSeries(ctx context.Context) ([]string, error)
 	ListAllTopics(ctx context.Context) ([]string, error)
-	ListAvailableArticles(ctx context.Context) ([]Article, error)
+	ListAvailableArticles(ctx context.Context, arg ListAvailableArticlesParams) ([]Article, error)
 	ListDomainsWithRole(ctx context.Context, role string) ([]string, error)
 	ListImages(ctx context.Context, arg ListImagesParams) ([]Image, error)
 	ListSpotlightPAArticles(ctx context.Context) ([]ListSpotlightPAArticlesRow, error)

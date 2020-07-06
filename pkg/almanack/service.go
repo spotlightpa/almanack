@@ -200,16 +200,28 @@ func (svc Service) GetArcStory(ctx context.Context, articleID string) (story *Ar
 
 }
 
-func (svc Service) ListAvailableArcStories(ctx context.Context) (stories []ArcStory, err error) {
+func (svc Service) ListAvailableArcStories(ctx context.Context, page int) (stories []ArcStory, nextPage int, err error) {
+	const limit = 20
+	offset := int32(page) * limit
+
 	start := time.Now()
 	var dbArts []db.Article
-	dbArts, err = svc.Querier.ListAvailableArticles(ctx)
+	dbArts, err = svc.Querier.ListAvailableArticles(ctx, db.ListAvailableArticlesParams{
+		Offset: offset,
+		Limit:  limit + 1,
+	})
 	svc.Printf("ListAvailableArticles query time: %v", time.Since(start))
 	if err != nil {
 		return
 	}
 
-	return storiesFromDB(dbArts)
+	if len(dbArts) > limit {
+		dbArts = dbArts[:limit]
+		nextPage = page + 1
+	}
+
+	stories, err = storiesFromDB(dbArts)
+	return
 }
 
 func (svc Service) SaveAlmanackArticle(ctx context.Context, article *ArcStory, setArcData bool) error {
