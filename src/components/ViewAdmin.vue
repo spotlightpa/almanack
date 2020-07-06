@@ -2,7 +2,6 @@
 import { ref } from "@vue/composition-api";
 
 import AdminList from "./AdminList.vue";
-import APILoader from "./APILoader.vue";
 import EmailComposer from "./EmailComposer.vue";
 
 import { useListAnyArc } from "@/api/hooks.js";
@@ -13,7 +12,6 @@ export default {
   name: "ViewAdmin",
   components: {
     AdminList,
-    APILoader,
     EmailComposer,
     ImageUploader,
   },
@@ -23,7 +21,7 @@ export default {
   setup() {
     let {
       articles,
-      rawData,
+      didLoad,
       isLoading,
       load,
       hasNextPage,
@@ -34,6 +32,7 @@ export default {
     return {
       showComposer: ref(false),
 
+      didLoad,
       isLoading,
       load,
       error,
@@ -41,8 +40,9 @@ export default {
       hasNextPage,
       loadNextPage,
 
-      refresh(newData) {
-        rawData.value = newData;
+      async refresh({ apiStatus, ref }) {
+        await load();
+        apiStatus[ref] = false;
       },
     };
   },
@@ -182,16 +182,20 @@ export default {
       </router-link>
     </div>
 
-    <APILoader :is-loading="isLoading" :reload="load" :error="error">
-      <keep-alive>
-        <AdminList
-          v-if="articles.length"
-          :articles="articles"
-          title="Arc Articles"
-          @refresh="refresh"
-        />
-      </keep-alive>
-    </APILoader>
+    <progress
+      v-if="!didLoad && isLoading"
+      class="progress is-large is-warning"
+      max="100"
+    >
+      Loading…
+    </progress>
+
+    <AdminList
+      v-if="articles.length"
+      :articles="articles"
+      title="Arc Articles"
+      @refresh="refresh"
+    />
 
     <div class="buttons mt-5">
       <button
