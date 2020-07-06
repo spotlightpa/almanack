@@ -1,4 +1,4 @@
-import { toRefs, computed } from "@vue/composition-api";
+import { toRefs, computed, ref, watch } from "@vue/composition-api";
 
 import ArcArticle from "./arc-article.js";
 import { makeState } from "./service-util.js";
@@ -45,7 +45,7 @@ export function useAvailableArc(id) {
 export function useListAnyArc() {
   let { listAnyArc, listRefreshArc } = useClient();
   let { apiState, exec } = makeState();
-  let page = 0;
+  let page = "0";
 
   const actions = {
     load: () => exec(() => listAnyArc(page)),
@@ -55,21 +55,28 @@ export function useListAnyArc() {
       return actions.load();
     },
   };
+
+  const articles = ref([]);
+  watch(
+    () => !apiState.isLoading && !apiState.error && apiState.rawData,
+    (hasData) => {
+      if (hasData) {
+        articles.value = ArcArticle.from(apiState.rawData);
+      }
+    }
+  );
+
   actions.loadAndRefresh();
 
   return {
     ...toRefs(apiState),
     ...actions,
+    articles,
 
     hasNextPage: computed(() =>
       apiState.isLoading || apiState.error || !apiState.rawData
         ? false
         : !!apiState.rawData.next_page
-    ),
-    articles: computed(() =>
-      apiState.isLoading || apiState.error || !apiState.rawData
-        ? []
-        : ArcArticle.from(apiState.rawData)
     ),
   };
 }

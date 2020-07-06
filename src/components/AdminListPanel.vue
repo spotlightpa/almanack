@@ -35,13 +35,7 @@ export default {
         apiStatus[ref] = false;
         return;
       }
-      let data;
-      [data, apiStatus.error] = await client.listAnyArc();
-      apiStatus[ref] = false;
-      if (apiStatus.error) {
-        return;
-      }
-      emit("refresh", data);
+      emit("refresh", { apiStatus, ref });
     }
 
     return {
