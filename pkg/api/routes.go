@@ -40,6 +40,7 @@ func (app *appEnv) routes() http.Handler {
 			app.hasRoleMiddleware("editor"),
 		).Group(func(r chi.Router) {
 			r.Get("/available-articles", app.listAvailableArcStories)
+			r.Get(`/list-available/{page:\d+}`, app.listAvailableArcStories)
 			r.Get("/available-articles/{id}", app.getArcStory)
 			r.Get("/mailchimp-signup-url", app.getSignupURL)
 		})
@@ -309,15 +310,32 @@ func (app *appEnv) postAlmanackArcStory(w http.ResponseWriter, r *http.Request) 
 }
 
 func (app *appEnv) listAvailableArcStories(w http.ResponseWriter, r *http.Request) {
-	app.Printf("starting listAvailableArcStories")
+	pageStr := chi.URLParam(r, "page")
+	pageInt := 0
+	if pageStr != "" {
+		if parsed, err := strconv.Atoi(pageStr); err != nil {
+			app.errorResponse(r.Context(), w, err)
+			return
+		} else {
+			pageInt = parsed
+		}
+	}
+	app.listAvailableArcStoriesByPage(w, r, pageInt)
+}
+
+func (app *appEnv) listAvailableArcStoriesByPage(w http.ResponseWriter, r *http.Request, page int) {
+	app.Printf("starting listAvailableArcStoriesByPage %d", page)
 	type response struct {
 		Contents []almanack.ArcStory `json:"contents"`
+		NextPage int                 `json:"next_page,string,omitempty"`
 	}
 	var (
 		res response
 		err error
 	)
-	if res.Contents, err = app.svc.ListAvailableArcStories(r.Context()); err != nil {
+	if res.Contents, res.NextPage, err = app.svc.ListAvailableArcStories(
+		r.Context(), page,
+	); err != nil {
 		app.errorResponse(r.Context(), w, err)
 		return
 	}
