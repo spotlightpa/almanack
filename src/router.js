@@ -90,6 +90,7 @@ let router = new Router({
       path: "/admin",
       name: "admin",
       component: ViewAdmin,
+      props: (route) => ({ page: route.query.page }),
       meta: {
         requiresAuth: isSpotlightPAUser,
       },

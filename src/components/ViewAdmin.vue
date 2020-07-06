@@ -1,5 +1,5 @@
 <script>
-import { ref } from "@vue/composition-api";
+import { ref, watch } from "@vue/composition-api";
 
 import AdminList from "./AdminList.vue";
 import EmailComposer from "./EmailComposer.vue";
@@ -15,20 +15,28 @@ export default {
     EmailComposer,
     ImageUploader,
   },
+  props: ["page"],
   metaInfo: {
     title: "Admin",
   },
-  setup() {
+  setup(props) {
     let {
       articles,
       didLoad,
       isLoading,
       load,
-      hasNextPage,
-      loadNextPage,
+      loadPage,
+      nextPage,
       error,
-    } = useListAnyArc();
-
+    } = useListAnyArc(props.page);
+    watch(
+      () => props.page,
+      (newVal, oldVal) => {
+        if (newVal !== oldVal) {
+          loadPage(newVal);
+        }
+      }
+    );
     return {
       showComposer: ref(false),
 
@@ -37,8 +45,7 @@ export default {
       load,
       error,
       articles,
-      hasNextPage,
-      loadNextPage,
+      nextPage,
 
       async refresh({ apiStatus, ref }) {
         await load();
@@ -51,8 +58,9 @@ export default {
 
 <template>
   <div>
-    <h1 class="title">
+    <h1 class="title is-flex">
       Spotlight Administrator
+      <template v-if="page">(page {{ page }})</template>
     </h1>
     <details class="content">
       <summary>Tools</summary>
@@ -198,14 +206,13 @@ export default {
     />
 
     <div class="buttons mt-5">
-      <button
-        v-if="hasNextPage"
-        type="button"
+      <router-link
+        v-if="nextPage"
+        :to="nextPage"
         class="button is-primary has-text-weight-semibold"
-        @click="loadNextPage()"
       >
         Show Older Stories…
-      </button>
+      </router-link>
     </div>
   </div>
 </template>

@@ -42,16 +42,15 @@ export function useAvailableArc(id) {
   };
 }
 
-export function useListAnyArc() {
+export function useListAnyArc(page) {
   let { listAnyArc, listRefreshArc } = useClient();
   let { apiState, exec } = makeState();
-  let page = "0";
 
   const actions = {
     load: () => exec(() => listAnyArc(page)),
     loadAndRefresh: () => exec(listRefreshArc),
-    loadNextPage: () => {
-      page = apiState.rawData.next_page;
+    loadPage: (newPage) => {
+      page = newPage;
       return actions.load();
     },
   };
@@ -66,17 +65,30 @@ export function useListAnyArc() {
     }
   );
 
-  actions.loadAndRefresh();
+  if (!page) {
+    actions.loadAndRefresh();
+  } else {
+    actions.load();
+  }
 
   return {
     ...toRefs(apiState),
     ...actions,
     articles,
 
-    hasNextPage: computed(() =>
-      apiState.isLoading || apiState.error || !apiState.rawData
-        ? false
-        : !!apiState.rawData.next_page
-    ),
+    nextPage: computed(() => {
+      if (apiState.isLoading || apiState.error || !apiState.rawData) {
+        return null;
+      }
+      if (!apiState.rawData.next_page) {
+        return null;
+      }
+      return {
+        name: "admin",
+        query: {
+          page: apiState.rawData.next_page,
+        },
+      };
+    }),
   };
 }
