@@ -66,6 +66,7 @@ let router = new Router({
       path: "/articles",
       name: "articles",
       component: ViewArticleList,
+      props: (route) => ({ page: route.query.page }),
       meta: {
         requiresAuth: isEditor,
       },
