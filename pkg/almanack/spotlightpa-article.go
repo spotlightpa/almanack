@@ -171,6 +171,30 @@ func (splArt *SpotlightPAArticle) ToTOML() (string, error) {
 	return buf.String(), nil
 }
 
+func (splArt *SpotlightPAArticle) FromTOML(content string) error {
+	const delimiter = "+++\n"
+	var frontmatter, body string
+
+	if !strings.HasPrefix(content, delimiter) {
+		return fmt.Errorf("could not parse frontmatter: no prefix delimiter")
+	}
+	frontmatter = content[len(delimiter):]
+	if end := strings.Index(frontmatter, delimiter); end != -1 {
+		body = frontmatter[end+len(delimiter):]
+		frontmatter = frontmatter[:end]
+	} else {
+		return fmt.Errorf("could not parse frontmatter: no end delimiter")
+	}
+
+	if _, err := toml.Decode(frontmatter, splArt); err != nil {
+		return err
+	}
+	body = strings.TrimPrefix(body, "\n")
+	body = strings.TrimSuffix(body, "\n")
+	splArt.Body = body
+	return nil
+}
+
 func (splArt *SpotlightPAArticle) Publish(ctx context.Context, svc Service) error {
 	data, err := splArt.ToTOML()
 	if err != nil {
