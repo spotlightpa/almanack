@@ -48,7 +48,7 @@ func (app *appEnv) routes() http.Handler {
 			app.hasRoleMiddleware("Spotlight PA"),
 		).Group(func(r chi.Router) {
 			r.Get("/upcoming-articles", app.listAllArcStories)
-			r.Get(`/list-arc-page/{page:\d+}`, app.listAllArcStories)
+			r.Get(`/list-any-arc/{page:\d+}`, app.listAllArcStories)
 			r.Get("/list-arc-refresh", app.listWithArcRefresh)
 			r.Post("/available-articles", app.postAlmanackArcStory)
 			r.Post("/message", app.postMessage)
