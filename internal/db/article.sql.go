@@ -261,7 +261,7 @@ ORDER BY
   WHEN 'A' THEN
     '1'
   END ASC,
-  arc_data -> 'last_updated_date' DESC
+  arc_data ->> 'last_updated_date' DESC
 LIMIT $1 OFFSET $2
 `
 
@@ -373,7 +373,7 @@ SELECT
 FROM
   article
 ORDER BY
-  arc_data -> 'last_updated_date' DESC
+  arc_data ->> 'last_updated_date' DESC
 `
 
 func (q *Queries) ListUpcoming(ctx context.Context) ([]Article, error) {
