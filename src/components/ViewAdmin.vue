@@ -1,5 +1,5 @@
 <script>
-import { ref, watch } from "@vue/composition-api";
+import { ref } from "@vue/composition-api";
 
 import AdminList from "./AdminList.vue";
 import EmailComposer from "./EmailComposer.vue";
@@ -20,23 +20,10 @@ export default {
     title: "Admin",
   },
   setup(props) {
-    let {
-      articles,
-      didLoad,
-      isLoading,
-      load,
-      loadPage,
-      nextPage,
-      error,
-    } = useListAnyArc(props.page);
-    watch(
-      () => props.page,
-      (newVal, oldVal) => {
-        if (newVal !== oldVal) {
-          loadPage(newVal);
-        }
-      }
+    let { articles, didLoad, isLoading, load, nextPage, error } = useListAnyArc(
+      () => props.page
     );
+
     return {
       showComposer: ref(false),
 
@@ -197,6 +184,21 @@ export default {
     >
       Loading…
     </progress>
+
+    <div v-if="error" class="message is-danger">
+      <div class="message-header">{{ error.name }}</div>
+      <div class="message-body">
+        <p class="content">{{ error.message }}</p>
+        <div class="buttons">
+          <button
+            class="button is-danger has-text-weight-semibold"
+            @click="load"
+          >
+            Reload?
+          </button>
+        </div>
+      </div>
+    </div>
 
     <AdminList
       v-if="articles.length"

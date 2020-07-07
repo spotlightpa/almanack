@@ -17,16 +17,18 @@ const responseError = (rsp) => {
 };
 
 const endpoints = {
+  // get id endpoints
   getAvailableArc: (id) => `/api/available-articles/${id}`,
   getScheduledArticle: (id) => `/api/scheduled-articles/${id}`,
+  // list page points
   listAnyArc: (page = "0") => `/api/list-arc-page/${page}`,
+  listAvailableArc: (page = "0") => `/api/list-available/${page}`,
   // Alphabetized by URL to show duplicates
   // GET and POST listed as two endpoints
   listAllSeries: `/api/all-series`,
   listAllTopics: `/api/all-topics`,
   addAuthorizedDomain: `/api/authorized-domains`,
   listAuthorizedDomains: `/api/authorized-domains`,
-  listAvailableArc: `/api/available-articles`,
   saveArcArticle: `/api/available-articles`,
   createSignedUpload: `/api/create-signed-upload`,
   getEditorsPicks: `/api/editors-picks`,
@@ -107,6 +109,7 @@ function makeClient($auth) {
     "getAvailableArc",
     "getScheduledArticle",
     "listAnyArc",
+    "listAvailableArc",
   ];
   for (let action of idGetActions) {
     let endpointFn = endpoints[action];
@@ -118,7 +121,6 @@ function makeClient($auth) {
     "listAllSeries",
     "listAllTopics",
     "listAuthorizedDomains",
-    "listAvailableArc",
     "listImages",
     "listRefreshArc",
     "listSpotlightPAArticles",

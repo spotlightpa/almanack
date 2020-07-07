@@ -4,22 +4,45 @@ import ArcArticle from "./arc-article.js";
 import { makeState } from "./service-util.js";
 import { useClient } from "./client.js";
 
-export function useListAvailableArc() {
+export function useListAvailableArc(pageCB) {
+  let page;
   let { listAvailableArc } = useClient();
   let { apiState, exec } = makeState();
 
-  const load = () => exec(listAvailableArc);
-  load();
+  const load = () => exec(() => listAvailableArc(page));
+
+  watch(pageCB, (newVal) => {
+    page = newVal;
+    load();
+  });
 
   return {
     ...toRefs(apiState),
     load,
 
+    loadPage(newPage) {
+      page = newPage;
+      return load();
+    },
     articles: computed(() =>
       apiState.isLoading || apiState.error || !apiState.rawData
         ? []
         : ArcArticle.from(apiState.rawData)
     ),
+    nextPage: computed(() => {
+      if (apiState.isLoading || apiState.error || !apiState.rawData) {
+        return null;
+      }
+      if (!apiState.rawData.next_page) {
+        return null;
+      }
+      return {
+        name: "articles",
+        query: {
+          page: apiState.rawData.next_page,
+        },
+      };
+    }),
   };
 }
 
@@ -42,9 +65,11 @@ export function useAvailableArc(id) {
   };
 }
 
-export function useListAnyArc(page) {
+export function useListAnyArc(pageCB) {
   let { listAnyArc, listRefreshArc } = useClient();
   let { apiState, exec } = makeState();
+
+  let page;
 
   const actions = {
     load: () => exec(() => listAnyArc(page)),
@@ -65,11 +90,14 @@ export function useListAnyArc(page) {
     }
   );
 
-  if (!page) {
-    actions.loadAndRefresh();
-  } else {
-    actions.load();
-  }
+  watch(pageCB, (newVal) => {
+    page = newVal;
+    if (!page) {
+      actions.loadAndRefresh();
+    } else {
+      actions.load();
+    }
+  });
 
   return {
     ...toRefs(apiState),

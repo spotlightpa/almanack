@@ -1,29 +1,37 @@
 <script>
 import ArticleList from "./ArticleList.vue";
-import APILoader from "./APILoader.vue";
 import { useAuth, useListAvailableArc, useClient } from "@/api/hooks.js";
 
 export default {
   name: "ViewArticleList",
   components: {
     ArticleList,
-    APILoader,
   },
+  props: ["page"],
   metaInfo: {
     title: "Available Articles",
   },
-  setup() {
+  setup(props) {
     let { fullName, roles } = useAuth();
-    let { articles, isLoading, load, error } = useListAvailableArc();
+    let {
+      articles,
+      nextPage,
+      didLoad,
+      isLoading,
+      load,
+      error,
+    } = useListAvailableArc(() => props.page);
     let client = useClient();
 
     return {
+      articles,
+      nextPage,
+      didLoad,
       isLoading,
       load,
       error,
       fullName,
       roles,
-      articles,
 
       async redirectToSignup() {
         let [url, err] = await client.getSignupURL();
@@ -60,12 +68,43 @@ export default {
       <a href="#" @click.prevent="redirectToSignup">resubscribe here</a>.
     </p>
 
-    <APILoader :is-loading="isLoading" :reload="load" :error="error">
-      <ArticleList
-        v-if="articles.length"
-        :articles="articles"
-        title="Spotlight PA Articles"
-      ></ArticleList>
-    </APILoader>
+    <progress
+      v-if="!didLoad && isLoading"
+      class="progress is-large is-warning"
+      max="100"
+    >
+      Loading…
+    </progress>
+
+    <div v-if="error" class="message is-danger">
+      <div class="message-header">{{ error.name }}</div>
+      <div class="message-body">
+        <p class="content">{{ error.message }}</p>
+        <div class="buttons">
+          <button
+            class="button is-danger has-text-weight-semibold"
+            @click="load"
+          >
+            Reload?
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <ArticleList
+      v-if="articles.length"
+      :articles="articles"
+      title="Spotlight PA Articles"
+    ></ArticleList>
+
+    <div class="buttons mt-5">
+      <router-link
+        v-if="nextPage"
+        :to="nextPage"
+        class="button is-primary has-text-weight-semibold"
+      >
+        Show Older Stories…
+      </router-link>
+    </div>
   </div>
 </template>
