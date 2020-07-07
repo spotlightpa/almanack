@@ -90,8 +90,12 @@ export function useListAnyArc(pageCB) {
     }
   );
 
-  watch(pageCB, (newVal) => {
+  watch(pageCB, (newVal, oldVal) => {
     page = newVal;
+    if (newVal !== oldVal) {
+      articles.value = [];
+      apiState.didLoad = false;
+    }
     if (!page) {
       actions.loadAndRefresh();
     } else {
