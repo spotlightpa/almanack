@@ -242,3 +242,18 @@ func (splArt *SpotlightPAArticle) Notify(ctx context.Context, svc Service) error
 		},
 	})
 }
+
+func (splArt *SpotlightPAArticle) RefreshFromContentStore(ctx context.Context, svc Service) {
+	if splArt.LastPublished == nil {
+		return
+	}
+	content, err := svc.ContentStore.GetFile(ctx, splArt.ContentFilepath())
+	if err != nil {
+		splArt.Warnings = append(splArt.Warnings, err.Error())
+		return
+	}
+	if err = splArt.FromTOML(content); err != nil {
+		splArt.Warnings = append(splArt.Warnings, err.Error())
+		return
+	}
+}
