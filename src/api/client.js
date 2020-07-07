@@ -21,7 +21,7 @@ const endpoints = {
   getAvailableArc: (id) => `/api/available-articles/${id}`,
   getScheduledArticle: (id) => `/api/scheduled-articles/${id}`,
   // list page points
-  listAnyArc: (page = "0") => `/api/list-arc-page/${page}`,
+  listAnyArc: (page = "0") => `/api/list-any-arc/${page}`,
   listAvailableArc: (page = "0") => `/api/list-available/${page}`,
   // Alphabetized by URL to show duplicates
   // GET and POST listed as two endpoints
