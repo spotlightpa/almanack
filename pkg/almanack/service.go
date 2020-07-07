@@ -74,6 +74,8 @@ func (svc Service) GetScheduledArticle(ctx context.Context, articleID string) (*
 		if err = schArticle.ResetArcData(ctx, svc, dart); err != nil {
 			return nil, err
 		}
+	} else {
+		schArticle.RefreshFromContentStore(ctx, svc)
 	}
 	return &schArticle, nil
 }
@@ -124,6 +126,18 @@ func (svc Service) SaveScheduledArticle(ctx context.Context, article *SpotlightP
 		shouldNotify = true
 	}
 
+	// Get the article so we can get fields not in the user article JSON
+	// like filepath
+	start = time.Now()
+	*dart, err = svc.Querier.GetArticle(ctx, dart.ArcID)
+	svc.Logger.Printf("queried GetArticle in %v", time.Since(start))
+	if err != nil {
+		return err
+	}
+	if err = article.fromDB(*dart); err != nil {
+		return err
+	}
+
 	if publishNow {
 		if err = article.Publish(ctx, svc); err != nil {
 			// TODO rollback?
@@ -144,16 +158,6 @@ func (svc Service) SaveScheduledArticle(ctx context.Context, article *SpotlightP
 		if err = article.Notify(ctx, svc); err != nil {
 			return err
 		}
-	}
-
-	start = time.Now()
-	*dart, err = svc.Querier.GetArticle(ctx, dart.ArcID)
-	svc.Logger.Printf("queried GetArticle in %v", time.Since(start))
-	if err != nil {
-		return err
-	}
-	if err = article.fromDB(*dart); err != nil {
-		return err
 	}
 
 	return nil
