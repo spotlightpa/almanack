@@ -114,6 +114,22 @@ function format:misc() {
 	_git-xargs '*.sql' pg_format -w 80 -s 2 _ -o _
 }
 
+function db:copy-prod() {
+	local DUMP_FILE
+	local DATE_NAME
+	echo "Using $PG_BIN"
+	set -x
+	heroku pg:backups:capture
+	DATE_NAME=$(date -u +"%Y-%m-%dT%H:%M:%S")
+	DUMP_FILE="$(mktemp -d)/dump-$DATE_NAME.sql"
+	heroku pg:backups:download --output "$DUMP_FILE"
+	"$PG_BIN"/pg_restore \
+		-d 'postgres://localhost/almanack?sslmode=disable' \
+		--clean \
+		--no-owner \
+		"$DUMP_FILE"
+}
+
 function api() {
 	go run ./funcs/almanack-api "$@"
 }
