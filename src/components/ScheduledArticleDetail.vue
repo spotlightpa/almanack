@@ -370,6 +370,7 @@ export default {
           v-text="schedulerPrimaryButtonText()"
         />
         <button
+          v-if="!article.hasPublished"
           class="button is-primary has-text-weight-semibold"
           :class="{ 'is-loading': article.isSaving }"
           :disabled="article.isSaving"
