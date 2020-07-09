@@ -95,7 +95,7 @@ export default {
       v-if="articles.length"
       :articles="articles"
       title="Spotlight PA Articles"
-    ></ArticleList>
+    />
 
     <div class="buttons mt-5">
       <router-link
