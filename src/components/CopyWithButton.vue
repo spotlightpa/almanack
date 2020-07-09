@@ -34,7 +34,7 @@ export default {
           :size="size"
           @copied="copied = $event"
           v-text="value"
-        ></CopyTextarea>
+        />
       </div>
     </div>
     <div class="field">

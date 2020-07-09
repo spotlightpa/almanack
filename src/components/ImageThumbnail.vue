@@ -49,11 +49,11 @@ export default {
       <p class="has-margin-bottom-thin">
         <strong>Caption:</strong>
       </p>
-      <CopyWithButton :value="caption" label="caption"></CopyWithButton>
+      <CopyWithButton :value="caption" label="caption" />
       <p class="has-margin-bottom-thin">
         <strong>Credit:</strong>
       </p>
-      <CopyWithButton :value="correctedCredits" label="credit"></CopyWithButton>
+      <CopyWithButton :value="correctedCredits" label="credit" />
     </figcaption>
   </figure>
 </template>

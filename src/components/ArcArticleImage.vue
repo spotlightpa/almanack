@@ -33,7 +33,10 @@ export default {
     <h2 class="subtitle is-4 has-text-weight-semibold">
       Embed #{{ n }}: Inline Image
     </h2>
-    <ImageThumbnail :url="imageURL" :caption="block.caption" :credits="credits">
-    </ImageThumbnail>
+    <ImageThumbnail
+      :url="imageURL"
+      :caption="block.caption"
+      :credits="credits"
+    />
   </div>
 </template>

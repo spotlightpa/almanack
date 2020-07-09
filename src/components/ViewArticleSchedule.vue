@@ -61,7 +61,7 @@ export default {
         </p>
       </div>
       <div v-else>
-        <ScheduledArticleDetail :article="article"></ScheduledArticleDetail>
+        <ScheduledArticleDetail :article="article" />
       </div>
     </APILoader>
   </div>

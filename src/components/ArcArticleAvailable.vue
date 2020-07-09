@@ -74,7 +74,7 @@ export default {
 <template>
   <div>
     <h1 class="title has-text-grey">
-      <ArticleSlugLine :article="article"></ArticleSlugLine>
+      <ArticleSlugLine :article="article" />
     </h1>
     <h2 class="title">
       Planned time
@@ -92,16 +92,13 @@ export default {
     </template>
 
     <h2 class="title">Suggested Hed</h2>
-    <CopyWithButton :value="article.headline" label="hed"></CopyWithButton>
+    <CopyWithButton :value="article.headline" label="hed" />
 
     <h2 class="title">Suggested Description</h2>
-    <CopyWithButton
-      :value="article.description"
-      label="description"
-    ></CopyWithButton>
+    <CopyWithButton :value="article.description" label="description" />
 
     <h2 class="title">Byline</h2>
-    <CopyWithButton :value="article.byline" label="byline"></CopyWithButton>
+    <CopyWithButton :value="article.byline" label="byline" />
 
     <template v-if="article.featuredImage">
       <h2 class="title is-spaced">Featured Image</h2>
@@ -111,7 +108,7 @@ export default {
         :caption="article.featuredImageCaption"
         :credits="article.featuredImageCredits"
         class="block"
-      ></ImageThumbnail>
+      />
     </template>
 
     <h2 v-if="embeds.length === 1" class="title">
@@ -226,14 +223,14 @@ export default {
       ref="copyHTML"
       size="is-small height-50vh"
       v-text="articleHTML"
-    ></CopyTextarea>
+    />
 
     <details class="block">
       <summary class="title">Budget details</summary>
       <p class="content">
         {{ article.budgetLine }}
       </p>
-      <ArticleWordCount :article="article"></ArticleWordCount>
+      <ArticleWordCount :article="article" />
     </details>
   </div>
 </template>

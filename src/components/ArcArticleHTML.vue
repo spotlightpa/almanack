@@ -22,6 +22,6 @@ export default {
       :rows="4"
       size="is-small"
       label="Code"
-    ></CopyWithButton>
+    />
   </figure>
 </template>

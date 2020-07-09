@@ -166,7 +166,7 @@ export default {
                   :value="image.path"
                   label="path"
                   size="is-small"
-                ></CopyWithButton>
+                />
               </p>
             </td>
             <td></td>

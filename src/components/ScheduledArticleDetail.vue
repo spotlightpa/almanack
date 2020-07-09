@@ -153,7 +153,7 @@ export default {
       label="Kicker"
       help="Small text appearing above the page headline, e.g. Health"
       :required="true"
-    ></BulmaFieldInput>
+    />
     <b-field label="Topics">
       <b-taginput
         v-model="article.topics"
@@ -178,12 +178,12 @@ export default {
       v-model="article.hed"
       label="Hed"
       help="Title as it appears at top of page"
-    ></BulmaFieldInput>
+    />
     <BulmaFieldInput
       v-model="article.subhead"
       label="Subhead"
       help="Appears below hed at top of page; AKA dek"
-    ></BulmaFieldInput>
+    />
 
     <b-field label="Authors">
       <b-taginput
@@ -197,13 +197,13 @@ export default {
       v-model="article.byline"
       label="Byline"
       help="If present, overrides the byline created from authors list"
-    ></BulmaFieldInput>
+    />
 
     <BulmaFieldInput
       v-model="article.linkTitle"
       label="Link to as"
       help="When linking to this page from another page, use this as the link title instead of hed"
-    ></BulmaFieldInput>
+    />
 
     <BulmaField
       v-slot="{ idForLabel }"
@@ -241,21 +241,15 @@ export default {
       </p>
     </BulmaField>
 
-    <BulmaFieldInput
-      v-model="article.imageURL"
-      label="Image URL"
-    ></BulmaFieldInput>
+    <BulmaFieldInput v-model="article.imageURL" label="Image URL" />
     <picture v-if="article.imagePreviewURL" class="has-ratio">
       <img :src="article.imagePreviewURL" class="is-3x4" width="200" />
     </picture>
     <BulmaFieldInput
       v-model="article.imageDescription"
       label="Image description"
-    ></BulmaFieldInput>
-    <BulmaFieldInput
-      v-model="article.imageCredit"
-      label="Image credit"
-    ></BulmaFieldInput>
+    />
+    <BulmaFieldInput v-model="article.imageCredit" label="Image credit" />
 
     <b-field label="Image size">
       <b-select v-model="article.imageSize" expanded>
@@ -284,10 +278,7 @@ export default {
       Derive slug from title
     </button>
 
-    <CopyWithButton
-      :value="article.pubURL"
-      label="planned URL"
-    ></CopyWithButton>
+    <CopyWithButton :value="article.pubURL" label="planned URL" />
 
     <div v-if="article.hasPublished && article.pubURL" class="buttons">
       <a
@@ -336,10 +327,7 @@ export default {
         </div>
       </BulmaField>
 
-      <BulmaFieldInput
-        v-model="article.overrideURL"
-        label="Override URL"
-      ></BulmaFieldInput>
+      <BulmaFieldInput v-model="article.overrideURL" label="Override URL" />
 
       <b-field label="URL Aliases">
         <b-taginput v-model="article.aliases"></b-taginput>

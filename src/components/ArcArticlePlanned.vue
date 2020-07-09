@@ -26,7 +26,7 @@ export default {
 <template>
   <div>
     <h1 class="title has-text-grey">
-      <ArticleSlugLine :article="article"></ArticleSlugLine>
+      <ArticleSlugLine :article="article" />
     </h1>
     <h2 class="title">
       Planned time
@@ -47,7 +47,7 @@ export default {
     <p class="content">
       {{ article.budgetLine }}
     </p>
-    <ArticleWordCount :article="article"></ArticleWordCount>
+    <ArticleWordCount :article="article" />
 
     <h2 class="title">Working Hed</h2>
     <NoCopyTextArea v-text="article.headline" />

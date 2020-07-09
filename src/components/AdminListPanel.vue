@@ -70,7 +70,7 @@ export default {
 <template>
   <div class="control">
     <h2 class="title is-spaced is-3">
-      <ArticleSlugLine :article="article"></ArticleSlugLine>
+      <ArticleSlugLine :article="article" />
     </h2>
 
     <p class="has-margin-top-negative">
