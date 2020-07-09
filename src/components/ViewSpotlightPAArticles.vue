@@ -112,10 +112,11 @@ export default {
           <tr v-for="article of filteredArticles" :key="article.id">
             <td>
               <router-link
+                v-if="article.arc_id"
                 :to="{ name: 'schedule', params: { id: article.arc_id } }"
-              >
-                {{ article.internal_id }}
-              </router-link>
+                v-text="article.internal_id"
+              />
+              <span v-else v-text="article.internal_id" />
             </td>
             <td>{{ article.hed }}</td>
             <td>{{ commaAnd(article.authors) }}</td>
