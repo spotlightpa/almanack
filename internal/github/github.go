@@ -8,11 +8,11 @@ import (
 
 	"github.com/google/go-github/v30/github"
 	"github.com/spotlightpa/almanack/internal/netlifyid"
-	"github.com/spotlightpa/almanack/pkg/almanack"
+	"github.com/spotlightpa/almanack/pkg/common"
 	"golang.org/x/oauth2"
 )
 
-func FlagVar(fl *flag.FlagSet) func(l almanack.Logger) (almanack.ContentStore, error) {
+func FlagVar(fl *flag.FlagSet) func(l common.Logger) (common.ContentStore, error) {
 	if fl == nil {
 		fl = flag.CommandLine
 	}
@@ -22,7 +22,7 @@ func FlagVar(fl *flag.FlagSet) func(l almanack.Logger) (almanack.ContentStore, e
 	repo := fl.String("github-repo", "", "name of Github `repo`")
 	branch := fl.String("github-branch", "", "Github `branch` to use")
 
-	return func(l almanack.Logger) (almanack.ContentStore, error) {
+	return func(l common.Logger) (common.ContentStore, error) {
 		if *token == "" || *owner == "" || *repo == "" || *branch == "" {
 			return NewMockClient(l)
 		}
@@ -33,10 +33,10 @@ func FlagVar(fl *flag.FlagSet) func(l almanack.Logger) (almanack.ContentStore, e
 type Client struct {
 	client              *github.Client
 	owner, repo, branch string
-	l                   almanack.Logger
+	l                   common.Logger
 }
 
-func NewClient(token, owner, repo, branch string, l almanack.Logger) (*Client, error) {
+func NewClient(token, owner, repo, branch string, l common.Logger) (*Client, error) {
 	ctx := context.Background()
 	ts := oauth2.StaticTokenSource(
 		&oauth2.Token{AccessToken: token},

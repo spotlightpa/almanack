@@ -12,21 +12,18 @@ import (
 	"time"
 
 	"github.com/carlmjohnson/crockford"
+	"github.com/spotlightpa/almanack/pkg/common"
 	"github.com/spotlightpa/almanack/pkg/errutil"
 	"golang.org/x/net/context/ctxhttp"
 )
 
-type ImageStore interface {
-	GetSignedURL(srcPath string) (signedURL string, err error)
-}
-
-func GetSignedUpload(is ImageStore, ext string) (signedURL, filename string, err error) {
+func GetSignedUpload(is common.ImageStore, ext string) (signedURL, filename string, err error) {
 	filename = makeFilename(ext)
 	signedURL, err = is.GetSignedURL(filename)
 	return
 }
 
-func GetSignedHashedUrl(is ImageStore, srcurl, ext string) (signedURL, filename string, err error) {
+func GetSignedHashedUrl(is common.ImageStore, srcurl, ext string) (signedURL, filename string, err error) {
 	filename = hashURLpath(srcurl, ext)
 	signedURL, err = is.GetSignedURL(filename)
 	return
@@ -50,7 +47,7 @@ func hashURLpath(srcPath, ext string) string {
 	)
 }
 
-func UploadFromURL(ctx context.Context, c *http.Client, is ImageStore, srcurl string) (filename, ext string, err error) {
+func UploadFromURL(ctx context.Context, c *http.Client, is common.ImageStore, srcurl string) (filename, ext string, err error) {
 	res, err := ctxhttp.Get(ctx, c, srcurl)
 	if err != nil {
 		return "", "", err

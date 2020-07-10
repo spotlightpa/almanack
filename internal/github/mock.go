@@ -6,15 +6,15 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/spotlightpa/almanack/pkg/almanack"
+	"github.com/spotlightpa/almanack/pkg/common"
 )
 
 type MockClient struct {
 	basepath string
-	l        almanack.Logger
+	l        common.Logger
 }
 
-func NewMockClient(l almanack.Logger) (*MockClient, error) {
+func NewMockClient(l common.Logger) (*MockClient, error) {
 	dir, err := ioutil.TempDir("", "example")
 	if err != nil {
 		return nil, err

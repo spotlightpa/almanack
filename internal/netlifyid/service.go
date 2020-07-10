@@ -5,11 +5,11 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/spotlightpa/almanack/pkg/almanack"
+	"github.com/spotlightpa/almanack/pkg/common"
 	"github.com/spotlightpa/almanack/pkg/errutil"
 )
 
-func NewService(isLambda bool, l almanack.Logger) almanack.AuthService {
+func NewService(isLambda bool, l common.Logger) common.AuthService {
 	if isLambda {
 		return AuthService{l}
 	}
@@ -17,9 +17,9 @@ func NewService(isLambda bool, l almanack.Logger) almanack.AuthService {
 	return MockAuthService{l}
 }
 
-type AuthService struct{ almanack.Logger }
+type AuthService struct{ common.Logger }
 
-var _ almanack.AuthService = AuthService{}
+var _ common.AuthService = AuthService{}
 
 type netlifyidContextType int
 

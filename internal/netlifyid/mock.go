@@ -3,13 +3,13 @@ package netlifyid
 import (
 	"net/http"
 
-	"github.com/spotlightpa/almanack/pkg/almanack"
+	"github.com/spotlightpa/almanack/pkg/common"
 	"github.com/spotlightpa/almanack/pkg/errutil"
 )
 
-type MockAuthService struct{ almanack.Logger }
+type MockAuthService struct{ common.Logger }
 
-var _ almanack.AuthService = MockAuthService{}
+var _ common.AuthService = MockAuthService{}
 
 func (mas MockAuthService) AddToRequest(r *http.Request) (*http.Request, error) {
 	return r, nil

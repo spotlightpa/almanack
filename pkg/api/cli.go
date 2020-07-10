@@ -25,6 +25,7 @@ import (
 	"github.com/spotlightpa/almanack/internal/netlifyid"
 	"github.com/spotlightpa/almanack/internal/slack"
 	"github.com/spotlightpa/almanack/pkg/almanack"
+	"github.com/spotlightpa/almanack/pkg/common"
 )
 
 const AppName = "almanack-api"
@@ -122,10 +123,10 @@ type appEnv struct {
 	isLambda           bool
 	mailchimpSignupURL string
 	c                  *http.Client
-	auth               almanack.AuthService
-	gh                 almanack.ContentStore
-	imageStore         almanack.ImageStore
-	email              almanack.EmailService
+	auth               common.AuthService
+	gh                 common.ContentStore
+	imageStore         common.ImageStore
+	email              common.EmailService
 	svc                almanack.Service
 	*log.Logger
 }
@@ -154,7 +155,7 @@ func (app *appEnv) exec() error {
 	return http.ListenAndServe(app.port, routes)
 }
 
-func (app *appEnv) initSentry(dsn string, l almanack.Logger) error {
+func (app *appEnv) initSentry(dsn string, l common.Logger) error {
 	var transport sentry.Transport
 	if app.isLambda {
 		l.Printf("setting sentry sync with timeout")

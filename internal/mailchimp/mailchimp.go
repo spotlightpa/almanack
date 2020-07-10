@@ -5,10 +5,10 @@ import (
 
 	"github.com/mattbaird/gochimp"
 
-	"github.com/spotlightpa/almanack/pkg/almanack"
+	"github.com/spotlightpa/almanack/pkg/common"
 )
 
-func NewMailService(apiKey, listID string, l almanack.Logger) almanack.EmailService {
+func NewMailService(apiKey, listID string, l common.Logger) common.EmailService {
 	if apiKey == "" || listID == "" {
 		l.Printf("using mock mail service")
 		return Mock{l}
@@ -18,7 +18,7 @@ func NewMailService(apiKey, listID string, l almanack.Logger) almanack.EmailServ
 
 type MailChimp struct {
 	apiKey, listID string
-	l              almanack.Logger
+	l              common.Logger
 }
 
 func (mc MailChimp) SendEmail(subject, body string) error {
@@ -47,7 +47,7 @@ func (mc MailChimp) SendEmail(subject, body string) error {
 }
 
 type Mock struct {
-	l almanack.Logger
+	l common.Logger
 }
 
 func (mock Mock) SendEmail(subject, body string) error {
