@@ -10,6 +10,7 @@ import (
 	"github.com/BurntSushi/toml"
 	"github.com/spotlightpa/almanack/internal/db"
 	"github.com/spotlightpa/almanack/internal/slack"
+	"github.com/spotlightpa/almanack/pkg/errutil"
 )
 
 type SpotlightPAArticle struct {
@@ -196,6 +197,15 @@ func (splArt *SpotlightPAArticle) FromTOML(content string) error {
 }
 
 func (splArt *SpotlightPAArticle) Publish(ctx context.Context, svc Service) error {
+	return errutil.ExecParallel(
+		func() error {
+			return splArt.publishContent(ctx, svc)
+		}, func() error {
+			return splArt.indexContent(svc)
+		})
+}
+
+func (splArt *SpotlightPAArticle) publishContent(ctx context.Context, svc Service) error {
 	data, err := splArt.ToTOML()
 	if err != nil {
 		return err
@@ -206,6 +216,11 @@ func (splArt *SpotlightPAArticle) Publish(ctx context.Context, svc Service) erro
 		return err
 	}
 	return nil
+}
+
+func (splArt *SpotlightPAArticle) indexContent(svc Service) error {
+	_, err := svc.Indexer.SaveObject(splArt.ToIndex())
+	return err
 }
 
 func (splArt *SpotlightPAArticle) Notify(ctx context.Context, svc Service) error {
@@ -255,5 +270,55 @@ func (splArt *SpotlightPAArticle) RefreshFromContentStore(ctx context.Context, s
 	if err = splArt.FromTOML(content); err != nil {
 		splArt.Warnings = append(splArt.Warnings, err.Error())
 		return
+	}
+}
+
+func (splArt *SpotlightPAArticle) ToIndex() interface{} {
+	return struct {
+		ObjectID         string    `json:"objectID"`
+		URL              string    `json:"URL"`
+		InternalID       string    `json:"internal-id"`
+		ImageURL         string    `json:"image-url"`
+		ImageDescription string    `json:"image-description"`
+		ImageCaption     string    `json:"image-caption"`
+		ImageCredit      string    `json:"image-credit"`
+		ImageSize        string    `json:"image-size"`
+		PubDate          time.Time `json:"pub-date"`
+		Slug             string    `json:"slug"`
+		Authors          []string  `json:"authors"`
+		Byline           string    `json:"byline"`
+		Hed              string    `json:"hed"`
+		Subhead          string    `json:"subhead"`
+		Summary          string    `json:"summary"`
+		Blurb            string    `json:"blurb"`
+		Kicker           string    `json:"kicker"`
+		Topics           []string  `json:"topics"`
+		Series           []string  `json:"series"`
+		LinkTitle        string    `json:"link-title"`
+		Aliases          []string  `json:"aliases"`
+		Body             string    `json:"body"`
+	}{
+		splArt.URL(),
+		splArt.URL(),
+		splArt.InternalID,
+		splArt.ImageURL,
+		splArt.ImageDescription,
+		splArt.ImageCaption,
+		splArt.ImageCredit,
+		splArt.ImageSize,
+		splArt.PubDate,
+		splArt.Slug,
+		splArt.Authors,
+		splArt.Byline,
+		splArt.Hed,
+		splArt.Subhead,
+		splArt.Summary,
+		splArt.Blurb,
+		splArt.Kicker,
+		splArt.Topics,
+		splArt.Series,
+		splArt.LinkTitle,
+		splArt.Aliases,
+		splArt.Body,
 	}
 }

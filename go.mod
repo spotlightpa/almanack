@@ -7,6 +7,7 @@ go 1.14
 
 require (
 	github.com/BurntSushi/toml v0.3.1
+	github.com/algolia/algoliasearch-client-go/v3 v3.8.2
 	github.com/aws/aws-lambda-go v1.17.0
 	github.com/aws/aws-sdk-go-v2 v0.19.0
 	github.com/carlmjohnson/crockford v0.0.3
