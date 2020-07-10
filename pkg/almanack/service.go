@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/spotlightpa/almanack/internal/db"
+	"github.com/spotlightpa/almanack/internal/index"
 	"github.com/spotlightpa/almanack/internal/slack"
 )
 
@@ -57,6 +58,7 @@ type Service struct {
 	ImageStore
 	Client      *http.Client
 	SlackClient slack.Client
+	Indexer     index.Indexer
 }
 
 func (svc Service) GetSpotlightPAArticle(ctx context.Context, dbID int32) (*SpotlightPAArticle, error) {
