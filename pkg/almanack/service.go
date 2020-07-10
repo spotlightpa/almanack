@@ -59,6 +59,20 @@ type Service struct {
 	SlackClient slack.Client
 }
 
+func (svc Service) GetSpotlightPAArticle(ctx context.Context, dbID int32) (*SpotlightPAArticle, error) {
+	start := time.Now()
+	dart, err := svc.Querier.GetArticleByDBID(ctx, dbID)
+	svc.Logger.Printf("queried GetArticleByDBID in %v", time.Since(start))
+	if err != nil {
+		return nil, db.ExpectNotFound(err)
+	}
+	var splArt SpotlightPAArticle
+	if err = splArt.fromDB(dart); err != nil {
+		return nil, err
+	}
+	return &splArt, nil
+}
+
 func (svc Service) GetScheduledArticle(ctx context.Context, articleID string) (*SpotlightPAArticle, error) {
 	start := time.Now()
 	dart, err := svc.Querier.GetArticle(ctx, nullString(articleID))
