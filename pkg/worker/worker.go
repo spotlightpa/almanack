@@ -20,6 +20,7 @@ import (
 	"github.com/spotlightpa/almanack/internal/mailchimp"
 	"github.com/spotlightpa/almanack/internal/slack"
 	"github.com/spotlightpa/almanack/pkg/almanack"
+	"github.com/spotlightpa/almanack/pkg/common"
 )
 
 const AppName = "almanack-worker"
@@ -118,9 +119,9 @@ Options:
 
 type appEnv struct {
 	srcFeedURL string
-	email      almanack.EmailService
+	email      common.EmailService
 	svc        almanack.Service
-	gh         almanack.ContentStore
+	gh         common.ContentStore
 	sc         slack.Client
 	*log.Logger
 }

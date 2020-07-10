@@ -11,6 +11,7 @@ import (
 	"github.com/spotlightpa/almanack/internal/db"
 	"github.com/spotlightpa/almanack/internal/index"
 	"github.com/spotlightpa/almanack/internal/slack"
+	"github.com/spotlightpa/almanack/pkg/common"
 )
 
 func nullString(s string) sql.NullString {
@@ -52,10 +53,10 @@ func diffTime(old, new sql.NullTime) bool {
 }
 
 type Service struct {
-	Logger
+	common.Logger
 	Querier db.Querier
-	ContentStore
-	ImageStore
+	common.ContentStore
+	common.ImageStore
 	Client      *http.Client
 	SlackClient slack.Client
 	Indexer     index.Indexer

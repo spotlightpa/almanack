@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 
 	"github.com/spotlightpa/almanack/internal/db"
+	"github.com/spotlightpa/almanack/pkg/common"
 )
 
 const EditorsPicksLoc = "data/editorsPicks.json"
@@ -31,7 +32,7 @@ func GetEditorsPicks(ctx context.Context, q db.Querier) (picks *EditorsPicks, er
 	return
 }
 
-func SetEditorsPicks(ctx context.Context, q db.Querier, gh ContentStore, picks *EditorsPicks) (err error) {
+func SetEditorsPicks(ctx context.Context, q db.Querier, gh common.ContentStore, picks *EditorsPicks) (err error) {
 	raw, err := json.MarshalIndent(picks, "", "  ")
 	if err != nil {
 		return err
