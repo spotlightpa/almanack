@@ -27,10 +27,3 @@ type ContentStore interface {
 type EmailService interface {
 	SendEmail(subject, body string) error
 }
-
-type DataStore interface {
-	Get(key string, v interface{}) error
-	Set(key string, v interface{}) error
-	GetSet(key string, getv, setv interface{}) (err error)
-	GetLock(key string) (unlock func(), err error)
-}
