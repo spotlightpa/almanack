@@ -3,19 +3,20 @@ package httpcache
 import (
 	"bufio"
 	"bytes"
-	"log"
 	"net/http"
 	"net/http/httputil"
 	"sync"
+
+	"github.com/spotlightpa/almanack/pkg/common"
 )
 
 type requestCache struct {
 	m sync.Map
 	r http.RoundTripper
-	*log.Logger
+	common.Logger
 }
 
-func SetRounderTripper(c *http.Client, l *log.Logger) {
+func SetRounderTripper(c *http.Client, l common.Logger) {
 	r := c.Transport
 	if r == nil {
 		r = http.DefaultTransport
