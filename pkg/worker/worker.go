@@ -2,11 +2,9 @@ package worker
 
 import (
 	"context"
-	"errors"
 	"flag"
 	"fmt"
 	"log"
-	"net/http"
 	"os"
 	"time"
 
@@ -14,8 +12,6 @@ import (
 	"github.com/getsentry/sentry-go"
 	"github.com/peterbourgon/ff/v2"
 
-	"github.com/spotlightpa/almanack/internal/db"
-	"github.com/spotlightpa/almanack/internal/github"
 	"github.com/spotlightpa/almanack/internal/httpjson"
 	"github.com/spotlightpa/almanack/internal/mailchimp"
 	"github.com/spotlightpa/almanack/internal/slack"
@@ -61,7 +57,6 @@ func CLI(args []string) error {
 func (app *appEnv) parseArgs(args []string) error {
 	fl := flag.NewFlagSet(AppName, flag.ContinueOnError)
 	fl.StringVar(&app.srcFeedURL, "src-feed", "", "source `URL` for Arc feed")
-	pg := db.FlagVar(fl, "postgres", "PostgreSQL database `URL`")
 	mcAPIKey := fl.String("mc-api-key", "", "API `key` for MailChimp")
 	mcListID := fl.String("mc-list-id", "", "List `ID` MailChimp campaign")
 	slackURL := fl.String("slack-hook-url", "", "Slack hook endpoint `URL`")
@@ -72,7 +67,7 @@ func (app *appEnv) parseArgs(args []string) error {
 		"silent",
 		`don't log debug output`,
 	)
-	getGithub := github.FlagVar(fl)
+	getService := almanack.Flags(fl)
 	fl.Usage = func() {
 		fmt.Fprintf(fl.Output(), `almanack-worker help
 
@@ -84,34 +79,17 @@ Options:
 		return err
 	}
 
-	if *pg == nil {
-		err := errors.New("must set postgres URL")
-		app.Logger.Printf("starting up: %v", err)
-		return err
-	}
-
-	app.sc = slack.New(*slackURL, app.Logger)
-
 	if err := sentry.Init(sentry.ClientOptions{
 		Dsn:     *sentryDSN,
 		Release: almanack.BuildVersion,
 	}); err != nil {
 		return err
 	}
-
+	app.sc = slack.New(*slackURL, app.Logger)
 	app.email = mailchimp.NewMailService(*mcAPIKey, *mcListID, app.Logger)
-
-	if gh, err := getGithub(app.Logger); err != nil {
-		app.Logger.Printf("could not connect to Github: %v", err)
+	var err error
+	if app.svc, err = getService(app.Logger); err != nil {
 		return err
-	} else {
-		app.gh = gh
-	}
-	app.svc = almanack.Service{
-		Querier:      *pg,
-		Logger:       app.Logger,
-		ContentStore: app.gh,
-		Client:       http.DefaultClient,
 	}
 
 	return nil
@@ -121,7 +99,6 @@ type appEnv struct {
 	srcFeedURL string
 	email      common.EmailService
 	svc        almanack.Service
-	gh         common.ContentStore
 	sc         slack.Client
 	*log.Logger
 }
