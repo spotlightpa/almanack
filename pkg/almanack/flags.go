@@ -30,9 +30,9 @@ func Flags(fl *flag.FlagSet) func(common.Logger) (svc Service, err error) {
 			err = err2
 			return
 		} else if usedHeroku {
-			l.Printf("got credentials from Heroku")
+			l.Printf("got credentials from Heroku API")
 		} else {
-			l.Printf("did not get credentials Heroku")
+			l.Printf("did not get credentials from Heroku API")
 		}
 
 		if *pg == nil {
@@ -41,17 +41,13 @@ func Flags(fl *flag.FlagSet) func(common.Logger) (svc Service, err error) {
 			return
 		}
 
-		var client http.Client
-		client = *http.DefaultClient
+		client := *http.DefaultClient
 		if *cache {
 			httpcache.SetRounderTripper(&client, l)
 		}
 
-		imageStore := getImageStore(l)
-		gh, err2 := getGithub(l)
-		if err2 != nil {
+		if svc.ContentStore, err = getGithub(l); err != nil {
 			l.Printf("could not connect to Github: %v", err)
-			err = err2
 			return
 		}
 
@@ -59,8 +55,8 @@ func Flags(fl *flag.FlagSet) func(common.Logger) (svc Service, err error) {
 			Logger:       l,
 			Client:       &client,
 			Querier:      *pg,
-			ContentStore: gh,
-			ImageStore:   imageStore,
+			ContentStore: svc.ContentStore,
+			ImageStore:   getImageStore(l),
 			SlackClient:  slack.New(*slackURL, l),
 			Indexer:      getIndex(l),
 		}, nil
