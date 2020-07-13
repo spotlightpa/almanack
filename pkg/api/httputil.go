@@ -75,7 +75,7 @@ func (app *appEnv) FetchFeed(ctx context.Context) (*almanack.ArcAPI, error) {
 	ctx, cancel := context.WithTimeout(ctx, 6*time.Second)
 	defer cancel()
 
-	if err := httpjson.Get(ctx, app.c, app.srcFeedURL, &feed); err != nil {
+	if err := httpjson.Get(ctx, app.svc.Client, app.srcFeedURL, &feed); err != nil {
 		return nil, err
 	}
 	return &feed, nil
