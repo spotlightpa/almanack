@@ -201,7 +201,7 @@ func (splArt *SpotlightPAArticle) Publish(ctx context.Context, svc Service) erro
 		func() error {
 			return splArt.publishContent(ctx, svc)
 		}, func() error {
-			return splArt.indexContent(svc)
+			return splArt.indexContent(ctx, svc)
 		})
 }
 
@@ -218,8 +218,8 @@ func (splArt *SpotlightPAArticle) publishContent(ctx context.Context, svc Servic
 	return nil
 }
 
-func (splArt *SpotlightPAArticle) indexContent(svc Service) error {
-	_, err := svc.Indexer.SaveObject(splArt.ToIndex())
+func (splArt *SpotlightPAArticle) indexContent(ctx context.Context, svc Service) error {
+	_, err := svc.Indexer.SaveObject(splArt.ToIndex(), ctx)
 	return err
 }
 
