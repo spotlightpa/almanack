@@ -148,7 +148,7 @@ func (app *appEnv) getProxyImage(w http.ResponseWriter, r *http.Request) {
 		app.errorResponse(r.Context(), w, err)
 		return
 	}
-	ctype, body, err := getImage(r.Context(), app.c, u)
+	ctype, body, err := getImage(r.Context(), app.svc.Client, u)
 	if err != nil {
 		app.errorResponse(r.Context(), w, err)
 		return
@@ -463,7 +463,7 @@ func (app *appEnv) postSignedUpload(w http.ResponseWriter, r *http.Request) {
 		res response
 		err error
 	)
-	res.SignedURL, res.FileName, err = almanack.GetSignedUpload(app.imageStore, ext)
+	res.SignedURL, res.FileName, err = almanack.GetSignedUpload(app.svc.ImageStore, ext)
 	if err != nil {
 		app.errorResponse(r.Context(), w, err)
 		return
@@ -632,7 +632,12 @@ func (app *appEnv) postEditorsPicks(w http.ResponseWriter, r *http.Request) {
 		app.errorResponse(r.Context(), w, err)
 		return
 	}
-	if err := almanack.SetEditorsPicks(r.Context(), app.svc.Querier, app.gh, &req); err != nil {
+	if err := almanack.SetEditorsPicks(
+		r.Context(),
+		app.svc.Querier,
+		app.svc.ContentStore,
+		&req,
+	); err != nil {
 		app.errorResponse(r.Context(), w, err)
 		return
 	}

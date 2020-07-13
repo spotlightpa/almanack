@@ -54,10 +54,10 @@ func diffTime(old, new sql.NullTime) bool {
 
 type Service struct {
 	common.Logger
+	Client  *http.Client
 	Querier db.Querier
 	common.ContentStore
 	common.ImageStore
-	Client      *http.Client
 	SlackClient slack.Client
 	Indexer     index.Indexer
 }

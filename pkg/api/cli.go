@@ -1,7 +1,6 @@
 package api
 
 import (
-	"errors"
 	"flag"
 	"fmt"
 	"log"
@@ -16,14 +15,8 @@ import (
 	sentryhttp "github.com/getsentry/sentry-go/http"
 	"github.com/peterbourgon/ff/v2"
 
-	"github.com/spotlightpa/almanack/internal/aws"
-	"github.com/spotlightpa/almanack/internal/db"
-	"github.com/spotlightpa/almanack/internal/github"
-	"github.com/spotlightpa/almanack/internal/herokuapi"
-	"github.com/spotlightpa/almanack/internal/httpcache"
 	"github.com/spotlightpa/almanack/internal/mailchimp"
 	"github.com/spotlightpa/almanack/internal/netlifyid"
-	"github.com/spotlightpa/almanack/internal/slack"
 	"github.com/spotlightpa/almanack/pkg/almanack"
 	"github.com/spotlightpa/almanack/pkg/common"
 )
@@ -46,29 +39,24 @@ func CLI(args []string) error {
 func (app *appEnv) parseArgs(args []string) error {
 	fl := flag.NewFlagSet(AppName, flag.ContinueOnError)
 
-	pg := db.FlagVar(fl, "postgres", "PostgreSQL database `URL`")
 	fl.StringVar(&app.srcFeedURL, "src-feed", "", "source `URL` for Arc feed")
-	cache := fl.Bool("cache", false, "use in-memory cache for fetched JSON")
-	slackURL := fl.String("slack-social-url", "", "Slack hook endpoint `URL` for social")
 	fl.BoolVar(&app.isLambda, "lambda", false, "use AWS Lambda rather than HTTP")
 	fl.StringVar(&app.port, "port", ":3001", "listen on port (HTTP only)")
 	fl.StringVar(&app.mailchimpSignupURL, "mc-signup-url", "http://example.com", "`URL` to redirect users to for MailChimp signup")
-	checkHerokuPG := herokuapi.FlagVar(fl, "postgres")
 	app.Logger = log.New(nil, AppName+" ", log.LstdFlags)
 	fl.Var(
 		flagext.Logger(app.Logger, flagext.LogSilent),
 		"silent",
 		`don't log debug output`,
 	)
-	getImageStore := aws.FlagVar(fl)
 	mcAPIKey := fl.String("mc-api-key", "", "API `key` for MailChimp")
 	mcListID := fl.String("mc-list-id", "", "List `ID` MailChimp campaign")
 	sentryDSN := fl.String("sentry-dsn", "", "DSN `pseudo-URL` for Sentry")
-	getGithub := github.FlagVar(fl)
 	fl.Usage = func() {
 		fmt.Fprintf(fl.Output(), "almanack-api help\n\n")
 		fl.PrintDefaults()
 	}
+	getService := almanack.Flags(fl)
 	if err := ff.Parse(fl, args, ff.WithEnvVarPrefix("ALMANACK")); err != nil {
 		return err
 	}
@@ -76,42 +64,11 @@ func (app *appEnv) parseArgs(args []string) error {
 	if err := app.initSentry(*sentryDSN, app.Logger); err != nil {
 		return err
 	}
-
-	// Get PostgreSQL URL from Heroku if possible, else get it from flag
-	if usedHeroku, err := checkHerokuPG(); err != nil {
-		return err
-	} else if usedHeroku {
-		app.Logger.Printf("got credentials from Heroku")
-	} else {
-		app.Logger.Printf("did not get credentials Heroku")
-	}
-
-	if *pg == nil {
-		err := errors.New("must set postgres URL")
-		app.Logger.Printf("starting up: %v", err)
-		return err
-	}
-
 	app.email = mailchimp.NewMailService(*mcAPIKey, *mcListID, app.Logger)
-	app.imageStore = getImageStore(app.Logger)
 	app.auth = netlifyid.NewService(app.isLambda, app.Logger)
-	app.c = http.DefaultClient
-	if *cache {
-		httpcache.SetRounderTripper(app.c, app.Logger)
-	}
-	if gh, err := getGithub(app.Logger); err != nil {
-		app.Logger.Printf("could not connect to Github: %v", err)
+	var err error
+	if app.svc, err = getService(app.Logger); err != nil {
 		return err
-	} else {
-		app.gh = gh
-	}
-	app.svc = almanack.Service{
-		Querier:      *pg,
-		Logger:       app.Logger,
-		ContentStore: app.gh,
-		ImageStore:   app.imageStore,
-		Client:       app.c,
-		SlackClient:  slack.New(*slackURL, app.Logger),
 	}
 
 	return nil
@@ -122,13 +79,10 @@ type appEnv struct {
 	port               string
 	isLambda           bool
 	mailchimpSignupURL string
-	c                  *http.Client
-	auth               common.AuthService
-	gh                 common.ContentStore
-	imageStore         common.ImageStore
-	email              common.EmailService
-	svc                almanack.Service
 	*log.Logger
+	auth  common.AuthService
+	email common.EmailService
+	svc   almanack.Service
 }
 
 func (app *appEnv) exec() error {
