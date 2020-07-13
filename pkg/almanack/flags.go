@@ -16,7 +16,7 @@ import (
 )
 
 func Flags(fl *flag.FlagSet) func(common.Logger) (svc Service, err error) {
-	cache := fl.Bool("cache", false, "use in-memory cache for fetched JSON")
+	cache := fl.Bool("cache", false, "use in-memory cache for http requests")
 	pg := db.FlagVar(fl, "postgres", "PostgreSQL database `URL`")
 	slackURL := fl.String("slack-social-url", "", "Slack hook endpoint `URL` for social")
 	checkHerokuPG := herokuapi.FlagVar(fl, "postgres")
@@ -41,9 +41,10 @@ func Flags(fl *flag.FlagSet) func(common.Logger) (svc Service, err error) {
 			return
 		}
 
-		c := http.DefaultClient
+		var client http.Client
+		client = *http.DefaultClient
 		if *cache {
-			httpcache.SetRounderTripper(c, l)
+			httpcache.SetRounderTripper(&client, l)
 		}
 
 		imageStore := getImageStore(l)
@@ -56,7 +57,7 @@ func Flags(fl *flag.FlagSet) func(common.Logger) (svc Service, err error) {
 
 		return Service{
 			Logger:       l,
-			Client:       c,
+			Client:       &client,
 			Querier:      *pg,
 			ContentStore: gh,
 			ImageStore:   imageStore,
