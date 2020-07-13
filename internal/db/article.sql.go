@@ -91,23 +91,25 @@ func (q *Queries) GetArticleIDFromSlug(ctx context.Context, slug string) (string
 	return arc_id, err
 }
 
-const listAllArticles = `-- name: ListAllArticles :many
+const listAllArcArticles = `-- name: ListAllArcArticles :many
 SELECT
   id, arc_id, arc_data, spotlightpa_path, spotlightpa_data, schedule_for, last_published, note, status, created_at, updated_at
 FROM
   article
+WHERE
+  arc_id IS NOT NULL
 ORDER BY
   arc_data ->> 'last_updated_date' DESC
 LIMIT $1 OFFSET $2
 `
 
-type ListAllArticlesParams struct {
+type ListAllArcArticlesParams struct {
 	Limit  int32 `json:"limit"`
 	Offset int32 `json:"offset"`
 }
 
-func (q *Queries) ListAllArticles(ctx context.Context, arg ListAllArticlesParams) ([]Article, error) {
-	rows, err := q.db.QueryContext(ctx, listAllArticles, arg.Limit, arg.Offset)
+func (q *Queries) ListAllArcArticles(ctx context.Context, arg ListAllArcArticlesParams) ([]Article, error) {
+	rows, err := q.db.QueryContext(ctx, listAllArcArticles, arg.Limit, arg.Offset)
 	if err != nil {
 		return nil, err
 	}

@@ -273,7 +273,7 @@ func (svc Service) ListAllArcStories(ctx context.Context, page int) (stories []A
 	offset := int32(page) * limit
 	start := time.Now()
 	var dbArts []db.Article
-	dbArts, err = svc.Querier.ListAllArticles(ctx, db.ListAllArticlesParams{
+	dbArts, err = svc.Querier.ListAllArcArticles(ctx, db.ListAllArcArticlesParams{
 		Limit:  limit + 1,
 		Offset: offset,
 	})

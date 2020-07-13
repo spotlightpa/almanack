@@ -97,11 +97,13 @@ FROM
 ORDER BY
   arc_data ->> 'last_updated_date' DESC;
 
--- name: ListAllArticles :many
+-- name: ListAllArcArticles :many
 SELECT
   *
 FROM
   article
+WHERE
+  arc_id IS NOT NULL
 ORDER BY
   arc_data ->> 'last_updated_date' DESC
 LIMIT $1 OFFSET $2;
