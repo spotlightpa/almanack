@@ -6,7 +6,7 @@ import (
 	"github.com/algolia/algoliasearch-client-go/v3/algolia/search"
 )
 
-func FlagVar(fl *flag.FlagSet, name, usage string) func(Logger) Indexer {
+func FlagVar(fl *flag.FlagSet) func(Logger) Indexer {
 	if fl == nil {
 		fl = flag.CommandLine
 	}
