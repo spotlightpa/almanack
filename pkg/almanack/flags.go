@@ -10,6 +10,7 @@ import (
 	"github.com/spotlightpa/almanack/internal/github"
 	"github.com/spotlightpa/almanack/internal/herokuapi"
 	"github.com/spotlightpa/almanack/internal/httpcache"
+	"github.com/spotlightpa/almanack/internal/index"
 	"github.com/spotlightpa/almanack/internal/slack"
 	"github.com/spotlightpa/almanack/pkg/common"
 )
@@ -21,6 +22,7 @@ func Flags(fl *flag.FlagSet) func(common.Logger) (svc Service, err error) {
 	checkHerokuPG := herokuapi.FlagVar(fl, "postgres")
 	getImageStore := aws.FlagVar(fl)
 	getGithub := github.FlagVar(fl)
+	getIndex := index.FlagVar(fl)
 
 	return func(l common.Logger) (svc Service, err error) {
 		// Get PostgreSQL URL from Heroku if possible, else get it from flag
@@ -59,7 +61,7 @@ func Flags(fl *flag.FlagSet) func(common.Logger) (svc Service, err error) {
 			ContentStore: gh,
 			ImageStore:   imageStore,
 			SlackClient:  slack.New(*slackURL, l),
-			// TODO: indexer
+			Indexer:      getIndex(l),
 		}, nil
 	}
 }
