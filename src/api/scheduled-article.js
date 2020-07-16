@@ -45,6 +45,7 @@ export default class ScheduledArticle {
       aliases: ["Aliases", []],
       modalExclude: ["ModalExclude", false],
       noIndex: ["NoIndex", false],
+      languageCode: ["LanguageCode", ""],
 
       warnings: ["Warnings", []],
       authors: ["Authors", []],
@@ -114,6 +115,7 @@ export default class ScheduledArticle {
       Aliases: this.aliases,
       ModalExclude: this.modalExclude,
       NoIndex: this.noIndex,
+      LanguageCode: this.languageCode,
       "almanack-refresh-arc": this._refreshArc,
     };
   }

@@ -40,6 +40,7 @@ type SpotlightPAArticle struct {
 	Aliases          []string   `toml:"aliases"`
 	ModalExclude     bool       `toml:"modal-exclude"`
 	NoIndex          bool       `toml:"no-index"`
+	LanguageCode     string     `toml:"language-code"`
 	Body             string     `toml:"-"`
 	Filepath         string     `toml:"-"`
 	LastArcSync      time.Time  `toml:"-"`
@@ -77,6 +78,7 @@ func (splArt *SpotlightPAArticle) toSPLData() interface{} {
 		Aliases          []string   `json:"aliases"`
 		ModalExclude     bool       `json:"modal-exclude"`
 		NoIndex          bool       `json:"no-index"`
+		LanguageCode     string     `json:"language-code"`
 		Body             string     `json:"body"`
 		Filepath         string     `json:"-"`
 		LastArcSync      time.Time  `json:"last-arc-sync"`
