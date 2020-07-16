@@ -62,6 +62,7 @@ weight = 0
 url = ""
 modal-exclude = false
 no-index = false
+language-code = ""
 +++
 
 
@@ -90,6 +91,7 @@ weight = 2
 url = "/url/"
 modal-exclude = true
 no-index = true
+language-code = ""
 +++
 
 
@@ -118,6 +120,7 @@ weight = 2
 url = "/url/"
 modal-exclude = true
 no-index = true
+language-code = ""
 +++
 
 Hello, world!
