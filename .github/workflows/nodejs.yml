@@ -26,6 +26,6 @@ jobs:
       env:
         CI: true
     - name: yarn build
-      run: ./run.sh test:backend
+      run: ./run.sh build:frontend
       env:
         CI: true
