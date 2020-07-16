@@ -263,6 +263,15 @@ export default {
       </b-select>
     </b-field>
 
+    <BulmaField v-slot="{ idForLabel }" label="Language">
+      <div class="select is-fullwidth">
+        <select :id="idForLabel" v-model="article.languageCode" class="select">
+          <option value="">English</option>
+          <option value="es">Spanish</option>
+        </select>
+      </div>
+    </BulmaField>
+
     <b-field label="Slug">
       <b-input
         v-model="article.slug"
