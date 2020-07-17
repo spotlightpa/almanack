@@ -12,8 +12,8 @@ import (
 	"time"
 
 	"github.com/carlmjohnson/crockford"
+	"github.com/carlmjohnson/resperr"
 	"github.com/spotlightpa/almanack/pkg/common"
-	"github.com/spotlightpa/almanack/pkg/errutil"
 	"golang.org/x/net/context/ctxhttp"
 )
 
@@ -70,11 +70,11 @@ func UploadFromURL(ctx context.Context, c *http.Client, is common.ImageStore, sr
 	} else if strings.HasPrefix(ct, "image/png") {
 		ext = "png"
 	} else {
-		return "", "", errutil.Response{
-			StatusCode: http.StatusBadRequest,
-			Message:    "URL must be an image",
-			Cause:      fmt.Errorf("%q did not have proper MIME type", srcurl),
-		}
+		return "", "", resperr.WithCodeAndMessage(
+			fmt.Errorf("%q did not have proper MIME type", srcurl),
+			http.StatusBadRequest,
+			"URL must be an image",
+		)
 	}
 
 	slurp, err := ioutil.ReadAll(buf)
@@ -99,11 +99,11 @@ func UploadFromURL(ctx context.Context, c *http.Client, is common.ImageStore, sr
 	defer res.Body.Close()
 
 	if res.StatusCode != http.StatusOK {
-		return "", "", errutil.Response{
-			StatusCode: http.StatusBadGateway,
-			Message:    "Could not upload image from URL",
-			Cause:      fmt.Errorf("unexpected S3 status: %d", res.StatusCode),
-		}
+		return "", "", resperr.WithCodeAndMessage(
+			fmt.Errorf("unexpected S3 status: %d", res.StatusCode),
+			http.StatusBadGateway,
+			"Could not upload image from URL",
+		)
 	}
 	return filename, ext, nil
 }

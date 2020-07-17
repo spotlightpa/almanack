@@ -8,8 +8,7 @@ import (
 	"net/http"
 
 	"github.com/aws/aws-lambda-go/lambdacontext"
-
-	"github.com/spotlightpa/almanack/pkg/errutil"
+	"github.com/carlmjohnson/resperr"
 )
 
 type JWT struct {
@@ -74,28 +73,19 @@ func FromRequest(r *http.Request) (*JWT, error) {
 func FromContext(ctx context.Context) (*JWT, error) {
 	lc, ok := lambdacontext.FromContext(ctx)
 	if !ok {
-		return nil, errutil.Response{
-			StatusCode: http.StatusInternalServerError,
-			Message:    "missing context",
-			Cause:      fmt.Errorf("no context given: is this localhost?"),
-		}
+		return nil, resperr.WithUserMessage(
+			fmt.Errorf("no context given: is this localhost?"),
+			"no context provided",
+		)
 	}
 	encoded := lc.ClientContext.Custom["netlify"]
 	jwtBytes, err := base64.StdEncoding.DecodeString(encoded)
 	if err != nil {
-		return nil, errutil.Response{
-			StatusCode: http.StatusInternalServerError,
-			Message:    "could not decode context",
-			Cause:      fmt.Errorf("could not decode context %q: %v", encoded, err),
-		}
+		return nil, fmt.Errorf("could not decode context %q: %v", encoded, err)
 	}
 	var netID JWT
 	if err = json.Unmarshal(jwtBytes, &netID); err != nil {
-		return nil, errutil.Response{
-			StatusCode: http.StatusInternalServerError,
-			Message:    "could not decode identity",
-			Cause:      fmt.Errorf("could not decode identity %q: %v", encoded, err),
-		}
+		return nil, fmt.Errorf("could not decode identity %q: %v", encoded, err)
 	}
 	return &netID, nil
 }

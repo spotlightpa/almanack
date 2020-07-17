@@ -8,9 +8,9 @@ import (
 	"time"
 
 	"github.com/BurntSushi/toml"
+	"github.com/carlmjohnson/errutil"
 	"github.com/spotlightpa/almanack/internal/db"
 	"github.com/spotlightpa/almanack/internal/slack"
-	"github.com/spotlightpa/almanack/pkg/errutil"
 )
 
 type SpotlightPAArticle struct {

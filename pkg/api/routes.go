@@ -12,6 +12,7 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/carlmjohnson/resperr"
 	"github.com/go-chi/chi"
 	"github.com/go-chi/chi/middleware"
 	"golang.org/x/net/context/ctxhttp"
@@ -20,7 +21,6 @@ import (
 	"github.com/spotlightpa/almanack/internal/httpjson"
 	"github.com/spotlightpa/almanack/internal/netlifyid"
 	"github.com/spotlightpa/almanack/pkg/almanack"
-	"github.com/spotlightpa/almanack/pkg/errutil"
 )
 
 func (app *appEnv) routes() http.Handler {
@@ -72,11 +72,7 @@ func (app *appEnv) routes() http.Handler {
 }
 
 func (app *appEnv) notFound(w http.ResponseWriter, r *http.Request) {
-	app.errorResponse(w, r, errutil.Response{
-		StatusCode: http.StatusNotFound,
-		Message:    http.StatusText(http.StatusNotFound),
-		Cause:      fmt.Errorf("path not found: %s", r.URL.Path),
-	})
+	app.errorResponse(w, r, resperr.NotFound(r))
 }
 
 func (app *appEnv) ping(w http.ResponseWriter, r *http.Request) {
@@ -97,11 +93,11 @@ func (app *appEnv) pingErr(w http.ResponseWriter, r *http.Request) {
 	statusCode, _ := strconv.Atoi(code)
 	app.Printf("start pingErr %q", code)
 
-	app.errorResponse(w, r, errutil.Response{
-		StatusCode: statusCode,
-		Message:    http.StatusText(statusCode),
-		Cause:      fmt.Errorf("got test ping %q", code),
-	})
+	app.errorResponse(w, r, resperr.WithStatusCode(
+		fmt.Errorf("got test ping %q", code),
+		statusCode,
+	))
+
 	return
 }
 
@@ -121,11 +117,7 @@ func (app *appEnv) getProxyImage(w http.ResponseWriter, r *http.Request) {
 	encURL := chi.URLParam(r, "encURL")
 	decURL, err := base64.URLEncoding.DecodeString(encURL)
 	if err != nil {
-		err = errutil.Response{
-			StatusCode: http.StatusBadRequest,
-			Cause:      err,
-		}
-		app.errorResponse(w, r, err)
+		app.errorResponse(w, r, resperr.WithStatusCode(err, http.StatusBadRequest))
 		return
 	}
 	u := string(decURL)
@@ -141,11 +133,7 @@ func (app *appEnv) getProxyImage(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 	if !inWhitelist {
-		err = errutil.Response{
-			StatusCode: http.StatusBadRequest,
-			Cause:      err,
-		}
-		app.errorResponse(w, r, err)
+		app.errorResponse(w, r, resperr.WithStatusCode(err, http.StatusBadRequest))
 		return
 	}
 	ctype, body, err := getImage(r.Context(), app.svc.Client, u)
@@ -187,11 +175,11 @@ func getImage(ctx context.Context, c *http.Client, srcurl string) (ctype string,
 	} else if strings.HasPrefix(ct, "image/png") {
 		ctype = "image/png"
 	} else {
-		return "", nil, errutil.Response{
-			StatusCode: http.StatusBadRequest,
-			Message:    "URL must be an image",
-			Cause:      fmt.Errorf("%q did not have proper MIME type", srcurl),
-		}
+		return "", nil, resperr.WithCodeAndMessage(
+			fmt.Errorf("%q did not have proper MIME type", srcurl),
+			http.StatusBadRequest,
+			"URL must be an image",
+		)
 	}
 
 	body, err = ioutil.ReadAll(buf)
@@ -353,7 +341,8 @@ func (app *appEnv) getArcStory(w http.ResponseWriter, r *http.Request) {
 		article.Status != almanack.StatusPlanned {
 		// Let Spotlight PA users get article regardless of its status
 		if err := app.auth.HasRole(r, "Spotlight PA"); err != nil {
-			app.errorResponse(w, r, errutil.NotFound)
+			app.errorResponse(w, r, resperr.WithStatusCode(
+				err, http.StatusNotFound))
 			return
 		}
 	}
@@ -448,10 +437,10 @@ func (app *appEnv) postSignedUpload(w http.ResponseWriter, r *http.Request) {
 	}
 	ext, ok := supportedContentTypes[userData.Type]
 	if !ok {
-		app.errorResponse(w, r, errutil.Response{
-			StatusCode: http.StatusBadRequest,
-			Cause:      fmt.Errorf("unsupported content type: %q", ext),
-		})
+		app.errorResponse(w, r, resperr.WithStatusCode(
+			fmt.Errorf("unsupported content type: %q", ext),
+			http.StatusBadRequest,
+		))
 		return
 	}
 

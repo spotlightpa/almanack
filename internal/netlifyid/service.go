@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"net/http"
 
+	"github.com/carlmjohnson/resperr"
 	"github.com/spotlightpa/almanack/pkg/common"
-	"github.com/spotlightpa/almanack/pkg/errutil"
 )
 
 func NewService(isLambda bool, l common.Logger) common.AuthService {
@@ -50,16 +50,16 @@ func (as AuthService) HasRole(r *http.Request, role string) error {
 			return nil
 		}
 
-		as.Logger.Printf("unauthorized user only had roles: %v",
+		err := fmt.Errorf("unauthorized user %s only had roles: %v",
+			jwt.User.Email,
 			jwt.User.AppMetadata.Roles)
 
-		return errutil.Unauthorized
+		return resperr.WithStatusCode(err, http.StatusUnauthorized)
 	}
 	as.Logger.Printf("no identity found: running on AWS?")
-	err := errutil.Response{
-		StatusCode: http.StatusInternalServerError,
-		Message:    "user info not set",
-		Cause:      fmt.Errorf("no user info: is this localhost?"),
-	}
-	return err
+
+	return resperr.WithUserMessage(
+		fmt.Errorf("no user info provided: is this localhost?"),
+		"no user info provided",
+	)
 }

@@ -6,11 +6,11 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/carlmjohnson/resperr"
 	"github.com/getsentry/sentry-go"
 
 	"github.com/spotlightpa/almanack/internal/httpjson"
 	"github.com/spotlightpa/almanack/pkg/almanack"
-	"github.com/spotlightpa/almanack/pkg/errutil"
 )
 
 func (app *appEnv) versionMiddleware(h http.Handler) http.Handler {
@@ -31,8 +31,15 @@ func (app *appEnv) jsonResponse(statusCode int, w http.ResponseWriter, data inte
 
 func (app *appEnv) errorResponse(w http.ResponseWriter, r *http.Request, err error) {
 	app.logErr(r.Context(), err)
-	errResp := errutil.ResponseFrom(err)
-	app.jsonResponse(errResp.StatusCode, w, errResp)
+	code := resperr.StatusCode(err)
+	msg := resperr.UserMessage(err)
+	app.jsonResponse(code, w, struct {
+		Status  int    `json:"status"`
+		Message string `json:"message"`
+	}{
+		code,
+		msg,
+	})
 }
 
 func (app *appEnv) logErr(ctx context.Context, err error) {

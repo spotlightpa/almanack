@@ -4,11 +4,12 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
+	"net/http"
 	"os"
 	"path/filepath"
 	"strings"
 
-	"github.com/spotlightpa/almanack/pkg/errutil"
+	"github.com/carlmjohnson/resperr"
 )
 
 type Logger interface {
@@ -59,7 +60,7 @@ func (loc Loc) Get(key string, v interface{}) error {
 	}
 	data, err := ioutil.ReadFile(loc.name(key))
 	if os.IsNotExist(err) {
-		return errutil.NotFound
+		return resperr.WithStatusCode(err, http.StatusNotFound)
 	} else if err != nil {
 		return fmt.Errorf("could not read cache data: %w", err)
 	}
