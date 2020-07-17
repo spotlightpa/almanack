@@ -72,7 +72,7 @@ func (app *appEnv) routes() http.Handler {
 }
 
 func (app *appEnv) notFound(w http.ResponseWriter, r *http.Request) {
-	app.errorResponse(r.Context(), w, errutil.Response{
+	app.errorResponse(w, r, errutil.Response{
 		StatusCode: http.StatusNotFound,
 		Message:    http.StatusText(http.StatusNotFound),
 		Cause:      fmt.Errorf("path not found: %s", r.URL.Path),
@@ -85,7 +85,7 @@ func (app *appEnv) ping(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Cache-Control", "public, max-age=60")
 	b, err := httputil.DumpRequest(r, true)
 	if err != nil {
-		app.errorResponse(r.Context(), w, err)
+		app.errorResponse(w, r, err)
 		return
 	}
 
@@ -97,7 +97,7 @@ func (app *appEnv) pingErr(w http.ResponseWriter, r *http.Request) {
 	statusCode, _ := strconv.Atoi(code)
 	app.Printf("start pingErr %q", code)
 
-	app.errorResponse(r.Context(), w, errutil.Response{
+	app.errorResponse(w, r, errutil.Response{
 		StatusCode: statusCode,
 		Message:    http.StatusText(statusCode),
 		Cause:      fmt.Errorf("got test ping %q", code),
@@ -109,7 +109,7 @@ func (app *appEnv) userInfo(w http.ResponseWriter, r *http.Request) {
 	app.Println("start userInfo")
 	userinfo, err := netlifyid.FromRequest(r)
 	if err != nil {
-		app.errorResponse(r.Context(), w, err)
+		app.errorResponse(w, r, err)
 		return
 	}
 	app.jsonResponse(http.StatusOK, w, userinfo)
@@ -125,7 +125,7 @@ func (app *appEnv) getProxyImage(w http.ResponseWriter, r *http.Request) {
 			StatusCode: http.StatusBadRequest,
 			Cause:      err,
 		}
-		app.errorResponse(r.Context(), w, err)
+		app.errorResponse(w, r, err)
 		return
 	}
 	u := string(decURL)
@@ -145,12 +145,12 @@ func (app *appEnv) getProxyImage(w http.ResponseWriter, r *http.Request) {
 			StatusCode: http.StatusBadRequest,
 			Cause:      err,
 		}
-		app.errorResponse(r.Context(), w, err)
+		app.errorResponse(w, r, err)
 		return
 	}
 	ctype, body, err := getImage(r.Context(), app.svc.Client, u)
 	if err != nil {
-		app.errorResponse(r.Context(), w, err)
+		app.errorResponse(w, r, err)
 		return
 	}
 	w.Header().Set("Content-Type", ctype)
@@ -205,7 +205,7 @@ func (app *appEnv) listAllArcStories(w http.ResponseWriter, r *http.Request) {
 	page := 0
 	if pageStr := chi.URLParam(r, "page"); pageStr != "" {
 		if parsed, err := strconv.Atoi(pageStr); err != nil {
-			app.errorResponse(r.Context(), w, fmt.Errorf(
+			app.errorResponse(w, r, fmt.Errorf(
 				"bad argument to listAllArcStories: %w", err,
 			))
 			return
@@ -226,7 +226,7 @@ func (app *appEnv) listAllArcStories(w http.ResponseWriter, r *http.Request) {
 	)
 	resp.Contents, resp.NextPage, err = app.svc.ListAllArcStories(r.Context(), page)
 	if err != nil {
-		app.errorResponse(r.Context(), w, err)
+		app.errorResponse(w, r, err)
 		return
 	}
 	app.jsonResponse(http.StatusOK, w, &resp)
@@ -246,13 +246,13 @@ func (app *appEnv) listWithArcRefresh(w http.ResponseWriter, r *http.Request) {
 		// Keep trucking even if you can't load feed
 		app.logErr(r.Context(), err)
 	} else if err = app.svc.StoreFeed(r.Context(), feed); err != nil {
-		app.errorResponse(r.Context(), w, err)
+		app.errorResponse(w, r, err)
 		return
 	}
 	var resp response
 	resp.Contents, resp.NextPage, err = app.svc.ListAllArcStories(r.Context(), 0)
 	if err != nil {
-		app.errorResponse(r.Context(), w, err)
+		app.errorResponse(w, r, err)
 		return
 	}
 	app.jsonResponse(http.StatusOK, w, resp)
@@ -268,7 +268,7 @@ func (app *appEnv) postAlmanackArcStory(w http.ResponseWriter, r *http.Request) 
 		RefreshArc bool            `json:"almanack-refresh-arc"`
 	}
 	if err := httpjson.DecodeRequest(w, r, &userData); err != nil {
-		app.errorResponse(r.Context(), w, err)
+		app.errorResponse(w, r, err)
 		return
 	}
 
@@ -282,11 +282,11 @@ func (app *appEnv) postAlmanackArcStory(w http.ResponseWriter, r *http.Request) 
 			err  error
 		)
 		if feed, err = app.FetchFeed(r.Context()); err != nil {
-			app.errorResponse(r.Context(), w, err)
+			app.errorResponse(w, r, err)
 			return
 		}
 		if err := app.svc.StoreFeed(r.Context(), feed); err != nil {
-			app.errorResponse(r.Context(), w, err)
+			app.errorResponse(w, r, err)
 			return
 		}
 		for i := range feed.Contents {
@@ -301,7 +301,7 @@ func (app *appEnv) postAlmanackArcStory(w http.ResponseWriter, r *http.Request) 
 	story.Status = userData.Status
 
 	if err := app.svc.SaveAlmanackArticle(r.Context(), &story, refreshStory); err != nil {
-		app.errorResponse(r.Context(), w, err)
+		app.errorResponse(w, r, err)
 		return
 	}
 	app.jsonResponse(http.StatusAccepted, w, &userData)
@@ -311,7 +311,7 @@ func (app *appEnv) listAvailableArcStories(w http.ResponseWriter, r *http.Reques
 	page := 0
 	if pageStr := chi.URLParam(r, "page"); pageStr != "" {
 		if parsed, err := strconv.Atoi(pageStr); err != nil {
-			app.errorResponse(r.Context(), w, fmt.Errorf(
+			app.errorResponse(w, r, fmt.Errorf(
 				"bad argument to listAvailableArcStories: %w", err,
 			))
 			return
@@ -332,7 +332,7 @@ func (app *appEnv) listAvailableArcStories(w http.ResponseWriter, r *http.Reques
 	if res.Contents, res.NextPage, err = app.svc.ListAvailableArcStories(
 		r.Context(), page,
 	); err != nil {
-		app.errorResponse(r.Context(), w, err)
+		app.errorResponse(w, r, err)
 		return
 	}
 
@@ -345,7 +345,7 @@ func (app *appEnv) getArcStory(w http.ResponseWriter, r *http.Request) {
 
 	article, err := app.svc.GetArcStory(r.Context(), articleID)
 	if err != nil {
-		app.errorResponse(r.Context(), w, err)
+		app.errorResponse(w, r, err)
 		return
 	}
 
@@ -353,7 +353,7 @@ func (app *appEnv) getArcStory(w http.ResponseWriter, r *http.Request) {
 		article.Status != almanack.StatusPlanned {
 		// Let Spotlight PA users get article regardless of its status
 		if err := app.auth.HasRole(r, "Spotlight PA"); err != nil {
-			app.errorResponse(r.Context(), w, errutil.NotFound)
+			app.errorResponse(w, r, errutil.NotFound)
 			return
 		}
 	}
@@ -370,11 +370,11 @@ func (app *appEnv) postMessage(w http.ResponseWriter, r *http.Request) {
 
 	var req request
 	if err := httpjson.DecodeRequest(w, r, &req); err != nil {
-		app.errorResponse(r.Context(), w, err)
+		app.errorResponse(w, r, err)
 		return
 	}
 	if err := app.email.SendEmail(req.Subject, req.Body); err != nil {
-		app.errorResponse(r.Context(), w, err)
+		app.errorResponse(w, r, err)
 		return
 	}
 	app.jsonResponse(http.StatusAccepted, w, http.StatusText(http.StatusAccepted))
@@ -386,7 +386,7 @@ func (app *appEnv) getScheduledArticle(w http.ResponseWriter, r *http.Request) {
 
 	article, err := app.svc.GetScheduledArticle(r.Context(), articleID)
 	if err != nil {
-		app.errorResponse(r.Context(), w, err)
+		app.errorResponse(w, r, err)
 		return
 	}
 
@@ -401,7 +401,7 @@ func (app *appEnv) postScheduledArticle(w http.ResponseWriter, r *http.Request) 
 		RefreshArc bool `json:"almanack-refresh-arc"`
 	}
 	if err := httpjson.DecodeRequest(w, r, &userData); err != nil {
-		app.errorResponse(r.Context(), w, err)
+		app.errorResponse(w, r, err)
 		return
 	}
 
@@ -411,21 +411,21 @@ func (app *appEnv) postScheduledArticle(w http.ResponseWriter, r *http.Request) 
 			err  error
 		)
 		if feed, err = app.FetchFeed(r.Context()); err != nil {
-			app.errorResponse(r.Context(), w, err)
+			app.errorResponse(w, r, err)
 			return
 		}
 		if err = app.svc.StoreFeed(r.Context(), feed); err != nil {
-			app.errorResponse(r.Context(), w, err)
+			app.errorResponse(w, r, err)
 			return
 		}
 		if err = app.svc.ResetSpotlightPAArticleArcData(r.Context(), &userData.SpotlightPAArticle); err != nil {
-			app.errorResponse(r.Context(), w, err)
+			app.errorResponse(w, r, err)
 			return
 		}
 	}
 
 	if err := app.svc.SaveScheduledArticle(r.Context(), &userData.SpotlightPAArticle); err != nil {
-		app.errorResponse(r.Context(), w, err)
+		app.errorResponse(w, r, err)
 		return
 	}
 
@@ -443,12 +443,12 @@ func (app *appEnv) postSignedUpload(w http.ResponseWriter, r *http.Request) {
 		Type string `json:"type"`
 	}
 	if err := httpjson.DecodeRequest(w, r, &userData); err != nil {
-		app.errorResponse(r.Context(), w, err)
+		app.errorResponse(w, r, err)
 		return
 	}
 	ext, ok := supportedContentTypes[userData.Type]
 	if !ok {
-		app.errorResponse(r.Context(), w, errutil.Response{
+		app.errorResponse(w, r, errutil.Response{
 			StatusCode: http.StatusBadRequest,
 			Cause:      fmt.Errorf("unsupported content type: %q", ext),
 		})
@@ -465,14 +465,14 @@ func (app *appEnv) postSignedUpload(w http.ResponseWriter, r *http.Request) {
 	)
 	res.SignedURL, res.FileName, err = almanack.GetSignedUpload(app.svc.ImageStore, ext)
 	if err != nil {
-		app.errorResponse(r.Context(), w, err)
+		app.errorResponse(w, r, err)
 		return
 	}
 	if n, err := app.svc.Querier.CreateImagePlaceholder(r.Context(), db.CreateImagePlaceholderParams{
 		Path: res.FileName,
 		Type: ext,
 	}); err != nil {
-		app.errorResponse(r.Context(), w, err)
+		app.errorResponse(w, r, err)
 		return
 	} else if n != 1 {
 		// Log and continue
@@ -487,7 +487,7 @@ func (app *appEnv) postImageUpdate(w http.ResponseWriter, r *http.Request) {
 
 	var userData db.UpdateImageParams
 	if err := httpjson.DecodeRequest(w, r, &userData); err != nil {
-		app.errorResponse(r.Context(), w, err)
+		app.errorResponse(w, r, err)
 		return
 	}
 	var (
@@ -495,7 +495,7 @@ func (app *appEnv) postImageUpdate(w http.ResponseWriter, r *http.Request) {
 		err error
 	)
 	if res, err = app.svc.Querier.UpdateImage(r.Context(), userData); err != nil {
-		app.errorResponse(r.Context(), w, err)
+		app.errorResponse(w, r, err)
 		return
 	}
 	app.jsonResponse(http.StatusOK, w, &res)
@@ -514,7 +514,7 @@ func (app *appEnv) listDomains(w http.ResponseWriter, r *http.Request) {
 
 	domains, err := app.svc.Querier.ListDomainsWithRole(r.Context(), "editor")
 	if err != nil {
-		app.errorResponse(r.Context(), w, err)
+		app.errorResponse(w, r, err)
 		return
 	}
 	app.jsonResponse(http.StatusOK, w, response{
@@ -532,7 +532,7 @@ func (app *appEnv) postDomain(w http.ResponseWriter, r *http.Request) {
 	}
 	var req request
 	if err := httpjson.DecodeRequest(w, r, &req); err != nil {
-		app.errorResponse(r.Context(), w, err)
+		app.errorResponse(w, r, err)
 		return
 	}
 
@@ -543,13 +543,13 @@ func (app *appEnv) postDomain(w http.ResponseWriter, r *http.Request) {
 			Role:   "editor",
 		},
 	); err != nil {
-		app.errorResponse(r.Context(), w, err)
+		app.errorResponse(w, r, err)
 		return
 	}
 
 	domains, err := app.svc.Querier.ListDomainsWithRole(r.Context(), "editor")
 	if err != nil {
-		app.errorResponse(r.Context(), w, err)
+		app.errorResponse(w, r, err)
 		return
 	}
 	app.jsonResponse(http.StatusOK, w, response{
@@ -568,7 +568,7 @@ func (app *appEnv) listSpotlightPAArticles(w http.ResponseWriter, r *http.Reques
 	)
 
 	if res.Articles, err = app.svc.Querier.ListSpotlightPAArticles(r.Context()); err != nil {
-		app.errorResponse(r.Context(), w, err)
+		app.errorResponse(w, r, err)
 		return
 	}
 
@@ -589,7 +589,7 @@ func (app *appEnv) listImages(w http.ResponseWriter, r *http.Request) {
 		Offset: 0,
 		Limit:  100,
 	}); err != nil {
-		app.errorResponse(r.Context(), w, err)
+		app.errorResponse(w, r, err)
 		return
 	}
 
@@ -619,7 +619,7 @@ func (app *appEnv) getEditorsPicks(w http.ResponseWriter, r *http.Request) {
 	app.Printf("starting getEditorsPicks")
 	resp, err := almanack.GetEditorsPicks(r.Context(), app.svc.Querier)
 	if err != nil {
-		app.errorResponse(r.Context(), w, err)
+		app.errorResponse(w, r, err)
 		return
 	}
 	app.jsonResponse(http.StatusOK, w, resp)
@@ -629,7 +629,7 @@ func (app *appEnv) postEditorsPicks(w http.ResponseWriter, r *http.Request) {
 	app.Printf("starting postEditorsPicks")
 	var req almanack.EditorsPicks
 	if err := httpjson.DecodeRequest(w, r, &req); err != nil {
-		app.errorResponse(r.Context(), w, err)
+		app.errorResponse(w, r, err)
 		return
 	}
 	if err := almanack.SetEditorsPicks(
@@ -638,12 +638,12 @@ func (app *appEnv) postEditorsPicks(w http.ResponseWriter, r *http.Request) {
 		app.svc.ContentStore,
 		&req,
 	); err != nil {
-		app.errorResponse(r.Context(), w, err)
+		app.errorResponse(w, r, err)
 		return
 	}
 	resp, err := almanack.GetEditorsPicks(r.Context(), app.svc.Querier)
 	if err != nil {
-		app.errorResponse(r.Context(), w, err)
+		app.errorResponse(w, r, err)
 		return
 	}
 	app.jsonResponse(http.StatusOK, w, resp)
@@ -653,7 +653,7 @@ func (app *appEnv) listAllTopics(w http.ResponseWriter, r *http.Request) {
 	app.Printf("starting listAllTopics")
 	t, err := app.svc.Querier.ListAllTopics(r.Context())
 	if err != nil {
-		app.errorResponse(r.Context(), w, err)
+		app.errorResponse(w, r, err)
 		return
 	}
 	app.jsonResponse(http.StatusOK, w, struct {
@@ -665,7 +665,7 @@ func (app *appEnv) listAllSeries(w http.ResponseWriter, r *http.Request) {
 	app.Printf("starting listAllSeries")
 	s, err := app.svc.Querier.ListAllSeries(r.Context())
 	if err != nil {
-		app.errorResponse(r.Context(), w, err)
+		app.errorResponse(w, r, err)
 		return
 	}
 	app.jsonResponse(http.StatusOK, w, struct {
