@@ -2,11 +2,13 @@ package redis
 
 import (
 	"encoding/json"
+	"net/http"
 	"time"
 
+	"github.com/carlmjohnson/errutil"
+	"github.com/carlmjohnson/resperr"
 	"github.com/go-redsync/redsync"
 	"github.com/gomodule/redigo/redis"
-	"github.com/spotlightpa/almanack/pkg/errutil"
 )
 
 var ErrNil = redis.ErrNil
@@ -42,7 +44,7 @@ func New(d Dialer, l Logger) (*Store, error) {
 
 func wrapErr(err error) error {
 	if err == redis.ErrNil {
-		return errutil.NotFound
+		return resperr.WithStatusCode(err, http.StatusNotFound)
 	}
 	return err
 }

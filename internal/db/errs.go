@@ -3,8 +3,9 @@ package db
 import (
 	"database/sql"
 	"errors"
+	"net/http"
 
-	"github.com/spotlightpa/almanack/pkg/errutil"
+	"github.com/carlmjohnson/resperr"
 )
 
 func IsNotFound(err error) bool {
@@ -13,7 +14,7 @@ func IsNotFound(err error) bool {
 
 func ExpectNotFound(err error) error {
 	if IsNotFound(err) {
-		return errutil.NotFound
+		return resperr.WithStatusCode(err, http.StatusNotFound)
 	}
 	return err
 }

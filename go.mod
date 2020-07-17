@@ -11,10 +11,11 @@ require (
 	github.com/aws/aws-lambda-go v1.17.0
 	github.com/aws/aws-sdk-go-v2 v0.19.0
 	github.com/carlmjohnson/crockford v0.0.3
-	github.com/carlmjohnson/errutil v0.0.9
+	github.com/carlmjohnson/errutil v0.20.1
 	github.com/carlmjohnson/exitcode v0.0.4
 	github.com/carlmjohnson/flagext v0.0.10
 	github.com/carlmjohnson/gateway v1.20.6
+	github.com/carlmjohnson/resperr v0.20.2
 	github.com/carlmjohnson/slackhook v0.20.2
 	github.com/getsentry/sentry-go v0.6.1
 	github.com/go-chi/chi v4.0.3+incompatible
