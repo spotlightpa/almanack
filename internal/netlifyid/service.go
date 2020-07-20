@@ -50,11 +50,12 @@ func (as AuthService) HasRole(r *http.Request, role string) error {
 			return nil
 		}
 
-		err := fmt.Errorf("unauthorized user %s only had roles: %v",
+		return resperr.New(
+			http.StatusUnauthorized,
+			"unauthorized user %s only had roles: %v",
 			jwt.User.Email,
-			jwt.User.AppMetadata.Roles)
-
-		return resperr.WithStatusCode(err, http.StatusUnauthorized)
+			jwt.User.AppMetadata.Roles,
+		)
 	}
 	as.Logger.Printf("no identity found: running on AWS?")
 

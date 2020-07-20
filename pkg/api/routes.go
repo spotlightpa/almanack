@@ -93,9 +93,8 @@ func (app *appEnv) pingErr(w http.ResponseWriter, r *http.Request) {
 	statusCode, _ := strconv.Atoi(code)
 	app.Printf("start pingErr %q", code)
 
-	app.errorResponse(w, r, resperr.WithStatusCode(
-		fmt.Errorf("got test ping %q", code),
-		statusCode,
+	app.errorResponse(w, r, resperr.New(
+		statusCode, "got test ping %q", code,
 	))
 
 	return
@@ -117,7 +116,9 @@ func (app *appEnv) getProxyImage(w http.ResponseWriter, r *http.Request) {
 	encURL := chi.URLParam(r, "encURL")
 	decURL, err := base64.URLEncoding.DecodeString(encURL)
 	if err != nil {
-		app.errorResponse(w, r, resperr.WithStatusCode(err, http.StatusBadRequest))
+		app.errorResponse(w, r, resperr.New(
+			http.StatusBadRequest, "could not decode URL param: %w", err,
+		))
 		return
 	}
 	u := string(decURL)
@@ -133,7 +134,9 @@ func (app *appEnv) getProxyImage(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 	if !inWhitelist {
-		app.errorResponse(w, r, resperr.WithStatusCode(err, http.StatusBadRequest))
+		app.errorResponse(w, r, resperr.New(
+			http.StatusBadRequest, "untrust image URL: %s", u,
+		))
 		return
 	}
 	ctype, body, err := getImage(r.Context(), app.svc.Client, u)
@@ -341,8 +344,9 @@ func (app *appEnv) getArcStory(w http.ResponseWriter, r *http.Request) {
 		article.Status != almanack.StatusPlanned {
 		// Let Spotlight PA users get article regardless of its status
 		if err := app.auth.HasRole(r, "Spotlight PA"); err != nil {
-			app.errorResponse(w, r, resperr.WithStatusCode(
-				err, http.StatusNotFound))
+			app.errorResponse(w, r, resperr.New(
+				http.StatusNotFound, "user unauthorized to view article: %w", err,
+			))
 			return
 		}
 	}
@@ -437,9 +441,8 @@ func (app *appEnv) postSignedUpload(w http.ResponseWriter, r *http.Request) {
 	}
 	ext, ok := supportedContentTypes[userData.Type]
 	if !ok {
-		app.errorResponse(w, r, resperr.WithStatusCode(
-			fmt.Errorf("unsupported content type: %q", ext),
-			http.StatusBadRequest,
+		app.errorResponse(w, r, resperr.New(
+			http.StatusBadRequest, "unsupported content type: %q", ext,
 		))
 		return
 	}
