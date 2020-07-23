@@ -20,7 +20,7 @@ func Flags(fl *flag.FlagSet) func(common.Logger) (svc Service, err error) {
 	pg := db.FlagVar(fl, "postgres", "PostgreSQL database `URL`")
 	slackURL := fl.String("slack-social-url", "", "Slack hook endpoint `URL` for social")
 	checkHerokuPG := herokuapi.FlagVar(fl, "postgres")
-	getImageStore := aws.FlagVar(fl)
+	getS3Store := aws.FlagVar(fl)
 	getGithub := github.FlagVar(fl)
 	getIndex := index.FlagVar(fl)
 
@@ -51,12 +51,13 @@ func Flags(fl *flag.FlagSet) func(common.Logger) (svc Service, err error) {
 			return
 		}
 
+		svc.ImageStore, svc.FileStore = getS3Store(l)
+
 		return Service{
 			Logger:       l,
 			Client:       &client,
 			Querier:      *pg,
 			ContentStore: svc.ContentStore,
-			ImageStore:   getImageStore(l),
 			SlackClient:  slack.New(*slackURL, l),
 			Indexer:      getIndex(l),
 		}, nil

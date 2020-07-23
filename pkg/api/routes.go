@@ -64,6 +64,9 @@ func (app *appEnv) routes() http.Handler {
 			r.Post("/editors-picks", app.postEditorsPicks)
 			r.Get("/all-topics", app.listAllTopics)
 			r.Get("/all-series", app.listAllSeries)
+			r.Get("/files-list", app.listFiles)
+			r.Post("/files-create", app.postFileCreate)
+			r.Post("/files-update", app.postFileUpdate)
 		})
 	})
 	r.NotFound(app.notFound)
@@ -455,7 +458,7 @@ func (app *appEnv) postSignedUpload(w http.ResponseWriter, r *http.Request) {
 		res response
 		err error
 	)
-	res.SignedURL, res.FileName, err = almanack.GetSignedUpload(app.svc.ImageStore, ext)
+	res.SignedURL, res.FileName, err = almanack.GetSignedImageUpload(app.svc.ImageStore, ext)
 	if err != nil {
 		app.errorResponse(w, r, err)
 		return
@@ -663,4 +666,87 @@ func (app *appEnv) listAllSeries(w http.ResponseWriter, r *http.Request) {
 	app.jsonResponse(http.StatusOK, w, struct {
 		Series []string `json:"series"`
 	}{s})
+}
+
+func (app *appEnv) listFiles(w http.ResponseWriter, r *http.Request) {
+	app.Printf("starting listFiles")
+	type response struct {
+		Files []db.File `json:"files"`
+	}
+	var (
+		res response
+		err error
+	)
+
+	if res.Files, err = app.svc.Querier.ListFiles(r.Context(), db.ListFilesParams{
+		Offset: 0,
+		Limit:  100,
+	}); err != nil {
+		app.errorResponse(w, r, err)
+		return
+	}
+
+	app.jsonResponse(http.StatusOK, w, res)
+}
+
+func (app *appEnv) postFileCreate(w http.ResponseWriter, r *http.Request) {
+	app.Printf("start postFileCreate")
+	var userData struct {
+		MimeType string `json:"mimeType"`
+		FileName string `json:"filename"`
+	}
+	if err := httpjson.DecodeRequest(w, r, &userData); err != nil {
+		app.errorResponse(w, r, err)
+		return
+	}
+	type response struct {
+		SignedURL string `json:"signed-url"`
+		FilePath  string `json:"filepath"`
+	}
+	var (
+		res response
+		err error
+	)
+
+	res.SignedURL, res.FilePath, err = almanack.GetSignedFileUpload(
+		app.svc.FileStore,
+		userData.FileName,
+	)
+	if err != nil {
+		app.errorResponse(w, r, err)
+		return
+	}
+	if n, err := app.svc.Querier.CreateFilePlaceholder(r.Context(),
+		db.CreateFilePlaceholderParams{
+			Filename: userData.FileName,
+			Type:     userData.MimeType,
+			Path:     res.FilePath,
+		}); err != nil {
+		app.errorResponse(w, r, err)
+		return
+	} else if n != 1 {
+		// Log and continue
+		app.logErr(r.Context(),
+			fmt.Errorf("creating file %q but it already exists", res.FilePath))
+	}
+	app.jsonResponse(http.StatusOK, w, &res)
+}
+
+func (app *appEnv) postFileUpdate(w http.ResponseWriter, r *http.Request) {
+	app.Println("start postFileUpdate")
+
+	var userData db.UpdateFileParams
+	if err := httpjson.DecodeRequest(w, r, &userData); err != nil {
+		app.errorResponse(w, r, err)
+		return
+	}
+	var (
+		res db.File
+		err error
+	)
+	if res, err = app.svc.Querier.UpdateFile(r.Context(), userData); err != nil {
+		app.errorResponse(w, r, err)
+		return
+	}
+	app.jsonResponse(http.StatusOK, w, &res)
 }

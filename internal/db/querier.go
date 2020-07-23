@@ -10,6 +10,7 @@ import (
 
 type Querier interface {
 	AppendRoleToDomain(ctx context.Context, arg AppendRoleToDomainParams) (DomainRole, error)
+	CreateFilePlaceholder(ctx context.Context, arg CreateFilePlaceholderParams) (int64, error)
 	CreateImage(ctx context.Context, arg CreateImageParams) (int64, error)
 	CreateImagePlaceholder(ctx context.Context, arg CreateImagePlaceholderParams) (int64, error)
 	GetArticle(ctx context.Context, arcID sql.NullString) (Article, error)
@@ -23,6 +24,7 @@ type Querier interface {
 	ListAllTopics(ctx context.Context) ([]string, error)
 	ListAvailableArticles(ctx context.Context, arg ListAvailableArticlesParams) ([]Article, error)
 	ListDomainsWithRole(ctx context.Context, role string) ([]string, error)
+	ListFiles(ctx context.Context, arg ListFilesParams) ([]File, error)
 	ListImages(ctx context.Context, arg ListImagesParams) ([]Image, error)
 	ListSpotlightPAArticles(ctx context.Context) ([]ListSpotlightPAArticlesRow, error)
 	ListUpcoming(ctx context.Context) ([]Article, error)
@@ -31,6 +33,7 @@ type Querier interface {
 	SetSiteData(ctx context.Context, arg SetSiteDataParams) error
 	UpdateAlmanackArticle(ctx context.Context, arg UpdateAlmanackArticleParams) (Article, error)
 	UpdateArcArticles(ctx context.Context, arcItems json.RawMessage) error
+	UpdateFile(ctx context.Context, arg UpdateFileParams) (File, error)
 	UpdateImage(ctx context.Context, arg UpdateImageParams) (Image, error)
 	UpdateSpotlightPAArticle(ctx context.Context, arg UpdateSpotlightPAArticleParams) (sql.NullTime, error)
 	UpdateSpotlightPAArticleLastPublished(ctx context.Context, arcID string) (sql.NullTime, error)
