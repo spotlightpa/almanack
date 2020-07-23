@@ -23,6 +23,6 @@ type EmailService interface {
 	SendEmail(subject, body string) error
 }
 
-type ImageStore interface {
+type FileStore interface {
 	GetSignedURL(srcPath string) (signedURL string, err error)
 }

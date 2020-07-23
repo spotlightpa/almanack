@@ -35,6 +35,17 @@ type DomainRole struct {
 	UpdatedAt time.Time `json:"updated_at"`
 }
 
+type File struct {
+	ID          int32     `json:"id"`
+	Path        string    `json:"path"`
+	Filename    string    `json:"filename"`
+	MimeType    string    `json:"mime_type"`
+	Description string    `json:"description"`
+	IsUploaded  bool      `json:"is_uploaded"`
+	CreatedAt   time.Time `json:"created_at"`
+	UpdatedAt   time.Time `json:"updated_at"`
+}
+
 type Image struct {
 	ID          int32     `json:"id"`
 	Path        string    `json:"path"`

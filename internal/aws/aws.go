@@ -11,13 +11,14 @@ import (
 	"github.com/spotlightpa/almanack/pkg/common"
 )
 
-func FlagVar(fl *flag.FlagSet) func(l common.Logger) common.ImageStore {
+func FlagVar(fl *flag.FlagSet) func(l common.Logger) (imageStore, fileStore common.FileStore) {
 	accessKeyID := fl.String("aws-access-key", "", "AWS access `key` ID")
 	secretAccessKey := fl.String("aws-secret-key", "", "AWS secret access `key`")
 	region := fl.String("aws-s3-region", "us-east-2", "AWS `region` to use for S3")
-	bucket := fl.String("aws-s3-bucket", "", "AWS `bucket` to use for S3")
+	ibucket := fl.String("aws-s3-bucket", "", "AWS `bucket` to use for S3 images")
+	fbucket := fl.String("aws-s3-file-bucket", "", "AWS `bucket` to use for S3 files")
 
-	return func(l common.Logger) common.ImageStore {
+	return func(l common.Logger) (imageStore, fileStore common.FileStore) {
 		cfg, err := external.LoadDefaultAWSConfig(
 			external.WithCredentialsValue(aws.Credentials{
 				AccessKeyID:     *accessKeyID,
@@ -25,38 +26,49 @@ func FlagVar(fl *flag.FlagSet) func(l common.Logger) common.ImageStore {
 			}),
 		)
 
-		if err != nil || *bucket == "" {
+		imageStore, fileStore = MockStore{l}, MockStore{l}
+		if err != nil {
 			l.Printf("using mock AWS: %v", err)
-			return MockImageStore{l}
+			return
 		}
 		cfg.Region = *region
-		return ImageStore{s3.New(cfg), *bucket, l}
+		if *ibucket != "" {
+			imageStore = S3Store{s3.New(cfg), *ibucket, l}
+		} else {
+			l.Printf("using mock AWS image bucket")
+		}
+		if *fbucket != "" {
+			fileStore = S3Store{s3.New(cfg), *fbucket, l}
+		} else {
+			l.Printf("using mock AWS file bucket")
+		}
+		return
 	}
 }
 
-type ImageStore struct {
+type S3Store struct {
 	svc    *s3.Client
 	bucket string
 	l      common.Logger
 }
 
-func (is ImageStore) GetSignedURL(srcPath string) (signedURL string, err error) {
-	is.l.Printf("creating presigned URL for %q", srcPath)
+func (ss S3Store) GetSignedURL(srcPath string) (signedURL string, err error) {
+	ss.l.Printf("creating presigned URL for %q", srcPath)
 	input := &s3.PutObjectInput{
-		Bucket: &is.bucket,
+		Bucket: &ss.bucket,
 		Key:    &srcPath,
 	}
-	req := is.svc.PutObjectRequest(input)
+	req := ss.svc.PutObjectRequest(input)
 	signedURL, err = req.Presign(15 * time.Minute)
 
 	return
 }
 
-type MockImageStore struct {
+type MockStore struct {
 	l common.Logger
 }
 
-func (mis MockImageStore) GetSignedURL(srcPath string) (signedURL string, err error) {
-	mis.l.Printf("returning mock signed URL")
+func (ms MockStore) GetSignedURL(srcPath string) (signedURL string, err error) {
+	ms.l.Printf("returning mock signed URL")
 	return "https://invalid", nil
 }

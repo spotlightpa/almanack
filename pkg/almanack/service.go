@@ -57,7 +57,8 @@ type Service struct {
 	Client  *http.Client
 	Querier db.Querier
 	common.ContentStore
-	common.ImageStore
+	ImageStore  common.FileStore
+	FileStore   common.FileStore
 	SlackClient slack.Client
 	Indexer     index.Indexer
 }
