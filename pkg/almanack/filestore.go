@@ -11,13 +11,13 @@ import (
 	"github.com/spotlightpa/almanack/pkg/common"
 )
 
-func GetSignedFileUpload(is common.FileStore, filename string) (signedURL, fileURL string, err error) {
+func GetSignedFileUpload(is common.FileStore, filename string) (signedURL, fileURL, disposition string, err error) {
 	filepath := makeFilePath(filename)
 	fileURL = is.BuildURL(filepath)
-	var h http.Header
-	h.Set("Content-Disposition", fmt.Sprintf(
-		"attachment; filename*=UTF-8''%s",
-		url.PathEscape(filename)))
+	h := http.Header{}
+	disposition = fmt.Sprintf("attachment; filename*=UTF-8''%s",
+		url.PathEscape(filename))
+	h.Set("Content-Disposition", disposition)
 	signedURL, err = is.GetSignedURL(filepath, h)
 	return
 }
@@ -28,11 +28,9 @@ func makeFilePath(filename string) string {
 	if filename == "" {
 		filename = "-"
 	}
-	sb.Grow(len("uploads/12/34/1234/") + len(filename))
+	sb.Grow(len("uploads/1234/1234/") + len(filename))
 	sb.WriteString("uploads/")
 	t := crockford.Time(crockford.Lower, time.Now())
-	sb.Write(t[:2])
-	sb.WriteString("/")
 	sb.Write(t[:4])
 	sb.WriteString("/")
 	sb.Write(t[4:])

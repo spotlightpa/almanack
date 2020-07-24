@@ -700,15 +700,16 @@ func (app *appEnv) postFileCreate(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	type response struct {
-		SignedURL string `json:"signed-url"`
-		FileURL   string `json:"file-url"`
+		SignedURL   string `json:"signed-url"`
+		FileURL     string `json:"file-url"`
+		Disposition string `json:"disposition"`
 	}
 	var (
 		res response
 		err error
 	)
 
-	res.SignedURL, res.FileURL, err = almanack.GetSignedFileUpload(
+	res.SignedURL, res.FileURL, res.Disposition, err = almanack.GetSignedFileUpload(
 		app.svc.FileStore,
 		userData.FileName,
 	)
