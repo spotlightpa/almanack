@@ -1,6 +1,9 @@
 package almanack
 
 import (
+	"fmt"
+	"net/http"
+	"net/url"
 	"strings"
 	"time"
 
@@ -10,7 +13,11 @@ import (
 
 func GetSignedFileUpload(is common.FileStore, filename string) (signedURL, filepath string, err error) {
 	filepath = makeFilePath(filename)
-	signedURL, err = is.GetSignedURL(filepath)
+	var h http.Header
+	h.Set("Content-Disposition", fmt.Sprintf(
+		"attachment; filename*=UTF-8''%s",
+		url.PathEscape(filename)))
+	signedURL, err = is.GetSignedURL(filepath, h)
 	return
 }
 
