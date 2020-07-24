@@ -19,13 +19,13 @@ import (
 
 func GetSignedImageUpload(is common.FileStore, ext string) (signedURL, filename string, err error) {
 	filename = makeFilename(ext)
-	signedURL, err = is.GetSignedURL(filename)
+	signedURL, err = is.GetSignedURL(filename, nil)
 	return
 }
 
 func GetSignedHashedUrl(is common.FileStore, srcurl, ext string) (signedURL, filename string, err error) {
 	filename = hashURLpath(srcurl, ext)
-	signedURL, err = is.GetSignedURL(filename)
+	signedURL, err = is.GetSignedURL(filename, nil)
 	return
 }
 

@@ -2,6 +2,7 @@ package aws
 
 import (
 	"flag"
+	"net/http"
 	"time"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
@@ -52,11 +53,15 @@ type S3Store struct {
 	l      common.Logger
 }
 
-func (ss S3Store) GetSignedURL(srcPath string) (signedURL string, err error) {
+func (ss S3Store) GetSignedURL(srcPath string, h http.Header) (signedURL string, err error) {
 	ss.l.Printf("creating presigned URL for %q", srcPath)
 	input := &s3.PutObjectInput{
 		Bucket: &ss.bucket,
 		Key:    &srcPath,
+	}
+	// TODO: Add more header decoding as needed
+	if disposition := h.Get("Content-Disposition"); disposition != "" {
+		input.ContentDisposition = &disposition
 	}
 	req := ss.svc.PutObjectRequest(input)
 	signedURL, err = req.Presign(15 * time.Minute)
@@ -68,7 +73,7 @@ type MockStore struct {
 	l common.Logger
 }
 
-func (ms MockStore) GetSignedURL(srcPath string) (signedURL string, err error) {
+func (ms MockStore) GetSignedURL(srcPath string, h http.Header) (signedURL string, err error) {
 	ms.l.Printf("returning mock signed URL")
 	return "https://invalid", nil
 }
