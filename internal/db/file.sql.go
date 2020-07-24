@@ -8,20 +8,20 @@ import (
 )
 
 const createFilePlaceholder = `-- name: CreateFilePlaceholder :execrows
-INSERT INTO file ("filename", "path", "mime_type")
+INSERT INTO file ("filename", "url", "mime_type")
   VALUES ($1, $2, $3)
-ON CONFLICT (path)
+ON CONFLICT (url)
   DO NOTHING
 `
 
 type CreateFilePlaceholderParams struct {
 	Filename string `json:"filename"`
-	Path     string `json:"path"`
+	URL      string `json:"url"`
 	Type     string `json:"type"`
 }
 
 func (q *Queries) CreateFilePlaceholder(ctx context.Context, arg CreateFilePlaceholderParams) (int64, error) {
-	result, err := q.db.ExecContext(ctx, createFilePlaceholder, arg.Filename, arg.Path, arg.Type)
+	result, err := q.db.ExecContext(ctx, createFilePlaceholder, arg.Filename, arg.URL, arg.Type)
 	if err != nil {
 		return 0, err
 	}
@@ -30,7 +30,7 @@ func (q *Queries) CreateFilePlaceholder(ctx context.Context, arg CreateFilePlace
 
 const listFiles = `-- name: ListFiles :many
 SELECT
-  id, path, filename, mime_type, description, is_uploaded, created_at, updated_at
+  id, url, filename, mime_type, description, is_uploaded, created_at, updated_at
 FROM
   file
 WHERE
@@ -56,7 +56,7 @@ func (q *Queries) ListFiles(ctx context.Context, arg ListFilesParams) ([]File, e
 		var i File
 		if err := rows.Scan(
 			&i.ID,
-			&i.Path,
+			&i.URL,
 			&i.Filename,
 			&i.MimeType,
 			&i.Description,
@@ -88,23 +88,23 @@ SET
   END,
   is_uploaded = TRUE
 WHERE
-  path = $3
+  url = $3
 RETURNING
-  id, path, filename, mime_type, description, is_uploaded, created_at, updated_at
+  id, url, filename, mime_type, description, is_uploaded, created_at, updated_at
 `
 
 type UpdateFileParams struct {
 	SetDescription bool   `json:"set_description"`
 	Description    string `json:"description"`
-	Path           string `json:"path"`
+	URL            string `json:"url"`
 }
 
 func (q *Queries) UpdateFile(ctx context.Context, arg UpdateFileParams) (File, error) {
-	row := q.db.QueryRowContext(ctx, updateFile, arg.SetDescription, arg.Description, arg.Path)
+	row := q.db.QueryRowContext(ctx, updateFile, arg.SetDescription, arg.Description, arg.URL)
 	var i File
 	err := row.Scan(
 		&i.ID,
-		&i.Path,
+		&i.URL,
 		&i.Filename,
 		&i.MimeType,
 		&i.Description,

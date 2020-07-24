@@ -11,8 +11,9 @@ import (
 	"github.com/spotlightpa/almanack/pkg/common"
 )
 
-func GetSignedFileUpload(is common.FileStore, filename string) (signedURL, filepath string, err error) {
-	filepath = makeFilePath(filename)
+func GetSignedFileUpload(is common.FileStore, filename string) (signedURL, fileURL string, err error) {
+	filepath := makeFilePath(filename)
+	fileURL = is.BuildURL(filepath)
 	var h http.Header
 	h.Set("Content-Disposition", fmt.Sprintf(
 		"attachment; filename*=UTF-8''%s",
