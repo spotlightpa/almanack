@@ -24,6 +24,9 @@ func GetSignedFileUpload(is common.FileStore, filename string) (signedURL, filep
 func makeFilePath(filename string) string {
 	var sb strings.Builder
 	filename = slugify(filename)
+	if filename == "" {
+		filename = "-"
+	}
 	sb.Grow(len("uploads/12/34/1234/") + len(filename))
 	sb.WriteString("uploads/")
 	t := crockford.Time(crockford.Lower, time.Now())
