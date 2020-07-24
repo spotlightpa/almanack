@@ -51,7 +51,7 @@ func Flags(fl *flag.FlagSet) func(common.Logger) (svc Service, err error) {
 			return
 		}
 
-		svc.ImageStore, svc.FileStore = getS3Store(l)
+		is, fs := getS3Store(l)
 
 		return Service{
 			Logger:       l,
@@ -59,6 +59,8 @@ func Flags(fl *flag.FlagSet) func(common.Logger) (svc Service, err error) {
 			Querier:      *pg,
 			ContentStore: svc.ContentStore,
 			SlackClient:  slack.New(*slackURL, l),
+			ImageStore:   is,
+			FileStore:    fs,
 			Indexer:      getIndex(l),
 		}, nil
 	}
