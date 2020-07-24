@@ -12,7 +12,7 @@ export default {
     CopyWithButton,
   },
   setup(props, { emit }) {
-    let { uploadFile } = useClient();
+    let { uploadImage } = useClient();
 
     let state = reactive({
       isUploading: false,
@@ -41,7 +41,7 @@ export default {
 
         state.isUploading = true;
         state.error = null;
-        [state.filename, state.error] = await uploadFile(body);
+        [state.filename, state.error] = await uploadImage(body);
         state.isUploading = false;
         emit("update-image-list");
       },

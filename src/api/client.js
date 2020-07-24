@@ -33,6 +33,9 @@ const endpoints = {
   createSignedUpload: `/api/create-signed-upload`,
   getEditorsPicks: `/api/editors-picks`,
   saveEditorsPicks: `/api/editors-picks`,
+  createFile: `/api/files-create`,
+  listFiles: `/api/files-list`,
+  updateFile: `/api/files-update`,
   updateImage: `/api/image-update`,
   listImages: `/api/images`,
   listRefreshArc: `/api/list-arc-refresh`,
@@ -74,7 +77,7 @@ function makeClient($auth) {
   }
 
   let actions = {
-    async uploadFile(body) {
+    async uploadImage(body) {
       let [data, err] = await tryTo(
         post(endpoints.createSignedUpload, { type: body.type })
       );
@@ -103,6 +106,40 @@ function makeClient($auth) {
       };
       return await tryTo(post(endpoints.updateImage, image));
     },
+    async uploadFile(body) {
+      let [data, err] = await tryTo(
+        post(endpoints.createFile, { filename: body.name, mimeType: body.type })
+      );
+      if (err) {
+        return ["", err];
+      }
+      let { "signed-url": signedURL, "file-url": fileURL, disposition } = data;
+      let opts = {
+        method: "PUT",
+        body,
+        headers: {
+          "Content-Disposition": disposition,
+        },
+      };
+      let rsp;
+      [rsp, err] = await tryTo(fetch(signedURL, opts));
+      if (err ?? !rsp.ok) {
+        return ["", err ?? responseError(rsp)];
+      }
+      [, err] = await actions.updateFile(fileURL);
+      if (err) {
+        return ["", err];
+      }
+      return [fileURL, null];
+    },
+    async updateFile(url, { description = null } = {}) {
+      let file = {
+        url,
+        description,
+        set_description: description !== null,
+      };
+      return await tryTo(post(endpoints.updateFile, file));
+    },
   };
   let idGetActions = [
     // does not include proxy images…
@@ -121,6 +158,7 @@ function makeClient($auth) {
     "listAllSeries",
     "listAllTopics",
     "listAuthorizedDomains",
+    "listFiles",
     "listImages",
     "listRefreshArc",
     "listSpotlightPAArticles",

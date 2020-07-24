@@ -165,6 +165,18 @@ export default {
       </router-link>
 
       <router-link
+        :to="{ name: 'file-uploader' }"
+        class="button is-small is-success has-text-weight-semibold"
+      >
+        <span class="icon">
+          <font-awesome-icon :icon="['fa', 'file-upload']" />
+        </span>
+        <span>
+          Files
+        </span>
+      </router-link>
+
+      <router-link
         :to="{ name: 'domains' }"
         class="button is-small is-success has-text-weight-semibold"
       >
