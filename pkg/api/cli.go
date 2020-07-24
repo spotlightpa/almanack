@@ -91,6 +91,7 @@ func (app *appEnv) exec() error {
 		New(sentryhttp.Options{
 			WaitForDelivery: true,
 			Timeout:         5 * time.Second,
+			Repanic:         !app.isLambda,
 		}).
 		Handle(app.routes())
 
