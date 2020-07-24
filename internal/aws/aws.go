@@ -2,6 +2,7 @@ package aws
 
 import (
 	"flag"
+	"fmt"
 	"net/http"
 	"time"
 
@@ -69,6 +70,11 @@ func (ss S3Store) GetSignedURL(srcPath string, h http.Header) (signedURL string,
 	return
 }
 
+func (ss S3Store) BuildURL(srcPath string) string {
+	// Just assuming bucket name is valid DNS…
+	return fmt.Sprintf("https://%s/%s", ss.bucket, srcPath)
+}
+
 type MockStore struct {
 	l common.Logger
 }
@@ -76,4 +82,8 @@ type MockStore struct {
 func (ms MockStore) GetSignedURL(srcPath string, h http.Header) (signedURL string, err error) {
 	ms.l.Printf("returning mock signed URL")
 	return "https://invalid", nil
+}
+
+func (ms MockStore) BuildURL(srcPath string) string {
+	return fmt.Sprintf("https://invalid/%s", srcPath)
 }

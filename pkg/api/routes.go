@@ -701,14 +701,14 @@ func (app *appEnv) postFileCreate(w http.ResponseWriter, r *http.Request) {
 	}
 	type response struct {
 		SignedURL string `json:"signed-url"`
-		FilePath  string `json:"filepath"`
+		FileURL   string `json:"file-url"`
 	}
 	var (
 		res response
 		err error
 	)
 
-	res.SignedURL, res.FilePath, err = almanack.GetSignedFileUpload(
+	res.SignedURL, res.FileURL, err = almanack.GetSignedFileUpload(
 		app.svc.FileStore,
 		userData.FileName,
 	)
@@ -720,14 +720,14 @@ func (app *appEnv) postFileCreate(w http.ResponseWriter, r *http.Request) {
 		db.CreateFilePlaceholderParams{
 			Filename: userData.FileName,
 			Type:     userData.MimeType,
-			Path:     res.FilePath,
+			URL:      res.FileURL,
 		}); err != nil {
 		app.errorResponse(w, r, err)
 		return
 	} else if n != 1 {
 		// Log and continue
 		app.logErr(r.Context(),
-			fmt.Errorf("creating file %q but it already exists", res.FilePath))
+			fmt.Errorf("creating file %q but it already exists", res.FileURL))
 	}
 	app.jsonResponse(http.StatusOK, w, &res)
 }

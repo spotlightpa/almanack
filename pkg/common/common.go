@@ -25,4 +25,5 @@ type EmailService interface {
 
 type FileStore interface {
 	GetSignedURL(srcPath string, h http.Header) (signedURL string, err error)
+	BuildURL(srcPath string) string
 }

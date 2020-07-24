@@ -10,9 +10,9 @@ ORDER BY
 LIMIT $1 OFFSET $2;
 
 -- name: CreateFilePlaceholder :execrows
-INSERT INTO file ("filename", "path", "mime_type")
-  VALUES (@filename, @path, @type)
-ON CONFLICT (path)
+INSERT INTO file ("filename", "url", "mime_type")
+  VALUES (@filename, @url, @type)
+ON CONFLICT (url)
   DO NOTHING;
 
 -- name: UpdateFile :one
@@ -26,6 +26,6 @@ SET
   END,
   is_uploaded = TRUE
 WHERE
-  path = @path
+  url = @url
 RETURNING
   *;

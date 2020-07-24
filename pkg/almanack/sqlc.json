@@ -13,7 +13,8 @@
 	"rename": {
 		"spotlightpa_data": "SpotlightPAData",
 		"spotlightpa_path": "SpotlightPAPath",
-		"src_url": "SourceURL"
+		"src_url": "SourceURL",
+		"url": "URL"
 	},
 	"version": "1"
 }

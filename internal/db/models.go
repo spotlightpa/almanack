@@ -37,7 +37,7 @@ type DomainRole struct {
 
 type File struct {
 	ID          int32     `json:"id"`
-	Path        string    `json:"path"`
+	URL         string    `json:"url"`
 	Filename    string    `json:"filename"`
 	MimeType    string    `json:"mime_type"`
 	Description string    `json:"description"`

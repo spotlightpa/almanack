@@ -1,6 +1,6 @@
 CREATE TABLE file (
   id serial PRIMARY KEY,
-  path text NOT NULL UNIQUE,
+  url text NOT NULL UNIQUE,
   filename text NOT NULL DEFAULT '',
   mime_type text NOT NULL DEFAULT '',
   description text NOT NULL DEFAULT '',
