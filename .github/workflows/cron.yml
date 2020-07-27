@@ -2,8 +2,8 @@ name: Cron publish
 
 on:
   schedule:
-    # Every five minutes
-    - cron: "*/5 * * * *"
+    # Every minute becomes five minutes with throttling
+    - cron: "* * * * *"
 
 jobs:
   cron:
