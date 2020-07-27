@@ -1,0 +1,13 @@
+name: Cron publish
+
+on:
+  schedule:
+    # Every five minutes
+    - cron: "*/5 * * * *"
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger Cron Hook
+        run: curl https://almanack.data.spotlightpa.org/api/cron
