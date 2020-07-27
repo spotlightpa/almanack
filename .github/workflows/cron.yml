@@ -6,8 +6,8 @@ on:
     - cron: "*/5 * * * *"
 
 jobs:
-  build:
+  cron:
     runs-on: ubuntu-latest
     steps:
-      - name: Trigger Cron Hook
-        run: curl https://almanack.data.spotlightpa.org/api/cron
+      - name: Curl API cron hook
+        run: curl -LSfso /dev/null 'https://almanack.data.spotlightpa.org/api/cron'
