@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/carlmjohnson/errutil"
 	"github.com/spotlightpa/almanack/internal/db"
 	"github.com/spotlightpa/almanack/internal/index"
 	"github.com/spotlightpa/almanack/internal/slack"
@@ -181,7 +182,7 @@ func (svc Service) SaveScheduledArticle(ctx context.Context, article *SpotlightP
 	return nil
 }
 
-func (svc Service) PopScheduledArticles(ctx context.Context, callback func([]*SpotlightPAArticle) error) error {
+func (svc Service) PopScheduledArticles(ctx context.Context) error {
 	start := time.Now()
 	poppedArts, err := svc.Querier.PopScheduled(ctx)
 	svc.Logger.Printf("queried PopScheduled in %v", time.Since(start))
@@ -195,14 +196,12 @@ func (svc Service) PopScheduledArticles(ctx context.Context, callback func([]*Sp
 			return err
 		}
 	}
-	// If the status of the article changed, fire callback then update the list
-	if len(overdueArts) > 0 {
-		if err := callback(overdueArts); err != nil {
-			// TODO rollback
-			return err
-		}
+	// If the status of the article changed, publish it
+	var errs errutil.Slice
+	for _, art := range overdueArts {
+		errs.Push(art.Publish(ctx, svc))
 	}
-	return nil
+	return errs.Merge()
 }
 
 func (svc Service) GetArcStory(ctx context.Context, articleID string) (story *ArcStory, err error) {

@@ -108,7 +108,7 @@ func (app *appEnv) exec() error {
 	start := time.Now()
 	defer func() { app.Println("finished in", time.Since(start)) }()
 
-	return app.publishStories()
+	return nil
 }
 
 func (app *appEnv) updateFeed() error {
@@ -136,12 +136,5 @@ func (app *appEnv) publishStories() error {
 	app.Println("starting publishStories")
 
 	ctx := context.Background()
-	return app.svc.PopScheduledArticles(ctx, func(articles []*almanack.SpotlightPAArticle) error {
-		for _, article := range articles {
-			if err := article.Publish(ctx, app.svc); err != nil {
-				return err
-			}
-		}
-		return nil
-	})
+	return app.svc.PopScheduledArticles(ctx)
 }

@@ -32,6 +32,7 @@ func (app *appEnv) routes() http.Handler {
 	r.Get("/api/healthcheck", app.ping)
 	r.Get(`/api/healthcheck/{code:\d{3}}`, app.pingErr)
 	r.Get(`/api/proxy-image/{encURL}`, app.getProxyImage)
+	r.Get(`/api/cron`, app.getCron)
 	r.Route("/api", func(r chi.Router) {
 		r.Use(app.authMiddleware)
 		r.Get("/user-info", app.userInfo)
@@ -750,4 +751,12 @@ func (app *appEnv) postFileUpdate(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	app.jsonResponse(http.StatusOK, w, &res)
+}
+
+func (app *appEnv) getCron(w http.ResponseWriter, r *http.Request) {
+	if err := app.svc.PopScheduledArticles(r.Context()); err != nil {
+		app.errorResponse(w, r, err)
+		return
+	}
+	app.jsonResponse(http.StatusOK, w, "OK")
 }
