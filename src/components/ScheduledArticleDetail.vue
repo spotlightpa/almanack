@@ -342,14 +342,6 @@ export default {
         <b-taginput v-model="article.aliases"></b-taginput>
         Redirect these URLs to the story
       </b-field>
-
-      <b-field label="Homepage override order number">
-        <b-numberinput
-          v-model="article.weight"
-          controls-position="compact"
-          type="is-light"
-        ></b-numberinput>
-      </b-field>
     </details>
 
     <div v-if="article.saveError" class="message is-danger">
