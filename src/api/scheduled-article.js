@@ -46,6 +46,7 @@ export default class ScheduledArticle {
       modalExclude: ["ModalExclude", false],
       noIndex: ["NoIndex", false],
       languageCode: ["LanguageCode", ""],
+      layout: ["LayoutType", ""],
 
       warnings: ["Warnings", []],
       authors: ["Authors", []],
@@ -116,6 +117,7 @@ export default class ScheduledArticle {
       ModalExclude: this.modalExclude,
       NoIndex: this.noIndex,
       LanguageCode: this.languageCode,
+      LayoutType: this.layout,
       "almanack-refresh-arc": this._refreshArc,
     };
   }

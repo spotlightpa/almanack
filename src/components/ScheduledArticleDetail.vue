@@ -342,6 +342,8 @@ export default {
         <b-taginput v-model="article.aliases"></b-taginput>
         Redirect these URLs to the story
       </b-field>
+
+      <BulmaFieldInput v-model="article.layout" label="Layout override" />
     </details>
 
     <div v-if="article.saveError" class="message is-danger">
