@@ -20,6 +20,10 @@ github.com/aymerick/raymond v2.0.3-0.20180322193309-b565731e1464+incompatible/go
 github.com/bradfitz/gomemcache v0.0.0-20170208213004-1952afaa557d/go.mod h1:PmM6Mmwb0LSuEubjR8N7PtNe1KxZLtOUHtbeikc5h60=
 github.com/carlmjohnson/crockford v0.0.3 h1:zOgtrTSNDhWr5dguEjzwgUudD1GQdwSumah+cgnAEYI=
 github.com/carlmjohnson/crockford v0.0.3/go.mod h1:HA9wNRRL5/4L3uFPiYnk2nXuRzfHiDEncu3Yyc6WQoc=
+github.com/carlmjohnson/emailx v0.20.1 h1:irJUV1dcYrCI2g9uJI7eRKYHVtjjQR2vE/UO3rlvfOQ=
+github.com/carlmjohnson/emailx v0.20.1/go.mod h1:Lngztj3awUX1Zu5b0Jv9ety36JBRKYvwlkFgem+0K+Q=
+github.com/carlmjohnson/emailx v0.20.2 h1:0euWTGWnz5zwxXaDwLjP/egV7kACYGUvO5Wqu/5RqL0=
+github.com/carlmjohnson/emailx v0.20.2/go.mod h1:Lngztj3awUX1Zu5b0Jv9ety36JBRKYvwlkFgem+0K+Q=
 github.com/carlmjohnson/errutil v0.20.1 h1:RadCQottxZxH7GnrLBg3ssl6/kEe4K1D81EZ6td8f9I=
 github.com/carlmjohnson/errutil v0.20.1/go.mod h1:t1n46sLob5fpvrJ5706xDg0zOcj2FigYuhAn37qSRec=
 github.com/carlmjohnson/exitcode v0.0.4 h1:C5c0GBs/1iuo5cKIHBHdBQVENeAmgPZcyXtqBKCe5i0=
