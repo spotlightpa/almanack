@@ -11,10 +11,16 @@ export function useListAvailableArc(pageCB) {
 
   const load = () => exec(() => listAvailableArc(page));
 
-  watch(pageCB, (newVal) => {
-    page = newVal;
-    load();
-  });
+  watch(
+    pageCB,
+    (newVal) => {
+      page = newVal;
+      load();
+    },
+    {
+      immediate: true,
+    }
+  );
 
   return {
     ...toRefs(apiState),
@@ -90,18 +96,24 @@ export function useListAnyArc(pageCB) {
     }
   );
 
-  watch(pageCB, (newVal, oldVal) => {
-    page = newVal;
-    if (newVal !== oldVal) {
-      articles.value = [];
-      apiState.didLoad = false;
+  watch(
+    pageCB,
+    (newVal, oldVal) => {
+      page = newVal;
+      if (newVal !== oldVal) {
+        articles.value = [];
+        apiState.didLoad = false;
+      }
+      if (!page) {
+        actions.loadAndRefresh();
+      } else {
+        actions.load();
+      }
+    },
+    {
+      immediate: true,
     }
-    if (!page) {
-      actions.loadAndRefresh();
-    } else {
-      actions.load();
-    }
-  });
+  );
 
   return {
     ...toRefs(apiState),
