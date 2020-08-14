@@ -75,7 +75,7 @@ func DecodeRequest(w http.ResponseWriter, r *http.Request, dst interface{}) erro
 	}
 
 	if dec.More() {
-		return errorf(err, http.StatusBadRequest,
+		return errorf(nil, http.StatusBadRequest,
 			"Request body must only contain a single JSON object")
 	}
 
