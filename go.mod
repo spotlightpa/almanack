@@ -11,6 +11,7 @@ require (
 	github.com/aws/aws-lambda-go v1.17.0
 	github.com/aws/aws-sdk-go-v2 v0.19.0
 	github.com/carlmjohnson/crockford v0.0.3
+	github.com/carlmjohnson/emailx v0.20.2
 	github.com/carlmjohnson/errutil v0.20.1
 	github.com/carlmjohnson/exitcode v0.0.4
 	github.com/carlmjohnson/flagext v0.0.10
