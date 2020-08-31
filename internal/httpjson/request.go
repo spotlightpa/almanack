@@ -1,21 +1,34 @@
 package httpjson
 
 import (
+	"bytes"
 	"context"
 	"encoding/json"
 	"fmt"
+	"io"
 	"io/ioutil"
 	"net/http"
 )
 
-func Get(ctx context.Context, c *http.Client, url string, v interface{}, acceptStatuses ...int) error {
+func Request(ctx context.Context, c *http.Client, method, url string, send, receive interface{}, acceptStatuses ...int) error {
 	if c == nil {
 		c = http.DefaultClient
 	}
 
-	req, err := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
+	var body io.Reader
+	if send != nil {
+		b, err := json.Marshal(send)
+		if err != nil {
+			return err
+		}
+		body = bytes.NewReader(b)
+	}
+	req, err := http.NewRequestWithContext(ctx, method, url, body)
 	if err != nil {
 		return err
+	}
+	if send != nil {
+		req.Header.Set("Content-Type", "application/json")
 	}
 
 	resp, err := c.Do(req)
@@ -32,8 +45,10 @@ func Get(ctx context.Context, c *http.Client, url string, v interface{}, acceptS
 	if err = StatusCheck(resp, acceptStatuses...); err != nil {
 		return err
 	}
-
-	if err = json.Unmarshal(b, v); err != nil {
+	if receive == nil {
+		return nil
+	}
+	if err = json.Unmarshal(b, receive); err != nil {
 		return err
 	}
 
