@@ -4,10 +4,9 @@ import (
 	"encoding/json"
 	"errors"
 	"io"
+	"mime"
 	"net/http"
 	"strings"
-
-	"github.com/golang/gddo/httputil/header"
 
 	"github.com/carlmjohnson/resperr"
 )
@@ -22,7 +21,7 @@ func errorf(cause error, status int, format string, v ...interface{}) error {
 func DecodeRequest(w http.ResponseWriter, r *http.Request, dst interface{}) error {
 	// Thanks to https://www.alexedwards.net/blog/how-to-properly-parse-a-json-request-body
 	if r.Header.Get("Content-Type") != "" {
-		value, _ := header.ParseValueAndParams(r.Header, "Content-Type")
+		value, _, _ := mime.ParseMediaType(r.Header.Get("Content-Type"))
 		if value != "application/json" {
 			return errorf(nil, http.StatusUnsupportedMediaType, "Content-Type header is not application/json")
 		}
