@@ -114,7 +114,8 @@ func (v3 V3) ListNewletters(ctx context.Context, kind string) ([]common.Newslett
 	}
 	newsletters := make([]common.Newsletter, 0, len(resp.Campaigns))
 	for _, camp := range resp.Campaigns {
-		if strings.HasPrefix(camp.Settings.Title, kind) {
+		// Hacky but probably the best method?
+		if strings.Contains(camp.Settings.Title, kind) {
 			newsletters = append(newsletters, common.Newsletter{
 				Subject:     camp.Settings.Subject,
 				ArchiveURL:  camp.ArchiveURL,
