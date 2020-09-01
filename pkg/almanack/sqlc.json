@@ -11,6 +11,7 @@
 		}
 	],
 	"rename": {
+		"archive_url": "ArchiveURL",
 		"spotlightpa_data": "SpotlightPAData",
 		"spotlightpa_path": "SpotlightPAPath",
 		"src_url": "SourceURL",

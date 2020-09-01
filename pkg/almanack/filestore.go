@@ -1,6 +1,7 @@
 package almanack
 
 import (
+	"context"
 	"fmt"
 	"net/http"
 	"net/url"
@@ -8,6 +9,7 @@ import (
 	"time"
 
 	"github.com/carlmjohnson/crockford"
+	"github.com/spotlightpa/almanack/internal/httpjson"
 	"github.com/spotlightpa/almanack/pkg/common"
 )
 
@@ -59,4 +61,13 @@ func slugify(s string) string {
 		return '-'
 	}
 	return strings.Map(f, s)
+}
+
+func UploadJSON(ctx context.Context, is common.FileStore, c *http.Client, filepath string, data interface{}) error {
+	signedURL, err := is.GetSignedURL(filepath, nil)
+	if err != nil {
+		return err
+	}
+
+	return httpjson.Put(ctx, c, signedURL, data, nil, http.StatusOK)
 }

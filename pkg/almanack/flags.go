@@ -11,6 +11,7 @@ import (
 	"github.com/spotlightpa/almanack/internal/herokuapi"
 	"github.com/spotlightpa/almanack/internal/httpcache"
 	"github.com/spotlightpa/almanack/internal/index"
+	"github.com/spotlightpa/almanack/internal/mailchimp"
 	"github.com/spotlightpa/almanack/internal/slack"
 	"github.com/spotlightpa/almanack/pkg/common"
 )
@@ -23,6 +24,7 @@ func Flags(fl *flag.FlagSet) func(common.Logger) (svc Service, err error) {
 	getS3Store := aws.FlagVar(fl)
 	getGithub := github.FlagVar(fl)
 	getIndex := index.FlagVar(fl)
+	getNewsletter := mailchimp.FlagVar(fl)
 
 	return func(l common.Logger) (svc Service, err error) {
 		// Get PostgreSQL URL from Heroku if possible, else get it from flag
@@ -54,14 +56,15 @@ func Flags(fl *flag.FlagSet) func(common.Logger) (svc Service, err error) {
 		is, fs := getS3Store(l)
 
 		return Service{
-			Logger:       l,
-			Client:       &client,
-			Querier:      *pg,
-			ContentStore: svc.ContentStore,
-			SlackClient:  slack.New(*slackURL, l),
-			ImageStore:   is,
-			FileStore:    fs,
-			Indexer:      getIndex(l),
+			Logger:           l,
+			Client:           &client,
+			Querier:          *pg,
+			ContentStore:     svc.ContentStore,
+			SlackClient:      slack.New(*slackURL, l),
+			ImageStore:       is,
+			FileStore:        fs,
+			Indexer:          getIndex(l),
+			NewletterService: getNewsletter(&client),
 		}, nil
 	}
 }

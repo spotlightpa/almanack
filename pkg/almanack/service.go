@@ -62,6 +62,7 @@ type Service struct {
 	FileStore   common.FileStore
 	SlackClient slack.Client
 	Indexer     index.Indexer
+	common.NewletterService
 }
 
 func (svc Service) GetSpotlightPAArticle(ctx context.Context, dbID int32) (*SpotlightPAArticle, error) {
@@ -330,4 +331,62 @@ func (svc Service) ReplaceImageURL(ctx context.Context, srcURL, description, cre
 		IsUploaded:  true,
 	})
 	return path, err
+}
+
+func (svc Service) UpdateNewsletterArchives(ctx context.Context) error {
+	return errutil.ExecParallel(
+		func() error {
+			return svc.UpdateNewsletterArchive(
+				ctx,
+				"The Investigator",
+				"investigator",
+				"The Investigator Newsletter Archive",
+				"feeds/newsletters/investigator.json",
+			)
+		},
+		func() error {
+			return svc.UpdateNewsletterArchive(
+				ctx,
+				"PA Post",
+				"papost",
+				"PA Post Newsletter Archive",
+				"feeds/newsletters/papost.json",
+			)
+		},
+	)
+}
+
+func (svc Service) UpdateNewsletterArchive(ctx context.Context, mcType, dbType, feedtitle, path string) error {
+	// get the latest from MC
+	newItems, err := svc.NewletterService.ListNewletters(ctx, mcType)
+	if err != nil {
+		return err
+	}
+	// update DB
+	data, err := json.Marshal(newItems)
+	if err != nil {
+		return err
+	}
+	if err = svc.Querier.UpdateNewsletterArchives(ctx, db.UpdateNewsletterArchivesParams{
+		Type: dbType,
+		Data: data,
+	}); err != nil {
+		return err
+	}
+	// get old items list from DB
+	items, err := svc.Querier.ListNewsletters(ctx, db.ListNewslettersParams{
+		Type:   dbType,
+		Limit:  100,
+		Offset: 0,
+	})
+	if err != nil {
+		return err
+	}
+	// push to S3
+	feed := db.NewsletterToFeed(feedtitle, items)
+	if err = UploadJSON(ctx, svc.FileStore, svc.Client, path, feed); err != nil {
+		return err
+	}
+
+	return nil
 }
