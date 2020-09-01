@@ -56,7 +56,7 @@ func (q *Queries) ListNewsletters(ctx context.Context, arg ListNewslettersParams
 	return items, nil
 }
 
-const updateNewsletterArchives = `-- name: UpdateNewsletterArchives :exec
+const updateNewsletterArchives = `-- name: UpdateNewsletterArchives :execrows
 WITH raw_json AS (
   SELECT
     jsonb_array_elements($2::jsonb) AS data
@@ -80,8 +80,6 @@ campaign AS (
     campaign
   ON CONFLICT
     DO NOTHING
-  RETURNING
-    subject, archive_url, published_at, type, created_at, updated_at
 `
 
 type UpdateNewsletterArchivesParams struct {
@@ -89,7 +87,10 @@ type UpdateNewsletterArchivesParams struct {
 	Data json.RawMessage `json:"data"`
 }
 
-func (q *Queries) UpdateNewsletterArchives(ctx context.Context, arg UpdateNewsletterArchivesParams) error {
-	_, err := q.db.ExecContext(ctx, updateNewsletterArchives, arg.Type, arg.Data)
-	return err
+func (q *Queries) UpdateNewsletterArchives(ctx context.Context, arg UpdateNewsletterArchivesParams) (int64, error) {
+	result, err := q.db.ExecContext(ctx, updateNewsletterArchives, arg.Type, arg.Data)
+	if err != nil {
+		return 0, err
+	}
+	return result.RowsAffected()
 }

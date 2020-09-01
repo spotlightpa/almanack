@@ -367,11 +367,17 @@ func (svc Service) UpdateNewsletterArchive(ctx context.Context, mcType, dbType, 
 	if err != nil {
 		return err
 	}
-	if err = svc.Querier.UpdateNewsletterArchives(ctx, db.UpdateNewsletterArchivesParams{
+	if n, err := svc.Querier.UpdateNewsletterArchives(ctx, db.UpdateNewsletterArchivesParams{
 		Type: dbType,
 		Data: data,
 	}); err != nil {
 		return err
+	} else if n == 0 {
+		// abort if there's nothing new to update
+		svc.Logger.Printf("%q got no new items", mcType)
+		return nil
+	} else {
+		svc.Logger.Printf("%q got %d new items", mcType, n)
 	}
 	// get old items list from DB
 	items, err := svc.Querier.ListNewsletters(ctx, db.ListNewslettersParams{

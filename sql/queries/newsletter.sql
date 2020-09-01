@@ -1,4 +1,4 @@
--- name: UpdateNewsletterArchives :exec
+-- name: UpdateNewsletterArchives :execrows
 WITH raw_json AS (
   SELECT
     jsonb_array_elements(@data::jsonb) AS data
@@ -21,9 +21,7 @@ campaign AS (
   FROM
     campaign
   ON CONFLICT
-    DO NOTHING
-  RETURNING
-    *;
+    DO NOTHING;
 
 -- name: ListNewsletters :many
 SELECT
