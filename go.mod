@@ -21,9 +21,10 @@ require (
 	github.com/getsentry/sentry-go v0.7.0
 	github.com/go-chi/chi v4.0.3+incompatible
 	github.com/go-redsync/redsync v1.3.1
-	github.com/golang/gddo v0.0.0-20200127195332-7365cb292b8b
 	github.com/gomodule/redigo v2.0.0+incompatible
 	github.com/google/go-github/v30 v30.0.0
+	github.com/gorilla/feeds v1.1.1
+	github.com/kr/pretty v0.2.0 // indirect
 	github.com/lib/pq v1.3.0
 	github.com/mattbaird/gochimp v0.0.0-20180111040707-a267553896d1
 	github.com/peterbourgon/ff/v2 v2.0.0
@@ -31,4 +32,6 @@ require (
 	golang.org/x/crypto v0.0.0-20191011191535-87dc89f01550 // indirect
 	golang.org/x/net v0.0.0-20200602114024-627f9648deb9
 	golang.org/x/oauth2 v0.0.0-20180821212333-d2e6202438be
+	google.golang.org/appengine v1.6.5 // indirect
+	gopkg.in/check.v1 v1.0.0-20190902080502-41f04d3bba15 // indirect
 )

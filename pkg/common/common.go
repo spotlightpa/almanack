@@ -3,6 +3,7 @@ package common
 import (
 	"context"
 	"net/http"
+	"time"
 )
 
 type Logger interface {
@@ -26,4 +27,14 @@ type EmailService interface {
 type FileStore interface {
 	GetSignedURL(srcPath string, h http.Header) (signedURL string, err error)
 	BuildURL(srcPath string) string
+}
+
+type Newsletter struct {
+	Subject     string    `json:"subject"`
+	ArchiveURL  string    `json:"archive_url"`
+	PublishedAt time.Time `json:"published_at"`
+}
+
+type NewletterService interface {
+	ListNewletters(ctx context.Context, kind string) ([]Newsletter, error)
 }

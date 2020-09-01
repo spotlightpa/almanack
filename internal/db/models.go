@@ -64,6 +64,21 @@ type ImageType struct {
 	Extensions []string `json:"extensions"`
 }
 
+type Newsletter struct {
+	Subject     string    `json:"subject"`
+	ArchiveURL  string    `json:"archive_url"`
+	PublishedAt time.Time `json:"published_at"`
+	Type        string    `json:"type"`
+	CreatedAt   time.Time `json:"created_at"`
+	UpdatedAt   time.Time `json:"updated_at"`
+}
+
+type NewsletterType struct {
+	Shortname   string `json:"shortname"`
+	Name        string `json:"name"`
+	Description string `json:"description"`
+}
+
 type SiteDatum struct {
 	ID        int32           `json:"id"`
 	Key       string          `json:"key"`

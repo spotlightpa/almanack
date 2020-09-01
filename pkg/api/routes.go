@@ -12,6 +12,7 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/carlmjohnson/errutil"
 	"github.com/carlmjohnson/resperr"
 	"github.com/go-chi/chi"
 	"github.com/go-chi/chi/middleware"
@@ -754,7 +755,11 @@ func (app *appEnv) postFileUpdate(w http.ResponseWriter, r *http.Request) {
 }
 
 func (app *appEnv) getCron(w http.ResponseWriter, r *http.Request) {
-	if err := app.svc.PopScheduledArticles(r.Context()); err != nil {
+	if err := errutil.ExecParallel(func() error {
+		return app.svc.PopScheduledArticles(r.Context())
+	}, func() error {
+		return app.svc.UpdateNewsletterArchives(r.Context())
+	}); err != nil {
 		app.errorResponse(w, r, err)
 		return
 	}
