@@ -82,9 +82,7 @@ export default {
       {{ formatDate(article.plannedDate) }}
     </p>
     <div class="field">
-      <label class="label">
-        Publication Note:
-      </label>
+      <label class="label"> Publication Note: </label>
     </div>
     <div class="field has-addons">
       <div class="control is-expanded">
@@ -115,9 +113,7 @@ export default {
         <span class="icon">
           <font-awesome-icon :icon="['fas', 'pen-nib']" />
         </span>
-        <span>
-          Show as Planned
-        </span>
+        <span> Show as Planned </span>
       </button>
       <button
         v-if="!article.isAvailable"
@@ -129,9 +125,7 @@ export default {
         <span class="icon">
           <font-awesome-icon :icon="['fas', 'check-circle']" />
         </span>
-        <span>
-          Make Available
-        </span>
+        <span> Make Available </span>
       </button>
       <button
         v-if="article.isPlanned || article.isAvailable"
@@ -143,9 +137,7 @@ export default {
         <span class="icon">
           <font-awesome-icon :icon="['fas', 'trash-alt']" />
         </span>
-        <span>
-          Remove from Almanack
-        </span>
+        <span> Remove from Almanack </span>
       </button>
       <button
         type="button"
@@ -156,9 +148,7 @@ export default {
         <span class="icon">
           <font-awesome-icon :icon="['fas', 'sync-alt']" />
         </span>
-        <span>
-          Refresh Arc Data
-        </span>
+        <span> Refresh Arc Data </span>
       </button>
 
       <button

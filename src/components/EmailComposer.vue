@@ -83,9 +83,7 @@ export default {
         <span class="icon">
           <font-awesome-icon :icon="['fas', 'paper-plane']" />
         </span>
-        <span>
-          Send Message
-        </span>
+        <span> Send Message </span>
       </button>
       <button
         class="button has-text-weight-semibold is-danger"
@@ -95,9 +93,7 @@ export default {
         <span class="icon">
           <font-awesome-icon :icon="['fas', 'trash-alt']" />
         </span>
-        <span>
-          Discard Changes
-        </span>
+        <span> Discard Changes </span>
       </button>
       <button
         class="button has-text-weight-semibold is-light"

@@ -61,9 +61,7 @@ export default {
           <span class="icon is-size-6">
             <font-awesome-icon :icon="['fas', 'link']" />
           </span>
-          <span>
-            View in Arc
-          </span>
+          <span> View in Arc </span>
         </a>
         <router-link
           v-if="isSpotlightPAUser"
@@ -73,9 +71,7 @@ export default {
           <span class="icon">
             <font-awesome-icon :icon="['fas', 'user-clock']" />
           </span>
-          <span>
-            Scheduler
-          </span>
+          <span> Scheduler </span>
         </router-link>
       </span>
     </span>
