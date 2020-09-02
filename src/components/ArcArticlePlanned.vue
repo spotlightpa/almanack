@@ -28,16 +28,12 @@ export default {
     <h1 class="title has-text-grey">
       <ArticleSlugLine :article="article" />
     </h1>
-    <h2 class="title">
-      Planned time
-    </h2>
+    <h2 class="title">Planned time</h2>
     <p class="content has-margin-top-negative">
       {{ formatDate(article.plannedDate) }}
     </p>
     <template v-if="article.note">
-      <h2 class="title is-stacked">
-        Publication Notes
-      </h2>
+      <h2 class="title is-stacked">Publication Notes</h2>
       <p class="content has-margin-top-negative">
         {{ article.note }}
       </p>
@@ -60,9 +56,7 @@ export default {
     <h2 class="title">Byline</h2>
     <NoCopyTextArea v-text="article.byline" />
 
-    <h2 v-if="embeds.length === 1" class="title">
-      Embed
-    </h2>
+    <h2 v-if="embeds.length === 1" class="title">Embed</h2>
     <h2 v-if="embeds.length > 1" class="title">Embeds: {{ embeds.length }}</h2>
 
     <component

@@ -111,9 +111,7 @@ export default {
     </p>
 
     <div v-if="article.warnings.length" class="message is-warning">
-      <div class="message-header">
-        Warnings
-      </div>
+      <div class="message-header">Warnings</div>
       <div class="message-body">
         <p
           v-for="warning of article.warnings"
@@ -298,9 +296,7 @@ export default {
         <span class="icon is-size-6">
           <font-awesome-icon :icon="['fas', 'link']" />
         </span>
-        <span>
-          Open live URL
-        </span>
+        <span> Open live URL </span>
       </a>
     </div>
 
@@ -314,9 +310,7 @@ export default {
     </BulmaField>
 
     <details class="field">
-      <summary class="has-text-weight-semibold">
-        Advanced options
-      </summary>
+      <summary class="has-text-weight-semibold">Advanced options</summary>
 
       <BulmaField label="Hide newsletters pop-up">
         <div>
@@ -399,9 +393,7 @@ export default {
     </p>
 
     <div v-if="article.warnings.length" class="message is-warning">
-      <div class="message-header">
-        Warnings
-      </div>
+      <div class="message-header">Warnings</div>
       <div class="message-body">
         <p
           v-for="warning of article.warnings"

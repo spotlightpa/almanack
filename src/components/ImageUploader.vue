@@ -100,9 +100,7 @@ export default {
                   >
                     Uploading…
                   </span>
-                  <span v-else class="file-label">
-                    Choose a file…
-                  </span>
+                  <span v-else class="file-label"> Choose a file… </span>
                 </span>
               </label>
             </fieldset>

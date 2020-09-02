@@ -76,16 +76,12 @@ export default {
     <h1 class="title has-text-grey">
       <ArticleSlugLine :article="article" />
     </h1>
-    <h2 class="title">
-      Planned time
-    </h2>
+    <h2 class="title">Planned time</h2>
     <p class="content has-margin-top-negative">
       {{ formatDate(article.plannedDate) }}
     </p>
     <template v-if="article.note">
-      <h2 class="title is-stacked">
-        Publication Notes
-      </h2>
+      <h2 class="title is-stacked">Publication Notes</h2>
       <p class="content has-margin-top-negative">
         {{ article.note }}
       </p>
@@ -111,9 +107,7 @@ export default {
       />
     </template>
 
-    <h2 v-if="embeds.length === 1" class="title">
-      Embed
-    </h2>
+    <h2 v-if="embeds.length === 1" class="title">Embed</h2>
     <h2 v-if="embeds.length > 1" class="title">Embeds: {{ embeds.length }}</h2>
 
     <component
@@ -136,9 +130,7 @@ export default {
               <span class="icon">
                 <font-awesome-icon :icon="['far', 'file-word']" />
               </span>
-              <span>
-                View Rich Text
-              </span>
+              <span> View Rich Text </span>
             </button>
             <button
               class="button is-primary has-text-weight-semibold"
@@ -148,9 +140,7 @@ export default {
               <span class="icon">
                 <font-awesome-icon :icon="['far', 'copy']" />
               </span>
-              <span>
-                Copy Rich Text
-              </span>
+              <span> Copy Rich Text </span>
             </button>
           </div>
         </div>
@@ -164,9 +154,7 @@ export default {
               <span class="icon">
                 <font-awesome-icon :icon="['far', 'file-code']" />
               </span>
-              <span>
-                View HTML
-              </span>
+              <span> View HTML </span>
             </button>
             <button
               class="button is-primary has-text-weight-semibold"
@@ -176,9 +164,7 @@ export default {
               <span class="icon">
                 <font-awesome-icon :icon="['far', 'copy']" />
               </span>
-              <span>
-                Copy HTML
-              </span>
+              <span> Copy HTML </span>
             </button>
           </div>
         </div>

@@ -83,9 +83,7 @@ export default {
       </ul>
     </nav>
 
-    <h1 class="title">
-      Spotlight PA Articles
-    </h1>
+    <h1 class="title">Spotlight PA Articles</h1>
 
     <APILoader :is-loading="isLoading" :reload="fetch" :error="error">
       <b-field label="">

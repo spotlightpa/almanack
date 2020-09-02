@@ -123,9 +123,7 @@ export default {
         <span class="icon">
           <font-awesome-icon :icon="['far', 'newspaper']" />
         </span>
-        <span>
-          External Editor View
-        </span>
+        <span> External Editor View </span>
       </router-link>
 
       <router-link
@@ -135,9 +133,7 @@ export default {
         <span class="icon">
           <font-awesome-icon :icon="['far', 'newspaper']" />
         </span>
-        <span>
-          Homepage Editor
-        </span>
+        <span> Homepage Editor </span>
       </router-link>
 
       <router-link
@@ -147,9 +143,7 @@ export default {
         <span class="icon">
           <font-awesome-icon :icon="['far', 'newspaper']" />
         </span>
-        <span>
-          Spotlight PA Articles
-        </span>
+        <span> Spotlight PA Articles </span>
       </router-link>
 
       <router-link
@@ -159,9 +153,7 @@ export default {
         <span class="icon">
           <font-awesome-icon :icon="['fa', 'file-upload']" />
         </span>
-        <span>
-          Images
-        </span>
+        <span> Images </span>
       </router-link>
 
       <router-link
@@ -171,9 +163,7 @@ export default {
         <span class="icon">
           <font-awesome-icon :icon="['fa', 'file-upload']" />
         </span>
-        <span>
-          Files
-        </span>
+        <span> Files </span>
       </router-link>
 
       <router-link
@@ -183,9 +173,7 @@ export default {
         <span class="icon">
           <font-awesome-icon :icon="['fas', 'user-circle']" />
         </span>
-        <span>
-          Approved User Domains
-        </span>
+        <span> Approved User Domains </span>
       </router-link>
     </div>
 

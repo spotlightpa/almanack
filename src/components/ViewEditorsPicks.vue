@@ -119,9 +119,7 @@ export default {
       </ul>
     </nav>
 
-    <h1 class="title">
-      Homepage Editor
-    </h1>
+    <h1 class="title">Homepage Editor</h1>
 
     <progress
       v-if="!didLoad && isLoading"

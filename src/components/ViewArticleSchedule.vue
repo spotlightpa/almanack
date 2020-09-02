@@ -52,9 +52,7 @@ export default {
 
     <APILoader :is-loading="isLoading" :reload="load" :error="error">
       <div v-if="!article" class="message is-warning">
-        <p class="message-header">
-          Not found
-        </p>
+        <p class="message-header">Not found</p>
         <p class="message-body">
           Article not found.
           <router-link :to="{ name: 'home' }">Go home</router-link>?
