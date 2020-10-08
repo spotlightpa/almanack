@@ -20,7 +20,7 @@ func (app *appEnv) versionMiddleware(h http.Handler) http.Handler {
 	})
 }
 
-func (app *appEnv) jsonResponse(statusCode int, w http.ResponseWriter, data interface{}) {
+func (app *appEnv) replyJSON(statusCode int, w http.ResponseWriter, data interface{}) {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(statusCode)
 	enc := json.NewEncoder(w)
@@ -29,11 +29,11 @@ func (app *appEnv) jsonResponse(statusCode int, w http.ResponseWriter, data inte
 	}
 }
 
-func (app *appEnv) errorResponse(w http.ResponseWriter, r *http.Request, err error) {
+func (app *appEnv) replyErr(w http.ResponseWriter, r *http.Request, err error) {
 	app.logErr(r.Context(), err)
 	code := resperr.StatusCode(err)
 	msg := resperr.UserMessage(err)
-	app.jsonResponse(code, w, struct {
+	app.replyJSON(code, w, struct {
 		Status  int    `json:"status"`
 		Message string `json:"message"`
 	}{
@@ -56,7 +56,7 @@ func (app *appEnv) authMiddleware(h http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		r, err := app.auth.AddToRequest(r)
 		if err != nil {
-			app.errorResponse(w, r, err)
+			app.replyErr(w, r, err)
 			return
 		}
 		h.ServeHTTP(w, r)
@@ -67,7 +67,7 @@ func (app *appEnv) hasRoleMiddleware(role string) func(next http.Handler) http.H
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			if err := app.auth.HasRole(r, role); err != nil {
-				app.errorResponse(w, r, err)
+				app.replyErr(w, r, err)
 				return
 			}
 			next.ServeHTTP(w, r)
