@@ -16,6 +16,7 @@ import (
 	"github.com/carlmjohnson/resperr"
 	"github.com/go-chi/chi"
 	"github.com/go-chi/chi/middleware"
+	"github.com/valyala/fasthttp"
 	"golang.org/x/net/context/ctxhttp"
 
 	"github.com/spotlightpa/almanack/internal/db"
@@ -160,6 +161,27 @@ func (app *appEnv) getProxyImage(w http.ResponseWriter, r *http.Request) {
 }
 
 func getImage(ctx context.Context, c *http.Client, srcurl string) (ctype string, body []byte, err error) {
+	sc, body, err := fasthttp.Get(nil, srcurl)
+	if sc > 299 {
+		err = fmt.Errorf("bad status %d", sc)
+		return
+	}
+	peek := body
+	if ct := http.DetectContentType(peek); strings.HasPrefix(ct, "image/jpeg") {
+		ctype = "image/jpeg"
+	} else if strings.HasPrefix(ct, "image/png") {
+		ctype = "image/png"
+	} else {
+		return "", nil, resperr.WithCodeAndMessage(
+			fmt.Errorf("%q did not have proper MIME type", srcurl),
+			http.StatusBadRequest,
+			"URL must be an image",
+		)
+	}
+	return
+}
+
+func getImageXXX(ctx context.Context, c *http.Client, srcurl string) (ctype string, body []byte, err error) {
 	var res *http.Response
 	res, err = ctxhttp.Get(ctx, c, srcurl)
 	if err != nil {

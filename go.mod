@@ -30,6 +30,7 @@ require (
 	github.com/mattbaird/gochimp v0.0.0-20180111040707-a267553896d1
 	github.com/peterbourgon/ff/v2 v2.0.0
 	github.com/tj/assert v0.0.3 // indirect
+	github.com/valyala/fasthttp v1.6.0
 	golang.org/x/net v0.0.0-20200822124328-c89045814202
 	golang.org/x/oauth2 v0.0.0-20200107190931-bf48bf16ab8d
 	google.golang.org/appengine v1.6.6 // indirect
