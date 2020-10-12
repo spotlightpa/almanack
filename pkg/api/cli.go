@@ -1,6 +1,7 @@
 package api
 
 import (
+	"crypto/tls"
 	"flag"
 	"fmt"
 	"log"
@@ -39,6 +40,7 @@ func CLI(args []string) error {
 func (app *appEnv) parseArgs(args []string) error {
 	fl := flag.NewFlagSet(AppName, flag.ContinueOnError)
 
+	tls12 := fl.Bool("disable-tls-13", true, "set max TLS version to 1.2")
 	fl.StringVar(&app.srcFeedURL, "src-feed", "", "source `URL` for Arc feed")
 	fl.BoolVar(&app.isLambda, "lambda", false, "use AWS Lambda rather than HTTP")
 	fl.StringVar(&app.port, "port", ":3001", "listen on port (HTTP only)")
@@ -70,7 +72,12 @@ func (app *appEnv) parseArgs(args []string) error {
 	if app.svc, err = getService(app.Logger); err != nil {
 		return err
 	}
-
+	if *tls12 {
+		dt := http.DefaultTransport.(*http.Transport)
+		dt.TLSClientConfig = &tls.Config{
+			MaxVersion: tls.VersionTLS12,
+		}
+	}
 	return nil
 }
 
