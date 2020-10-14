@@ -208,6 +208,7 @@ func readContentElements(ctx context.Context, svc Service, rawels []*json.RawMes
 				`{{<picture src="%s" description="%s" caption="%s" credit="%s">}}`+"\n",
 				u, desc, desc, credit,
 			)
+			graf = strings.ReplaceAll(graf, "\n", " ")
 
 		case "gallery", "interstitial_link":
 			continue
