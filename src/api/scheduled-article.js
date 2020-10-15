@@ -47,6 +47,7 @@ export default class ScheduledArticle {
       noIndex: ["NoIndex", false],
       languageCode: ["LanguageCode", ""],
       layout: ["LayoutType", ""],
+      extendedKicker: ["ExtendedKicker", ""],
 
       warnings: ["Warnings", []],
       authors: ["Authors", []],
@@ -118,6 +119,7 @@ export default class ScheduledArticle {
       NoIndex: this.noIndex,
       LanguageCode: this.languageCode,
       LayoutType: this.layout,
+      ExtendedKicker: this.extendedKicker,
       "almanack-refresh-arc": this._refreshArc,
     };
   }

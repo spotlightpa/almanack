@@ -64,6 +64,7 @@ modal-exclude = false
 no-index = false
 language-code = ""
 layout = ""
+extended-kicker = ""
 +++
 
 
@@ -94,6 +95,7 @@ modal-exclude = true
 no-index = true
 language-code = "es"
 layout = "fancy"
+extended-kicker = "More News"
 +++
 
 
@@ -124,6 +126,7 @@ modal-exclude = true
 no-index = true
 language-code = "es"
 layout = "fancy"
+extended-kicker = "More News"
 +++
 
 Hello, world!

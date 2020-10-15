@@ -42,6 +42,7 @@ type SpotlightPAArticle struct {
 	NoIndex          bool       `toml:"no-index"`
 	LanguageCode     string     `toml:"language-code"`
 	LayoutType       string     `toml:"layout"`
+	ExtendedKicker   string     `toml:"extended-kicker"`
 	Body             string     `toml:"-"`
 	Filepath         string     `toml:"-"`
 	LastArcSync      time.Time  `toml:"-"`
@@ -81,6 +82,7 @@ func (splArt *SpotlightPAArticle) toSPLData() interface{} {
 		NoIndex          bool       `json:"no-index"`
 		LanguageCode     string     `json:"language-code"`
 		LayoutType       string     `json:"layout"`
+		ExtendedKicker   string     `json:"extended-kicker"`
 		Body             string     `json:"body"`
 		Filepath         string     `json:"-"`
 		LastArcSync      time.Time  `json:"last-arc-sync"`

@@ -312,6 +312,11 @@ export default {
     <details class="field">
       <summary class="has-text-weight-semibold">Advanced options</summary>
 
+      <BulmaFieldInput
+        v-model="article.extendedKicker"
+        label="Homepage extended kicker (e.g. Top News)"
+      />
+
       <BulmaField label="Hide newsletters pop-up">
         <div>
           <label class="checkbox">
