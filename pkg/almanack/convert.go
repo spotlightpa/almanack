@@ -28,7 +28,7 @@ func (arcStory *ArcStory) ToArticle(ctx context.Context, svc Service, article *S
 		return
 	}
 
-	// Hacky: Add the of XX orgs then remove them
+	// Hacky: Add the of/for XX orgs then remove them
 	article.Authors = make([]string, len(arcStory.Credits.By))
 	for i := range arcStory.Credits.By {
 		article.Authors[i] = authorFrom(&arcStory.Credits.By[i])
@@ -37,6 +37,8 @@ func (arcStory *ArcStory) ToArticle(ctx context.Context, svc Service, article *S
 	article.Byline = commaAndJoiner(article.Authors)
 	for i := range article.Authors {
 		if pos := strings.Index(article.Authors[i], " of "); pos != -1 {
+			article.Authors[i] = article.Authors[i][:pos]
+		} else if pos := strings.Index(article.Authors[i], " for "); pos != -1 {
 			article.Authors[i] = article.Authors[i][:pos]
 		}
 	}
