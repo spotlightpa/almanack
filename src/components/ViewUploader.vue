@@ -18,7 +18,7 @@ export default {
     ImageUploader,
   },
   metaInfo: {
-    title: "Images",
+    title: "Photos",
   },
   setup() {
     let { listImages, updateImage } = useClient();

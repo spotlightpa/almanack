@@ -153,7 +153,7 @@ export default {
         <span class="icon">
           <font-awesome-icon :icon="['fa', 'file-upload']" />
         </span>
-        <span> Images </span>
+        <span>Photos</span>
       </router-link>
 
       <router-link
@@ -163,7 +163,7 @@ export default {
         <span class="icon">
           <font-awesome-icon :icon="['fa', 'file-upload']" />
         </span>
-        <span> Files </span>
+        <span>Files</span>
       </router-link>
 
       <router-link
