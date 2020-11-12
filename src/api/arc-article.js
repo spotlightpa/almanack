@@ -313,12 +313,12 @@ export default class ArcArticle {
   }
 
   get emailSubject() {
-    return `Update on ${this.slug}`;
+    return `New Spotlight PA story ${this.slug}`;
   }
 
   get emailBody() {
     let text = `
-Update on ${this.slug}
+New ${this.slug}
 
 https://almanack.data.spotlightpa.org/articles/${this.id}
 
