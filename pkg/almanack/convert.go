@@ -215,6 +215,9 @@ func readContentElements(ctx context.Context, svc Service, rawels []*json.RawMes
 		case "gallery", "interstitial_link":
 			continue
 
+		case "divider":
+			graf = "<hr>"
+
 		default:
 			warnings = append(warnings,
 				fmt.Sprintf("unknown element type - %q", _type))

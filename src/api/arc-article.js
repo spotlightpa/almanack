@@ -6,6 +6,7 @@ import commaAnd from "@/utils/comma-and.js";
 
 import { formatDate } from "@/utils/time-format.js";
 
+import ArcArticleDivider from "@/components/ArcArticleDivider.vue";
 import ArcArticleImage from "@/components/ArcArticleImage.vue";
 import ArcArticleList from "@/components/ArcArticleList.vue";
 import ArcArticleHTML from "@/components/ArcArticleHTML.vue";
@@ -18,6 +19,7 @@ let contentComponentsTypes = {
   header: ArcArticleHeader,
   list: ArcArticleList,
   text: ArcArticleText,
+  divider: ArcArticleDivider,
 };
 
 let embedComponentsTypes = {
