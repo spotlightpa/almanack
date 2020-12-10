@@ -132,6 +132,7 @@ func (app *appEnv) getProxyImage(w http.ResponseWriter, r *http.Request) {
 	for _, prefix := range []string{
 		"https://www.inquirer.com/resizer/",
 		"https://arc-anglerfish-arc2-prod-pmn.s3.amazonaws.com/public/",
+		"https://cloudfront-us-east-1.images.arcpublishing.com/pmn/",
 	} {
 		if strings.HasPrefix(u, prefix) {
 			inWhitelist = true

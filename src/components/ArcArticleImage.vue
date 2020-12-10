@@ -16,8 +16,9 @@ export default {
     imageURL() {
       let srcURL = this.block.url;
       // Some images haven't been published and can't be used
-      if (!this.block.url.match(/\/public\//)) {
-        srcURL = this.block.additional_properties.resizeUrl;
+      let pubURL = this.block?.additional_properties?.resizeUrl;
+      if (!srcURL.match(/\/public\//) && pubURL) {
+        srcURL = pubURL;
       }
       if (!srcURL) {
         return "";
