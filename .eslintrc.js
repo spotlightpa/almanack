@@ -66,5 +66,6 @@ module.exports = {
     ],
     "vue/this-in-template": ["error", "never"],
     "vue/v-bind-style": ["warn", "shorthand"],
+    "vue/no-mutating-props": "off",
   },
 };
