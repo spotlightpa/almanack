@@ -7,19 +7,18 @@ let dsn =
 
 Sentry.init({ dsn });
 
-import Vue from "vue";
+import { createApp } from "vue";
 import router from "./router.js";
-import "./plugins/font-awesome.js";
-import "./plugins/buefy.js";
-
-import VueMeta from "vue-meta";
-Vue.use(VueMeta);
+import registerFA from "./plugins/font-awesome.js";
+import registerBuefy from "./plugins/buefy.js";
+// import VueMeta from "vue-meta";
 
 import App from "./components/TheApp.vue";
 
-Vue.config.ignoredElements = ["raw-html"];
+// Vue.config.ignoredElements = ["raw-html"];
 
-new Vue({
-  router,
-  render: (h) => h(App),
-}).$mount("#app");
+let app = createApp(App);
+registerFA(app);
+registerBuefy(app);
+app.use(router);
+app.mount("#app");

@@ -1,5 +1,5 @@
 <script>
-import { reactive, ref, toRefs } from "@vue/composition-api";
+import { reactive, ref, toRefs } from "vue";
 import { useClient } from "@/api/hooks.js";
 import { formatDate } from "@/utils/time-format.js";
 

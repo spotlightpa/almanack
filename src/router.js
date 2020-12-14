@@ -1,6 +1,6 @@
-import Vue from "vue";
-import Router from "vue-router";
-import { watch } from "@vue/composition-api";
+// import Vue from "vue";
+import { createRouter, createWebHistory } from "vue-router";
+import { watch } from "vue";
 
 import { useAuth } from "@/api/hooks.js";
 import { setDimensions, sendGAPageview } from "@/utils/google-analytics.js";
@@ -18,7 +18,7 @@ import ViewSpotlightPAArticles from "./components/ViewSpotlightPAArticles.vue";
 import ViewUnauthorized from "./components/ViewUnauthorized.vue";
 import ViewUploader from "./components/ViewUploader.vue";
 
-Vue.use(Router);
+// Vue.use(Router);
 
 let {
   roles,
@@ -29,8 +29,8 @@ let {
   isSignedIn,
 } = useAuth();
 
-let router = new Router({
-  mode: "history",
+let router = createRouter({
+  history: createWebHistory(),
   base: process.env.BASE_URL,
   routes: [
     {

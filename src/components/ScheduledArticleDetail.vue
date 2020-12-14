@@ -1,5 +1,5 @@
 <script>
-import { computed, reactive } from "@vue/composition-api";
+import { computed, reactive } from "vue";
 
 import { useClient } from "@/api/hooks.js";
 import fuzzyMatch from "@/utils/fuzzy-match.js";

@@ -1,5 +1,5 @@
 <script>
-import { ref } from "@vue/composition-api";
+import { ref } from "vue";
 
 import AdminList from "./AdminList.vue";
 import EmailComposer from "./EmailComposer.vue";

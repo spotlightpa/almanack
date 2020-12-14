@@ -1,6 +1,5 @@
 <script>
-import Vue from "vue";
-import { reactive, computed, toRefs } from "@vue/composition-api";
+import { reactive, computed, toRefs } from "vue";
 
 import { useClient, makeState } from "@/api/hooks.js";
 
@@ -10,7 +9,7 @@ class EditorsPicksData {
   constructor(data, articlesByPath) {
     this._initialData = { data, articlesByPath };
     this.reset();
-    Vue.observable(this);
+    reactive(this);
   }
 
   reset() {

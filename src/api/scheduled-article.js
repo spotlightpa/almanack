@@ -1,4 +1,4 @@
-import Vue from "vue";
+import { reactive } from "vue";
 
 import getProp from "@/utils/getter.js";
 import imgproxyURL from "@/api/imgproxy-url.js";
@@ -10,7 +10,7 @@ export default class ScheduledArticle {
 
     this.init(data);
 
-    Vue.observable(this);
+    reactive(this);
   }
 
   init(data, { save_reset = true } = {}) {

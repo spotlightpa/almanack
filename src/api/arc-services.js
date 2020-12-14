@@ -1,4 +1,4 @@
-import { toRefs, computed, ref, watch } from "@vue/composition-api";
+import { toRefs, computed, ref, watch } from "vue";
 
 import ArcArticle from "./arc-article.js";
 import { makeState } from "./service-util.js";

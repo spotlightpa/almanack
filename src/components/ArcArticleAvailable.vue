@@ -1,5 +1,5 @@
 <script>
-import { reactive, toRefs } from "@vue/composition-api";
+import { reactive, toRefs } from "vue";
 import { sendGAEvent } from "@/utils/google-analytics.js";
 import { formatDate } from "@/utils/time-format.js";
 

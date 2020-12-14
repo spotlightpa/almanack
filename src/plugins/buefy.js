@@ -1,13 +1,11 @@
-import Vue from "vue";
-
 import config from "buefy/src/utils/config";
 import {
-  Autocomplete,
+  // Autocomplete,
   Datetimepicker,
   Field,
-  Input,
-  Numberinput,
-  Select,
+  // Input,
+  // Numberinput,
+  // Select,
   Taginput,
 } from "buefy/src/components";
 
@@ -19,12 +17,12 @@ const MyBuefy = {
     });
 
     let comps = [
-      Autocomplete,
+      // Autocomplete,
       Datetimepicker,
       Field,
-      Input,
-      Numberinput,
-      Select,
+      // Input,
+      // Numberinput,
+      // Select,
       Taginput,
     ];
 
@@ -34,4 +32,6 @@ const MyBuefy = {
   },
 };
 
-Vue.use(MyBuefy);
+export default function register(app) {
+  app.use(MyBuefy);
+}
