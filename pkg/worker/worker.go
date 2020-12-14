@@ -10,7 +10,6 @@ import (
 
 	"github.com/carlmjohnson/flagext"
 	"github.com/getsentry/sentry-go"
-	"github.com/peterbourgon/ff/v2"
 
 	"github.com/spotlightpa/almanack/internal/httpjson"
 	"github.com/spotlightpa/almanack/internal/mailchimp"
@@ -75,7 +74,10 @@ Options:
 `)
 		fl.PrintDefaults()
 	}
-	if err := ff.Parse(fl, args, ff.WithEnvVarPrefix("ALMANACK")); err != nil {
+	if err := fl.Parse(args); err != nil {
+		return err
+	}
+	if err := flagext.ParseEnv(fl, "almanack"); err != nil {
 		return err
 	}
 

@@ -14,7 +14,6 @@ import (
 	"github.com/carlmjohnson/gateway"
 	"github.com/getsentry/sentry-go"
 	sentryhttp "github.com/getsentry/sentry-go/http"
-	"github.com/peterbourgon/ff/v2"
 
 	"github.com/spotlightpa/almanack/internal/mailchimp"
 	"github.com/spotlightpa/almanack/internal/netlifyid"
@@ -59,7 +58,11 @@ func (app *appEnv) parseArgs(args []string) error {
 		fl.PrintDefaults()
 	}
 	getService := almanack.Flags(fl)
-	if err := ff.Parse(fl, args, ff.WithEnvVarPrefix("ALMANACK")); err != nil {
+
+	if err := fl.Parse(args); err != nil {
+		return err
+	}
+	if err := flagext.ParseEnv(fl, "almanack"); err != nil {
 		return err
 	}
 
