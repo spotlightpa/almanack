@@ -19,7 +19,7 @@ require (
 	github.com/carlmjohnson/resperr v0.20.4
 	github.com/carlmjohnson/slackhook v0.20.2
 	github.com/getsentry/sentry-go v0.9.0
-	github.com/go-chi/chi v4.1.2+incompatible
+	github.com/go-chi/chi v1.5.1
 	github.com/go-redsync/redsync v1.3.1
 	github.com/gomodule/redigo v2.0.0+incompatible
 	github.com/google/go-github/v33 v33.0.0
