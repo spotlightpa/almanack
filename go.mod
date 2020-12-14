@@ -22,7 +22,7 @@ require (
 	github.com/go-chi/chi v4.1.2+incompatible
 	github.com/go-redsync/redsync v1.3.1
 	github.com/gomodule/redigo v2.0.0+incompatible
-	github.com/google/go-github/v30 v30.1.0
+	github.com/google/go-github/v33 v33.0.0
 	github.com/gorilla/feeds v1.1.1
 	github.com/lib/pq v1.9.0
 	github.com/mattbaird/gochimp v0.0.0-20180111040707-a267553896d1

@@ -6,7 +6,7 @@ import (
 	"flag"
 	"net/http"
 
-	"github.com/google/go-github/v30/github"
+	"github.com/google/go-github/v33/github"
 	"github.com/spotlightpa/almanack/internal/netlifyid"
 	"github.com/spotlightpa/almanack/pkg/common"
 	"golang.org/x/oauth2"
