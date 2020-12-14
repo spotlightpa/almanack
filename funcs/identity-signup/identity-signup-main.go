@@ -13,8 +13,8 @@ import (
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
 	"github.com/getsentry/sentry-go"
-	"github.com/peterbourgon/ff/v2"
 
+	"github.com/carlmjohnson/flagext"
 	"github.com/spotlightpa/almanack/internal/db"
 	"github.com/spotlightpa/almanack/internal/herokuapi"
 	"github.com/spotlightpa/almanack/internal/netlifyid"
@@ -50,7 +50,10 @@ func (app *appEnv) parseEnv() error {
 	pg := db.FlagVar(fl, "postgres", "PostgreSQL database `URL`")
 	checkHerokuPG := herokuapi.FlagVar(fl, "postgres")
 	sentryDSN := fl.String("sentry-dsn", "", "DSN `pseudo-URL` for Sentry")
-	if err := ff.Parse(fl, []string{}, ff.WithEnvVarPrefix("ALMANACK")); err != nil {
+	if err := fl.Parse([]string{}); err != nil {
+		return err
+	}
+	if err := flagext.ParseEnv(fl, "almanack"); err != nil {
 		return err
 	}
 	if err := sentry.Init(sentry.ClientOptions{
