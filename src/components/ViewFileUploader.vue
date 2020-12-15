@@ -140,32 +140,40 @@ export default {
 
     <h2 class="title has-margin-top">Existing files</h2>
     <APILoader :is-loading="isLoading" :reload="fetch" :error="error">
-      <table class="table is-striped is-fullwidth">
-        <thead>
-          <tr>
-            <th>URL</th>
-            <th>Name</th>
-            <th>Description</th>
-            <th>Created</th>
-          </tr>
-        </thead>
+      <table class="table is-striped is-narrow is-fullwidth">
         <tbody>
           <tr v-for="file of files" :key="file.id">
-            <td>
-              <CopyWithButton :value="file.url" label="URL" size="is-small" />
-            </td>
-            <td>
-              <a :href="file.url" target="_blank" v-text="file.filename" />
+            <td style="vertical-align: middle">
+              <a
+                class="icon has-text-success"
+                :href="file.url"
+                target="_blank"
+                :title="`Download ${file.filename}`"
+              >
+                <font-awesome-icon :icon="['fas', 'file-download']" size="2x" />
+              </a>
             </td>
             <td>
               <p>
-                <a @click="updateDescription(file)">
-                  {{ file.description || "&lt;no description&gt;" }}
-                </a>
+                <strong>Name: </strong>
+                {{ file.filename }}
               </p>
-            </td>
-            <td>
-              {{ formatDate(file.created_at) }}
+              <p>
+                <strong>Uploaded: </strong>
+                {{ formatDate(file.created_at) }}
+              </p>
+              <p>
+                <a
+                  class="has-text-weight-semibold"
+                  @click="updateDescription(file)"
+                >
+                  Description:
+                </a>
+                {{ file.description || "&lt;no description&gt;" }}
+              </p>
+              <p>
+                <CopyWithButton :value="file.url" label="URL" size="is-small" />
+              </p>
             </td>
           </tr>
         </tbody>
