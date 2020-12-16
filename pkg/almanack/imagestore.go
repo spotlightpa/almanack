@@ -12,6 +12,7 @@ import (
 
 	"github.com/carlmjohnson/crockford"
 	"github.com/carlmjohnson/resperr"
+	"github.com/gabriel-vasile/mimetype"
 	"github.com/spotlightpa/almanack/internal/aws"
 	"golang.org/x/net/context/ctxhttp"
 )
@@ -59,19 +60,19 @@ func UploadFromURL(ctx context.Context, c *http.Client, is aws.BlobStore, srcurl
 	const (
 		megabyte = 1 << 20
 		maxSize  = 25 * megabyte
+		peekSize = 512
 	)
 	buf := bufio.NewReader(http.MaxBytesReader(nil, res.Body, maxSize))
-	// http.DetectContentType only uses first 512 bytes
-	peek, err := buf.Peek(512)
+
+	peek, err := buf.Peek(peekSize)
 	if err != nil && err != io.EOF {
 		return "", "", err
 	}
 
-	// TODO: Use better mime library
-	ct := http.DetectContentType(peek)
-	if strings.HasPrefix(ct, "image/jpeg") {
+	ct := mimetype.Detect(peek)
+	if ct.Is("image/jpeg") {
 		ext = "jpeg"
-	} else if strings.HasPrefix(ct, "image/png") {
+	} else if ct.Is("image/png") {
 		ext = "png"
 	} else {
 		return "", "", resperr.WithCodeAndMessage(
@@ -89,7 +90,7 @@ func UploadFromURL(ctx context.Context, c *http.Client, is aws.BlobStore, srcurl
 	filename = hashURLpath(srcurl, ext)
 
 	h := make(http.Header, 1)
-	h.Set("Content-Type", ct)
+	h.Set("Content-Type", ct.String())
 	if err = is.WriteFile(ctx, filename, h, slurp); err != nil {
 		return "", "", resperr.WithCodeAndMessage(
 			fmt.Errorf("unexpected S3 status: %d", res.StatusCode),
