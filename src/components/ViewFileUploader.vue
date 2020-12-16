@@ -47,14 +47,15 @@ export default {
       },
       async uploadFileInput(ev) {
         let { files } = ev.target;
-        if (files.length !== 1) {
-          state.uploadError = new Error("Can only upload one file at a time");
-          return;
-        }
-        let [body] = files;
         state.isUploading = true;
         state.uploadError = null;
-        [state.fileURL, state.uploadError] = await uploadFile(body);
+
+        for (let body of files) {
+          [state.fileURL, state.uploadError] = await uploadFile(body);
+          if (state.uploadError) {
+            break;
+          }
+        }
         state.isUploading = false;
         await actions.fetch();
       },
@@ -99,6 +100,7 @@ export default {
                 <input
                   type="file"
                   class="file-input"
+                  multiple
                   @change="uploadFileInput"
                 />
 
