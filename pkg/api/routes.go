@@ -462,7 +462,8 @@ func (app *appEnv) postSignedUpload(w http.ResponseWriter, r *http.Request) {
 		res response
 		err error
 	)
-	res.SignedURL, res.FileName, err = almanack.GetSignedImageUpload(app.svc.ImageStore, userData.Type)
+	res.SignedURL, res.FileName, err = almanack.GetSignedImageUpload(
+		r.Context(), app.svc.ImageStore, userData.Type)
 	if err != nil {
 		app.replyErr(w, r, err)
 		return
@@ -715,6 +716,7 @@ func (app *appEnv) postFileCreate(w http.ResponseWriter, r *http.Request) {
 	)
 
 	res.SignedURL, res.FileURL, res.Disposition, res.CacheControl, err = almanack.GetSignedFileUpload(
+		r.Context(),
 		app.svc.FileStore,
 		userData.FileName,
 		userData.MimeType,
