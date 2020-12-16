@@ -29,19 +29,23 @@ export default {
           return;
         }
         let { files } = ev.target;
-        if (files.length !== 1) {
-          state.error = new Error("Can only upload one file at a time");
-          return;
-        }
-        let [body] = files;
-        if (!["image/jpeg", "image/png"].includes(body.type)) {
-          state.error = new Error("Only JPEG and PNG are supported");
-          return;
-        }
 
+        for (let body of files) {
+          if (!["image/jpeg", "image/png"].includes(body.type)) {
+            state.error = new Error("Only JPEG and PNG are supported");
+            return;
+          }
+        }
         state.isUploading = true;
         state.error = null;
-        [state.filename, state.error] = await uploadImage(body);
+
+        for (let body of files) {
+          [state.filename, state.error] = await uploadImage(body);
+          if (state.error) {
+            break;
+          }
+        }
+
         state.isUploading = false;
         emit("update-image-list");
       },
@@ -81,6 +85,7 @@ export default {
                   type="file"
                   accept="image/jpeg,image/png"
                   class="file-input"
+                  multiple
                   @change="uploadFileInput"
                 />
 
