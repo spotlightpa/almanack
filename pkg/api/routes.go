@@ -765,6 +765,8 @@ func (app *appEnv) getCron(w http.ResponseWriter, r *http.Request) {
 		return app.svc.PopScheduledArticles(r.Context())
 	}, func() error {
 		return app.svc.UpdateNewsletterArchives(r.Context())
+	}, func() error {
+		return app.svc.UpdateMostPopular(r.Context())
 	}); err != nil {
 		app.replyErr(w, r, err)
 		return

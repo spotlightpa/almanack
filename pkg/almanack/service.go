@@ -11,6 +11,7 @@ import (
 	"github.com/carlmjohnson/errutil"
 	"github.com/spotlightpa/almanack/internal/aws"
 	"github.com/spotlightpa/almanack/internal/db"
+	"github.com/spotlightpa/almanack/internal/ganalytics"
 	"github.com/spotlightpa/almanack/internal/index"
 	"github.com/spotlightpa/almanack/internal/slack"
 	"github.com/spotlightpa/almanack/pkg/common"
@@ -64,6 +65,7 @@ type Service struct {
 	SlackClient slack.Client
 	Indexer     index.Indexer
 	common.NewletterService
+	ga *ganalytics.Client
 }
 
 func (svc Service) GetSpotlightPAArticle(ctx context.Context, dbID int32) (*SpotlightPAArticle, error) {
@@ -396,4 +398,22 @@ func (svc Service) UpdateNewsletterArchive(ctx context.Context, mcType, dbType, 
 	}
 
 	return nil
+}
+
+func (svc Service) UpdateMostPopular(ctx context.Context) error {
+	svc.Logger.Printf("updating most popular")
+	pages, err := svc.ga.MostPopularNews(ctx)
+	if err != nil {
+		return err
+	}
+	data := struct {
+		Pages []string `json:"pages"`
+	}{pages}
+	return UploadJSON(
+		ctx,
+		svc.FileStore,
+		"feeds/most-popular.json",
+		"public, max-age=300",
+		&data,
+	)
 }
