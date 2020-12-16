@@ -24,11 +24,6 @@ type EmailService interface {
 	SendEmail(subject, body string) error
 }
 
-type FileStore interface {
-	GetSignedURL(srcPath string, h http.Header) (signedURL string, err error)
-	BuildURL(srcPath string) string
-}
-
 type Newsletter struct {
 	Subject     string    `json:"subject"`
 	ArchiveURL  string    `json:"archive_url"`

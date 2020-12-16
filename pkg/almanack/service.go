@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/carlmjohnson/errutil"
+	"github.com/spotlightpa/almanack/internal/aws"
 	"github.com/spotlightpa/almanack/internal/db"
 	"github.com/spotlightpa/almanack/internal/index"
 	"github.com/spotlightpa/almanack/internal/slack"
@@ -58,8 +59,8 @@ type Service struct {
 	Client  *http.Client
 	Querier db.Querier
 	common.ContentStore
-	ImageStore  common.FileStore
-	FileStore   common.FileStore
+	ImageStore  aws.BlobStore
+	FileStore   aws.BlobStore
 	SlackClient slack.Client
 	Indexer     index.Indexer
 	common.NewletterService

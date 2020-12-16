@@ -14,11 +14,11 @@ import (
 
 	"github.com/carlmjohnson/crockford"
 	"github.com/carlmjohnson/resperr"
-	"github.com/spotlightpa/almanack/pkg/common"
+	"github.com/spotlightpa/almanack/internal/aws"
 	"golang.org/x/net/context/ctxhttp"
 )
 
-func GetSignedImageUpload(is common.FileStore, ct string) (signedURL, filename string, err error) {
+func GetSignedImageUpload(is aws.BlobStore, ct string) (signedURL, filename string, err error) {
 	var ext string
 	if exts, err := mime.ExtensionsByType(ct); err != nil && len(exts) > 0 {
 		return "", "", fmt.Errorf("could not upload file of unknown mime type: %w", err)
@@ -32,7 +32,7 @@ func GetSignedImageUpload(is common.FileStore, ct string) (signedURL, filename s
 	return
 }
 
-func GetSignedHashedUrl(is common.FileStore, srcurl, ext string) (signedURL, filename string, err error) {
+func GetSignedHashedUrl(is aws.BlobStore, srcurl, ext string) (signedURL, filename string, err error) {
 	filename = hashURLpath(srcurl, ext)
 	signedURL, err = is.GetSignedURL(filename, nil)
 	return
@@ -55,7 +55,7 @@ func hashURLpath(srcPath, ext string) string {
 	)
 }
 
-func UploadFromURL(ctx context.Context, c *http.Client, is common.FileStore, srcurl string) (filename, ext string, err error) {
+func UploadFromURL(ctx context.Context, c *http.Client, is aws.BlobStore, srcurl string) (filename, ext string, err error) {
 	res, err := ctxhttp.Get(ctx, c, srcurl)
 	if err != nil {
 		return "", "", err
