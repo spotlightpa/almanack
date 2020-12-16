@@ -2,6 +2,7 @@ package aws
 
 import (
 	"context"
+	"crypto/md5"
 	"flag"
 	"fmt"
 	"net/http"
@@ -79,4 +80,37 @@ func (bs BlobStore) BuildURL(srcPath string) string {
 
 	// Just assuming bucket name is valid DNS…
 	return fmt.Sprintf("https://%s/%s", u.Hostname(), srcPath)
+}
+
+func (bs BlobStore) WriteFile(ctx context.Context, path string, h http.Header, data []byte) error {
+	b, err := blob.OpenBucket(ctx, bs.bucket)
+	if err != nil {
+		return err
+	}
+	defer b.Close()
+
+	var checksum []byte
+
+	attrs, err := b.Attributes(ctx, path)
+	// If attrs +MD5 match skip
+	if err == nil && attrs.MD5 != nil &&
+		attrs.CacheControl == h.Get("Cache-Control") &&
+		attrs.ContentType == h.Get("Content-Type") &&
+		attrs.ContentDisposition == h.Get("Content-Disposition") {
+		// Get checksum
+		a := md5.Sum(data)
+		checksum = a[:]
+		if string(checksum) == string(attrs.MD5) {
+			bs.l.Printf("skipping %q %q; already uploaded", bs.bucket, path)
+			return nil
+		}
+	}
+
+	bs.l.Printf("writing to %q %q", bs.bucket, path)
+	return b.WriteAll(ctx, path, data, &blob.WriterOptions{
+		CacheControl:       h.Get("Cache-Control"),
+		ContentType:        h.Get("Content-Type"),
+		ContentDisposition: h.Get("Content-Disposition"),
+		ContentMD5:         checksum,
+	})
 }

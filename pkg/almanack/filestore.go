@@ -2,6 +2,7 @@ package almanack
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"net/http"
 	"net/url"
@@ -10,7 +11,6 @@ import (
 
 	"github.com/carlmjohnson/crockford"
 	"github.com/spotlightpa/almanack/internal/aws"
-	"github.com/spotlightpa/almanack/internal/httpjson"
 )
 
 func GetSignedFileUpload(is aws.BlobStore, filename, mimetype string) (signedURL, fileURL, disposition, cachecontrol string, err error) {
@@ -66,12 +66,13 @@ func slugify(s string) string {
 	return strings.Map(f, s)
 }
 
-func UploadJSON(ctx context.Context, is aws.BlobStore, c *http.Client, filepath string, data interface{}) error {
-	// TODO: direct upload
-	signedURL, err := is.GetSignedURL(filepath, nil)
+func UploadJSON(ctx context.Context, is aws.BlobStore, filepath, cachecontrol string, data interface{}) error {
+	b, err := json.Marshal(data)
 	if err != nil {
 		return err
 	}
-
-	return httpjson.Put(ctx, c, signedURL, data, nil, http.StatusOK)
+	var h http.Header
+	h.Set("Content-Type", "application/json")
+	h.Set("Cache-Control", cachecontrol)
+	return is.WriteFile(ctx, filepath, h, b)
 }

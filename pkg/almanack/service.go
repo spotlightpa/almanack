@@ -391,7 +391,7 @@ func (svc Service) UpdateNewsletterArchive(ctx context.Context, mcType, dbType, 
 	}
 	// push to S3
 	feed := db.NewsletterToFeed(feedtitle, items)
-	if err = UploadJSON(ctx, svc.FileStore, svc.Client, path, feed); err != nil {
+	if err = UploadJSON(ctx, svc.FileStore, path, "public, max-age=300", feed); err != nil {
 		return err
 	}
 
