@@ -113,12 +113,18 @@ function makeClient($auth) {
       if (err) {
         return ["", err];
       }
-      let { "signed-url": signedURL, "file-url": fileURL, disposition } = data;
+      let {
+        "signed-url": signedURL,
+        "file-url": fileURL,
+        "cache-control": cacheControl,
+        disposition,
+      } = data;
       let opts = {
         method: "PUT",
         body,
         headers: {
           "Content-Disposition": disposition,
+          "Cache-Control": cacheControl,
         },
       };
       let rsp;

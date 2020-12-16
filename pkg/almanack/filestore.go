@@ -13,7 +13,7 @@ import (
 	"github.com/spotlightpa/almanack/pkg/common"
 )
 
-func GetSignedFileUpload(is common.FileStore, filename, mimetype string) (signedURL, fileURL, disposition string, err error) {
+func GetSignedFileUpload(is common.FileStore, filename, mimetype string) (signedURL, fileURL, disposition, cachecontrol string, err error) {
 	filepath := makeFilePath(filename)
 	fileURL = is.BuildURL(filepath)
 	h := http.Header{}
@@ -21,6 +21,8 @@ func GetSignedFileUpload(is common.FileStore, filename, mimetype string) (signed
 		url.PathEscape(filename))
 	h.Set("Content-Disposition", disposition)
 	h.Set("Content-Type", mimetype)
+	cachecontrol = "public,max-age=365000000,immutable"
+	h.Set("Cache-Control", cachecontrol)
 	signedURL, err = is.GetSignedURL(filepath, h)
 	return
 }
