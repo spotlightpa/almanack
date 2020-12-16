@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"github.com/aws/aws-sdk-go/service/s3"
+	"github.com/carlmjohnson/errutil"
 	"gocloud.dev/blob"
 
 	"github.com/spotlightpa/almanack/pkg/common"
@@ -81,18 +82,18 @@ func (bs BlobStore) BuildURL(srcPath string) string {
 	return fmt.Sprintf("https://%s/%s", u.Hostname(), srcPath)
 }
 
-func (bs BlobStore) WriteFile(ctx context.Context, path string, h http.Header, data []byte) error {
+func (bs BlobStore) WriteFile(ctx context.Context, path string, h http.Header, data []byte) (err error) {
 	b, err := blob.OpenBucket(ctx, bs.bucket)
 	if err != nil {
 		return err
 	}
-	defer b.Close()
+	defer errutil.Defer(&err, b.Close)
 
 	var checksum []byte
 
-	attrs, err := b.Attributes(ctx, path)
-	// If attrs +MD5 match skip
-	if err == nil && attrs.MD5 != nil &&
+	// If attrs + MD5 match skip
+	if attrs, err := b.Attributes(ctx, path); err == nil &&
+		attrs.MD5 != nil &&
 		attrs.CacheControl == h.Get("Cache-Control") &&
 		attrs.ContentType == h.Get("Content-Type") &&
 		attrs.ContentDisposition == h.Get("Content-Disposition") {
