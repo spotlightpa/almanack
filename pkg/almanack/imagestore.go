@@ -2,7 +2,6 @@ package almanack
 
 import (
 	"bufio"
-	"bytes"
 	"context"
 	"fmt"
 	"io"
@@ -29,12 +28,6 @@ func GetSignedImageUpload(is aws.BlobStore, ct string) (signedURL, filename stri
 	h := http.Header{}
 	h.Set("Content-Type", ct)
 	signedURL, err = is.GetSignedURL(filename, h)
-	return
-}
-
-func GetSignedHashedUrl(is aws.BlobStore, srcurl, ext string) (signedURL, filename string, err error) {
-	filename = hashURLpath(srcurl, ext)
-	signedURL, err = is.GetSignedURL(filename, nil)
 	return
 }
 
@@ -73,7 +66,9 @@ func UploadFromURL(ctx context.Context, c *http.Client, is aws.BlobStore, srcurl
 		return "", "", err
 	}
 
-	if ct := http.DetectContentType(peek); strings.HasPrefix(ct, "image/jpeg") {
+	// TODO: Use better mime library
+	ct := http.DetectContentType(peek)
+	if strings.HasPrefix(ct, "image/jpeg") {
 		ext = "jpeg"
 	} else if strings.HasPrefix(ct, "image/png") {
 		ext = "png"
@@ -90,24 +85,11 @@ func UploadFromURL(ctx context.Context, c *http.Client, is aws.BlobStore, srcurl
 		return "", "", err
 	}
 
-	// TODO: Direct upload
-	var signedURL string
-	signedURL, filename, err = GetSignedHashedUrl(is, srcurl, ext)
-	if err != nil {
-		return "", "", err
-	}
+	filename = hashURLpath(srcurl, ext)
 
-	req, err := http.NewRequest(http.MethodPut, signedURL, bytes.NewReader(slurp))
-	if err != nil {
-		return "", "", err
-	}
-	res, err = ctxhttp.Do(ctx, c, req)
-	if err != nil {
-		return "", "", err
-	}
-	defer res.Body.Close()
-
-	if res.StatusCode != http.StatusOK {
+	h := make(http.Header, 1)
+	h.Set("Content-Type", ct)
+	if err = is.WriteFile(ctx, filename, h, slurp); err != nil {
 		return "", "", resperr.WithCodeAndMessage(
 			fmt.Errorf("unexpected S3 status: %d", res.StatusCode),
 			http.StatusBadGateway,

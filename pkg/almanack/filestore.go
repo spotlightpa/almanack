@@ -71,7 +71,7 @@ func UploadJSON(ctx context.Context, is aws.BlobStore, filepath, cachecontrol st
 	if err != nil {
 		return err
 	}
-	var h http.Header
+	h := make(http.Header, 2)
 	h.Set("Content-Type", "application/json")
 	h.Set("Cache-Control", cachecontrol)
 	return is.WriteFile(ctx, filepath, h, b)
