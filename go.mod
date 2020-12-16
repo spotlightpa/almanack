@@ -18,6 +18,7 @@ require (
 	github.com/carlmjohnson/gateway v1.20.6
 	github.com/carlmjohnson/resperr v0.20.4
 	github.com/carlmjohnson/slackhook v0.20.2
+	github.com/gabriel-vasile/mimetype v1.1.2
 	github.com/getsentry/sentry-go v0.9.0
 	github.com/go-chi/chi v1.5.1
 	github.com/go-redsync/redsync v1.3.1
