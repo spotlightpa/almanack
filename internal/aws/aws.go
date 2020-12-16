@@ -1,14 +1,15 @@
 package aws
 
 import (
+	"context"
 	"flag"
 	"fmt"
 	"net/http"
+	"net/url"
 	"time"
 
-	"github.com/aws/aws-sdk-go-v2/aws"
-	"github.com/aws/aws-sdk-go-v2/aws/external"
-	"github.com/aws/aws-sdk-go-v2/service/s3"
+	"github.com/aws/aws-sdk-go/service/s3"
+	"gocloud.dev/blob"
 
 	"github.com/spotlightpa/almanack/pkg/common"
 )
@@ -17,31 +18,20 @@ func FlagVar(fl *flag.FlagSet) func(l common.Logger) (imageStore, fileStore comm
 	accessKeyID := fl.String("aws-access-key", "", "AWS access `key` ID")
 	secretAccessKey := fl.String("aws-secret-key", "", "AWS secret access `key`")
 	region := fl.String("aws-s3-region", "us-east-2", "AWS `region` to use for S3")
-	ibucket := fl.String("aws-s3-bucket", "", "AWS `bucket` to use for S3 images")
-	fbucket := fl.String("aws-s3-file-bucket", "", "AWS `bucket` to use for S3 files")
+	ibucket := fl.String("image-bucket-url", "mem://", "bucket `URL` for images")
+	fbucket := fl.String("file-bucket-url", "mem://", "bucket `URL` for files")
 
 	return func(l common.Logger) (imageStore, fileStore common.FileStore) {
-		cfg, err := external.LoadDefaultAWSConfig(
-			external.WithCredentialsValue(aws.Credentials{
-				AccessKeyID:     *accessKeyID,
-				SecretAccessKey: *secretAccessKey,
-			}),
-		)
-
-		imageStore, fileStore = MockStore{l}, MockStore{l}
+		err := register("s3-cli", *region, *accessKeyID, *secretAccessKey)
 		if err != nil {
-			l.Printf("using mock AWS: %v", err)
-			return
+			l.Printf("problem registering gocloud: %v", err)
 		}
-		cfg.Region = *region
-		if *ibucket != "" {
-			imageStore = S3Store{s3.New(cfg), *ibucket, l}
-		} else {
+		imageStore = S3Store{*ibucket, l}
+		if *ibucket == "mem://" {
 			l.Printf("using mock AWS image bucket")
 		}
-		if *fbucket != "" {
-			fileStore = S3Store{s3.New(cfg), *fbucket, l}
-		} else {
+		fileStore = S3Store{*fbucket, l}
+		if *fbucket == "mem://" {
 			l.Printf("using mock AWS file bucket")
 		}
 		return
@@ -49,41 +39,44 @@ func FlagVar(fl *flag.FlagSet) func(l common.Logger) (imageStore, fileStore comm
 }
 
 type S3Store struct {
-	svc    *s3.Client
 	bucket string
 	l      common.Logger
 }
 
 func (ss S3Store) GetSignedURL(srcPath string, h http.Header) (signedURL string, err error) {
 	ss.l.Printf("creating presigned URL for %q", srcPath)
-	input := &s3.PutObjectInput{
-		Bucket: &ss.bucket,
-		Key:    &srcPath,
+	ctx := context.TODO()
+	b, err := blob.OpenBucket(ctx, ss.bucket)
+	if err != nil {
+		return "", err
 	}
-	// TODO: Add more header decoding as needed
-	if disposition := h.Get("Content-Disposition"); disposition != "" {
-		input.ContentDisposition = &disposition
-	}
-	req := ss.svc.PutObjectRequest(input)
-	signedURL, err = req.Presign(15 * time.Minute)
-
-	return
+	defer b.Close()
+	return b.SignedURL(ctx, srcPath, &blob.SignedURLOptions{
+		Expiry:                   15 * time.Minute,
+		Method:                   http.MethodPut,
+		ContentType:              h.Get("Content-Type"),
+		EnforceAbsentContentType: true,
+		BeforeSign: func(as func(interface{}) bool) error {
+			var opts *s3.PutObjectInput
+			if as(&opts) {
+				if disposition := h.Get("Content-Disposition"); disposition != "" {
+					opts.ContentDisposition = &disposition
+				}
+				if cc := h.Get("Cache-Control"); cc != "" {
+					opts.CacheControl = &cc
+				}
+			}
+			return nil
+		},
+	})
 }
 
 func (ss S3Store) BuildURL(srcPath string) string {
+	u, err := url.Parse(ss.bucket)
+	if err != nil {
+		panic(err)
+	}
+
 	// Just assuming bucket name is valid DNS…
-	return fmt.Sprintf("https://%s/%s", ss.bucket, srcPath)
-}
-
-type MockStore struct {
-	l common.Logger
-}
-
-func (ms MockStore) GetSignedURL(srcPath string, h http.Header) (signedURL string, err error) {
-	ms.l.Printf("returning mock signed URL")
-	return "https://invalid", nil
-}
-
-func (ms MockStore) BuildURL(srcPath string) string {
-	return fmt.Sprintf("https://invalid/%s", srcPath)
+	return fmt.Sprintf("https://%s/%s", u.Hostname(), srcPath)
 }

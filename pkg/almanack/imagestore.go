@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"io"
 	"io/ioutil"
+	"mime"
 	"net/http"
 	"strings"
 	"time"
@@ -17,9 +18,17 @@ import (
 	"golang.org/x/net/context/ctxhttp"
 )
 
-func GetSignedImageUpload(is common.FileStore, ext string) (signedURL, filename string, err error) {
+func GetSignedImageUpload(is common.FileStore, ct string) (signedURL, filename string, err error) {
+	var ext string
+	if exts, err := mime.ExtensionsByType(ct); err != nil && len(exts) > 0 {
+		return "", "", fmt.Errorf("could not upload file of unknown mime type: %w", err)
+	} else {
+		ext = exts[0]
+	}
 	filename = makeFilename(ext)
-	signedURL, err = is.GetSignedURL(filename, nil)
+	h := http.Header{}
+	h.Set("Content-Type", ct)
+	signedURL, err = is.GetSignedURL(filename, h)
 	return
 }
 
@@ -31,11 +40,10 @@ func GetSignedHashedUrl(is common.FileStore, srcurl, ext string) (signedURL, fil
 
 func makeFilename(ext string) string {
 	var sb strings.Builder
-	sb.Grow(len("2006/01/123456789abcdefg.") + len(ext))
+	sb.Grow(len("2006/01/123456789abcdefg") + len(ext))
 	sb.WriteString(time.Now().Format("2006/01/"))
 	sb.Write(crockford.Time(crockford.Lower, time.Now()))
 	sb.Write(crockford.AppendRandom(crockford.Lower, nil))
-	sb.WriteString(".")
 	sb.WriteString(ext)
 	return sb.String()
 }
@@ -82,6 +90,7 @@ func UploadFromURL(ctx context.Context, c *http.Client, is common.FileStore, src
 		return "", "", err
 	}
 
+	// TODO: Direct upload
 	var signedURL string
 	signedURL, filename, err = GetSignedHashedUrl(is, srcurl, ext)
 	if err != nil {

@@ -13,13 +13,14 @@ import (
 	"github.com/spotlightpa/almanack/pkg/common"
 )
 
-func GetSignedFileUpload(is common.FileStore, filename string) (signedURL, fileURL, disposition string, err error) {
+func GetSignedFileUpload(is common.FileStore, filename, mimetype string) (signedURL, fileURL, disposition string, err error) {
 	filepath := makeFilePath(filename)
 	fileURL = is.BuildURL(filepath)
 	h := http.Header{}
 	disposition = fmt.Sprintf("attachment; filename*=UTF-8''%s",
 		url.PathEscape(filename))
 	h.Set("Content-Disposition", disposition)
+	h.Set("Content-Type", mimetype)
 	signedURL, err = is.GetSignedURL(filepath, h)
 	return
 }
@@ -64,6 +65,7 @@ func slugify(s string) string {
 }
 
 func UploadJSON(ctx context.Context, is common.FileStore, c *http.Client, filepath string, data interface{}) error {
+	// TODO: direct upload
 	signedURL, err := is.GetSignedURL(filepath, nil)
 	if err != nil {
 		return err
