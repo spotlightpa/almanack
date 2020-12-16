@@ -13,7 +13,7 @@ import (
 	"github.com/spotlightpa/almanack/internal/aws"
 )
 
-func GetSignedFileUpload(is aws.BlobStore, filename, mimetype string) (signedURL, fileURL, disposition, cachecontrol string, err error) {
+func GetSignedFileUpload(ctx context.Context, is aws.BlobStore, filename, mimetype string) (signedURL, fileURL, disposition, cachecontrol string, err error) {
 	filepath := makeFilePath(filename)
 	fileURL = is.BuildURL(filepath)
 	h := http.Header{}
@@ -23,7 +23,7 @@ func GetSignedFileUpload(is aws.BlobStore, filename, mimetype string) (signedURL
 	h.Set("Content-Type", mimetype)
 	cachecontrol = "public,max-age=365000000,immutable"
 	h.Set("Cache-Control", cachecontrol)
-	signedURL, err = is.GetSignedURL(filepath, h)
+	signedURL, err = is.GetSignedURL(ctx, filepath, h)
 	return
 }
 

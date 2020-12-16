@@ -17,7 +17,7 @@ import (
 	"golang.org/x/net/context/ctxhttp"
 )
 
-func GetSignedImageUpload(is aws.BlobStore, ct string) (signedURL, filename string, err error) {
+func GetSignedImageUpload(ctx context.Context, is aws.BlobStore, ct string) (signedURL, filename string, err error) {
 	var ext string
 	if exts, err := mime.ExtensionsByType(ct); err != nil && len(exts) > 0 {
 		return "", "", fmt.Errorf("could not upload file of unknown mime type: %w", err)
@@ -27,7 +27,7 @@ func GetSignedImageUpload(is aws.BlobStore, ct string) (signedURL, filename stri
 	filename = makeFilename(ext)
 	h := http.Header{}
 	h.Set("Content-Type", ct)
-	signedURL, err = is.GetSignedURL(filename, h)
+	signedURL, err = is.GetSignedURL(ctx, filename, h)
 	return
 }
 

@@ -44,9 +44,8 @@ type BlobStore struct {
 	l      common.Logger
 }
 
-func (bs BlobStore) GetSignedURL(srcPath string, h http.Header) (signedURL string, err error) {
+func (bs BlobStore) GetSignedURL(ctx context.Context, srcPath string, h http.Header) (signedURL string, err error) {
 	bs.l.Printf("creating presigned URL for %q", srcPath)
-	ctx := context.TODO()
 	b, err := blob.OpenBucket(ctx, bs.bucket)
 	if err != nil {
 		return "", err
