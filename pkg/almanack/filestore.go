@@ -9,11 +9,11 @@ import (
 	"time"
 
 	"github.com/carlmjohnson/crockford"
+	"github.com/spotlightpa/almanack/internal/aws"
 	"github.com/spotlightpa/almanack/internal/httpjson"
-	"github.com/spotlightpa/almanack/pkg/common"
 )
 
-func GetSignedFileUpload(is common.FileStore, filename, mimetype string) (signedURL, fileURL, disposition, cachecontrol string, err error) {
+func GetSignedFileUpload(is aws.BlobStore, filename, mimetype string) (signedURL, fileURL, disposition, cachecontrol string, err error) {
 	filepath := makeFilePath(filename)
 	fileURL = is.BuildURL(filepath)
 	h := http.Header{}
@@ -66,7 +66,7 @@ func slugify(s string) string {
 	return strings.Map(f, s)
 }
 
-func UploadJSON(ctx context.Context, is common.FileStore, c *http.Client, filepath string, data interface{}) error {
+func UploadJSON(ctx context.Context, is aws.BlobStore, c *http.Client, filepath string, data interface{}) error {
 	// TODO: direct upload
 	signedURL, err := is.GetSignedURL(filepath, nil)
 	if err != nil {
