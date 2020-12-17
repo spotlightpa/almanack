@@ -13,20 +13,21 @@ import (
 	"github.com/spotlightpa/almanack/pkg/common"
 )
 
-func FromFlagSet(fl *flag.FlagSet) *Config {
-	var conf Config
+func ConfigureFlagSet(fl *flag.FlagSet) *Configurator {
+	conf := Configurator{fl: fl}
 	fl.StringVar(&conf.apiKey, "heroku-api-key", "", "`API key` for retrieving config from Heroku")
 	fl.StringVar(&conf.appName, "heroku-app-name", "", "`name` for Heroku app to get config from")
 	return &conf
 }
 
-type Config struct {
+type Configurator struct {
+	fl              *flag.FlagSet
 	apiKey, appName string
 }
 
 const timeout = 5 * time.Second
 
-func (conf *Config) Request() (vals map[string]string, err error) {
+func (conf *Configurator) Request() (vals map[string]string, err error) {
 	ctx, cancel := context.WithTimeout(context.Background(), timeout)
 	defer cancel()
 
@@ -70,15 +71,15 @@ func listVisitedFlagNames(fl *flag.FlagSet) map[string]bool {
 	return seen
 }
 
-func (conf *Config) GetConfig(fl *flag.FlagSet, l common.Logger, f2c map[string]string) error {
+func (conf *Configurator) Configure(l common.Logger, f2c map[string]string) error {
 	if conf.apiKey == "" {
 		l.Printf("no Heroku API key")
 		return nil
 	}
-	seen := listVisitedFlagNames(fl)
+	seen := listVisitedFlagNames(conf.fl)
 
 	unseen := []*flag.Flag{}
-	fl.VisitAll(func(ff *flag.Flag) {
+	conf.fl.VisitAll(func(ff *flag.Flag) {
 		if !seen[ff.Name] && f2c[ff.Name] != "" {
 			unseen = append(unseen, ff)
 		}
@@ -99,7 +100,7 @@ func (conf *Config) GetConfig(fl *flag.FlagSet, l common.Logger, f2c map[string]
 			l.Printf("%s not set as %s in Heroku", ff.Name, cname)
 		} else {
 			l.Printf("setting %s from Heroku", ff.Name)
-			errs.Push(fl.Set(ff.Name, val))
+			errs.Push(conf.fl.Set(ff.Name, val))
 		}
 	}
 	return errs.Merge()

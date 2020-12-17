@@ -48,7 +48,7 @@ func (app *appEnv) parseEnv() error {
 	fl := flag.NewFlagSet("identity-signup", flag.ContinueOnError)
 	slackHookURL := fl.String("slack-hook-url", "", "Slack hook endpoint `URL`")
 	pg := db.FlagVar(fl, "postgres", "PostgreSQL database `URL`")
-	herokuconf := herokuapi.FromFlagSet(fl)
+	heroku := herokuapi.ConfigureFlagSet(fl)
 	sentryDSN := fl.String("sentry-dsn", "", "DSN `pseudo-URL` for Sentry")
 	if err := fl.Parse([]string{}); err != nil {
 		return err
@@ -56,7 +56,7 @@ func (app *appEnv) parseEnv() error {
 	if err := flagext.ParseEnv(fl, "almanack"); err != nil {
 		return err
 	}
-	if err := herokuconf.GetConfig(fl, app.logger, map[string]string{
+	if err := heroku.Configure(app.logger, map[string]string{
 		"postgres": "DATABASE_URL",
 	}); err != nil {
 		return err

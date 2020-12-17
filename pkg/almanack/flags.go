@@ -21,7 +21,7 @@ func Flags(fl *flag.FlagSet) func(common.Logger) (svc Service, err error) {
 	cache := fl.Bool("cache", false, "use in-memory cache for http requests")
 	pg := db.FlagVar(fl, "postgres", "PostgreSQL database `URL`")
 	slackURL := fl.String("slack-social-url", "", "Slack hook endpoint `URL` for social")
-	herokuconf := herokuapi.FromFlagSet(fl)
+	heroku := herokuapi.ConfigureFlagSet(fl)
 	getS3Store := aws.FlagVar(fl)
 	getGithub := github.FlagVar(fl)
 	getIndex := index.FlagVar(fl)
@@ -30,7 +30,7 @@ func Flags(fl *flag.FlagSet) func(common.Logger) (svc Service, err error) {
 
 	return func(l common.Logger) (svc Service, err error) {
 		// Get PostgreSQL URL from Heroku if possible, else get it from flag
-		if err = herokuconf.GetConfig(fl, l, map[string]string{
+		if err = heroku.Configure(l, map[string]string{
 			"postgres":    "DATABASE_URL",
 			"google-json": "ALMANACK_GOOGLE_JSON",
 		}); err != nil {
