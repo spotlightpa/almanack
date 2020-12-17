@@ -18,21 +18,20 @@ import (
 )
 
 func GetSignedImageUpload(ctx context.Context, is aws.BlobStore, ct string) (signedURL, filename string, err error) {
-	var ext string
-	if i := strings.Index(ct, "/"); i == -1 || i+1 >= len(ct) {
-		return "", "", resperr.New(
-			http.StatusBadRequest, "bad mimetype %q", ct)
-	} else {
-		ext = ct[i:]
-	}
-	filename = makeFilename(ext)
+	filename = makeImageName(ct)
 	h := make(http.Header, 1)
 	h.Set("Content-Type", ct)
 	signedURL, err = is.GetSignedURL(ctx, filename, h)
 	return
 }
 
-func makeFilename(ext string) string {
+func makeImageName(ct string) string {
+	ext := "bin"
+	if i := strings.Index(ct, "/"); i != -1 {
+		if tempext := ct[i+1:]; len(tempext) >= 3 {
+			ext = tempext
+		}
+	}
 	var sb strings.Builder
 	sb.Grow(len("2006/01/123456789abcdefg.") + len(ext))
 	sb.WriteString(time.Now().Format("2006/01/"))
