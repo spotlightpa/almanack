@@ -20,8 +20,8 @@ import (
 
 func Var(fl *flag.FlagSet) func(l common.Logger) *Client {
 	var ga Client
-	// Using a crazy callback because Netlify is getting
-	// tripped up by the real credentials
+	// Using a crazy Base64+GZIP because storing JSON containing \n in
+	//an env var breaks a lot for some reason
 	flagext.Callback(fl, "google-json", "", "GZIP Base64 JSON credentials for Google",
 		func(s string) error {
 			b, err := base64.StdEncoding.DecodeString(s)
@@ -62,6 +62,9 @@ type Client struct {
 }
 
 func (ga *Client) getClient(ctx context.Context) (err error) {
+	if ga.viewID == "" {
+		return fmt.Errorf("view ID not set")
+	}
 	if ga.c != nil {
 		return nil
 	}
