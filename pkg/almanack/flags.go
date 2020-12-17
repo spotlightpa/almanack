@@ -1,10 +1,10 @@
 package almanack
 
 import (
-	"errors"
 	"flag"
 	"net/http"
 
+	"github.com/carlmjohnson/flagext"
 	"github.com/spotlightpa/almanack/internal/aws"
 	"github.com/spotlightpa/almanack/internal/db"
 	"github.com/spotlightpa/almanack/internal/ganalytics"
@@ -21,7 +21,7 @@ func Flags(fl *flag.FlagSet) func(common.Logger) (svc Service, err error) {
 	cache := fl.Bool("cache", false, "use in-memory cache for http requests")
 	pg := db.FlagVar(fl, "postgres", "PostgreSQL database `URL`")
 	slackURL := fl.String("slack-social-url", "", "Slack hook endpoint `URL` for social")
-	checkHerokuPG := herokuapi.FlagVar(fl, "postgres")
+	herokuconf := herokuapi.FromFlagSet(fl)
 	getS3Store := aws.FlagVar(fl)
 	getGithub := github.FlagVar(fl)
 	getIndex := index.FlagVar(fl)
@@ -30,18 +30,12 @@ func Flags(fl *flag.FlagSet) func(common.Logger) (svc Service, err error) {
 
 	return func(l common.Logger) (svc Service, err error) {
 		// Get PostgreSQL URL from Heroku if possible, else get it from flag
-		if usedHeroku, err2 := checkHerokuPG(); err2 != nil {
-			err = err2
+		if err = herokuconf.GetConfig(fl, l, map[string]string{
+			"postgres": "DATABASE_URL",
+		}); err != nil {
 			return
-		} else if usedHeroku {
-			l.Printf("got credentials from Heroku API")
-		} else {
-			l.Printf("did not get credentials from Heroku API")
 		}
-
-		if *pg == nil {
-			err = errors.New("must set postgres URL")
-			l.Printf("starting up: %v", err)
+		if err = flagext.MustHave(fl, "postgres"); err != nil {
 			return
 		}
 
