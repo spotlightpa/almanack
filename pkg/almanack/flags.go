@@ -31,7 +31,8 @@ func Flags(fl *flag.FlagSet) func(common.Logger) (svc Service, err error) {
 	return func(l common.Logger) (svc Service, err error) {
 		// Get PostgreSQL URL from Heroku if possible, else get it from flag
 		if err = herokuconf.GetConfig(fl, l, map[string]string{
-			"postgres": "DATABASE_URL",
+			"postgres":    "DATABASE_URL",
+			"google-json": "ALMANACK_GOOGLE_JSON",
 		}); err != nil {
 			return
 		}
