@@ -20,7 +20,7 @@ func TestHerokuAPI(t *testing.T) {
 		t.Skip("no app name specified")
 	}
 	fs := flag.NewFlagSet("test", flag.ContinueOnError)
-	conf := herokuapi.FromFlagSet(fs)
+	conf := herokuapi.ConfigureFlagSet(fs)
 	dbstr := fs.String("db", "", "")
 	xxstr := fs.String("xx", "initial", "")
 	err := fs.Parse([]string{
@@ -31,7 +31,7 @@ func TestHerokuAPI(t *testing.T) {
 	}
 	var buf bytes.Buffer
 	l := log.New(&buf, "", log.LstdFlags)
-	err = conf.GetConfig(fs, l, map[string]string{
+	err = conf.Configure(l, map[string]string{
 		"db": "DATABASE_URL",
 		"xx": "MISSING_VAL",
 	})
