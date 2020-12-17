@@ -48,12 +48,17 @@ func (app *appEnv) parseEnv() error {
 	fl := flag.NewFlagSet("identity-signup", flag.ContinueOnError)
 	slackHookURL := fl.String("slack-hook-url", "", "Slack hook endpoint `URL`")
 	pg := db.FlagVar(fl, "postgres", "PostgreSQL database `URL`")
-	checkHerokuPG := herokuapi.FlagVar(fl, "postgres")
+	herokuconf := herokuapi.FromFlagSet(fl)
 	sentryDSN := fl.String("sentry-dsn", "", "DSN `pseudo-URL` for Sentry")
 	if err := fl.Parse([]string{}); err != nil {
 		return err
 	}
 	if err := flagext.ParseEnv(fl, "almanack"); err != nil {
+		return err
+	}
+	if err := herokuconf.GetConfig(fl, app.logger, map[string]string{
+		"postgres": "DATABASE_URL",
+	}); err != nil {
 		return err
 	}
 	if err := sentry.Init(sentry.ClientOptions{
@@ -65,14 +70,10 @@ func (app *appEnv) parseEnv() error {
 	}
 
 	app.sc = slack.New(*slackHookURL, app.logger)
-	if usedHeroku, err := checkHerokuPG(); err != nil {
+	if err := flagext.MustHave(fl, "postgres"); err != nil {
 		return err
-	} else if usedHeroku {
-		app.logger.Printf("used Heroku")
 	}
-	if *pg == nil {
-		return fmt.Errorf("must set -postgres to database URL")
-	}
+
 	app.db = *pg
 	return nil
 }
