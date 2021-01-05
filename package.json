@@ -15,7 +15,7 @@
     "@fullhuman/postcss-purgecss": "^3.0.0",
     "@sentry/browser": "^5.29.0",
     "@vue/composition-api": "^1.0.0-beta.21",
-    "axios": "^0.21.0",
+    "axios": "^0.21.1",
     "buefy": "^0.9.4",
     "bulma": "^0.9.1",
     "core-js": "^3.8.1",
