@@ -2,8 +2,8 @@ CREATE TABLE domain_roles (
   id serial PRIMARY KEY,
   domain text NOT NULL,
   roles text[],
-  created_at timestamp WITH time zone NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  updated_at timestamp WITH time zone NOT NULL DEFAULT CURRENT_TIMESTAMP
+  created_at timestamp with time zone NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at timestamp with time zone NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE UNIQUE INDEX unique_domain_on_domain_roles ON domain_roles

@@ -2,9 +2,8 @@
 UPDATE
   article
 SET
-  spotlightpa_data = spotlightpa_data ||
-    jsonb_build_object('image-description', spotlightpa_data ->>
-    'image-caption')
+  spotlightpa_data = spotlightpa_data || jsonb_build_object('image-description',
+    spotlightpa_data ->> 'image-caption')
 WHERE
   spotlightpa_data ->> 'image-caption' IS NOT NULL
 RETURNING

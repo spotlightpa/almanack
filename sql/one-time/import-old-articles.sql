@@ -1,5 +1,5 @@
 BEGIN;
-ALTER TABLE article disable TRIGGER row_updated_at_on_article_trigger_;
+ALTER TABLE article DISABLE TRIGGER row_updated_at_on_article_trigger_;
 WITH export_data AS (
   SELECT
     jsonb_array_elements($$ REPLACEME $$::jsonb) AS article_data
@@ -7,13 +7,11 @@ WITH export_data AS (
 structured_data AS (
   SELECT
     article_data -> 'spotlightpa_data' ->> 'arc-id' AS arc_id,
-    to_timestamp(article_data ->> 'last_published',
-      'YYYY-MM-DD"T"HH24:MI:SS"Z"')::timestamp WITH time zone AS
-      last_published,
+    to_timestamp(article_data ->> 'last_published', 'YYYY-MM-DD"T"HH24:MI:SS"Z"')::timestamp WITH time
+      zone AS last_published,
     article_data ->> 'spotlightpa_path' AS spotlightpa_path,
     article_data -> 'spotlightpa_data' || jsonb_build_object('last-arc-sync',
-      to_char(transaction_timestamp(), 'YYYY-MM-DD"T"HH24:MI:SS"Z"')) AS
-      spotlightpa_data
+      to_char(transaction_timestamp(), 'YYYY-MM-DD"T"HH24:MI:SS"Z"')) AS spotlightpa_data
   FROM
     export_data
 ),
@@ -54,13 +52,11 @@ WITH export_data AS (
 structured_data AS (
   SELECT
     article_data -> 'spotlightpa_data' ->> 'arc-id' AS arc_id,
-    to_timestamp(article_data ->> 'last_published',
-      'YYYY-MM-DD"T"HH24:MI:SS"Z"')::timestamp WITH time zone AS
-      last_published,
+    to_timestamp(article_data ->> 'last_published', 'YYYY-MM-DD"T"HH24:MI:SS"Z"')::timestamp WITH
+      time zone AS last_published,
     article_data ->> 'spotlightpa_path' AS spotlightpa_path,
     article_data -> 'spotlightpa_data' || jsonb_build_object('last-arc-sync',
-      to_char(transaction_timestamp(), 'YYYY-MM-DD"T"HH24:MI:SS"Z"')) AS
-      spotlightpa_data
+      to_char(transaction_timestamp(), 'YYYY-MM-DD"T"HH24:MI:SS"Z"')) AS spotlightpa_data
   FROM
     export_data
 ),
@@ -89,5 +85,5 @@ WHERE
   AND spotlightpa_path IS NOT NULL
 RETURNING
   *;
-ALTER TABLE article enable TRIGGER row_updated_at_on_article_trigger_;
+ALTER TABLE article ENABLE TRIGGER row_updated_at_on_article_trigger_;
 COMMIT;
