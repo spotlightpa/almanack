@@ -76,7 +76,7 @@ export default {
       <article
         v-for="article of filteredArticles"
         :key="article.id"
-        class="panel-block"
+        class="panel-block pb-5 bg-striped"
       >
         <AdminListPanel
           :article="article"
@@ -86,3 +86,9 @@ export default {
     </nav>
   </div>
 </template>
+
+<style scoped>
+.bg-striped:nth-child(odd) {
+  background-color: #eaeaea;
+}
+</style>
