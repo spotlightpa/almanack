@@ -9,6 +9,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"net/http/httputil"
+	"net/url"
 	"strconv"
 	"strings"
 
@@ -115,6 +116,14 @@ func (app *appEnv) userInfo(w http.ResponseWriter, r *http.Request) {
 	app.replyJSON(http.StatusOK, w, userinfo)
 }
 
+var inkyURL = func() *url.URL {
+	u, err := url.Parse("https://www.inquirer.com")
+	if err != nil {
+		panic(err)
+	}
+	return u
+}()
+
 func (app *appEnv) getProxyImage(w http.ResponseWriter, r *http.Request) {
 	app.Println("start getProxyImage")
 
@@ -126,26 +135,34 @@ func (app *appEnv) getProxyImage(w http.ResponseWriter, r *http.Request) {
 		))
 		return
 	}
-	u := string(decURL)
+	u, err := inkyURL.Parse(string(decURL))
+	if err != nil {
+		app.replyErr(w, r, resperr.New(
+			http.StatusBadRequest, "bad image URL: %s", decURL,
+		))
+		return
+	}
 	app.Printf("requested %q", u)
 	inWhitelist := false
-	for _, prefix := range []string{
-		"https://www.inquirer.com/resizer/",
-		"https://arc-anglerfish-arc2-prod-pmn.s3.amazonaws.com/public/",
-		"https://cloudfront-us-east-1.images.arcpublishing.com/pmn/",
+	for _, domain := range []string{
+		".inquirer.com",
+		".arcpublishing.com",
 	} {
-		if strings.HasPrefix(u, prefix) {
+		if strings.HasSuffix(u.Host, domain) {
 			inWhitelist = true
 			break
 		}
 	}
+	if u.Host == "arc-anglerfish-arc2-prod-pmn.s3.amazonaws.com" {
+		inWhitelist = true
+	}
 	if !inWhitelist {
 		app.replyErr(w, r, resperr.New(
-			http.StatusBadRequest, "untrust image URL: %s", u,
+			http.StatusBadRequest, "untrusted image URL: %s", u,
 		))
 		return
 	}
-	ctype, body, err := getImage(r.Context(), app.svc.Client, u)
+	ctype, body, err := getImage(r.Context(), app.svc.Client, u.String())
 	if err != nil {
 		app.replyErr(w, r, err)
 		return
