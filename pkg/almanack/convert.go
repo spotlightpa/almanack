@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"html"
 	"log"
+	"net/url"
 	"regexp"
 	"strconv"
 	"strings"
@@ -231,10 +232,29 @@ func readContentElements(ctx context.Context, svc Service, rawels []*json.RawMes
 	return
 }
 
+var inkyURL = func() *url.URL {
+	u, err := url.Parse("https://www.inquirer.com")
+	if err != nil {
+		panic(err)
+	}
+	return u
+}()
+
+func resolveFromInky(s string) string {
+	if s == "" {
+		return s
+	}
+	u, err := inkyURL.Parse(s)
+	if err != nil {
+		return s
+	}
+	return u.String()
+}
+
 func setArticleImage(a *SpotlightPAArticle, p PromoItems) {
-	a.ImageURL = p.Basic.AdditionalProperties.ResizeURL
+	a.ImageURL = resolveFromInky(p.Basic.AdditionalProperties.ResizeURL)
 	if a.ImageURL == "" && strings.Contains(p.Basic.URL, "public") {
-		a.ImageURL = p.Basic.URL
+		a.ImageURL = resolveFromInky(p.Basic.URL)
 	}
 	var credits []string
 	for _, credit := range p.Basic.Credits.By {
