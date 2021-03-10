@@ -89,7 +89,7 @@ func NewV3(apiKey, listID string, c *http.Client) V3 {
 func (v3 V3) ListCampaigns(ctx context.Context) (*ListCampaignsResp, error) {
 	var data ListCampaignsResp
 	if err := httpjson.Get(ctx, v3.cl, v3.listCampaignsURL, &data); err != nil {
-		return nil, err
+		return nil, fmt.Errorf("could not list MC campaigns: %w", err)
 	}
 	return &data, nil
 }
