@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/carlmjohnson/errutil"
+	"github.com/carlmjohnson/resperr"
 	"github.com/spotlightpa/almanack/internal/aws"
 	"github.com/spotlightpa/almanack/internal/db"
 	"github.com/spotlightpa/almanack/internal/ganalytics"
@@ -323,7 +324,10 @@ func (svc Service) ReplaceImageURL(ctx context.Context, srcURL, description, cre
 	}
 	var path, ext string
 	if path, ext, err = UploadFromURL(ctx, svc.Client, svc.ImageStore, srcURL); err != nil {
-		return "", err
+		return "", resperr.New(
+			http.StatusBadGateway,
+			"could not upload image %s: %w", srcURL, err,
+		)
 	}
 	_, err = svc.Querier.CreateImage(ctx, db.CreateImageParams{
 		Path:        path,
