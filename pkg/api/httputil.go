@@ -83,7 +83,8 @@ func (app *appEnv) FetchFeed(ctx context.Context) (*almanack.ArcAPI, error) {
 	defer cancel()
 
 	if err := httpjson.Get(ctx, app.svc.Client, app.srcFeedURL, &feed); err != nil {
-		return nil, err
+		return nil, resperr.New(
+			http.StatusBadGateway, "could not fetch Arc feed: %w", err)
 	}
 	return &feed, nil
 }
