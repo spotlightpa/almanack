@@ -191,9 +191,9 @@ func readContentElements(ctx context.Context, svc Service, rawels []*json.RawMes
 			}
 			credit := fixCredit(strings.Join(credits, " "))
 
-			imageURL := v.AdditionalProperties.ResizeURL
+			imageURL := resolveFromInky(v.AdditionalProperties.ResizeURL)
 			if imageURL == "" && strings.Contains(v.URL, "public") {
-				imageURL = v.URL
+				imageURL = resolveFromInky(v.URL)
 			}
 			if imageURL == "" {
 				warnings = append(warnings,
