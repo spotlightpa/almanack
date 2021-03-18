@@ -13,13 +13,6 @@ import (
 	"github.com/spotlightpa/almanack/pkg/almanack"
 )
 
-func (app *appEnv) versionMiddleware(h http.Handler) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set("Almanack-App-Version", almanack.BuildVersion)
-		h.ServeHTTP(w, r)
-	})
-}
-
 func (app *appEnv) replyJSON(statusCode int, w http.ResponseWriter, data interface{}) {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(statusCode)
@@ -50,6 +43,13 @@ func (app *appEnv) logErr(ctx context.Context, err error) {
 	}
 
 	app.Printf("err: %v", err)
+}
+
+func (app *appEnv) versionMiddleware(h http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Almanack-App-Version", almanack.BuildVersion)
+		h.ServeHTTP(w, r)
+	})
 }
 
 func (app *appEnv) authMiddleware(h http.Handler) http.Handler {
