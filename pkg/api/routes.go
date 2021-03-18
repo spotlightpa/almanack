@@ -48,8 +48,6 @@ func (app *appEnv) pingErr(w http.ResponseWriter, r *http.Request) {
 	app.replyErr(w, r, resperr.New(
 		statusCode, "got test ping %q", code,
 	))
-
-	return
 }
 
 func (app *appEnv) userInfo(w http.ResponseWriter, r *http.Request) {
