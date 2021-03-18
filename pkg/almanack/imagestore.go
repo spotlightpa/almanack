@@ -5,7 +5,6 @@ import (
 	"context"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"net/http"
 	"strings"
 	"time"
@@ -81,7 +80,7 @@ func UploadFromURL(ctx context.Context, c *http.Client, is aws.BlobStore, srcurl
 		)
 	}
 
-	slurp, err := ioutil.ReadAll(buf)
+	slurp, err := io.ReadAll(buf)
 	if err != nil {
 		return "", "", err
 	}

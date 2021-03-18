@@ -2,7 +2,6 @@ package github
 
 import (
 	"context"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 
@@ -15,7 +14,7 @@ type MockClient struct {
 }
 
 func NewMockClient(l common.Logger) (*MockClient, error) {
-	dir, err := ioutil.TempDir("", "example")
+	dir, err := os.MkdirTemp("", "example")
 	if err != nil {
 		return nil, err
 	}
@@ -38,14 +37,14 @@ func (mc *MockClient) CreateFile(ctx context.Context, msg, path string, content 
 	tmpfn := mc.abspath(path)
 	mc.l.Printf("creating file %s on mock Github", tmpfn)
 	mc.ensureParent(tmpfn)
-	return ioutil.WriteFile(tmpfn, content, 0644)
+	return os.WriteFile(tmpfn, content, 0644)
 }
 
 func (mc *MockClient) GetFile(ctx context.Context, path string) (contents string, err error) {
 	tmpfn := mc.abspath(path)
 	mc.l.Printf("getting file %s from mock Github", tmpfn)
 	var b []byte
-	b, err = ioutil.ReadFile(tmpfn)
+	b, err = os.ReadFile(tmpfn)
 	return string(b), err
 }
 
@@ -53,5 +52,5 @@ func (mc *MockClient) UpdateFile(ctx context.Context, msg, path string, content 
 	tmpfn := mc.abspath(path)
 	mc.l.Printf("updating file %s on mock Github", tmpfn)
 	mc.ensureParent(tmpfn)
-	return ioutil.WriteFile(tmpfn, content, 0644)
+	return os.WriteFile(tmpfn, content, 0644)
 }

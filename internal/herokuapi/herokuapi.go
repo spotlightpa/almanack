@@ -5,7 +5,7 @@ import (
 	"encoding/json"
 	"flag"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"time"
 
@@ -51,7 +51,7 @@ func (conf *Configurator) Request() (vals map[string]string, err error) {
 	if resp.StatusCode != http.StatusOK {
 		return nil, fmt.Errorf("bad status from Heroku: %s", resp.Status)
 	}
-	b, err := ioutil.ReadAll(resp.Body)
+	b, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return
 	}
