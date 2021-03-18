@@ -13,6 +13,7 @@ func (app *appEnv) routes() http.Handler {
 	r.Use(middleware.RealIP)
 	r.Use(middleware.RequestLogger(&middleware.DefaultLogFormatter{Logger: app.Logger}))
 	r.Use(app.versionMiddleware)
+	r.Use(app.maxSizeMiddleware)
 	r.Get("/api/healthcheck", app.ping)
 	r.Get(`/api/healthcheck/{code:\d{3}}`, app.pingErr)
 	r.Get(`/api/proxy-image/{encURL}`, app.getProxyImage)
