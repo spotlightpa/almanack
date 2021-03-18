@@ -27,12 +27,6 @@ func DecodeRequest(w http.ResponseWriter, r *http.Request, dst interface{}) erro
 		}
 	}
 
-	const (
-		megabyte = 1 << 20
-		maxSize  = 5 * megabyte
-	)
-	r.Body = http.MaxBytesReader(w, r.Body, maxSize)
-
 	dec := json.NewDecoder(r.Body)
 	dec.DisallowUnknownFields()
 
@@ -66,7 +60,7 @@ func DecodeRequest(w http.ResponseWriter, r *http.Request, dst interface{}) erro
 
 		case err.Error() == "http: request body too large":
 			return errorf(err, http.StatusRequestEntityTooLarge,
-				"Request body must not be larger than %d bytes", maxSize)
+				"Request body too large")
 
 		default:
 			return resperr.WithStatusCode(err, http.StatusBadRequest)
