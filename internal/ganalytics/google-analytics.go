@@ -7,7 +7,7 @@ import (
 	"encoding/base64"
 	"flag"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"net/url"
 
@@ -33,7 +33,7 @@ func Var(fl *flag.FlagSet) func(l common.Logger) *Client {
 				return err
 			}
 			defer g.Close()
-			b, err = ioutil.ReadAll(g)
+			b, err = io.ReadAll(g)
 			if err != nil {
 				return err
 			}

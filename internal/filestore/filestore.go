@@ -3,7 +3,6 @@ package filestore
 import (
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -58,7 +57,7 @@ func (loc Loc) Get(key string, v interface{}) error {
 	if err != nil {
 		return fmt.Errorf("could not read cache data: %w", err)
 	}
-	data, err := ioutil.ReadFile(loc.name(key))
+	data, err := os.ReadFile(loc.name(key))
 	if os.IsNotExist(err) {
 		return resperr.WithStatusCode(err, http.StatusNotFound)
 	} else if err != nil {
@@ -80,7 +79,7 @@ func (loc Loc) Set(key string, v interface{}) error {
 	if err = loc.ensure(); err != nil {
 		return fmt.Errorf("could not write cache data: %w", err)
 	}
-	if err = ioutil.WriteFile(loc.name(key), data, 0644); err != nil {
+	if err = os.WriteFile(loc.name(key), data, 0644); err != nil {
 		return fmt.Errorf("could not write cache data: %w", err)
 	}
 	return nil

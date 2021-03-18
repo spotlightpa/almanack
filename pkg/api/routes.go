@@ -6,7 +6,6 @@ import (
 	"encoding/base64"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"net/http"
 	"net/http/httputil"
 	"net/url"
@@ -155,7 +154,7 @@ func getImage(ctx context.Context, c *http.Client, srcurl string) (ctype string,
 		)
 	}
 
-	body, err = ioutil.ReadAll(buf)
+	body, err = io.ReadAll(buf)
 	if err != nil {
 		return "", nil, err
 	}
