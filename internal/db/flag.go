@@ -5,8 +5,6 @@ import (
 	"database/sql"
 	"flag"
 	"time"
-
-	"github.com/carlmjohnson/flagext"
 )
 
 // FlagVar adds an option to the specified FlagSet (or flag.CommandLine if nil)
@@ -16,7 +14,7 @@ func FlagVar(fl *flag.FlagSet, name, usage string) (q *Querier) {
 		fl = flag.CommandLine
 	}
 	q = new(Querier)
-	flagext.Callback(fl, name, "", usage, func(dbURL string) error {
+	fl.Func(name, usage, func(dbURL string) error {
 		var err error
 		*q, err = Open(dbURL)
 		return err
