@@ -8,6 +8,14 @@ import (
 	"time"
 )
 
+type AddressRole struct {
+	ID           int32     `json:"id"`
+	EmailAddress string    `json:"email_address"`
+	Roles        []string  `json:"roles"`
+	CreatedAt    time.Time `json:"created_at"`
+	UpdatedAt    time.Time `json:"updated_at"`
+}
+
 type Article struct {
 	ID              int32           `json:"id"`
 	ArcID           sql.NullString  `json:"arc_id"`

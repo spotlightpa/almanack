@@ -101,7 +101,7 @@ func whitelistEmails(ctx context.Context, request events.APIGatewayProxyRequest)
 		return resp, err
 	}
 
-	roles, err := db.GetRolesForEmailDomain(ctx, globalEnv.db, data.User.Email)
+	roles, err := db.GetRolesForEmail(ctx, globalEnv.db, data.User.Email)
 	if err != nil {
 		return resp, err
 	}

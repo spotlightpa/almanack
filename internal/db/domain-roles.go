@@ -7,15 +7,24 @@ import (
 	"github.com/carlmjohnson/emailx"
 )
 
-func GetRolesForEmailDomain(ctx context.Context, q Querier, email string) (roles []string, err error) {
+func GetRolesForEmail(ctx context.Context, q Querier, email string) (roles []string, err error) {
 	_, domain := emailx.Split(email)
 	if domain == "" {
 		return nil, fmt.Errorf("invalid email: %q", email)
 	}
-
+	roles, err = q.GetRolesForAddress(ctx, email)
+	if err != nil && !IsNotFound(err) {
+		return
+	}
+	// if user has specific roles, early exit
+	if err == nil && len(roles) > 0 {
+		return
+	}
 	roles, err = q.GetRolesForDomain(ctx, domain)
 	if err != nil && !IsNotFound(err) {
-		return nil, err
+		return
 	}
-	return roles, nil
+	// ignore any not found errors
+	err = nil
+	return
 }
