@@ -17,8 +17,10 @@ type Querier interface {
 	GetArticleByDBID(ctx context.Context, id int32) (Article, error)
 	GetArticleIDFromSlug(ctx context.Context, slug string) (string, error)
 	GetImageBySourceURL(ctx context.Context, srcUrl string) (Image, error)
+	GetRolesForAddress(ctx context.Context, emailAddress string) ([]string, error)
 	GetRolesForDomain(ctx context.Context, domain string) ([]string, error)
 	GetSiteData(ctx context.Context, key string) (json.RawMessage, error)
+	ListAddressesWithRole(ctx context.Context, role string) ([]string, error)
 	ListAllArcArticles(ctx context.Context, arg ListAllArcArticlesParams) ([]Article, error)
 	ListAllSeries(ctx context.Context) ([]string, error)
 	ListAllTopics(ctx context.Context) ([]string, error)
@@ -30,6 +32,7 @@ type Querier interface {
 	ListSpotlightPAArticles(ctx context.Context) ([]ListSpotlightPAArticlesRow, error)
 	ListUpcoming(ctx context.Context) ([]Article, error)
 	PopScheduled(ctx context.Context) ([]Article, error)
+	SetRolesForAddress(ctx context.Context, arg SetRolesForAddressParams) (AddressRole, error)
 	SetRolesForDomain(ctx context.Context, arg SetRolesForDomainParams) (DomainRole, error)
 	SetSiteData(ctx context.Context, arg SetSiteDataParams) error
 	UpdateAlmanackArticle(ctx context.Context, arg UpdateAlmanackArticleParams) (Article, error)
