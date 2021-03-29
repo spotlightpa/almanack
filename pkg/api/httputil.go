@@ -4,10 +4,12 @@ import (
 	"context"
 	"encoding/json"
 	"net/http"
+	"strconv"
 	"time"
 
 	"github.com/carlmjohnson/resperr"
 	"github.com/getsentry/sentry-go"
+	"github.com/go-chi/chi"
 
 	"github.com/spotlightpa/almanack/internal/httpjson"
 	"github.com/spotlightpa/almanack/pkg/almanack"
@@ -85,6 +87,17 @@ func (app *appEnv) maxSizeMiddleware(next http.Handler) http.Handler {
 		r2.Body = http.MaxBytesReader(w, r.Body, maxSize)
 		next.ServeHTTP(w, &r2)
 	})
+}
+
+func (app *appEnv) getPage(r *http.Request, route string) (page int, err error) {
+	if pageStr := chi.URLParam(r, "page"); pageStr != "" {
+		if page, err = strconv.Atoi(pageStr); err != nil {
+			err = resperr.New(http.StatusBadRequest,
+				"bad argument to %s: %w", route, err)
+			return
+		}
+	}
+	return
 }
 
 func (app *appEnv) FetchFeed(ctx context.Context) (*almanack.ArcAPI, error) {
