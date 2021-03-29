@@ -11,7 +11,7 @@ export default {
     APILoader,
   },
   metaInfo: {
-    title: "Authorized Domains",
+    title: "Authorized Domains and Addresses",
   },
   setup() {
     let { listAuthorizedDomains, addAuthorizedDomain } = useClient();
@@ -31,7 +31,15 @@ export default {
     }
 
     async function addDomain(domain) {
-      await addExec(() => addAuthorizedDomain({ domain }));
+      await addExec(() => addAuthorizedDomain({ domain, remove: false }));
+      await list();
+    }
+
+    async function removeDomain(domain) {
+      if (!window.confirm(`Are you sure you want to remove ${domain}?`)) {
+        return;
+      }
+      await addExec(() => addAuthorizedDomain({ domain, remove: true }));
       await list();
     }
 
@@ -41,6 +49,7 @@ export default {
       name: ref(""),
       list,
       addDomain,
+      removeDomain,
       ...toRefs(apiState),
     };
   },
@@ -51,14 +60,14 @@ export default {
   <div>
     <h2 class="title">Authorized domains</h2>
     <APILoader :is-loading="isLoading" :reload="list" :error="error">
-      <ul class="tags">
-        <li
-          v-for="domain of domains"
-          :key="domain"
-          class="tag"
-          v-text="domain"
-        />
-      </ul>
+      <div class="field is-grouped is-grouped-multiline">
+        <div v-for="domain of domains" :key="domain" class="control">
+          <div class="tags has-addons">
+            <span class="tag is-small" v-text="domain" />
+            <a class="tag is-delete" @click="removeDomain(domain)" />
+          </div>
+        </div>
+      </div>
       <form class="field has-addons" @submit.prevent="addDomain(name)">
         <div class="control is-expanded">
           <input v-model="name" class="input" />
@@ -67,7 +76,11 @@ export default {
           <button
             class="button has-text-weight-semibold is-primary"
             :class="{ 'is-loading': isLoading }"
-            @click="addDomain(name)"
+            @click="
+              addDomain(name).then(() => {
+                name = '';
+              })
+            "
           >
             Add domain
           </button>
