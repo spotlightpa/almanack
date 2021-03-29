@@ -44,6 +44,8 @@ func (app *appEnv) routes() http.Handler {
 			r.Post("/image-update", app.postImageUpdate)
 			r.Get("/authorized-domains", app.listDomains)
 			r.Post("/authorized-domains", app.postDomain)
+			r.Get("/authorized-addresses", app.listAddresses)
+			r.Post("/authorized-addresses", app.postAddress)
 			r.Get("/spotlightpa-articles", app.listSpotlightPAArticles)
 			r.Get("/images", app.listImages)
 			r.Get("/editors-picks", app.getEditorsPicks)

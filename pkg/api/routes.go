@@ -468,6 +468,7 @@ func (app *appEnv) postDomain(w http.ResponseWriter, r *http.Request) {
 	app.Println("start postDomain")
 	type request struct {
 		Domain string `json:"domain"`
+		Remove bool   `json:"remove"`
 	}
 	type response struct {
 		Domains []string `json:"domains"`
@@ -478,11 +479,22 @@ func (app *appEnv) postDomain(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if _, err := app.svc.Querier.AppendRoleToDomain(
+	if req.Domain == "spotlightpa.org" {
+		app.replyErr(w, r, resperr.New(http.StatusBadRequest,
+			"can't remove spotlightpa.org!"))
+		return
+	}
+
+	var roles []string
+	if !req.Remove {
+		roles = []string{"editor"}
+	}
+
+	if _, err := app.svc.Querier.SetRolesForDomain(
 		r.Context(),
-		db.AppendRoleToDomainParams{
+		db.SetRolesForDomainParams{
 			Domain: req.Domain,
-			Role:   "editor",
+			Roles:  roles,
 		},
 	); err != nil {
 		app.replyErr(w, r, err)
@@ -497,6 +509,64 @@ func (app *appEnv) postDomain(w http.ResponseWriter, r *http.Request) {
 	app.replyJSON(http.StatusOK, w, response{
 		domains,
 	})
+}
+func (app *appEnv) listAddresses(w http.ResponseWriter, r *http.Request) {
+	app.Println("start listAddresses")
+	var (
+		resp struct {
+			Addresses []string `json:"addresses"`
+		}
+		err error
+	)
+	resp.Addresses, err = app.svc.Querier.ListAddressesWithRole(r.Context(), "editor")
+	if err != nil {
+		app.replyErr(w, r, err)
+		return
+	}
+	app.replyJSON(http.StatusOK, w, resp)
+}
+
+func (app *appEnv) postAddress(w http.ResponseWriter, r *http.Request) {
+	app.Println("start postAddresses")
+	type request struct {
+		Address string `json:"address"`
+		Remove  bool   `json:"remove"`
+	}
+	type response struct {
+		Addresses []string `json:"addresses"`
+	}
+	var req request
+	if err := httpjson.DecodeRequest(w, r, &req); err != nil {
+		app.replyErr(w, r, err)
+		return
+	}
+
+	var roles []string
+	if !req.Remove {
+		roles = []string{"editor"}
+	}
+
+	if _, err := app.svc.Querier.SetRolesForAddress(
+		r.Context(),
+		db.SetRolesForAddressParams{
+			EmailAddress: req.Address,
+			Roles:        roles,
+		},
+	); err != nil {
+		app.replyErr(w, r, err)
+		return
+	}
+
+	var (
+		resp response
+		err  error
+	)
+	resp.Addresses, err = app.svc.Querier.ListAddressesWithRole(r.Context(), "editor")
+	if err != nil {
+		app.replyErr(w, r, err)
+		return
+	}
+	app.replyJSON(http.StatusOK, w, resp)
 }
 
 func (app *appEnv) listSpotlightPAArticles(w http.ResponseWriter, r *http.Request) {
