@@ -160,28 +160,19 @@ func getImage(ctx context.Context, c *http.Client, srcurl string) (ctype string,
 }
 
 func (app *appEnv) listAllArcStories(w http.ResponseWriter, r *http.Request) {
-	page := 0
-	if pageStr := chi.URLParam(r, "page"); pageStr != "" {
-		if parsed, err := strconv.Atoi(pageStr); err != nil {
-			app.replyErr(w, r, fmt.Errorf(
-				"bad argument to listAllArcStories: %w", err,
-			))
-			return
-		} else {
-			page = parsed
-		}
+	page, err := app.getPage(r, "listAllArcStories")
+	if err != nil {
+		app.replyErr(w, r, err)
+		return
 	}
 
 	app.Printf("start listAllArcStories page %d", page)
 
-	type response struct {
+	var resp struct {
 		Contents []almanack.ArcStory `json:"contents"`
 		NextPage int                 `json:"next_page,omitempty"`
 	}
-	var (
-		resp response
-		err  error
-	)
+
 	resp.Contents, resp.NextPage, err = app.svc.ListAllArcStories(r.Context(), page)
 	if err != nil {
 		app.replyErr(w, r, err)
@@ -266,27 +257,17 @@ func (app *appEnv) postAlmanackArcStory(w http.ResponseWriter, r *http.Request) 
 }
 
 func (app *appEnv) listAvailableArcStories(w http.ResponseWriter, r *http.Request) {
-	page := 0
-	if pageStr := chi.URLParam(r, "page"); pageStr != "" {
-		if parsed, err := strconv.Atoi(pageStr); err != nil {
-			app.replyErr(w, r, fmt.Errorf(
-				"bad argument to listAvailableArcStories: %w", err,
-			))
-			return
-		} else {
-			page = parsed
-		}
+	page, err := app.getPage(r, "listAvailableArcStories")
+	if err != nil {
+		app.replyErr(w, r, err)
+		return
 	}
 	app.Printf("starting listAvailableArcStories page %d", page)
 
-	type response struct {
+	var res struct {
 		Contents []almanack.ArcStory `json:"contents"`
 		NextPage int                 `json:"next_page,string,omitempty"`
 	}
-	var (
-		res response
-		err error
-	)
 	if res.Contents, res.NextPage, err = app.svc.ListAvailableArcStories(
 		r.Context(), page,
 	); err != nil {
