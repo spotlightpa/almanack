@@ -27,8 +27,10 @@ const endpoints = {
   // GET and POST listed as two endpoints
   listAllSeries: `/api/all-series`,
   listAllTopics: `/api/all-topics`,
-  addAuthorizedDomain: `/api/authorized-domains`,
+  postAuthorizedDomain: `/api/authorized-domains`,
   listAuthorizedDomains: `/api/authorized-domains`,
+  postAuthorizedEmailAddress: `/api/authorized-addresses`,
+  listAuthorizedEmailAddresses: `/api/authorized-addresses`,
   saveArcArticle: `/api/available-articles`,
   createSignedUpload: `/api/create-signed-upload`,
   getEditorsPicks: `/api/editors-picks`,
@@ -164,6 +166,7 @@ function makeClient($auth) {
     "listAllSeries",
     "listAllTopics",
     "listAuthorizedDomains",
+    "listAuthorizedEmailAddresses",
     "listFiles",
     "listImages",
     "listRefreshArc",
@@ -174,7 +177,8 @@ function makeClient($auth) {
     actions[action] = () => tryTo(request(endpoint));
   }
   let simplePostActions = [
-    "addAuthorizedDomain",
+    "postAuthorizedDomain",
+    "postAuthorizedEmailAddress",
     "saveArcArticle",
     "saveArticle",
     "saveEditorsPicks",

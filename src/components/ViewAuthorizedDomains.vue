@@ -3,10 +3,8 @@ import { computed, reactive, ref, toRefs } from "@vue/composition-api";
 
 import { useClient, makeState } from "@/api/hooks.js";
 
-import APILoader from "./APILoader.vue";
-
 function domainState() {
-  let { listAuthorizedDomains, addAuthorizedDomain } = useClient();
+  let { listAuthorizedDomains, postAuthorizedDomain } = useClient();
 
   let { apiState: listState, exec: listExec } = makeState();
   let { apiState: addState, exec: addExec } = makeState();
@@ -14,7 +12,9 @@ function domainState() {
   let apiState = reactive({
     didLoad: computed(() => listState.didLoad || addState.didLoad),
     isLoading: computed(() => listState.isLoading || addState.isLoading),
-    error: computed(() => listState.error || addState.error),
+    errors: computed(() =>
+      [listState.error, addState.error].filter((o) => !!o)
+    ),
     domains: computed(() => listState.rawData?.domains || []),
   });
 
@@ -23,7 +23,7 @@ function domainState() {
   }
 
   async function addDomain(domain) {
-    await addExec(() => addAuthorizedDomain({ domain, remove: false }));
+    await addExec(() => postAuthorizedDomain({ domain, remove: false }));
     await list();
   }
 
@@ -31,7 +31,7 @@ function domainState() {
     if (!window.confirm(`Are you sure you want to remove ${domain}?`)) {
       return;
     }
-    await addExec(() => addAuthorizedDomain({ domain, remove: true }));
+    await addExec(() => postAuthorizedDomain({ domain, remove: true }));
     await list();
   }
 
@@ -45,18 +45,63 @@ function domainState() {
   };
 }
 
+function addressState() {
+  let {
+    listAuthorizedEmailAddresses,
+    postAuthorizedEmailAddress,
+  } = useClient();
+
+  let { apiState: listState, exec: listExec } = makeState();
+  let { apiState: addState, exec: addExec } = makeState();
+
+  let apiState = reactive({
+    didLoad: computed(() => listState.didLoad || addState.didLoad),
+    isLoading: computed(() => listState.isLoading || addState.isLoading),
+    errors: computed(() =>
+      [listState.error, addState.error].filter((o) => !!o)
+    ),
+    addresses: computed(() => listState.rawData?.addresses || []),
+  });
+
+  async function list() {
+    await listExec(listAuthorizedEmailAddresses);
+  }
+
+  async function addAddress(address) {
+    await addExec(() => postAuthorizedEmailAddress({ address, remove: false }));
+    await list();
+  }
+
+  async function removeAddress(address) {
+    if (!window.confirm(`Are you sure you want to remove ${address}?`)) {
+      return;
+    }
+    await addExec(() => postAuthorizedEmailAddress({ address, remove: true }));
+    await list();
+  }
+
+  list();
+
+  return {
+    list,
+    addAddress,
+    removeAddress,
+    ...toRefs(apiState),
+  };
+}
+
 export default {
   name: "ViewAuthorizedDomains",
-  components: {
-    APILoader,
-  },
+  components: {},
   metaInfo: {
-    title: "Authorized Domains and Addresses",
+    title: "Preauthorized Domains and Addresses",
   },
   setup() {
     return {
       newDomainName: ref(""),
       domain: domainState(),
+      newEmailAddress: ref(""),
+      address: addressState(),
     };
   },
 };
@@ -64,12 +109,16 @@ export default {
 
 <template>
   <div>
-    <h2 class="title">Authorized domains</h2>
-    <APILoader
-      :is-loading="domain.isLoading.value"
-      :reload="domain.list.value"
-      :error="domain.error.value"
-    >
+    <div>
+      <h2 class="title">Preauthorized domains</h2>
+      <progress
+        v-if="domain.isLoading.value"
+        class="progress is-large is-warning"
+        max="100"
+      >
+        Loading…
+      </progress>
+
       <div class="field is-grouped is-grouped-multiline">
         <div v-for="d of domain.domains.value" :key="d" class="control">
           <div class="tags has-addons">
@@ -78,26 +127,113 @@ export default {
           </div>
         </div>
       </div>
-    </APILoader>
-    <form
-      class="mt-5 field has-addons"
-      @submit.prevent="
-        domain.addDomain(newDomainName).then(() => {
-          newDomainName = '';
-        })
-      "
-    >
-      <div class="control is-expanded">
-        <input v-model="newDomainName" class="input" />
+
+      <div
+        v-for="error of domain.errors.value"
+        :key="error.name"
+        class="message is-danger"
+      >
+        <div class="message-header">{{ error.name }}</div>
+        <div class="message-body">
+          <p class="content">{{ error.message }}</p>
+          <div class="buttons">
+            <button
+              class="button is-danger has-text-weight-semibold"
+              @click="domain.list()"
+            >
+              Reload?
+            </button>
+          </div>
+        </div>
       </div>
-      <div class="control">
-        <button
-          class="button has-text-weight-semibold is-primary"
-          :class="{ 'is-loading': domain.isLoading.value }"
+
+      <form
+        class="mt-5 field has-addons"
+        @submit.prevent="
+          domain.addDomain(newDomainName).then(() => {
+            newDomainName = '';
+          })
+        "
+      >
+        <div class="control is-expanded">
+          <input v-model="newDomainName" class="input" />
+        </div>
+        <div class="control">
+          <button
+            class="button has-text-weight-semibold is-primary"
+            :class="{ 'is-loading': domain.isLoading.value }"
+          >
+            Add domain
+          </button>
+        </div>
+      </form>
+    </div>
+    <div class="mt-6">
+      <h2 class="title">Preauthorized email adddresses</h2>
+      <progress
+        v-if="address.isLoading.value"
+        class="progress is-large is-warning"
+        max="100"
+      >
+        Loading…
+      </progress>
+
+      <div class="field is-grouped is-grouped-multiline">
+        <div
+          v-for="email of address.addresses.value"
+          :key="email"
+          class="control"
         >
-          Add domain
-        </button>
+          <div class="tags has-addons">
+            <span class="tag is-small" v-text="email" />
+            <a class="tag is-delete" @click="address.removeAddress(email)" />
+          </div>
+        </div>
       </div>
-    </form>
+
+      <div
+        v-for="error of address.errors.value"
+        :key="error.name"
+        class="message is-danger"
+      >
+        <div class="message-header">{{ error.name }}</div>
+        <div class="message-body">
+          <p class="content">{{ error.message }}</p>
+          <div class="buttons">
+            <button
+              class="button is-danger has-text-weight-semibold"
+              @click="address.list()"
+            >
+              Reload?
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <form
+        class="mt-5 field has-addons"
+        @submit.prevent="
+          address.addAddress(newEmailAddress).then(() => {
+            newEmailAddress = '';
+          })
+        "
+      >
+        <div class="control is-expanded">
+          <input v-model="newEmailAddress" type="email" class="input" />
+        </div>
+        <div class="control">
+          <button
+            class="button has-text-weight-semibold is-primary"
+            :class="{ 'is-loading': address.isLoading.value }"
+          >
+            Add email address
+          </button>
+        </div>
+      </form>
+    </div>
+    <p class="mt-6 is-italic">
+      <em class="is-bold">Note</em>: Deleting a domain or address will not
+      remove any users who have already been authorized.
+    </p>
   </div>
 </template>
