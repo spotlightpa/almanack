@@ -173,7 +173,7 @@ export default {
         <span class="icon">
           <font-awesome-icon :icon="['fas', 'user-circle']" />
         </span>
-        <span> Approved User Domains </span>
+        <span> Preauthorization </span>
       </router-link>
     </div>
 
