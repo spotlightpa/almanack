@@ -12,6 +12,7 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/carlmjohnson/emailx"
 	"github.com/carlmjohnson/errutil"
 	"github.com/carlmjohnson/resperr"
 	"github.com/go-chi/chi"
@@ -544,6 +545,12 @@ func (app *appEnv) postAddress(w http.ResponseWriter, r *http.Request) {
 	var req request
 	if err := httpjson.DecodeRequest(w, r, &req); err != nil {
 		app.replyErr(w, r, err)
+		return
+	}
+
+	if !emailx.Valid(req.Address) {
+		app.replyErr(w, r, resperr.New(http.StatusBadRequest,
+			"invalid email address: %q", req.Address))
 		return
 	}
 
