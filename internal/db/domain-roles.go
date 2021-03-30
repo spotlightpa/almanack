@@ -8,6 +8,10 @@ import (
 )
 
 func GetRolesForEmail(ctx context.Context, q Querier, email string) (roles []string, err error) {
+	// not likely to get pass Netlify with an invalid address, but why not check?
+	if err = emailx.Validate(email); err != nil {
+		return
+	}
 	_, domain := emailx.Split(email)
 	if domain == "" {
 		return nil, fmt.Errorf("invalid email: %q", email)
