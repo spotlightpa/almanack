@@ -18,8 +18,6 @@ require (
 	github.com/gabriel-vasile/mimetype v1.2.0
 	github.com/getsentry/sentry-go v0.10.0
 	github.com/go-chi/chi v1.5.4
-	github.com/go-redsync/redsync v1.4.2
-	github.com/gomodule/redigo v2.0.0+incompatible
 	github.com/google/go-github/v33 v33.0.0
 	github.com/gorilla/feeds v1.1.1
 	github.com/lib/pq v1.10.0
