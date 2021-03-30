@@ -479,9 +479,15 @@ func (app *appEnv) postDomain(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	if req.Domain == "" {
+		app.replyErr(w, r, resperr.New(http.StatusBadRequest,
+			"can't add nothing!"))
+		return
+	}
+
 	if req.Domain == "spotlightpa.org" {
 		app.replyErr(w, r, resperr.New(http.StatusBadRequest,
-			"can't remove spotlightpa.org!"))
+			"can't change spotlightpa.org!"))
 		return
 	}
 
