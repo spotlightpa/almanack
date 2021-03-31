@@ -3,7 +3,7 @@ import { computed, reactive } from "@vue/composition-api";
 
 import { useClient } from "@/api/hooks.js";
 import fuzzyMatch from "@/utils/fuzzy-match.js";
-import { formatDate, formatTime } from "@/utils/time-format.js";
+import { formatDate, formatTime, formatDateTime } from "@/utils/time-format.js";
 
 import BulmaField from "./BulmaField.vue";
 import BulmaFieldInput from "./BulmaFieldInput.vue";
@@ -93,6 +93,7 @@ export default {
       },
 
       formatDate,
+      formatDateTime,
       formatTime,
     };
   },
@@ -130,7 +131,8 @@ export default {
         :id="idForLabel"
         v-model="article.pubDate"
         icon="user-clock"
-        :timepicker="{ hourFormat: '12' }"
+        :datetime-formatter="formatDateTime"
+        locale="en-US"
       >
       </b-datetimepicker>
       <p class="content is-small">
