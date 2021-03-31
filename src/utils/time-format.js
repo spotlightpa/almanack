@@ -30,3 +30,18 @@ export function formatTime(d) {
   }
   return aptime(d) + tzname;
 }
+
+const toShortWeekday = new Intl.DateTimeFormat("en-US", {
+  weekday: "short",
+});
+
+export function formatDateTime(d) {
+  if (!d) {
+    return "";
+  }
+  if (typeof d === "string") {
+    d = new Date(d);
+  }
+
+  return toShortWeekday.format(d) + "., " + apdate(d) + " " + formatTime(d);
+}
