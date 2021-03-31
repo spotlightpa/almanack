@@ -517,6 +517,7 @@ func (app *appEnv) postDomain(w http.ResponseWriter, r *http.Request) {
 		domains,
 	})
 }
+
 func (app *appEnv) listAddresses(w http.ResponseWriter, r *http.Request) {
 	app.Println("start listAddresses")
 	var (
