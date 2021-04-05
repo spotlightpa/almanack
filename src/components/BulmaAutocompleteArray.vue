@@ -102,6 +102,7 @@ export default {
       @input="detectChange($event.currentTarget.value)"
       @paste.prevent="paste"
       @keydown.enter="push"
+      @keydown.esc="currentInput = ''"
       @focusin="hasFocus = true"
       @focusout="
         push();
