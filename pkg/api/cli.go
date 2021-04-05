@@ -40,7 +40,7 @@ func (app *appEnv) parseArgs(args []string) error {
 
 	fl.StringVar(&app.srcFeedURL, "src-feed", "", "source `URL` for Arc feed")
 	fl.BoolVar(&app.isLambda, "lambda", false, "use AWS Lambda rather than HTTP")
-	fl.StringVar(&app.port, "port", ":3001", "listen on port (HTTP only)")
+	fl.StringVar(&app.port, "port", ":33160", "listen on port (HTTP only)")
 	fl.StringVar(&app.mailchimpSignupURL, "mc-signup-url", "http://example.com", "`URL` to redirect users to for MailChimp signup")
 	app.Logger = log.New(nil, AppName+" ", log.LstdFlags)
 	fl.Var(
