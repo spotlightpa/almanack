@@ -2,15 +2,42 @@
 import { computed, reactive } from "@vue/composition-api";
 
 import { useClient } from "@/api/hooks.js";
-import fuzzyMatch from "@/utils/fuzzy-match.js";
 import { formatDate, formatTime, formatDateTime } from "@/utils/time-format.js";
 
+import BulmaAutocompleteArray from "./BulmaAutocompleteArray.vue";
 import BulmaField from "./BulmaField.vue";
 import BulmaFieldInput from "./BulmaFieldInput.vue";
 import CopyWithButton from "./CopyWithButton.vue";
 
+function useAutocompletions() {
+  let { listAllTopics, listAllSeries } = useClient();
+  const autocomplete = reactive({
+    topics: [],
+    series: [],
+  });
+
+  listAllTopics().then(([data, err]) => {
+    if (!err) {
+      autocomplete.topics = data.topics || [];
+    } else {
+      // eslint-disable-next-line no-console
+      console.warn(err);
+    }
+  });
+  listAllSeries().then(([data, err]) => {
+    if (!err) {
+      autocomplete.series = data.series || [];
+    } else {
+      // eslint-disable-next-line no-console
+      console.warn(err);
+    }
+  });
+  return autocomplete;
+}
+
 export default {
   components: {
+    BulmaAutocompleteArray,
     BulmaField,
     BulmaFieldInput,
     CopyWithButton,
@@ -19,46 +46,8 @@ export default {
     article: { type: Object, required: true },
   },
   setup(props) {
-    let { listAllTopics, listAllSeries } = useClient();
     let isPostDated = computed(() => new Date() - props.article.pubDate < 0);
-    const autocomplete = reactive({
-      topicsRaw: [],
-      topicsFilter: "",
-      topics: computed(() =>
-        autocomplete.topicsFilter
-          ? autocomplete.topicsRaw.filter((s) =>
-              fuzzyMatch(s, autocomplete.topicsFilter)
-            )
-          : autocomplete.topicsRaw
-      ),
-
-      seriesRaw: [],
-      seriesFilter: "",
-      series: computed(() =>
-        autocomplete.seriesFilter
-          ? autocomplete.seriesRaw.filter((s) =>
-              fuzzyMatch(s, autocomplete.seriesFilter)
-            )
-          : autocomplete.seriesRaw
-      ),
-    });
-
-    listAllTopics().then(([data, err]) => {
-      if (!err) {
-        autocomplete.topicsRaw = data.topics || [];
-      } else {
-        // eslint-disable-next-line no-console
-        console.warn(err);
-      }
-    });
-    listAllSeries().then(([data, err]) => {
-      if (!err) {
-        autocomplete.seriesRaw = data.series || [];
-      } else {
-        // eslint-disable-next-line no-console
-        console.warn(err);
-      }
-    });
+    let autocomplete = useAutocompletions();
 
     return {
       isPostDated,
@@ -150,30 +139,22 @@ export default {
     </p>
     <BulmaFieldInput
       v-model="article.kicker"
-      label="Kicker"
+      label="Eyebrow"
       help="Small text appearing above the page headline, e.g. Health"
       :required="true"
     />
-    <b-field label="Topics">
-      <b-taginput
-        v-model="article.topics"
-        :open-on-focus="true"
-        :data="autocomplete.topics"
-        attached
-        @typing="autocomplete.topicsFilter = $event"
-      ></b-taginput>
-      Topics, e.g. Coronavirus
-    </b-field>
-    <b-field label="Series">
-      <b-taginput
-        v-model="article.series"
-        :open-on-focus="true"
-        :data="autocomplete.series"
-        attached
-        @typing="autocomplete.seriesFilter = $event"
-      ></b-taginput>
-      Series, e.g. “Legislative privilege 2020”
-    </b-field>
+    <BulmaAutocompleteArray
+      v-model="article.topics"
+      label="Topics"
+      :options="autocomplete.topics"
+      help="Topics are open-ended collections, e.g. “Events”, “Coronavirus”"
+    />
+    <BulmaAutocompleteArray
+      v-model="article.series"
+      label="Series"
+      :options="autocomplete.series"
+      help="Series are limited-time collections, e.g. “Legislative privilege 2020”"
+    />
     <BulmaFieldInput
       v-model="article.hed"
       label="Hed"
