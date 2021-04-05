@@ -166,14 +166,13 @@ export default {
       help="Appears below hed at top of page; AKA dek"
     />
 
-    <b-field label="Authors">
-      <b-taginput
-        v-model="article.authors"
-        attached
-        allow-duplicates
-      ></b-taginput>
-      Full name as listed in data profile
-    </b-field>
+    <BulmaAutocompleteArray
+      v-model="article.authors"
+      label="Authors"
+      help="Full name as listed in data profile"
+      :options="[]"
+    />
+
     <BulmaFieldInput
       v-model="article.byline"
       label="Byline"
@@ -320,10 +319,12 @@ export default {
 
       <BulmaFieldInput v-model="article.overrideURL" label="Override URL" />
 
-      <b-field label="URL Aliases">
-        <b-taginput v-model="article.aliases"></b-taginput>
-        Redirect these URLs to the story
-      </b-field>
+      <BulmaAutocompleteArray
+        v-model="article.aliases"
+        label="URL Aliases"
+        help="Redirect these URLs to the story"
+        :options="[]"
+      />
 
       <BulmaFieldInput v-model="article.layout" label="Layout override" />
     </details>
