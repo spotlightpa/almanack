@@ -33,6 +33,8 @@ export default {
     return {
       currentInput: "",
       hasFocus: false,
+      dragoverIndex: null,
+      dragoverFrom: null,
       idForDatalist: `BulmaAutocompleteArray-${labelIDCounter}`,
     };
   },
@@ -75,6 +77,24 @@ export default {
       vals.splice(i, 1);
       this.$emit("input", vals);
     },
+    dragover(i) {
+      // abort if some random other thing is being dragged on it
+      if (this.dragoverFrom === null) {
+        return;
+      }
+      this.dragoverIndex = i;
+    },
+    drop(to) {
+      let from = this.dragoverFrom;
+      if (from === null || from === to) {
+        return;
+      }
+      this.dragoverFrom = null;
+      let vals = [...this.value];
+      vals[from] = this.value[to];
+      vals[to] = this.value[from];
+      this.$emit("input", vals);
+    },
   },
 };
 </script>
@@ -83,9 +103,29 @@ export default {
   <BulmaField ref="field" v-slot="{ idForLabel }" v-bind="fieldProps">
     <div class="field is-grouped is-grouped-multiline">
       <div v-for="(v, i) of value" :key="i" class="control">
-        <div class="tags has-addons">
-          <span class="tag is-small" v-text="v" />
-          <a class="tag is-delete" @click="remove(i)" />
+        <div
+          class="tags has-addons"
+          draggable="true"
+          @dragstart="dragoverFrom = i"
+          @dragover.prevent="dragover(i)"
+          @dragleave="dragoverIndex = null"
+          @dragend="dragoverIndex = null"
+          @drop.prevent="drop(i)"
+        >
+          <span
+            :class="{
+              'is-link': dragoverIndex === i && dragoverFrom !== i,
+              grabbable: dragoverFrom === null,
+              grabbed: dragoverFrom === i,
+            }"
+            class="tag is-small"
+            v-text="v"
+          />
+          <a
+            :class="{ 'is-link': dragoverIndex === i && dragoverFrom !== i }"
+            class="tag is-delete"
+            @click="remove(i)"
+          />
         </div>
       </div>
     </div>
@@ -114,3 +154,12 @@ export default {
     </datalist>
   </BulmaField>
 </template>
+
+<style scoped>
+.grabbable {
+  cursor: grab;
+}
+.grabbed {
+  cursor: grabbing;
+}
+</style>
