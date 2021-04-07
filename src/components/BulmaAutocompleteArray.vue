@@ -78,18 +78,28 @@ export default {
       this.$emit("input", vals);
     },
     dragover(i) {
-      // abort if some random other thing is being dragged on it
-      if (this.dragoverFrom === null) {
+      if (
+        // abort if some random other thing is being dragged on it
+        this.dragoverFrom === null ||
+        // performance? avoid triggering reactivity system
+        this.dragoverIndex === i
+      ) {
         return;
       }
       this.dragoverIndex = i;
+    },
+    dragleave() {
+      // performance? avoid triggering reactivity system
+      if (this.dragoverIndex === null) {
+        return;
+      }
+      this.dragoverIndex = null;
     },
     drop(to) {
       let from = this.dragoverFrom;
       if (from === null || from === to) {
         return;
       }
-      this.dragoverFrom = null;
       let vals = [...this.value];
       vals[from] = this.value[to];
       vals[to] = this.value[from];
@@ -107,16 +117,19 @@ export default {
           class="tags has-addons"
           draggable="true"
           @dragstart="dragoverFrom = i"
-          @dragover.prevent="dragover(i)"
-          @dragleave="dragoverIndex = null"
-          @dragend="dragoverIndex = null"
+          @dragover.prevent.stop="dragover(i)"
+          @dragleave="dragleave()"
           @drop.prevent="drop(i)"
+          @dragend="
+            dragoverFrom = null;
+            dragoverIndex = null;
+          "
         >
           <span
             :class="{
               'is-link': dragoverIndex === i && dragoverFrom !== i,
               grabbable: dragoverFrom === null,
-              grabbed: dragoverFrom === i,
+              grabbed: dragoverFrom !== null,
             }"
             class="tag is-small"
             v-text="v"
@@ -158,6 +171,7 @@ export default {
 <style scoped>
 .grabbable {
   cursor: grab;
+  user-select: none;
 }
 .grabbed {
   cursor: grabbing;
