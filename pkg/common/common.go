@@ -26,6 +26,8 @@ type EmailService interface {
 
 type Newsletter struct {
 	Subject     string    `json:"subject"`
+	Blurb       string    `json:"blurb"`
+	Description string    `json:"description"`
 	ArchiveURL  string    `json:"archive_url"`
 	PublishedAt time.Time `json:"published_at"`
 }

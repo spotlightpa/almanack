@@ -33,7 +33,7 @@ func NewV3(apiKey, listID string, c *http.Client) V3 {
 	}
 
 	return V3{
-		requests.URL("https://dc.api.mailchimp.com/3.0/campaigns?count=10&offset=0&status=sent&fields=campaigns.archive_url,campaigns.send_time,campaigns.settings.subject_line,campaigns.settings.title&sort_field=send_time&sort_dir=desc").
+		requests.URL("https://dc.api.mailchimp.com/3.0/campaigns?count=10&offset=0&status=sent&fields=campaigns.archive_url,campaigns.send_time,campaigns.settings.subject_line,campaigns.settings.title,campaigns.settings.preview_text&sort_field=send_time&sort_dir=desc").
 			Client(c).
 			BasicAuth("", apiKey).
 			Hostf("%s.api.mailchimp.com", datacenter).
@@ -60,8 +60,9 @@ type Campaign struct {
 	ArchiveURL string    `json:"archive_url"`
 	SentAt     time.Time `json:"send_time"`
 	Settings   struct {
-		Subject string `json:"subject_line"`
-		Title   string `json:"title"`
+		Subject     string `json:"subject_line"`
+		Title       string `json:"title"`
+		PreviewText string `json:"preview_text"`
 	} `json:"settings"`
 }
 
@@ -76,6 +77,8 @@ func (v3 V3) ListNewletters(ctx context.Context, kind string) ([]common.Newslett
 		if strings.Contains(camp.Settings.Title, kind) {
 			newsletters = append(newsletters, common.Newsletter{
 				Subject:     camp.Settings.Subject,
+				Blurb:       camp.Settings.PreviewText,
+				Description: camp.Settings.Title,
 				ArchiveURL:  camp.ArchiveURL,
 				PublishedAt: camp.SentAt,
 			})

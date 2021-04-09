@@ -10,7 +10,7 @@ import (
 
 const listNewsletters = `-- name: ListNewsletters :many
 SELECT
-  subject, archive_url, published_at, type, created_at, updated_at
+  subject, archive_url, published_at, type, created_at, updated_at, description, blurb
 FROM
   newsletter
 WHERE
@@ -42,6 +42,8 @@ func (q *Queries) ListNewsletters(ctx context.Context, arg ListNewslettersParams
 			&i.Type,
 			&i.CreatedAt,
 			&i.UpdatedAt,
+			&i.Description,
+			&i.Blurb,
 		); err != nil {
 			return nil, err
 		}
@@ -64,15 +66,20 @@ WITH raw_json AS (
 campaign AS (
   SELECT
     data ->> 'subject' AS subject,
+    data ->> 'blurb' AS blurb,
+    data ->> 'description' AS description,
     data ->> 'archive_url' AS archive_url,
     to_timestamp(data ->> 'published_at'::text,
       -- ISO date
       'YYYY-MM-DD"T"HH24:MI:SS"Z"')::timestamp WITH time zone AS published_at
   FROM
     raw_json)
-  INSERT INTO newsletter ("subject", "archive_url", "published_at", "type")
+  INSERT INTO newsletter ("subject", "blurb", "description", "archive_url",
+    "published_at", "type")
   SELECT
     subject,
+    blurb,
+    description,
     archive_url,
     published_at,
     $1

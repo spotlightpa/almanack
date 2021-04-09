@@ -41,5 +41,8 @@ func TestV3(t *testing.T) {
 		if c.Settings.Title == "" {
 			t.Errorf("missing title for %q", c.ArchiveURL)
 		}
+		if c.Settings.PreviewText == "" {
+			t.Errorf("missing preview_text for %q", c.ArchiveURL)
+		}
 	}
 }
