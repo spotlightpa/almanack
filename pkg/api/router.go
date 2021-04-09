@@ -9,8 +9,12 @@ import (
 
 func (app *appEnv) routes() http.Handler {
 	r := chi.NewRouter()
-	r.Use(middleware.RequestID)
-	r.Use(middleware.RealIP)
+	if app.isLambda {
+		r.Use(middleware.RequestID)
+		r.Use(middleware.RealIP)
+	} else {
+		r.Use(middleware.Recoverer)
+	}
 	r.Use(middleware.RequestLogger(&middleware.DefaultLogFormatter{Logger: app.Logger}))
 	r.Use(app.versionMiddleware)
 	r.Use(app.maxSizeMiddleware)
