@@ -63,7 +63,7 @@ type Client struct {
 
 func (ga *Client) getClient(ctx context.Context) (err error) {
 	if ga.viewID == "" {
-		return fmt.Errorf("view ID not set")
+		return fmt.Errorf("getClient for Google Analytics: view ID not set")
 	}
 	if ga.c != nil {
 		return nil
