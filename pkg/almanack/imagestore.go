@@ -32,10 +32,18 @@ func makeImageName(ct string) string {
 		}
 	}
 	var sb strings.Builder
-	sb.Grow(len("2006/01/123456789abcdefg.") + len(ext))
+	sb.Grow(len("2006/01/1234-5678-9abc-defg.") + len(ext))
 	sb.WriteString(time.Now().Format("2006/01/"))
-	sb.Write(crockford.Time(crockford.Lower, time.Now()))
-	sb.Write(crockford.AppendRandom(crockford.Lower, nil))
+	buf := make([]byte, 0, crockford.LenTime)
+	buf = crockford.AppendTime(crockford.Lower, time.Now(), buf)
+	sb.Write(buf[:4])
+	sb.WriteByte('-')
+	sb.Write(buf[4:])
+	sb.WriteByte('-')
+	buf = crockford.AppendRandom(crockford.Lower, buf[:0])
+	sb.Write(buf[:4])
+	sb.WriteByte('-')
+	sb.Write(buf[4:])
 	sb.WriteString(".")
 	sb.WriteString(ext)
 	return sb.String()
@@ -43,7 +51,7 @@ func makeImageName(ct string) string {
 
 func hashURLpath(srcPath, ext string) string {
 	return fmt.Sprintf("external/%s.%s",
-		crockford.AppendMD5(crockford.Lower, nil, []byte(srcPath)),
+		crockford.MD5(crockford.Lower, []byte(srcPath)),
 		ext,
 	)
 }
