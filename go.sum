@@ -95,8 +95,8 @@ github.com/aws/aws-sdk-go v1.36.1/go.mod h1:hcU610XS61/+aQV88ixoOzUoG7v3b31pl2zK
 github.com/aws/aws-sdk-go v1.37.33 h1:bAzhEFOh/UKC2e1QwlUA4klDc6EdV0j0AcnzgeGzifU=
 github.com/aws/aws-sdk-go v1.37.33/go.mod h1:hcU610XS61/+aQV88ixoOzUoG7v3b31pl2zKMmprdro=
 github.com/aymerick/raymond v2.0.3-0.20180322193309-b565731e1464+incompatible/go.mod h1:osfaiScAUVup+UC9Nfq76eWqDhXlp+4UYaA8uhTBO6g=
-github.com/carlmjohnson/crockford v0.0.3 h1:zOgtrTSNDhWr5dguEjzwgUudD1GQdwSumah+cgnAEYI=
-github.com/carlmjohnson/crockford v0.0.3/go.mod h1:HA9wNRRL5/4L3uFPiYnk2nXuRzfHiDEncu3Yyc6WQoc=
+github.com/carlmjohnson/crockford v0.21.3 h1:C8YDx63IqTDY/UgoILjmahBivgOGnDFUcdum8ZO+B88=
+github.com/carlmjohnson/crockford v0.21.3/go.mod h1:Ry0l3g9KMB919ee2CjzhPH8FccE9xZNgcPBi8TQm6LM=
 github.com/carlmjohnson/emailx v0.20.2 h1:0euWTGWnz5zwxXaDwLjP/egV7kACYGUvO5Wqu/5RqL0=
 github.com/carlmjohnson/emailx v0.20.2/go.mod h1:Lngztj3awUX1Zu5b0Jv9ety36JBRKYvwlkFgem+0K+Q=
 github.com/carlmjohnson/errutil v0.20.1 h1:RadCQottxZxH7GnrLBg3ssl6/kEe4K1D81EZ6td8f9I=
