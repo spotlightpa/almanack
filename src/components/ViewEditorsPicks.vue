@@ -56,11 +56,8 @@ export default {
     title: "Homepage Editor",
   },
   setup() {
-    let {
-      listSpotlightPAArticles,
-      getEditorsPicks,
-      saveEditorsPicks,
-    } = useClient();
+    let { listSpotlightPAArticles, getEditorsPicks, saveEditorsPicks } =
+      useClient();
 
     let { apiState: listState, exec: listExec } = makeState();
     let { apiState: edPicksState, exec: edPickExec } = makeState();

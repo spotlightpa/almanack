@@ -13,14 +13,8 @@ export default {
   },
   setup(props) {
     let { fullName, roles } = useAuth();
-    let {
-      articles,
-      nextPage,
-      didLoad,
-      isLoading,
-      load,
-      error,
-    } = useListAvailableArc(() => props.page);
+    let { articles, nextPage, didLoad, isLoading, load, error } =
+      useListAvailableArc(() => props.page);
     let client = useClient();
 
     return {
