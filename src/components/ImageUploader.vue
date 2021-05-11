@@ -31,8 +31,8 @@ export default {
         let { files } = ev.target;
 
         for (let body of files) {
-          if (!["image/jpeg", "image/png"].includes(body.type)) {
-            state.error = new Error("Only JPEG and PNG are supported");
+          if (!["image/jpeg", "image/png", "image/tiff"].includes(body.type)) {
+            state.error = new Error("Only JPEG, PNG, and TIFF are supported");
             return;
           }
         }
@@ -83,7 +83,7 @@ export default {
               <label class="file-label">
                 <input
                   type="file"
-                  accept="image/jpeg,image/png"
+                  accept="image/jpeg,image/png,image/tiff"
                   class="file-input"
                   multiple
                   @change="uploadFileInput"

@@ -80,6 +80,8 @@ func UploadFromURL(ctx context.Context, c *http.Client, is aws.BlobStore, srcurl
 		ext = "jpeg"
 	} else if ct.Is("image/png") {
 		ext = "png"
+	} else if ct.Is("image/tiff") {
+		ext = "tiff"
 	} else {
 		return "", "", resperr.WithCodeAndMessage(
 			fmt.Errorf("%q did not have proper MIME type", srcurl),

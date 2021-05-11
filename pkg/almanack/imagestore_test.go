@@ -16,6 +16,7 @@ func TestMakeImageName(t *testing.T) {
 		"malformed": {"image/", ".bin"},
 		"png":       {"image/png", ".png"},
 		"jpeg":      {"image/jpeg", ".jpeg"},
+		"tiff":      {"image/tiff", ".tiff"},
 		"json":      {"application/json", ".json"},
 		"text":      {"text/plain", ".plain"},
 	}
