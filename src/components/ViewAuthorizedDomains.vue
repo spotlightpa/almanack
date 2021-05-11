@@ -46,10 +46,8 @@ function domainState() {
 }
 
 function addressState() {
-  let {
-    listAuthorizedEmailAddresses,
-    postAuthorizedEmailAddress,
-  } = useClient();
+  let { listAuthorizedEmailAddresses, postAuthorizedEmailAddress } =
+    useClient();
 
   let { apiState: listState, exec: listExec } = makeState();
   let { apiState: addState, exec: addExec } = makeState();

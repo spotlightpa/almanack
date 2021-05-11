@@ -20,14 +20,8 @@ import ViewUploader from "./components/ViewUploader.vue";
 
 Vue.use(Router);
 
-let {
-  roles,
-  fullName,
-  email,
-  isEditor,
-  isSpotlightPAUser,
-  isSignedIn,
-} = useAuth();
+let { roles, fullName, email, isEditor, isSpotlightPAUser, isSignedIn } =
+  useAuth();
 
 let router = new Router({
   mode: "history",

@@ -131,7 +131,11 @@ export default {
             <td>
               <div class="max-128">
                 <picture
-                  class="image is-square has-background-grey-lighter has-margin-bottom"
+                  class="
+                    image
+                    is-square
+                    has-background-grey-lighter has-margin-bottom
+                  "
                 >
                   <img :src="image.url" width="256" height="256" />
                 </picture>
