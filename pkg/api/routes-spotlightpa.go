@@ -183,6 +183,7 @@ func (app *appEnv) postScheduledArticle(w http.ResponseWriter, r *http.Request) 
 var supportedContentTypes = map[string]string{
 	"image/jpeg": "jpeg",
 	"image/png":  "png",
+	"image/tiff": "tiff",
 }
 
 func (app *appEnv) postSignedUpload(w http.ResponseWriter, r *http.Request) {

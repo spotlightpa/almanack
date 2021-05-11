@@ -130,6 +130,8 @@ func getImage(ctx context.Context, c *http.Client, srcurl string) (ctype string,
 		ctype = "image/jpeg"
 	} else if strings.HasPrefix(ct, "image/png") {
 		ctype = "image/png"
+	} else if strings.HasPrefix(ct, "image/tiff") {
+		ctype = "image/tiff"
 	} else {
 		return "", nil, resperr.WithCodeAndMessage(
 			fmt.Errorf("%q did not have proper MIME type", srcurl),
