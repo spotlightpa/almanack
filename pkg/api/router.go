@@ -22,7 +22,7 @@ func (app *appEnv) routes() http.Handler {
 	r.Get(`/api/healthcheck/{code:\d{3}}`, app.pingErr)
 	r.Get(`/api/proxy-image/{encURL}`, app.getProxyImage)
 	r.Get(`/api/cron`, app.getCron)
-	r.Get("/bookmarklet/{slug}", app.getBookmarklet)
+	r.Get("/api/bookmarklet/{slug}", app.getBookmarklet)
 	r.Route("/api", func(r chi.Router) {
 		r.Use(app.authMiddleware)
 		r.Get("/user-info", app.userInfo)
