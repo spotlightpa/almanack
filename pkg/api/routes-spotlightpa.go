@@ -8,7 +8,6 @@ import (
 	"github.com/carlmjohnson/resperr"
 	"github.com/go-chi/chi"
 	"github.com/spotlightpa/almanack/internal/db"
-	"github.com/spotlightpa/almanack/internal/httpjson"
 	"github.com/spotlightpa/almanack/pkg/almanack"
 )
 
@@ -69,8 +68,7 @@ func (app *appEnv) postAlmanackArcStory(w http.ResponseWriter, r *http.Request) 
 		Status     almanack.Status `json:"almanack-status,omitempty"`
 		RefreshArc bool            `json:"almanack-refresh-arc"`
 	}
-	if err := httpjson.DecodeRequest(w, r, &userData); err != nil {
-		app.replyErr(w, r, err)
+	if !app.readJSON(w, r, &userData) {
 		return
 	}
 
@@ -117,8 +115,7 @@ func (app *appEnv) postMessage(w http.ResponseWriter, r *http.Request) {
 	}
 
 	var req request
-	if err := httpjson.DecodeRequest(w, r, &req); err != nil {
-		app.replyErr(w, r, err)
+	if !app.readJSON(w, r, &req) {
 		return
 	}
 	if err := app.email.SendEmail(req.Subject, req.Body); err != nil {
@@ -148,8 +145,7 @@ func (app *appEnv) postScheduledArticle(w http.ResponseWriter, r *http.Request) 
 		almanack.SpotlightPAArticle
 		RefreshArc bool `json:"almanack-refresh-arc"`
 	}
-	if err := httpjson.DecodeRequest(w, r, &userData); err != nil {
-		app.replyErr(w, r, err)
+	if !app.readJSON(w, r, &userData) {
 		return
 	}
 
@@ -191,8 +187,7 @@ func (app *appEnv) postSignedUpload(w http.ResponseWriter, r *http.Request) {
 	var userData struct {
 		Type string `json:"type"`
 	}
-	if err := httpjson.DecodeRequest(w, r, &userData); err != nil {
-		app.replyErr(w, r, err)
+	if !app.readJSON(w, r, &userData) {
 		return
 	}
 
@@ -236,8 +231,7 @@ func (app *appEnv) postImageUpdate(w http.ResponseWriter, r *http.Request) {
 	app.Println("start postImageUpdate")
 
 	var userData db.UpdateImageParams
-	if err := httpjson.DecodeRequest(w, r, &userData); err != nil {
-		app.replyErr(w, r, err)
+	if !app.readJSON(w, r, &userData) {
 		return
 	}
 	var (
@@ -277,8 +271,7 @@ func (app *appEnv) postDomain(w http.ResponseWriter, r *http.Request) {
 		Domains []string `json:"domains"`
 	}
 	var req request
-	if err := httpjson.DecodeRequest(w, r, &req); err != nil {
-		app.replyErr(w, r, err)
+	if !app.readJSON(w, r, &req) {
 		return
 	}
 
@@ -346,8 +339,7 @@ func (app *appEnv) postAddress(w http.ResponseWriter, r *http.Request) {
 		Addresses []string `json:"addresses"`
 	}
 	var req request
-	if err := httpjson.DecodeRequest(w, r, &req); err != nil {
-		app.replyErr(w, r, err)
+	if !app.readJSON(w, r, &req) {
 		return
 	}
 
@@ -437,8 +429,7 @@ func (app *appEnv) getEditorsPicks(w http.ResponseWriter, r *http.Request) {
 func (app *appEnv) postEditorsPicks(w http.ResponseWriter, r *http.Request) {
 	app.Printf("starting postEditorsPicks")
 	var req almanack.EditorsPicks
-	if err := httpjson.DecodeRequest(w, r, &req); err != nil {
-		app.replyErr(w, r, err)
+	if !app.readJSON(w, r, &req) {
 		return
 	}
 	if err := almanack.SetEditorsPicks(
@@ -509,8 +500,7 @@ func (app *appEnv) postFileCreate(w http.ResponseWriter, r *http.Request) {
 		MimeType string `json:"mimeType"`
 		FileName string `json:"filename"`
 	}
-	if err := httpjson.DecodeRequest(w, r, &userData); err != nil {
-		app.replyErr(w, r, err)
+	if !app.readJSON(w, r, &userData) {
 		return
 	}
 	type response struct {
@@ -554,8 +544,7 @@ func (app *appEnv) postFileUpdate(w http.ResponseWriter, r *http.Request) {
 	app.Println("start postFileUpdate")
 
 	var userData db.UpdateFileParams
-	if err := httpjson.DecodeRequest(w, r, &userData); err != nil {
-		app.replyErr(w, r, err)
+	if !app.readJSON(w, r, &userData) {
 		return
 	}
 	var (
