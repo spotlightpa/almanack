@@ -58,12 +58,12 @@ function sql() {
 
 function migrate() {
 	cd sql/schema
-	tern migrate
+	tern migrate "$@"
 }
 
 function migrate:prod() {
 	cd sql/schema
-	tern migrate -c prod.conf
+	tern migrate -c prod.conf "$@"
 }
 
 function build:frontend() {
