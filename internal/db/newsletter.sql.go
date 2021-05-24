@@ -10,7 +10,7 @@ import (
 
 const listNewsletters = `-- name: ListNewsletters :many
 SELECT
-  subject, archive_url, published_at, type, created_at, updated_at, description, blurb
+  subject, archive_url, published_at, type, created_at, updated_at, description, blurb, spotlightpa_path
 FROM
   newsletter
 WHERE
@@ -44,6 +44,7 @@ func (q *Queries) ListNewsletters(ctx context.Context, arg ListNewslettersParams
 			&i.UpdatedAt,
 			&i.Description,
 			&i.Blurb,
+			&i.SpotlightPAPath,
 		); err != nil {
 			return nil, err
 		}

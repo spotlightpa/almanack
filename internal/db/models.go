@@ -73,20 +73,32 @@ type ImageType struct {
 }
 
 type Newsletter struct {
-	Subject     string    `json:"subject"`
-	ArchiveURL  string    `json:"archive_url"`
-	PublishedAt time.Time `json:"published_at"`
-	Type        string    `json:"type"`
-	CreatedAt   time.Time `json:"created_at"`
-	UpdatedAt   time.Time `json:"updated_at"`
-	Description string    `json:"description"`
-	Blurb       string    `json:"blurb"`
+	Subject         string         `json:"subject"`
+	ArchiveURL      string         `json:"archive_url"`
+	PublishedAt     time.Time      `json:"published_at"`
+	Type            string         `json:"type"`
+	CreatedAt       time.Time      `json:"created_at"`
+	UpdatedAt       time.Time      `json:"updated_at"`
+	Description     string         `json:"description"`
+	Blurb           string         `json:"blurb"`
+	SpotlightPAPath sql.NullString `json:"spotlightpa_path"`
 }
 
 type NewsletterType struct {
 	Shortname   string `json:"shortname"`
 	Name        string `json:"name"`
 	Description string `json:"description"`
+}
+
+type Page struct {
+	ID            int64           `json:"id"`
+	Path          string          `json:"path"`
+	Frontmatter   json.RawMessage `json:"frontmatter"`
+	Body          string          `json:"body"`
+	ScheduleFor   sql.NullTime    `json:"schedule_for"`
+	LastPublished sql.NullTime    `json:"last_published"`
+	CreatedAt     time.Time       `json:"created_at"`
+	UpdatedAt     time.Time       `json:"updated_at"`
 }
 
 type SiteDatum struct {
