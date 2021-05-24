@@ -12,7 +12,7 @@ import (
 	"net/url"
 
 	"github.com/carlmjohnson/flagext"
-	"github.com/spotlightpa/almanack/internal/httpjson"
+	"github.com/carlmjohnson/requests"
 	"github.com/spotlightpa/almanack/pkg/common"
 	"golang.org/x/oauth2"
 	"golang.org/x/oauth2/google"
@@ -101,13 +101,12 @@ func (ga *Client) MostPopularNews(ctx context.Context) ([]string, error) {
 	}
 
 	var data AnalyticsResponse
-	if err := httpjson.Post(
-		ctx,
-		ga.c,
-		"https://analyticsreporting.googleapis.com/v4/reports:batchGet",
-		req,
-		&data,
-	); err != nil {
+	if err := requests.
+		URL("https://analyticsreporting.googleapis.com/v4/reports:batchGet").
+		Client(ga.c).
+		BodyJSON(req).
+		ToJSON(&data).
+		Fetch(ctx); err != nil {
 		return nil, fmt.Errorf("could not get most-popular: %w", err)
 	}
 
