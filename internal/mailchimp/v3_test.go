@@ -2,22 +2,25 @@ package mailchimp_test
 
 import (
 	"context"
+	"net/http"
 	"net/url"
 	"os"
 	"testing"
 
+	"github.com/carlmjohnson/requests"
 	"github.com/spotlightpa/almanack/internal/mailchimp"
 )
 
 func TestV3(t *testing.T) {
+	cl := *http.DefaultClient
+	cl.Transport = requests.Record(nil, "testdata")
 	apiKey := os.Getenv("ALMANACK_MC_TEST_API_KEY")
 	listID := os.Getenv("ALMANACK_MC_TEST_LISTID")
 
 	if apiKey == "" || listID == "" {
-		t.Skip("Missing MailChimp ENV vars")
+		cl.Transport = requests.Replay("testdata")
 	}
-
-	v3 := mailchimp.NewV3(apiKey, listID, nil)
+	v3 := mailchimp.NewV3(apiKey, listID, &cl)
 	res, err := v3.ListCampaigns(context.Background())
 	if err != nil {
 		t.Fatalf("err != nil: %v", err)

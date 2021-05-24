@@ -11,11 +11,11 @@ import (
 	"strings"
 	"time"
 
+	"github.com/carlmjohnson/requests"
 	"github.com/carlmjohnson/resperr"
 	"github.com/getsentry/sentry-go"
 	"github.com/go-chi/chi"
 
-	"github.com/spotlightpa/almanack/internal/httpjson"
 	"github.com/spotlightpa/almanack/pkg/almanack"
 )
 
@@ -181,7 +181,10 @@ func (app *appEnv) FetchFeed(ctx context.Context) (*almanack.ArcAPI, error) {
 	ctx, cancel := context.WithTimeout(ctx, 6*time.Second)
 	defer cancel()
 
-	if err := httpjson.Get(ctx, app.svc.Client, app.srcFeedURL, &feed); err != nil {
+	if err := requests.URL(app.srcFeedURL).
+		Client(app.svc.Client).
+		ToJSON(&feed).
+		Fetch(ctx); err != nil {
 		return nil, resperr.New(
 			http.StatusBadGateway, "could not fetch Arc feed: %w", err)
 	}
