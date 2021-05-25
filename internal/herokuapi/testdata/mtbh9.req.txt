@@ -1,0 +1,5 @@
+GET /apps//config-vars HTTP/1.1
+Host: api.heroku.com
+Accept: application/vnd.heroku+json; version=3
+Authorization: Bearer testing123
+

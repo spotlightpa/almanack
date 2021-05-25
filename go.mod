@@ -13,7 +13,7 @@ require (
 	github.com/carlmjohnson/exitcode v0.20.2
 	github.com/carlmjohnson/flagext v0.21.0
 	github.com/carlmjohnson/gateway v1.20.7
-	github.com/carlmjohnson/requests v0.21.3
+	github.com/carlmjohnson/requests v0.21.4
 	github.com/carlmjohnson/resperr v0.20.5
 	github.com/carlmjohnson/slackhook v0.21.1
 	github.com/gabriel-vasile/mimetype v1.2.0
@@ -24,6 +24,6 @@ require (
 	github.com/lib/pq v1.10.0
 	github.com/mattbaird/gochimp v0.0.0-20200820164431-f1082bcdf63f
 	gocloud.dev v0.22.0
-	golang.org/x/net v0.0.0-20210316092652-d523dce5a7f4
+	golang.org/x/net v0.0.0-20210525063256-abc453219eb5
 	golang.org/x/oauth2 v0.0.0-20210313182246-cd4f82c27b84
 )

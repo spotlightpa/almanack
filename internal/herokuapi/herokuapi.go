@@ -2,14 +2,11 @@ package herokuapi
 
 import (
 	"context"
-	"encoding/json"
 	"flag"
-	"fmt"
-	"io"
-	"net/http"
 	"time"
 
 	"github.com/carlmjohnson/errutil"
+	"github.com/carlmjohnson/requests"
 	"github.com/spotlightpa/almanack/pkg/common"
 )
 
@@ -30,37 +27,14 @@ const timeout = 5 * time.Second
 func (conf *Configurator) Request() (vals map[string]string, err error) {
 	ctx, cancel := context.WithTimeout(context.Background(), timeout)
 	defer cancel()
-
-	req, err := http.NewRequestWithContext(
-		ctx,
-		http.MethodGet,
-		"https://api.heroku.com/apps/"+conf.appName+"/config-vars",
-		nil,
-	)
-	if err != nil {
-		return
-	}
-	req.Header.Set("Authorization", "Bearer "+conf.apiKey)
-	req.Header.Set("Accept", "application/vnd.heroku+json; version=3")
-
-	resp, err := http.DefaultClient.Do(req)
-	if err != nil {
-		return
-	}
-	defer resp.Body.Close()
-	if resp.StatusCode != http.StatusOK {
-		return nil, fmt.Errorf("bad status from Heroku: %s", resp.Status)
-	}
-	b, err := io.ReadAll(resp.Body)
-	if err != nil {
-		return
-	}
 	vals = make(map[string]string)
-	if err = json.Unmarshal(b, &vals); err != nil {
-		return nil, err
-	}
-
-	return vals, nil
+	err = requests.URL("https://api.heroku.com").
+		Pathf("/apps/%s/config-vars", conf.appName).
+		Bearer(conf.apiKey).
+		Accept("application/vnd.heroku+json; version=3").
+		ToJSON(&vals).
+		Fetch(ctx)
+	return
 }
 
 func listVisitedFlagNames(fl *flag.FlagSet) map[string]bool {
