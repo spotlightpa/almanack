@@ -13,12 +13,12 @@ import (
 
 func TestV3(t *testing.T) {
 	cl := *http.DefaultClient
-	cl.Transport = requests.Record(nil, "testdata")
+	cl.Transport = requests.Replay("testdata")
 	apiKey := os.Getenv("ALMANACK_MC_TEST_API_KEY")
 	listID := os.Getenv("ALMANACK_MC_TEST_LISTID")
 
-	if apiKey == "" || listID == "" {
-		cl.Transport = requests.Replay("testdata")
+	if os.Getenv("ALMANACK_MC_TEST_RECORD_REQUEST") != "" {
+		cl.Transport = requests.Record(nil, "testdata")
 	}
 	v3 := mailchimp.NewV3(apiKey, listID, &cl)
 	res, err := v3.ListCampaigns(context.Background())
