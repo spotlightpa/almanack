@@ -107,8 +107,8 @@ github.com/carlmjohnson/flagext v0.21.0 h1:/c4uK3ie786Z7caXLcIMvePNSSiH3bQVGDvmG
 github.com/carlmjohnson/flagext v0.21.0/go.mod h1:Eenv0epIUAr4NuedNmkzI8WmBmjIxZC239XcKxYS2ac=
 github.com/carlmjohnson/gateway v1.20.7 h1:YAh975ebqncs2CnHUcauq0DtQcWbI1d/bRi5KhqWdCc=
 github.com/carlmjohnson/gateway v1.20.7/go.mod h1:6D9xs2uAFs8UbCawK3gDCRkPRvZHuKI+HSs29zwFsHs=
-github.com/carlmjohnson/requests v0.21.4 h1:fJHtIgnkKW+2gZKK0VdoMJxnlNOCfyFGvxeZGrLs41I=
-github.com/carlmjohnson/requests v0.21.4/go.mod h1:/9DnSrKklCIzRi9R9hYXcaCpesh/7fVeVRU50fvaCTo=
+github.com/carlmjohnson/requests v0.21.8 h1:C2aY1NcANtEG58Ubk0G8r51+bD9gop9x/i1ucQygHkA=
+github.com/carlmjohnson/requests v0.21.8/go.mod h1:1i7g2I2eq5ZlNY6V/2wz5d2IVMH0TXyARtZ8P0t0/i4=
 github.com/carlmjohnson/resperr v0.20.5 h1:LBw+jsFSiGsb+kdJBmRtS9ky5CZmiLqWgj3QtiKYGC0=
 github.com/carlmjohnson/resperr v0.20.5/go.mod h1:UD4WLdpQTfUt4pl0wZsKF/7MuZIoi78qWloEDXV5Rw0=
 github.com/carlmjohnson/slackhook v0.21.1 h1:6vm4ES1C0oUKcIpzL0PodyuSPaZrOeUlh8dIdJoAO/c=
