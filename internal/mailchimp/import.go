@@ -8,24 +8,24 @@ import (
 	"net/http"
 	"strings"
 
+	"github.com/carlmjohnson/requests"
 	"golang.org/x/net/html"
 	"golang.org/x/net/html/atom"
 )
 
-func Import(ctx context.Context, cl *http.Client, page string) (string, error) {
-	req, err := http.NewRequestWithContext(ctx, http.MethodGet, page, nil)
+func ImportPage(ctx context.Context, cl *http.Client, page string) (body string, err error) {
+	err = requests.
+		URL(page).
+		Client(cl).
+		ToBufioReader(func(r *bufio.Reader) error {
+			body, err = PageContent(r)
+			return err
+		}).
+		Fetch(ctx)
 	if err != nil {
-		return "", err
+		return "", fmt.Errorf("problem importing MailChimp page: %w", err)
 	}
-	rsp, err := cl.Do(req)
-	if err != nil {
-		return "", err
-	}
-	defer rsp.Body.Close()
-	if rsp.StatusCode != http.StatusOK {
-		return "", fmt.Errorf("unexpected status for %s: %s", page, rsp.Status)
-	}
-	return PageContent(bufio.NewReader(rsp.Body))
+	return
 }
 
 func PageContent(r io.Reader) (body string, err error) {
@@ -55,7 +55,6 @@ func PageContent(r io.Reader) (body string, err error) {
 		if p := n.Parent; p != nil {
 			remove = append(remove, [2]*html.Node{p, n})
 		}
-		return
 	})
 	for i := range remove {
 		p, c := remove[i][0], remove[i][1]
