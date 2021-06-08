@@ -1,19 +1,18 @@
 package almanack
 
 import (
-	"bufio"
+	"bytes"
 	"context"
 	"fmt"
-	"io"
 	"net/http"
 	"strings"
 	"time"
 
 	"github.com/carlmjohnson/crockford"
+	"github.com/carlmjohnson/requests"
 	"github.com/carlmjohnson/resperr"
 	"github.com/gabriel-vasile/mimetype"
 	"github.com/spotlightpa/almanack/internal/aws"
-	"golang.org/x/net/context/ctxhttp"
 )
 
 func GetSignedImageUpload(ctx context.Context, is aws.BlobStore, ct string) (signedURL, filename string, err error) {
@@ -57,54 +56,47 @@ func hashURLpath(srcPath, ext string) string {
 }
 
 func UploadFromURL(ctx context.Context, c *http.Client, is aws.BlobStore, srcurl string) (filename, ext string, err error) {
-	res, err := ctxhttp.Get(ctx, c, srcurl)
+	body, ctype, err := FetchImageURL(ctx, c, srcurl)
 	if err != nil {
 		return "", "", err
 	}
-	defer res.Body.Close()
-
-	const (
-		megabyte = 1 << 20
-		maxSize  = 25 * megabyte
-		peekSize = 512
-	)
-	buf := bufio.NewReader(http.MaxBytesReader(nil, res.Body, maxSize))
-
-	peek, err := buf.Peek(peekSize)
-	if err != nil && err != io.EOF {
-		return "", "", err
-	}
-
-	ct := mimetype.Detect(peek)
-	if ct.Is("image/jpeg") {
-		ext = "jpeg"
-	} else if ct.Is("image/png") {
-		ext = "png"
-	} else if ct.Is("image/tiff") {
-		ext = "tiff"
-	} else {
-		return "", "", resperr.WithCodeAndMessage(
-			fmt.Errorf("%q did not have proper MIME type", srcurl),
-			http.StatusBadRequest,
-			"URL must be an image",
-		)
-	}
-
-	slurp, err := io.ReadAll(buf)
-	if err != nil {
-		return "", "", err
-	}
-
+	ext = strings.TrimPrefix(ctype, "image/")
 	filename = hashURLpath(srcurl, ext)
 
 	h := make(http.Header, 1)
-	h.Set("Content-Type", ct.String())
-	if err = is.WriteFile(ctx, filename, h, slurp); err != nil {
+	h.Set("Content-Type", ctype)
+	if err = is.WriteFile(ctx, filename, h, body); err != nil {
 		return "", "", resperr.WithCodeAndMessage(
-			fmt.Errorf("unexpected S3 status: %d", res.StatusCode),
+			fmt.Errorf("problem writing to S3: %w", err),
 			http.StatusBadGateway,
 			"Could not upload image from URL",
 		)
 	}
 	return filename, ext, nil
+}
+
+func FetchImageURL(ctx context.Context, c *http.Client, srcurl string) (body []byte, ctype string, err error) {
+	var buf bytes.Buffer
+	if err = requests.
+		URL(srcurl).
+		Client(c).
+		Peek(512, func(peek []byte) error {
+			ct := mimetype.Detect(peek)
+			if ct.Is("image/jpeg") || ct.Is("image/png") || ct.Is("image/tiff") {
+				ctype = ct.String()
+				return nil
+			}
+			return resperr.WithCodeAndMessage(
+				fmt.Errorf("%q did not have proper MIME type: %s",
+					srcurl, ct.String()),
+				http.StatusBadRequest,
+				"URL must be an image",
+			)
+		}).
+		ToBytesBuffer(&buf).
+		Fetch(ctx); err != nil {
+		return nil, "", err
+	}
+
+	return buf.Bytes(), ctype, nil
 }
