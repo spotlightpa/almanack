@@ -95,7 +95,10 @@ func FetchImageURL(ctx context.Context, c *http.Client, srcurl string) (body []b
 		}).
 		ToBytesBuffer(&buf).
 		Fetch(ctx); err != nil {
-		return nil, "", err
+		if resperr.StatusCode(err) != http.StatusInternalServerError {
+			return nil, "", err
+		}
+		return nil, "", resperr.New(http.StatusBadGateway, "problem fetching image: %w", err)
 	}
 
 	return buf.Bytes(), ctype, nil
