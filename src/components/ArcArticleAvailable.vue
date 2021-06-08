@@ -99,7 +99,6 @@ export default {
     <template v-if="article.featuredImage">
       <h2 class="title is-spaced">Featured Image</h2>
       <ImageThumbnail
-        v-if="article.featuredImage"
         :url="article.featuredImage"
         :caption="article.featuredImageCaption"
         :credits="article.featuredImageCredits"
