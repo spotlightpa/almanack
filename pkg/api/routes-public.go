@@ -1,11 +1,8 @@
 package api
 
 import (
-	"bufio"
-	"context"
 	"encoding/base64"
 	"fmt"
-	"io"
 	"net/http"
 	"net/http/httputil"
 	"net/url"
@@ -16,7 +13,7 @@ import (
 	"github.com/carlmjohnson/resperr"
 	"github.com/go-chi/chi"
 	"github.com/spotlightpa/almanack/internal/db"
-	"golang.org/x/net/context/ctxhttp"
+	"github.com/spotlightpa/almanack/pkg/almanack"
 )
 
 func (app *appEnv) notFound(w http.ResponseWriter, r *http.Request) {
@@ -92,7 +89,7 @@ func (app *appEnv) getProxyImage(w http.ResponseWriter, r *http.Request) {
 		))
 		return
 	}
-	ctype, body, err := getImage(r.Context(), app.svc.Client, u.String())
+	body, ctype, err := almanack.FetchImageURL(r.Context(), app.svc.Client, u.String())
 	if err != nil {
 		app.replyErr(w, r, err)
 		return
@@ -105,46 +102,6 @@ func (app *appEnv) getProxyImage(w http.ResponseWriter, r *http.Request) {
 	if _, err = w.Write(body); err != nil {
 		app.logErr(r.Context(), err)
 	}
-}
-
-func getImage(ctx context.Context, c *http.Client, srcurl string) (ctype string, body []byte, err error) {
-	var res *http.Response
-	res, err = ctxhttp.Get(ctx, c, srcurl)
-	if err != nil {
-		return
-	}
-	defer res.Body.Close()
-
-	const (
-		megabyte = 1 << 20
-		maxSize  = 25 * megabyte
-	)
-	buf := bufio.NewReader(http.MaxBytesReader(nil, res.Body, maxSize))
-	// http.DetectContentType only uses first 512 bytes
-	peek, err := buf.Peek(512)
-	if err != nil && err != io.EOF {
-		return "", nil, err
-	}
-
-	if ct := http.DetectContentType(peek); strings.HasPrefix(ct, "image/jpeg") {
-		ctype = "image/jpeg"
-	} else if strings.HasPrefix(ct, "image/png") {
-		ctype = "image/png"
-	} else if strings.HasPrefix(ct, "image/tiff") {
-		ctype = "image/tiff"
-	} else {
-		return "", nil, resperr.WithCodeAndMessage(
-			fmt.Errorf("%q did not have proper MIME type", srcurl),
-			http.StatusBadRequest,
-			"URL must be an image",
-		)
-	}
-
-	body, err = io.ReadAll(buf)
-	if err != nil {
-		return "", nil, err
-	}
-	return
 }
 
 func (app *appEnv) getCron(w http.ResponseWriter, r *http.Request) {
