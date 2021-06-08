@@ -3,12 +3,14 @@ import { formatDate } from "@/utils/time-format.js";
 
 import ArticleSlugLine from "./ArticleSlugLine.vue";
 import ArticleWordCount from "./ArticleWordCount.vue";
+import ImageThumbnail from "./ImageThumbnail.vue";
 import NoCopyTextArea from "./NoCopyTextArea.vue";
 
 export default {
   components: {
     ArticleSlugLine,
     ArticleWordCount,
+    ImageThumbnail,
     NoCopyTextArea,
   },
   props: {
@@ -56,6 +58,13 @@ export default {
     <h2 class="title">Byline</h2>
     <NoCopyTextArea v-text="article.byline" />
 
+    <template v-if="article.featuredImage">
+      <h2 class="title">Working Image</h2>
+      <div class="image max-256 has-background-grey-lighter has-margin-bottom">
+        <img :src="article.featuredImage" />
+      </div>
+    </template>
+
     <h2 v-if="embeds.length === 1" class="title">Embed</h2>
     <h2 v-if="embeds.length > 1" class="title">Embeds: {{ embeds.length }}</h2>
 
@@ -84,5 +93,12 @@ export default {
 .height-50vh {
   height: 50vh !important;
   overflow-y: scroll;
+}
+
+.max-256 {
+  max-height: 256px;
+  max-width: 256px;
+  min-height: 1rem;
+  min-width: 1rem;
 }
 </style>
