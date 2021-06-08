@@ -1,3 +1,0 @@
-GET /3.0/campaigns?count=10&fields=campaigns.archive_url%2Ccampaigns.send_time%2Ccampaigns.settings.subject_line%2Ccampaigns.settings.title&list_id=6c1fbeb603&offset=0&sort_dir=desc&sort_field=send_time&status=sent HTTP/1.1
-Host: .api.mailchimp.com
-Authorization: Basic Og==
