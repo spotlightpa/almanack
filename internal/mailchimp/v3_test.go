@@ -45,4 +45,17 @@ func TestV3(t *testing.T) {
 			t.Errorf("missing preview_text for %q", c.ArchiveURL)
 		}
 	}
+	camp := res.Campaigns[0]
+	body, err := mailchimp.ImportPage(context.Background(), &cl, camp.ArchiveURL)
+	if err != nil {
+		t.Fatalf("problem getting campaign page: %v", err)
+	}
+	expect, err := os.ReadFile("testdata/body.html")
+	if err != nil {
+		t.Fatalf("problem reading campaign example: %v", err)
+	}
+	if string(expect) != body {
+		os.WriteFile("testdata/got.html", []byte(body), 0644)
+		t.Fatal("unexpected body")
+	}
 }
