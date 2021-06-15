@@ -76,6 +76,7 @@ function build:backend() {
 	echo "$(git rev-parse --short HEAD)" >pkg/almanack/build-version.txt
 	echo "${DEPLOY_PRIME_URL:-http://local.dev}" >pkg/almanack/deploy-url.txt
 	GOBIN=$THIS_DIR/functions go install ./funcs/...
+	cp $THIS_DIR/functions/almanack-api $THIS_DIR/functions/almanack-api-background
 }
 
 function build:prod() {
