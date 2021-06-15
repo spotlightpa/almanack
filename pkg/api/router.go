@@ -61,6 +61,7 @@ func (app *appEnv) routes() http.Handler {
 			r.Post("/files-update", app.postFileUpdate)
 		})
 	})
+	r.Get(`/api-background/healthcheck`, app.ping)
 	r.NotFound(app.notFound)
 
 	return r
