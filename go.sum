@@ -101,6 +101,8 @@ github.com/carlmjohnson/emailx v0.20.2 h1:0euWTGWnz5zwxXaDwLjP/egV7kACYGUvO5Wqu/
 github.com/carlmjohnson/emailx v0.20.2/go.mod h1:Lngztj3awUX1Zu5b0Jv9ety36JBRKYvwlkFgem+0K+Q=
 github.com/carlmjohnson/errutil v0.20.1 h1:RadCQottxZxH7GnrLBg3ssl6/kEe4K1D81EZ6td8f9I=
 github.com/carlmjohnson/errutil v0.20.1/go.mod h1:t1n46sLob5fpvrJ5706xDg0zOcj2FigYuhAn37qSRec=
+github.com/carlmjohnson/errutil v0.21.1 h1:AzPzbVIZBWipr2bJJ3hDo8PEQ9NBaDnro+0uyjRswak=
+github.com/carlmjohnson/errutil v0.21.1/go.mod h1:t1n46sLob5fpvrJ5706xDg0zOcj2FigYuhAn37qSRec=
 github.com/carlmjohnson/exitcode v0.20.2 h1:vE6rmkCGNA4kO4m1qwWIa77PKlUBVg46cNjs22eAOXE=
 github.com/carlmjohnson/exitcode v0.20.2/go.mod h1:MZ6ThCDx517DQcrpYnnns1pLh8onjFl+B/AsrOrdmpc=
 github.com/carlmjohnson/flagext v0.21.0 h1:/c4uK3ie786Z7caXLcIMvePNSSiH3bQVGDvmGLMme60=
