@@ -12,14 +12,14 @@ import (
 func check(t *testing.T, err error, msg string) {
 	t.Helper()
 	if err != nil {
-		t.Errorf("%s: %v", msg, err)
+		t.Fatalf("%s: %v", msg, err)
 	}
 }
 
 func eq(t *testing.T, want, have string) {
 	t.Helper()
 	if want != have {
-		t.Errorf("want %q; have %q", want, have)
+		t.Fatalf("want %q; have %q", want, have)
 	}
 }
 
