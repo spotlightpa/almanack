@@ -79,6 +79,7 @@ type Newsletter struct {
 	Type            string         `json:"type"`
 	CreatedAt       time.Time      `json:"created_at"`
 	UpdatedAt       time.Time      `json:"updated_at"`
+	ID              int64          `json:"id"`
 	Description     string         `json:"description"`
 	Blurb           string         `json:"blurb"`
 	SpotlightPAPath sql.NullString `json:"spotlightpa_path"`
@@ -91,14 +92,14 @@ type NewsletterType struct {
 }
 
 type Page struct {
-	ID            int64           `json:"id"`
-	Path          string          `json:"path"`
-	Frontmatter   json.RawMessage `json:"frontmatter"`
-	Body          string          `json:"body"`
-	ScheduleFor   sql.NullTime    `json:"schedule_for"`
-	LastPublished sql.NullTime    `json:"last_published"`
-	CreatedAt     time.Time       `json:"created_at"`
-	UpdatedAt     time.Time       `json:"updated_at"`
+	ID            int64        `json:"id"`
+	Path          string       `json:"path"`
+	Frontmatter   Map          `json:"frontmatter"`
+	Body          string       `json:"body"`
+	ScheduleFor   sql.NullTime `json:"schedule_for"`
+	LastPublished sql.NullTime `json:"last_published"`
+	CreatedAt     time.Time    `json:"created_at"`
+	UpdatedAt     time.Time    `json:"updated_at"`
 }
 
 type SiteDatum struct {
