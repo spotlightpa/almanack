@@ -5,12 +5,13 @@ package db
 
 import (
 	"context"
+	"database/sql"
 	"encoding/json"
 )
 
 const listNewsletters = `-- name: ListNewsletters :many
 SELECT
-  subject, archive_url, published_at, type, created_at, updated_at, description, blurb, spotlightpa_path
+  subject, archive_url, published_at, type, created_at, updated_at, id, description, blurb, spotlightpa_path
 FROM
   newsletter
 WHERE
@@ -42,6 +43,7 @@ func (q *Queries) ListNewsletters(ctx context.Context, arg ListNewslettersParams
 			&i.Type,
 			&i.CreatedAt,
 			&i.UpdatedAt,
+			&i.ID,
 			&i.Description,
 			&i.Blurb,
 			&i.SpotlightPAPath,
@@ -57,6 +59,91 @@ func (q *Queries) ListNewsletters(ctx context.Context, arg ListNewslettersParams
 		return nil, err
 	}
 	return items, nil
+}
+
+const listUnpublishedNewsletters = `-- name: ListUnpublishedNewsletters :many
+SELECT
+  subject, archive_url, published_at, type, created_at, updated_at, id, description, blurb, spotlightpa_path
+FROM
+  newsletter
+WHERE
+  "spotlightpa_path" IS NULL
+ORDER BY
+  published_at DESC
+LIMIT $1 OFFSET $2
+`
+
+type ListUnpublishedNewslettersParams struct {
+	Limit  int32 `json:"limit"`
+	Offset int32 `json:"offset"`
+}
+
+func (q *Queries) ListUnpublishedNewsletters(ctx context.Context, arg ListUnpublishedNewslettersParams) ([]Newsletter, error) {
+	rows, err := q.db.QueryContext(ctx, listUnpublishedNewsletters, arg.Limit, arg.Offset)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []Newsletter
+	for rows.Next() {
+		var i Newsletter
+		if err := rows.Scan(
+			&i.Subject,
+			&i.ArchiveURL,
+			&i.PublishedAt,
+			&i.Type,
+			&i.CreatedAt,
+			&i.UpdatedAt,
+			&i.ID,
+			&i.Description,
+			&i.Blurb,
+			&i.SpotlightPAPath,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const updateNewsletter = `-- name: UpdateNewsletter :one
+UPDATE
+  newsletter
+SET
+  "spotlightpa_path" = $2
+WHERE
+  id = $1
+RETURNING
+  subject, archive_url, published_at, type, created_at, updated_at, id, description, blurb, spotlightpa_path
+`
+
+type UpdateNewsletterParams struct {
+	ID              int64          `json:"id"`
+	SpotlightPAPath sql.NullString `json:"spotlightpa_path"`
+}
+
+func (q *Queries) UpdateNewsletter(ctx context.Context, arg UpdateNewsletterParams) (Newsletter, error) {
+	row := q.db.QueryRowContext(ctx, updateNewsletter, arg.ID, arg.SpotlightPAPath)
+	var i Newsletter
+	err := row.Scan(
+		&i.Subject,
+		&i.ArchiveURL,
+		&i.PublishedAt,
+		&i.Type,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+		&i.ID,
+		&i.Description,
+		&i.Blurb,
+		&i.SpotlightPAPath,
+	)
+	return i, err
 }
 
 const updateNewsletterArchives = `-- name: UpdateNewsletterArchives :execrows

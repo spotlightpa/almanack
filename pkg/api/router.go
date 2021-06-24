@@ -62,6 +62,7 @@ func (app *appEnv) routes() http.Handler {
 		})
 	})
 	r.Get(`/api-background/sleep/{duration}`, app.backgroundSleep)
+	r.Get(`/api-background/cron`, app.backgroundCron)
 	r.NotFound(app.notFound)
 
 	return r
