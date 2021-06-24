@@ -38,3 +38,24 @@ WHERE
 ORDER BY
   published_at DESC
 LIMIT $2 OFFSET $3;
+
+-- name: ListUnpublishedNewsletters :many
+SELECT
+  *
+FROM
+  newsletter
+WHERE
+  "spotlightpa_path" IS NULL
+ORDER BY
+  published_at DESC
+LIMIT $1 OFFSET $2;
+
+-- name: UpdateNewsletter :one
+UPDATE
+  newsletter
+SET
+  "spotlightpa_path" = $2
+WHERE
+  id = $1
+RETURNING
+  *;

@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"strings"
 	"time"
 
 	"github.com/carlmjohnson/errutil"
@@ -14,6 +15,7 @@ import (
 	"github.com/spotlightpa/almanack/internal/db"
 	"github.com/spotlightpa/almanack/internal/ganalytics"
 	"github.com/spotlightpa/almanack/internal/index"
+	"github.com/spotlightpa/almanack/internal/mailchimp"
 	"github.com/spotlightpa/almanack/internal/slack"
 	"github.com/spotlightpa/almanack/pkg/common"
 )
@@ -420,4 +422,101 @@ func (svc Service) UpdateMostPopular(ctx context.Context) error {
 		"public, max-age=300",
 		&data,
 	)
+}
+
+func (svc Service) ImportNewsletterPages(ctx context.Context) (err error) {
+	defer errutil.Prefix(&err, "problem importing newsletter pages")
+
+	nls, err := svc.Querier.ListUnpublishedNewsletters(ctx, db.ListUnpublishedNewslettersParams{
+		Offset: 0,
+		Limit:  10,
+	})
+	if err != nil {
+		return err
+	}
+	svc.Logger.Printf("importing %d newsletter pages", len(nls))
+	for _, nl := range nls {
+		body, err := mailchimp.ImportPage(ctx, svc.Client, nl.ArchiveURL)
+		if err != nil {
+			return err
+		}
+		if err = svc.SaveNewsletterPage(ctx, &nl, body); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+var kickerFor = map[string]string{
+	"investigator": "The Investigator",
+	"papost":       "PA Post",
+}
+
+func (svc Service) SaveNewsletterPage(ctx context.Context, nl *db.Newsletter, body string) (err error) {
+	defer errutil.Prefix(&err, "problem saving newsletter page")
+
+	needsUpdate := false
+	if !nl.SpotlightPAPath.Valid {
+		nl.SpotlightPAPath.Valid = true
+		nl.SpotlightPAPath.String = fmt.Sprintf("content/newsletters/%s/%s.md",
+			nl.Type, nl.PublishedAt.Format("2006-01-02-1504"),
+		)
+		needsUpdate = true
+	}
+
+	// create or update the page
+	if needsUpdate {
+		path := nl.SpotlightPAPath.String
+		if err := svc.Querier.EnsurePage(ctx, path); err != nil {
+			return err
+		}
+		if _, err := svc.Querier.UpdatePage(ctx, db.UpdatePageParams{
+			SetFrontmatter: true,
+			Frontmatter: map[string]interface{}{
+				"aliases":           []string{},
+				"authors":           []string{},
+				"blurb":             nl.Blurb,
+				"byline":            "",
+				"description":       nl.Description,
+				"draft":             true,
+				"extended-kicker":   "",
+				"image":             "",
+				"image-caption":     "",
+				"image-credit":      "",
+				"image-description": "",
+				"image-size":        "",
+				"internal-id": fmt.Sprintf("%s-%s",
+					strings.ToUpper(nl.Type),
+					nl.PublishedAt.Format("01-02-06")),
+				//TODO: proper kicker lookup
+				"kicker":      kickerFor[nl.Type],
+				"layout":      "mailchimp-page",
+				"linktitle":   "",
+				"no-index":    false,
+				"published":   nl.PublishedAt,
+				"raw-content": body,
+				"series":      []string{},
+				"slug":        "",
+				"title":       nl.Subject,
+				"title-tag":   "",
+				"topics":      []string{},
+				"url":         "",
+			},
+			SetBody: true,
+			Body:    "",
+			Path:    path,
+		}); err != nil {
+			return err
+		}
+
+		if nl2, err := svc.Querier.UpdateNewsletter(ctx, db.UpdateNewsletterParams{
+			ID:              nl.ID,
+			SpotlightPAPath: nl.SpotlightPAPath,
+		}); err != nil {
+			return err
+		} else {
+			*nl = nl2
+		}
+	}
+	return nil
 }

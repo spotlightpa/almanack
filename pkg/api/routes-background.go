@@ -20,3 +20,13 @@ func (app *appEnv) backgroundSleep(w http.ResponseWriter, r *http.Request) {
 		SleptFor time.Duration `json:"slept-for"`
 	}{duration})
 }
+
+func (app *appEnv) backgroundCron(w http.ResponseWriter, r *http.Request) {
+	app.Println("start background cron")
+	// reply shows up in dev only
+	if err := app.svc.ImportNewsletterPages(r.Context()); err != nil {
+		app.replyErr(w, r, err)
+		return
+	}
+	app.replyJSON(http.StatusAccepted, w, "OK")
+}
