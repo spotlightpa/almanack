@@ -561,3 +561,16 @@ func (svc Service) RefreshPageFromContentStore(ctx context.Context, page *db.Pag
 	}
 	return nil
 }
+
+func (svc Service) PopScheduledPages(ctx context.Context) error {
+	pages, err := svc.Querier.PopScheduledPages(ctx)
+	if err != nil {
+		return err
+	}
+
+	var errs errutil.Slice
+	for _, page := range pages {
+		errs.Push(svc.PublishPage(ctx, &page))
+	}
+	return errs.Merge()
+}

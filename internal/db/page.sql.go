@@ -45,6 +45,50 @@ func (q *Queries) GetPage(ctx context.Context, path string) (Page, error) {
 	return i, err
 }
 
+const popScheduledPages = `-- name: PopScheduledPages :many
+UPDATE
+  page
+SET
+  last_published = CURRENT_TIMESTAMP
+WHERE
+  last_published IS NULL
+  AND schedule_for < (CURRENT_TIMESTAMP + '5 minutes'::interval)
+RETURNING
+  id, path, frontmatter, body, schedule_for, last_published, created_at, updated_at
+`
+
+func (q *Queries) PopScheduledPages(ctx context.Context) ([]Page, error) {
+	rows, err := q.db.QueryContext(ctx, popScheduledPages)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []Page
+	for rows.Next() {
+		var i Page
+		if err := rows.Scan(
+			&i.ID,
+			&i.Path,
+			&i.Frontmatter,
+			&i.Body,
+			&i.ScheduleFor,
+			&i.LastPublished,
+			&i.CreatedAt,
+			&i.UpdatedAt,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const updatePage = `-- name: UpdatePage :one
 UPDATE
   page

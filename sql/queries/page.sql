@@ -40,3 +40,14 @@ FROM
   "page"
 WHERE
   path = $1;
+
+-- name: PopScheduledPages :many
+UPDATE
+  page
+SET
+  last_published = CURRENT_TIMESTAMP
+WHERE
+  last_published IS NULL
+  AND schedule_for < (CURRENT_TIMESTAMP + '5 minutes'::interval)
+RETURNING
+  *;
