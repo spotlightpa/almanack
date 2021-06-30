@@ -520,3 +520,44 @@ func (svc Service) SaveNewsletterPage(ctx context.Context, nl *db.Newsletter, bo
 	}
 	return nil
 }
+
+func (svc Service) PublishPage(ctx context.Context, page *db.Page) error {
+	data, err := page.ToTOML()
+	if err != nil {
+		return err
+	}
+
+	msg := fmt.Sprintf("Content: publishing %q", page.Path)
+	if err = svc.ContentStore.UpdateFile(ctx, msg, page.Path, []byte(data)); err != nil {
+		return err
+	}
+
+	p2, err := svc.Querier.UpdatePage(ctx, db.UpdatePageParams{
+		Path:             page.Path,
+		SetLastPublished: true,
+		SetFrontmatter:   false,
+		SetBody:          false,
+		SetScheduleFor:   false,
+	})
+	if err != nil {
+		return err
+	}
+	*page = p2
+	return nil
+}
+
+func (svc Service) RefreshPageFromContentStore(ctx context.Context, page *db.Page) (err error) {
+	defer errutil.Prefix(&err, "problem refreshing page content from Github")
+
+	if !page.LastPublished.Valid {
+		return
+	}
+	content, err := svc.ContentStore.GetFile(ctx, page.Path)
+	if err != nil {
+		return err
+	}
+	if err = page.FromTOML(content); err != nil {
+		return err
+	}
+	return nil
+}
