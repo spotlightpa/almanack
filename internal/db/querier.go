@@ -35,6 +35,7 @@ type Querier interface {
 	ListUnpublishedNewsletters(ctx context.Context, arg ListUnpublishedNewslettersParams) ([]Newsletter, error)
 	ListUpcoming(ctx context.Context) ([]Article, error)
 	PopScheduled(ctx context.Context) ([]Article, error)
+	PopScheduledPages(ctx context.Context) ([]Page, error)
 	SetRolesForAddress(ctx context.Context, arg SetRolesForAddressParams) (AddressRole, error)
 	SetRolesForDomain(ctx context.Context, arg SetRolesForDomainParams) (DomainRole, error)
 	SetSiteData(ctx context.Context, arg SetSiteDataParams) error
