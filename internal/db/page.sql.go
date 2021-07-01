@@ -6,6 +6,7 @@ package db
 import (
 	"context"
 	"database/sql"
+	"time"
 )
 
 const ensurePage = `-- name: EnsurePage :exec
@@ -43,6 +44,83 @@ func (q *Queries) GetPage(ctx context.Context, path string) (Page, error) {
 		&i.UpdatedAt,
 	)
 	return i, err
+}
+
+const listPages = `-- name: ListPages :many
+SELECT
+  "id",
+  "path",
+  (frontmatter ->> 'internal-id')::text AS "internal_id",
+  (frontmatter ->> 'title')::text AS "title",
+  (frontmatter ->> 'description')::text AS "description",
+  (frontmatter ->> 'blurb')::text AS "blurb",
+  "last_published",
+  "created_at",
+  "updated_at",
+  to_timestamp(frontmatter ->> 'published',
+    -- ISO date
+    'YYYY-MM-DD"T"HH24:MI:SS"Z"')::timestamptz AS "published_at"
+FROM
+  page
+WHERE
+  "path" ILIKE $1
+ORDER BY
+  last_published DESC,
+  created_at DESC
+LIMIT $2 OFFSET $3
+`
+
+type ListPagesParams struct {
+	Path   string `json:"path"`
+	Limit  int32  `json:"limit"`
+	Offset int32  `json:"offset"`
+}
+
+type ListPagesRow struct {
+	ID            int64        `json:"id"`
+	Path          string       `json:"path"`
+	InternalID    string       `json:"internal_id"`
+	Title         string       `json:"title"`
+	Description   string       `json:"description"`
+	Blurb         string       `json:"blurb"`
+	LastPublished sql.NullTime `json:"last_published"`
+	CreatedAt     time.Time    `json:"created_at"`
+	UpdatedAt     time.Time    `json:"updated_at"`
+	PublishedAt   time.Time    `json:"published_at"`
+}
+
+func (q *Queries) ListPages(ctx context.Context, arg ListPagesParams) ([]ListPagesRow, error) {
+	rows, err := q.db.QueryContext(ctx, listPages, arg.Path, arg.Limit, arg.Offset)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []ListPagesRow
+	for rows.Next() {
+		var i ListPagesRow
+		if err := rows.Scan(
+			&i.ID,
+			&i.Path,
+			&i.InternalID,
+			&i.Title,
+			&i.Description,
+			&i.Blurb,
+			&i.LastPublished,
+			&i.CreatedAt,
+			&i.UpdatedAt,
+			&i.PublishedAt,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
 }
 
 const popScheduledPages = `-- name: PopScheduledPages :many
