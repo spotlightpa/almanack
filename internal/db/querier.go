@@ -31,6 +31,7 @@ type Querier interface {
 	ListFiles(ctx context.Context, arg ListFilesParams) ([]File, error)
 	ListImages(ctx context.Context, arg ListImagesParams) ([]Image, error)
 	ListNewsletters(ctx context.Context, arg ListNewslettersParams) ([]Newsletter, error)
+	ListPages(ctx context.Context, arg ListPagesParams) ([]ListPagesRow, error)
 	ListSpotlightPAArticles(ctx context.Context) ([]ListSpotlightPAArticlesRow, error)
 	ListUnpublishedNewsletters(ctx context.Context, arg ListUnpublishedNewslettersParams) ([]Newsletter, error)
 	ListUpcoming(ctx context.Context) ([]Article, error)

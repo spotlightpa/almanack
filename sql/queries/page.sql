@@ -51,3 +51,26 @@ WHERE
   AND schedule_for < (CURRENT_TIMESTAMP + '5 minutes'::interval)
 RETURNING
   *;
+
+-- name: ListPages :many
+SELECT
+  "id",
+  "path",
+  (frontmatter ->> 'internal-id')::text AS "internal_id",
+  (frontmatter ->> 'title')::text AS "title",
+  (frontmatter ->> 'description')::text AS "description",
+  (frontmatter ->> 'blurb')::text AS "blurb",
+  "last_published",
+  "created_at",
+  "updated_at",
+  to_timestamp(frontmatter ->> 'published',
+    -- ISO date
+    'YYYY-MM-DD"T"HH24:MI:SS"Z"')::timestamptz AS "published_at"
+FROM
+  page
+WHERE
+  "path" ILIKE $1
+ORDER BY
+  last_published DESC,
+  created_at DESC
+LIMIT $2 OFFSET $3;
