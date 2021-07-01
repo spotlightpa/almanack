@@ -11,6 +11,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/carlmjohnson/errutil"
 	"github.com/carlmjohnson/requests"
 	"github.com/carlmjohnson/resperr"
 	"github.com/getsentry/sentry-go"
@@ -43,12 +44,13 @@ func (app *appEnv) replyErr(w http.ResponseWriter, r *http.Request, err error) {
 
 func (app *appEnv) logErr(ctx context.Context, err error) {
 	if hub := sentry.GetHubFromContext(ctx); hub != nil {
-		hub.CaptureException(err)
+		for _, suberr := range errutil.AsSlice(err) {
+			hub.CaptureException(suberr)
+		}
 	} else {
 		app.Printf("sentry not in context")
 	}
-
-	app.Printf("err: %v", err)
+	app.Printf("err: %+v", err)
 }
 
 func (app *appEnv) tryReadJSON(w http.ResponseWriter, r *http.Request, dst interface{}) error {

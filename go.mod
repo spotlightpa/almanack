@@ -9,7 +9,7 @@ require (
 	github.com/aws/aws-sdk-go v1.37.33
 	github.com/carlmjohnson/crockford v0.21.3
 	github.com/carlmjohnson/emailx v0.20.2
-	github.com/carlmjohnson/errutil v0.21.1
+	github.com/carlmjohnson/errutil v0.21.2
 	github.com/carlmjohnson/exitcode v0.20.2
 	github.com/carlmjohnson/flagext v0.21.0
 	github.com/carlmjohnson/gateway v1.20.7
