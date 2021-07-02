@@ -33,10 +33,11 @@ type Querier interface {
 	ListNewsletters(ctx context.Context, arg ListNewslettersParams) ([]Newsletter, error)
 	ListPages(ctx context.Context, arg ListPagesParams) ([]ListPagesRow, error)
 	ListSpotlightPAArticles(ctx context.Context) ([]ListSpotlightPAArticlesRow, error)
-	ListUnpublishedNewsletters(ctx context.Context, arg ListUnpublishedNewslettersParams) ([]Newsletter, error)
+	ListNewslettersWithoutPage(ctx context.Context, arg ListNewslettersWithoutPageParams) ([]Newsletter, error)
 	ListUpcoming(ctx context.Context) ([]Article, error)
 	PopScheduled(ctx context.Context) ([]Article, error)
 	PopScheduledPages(ctx context.Context) ([]Page, error)
+	SetNewsletterPage(ctx context.Context, arg SetNewsletterPageParams) (Newsletter, error)
 	SetRolesForAddress(ctx context.Context, arg SetRolesForAddressParams) (AddressRole, error)
 	SetRolesForDomain(ctx context.Context, arg SetRolesForDomainParams) (DomainRole, error)
 	SetSiteData(ctx context.Context, arg SetSiteDataParams) error
@@ -44,7 +45,6 @@ type Querier interface {
 	UpdateArcArticles(ctx context.Context, arcItems json.RawMessage) error
 	UpdateFile(ctx context.Context, arg UpdateFileParams) (File, error)
 	UpdateImage(ctx context.Context, arg UpdateImageParams) (Image, error)
-	UpdateNewsletter(ctx context.Context, arg UpdateNewsletterParams) (Newsletter, error)
 	UpdateNewsletterArchives(ctx context.Context, arg UpdateNewsletterArchivesParams) (int64, error)
 	UpdatePage(ctx context.Context, arg UpdatePageParams) (Page, error)
 	UpdateSpotlightPAArticle(ctx context.Context, arg UpdateSpotlightPAArticleParams) (sql.NullTime, error)

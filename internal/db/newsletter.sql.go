@@ -61,7 +61,7 @@ func (q *Queries) ListNewsletters(ctx context.Context, arg ListNewslettersParams
 	return items, nil
 }
 
-const listUnpublishedNewsletters = `-- name: ListUnpublishedNewsletters :many
+const listNewslettersWithoutPage = `-- name: ListNewslettersWithoutPage :many
 SELECT
   subject, archive_url, published_at, type, created_at, updated_at, id, description, blurb, spotlightpa_path
 FROM
@@ -73,13 +73,13 @@ ORDER BY
 LIMIT $1 OFFSET $2
 `
 
-type ListUnpublishedNewslettersParams struct {
+type ListNewslettersWithoutPageParams struct {
 	Limit  int32 `json:"limit"`
 	Offset int32 `json:"offset"`
 }
 
-func (q *Queries) ListUnpublishedNewsletters(ctx context.Context, arg ListUnpublishedNewslettersParams) ([]Newsletter, error) {
-	rows, err := q.db.QueryContext(ctx, listUnpublishedNewsletters, arg.Limit, arg.Offset)
+func (q *Queries) ListNewslettersWithoutPage(ctx context.Context, arg ListNewslettersWithoutPageParams) ([]Newsletter, error) {
+	rows, err := q.db.QueryContext(ctx, listNewslettersWithoutPage, arg.Limit, arg.Offset)
 	if err != nil {
 		return nil, err
 	}
@@ -112,7 +112,7 @@ func (q *Queries) ListUnpublishedNewsletters(ctx context.Context, arg ListUnpubl
 	return items, nil
 }
 
-const updateNewsletter = `-- name: UpdateNewsletter :one
+const setNewsletterPage = `-- name: SetNewsletterPage :one
 UPDATE
   newsletter
 SET
@@ -123,13 +123,13 @@ RETURNING
   subject, archive_url, published_at, type, created_at, updated_at, id, description, blurb, spotlightpa_path
 `
 
-type UpdateNewsletterParams struct {
+type SetNewsletterPageParams struct {
 	ID              int64          `json:"id"`
 	SpotlightPAPath sql.NullString `json:"spotlightpa_path"`
 }
 
-func (q *Queries) UpdateNewsletter(ctx context.Context, arg UpdateNewsletterParams) (Newsletter, error) {
-	row := q.db.QueryRowContext(ctx, updateNewsletter, arg.ID, arg.SpotlightPAPath)
+func (q *Queries) SetNewsletterPage(ctx context.Context, arg SetNewsletterPageParams) (Newsletter, error) {
+	row := q.db.QueryRowContext(ctx, setNewsletterPage, arg.ID, arg.SpotlightPAPath)
 	var i Newsletter
 	err := row.Scan(
 		&i.Subject,

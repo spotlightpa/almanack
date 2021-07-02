@@ -39,7 +39,7 @@ ORDER BY
   published_at DESC
 LIMIT $2 OFFSET $3;
 
--- name: ListUnpublishedNewsletters :many
+-- name: ListNewslettersWithoutPage :many
 SELECT
   *
 FROM
@@ -50,7 +50,7 @@ ORDER BY
   published_at DESC
 LIMIT $1 OFFSET $2;
 
--- name: UpdateNewsletter :one
+-- name: SetNewsletterPage :one
 UPDATE
   newsletter
 SET
