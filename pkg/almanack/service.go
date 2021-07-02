@@ -427,7 +427,7 @@ func (svc Service) UpdateMostPopular(ctx context.Context) error {
 func (svc Service) ImportNewsletterPages(ctx context.Context) (err error) {
 	defer errutil.Prefix(&err, "problem importing newsletter pages")
 
-	nls, err := svc.Querier.ListUnpublishedNewsletters(ctx, db.ListUnpublishedNewslettersParams{
+	nls, err := svc.Querier.ListNewslettersWithoutPage(ctx, db.ListNewslettersWithoutPageParams{
 		Offset: 0,
 		Limit:  10,
 	})
@@ -509,7 +509,7 @@ func (svc Service) SaveNewsletterPage(ctx context.Context, nl *db.Newsletter, bo
 			return err
 		}
 
-		if nl2, err := svc.Querier.UpdateNewsletter(ctx, db.UpdateNewsletterParams{
+		if nl2, err := svc.Querier.SetNewsletterPage(ctx, db.SetNewsletterPageParams{
 			ID:              nl.ID,
 			SpotlightPAPath: nl.SpotlightPAPath,
 		}); err != nil {
