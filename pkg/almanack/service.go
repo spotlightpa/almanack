@@ -478,7 +478,7 @@ func (svc Service) SaveNewsletterPage(ctx context.Context, nl *db.Newsletter, bo
 				"blurb":             nl.Blurb,
 				"byline":            "",
 				"description":       nl.Description,
-				"draft":             true,
+				"draft":             false,
 				"extended-kicker":   "",
 				"image":             "",
 				"image-caption":     "",
