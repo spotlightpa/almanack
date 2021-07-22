@@ -43,7 +43,7 @@ func makeImageName(ct string) string {
 	sb.Write(buf[:4])
 	sb.WriteByte('-')
 	sb.Write(buf[4:])
-	sb.WriteString(".")
+	sb.WriteByte('.')
 	sb.WriteString(ext)
 	return sb.String()
 }
