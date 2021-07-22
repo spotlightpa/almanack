@@ -3,6 +3,7 @@ package db
 import (
 	"fmt"
 	"strings"
+	"time"
 
 	"github.com/BurntSushi/toml"
 	"github.com/carlmjohnson/errutil"
@@ -12,7 +13,21 @@ func (page *Page) ToTOML() (string, error) {
 	var buf strings.Builder
 	buf.WriteString("+++\n")
 	enc := toml.NewEncoder(&buf)
-	if err := enc.Encode(page.Frontmatter); err != nil {
+	// Remove blank values
+	frontmatter := Map{}
+	for key, val := range page.Frontmatter {
+		if val == nil {
+			continue
+		}
+		if s, ok := val.(string); ok && s == "" {
+			continue
+		}
+		if t, ok := val.(time.Time); ok && t.IsZero() {
+			continue
+		}
+		frontmatter[key] = val
+	}
+	if err := enc.Encode(frontmatter); err != nil {
 		return "", err
 	}
 	buf.WriteString("+++\n\n")
