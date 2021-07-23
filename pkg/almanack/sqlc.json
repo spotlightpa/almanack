@@ -15,7 +15,8 @@
 		"spotlightpa_data": "SpotlightPAData",
 		"spotlightpa_path": "SpotlightPAPath",
 		"src_url": "SourceURL",
-		"url": "URL"
+		"url": "URL",
+		"url_path": "URLPath"
 	},
 	"overrides": [
 		{

@@ -2,6 +2,7 @@ package db
 
 import (
 	"fmt"
+	"path"
 	"strings"
 	"time"
 
@@ -62,4 +63,26 @@ func (page *Page) FromTOML(content string) (err error) {
 	body = strings.TrimSuffix(body, "\n")
 	page.Body = body
 	return nil
+}
+
+func (page *Page) SetURLPath() {
+	if page.URLPath.Valid && page.URLPath.String != "" {
+		return
+	}
+	if u, _ := page.Frontmatter["url"].(string); u != "" {
+		page.URLPath.String = u
+		page.URLPath.Valid = true
+		return
+	}
+	upath := page.FilePath
+	upath = strings.TrimPrefix(upath, "content")
+	upath = strings.TrimSuffix(upath, ".md")
+	if slug, _ := page.Frontmatter["slug"].(string); slug != "" {
+		upath = path.Join(path.Dir(upath), slug)
+	}
+	if upath != "" {
+		upath += "/"
+	}
+	page.URLPath.String = upath
+	page.URLPath.Valid = upath != ""
 }

@@ -10,38 +10,39 @@ import (
 )
 
 const ensurePage = `-- name: EnsurePage :exec
-INSERT INTO page ("path")
+INSERT INTO page ("file_path")
   VALUES ($1)
-ON CONFLICT (path)
+ON CONFLICT (file_path)
   DO NOTHING
 `
 
-func (q *Queries) EnsurePage(ctx context.Context, path string) error {
-	_, err := q.db.ExecContext(ctx, ensurePage, path)
+func (q *Queries) EnsurePage(ctx context.Context, filePath string) error {
+	_, err := q.db.ExecContext(ctx, ensurePage, filePath)
 	return err
 }
 
 const getPage = `-- name: GetPage :one
 SELECT
-  id, path, frontmatter, body, schedule_for, last_published, created_at, updated_at
+  id, file_path, frontmatter, body, schedule_for, last_published, created_at, updated_at, url_path
 FROM
   "page"
 WHERE
-  path = $1
+  file_path = $1
 `
 
-func (q *Queries) GetPage(ctx context.Context, path string) (Page, error) {
-	row := q.db.QueryRowContext(ctx, getPage, path)
+func (q *Queries) GetPage(ctx context.Context, filePath string) (Page, error) {
+	row := q.db.QueryRowContext(ctx, getPage, filePath)
 	var i Page
 	err := row.Scan(
 		&i.ID,
-		&i.Path,
+		&i.FilePath,
 		&i.Frontmatter,
 		&i.Body,
 		&i.ScheduleFor,
 		&i.LastPublished,
 		&i.CreatedAt,
 		&i.UpdatedAt,
+		&i.URLPath,
 	)
 	return i, err
 }
@@ -49,7 +50,7 @@ func (q *Queries) GetPage(ctx context.Context, path string) (Page, error) {
 const listPages = `-- name: ListPages :many
 SELECT
   "id",
-  "path",
+  "file_path",
   (frontmatter ->> 'internal-id')::text AS "internal_id",
   (frontmatter ->> 'title')::text AS "title",
   (frontmatter ->> 'description')::text AS "description",
@@ -63,22 +64,21 @@ SELECT
 FROM
   page
 WHERE
-  "path" ILIKE $1
+  "file_path" ILIKE $1
 ORDER BY
-  last_published DESC,
-  created_at DESC
+  published_at DESC
 LIMIT $2 OFFSET $3
 `
 
 type ListPagesParams struct {
-	Path   string `json:"path"`
-	Limit  int32  `json:"limit"`
-	Offset int32  `json:"offset"`
+	FilePath string `json:"file_path"`
+	Limit    int32  `json:"limit"`
+	Offset   int32  `json:"offset"`
 }
 
 type ListPagesRow struct {
 	ID            int64        `json:"id"`
-	Path          string       `json:"path"`
+	FilePath      string       `json:"file_path"`
 	InternalID    string       `json:"internal_id"`
 	Title         string       `json:"title"`
 	Description   string       `json:"description"`
@@ -90,7 +90,7 @@ type ListPagesRow struct {
 }
 
 func (q *Queries) ListPages(ctx context.Context, arg ListPagesParams) ([]ListPagesRow, error) {
-	rows, err := q.db.QueryContext(ctx, listPages, arg.Path, arg.Limit, arg.Offset)
+	rows, err := q.db.QueryContext(ctx, listPages, arg.FilePath, arg.Limit, arg.Offset)
 	if err != nil {
 		return nil, err
 	}
@@ -100,7 +100,7 @@ func (q *Queries) ListPages(ctx context.Context, arg ListPagesParams) ([]ListPag
 		var i ListPagesRow
 		if err := rows.Scan(
 			&i.ID,
-			&i.Path,
+			&i.FilePath,
 			&i.InternalID,
 			&i.Title,
 			&i.Description,
@@ -132,7 +132,7 @@ WHERE
   last_published IS NULL
   AND schedule_for < (CURRENT_TIMESTAMP + '5 minutes'::interval)
 RETURNING
-  id, path, frontmatter, body, schedule_for, last_published, created_at, updated_at
+  id, file_path, frontmatter, body, schedule_for, last_published, created_at, updated_at, url_path
 `
 
 func (q *Queries) PopScheduledPages(ctx context.Context) ([]Page, error) {
@@ -146,13 +146,14 @@ func (q *Queries) PopScheduledPages(ctx context.Context) ([]Page, error) {
 		var i Page
 		if err := rows.Scan(
 			&i.ID,
-			&i.Path,
+			&i.FilePath,
 			&i.Frontmatter,
 			&i.Body,
 			&i.ScheduleFor,
 			&i.LastPublished,
 			&i.CreatedAt,
 			&i.UpdatedAt,
+			&i.URLPath,
 		); err != nil {
 			return nil, err
 		}
@@ -186,15 +187,20 @@ SET
   ELSE
     schedule_for
   END,
-  last_published = CASE WHEN $7::boolean THEN
+  url_path = CASE WHEN $7::text != '' THEN
+    $7
+  ELSE
+    url_path
+  END,
+  last_published = CASE WHEN $8::boolean THEN
     CURRENT_TIMESTAMP
   ELSE
     last_published
   END
 WHERE
-  path = $8
+  file_path = $9
 RETURNING
-  id, path, frontmatter, body, schedule_for, last_published, created_at, updated_at
+  id, file_path, frontmatter, body, schedule_for, last_published, created_at, updated_at, url_path
 `
 
 type UpdatePageParams struct {
@@ -204,8 +210,9 @@ type UpdatePageParams struct {
 	Body             string       `json:"body"`
 	SetScheduleFor   bool         `json:"set_schedule_for"`
 	ScheduleFor      sql.NullTime `json:"schedule_for"`
+	URLPath          string       `json:"url_path"`
 	SetLastPublished bool         `json:"set_last_published"`
-	Path             string       `json:"path"`
+	FilePath         string       `json:"file_path"`
 }
 
 func (q *Queries) UpdatePage(ctx context.Context, arg UpdatePageParams) (Page, error) {
@@ -216,19 +223,21 @@ func (q *Queries) UpdatePage(ctx context.Context, arg UpdatePageParams) (Page, e
 		arg.Body,
 		arg.SetScheduleFor,
 		arg.ScheduleFor,
+		arg.URLPath,
 		arg.SetLastPublished,
-		arg.Path,
+		arg.FilePath,
 	)
 	var i Page
 	err := row.Scan(
 		&i.ID,
-		&i.Path,
+		&i.FilePath,
 		&i.Frontmatter,
 		&i.Body,
 		&i.ScheduleFor,
 		&i.LastPublished,
 		&i.CreatedAt,
 		&i.UpdatedAt,
+		&i.URLPath,
 	)
 	return i, err
 }

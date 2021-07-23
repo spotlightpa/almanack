@@ -1,7 +1,7 @@
 -- name: EnsurePage :exec
-INSERT INTO page ("path")
-  VALUES (@path)
-ON CONFLICT (path)
+INSERT INTO page ("file_path")
+  VALUES (@file_path)
+ON CONFLICT (file_path)
   DO NOTHING;
 
 -- name: UpdatePage :one
@@ -23,13 +23,18 @@ SET
   ELSE
     schedule_for
   END,
+  url_path = CASE WHEN @url_path::text != '' THEN
+    @url_path
+  ELSE
+    url_path
+  END,
   last_published = CASE WHEN @set_last_published::boolean THEN
     CURRENT_TIMESTAMP
   ELSE
     last_published
   END
 WHERE
-  path = @path
+  file_path = @file_path
 RETURNING
   *;
 
@@ -39,7 +44,7 @@ SELECT
 FROM
   "page"
 WHERE
-  path = $1;
+  file_path = $1;
 
 -- name: PopScheduledPages :many
 UPDATE
@@ -55,7 +60,7 @@ RETURNING
 -- name: ListPages :many
 SELECT
   "id",
-  "path",
+  "file_path",
   (frontmatter ->> 'internal-id')::text AS "internal_id",
   (frontmatter ->> 'title')::text AS "title",
   (frontmatter ->> 'description')::text AS "description",
@@ -69,8 +74,7 @@ SELECT
 FROM
   page
 WHERE
-  "path" ILIKE $1
+  "file_path" ILIKE $1
 ORDER BY
-  last_published DESC,
-  created_at DESC
+  published_at DESC
 LIMIT $2 OFFSET $3;

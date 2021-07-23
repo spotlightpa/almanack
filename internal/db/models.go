@@ -92,14 +92,15 @@ type NewsletterType struct {
 }
 
 type Page struct {
-	ID            int64        `json:"id"`
-	Path          string       `json:"path"`
-	Frontmatter   Map          `json:"frontmatter"`
-	Body          string       `json:"body"`
-	ScheduleFor   sql.NullTime `json:"schedule_for"`
-	LastPublished sql.NullTime `json:"last_published"`
-	CreatedAt     time.Time    `json:"created_at"`
-	UpdatedAt     time.Time    `json:"updated_at"`
+	ID            int64          `json:"id"`
+	FilePath      string         `json:"file_path"`
+	Frontmatter   Map            `json:"frontmatter"`
+	Body          string         `json:"body"`
+	ScheduleFor   sql.NullTime   `json:"schedule_for"`
+	LastPublished sql.NullTime   `json:"last_published"`
+	CreatedAt     time.Time      `json:"created_at"`
+	UpdatedAt     time.Time      `json:"updated_at"`
+	URLPath       sql.NullString `json:"url_path"`
 }
 
 type SiteDatum struct {

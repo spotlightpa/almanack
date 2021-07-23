@@ -502,9 +502,9 @@ func (svc Service) SaveNewsletterPage(ctx context.Context, nl *db.Newsletter, bo
 				"topics":      []string{},
 				"url":         "",
 			},
-			SetBody: true,
-			Body:    "",
-			Path:    path,
+			SetBody:  true,
+			Body:     "",
+			FilePath: path,
 		}); err != nil {
 			return err
 		}
@@ -522,18 +522,19 @@ func (svc Service) SaveNewsletterPage(ctx context.Context, nl *db.Newsletter, bo
 }
 
 func (svc Service) PublishPage(ctx context.Context, page *db.Page) error {
+	page.SetURLPath()
 	data, err := page.ToTOML()
 	if err != nil {
 		return err
 	}
 
-	msg := fmt.Sprintf("Content: publishing %q", page.Path)
-	if err = svc.ContentStore.UpdateFile(ctx, msg, page.Path, []byte(data)); err != nil {
+	msg := fmt.Sprintf("Content: publishing %q", page.FilePath)
+	if err = svc.ContentStore.UpdateFile(ctx, msg, page.FilePath, []byte(data)); err != nil {
 		return err
 	}
-
 	p2, err := svc.Querier.UpdatePage(ctx, db.UpdatePageParams{
-		Path:             page.Path,
+		FilePath:         page.FilePath,
+		URLPath:          page.URLPath.String,
 		SetLastPublished: true,
 		SetFrontmatter:   false,
 		SetBody:          false,
@@ -552,7 +553,7 @@ func (svc Service) RefreshPageFromContentStore(ctx context.Context, page *db.Pag
 	if !page.LastPublished.Valid {
 		return
 	}
-	content, err := svc.ContentStore.GetFile(ctx, page.Path)
+	content, err := svc.ContentStore.GetFile(ctx, page.FilePath)
 	if err != nil {
 		return err
 	}
