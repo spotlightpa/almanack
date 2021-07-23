@@ -20,7 +20,7 @@ func (app *appEnv) userInfo(w http.ResponseWriter, r *http.Request) {
 }
 
 func (app *appEnv) listAvailableArcStories(w http.ResponseWriter, r *http.Request) {
-	page, err := app.getPage(r, "listAvailableArcStories")
+	page, err := app.getRequestPage(r, "listAvailableArcStories")
 	if err != nil {
 		app.replyErr(w, r, err)
 		return

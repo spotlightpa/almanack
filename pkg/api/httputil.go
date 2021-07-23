@@ -165,7 +165,7 @@ func (app *appEnv) maxSizeMiddleware(next http.Handler) http.Handler {
 	})
 }
 
-func (app *appEnv) getPage(r *http.Request, route string) (page int, err error) {
+func (app *appEnv) getRequestPage(r *http.Request, route string) (page int, err error) {
 	if pageStr := chi.URLParam(r, "page"); pageStr != "" {
 		if page, err = strconv.Atoi(pageStr); err != nil {
 			err = resperr.New(http.StatusBadRequest,
