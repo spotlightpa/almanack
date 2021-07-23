@@ -38,13 +38,21 @@ WHERE
 RETURNING
   *;
 
--- name: GetPage :one
+-- name: GetPageByPath :one
 SELECT
   *
 FROM
   "page"
 WHERE
   file_path = $1;
+
+-- name: GetPageByID :one
+SELECT
+  *
+FROM
+  "page"
+WHERE
+  id = $1;
 
 -- name: PopScheduledPages :many
 UPDATE
@@ -65,6 +73,7 @@ SELECT
   (frontmatter ->> 'title')::text AS "title",
   (frontmatter ->> 'description')::text AS "description",
   (frontmatter ->> 'blurb')::text AS "blurb",
+  coalesce("url_path", ''),
   "last_published",
   "created_at",
   "updated_at",

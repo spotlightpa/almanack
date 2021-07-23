@@ -21,7 +21,33 @@ func (q *Queries) EnsurePage(ctx context.Context, filePath string) error {
 	return err
 }
 
-const getPage = `-- name: GetPage :one
+const getPageByID = `-- name: GetPageByID :one
+SELECT
+  id, file_path, frontmatter, body, schedule_for, last_published, created_at, updated_at, url_path
+FROM
+  "page"
+WHERE
+  id = $1
+`
+
+func (q *Queries) GetPageByID(ctx context.Context, id int64) (Page, error) {
+	row := q.db.QueryRowContext(ctx, getPageByID, id)
+	var i Page
+	err := row.Scan(
+		&i.ID,
+		&i.FilePath,
+		&i.Frontmatter,
+		&i.Body,
+		&i.ScheduleFor,
+		&i.LastPublished,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+		&i.URLPath,
+	)
+	return i, err
+}
+
+const getPageByPath = `-- name: GetPageByPath :one
 SELECT
   id, file_path, frontmatter, body, schedule_for, last_published, created_at, updated_at, url_path
 FROM
@@ -30,8 +56,8 @@ WHERE
   file_path = $1
 `
 
-func (q *Queries) GetPage(ctx context.Context, filePath string) (Page, error) {
-	row := q.db.QueryRowContext(ctx, getPage, filePath)
+func (q *Queries) GetPageByPath(ctx context.Context, filePath string) (Page, error) {
+	row := q.db.QueryRowContext(ctx, getPageByPath, filePath)
 	var i Page
 	err := row.Scan(
 		&i.ID,
@@ -55,6 +81,7 @@ SELECT
   (frontmatter ->> 'title')::text AS "title",
   (frontmatter ->> 'description')::text AS "description",
   (frontmatter ->> 'blurb')::text AS "blurb",
+  coalesce("url_path", ''),
   "last_published",
   "created_at",
   "updated_at",
@@ -83,6 +110,7 @@ type ListPagesRow struct {
 	Title         string       `json:"title"`
 	Description   string       `json:"description"`
 	Blurb         string       `json:"blurb"`
+	URLPath       string       `json:"url_path"`
 	LastPublished sql.NullTime `json:"last_published"`
 	CreatedAt     time.Time    `json:"created_at"`
 	UpdatedAt     time.Time    `json:"updated_at"`
@@ -105,6 +133,7 @@ func (q *Queries) ListPages(ctx context.Context, arg ListPagesParams) ([]ListPag
 			&i.Title,
 			&i.Description,
 			&i.Blurb,
+			&i.URLPath,
 			&i.LastPublished,
 			&i.CreatedAt,
 			&i.UpdatedAt,

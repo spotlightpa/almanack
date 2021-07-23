@@ -3,8 +3,11 @@ package api
 import (
 	"fmt"
 	"net/http"
+	"strconv"
+	"time"
 
 	"github.com/carlmjohnson/emailx"
+	"github.com/carlmjohnson/errutil"
 	"github.com/carlmjohnson/resperr"
 	"github.com/go-chi/chi"
 	"github.com/spotlightpa/almanack/internal/db"
@@ -589,4 +592,55 @@ func (app *appEnv) listNewsletterPages(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	app.replyJSON(http.StatusOK, w, &resp)
+}
+
+func (app *appEnv) getNewsletterPage(w http.ResponseWriter, r *http.Request) {
+	var (
+		id  int64
+		err error
+	)
+	if idStr := chi.URLParam(r, "id"); idStr != "" {
+		if id, err = strconv.ParseInt(idStr, 10, 64); err != nil {
+			app.replyErr(w, r, resperr.New(
+				http.StatusBadRequest, "bad argument to getNewsletterPage: %w", err))
+			return
+		}
+	}
+
+	app.Printf("start getNewsletterPage page %d", id)
+	page, err := app.svc.Queries.GetPageByID(r.Context(), id)
+	if err != nil {
+		if db.IsNotFound(err) {
+			err = resperr.New(http.StatusNotFound, "page ID not found: %d", id)
+		}
+		app.replyErr(w, r, err)
+		return
+	}
+	app.replyJSON(http.StatusOK, w, page)
+}
+
+func (app *appEnv) postNewsletterPage(w http.ResponseWriter, r *http.Request) {
+	app.Printf("start postNewsletterPage")
+
+	var userUpdate db.UpdatePageParams
+	if !app.readJSON(w, r, &userUpdate) {
+		return
+	}
+
+	res, err := app.svc.Queries.UpdatePage(r.Context(), userUpdate)
+	if err != nil {
+		errutil.Prefix(&err, "postNewsletterPage update problem")
+		app.replyErr(w, r, err)
+		return
+	}
+	if userUpdate.SetScheduleFor &&
+		userUpdate.ScheduleFor.Valid &&
+		userUpdate.ScheduleFor.Time.Before(time.Now()) {
+		if err = app.svc.PublishPage(r.Context(), &res); err != nil {
+			errutil.Prefix(&err, "postNewsletterPage publish problem")
+			app.replyErr(w, r, err)
+			return
+		}
+	}
+	app.replyJSON(http.StatusOK, w, &res)
 }
