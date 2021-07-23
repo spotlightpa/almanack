@@ -1,6 +1,7 @@
 package db_test
 
 import (
+	"database/sql"
 	"fmt"
 	"os"
 	"testing"
@@ -71,6 +72,61 @@ func TestFromToTOML(t *testing.T) {
 			if toml != string(b) {
 				os.WriteFile("testdata/bad-"+name, []byte(toml), 0644)
 				t.Errorf("%q did not round trip", name)
+			}
+		})
+	}
+}
+
+func TestSetURLPath(t *testing.T) {
+	cases := map[string]struct {
+		db.Page
+		string
+	}{
+		"blank": {
+			db.Page{}, "",
+		},
+		"no-slug": {
+			db.Page{FilePath: "content/abc/123.md"}, "/abc/123/",
+		},
+		"already-set": {
+			db.Page{
+				FilePath: "content/abc/123.md",
+				URLPath: sql.NullString{
+					Valid:  true,
+					String: "/xyz/345/",
+				},
+			},
+			"/xyz/345/",
+		},
+		"from-slug": {
+			db.Page{
+				FilePath: "content/abc/123.md",
+				Frontmatter: db.Map{
+					"slug": "567",
+				},
+			},
+			"/abc/567/",
+		},
+		"from-url": {
+			db.Page{
+				FilePath: "content/abc/123.md",
+				Frontmatter: db.Map{
+					"slug": "567",
+					"url":  "/hello-world",
+				},
+			},
+			"/hello-world",
+		},
+	}
+	for name, tc := range cases {
+		t.Run(name, func(t *testing.T) {
+			tc.Page.SetURLPath()
+			if tc.Page.URLPath.Valid != (tc.Page.URLPath.String != "") {
+				t.Fatalf("bad validity")
+			}
+
+			if tc.Page.URLPath.String != tc.string {
+				t.Fatalf("got %v", tc.Page.URLPath)
 			}
 		})
 	}

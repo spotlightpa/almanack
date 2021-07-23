@@ -25,7 +25,7 @@ func TestMap(t *testing.T) {
 	check(t, err, "creation not idempotent")
 	p1, err := q.GetPage(ctx, testpath)
 	check(t, err, "could not get page")
-	eq(t, testpath, p1.Path)
+	eq(t, testpath, p1.FilePath)
 	p2, err := q.UpdatePage(ctx, db.UpdatePageParams{
 		SetFrontmatter: true,
 		Frontmatter: db.Map{
@@ -33,17 +33,17 @@ func TestMap(t *testing.T) {
 			"bool":   true,
 			"number": 1,
 		},
-		SetBody: true,
-		Body:    "hello",
-		Path:    testpath,
+		SetBody:  true,
+		Body:     "hello",
+		FilePath: testpath,
 	})
 	check(t, err, "could not update page")
-	eq(t, testpath, p2.Path)
+	eq(t, testpath, p2.FilePath)
 	eq(t, "hello", p2.Body)
 	eq(t, "map[bool:true hello:world number:1]", fmt.Sprint(p2.Frontmatter))
 	p3, err := q.GetPage(ctx, testpath)
 	check(t, err, "could not get page")
-	eq(t, testpath, p3.Path)
+	eq(t, testpath, p3.FilePath)
 	eq(t, "hello", p3.Body)
 	eq(t, "map[bool:true hello:world number:1]", fmt.Sprint(p3.Frontmatter))
 }

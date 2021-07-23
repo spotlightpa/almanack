@@ -575,9 +575,9 @@ func (app *appEnv) listNewsletterPages(w http.ResponseWriter, r *http.Request) {
 	offset := int32(page) * limit
 
 	resp.Pages, err = app.svc.Querier.ListPages(r.Context(), db.ListPagesParams{
-		Path:   "content/newsletters/%",
-		Limit:  limit + 1,
-		Offset: offset,
+		FilePath: "content/newsletters/%",
+		Limit:    limit + 1,
+		Offset:   offset,
 	})
 	hasNext := len(resp.Pages) == limit+1
 	if hasNext {
