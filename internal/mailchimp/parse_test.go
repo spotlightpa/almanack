@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"io"
 	"net/http"
-	"os"
 	"strings"
 	"testing"
 
@@ -54,12 +53,6 @@ func TestSimpleParse(t *testing.T) {
 	assertContains(t, doc, "p2")
 	assertNotContains(t, doc, "p3")
 	assertNotContains(t, doc, "script")
-}
-
-func TestParse(t *testing.T) {
-	doc, err := parseResponse()
-	assertErrNil(t, err)
-	os.WriteFile("body.html", []byte(doc), os.ModePerm)
 }
 
 var globalDoc string
