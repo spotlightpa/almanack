@@ -15,7 +15,7 @@ import (
 )
 
 func (app *appEnv) listAllArcStories(w http.ResponseWriter, r *http.Request) {
-	page, err := app.getPage(r, "listAllArcStories")
+	page, err := app.getRequestPage(r, "listAllArcStories")
 	if err != nil {
 		app.replyErr(w, r, err)
 		return
@@ -562,7 +562,7 @@ func (app *appEnv) postFileUpdate(w http.ResponseWriter, r *http.Request) {
 }
 
 func (app *appEnv) listNewsletterPages(w http.ResponseWriter, r *http.Request) {
-	page, err := app.getPage(r, "listNewsletterPages")
+	page, err := app.getRequestPage(r, "listNewsletterPages")
 	if err != nil {
 		app.replyErr(w, r, err)
 		return
@@ -594,7 +594,7 @@ func (app *appEnv) listNewsletterPages(w http.ResponseWriter, r *http.Request) {
 	app.replyJSON(http.StatusOK, w, &resp)
 }
 
-func (app *appEnv) getNewsletterPage(w http.ResponseWriter, r *http.Request) {
+func (app *appEnv) getPage(w http.ResponseWriter, r *http.Request) {
 	var (
 		id  int64
 		err error
@@ -602,12 +602,12 @@ func (app *appEnv) getNewsletterPage(w http.ResponseWriter, r *http.Request) {
 	if idStr := chi.URLParam(r, "id"); idStr != "" {
 		if id, err = strconv.ParseInt(idStr, 10, 64); err != nil {
 			app.replyErr(w, r, resperr.New(
-				http.StatusBadRequest, "bad argument to getNewsletterPage: %w", err))
+				http.StatusBadRequest, "bad argument to getPage: %w", err))
 			return
 		}
 	}
 
-	app.Printf("start getNewsletterPage page %d", id)
+	app.Printf("start getPage for %d", id)
 	page, err := app.svc.Queries.GetPageByID(r.Context(), id)
 	if err != nil {
 		if db.IsNotFound(err) {
@@ -619,8 +619,8 @@ func (app *appEnv) getNewsletterPage(w http.ResponseWriter, r *http.Request) {
 	app.replyJSON(http.StatusOK, w, page)
 }
 
-func (app *appEnv) postNewsletterPage(w http.ResponseWriter, r *http.Request) {
-	app.Printf("start postNewsletterPage")
+func (app *appEnv) postPage(w http.ResponseWriter, r *http.Request) {
+	app.Printf("start postPage")
 
 	var userUpdate db.UpdatePageParams
 	if !app.readJSON(w, r, &userUpdate) {
@@ -629,7 +629,7 @@ func (app *appEnv) postNewsletterPage(w http.ResponseWriter, r *http.Request) {
 
 	res, err := app.svc.Queries.UpdatePage(r.Context(), userUpdate)
 	if err != nil {
-		errutil.Prefix(&err, "postNewsletterPage update problem")
+		errutil.Prefix(&err, "postPage update problem")
 		app.replyErr(w, r, err)
 		return
 	}
@@ -637,7 +637,7 @@ func (app *appEnv) postNewsletterPage(w http.ResponseWriter, r *http.Request) {
 		userUpdate.ScheduleFor.Valid &&
 		userUpdate.ScheduleFor.Time.Before(time.Now()) {
 		if err = app.svc.PublishPage(r.Context(), &res); err != nil {
-			errutil.Prefix(&err, "postNewsletterPage publish problem")
+			errutil.Prefix(&err, "postPage publish problem")
 			app.replyErr(w, r, err)
 			return
 		}
