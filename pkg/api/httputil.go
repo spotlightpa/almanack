@@ -25,7 +25,7 @@ func (app *appEnv) replyJSON(statusCode int, w http.ResponseWriter, data interfa
 	w.WriteHeader(statusCode)
 	enc := json.NewEncoder(w)
 	if err := enc.Encode(data); err != nil {
-		app.Printf("jsonResponse problem: %v", err)
+		app.Printf("replyJSON problem: %v", err)
 	}
 }
 
