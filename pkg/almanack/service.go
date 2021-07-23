@@ -61,7 +61,7 @@ func diffTime(old, new sql.NullTime) bool {
 type Service struct {
 	common.Logger
 	Client  *http.Client
-	Querier db.Querier
+	Queries *db.Queries
 	common.ContentStore
 	ImageStore  aws.BlobStore
 	FileStore   aws.BlobStore
@@ -73,7 +73,7 @@ type Service struct {
 
 func (svc Service) GetSpotlightPAArticle(ctx context.Context, dbID int32) (*SpotlightPAArticle, error) {
 	start := time.Now()
-	dart, err := svc.Querier.GetArticleByDBID(ctx, dbID)
+	dart, err := svc.Queries.GetArticleByDBID(ctx, dbID)
 	svc.Logger.Printf("queried GetArticleByDBID in %v", time.Since(start))
 	if err != nil {
 		return nil, db.ExpectNotFound(err)
@@ -87,7 +87,7 @@ func (svc Service) GetSpotlightPAArticle(ctx context.Context, dbID int32) (*Spot
 
 func (svc Service) GetScheduledArticle(ctx context.Context, articleID string) (*SpotlightPAArticle, error) {
 	start := time.Now()
-	dart, err := svc.Querier.GetArticle(ctx, nullString(articleID))
+	dart, err := svc.Queries.GetArticle(ctx, nullString(articleID))
 	svc.Logger.Printf("queried GetArticle in %v", time.Since(start))
 	if err != nil {
 		return nil, db.ExpectNotFound(err)
@@ -108,7 +108,7 @@ func (svc Service) GetScheduledArticle(ctx context.Context, articleID string) (*
 
 func (svc Service) ResetSpotlightPAArticleArcData(ctx context.Context, article *SpotlightPAArticle) error {
 	start := time.Now()
-	dart, err := svc.Querier.GetArticle(ctx, nullString(article.ArcID))
+	dart, err := svc.Queries.GetArticle(ctx, nullString(article.ArcID))
 	svc.Logger.Printf("queried GetArticle in %v", time.Since(start))
 	if err != nil {
 		return err
@@ -136,7 +136,7 @@ func (svc Service) SaveScheduledArticle(ctx context.Context, article *SpotlightP
 
 	start := time.Now()
 	var oldSchedule sql.NullTime
-	oldSchedule, err = svc.Querier.UpdateSpotlightPAArticle(ctx, db.UpdateSpotlightPAArticleParams{
+	oldSchedule, err = svc.Queries.UpdateSpotlightPAArticle(ctx, db.UpdateSpotlightPAArticleParams{
 		ArcID:           dart.ArcID,
 		SpotlightPAPath: dart.SpotlightPAPath,
 		SpotlightPAData: dart.SpotlightPAData,
@@ -155,7 +155,7 @@ func (svc Service) SaveScheduledArticle(ctx context.Context, article *SpotlightP
 	// Get the article so we can get fields not in the user article JSON
 	// like filepath
 	start = time.Now()
-	*dart, err = svc.Querier.GetArticle(ctx, dart.ArcID)
+	*dart, err = svc.Queries.GetArticle(ctx, dart.ArcID)
 	svc.Logger.Printf("queried GetArticle in %v", time.Since(start))
 	if err != nil {
 		return err
@@ -170,7 +170,7 @@ func (svc Service) SaveScheduledArticle(ctx context.Context, article *SpotlightP
 			return err
 		}
 		var oldTime sql.NullTime
-		oldTime, err = svc.Querier.UpdateSpotlightPAArticleLastPublished(ctx, article.ArcID)
+		oldTime, err = svc.Queries.UpdateSpotlightPAArticleLastPublished(ctx, article.ArcID)
 		if err != nil {
 			return err
 		}
@@ -191,7 +191,7 @@ func (svc Service) SaveScheduledArticle(ctx context.Context, article *SpotlightP
 
 func (svc Service) PopScheduledArticles(ctx context.Context) error {
 	start := time.Now()
-	poppedArts, err := svc.Querier.PopScheduled(ctx)
+	poppedArts, err := svc.Queries.PopScheduled(ctx)
 	svc.Logger.Printf("queried PopScheduled in %v", time.Since(start))
 	if err != nil {
 		return err
@@ -213,7 +213,7 @@ func (svc Service) PopScheduledArticles(ctx context.Context) error {
 
 func (svc Service) GetArcStory(ctx context.Context, articleID string) (story *ArcStory, err error) {
 	start := time.Now()
-	dart, err := svc.Querier.GetArticle(ctx, nullString(articleID))
+	dart, err := svc.Queries.GetArticle(ctx, nullString(articleID))
 	svc.Printf("GetArticle query time: %v", time.Since(start))
 	if err != nil {
 		err = db.ExpectNotFound(err)
@@ -234,7 +234,7 @@ func (svc Service) ListAvailableArcStories(ctx context.Context, page int) (stori
 
 	start := time.Now()
 	var dbArts []db.Article
-	dbArts, err = svc.Querier.ListAvailableArticles(ctx, db.ListAvailableArticlesParams{
+	dbArts, err = svc.Queries.ListAvailableArticles(ctx, db.ListAvailableArticlesParams{
 		Offset: offset,
 		Limit:  limit + 1,
 	})
@@ -263,7 +263,7 @@ func (svc Service) SaveAlmanackArticle(ctx context.Context, article *ArcStory, s
 		}
 	}
 	start := time.Now()
-	dart, err := svc.Querier.UpdateAlmanackArticle(ctx, db.UpdateAlmanackArticleParams{
+	dart, err := svc.Queries.UpdateAlmanackArticle(ctx, db.UpdateAlmanackArticleParams{
 		ArcID:      nullString(article.ID),
 		Status:     article.Status.dbstring(),
 		Note:       article.Note,
@@ -287,7 +287,7 @@ func (svc Service) StoreFeed(ctx context.Context, newfeed *ArcAPI) (err error) {
 		return err
 	}
 	start := time.Now()
-	err = svc.Querier.UpdateArcArticles(ctx, arcItems)
+	err = svc.Queries.UpdateArcArticles(ctx, arcItems)
 	svc.Printf("StoreFeed query time: %v", time.Since(start))
 	return err
 }
@@ -297,7 +297,7 @@ func (svc Service) ListAllArcStories(ctx context.Context, page int) (stories []A
 	offset := int32(page) * limit
 	start := time.Now()
 	var dbArts []db.Article
-	dbArts, err = svc.Querier.ListAllArcArticles(ctx, db.ListAllArcArticlesParams{
+	dbArts, err = svc.Queries.ListAllArcArticles(ctx, db.ListAllArcArticlesParams{
 		Limit:  limit + 1,
 		Offset: offset,
 	})
@@ -317,7 +317,7 @@ func (svc Service) ReplaceImageURL(ctx context.Context, srcURL, description, cre
 	if srcURL == "" {
 		return "", fmt.Errorf("no image provided")
 	}
-	image, err := svc.Querier.GetImageBySourceURL(ctx, srcURL)
+	image, err := svc.Queries.GetImageBySourceURL(ctx, srcURL)
 	if err != nil && !db.IsNotFound(err) {
 		return "", err
 	}
@@ -331,7 +331,7 @@ func (svc Service) ReplaceImageURL(ctx context.Context, srcURL, description, cre
 			"could not upload image %s: %w", srcURL, err,
 		)
 	}
-	_, err = svc.Querier.CreateImage(ctx, db.CreateImageParams{
+	_, err = svc.Queries.CreateImage(ctx, db.CreateImageParams{
 		Path:        path,
 		Type:        ext,
 		Description: description,
@@ -376,7 +376,7 @@ func (svc Service) UpdateNewsletterArchive(ctx context.Context, mcType, dbType, 
 	if err != nil {
 		return err
 	}
-	if n, err := svc.Querier.UpdateNewsletterArchives(ctx, db.UpdateNewsletterArchivesParams{
+	if n, err := svc.Queries.UpdateNewsletterArchives(ctx, db.UpdateNewsletterArchivesParams{
 		Type: dbType,
 		Data: data,
 	}); err != nil {
@@ -389,7 +389,7 @@ func (svc Service) UpdateNewsletterArchive(ctx context.Context, mcType, dbType, 
 		svc.Logger.Printf("%q got %d new items", mcType, n)
 	}
 	// get old items list from DB
-	items, err := svc.Querier.ListNewsletters(ctx, db.ListNewslettersParams{
+	items, err := svc.Queries.ListNewsletters(ctx, db.ListNewslettersParams{
 		Type:   dbType,
 		Limit:  100,
 		Offset: 0,
@@ -427,7 +427,7 @@ func (svc Service) UpdateMostPopular(ctx context.Context) error {
 func (svc Service) ImportNewsletterPages(ctx context.Context) (err error) {
 	defer errutil.Prefix(&err, "problem importing newsletter pages")
 
-	nls, err := svc.Querier.ListNewslettersWithoutPage(ctx, db.ListNewslettersWithoutPageParams{
+	nls, err := svc.Queries.ListNewslettersWithoutPage(ctx, db.ListNewslettersWithoutPageParams{
 		Offset: 0,
 		Limit:  10,
 	})
@@ -467,10 +467,10 @@ func (svc Service) SaveNewsletterPage(ctx context.Context, nl *db.Newsletter, bo
 	// create or update the page
 	if needsUpdate {
 		path := nl.SpotlightPAPath.String
-		if err := svc.Querier.EnsurePage(ctx, path); err != nil {
+		if err := svc.Queries.EnsurePage(ctx, path); err != nil {
 			return err
 		}
-		if _, err := svc.Querier.UpdatePage(ctx, db.UpdatePageParams{
+		if _, err := svc.Queries.UpdatePage(ctx, db.UpdatePageParams{
 			SetFrontmatter: true,
 			Frontmatter: map[string]interface{}{
 				"aliases":           []string{},
@@ -509,7 +509,7 @@ func (svc Service) SaveNewsletterPage(ctx context.Context, nl *db.Newsletter, bo
 			return err
 		}
 
-		if nl2, err := svc.Querier.SetNewsletterPage(ctx, db.SetNewsletterPageParams{
+		if nl2, err := svc.Queries.SetNewsletterPage(ctx, db.SetNewsletterPageParams{
 			ID:              nl.ID,
 			SpotlightPAPath: nl.SpotlightPAPath,
 		}); err != nil {
@@ -532,7 +532,7 @@ func (svc Service) PublishPage(ctx context.Context, page *db.Page) error {
 	if err = svc.ContentStore.UpdateFile(ctx, msg, page.FilePath, []byte(data)); err != nil {
 		return err
 	}
-	p2, err := svc.Querier.UpdatePage(ctx, db.UpdatePageParams{
+	p2, err := svc.Queries.UpdatePage(ctx, db.UpdatePageParams{
 		FilePath:         page.FilePath,
 		URLPath:          page.URLPath.String,
 		SetLastPublished: true,
@@ -564,7 +564,7 @@ func (svc Service) RefreshPageFromContentStore(ctx context.Context, page *db.Pag
 }
 
 func (svc Service) PopScheduledPages(ctx context.Context) error {
-	pages, err := svc.Querier.PopScheduledPages(ctx)
+	pages, err := svc.Queries.PopScheduledPages(ctx)
 	if err != nil {
 		return err
 	}

@@ -213,7 +213,7 @@ func (app *appEnv) postSignedUpload(w http.ResponseWriter, r *http.Request) {
 		app.replyErr(w, r, err)
 		return
 	}
-	if n, err := app.svc.Querier.CreateImagePlaceholder(r.Context(), db.CreateImagePlaceholderParams{
+	if n, err := app.svc.Queries.CreateImagePlaceholder(r.Context(), db.CreateImagePlaceholderParams{
 		Path: res.FileName,
 		Type: ext,
 	}); err != nil {
@@ -238,7 +238,7 @@ func (app *appEnv) postImageUpdate(w http.ResponseWriter, r *http.Request) {
 		res db.Image
 		err error
 	)
-	if res, err = app.svc.Querier.UpdateImage(r.Context(), userData); err != nil {
+	if res, err = app.svc.Queries.UpdateImage(r.Context(), userData); err != nil {
 		app.replyErr(w, r, err)
 		return
 	}
@@ -251,7 +251,7 @@ func (app *appEnv) listDomains(w http.ResponseWriter, r *http.Request) {
 		Domains []string `json:"domains"`
 	}
 
-	domains, err := app.svc.Querier.ListDomainsWithRole(r.Context(), "editor")
+	domains, err := app.svc.Queries.ListDomainsWithRole(r.Context(), "editor")
 	if err != nil {
 		app.replyErr(w, r, err)
 		return
@@ -292,7 +292,7 @@ func (app *appEnv) postDomain(w http.ResponseWriter, r *http.Request) {
 		roles = []string{"editor"}
 	}
 
-	if _, err := app.svc.Querier.SetRolesForDomain(
+	if _, err := app.svc.Queries.SetRolesForDomain(
 		r.Context(),
 		db.SetRolesForDomainParams{
 			Domain: req.Domain,
@@ -303,7 +303,7 @@ func (app *appEnv) postDomain(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	domains, err := app.svc.Querier.ListDomainsWithRole(r.Context(), "editor")
+	domains, err := app.svc.Queries.ListDomainsWithRole(r.Context(), "editor")
 	if err != nil {
 		app.replyErr(w, r, err)
 		return
@@ -321,7 +321,7 @@ func (app *appEnv) listAddresses(w http.ResponseWriter, r *http.Request) {
 		}
 		err error
 	)
-	resp.Addresses, err = app.svc.Querier.ListAddressesWithRole(r.Context(), "editor")
+	resp.Addresses, err = app.svc.Queries.ListAddressesWithRole(r.Context(), "editor")
 	if err != nil {
 		app.replyErr(w, r, err)
 		return
@@ -354,7 +354,7 @@ func (app *appEnv) postAddress(w http.ResponseWriter, r *http.Request) {
 		roles = []string{"editor"}
 	}
 
-	if _, err := app.svc.Querier.SetRolesForAddress(
+	if _, err := app.svc.Queries.SetRolesForAddress(
 		r.Context(),
 		db.SetRolesForAddressParams{
 			EmailAddress: req.Address,
@@ -369,7 +369,7 @@ func (app *appEnv) postAddress(w http.ResponseWriter, r *http.Request) {
 		resp response
 		err  error
 	)
-	resp.Addresses, err = app.svc.Querier.ListAddressesWithRole(r.Context(), "editor")
+	resp.Addresses, err = app.svc.Queries.ListAddressesWithRole(r.Context(), "editor")
 	if err != nil {
 		app.replyErr(w, r, err)
 		return
@@ -387,7 +387,7 @@ func (app *appEnv) listSpotlightPAArticles(w http.ResponseWriter, r *http.Reques
 		err error
 	)
 
-	if res.Articles, err = app.svc.Querier.ListSpotlightPAArticles(r.Context()); err != nil {
+	if res.Articles, err = app.svc.Queries.ListSpotlightPAArticles(r.Context()); err != nil {
 		app.replyErr(w, r, err)
 		return
 	}
@@ -405,7 +405,7 @@ func (app *appEnv) listImages(w http.ResponseWriter, r *http.Request) {
 		err error
 	)
 
-	if res.Images, err = app.svc.Querier.ListImages(r.Context(), db.ListImagesParams{
+	if res.Images, err = app.svc.Queries.ListImages(r.Context(), db.ListImagesParams{
 		Offset: 0,
 		Limit:  100,
 	}); err != nil {
@@ -418,7 +418,7 @@ func (app *appEnv) listImages(w http.ResponseWriter, r *http.Request) {
 
 func (app *appEnv) getEditorsPicks(w http.ResponseWriter, r *http.Request) {
 	app.Printf("starting getEditorsPicks")
-	resp, err := almanack.GetEditorsPicks(r.Context(), app.svc.Querier)
+	resp, err := almanack.GetEditorsPicks(r.Context(), app.svc.Queries)
 	if err != nil {
 		app.replyErr(w, r, err)
 		return
@@ -434,14 +434,14 @@ func (app *appEnv) postEditorsPicks(w http.ResponseWriter, r *http.Request) {
 	}
 	if err := almanack.SetEditorsPicks(
 		r.Context(),
-		app.svc.Querier,
+		app.svc.Queries,
 		app.svc.ContentStore,
 		&req,
 	); err != nil {
 		app.replyErr(w, r, err)
 		return
 	}
-	resp, err := almanack.GetEditorsPicks(r.Context(), app.svc.Querier)
+	resp, err := almanack.GetEditorsPicks(r.Context(), app.svc.Queries)
 	if err != nil {
 		app.replyErr(w, r, err)
 		return
@@ -451,7 +451,7 @@ func (app *appEnv) postEditorsPicks(w http.ResponseWriter, r *http.Request) {
 
 func (app *appEnv) listAllTopics(w http.ResponseWriter, r *http.Request) {
 	app.Printf("starting listAllTopics")
-	t, err := app.svc.Querier.ListAllTopics(r.Context())
+	t, err := app.svc.Queries.ListAllTopics(r.Context())
 	if err != nil {
 		app.replyErr(w, r, err)
 		return
@@ -463,7 +463,7 @@ func (app *appEnv) listAllTopics(w http.ResponseWriter, r *http.Request) {
 
 func (app *appEnv) listAllSeries(w http.ResponseWriter, r *http.Request) {
 	app.Printf("starting listAllSeries")
-	s, err := app.svc.Querier.ListAllSeries(r.Context())
+	s, err := app.svc.Queries.ListAllSeries(r.Context())
 	if err != nil {
 		app.replyErr(w, r, err)
 		return
@@ -483,7 +483,7 @@ func (app *appEnv) listFiles(w http.ResponseWriter, r *http.Request) {
 		err error
 	)
 
-	if res.Files, err = app.svc.Querier.ListFiles(r.Context(), db.ListFilesParams{
+	if res.Files, err = app.svc.Queries.ListFiles(r.Context(), db.ListFilesParams{
 		Offset: 0,
 		Limit:  100,
 	}); err != nil {
@@ -524,7 +524,7 @@ func (app *appEnv) postFileCreate(w http.ResponseWriter, r *http.Request) {
 		app.replyErr(w, r, err)
 		return
 	}
-	if n, err := app.svc.Querier.CreateFilePlaceholder(r.Context(),
+	if n, err := app.svc.Queries.CreateFilePlaceholder(r.Context(),
 		db.CreateFilePlaceholderParams{
 			Filename: userData.FileName,
 			Type:     userData.MimeType,
@@ -551,7 +551,7 @@ func (app *appEnv) postFileUpdate(w http.ResponseWriter, r *http.Request) {
 		res db.File
 		err error
 	)
-	if res, err = app.svc.Querier.UpdateFile(r.Context(), userData); err != nil {
+	if res, err = app.svc.Queries.UpdateFile(r.Context(), userData); err != nil {
 		app.replyErr(w, r, err)
 		return
 	}
@@ -574,7 +574,7 @@ func (app *appEnv) listNewsletterPages(w http.ResponseWriter, r *http.Request) {
 	const limit = 100
 	offset := int32(page) * limit
 
-	resp.Pages, err = app.svc.Querier.ListPages(r.Context(), db.ListPagesParams{
+	resp.Pages, err = app.svc.Queries.ListPages(r.Context(), db.ListPagesParams{
 		FilePath: "content/newsletters/%",
 		Limit:    limit + 1,
 		Offset:   offset,

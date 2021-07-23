@@ -7,7 +7,7 @@ import (
 	"github.com/carlmjohnson/emailx"
 )
 
-func GetRolesForEmail(ctx context.Context, q Querier, email string) (roles []string, err error) {
+func GetRolesForEmail(ctx context.Context, q *Queries, email string) (roles []string, err error) {
 	// not likely to get pass Netlify with an invalid address, but why not check?
 	if err = emailx.Validate(email); err != nil {
 		return

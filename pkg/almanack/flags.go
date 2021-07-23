@@ -55,7 +55,7 @@ func Flags(fl *flag.FlagSet) func(common.Logger) (svc Service, err error) {
 		return Service{
 			Logger:           l,
 			Client:           &client,
-			Querier:          *pg,
+			Queries:          pg,
 			ContentStore:     svc.ContentStore,
 			SlackClient:      slack.New(*slackURL, l),
 			ImageStore:       is,

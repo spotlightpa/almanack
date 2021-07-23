@@ -9,20 +9,20 @@ import (
 
 // FlagVar adds an option to the specified FlagSet (or flag.CommandLine if nil)
 // that creates and tests a DB
-func FlagVar(fl *flag.FlagSet, name, usage string) (q *Querier) {
+func FlagVar(fl *flag.FlagSet, name, usage string) (q *Queries) {
 	if fl == nil {
 		fl = flag.CommandLine
 	}
-	q = new(Querier)
+	q = new(Queries)
 	fl.Func(name, usage, func(dbURL string) error {
-		var err error
-		*q, err = Open(dbURL)
+		q2, err := Open(dbURL)
+		*q = *q2
 		return err
 	})
 	return
 }
 
-func Open(dbURL string) (q Querier, err error) {
+func Open(dbURL string) (q *Queries, err error) {
 	db, err := sql.Open("postgres", dbURL)
 	if err != nil {
 		return nil, err

@@ -19,7 +19,7 @@ type EditorsPicks struct {
 	SidebarPicks     []string `json:"sidebarPicks"`
 }
 
-func GetEditorsPicks(ctx context.Context, q db.Querier) (picks *EditorsPicks, err error) {
+func GetEditorsPicks(ctx context.Context, q *db.Queries) (picks *EditorsPicks, err error) {
 	raw, err := q.GetSiteData(ctx, EditorsPicksLoc)
 	if err != nil {
 		return
@@ -32,7 +32,7 @@ func GetEditorsPicks(ctx context.Context, q db.Querier) (picks *EditorsPicks, er
 	return
 }
 
-func SetEditorsPicks(ctx context.Context, q db.Querier, gh common.ContentStore, picks *EditorsPicks) (err error) {
+func SetEditorsPicks(ctx context.Context, q *db.Queries, gh common.ContentStore, picks *EditorsPicks) (err error) {
 	raw, err := json.MarshalIndent(picks, "", "  ")
 	if err != nil {
 		return err
