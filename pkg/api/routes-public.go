@@ -122,7 +122,7 @@ func (app *appEnv) getBookmarklet(w http.ResponseWriter, r *http.Request) {
 	slug := chi.URLParam(r, "slug")
 	app.Printf("starting getBookmarklet for %q", slug)
 
-	arcid, err := app.svc.Querier.GetArticleIDFromSlug(r.Context(), slug)
+	arcid, err := app.svc.Queries.GetArticleIDFromSlug(r.Context(), slug)
 	if err != nil && !db.IsNotFound(err) {
 		app.logErr(r.Context(), err)
 		http.Error(w, "something went wrong", http.StatusInternalServerError)

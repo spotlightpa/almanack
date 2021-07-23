@@ -38,7 +38,7 @@ func main() {
 }
 
 type appEnv struct {
-	db     db.Querier
+	db     *db.Queries
 	sc     slack.Client
 	logger *log.Logger
 }
@@ -74,7 +74,7 @@ func (app *appEnv) parseEnv() error {
 		return err
 	}
 
-	app.db = *pg
+	app.db = pg
 	return nil
 }
 
