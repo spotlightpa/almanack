@@ -10,6 +10,11 @@ import (
 
 func (app *appEnv) backgroundSleep(w http.ResponseWriter, r *http.Request) {
 	app.Println("start backgroundSleep")
+	if deadline, ok := r.Context().Deadline(); ok {
+		app.Printf("deadline: %s", deadline.Format(time.RFC1123))
+	} else {
+		app.Printf("no deadline")
+	}
 	durationStr := chi.URLParam(r, "duration")
 	duration, err := time.ParseDuration(durationStr)
 	if err != nil {
