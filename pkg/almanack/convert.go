@@ -44,6 +44,17 @@ func (arcStory *ArcStory) ToArticle(ctx context.Context, svc Service, article *S
 		}
 	}
 
+	// Drop "Spotlight PA Staff" as an author
+	{
+		filteredAuthors := article.Authors[:0]
+		for _, author := range article.Authors {
+			if !strings.EqualFold(author, "Spotlight PA Staff") {
+				filteredAuthors = append(filteredAuthors, author)
+			}
+		}
+		article.Authors = filteredAuthors
+	}
+
 	article.ArcID = arcStory.ID
 	article.InternalID = arcStory.Slug
 
