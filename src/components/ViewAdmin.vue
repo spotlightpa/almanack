@@ -175,6 +175,15 @@ export default {
         </span>
         <span> Preauthorization </span>
       </router-link>
+      <router-link
+        :to="{ name: 'newsletters' }"
+        class="button is-small is-success has-text-weight-semibold"
+      >
+        <span class="icon">
+          <font-awesome-icon :icon="['fas', 'mail-bulk']" />
+        </span>
+        <span> Newsletter pages </span>
+      </router-link>
     </div>
 
     <progress

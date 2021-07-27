@@ -14,6 +14,7 @@ import ViewEditorsPicks from "./components/ViewEditorsPicks.vue";
 import ViewError from "./components/ViewError.vue";
 import ViewFileUploader from "./components/ViewFileUploader.vue";
 import ViewLogin from "./components/ViewLogin.vue";
+import ViewNewsletterList from "./components/ViewNewsletterList.vue";
 import ViewSpotlightPAArticles from "./components/ViewSpotlightPAArticles.vue";
 import ViewUnauthorized from "./components/ViewUnauthorized.vue";
 import ViewUploader from "./components/ViewUploader.vue";
@@ -128,6 +129,15 @@ let router = new Router({
       path: "/admin/domains",
       name: "domains",
       component: ViewAuthorizedDomains,
+      meta: {
+        requiresAuth: isSpotlightPAUser,
+      },
+    },
+    {
+      path: "/admin/newsletters",
+      name: "newsletters",
+      component: ViewNewsletterList,
+      props: (route) => ({ page: route.query.page }),
       meta: {
         requiresAuth: isSpotlightPAUser,
       },
