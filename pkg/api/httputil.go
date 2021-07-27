@@ -17,6 +17,8 @@ import (
 	"github.com/getsentry/sentry-go"
 	"github.com/go-chi/chi"
 
+	"github.com/spotlightpa/almanack/internal/netlifyid"
+	"github.com/spotlightpa/almanack/internal/stringutils"
 	"github.com/spotlightpa/almanack/pkg/almanack"
 )
 
@@ -44,9 +46,15 @@ func (app *appEnv) replyErr(w http.ResponseWriter, r *http.Request, err error) {
 
 func (app *appEnv) logErr(ctx context.Context, err error) {
 	if hub := sentry.GetHubFromContext(ctx); hub != nil {
-		for _, suberr := range errutil.AsSlice(err) {
-			hub.CaptureException(suberr)
-		}
+		hub.WithScope(func(scope *sentry.Scope) {
+			userinfo, _ := netlifyid.FromContext(ctx)
+			scope.SetTag("username", stringutils.First(userinfo.Username(), "anonymous"))
+			scope.SetTag("email", stringutils.First(userinfo.Email(), "not set"))
+
+			for _, suberr := range errutil.AsSlice(err) {
+				hub.CaptureException(suberr)
+			}
+		})
 	} else {
 		app.Printf("sentry not in context")
 	}
