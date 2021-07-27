@@ -23,6 +23,7 @@ const endpoints = {
   // list page points
   listAnyArc: (page = "0") => `/api/list-any-arc/${page}`,
   listAvailableArc: (page = "0") => `/api/list-available/${page}`,
+  listNewsletterPages: (page = "0") => `/api/newsletter-pages/${page}`,
   // Alphabetized by URL to show duplicates
   // GET and POST listed as two endpoints
   listAllSeries: `/api/all-series`,
@@ -155,6 +156,7 @@ function makeClient($auth) {
     "getScheduledArticle",
     "listAnyArc",
     "listAvailableArc",
+    "listNewsletterPages",
   ];
   for (let action of idGetActions) {
     let endpointFn = endpoints[action];
