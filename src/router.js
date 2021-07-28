@@ -15,6 +15,7 @@ import ViewError from "./components/ViewError.vue";
 import ViewFileUploader from "./components/ViewFileUploader.vue";
 import ViewLogin from "./components/ViewLogin.vue";
 import ViewNewsletterList from "./components/ViewNewsletterList.vue";
+import ViewNewsletterPage from "./components/ViewNewsletterPage.vue";
 import ViewSpotlightPAArticles from "./components/ViewSpotlightPAArticles.vue";
 import ViewUnauthorized from "./components/ViewUnauthorized.vue";
 import ViewUploader from "./components/ViewUploader.vue";
@@ -141,6 +142,13 @@ let router = new Router({
       meta: {
         requiresAuth: isSpotlightPAUser,
       },
+    },
+    {
+      path: "/admin/newsletters/:id",
+      name: "newsletter-page",
+      component: ViewNewsletterPage,
+      props: true,
+      meta: { requiresAuth: isSpotlightPAUser },
     },
     {
       path: "/*",
