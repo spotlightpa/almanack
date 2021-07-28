@@ -17,14 +17,15 @@ const responseError = (rsp) => {
 };
 
 const endpoints = {
+  // Alphabetize lists by URL to show duplicates
   // get id endpoints
   getAvailableArc: (id) => `/api/available-articles/${id}`,
   getScheduledArticle: (id) => `/api/scheduled-articles/${id}`,
+  getPage: (id) => `/api/page/${id}`,
   // list page points
   listAnyArc: (page = "0") => `/api/list-any-arc/${page}`,
   listAvailableArc: (page = "0") => `/api/list-available/${page}`,
   listNewsletterPages: (page = "0") => `/api/newsletter-pages/${page}`,
-  // Alphabetized by URL to show duplicates
   // GET and POST listed as two endpoints
   listAllSeries: `/api/all-series`,
   listAllTopics: `/api/all-topics`,
@@ -44,6 +45,7 @@ const endpoints = {
   listRefreshArc: `/api/list-arc-refresh`,
   getSignupURL: `/api/mailchimp-signup-url`,
   sendMessage: `/api/message`,
+  postPage: `/api/page`,
   saveArticle: `/api/scheduled-articles`,
   listSpotlightPAArticles: `/api/spotlightpa-articles`,
 };
@@ -154,6 +156,7 @@ function makeClient($auth) {
     // does not include proxy images…
     "getAvailableArc",
     "getScheduledArticle",
+    "getPage",
     "listAnyArc",
     "listAvailableArc",
     "listNewsletterPages",
@@ -181,6 +184,7 @@ function makeClient($auth) {
   let simplePostActions = [
     "postAuthorizedDomain",
     "postAuthorizedEmailAddress",
+    "postPage",
     "saveArcArticle",
     "saveArticle",
     "saveEditorsPicks",
