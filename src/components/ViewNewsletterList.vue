@@ -30,9 +30,23 @@ class Page {
         this[dateProp] = new Date(this[dateProp]);
       }
     }
+
+    this.lastPublished = this.lastPublished?.Valid
+      ? new Date(this.lastPublished.Time)
+      : null;
   }
-  get published() {
-    return this.lastPublished.Valid;
+
+  get isPublished() {
+    return !!this.lastPublished;
+  }
+
+  get link() {
+    return {
+      name: "newsletter-page",
+      params: {
+        id: "" + this.id,
+      },
+    };
   }
 }
 
@@ -80,30 +94,46 @@ export default {
 
 <template>
   <div>
-    <h1 class="title">Newsletter Pages</h1>
+    <nav class="breadcrumb has-succeeds-separator" aria-label="breadcrumbs">
+      <ul>
+        <li>
+          <router-link :to="{ name: 'admin' }">Admin</router-link>
+        </li>
+        <li class="is-active">
+          <router-link exact :to="{ name: 'newsletters' }">
+            Newsletter Pages
+          </router-link>
+        </li>
+      </ul>
+    </nav>
+
+    <h1 class="title">
+      Newsletter Pages
+      <template v-if="page">(overflow page {{ page }})</template>
+    </h1>
     <APILoader :is-loading="isLoading" :reload="fetch" :error="error">
       <table class="table is-striped is-narrow is-fullwidth">
         <tbody>
           <tr v-for="page of pages" :key="page.id">
             <td>
-              <a href class="is-block my-2">
+              <router-link class="is-block my-2" :to="page.link">
                 <span class="is-inline-flex middle">
                   <span class="tags mb-0">
                     <span
                       class="tag is-small has-text-weight-semibold"
-                      :class="page.published ? 'is-success' : 'is-warning'"
+                      :class="page.isPublished ? 'is-success' : 'is-warning'"
                     >
                       <span class="icon is-size-6">
                         <font-awesome-icon
                           :icon="
-                            page.published
+                            page.isPublished
                               ? ['fas', 'check-circle']
                               : ['fas', 'pen-nib']
                           "
                         />
                       </span>
                       <span>
-                        {{ page.published ? "Published" : "Unpublished" }}
+                        {{ page.isPublished ? "Published" : "Unpublished" }}
                       </span>
                     </span>
                     <span
@@ -121,7 +151,7 @@ export default {
                 <p class="has-text-weight-light has-text-dark">
                   {{ page.blurb }}
                 </p>
-              </a>
+              </router-link>
             </td>
           </tr>
         </tbody>
