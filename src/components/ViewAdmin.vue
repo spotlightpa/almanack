@@ -38,6 +38,45 @@ export default {
         await load();
         apiStatus[ref] = false;
       },
+
+      navLinks: [
+        {
+          to: "articles",
+          icon: ["fas", "file-invoice"],
+          text: "External Editor View",
+        },
+        {
+          to: "editors-picks",
+          icon: ["fas", "newspaper"],
+          text: "Homepage Editor",
+        },
+        {
+          to: "spotlightpa-articles",
+          icon: ["fas", "file-signature"],
+          text: "Spotlight PA Articles",
+        },
+        {
+          to: "newsletters",
+          icon: ["fas", "mail-bulk"],
+          text: "Newsletter pages",
+        },
+
+        {
+          to: "uploader",
+          icon: ["fa", "file-image"],
+          text: "Photo manager",
+        },
+        {
+          to: "file-uploader",
+          icon: ["fa", "file-upload"],
+          text: "File manager",
+        },
+        {
+          to: "domains",
+          icon: ["fas", "user-circle"],
+          text: "Preauthorization",
+        },
+      ],
     };
   },
 };
@@ -49,6 +88,21 @@ export default {
       Spotlight Administrator
       <template v-if="page">(page {{ page }})</template>
     </h1>
+
+    <nav class="buttons">
+      <router-link
+        v-for="(link, i) in navLinks"
+        :key="i"
+        :to="{ name: link.to }"
+        class="button is-small is-light has-text-weight-semibold"
+      >
+        <span class="icon">
+          <font-awesome-icon :icon="link.icon" />
+        </span>
+        <span v-text="link.text" />
+      </router-link>
+    </nav>
+
     <details class="content">
       <summary>Tools</summary>
       <p>
@@ -114,77 +168,6 @@ export default {
         @hide="showComposer = false"
       />
     </keep-alive>
-
-    <div class="buttons">
-      <router-link
-        :to="{ name: 'articles' }"
-        class="button is-small is-success has-text-weight-semibold"
-      >
-        <span class="icon">
-          <font-awesome-icon :icon="['far', 'newspaper']" />
-        </span>
-        <span> External Editor View </span>
-      </router-link>
-
-      <router-link
-        class="button is-small is-success has-text-weight-semibold"
-        :to="{ name: 'editors-picks' }"
-      >
-        <span class="icon">
-          <font-awesome-icon :icon="['far', 'newspaper']" />
-        </span>
-        <span> Homepage Editor </span>
-      </router-link>
-
-      <router-link
-        class="button is-small is-success has-text-weight-semibold"
-        :to="{ name: 'spotlightpa-articles' }"
-      >
-        <span class="icon">
-          <font-awesome-icon :icon="['far', 'newspaper']" />
-        </span>
-        <span> Spotlight PA Articles </span>
-      </router-link>
-
-      <router-link
-        :to="{ name: 'uploader' }"
-        class="button is-small is-success has-text-weight-semibold"
-      >
-        <span class="icon">
-          <font-awesome-icon :icon="['fa', 'file-upload']" />
-        </span>
-        <span>Photos</span>
-      </router-link>
-
-      <router-link
-        :to="{ name: 'file-uploader' }"
-        class="button is-small is-success has-text-weight-semibold"
-      >
-        <span class="icon">
-          <font-awesome-icon :icon="['fa', 'file-upload']" />
-        </span>
-        <span>Files</span>
-      </router-link>
-
-      <router-link
-        :to="{ name: 'domains' }"
-        class="button is-small is-success has-text-weight-semibold"
-      >
-        <span class="icon">
-          <font-awesome-icon :icon="['fas', 'user-circle']" />
-        </span>
-        <span> Preauthorization </span>
-      </router-link>
-      <router-link
-        :to="{ name: 'newsletters' }"
-        class="button is-small is-success has-text-weight-semibold"
-      >
-        <span class="icon">
-          <font-awesome-icon :icon="['fas', 'mail-bulk']" />
-        </span>
-        <span> Newsletter pages </span>
-      </router-link>
-    </div>
 
     <progress
       v-if="!didLoad && isLoading"
