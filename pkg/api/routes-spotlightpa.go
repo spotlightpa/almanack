@@ -616,6 +616,9 @@ func (app *appEnv) getPage(w http.ResponseWriter, r *http.Request) {
 		app.replyErr(w, r, err)
 		return
 	}
+	if warning := app.svc.RefreshPageFromContentStore(r.Context(), &page); warning != nil {
+		app.logErr(r.Context(), warning)
+	}
 	app.replyJSON(http.StatusOK, w, page)
 }
 
