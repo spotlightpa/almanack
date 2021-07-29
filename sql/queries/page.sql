@@ -77,6 +77,7 @@ SELECT
   "last_published",
   "created_at",
   "updated_at",
+  "schedule_for",
   to_timestamp(frontmatter ->> 'published',
     -- ISO date
     'YYYY-MM-DD"T"HH24:MI:SS"Z"')::timestamptz AS "published_at"
