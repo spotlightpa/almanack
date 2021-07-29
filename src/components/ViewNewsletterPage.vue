@@ -156,11 +156,22 @@ export default {
     };
   },
   setup(props) {
+    const hideProgress = ref(false);
+    const toggleProgress = () => {
+      hideProgress.value = true;
+      window.setTimeout(() => {
+        hideProgress.value = false;
+      }, 500);
+    };
+
     const { getPage, postPage } = useClient();
     const { apiState, exec } = makeState();
 
     const fetch = (id) => exec(() => getPage(id));
-    const post = (page) => exec(() => postPage(page));
+    const post = (page) => {
+      toggleProgress();
+      return exec(() => postPage(page));
+    };
     const page = computed(() =>
       apiState.rawData ? new Page(apiState.rawData) : null
     );
@@ -170,6 +181,9 @@ export default {
     });
 
     return {
+      hideProgress,
+      showScheduler: ref(false),
+
       ...toRefs(apiState),
       formatDateTime,
 
@@ -177,7 +191,6 @@ export default {
       post,
       page,
 
-      showScheduler: ref(false),
       title: computed(() => {
         if (!page.value) {
           return `Newsletter Page ${props.id}`;
@@ -244,14 +257,6 @@ export default {
     </nav>
 
     <h1 class="title" v-text="title" />
-
-    <progress
-      v-if="!didLoad && isLoading"
-      class="progress is-large is-warning"
-      max="100"
-    >
-      Loading…
-    </progress>
 
     <div v-if="didLoad">
       <BulmaField
@@ -536,6 +541,14 @@ export default {
         </button>
       </div>
     </div>
+
+    <progress
+      v-if="isLoading && !hideProgress"
+      class="my-5 progress is-large is-warning"
+      max="100"
+    >
+      Loading…
+    </progress>
 
     <div v-if="error" class="message is-danger">
       <div class="message-header">{{ error.name }}</div>
