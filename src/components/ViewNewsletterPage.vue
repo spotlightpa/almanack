@@ -1,6 +1,6 @@
 <script>
 import Vue from "vue";
-import { computed, toRefs, watch } from "@vue/composition-api";
+import { computed, ref, toRefs, watch } from "@vue/composition-api";
 
 import { formatDateTime } from "@/utils/time-format.js";
 
@@ -14,11 +14,6 @@ import BulmaFieldInput from "./BulmaFieldInput.vue";
 
 class Page {
   constructor(data) {
-    this.init(data);
-    Vue.observable(this);
-  }
-
-  init(data) {
     this.id = data["id"] ?? "";
     this.body = data["body"] ?? "";
     this.frontmatter = data["frontmatter"] ?? {};
@@ -52,6 +47,8 @@ class Page {
     this.overrideURL = this.frontmatter["url"] ?? "";
     this.aliases = this.frontmatter["aliases"] ?? [];
     this.layout = this.frontmatter["layout"] ?? "";
+
+    Vue.observable(this);
   }
 
   static getDate(data, prop) {
@@ -67,6 +64,21 @@ class Page {
     return !!this.lastPublished;
   }
 
+  get status() {
+    if (this.isPublished) {
+      return "pub";
+    }
+    return this.scheduleFor ? "sked" : "none";
+  }
+
+  get statusVerbose() {
+    return {
+      pub: "published",
+      sked: "scheduled to be published",
+      none: "unpublished",
+    }[this.status];
+  }
+
   get link() {
     if (!this.isPublished || !this.urlPath) {
       return "";
@@ -80,6 +92,51 @@ class Page {
       return "";
     }
     return imgproxyURL(this.image);
+  }
+
+  toJSON() {
+    return {
+      file_path: this.filePath,
+      set_frontmatter: true,
+      frontmatter: {
+        // preserve unknown props
+        ...this.frontmatter,
+        // copy others
+        published: this.publishedAt,
+        kicker: this.kicker,
+        title: this.title,
+        "internal-id": this.internalID,
+        linktitle: this.linkTitle,
+        "title-tag": this.titleTag,
+        authors: this.authors,
+        byline: this.byline,
+        description: this.summary,
+        blurb: this.blurb,
+        topics: this.topics,
+        series: this.series,
+        image: this.image,
+        "image-description": this.imageDescription,
+        "image-credit": this.imageCredit,
+        "image-size": this.imageSize,
+        "language-code": this.languageCode,
+        slug: this.slug,
+        "extended-kicker": this.extendedKicker,
+        "modal-exclude": this.modalExclude,
+        "no-index": this.noIndex,
+        url: this.overrideURL,
+        aliases: this.aliases,
+        layout: this.layout,
+      },
+      set_body: false, // todo
+      body: "",
+      set_schedule_for: true,
+      schedule_for: {
+        Valid: !!this.scheduleFor,
+        Time: this.scheduleFor,
+      },
+      url_path: "", // leave blank to prevent changes
+      set_last_published: false,
+    };
   }
 }
 
@@ -99,24 +156,28 @@ export default {
     };
   },
   setup(props) {
-    let { getPage } = useClient();
-    let { apiState, exec } = makeState();
+    const { getPage, postPage } = useClient();
+    const { apiState, exec } = makeState();
 
     const fetch = (id) => exec(() => getPage(id));
+    const post = (page) => exec(() => postPage(page));
+    const page = computed(() =>
+      apiState.rawData ? new Page(apiState.rawData) : null
+    );
 
     watch(() => props.id, fetch, {
       immediate: true,
     });
-    const page = computed(() =>
-      apiState.rawData ? new Page(apiState.rawData) : null
-    );
 
     return {
       ...toRefs(apiState),
       formatDateTime,
 
       fetch,
+      post,
       page,
+
+      showScheduler: ref(false),
       title: computed(() => {
         if (!page.value) {
           return `Newsletter Page ${props.id}`;
@@ -131,6 +192,31 @@ export default {
           .replace(/\W+/g, " ")
           .trim()
           .replace(/ /g, "-");
+      },
+      discardChanges() {
+        if (window.confirm("Do you really want to discard all changes?")) {
+          fetch(props.id);
+        }
+      },
+      publishNow() {
+        page.value.scheduleFor = new Date();
+        return post(page.value);
+      },
+      updateSchedule() {
+        let isPostDated = page.value.scheduleFor - new Date() > 0;
+        if (
+          !isPostDated &&
+          !window.confirm(
+            "Scheduled publication date is in the past. Do you want to publish now?"
+          )
+        ) {
+          return;
+        }
+        return post(page.value);
+      },
+      updateOnly() {
+        page.value.scheduleFor = null;
+        return post(page.value);
       },
     };
   },
@@ -379,6 +465,76 @@ export default {
 
         <BulmaFieldInput v-model="page.layout" label="Layout override" />
       </details>
+
+      <p class="my-4 has-text-weight-semibold">
+        Page is {{ page.statusVerbose
+        }}<template v-if="page.status == 'sked'">
+          at {{ formatDateTime(page.scheduleFor) }}</template
+        >.
+      </p>
+
+      <div class="field is-grouped">
+        <div class="buttons">
+          <button
+            class="button is-success has-text-weight-semibold"
+            :disabled="isLoading"
+            type="button"
+            @click="publishNow"
+          >
+            {{ page.status === "pub" ? "Update page" : "Publish now" }}
+          </button>
+          <button
+            v-if="page.status === 'none'"
+            class="button is-warning has-text-weight-semibold"
+            :disabled="isLoading"
+            type="button"
+            @click="showScheduler = true"
+          >
+            Schedule publishing
+          </button>
+          <button
+            v-if="page.status === 'none'"
+            class="button is-light has-text-weight-semibold"
+            :disabled="isLoading"
+            type="button"
+            @click="updateOnly"
+          >
+            Save without publishing
+          </button>
+
+          <button
+            class="button is-light has-text-weight-semibold"
+            :disabled="isLoading"
+            type="button"
+            @click="discardChanges"
+          >
+            Discard Changes
+          </button>
+        </div>
+      </div>
+      <div v-if="showScheduler || page.status === 'sked'">
+        <BulmaField
+          v-slot="{ idForLabel }"
+          label="Schedule For"
+          help="Page will be automatically published at this time"
+        >
+          <b-datetimepicker
+            :id="idForLabel"
+            v-model="page.scheduleFor"
+            icon="user-clock"
+            :datetime-formatter="formatDateTime"
+            locale="en-US"
+          />
+        </BulmaField>
+        <button
+          class="button is-warning has-text-weight-semibold"
+          :disabled="isLoading || !page.scheduleFor"
+          type="button"
+          @click="updateSchedule"
+        >
+          {{ page.status === "none" ? "Schedule to publish" : "Save changes" }}
+        </button>
+      </div>
     </div>
 
     <div v-if="error" class="message is-danger">
@@ -389,7 +545,7 @@ export default {
           <button
             class="button is-danger has-text-weight-semibold"
             type="button"
-            @click="reload"
+            @click="fetch(id)"
           >
             Reload?
           </button>
