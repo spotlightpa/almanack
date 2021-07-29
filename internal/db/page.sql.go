@@ -85,6 +85,7 @@ SELECT
   "last_published",
   "created_at",
   "updated_at",
+  "schedule_for",
   to_timestamp(frontmatter ->> 'published',
     -- ISO date
     'YYYY-MM-DD"T"HH24:MI:SS"Z"')::timestamptz AS "published_at"
@@ -114,6 +115,7 @@ type ListPagesRow struct {
 	LastPublished sql.NullTime `json:"last_published"`
 	CreatedAt     time.Time    `json:"created_at"`
 	UpdatedAt     time.Time    `json:"updated_at"`
+	ScheduleFor   sql.NullTime `json:"schedule_for"`
 	PublishedAt   time.Time    `json:"published_at"`
 }
 
@@ -137,6 +139,7 @@ func (q *Queries) ListPages(ctx context.Context, arg ListPagesParams) ([]ListPag
 			&i.LastPublished,
 			&i.CreatedAt,
 			&i.UpdatedAt,
+			&i.ScheduleFor,
 			&i.PublishedAt,
 		); err != nil {
 			return nil, err

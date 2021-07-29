@@ -10,34 +10,54 @@ import APILoader from "./APILoader.vue";
 
 class Page {
   constructor(data) {
-    for (let [prop, key] of Object.entries({
-      id: "id",
-      internalID: "internal_id",
-      title: "title",
-      blurb: "blurb",
-      description: "description",
-      filePath: "file_path",
-      urlPath: "url_path",
-      createdAt: "created_at",
-      lastPublished: "last_published",
-      publishedAt: "published_at",
-      updatedAt: "updated_at",
-    })) {
-      this[prop] = data[key];
-    }
-    for (let dateProp of ["createdAt", "publishedAt", "updatedAt"]) {
-      if (this[dateProp]) {
-        this[dateProp] = new Date(this[dateProp]);
-      }
-    }
+    this.id = data["id"] || "";
+    this.internalID = data["internal_id"] || "";
+    this.title = data["title"] || "";
+    this.blurb = data["blurb"] || "";
+    this.description = data["description"] || "";
+    this.filePath = data["file_path"] || "";
+    this.urlPath = data["url_path"] || "";
+    this.createdAt = Page.getDate(data, "created_at");
+    this.publishedAt = Page.getDate(data, "published_at");
+    this.updatedAt = Page.getDate(data, "updated_at");
+    this.lastPublished = Page.getNullableDate(data, "last_published");
+    this.scheduleFor = Page.getNullableDate(data, "schedule_for");
+  }
 
-    this.lastPublished = this.lastPublished?.Valid
-      ? new Date(this.lastPublished.Time)
-      : null;
+  static getDate(data, prop) {
+    let date = data[prop] ?? null;
+    return date && new Date(date);
+  }
+
+  static getNullableDate(data, prop) {
+    return data[prop]?.Valid ? new Date(data[prop].Time) : null;
   }
 
   get isPublished() {
     return !!this.lastPublished;
+  }
+
+  get status() {
+    if (this.isPublished) {
+      return "pub";
+    }
+    return this.scheduleFor ? "sked" : "none";
+  }
+
+  get statusVerbose() {
+    return {
+      pub: "Published",
+      sked: "Scheduled",
+      none: "Unpublished",
+    }[this.status];
+  }
+
+  get statusClass() {
+    return {
+      pub: "is-success",
+      sked: "is-warning",
+      none: "is-danger",
+    }[this.status];
   }
 
   get link() {
@@ -121,7 +141,7 @@ export default {
                   <span class="tags mb-0">
                     <span
                       class="tag is-small has-text-weight-semibold"
-                      :class="page.isPublished ? 'is-success' : 'is-warning'"
+                      :class="page.statusClass"
                     >
                       <span class="icon is-size-6">
                         <font-awesome-icon
@@ -133,7 +153,7 @@ export default {
                         />
                       </span>
                       <span>
-                        {{ page.isPublished ? "Published" : "Unpublished" }}
+                        {{ page.statusVerbose }}
                       </span>
                     </span>
                     <span
