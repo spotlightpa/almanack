@@ -48,6 +48,12 @@ class Page {
     this.aliases = this.frontmatter["aliases"] ?? [];
     this.layout = this.frontmatter["layout"] ?? "";
 
+    // not a getter so it won't react to changes
+    this.status = "pub";
+    if (!this.lastPublished) {
+      this.status = this.scheduleFor ? "sked" : "none";
+    }
+
     Vue.observable(this);
   }
 
@@ -62,13 +68,6 @@ class Page {
 
   get isPublished() {
     return !!this.lastPublished;
-  }
-
-  get status() {
-    if (this.isPublished) {
-      return "pub";
-    }
-    return this.scheduleFor ? "sked" : "none";
   }
 
   get statusVerbose() {
@@ -216,13 +215,10 @@ export default {
         return post(page.value);
       },
       updateSchedule() {
+        const msg =
+          "Scheduled publication date is in the past. Do you want to publish now?";
         let isPostDated = page.value.scheduleFor - new Date() > 0;
-        if (
-          !isPostDated &&
-          !window.confirm(
-            "Scheduled publication date is in the past. Do you want to publish now?"
-          )
-        ) {
+        if (!isPostDated && !window.confirm(msg)) {
           return;
         }
         return post(page.value);
@@ -478,7 +474,22 @@ export default {
         >.
       </p>
 
-      <div class="field is-grouped">
+      <div v-if="page.status !== 'pub'" class="field mb-5">
+        <BulmaField
+          v-slot="{ idForLabel }"
+          label="Schedule For"
+          help="Page will be automatically published at this time if set"
+        >
+          <b-datetimepicker
+            :id="idForLabel"
+            v-model="page.scheduleFor"
+            icon="user-clock"
+            :datetime-formatter="formatDateTime"
+            locale="en-US"
+          />
+        </BulmaField>
+      </div>
+      <div class="field">
         <div class="buttons">
           <button
             class="button is-success has-text-weight-semibold"
@@ -489,13 +500,24 @@ export default {
             {{ page.status === "pub" ? "Update page" : "Publish now" }}
           </button>
           <button
-            v-if="page.status === 'none'"
+            v-if="page.status !== 'pub'"
             class="button is-warning has-text-weight-semibold"
+            :disabled="isLoading || !page.scheduleFor"
+            type="button"
+            @click="updateSchedule"
+          >
+            {{
+              page.status === "none" ? "Schedule to publish" : "Save changes"
+            }}
+          </button>
+          <button
+            v-if="page.status === 'sked'"
+            class="button is-danger has-text-weight-semibold"
             :disabled="isLoading"
             type="button"
-            @click="showScheduler = true"
+            @click="updateOnly"
           >
-            Schedule publishing
+            Unschedule
           </button>
           <button
             v-if="page.status === 'none'"
@@ -516,29 +538,6 @@ export default {
             Discard Changes
           </button>
         </div>
-      </div>
-      <div v-if="showScheduler || page.status === 'sked'">
-        <BulmaField
-          v-slot="{ idForLabel }"
-          label="Schedule For"
-          help="Page will be automatically published at this time"
-        >
-          <b-datetimepicker
-            :id="idForLabel"
-            v-model="page.scheduleFor"
-            icon="user-clock"
-            :datetime-formatter="formatDateTime"
-            locale="en-US"
-          />
-        </BulmaField>
-        <button
-          class="button is-warning has-text-weight-semibold"
-          :disabled="isLoading || !page.scheduleFor"
-          type="button"
-          @click="updateSchedule"
-        >
-          {{ page.status === "none" ? "Schedule to publish" : "Save changes" }}
-        </button>
       </div>
     </div>
 
