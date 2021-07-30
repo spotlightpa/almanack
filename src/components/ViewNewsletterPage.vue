@@ -155,18 +155,21 @@ export default {
     };
   },
   setup(props) {
-    const hideProgress = ref(false);
+    const showProgress = ref(false);
     const toggleProgress = () => {
-      hideProgress.value = true;
+      showProgress.value = true;
       window.setTimeout(() => {
-        hideProgress.value = false;
-      }, 500);
+        showProgress.value = false;
+      }, 1000);
     };
 
     const { getPage, postPage, listImages } = useClient();
     const { apiState, exec } = makeState();
 
-    const fetch = (id) => exec(() => getPage(id));
+    const fetch = (id) => {
+      toggleProgress();
+      return exec(() => getPage(id));
+    };
     const post = (page) => {
       toggleProgress();
       return exec(() => postPage(page));
@@ -183,7 +186,7 @@ export default {
     execImage(() => listImages());
 
     return {
-      hideProgress,
+      showProgress,
       showScheduler: ref(false),
 
       ...toRefs(apiState),
@@ -268,7 +271,7 @@ export default {
 
     <h1 class="title" v-text="title" />
 
-    <div v-if="didLoad">
+    <div v-if="page">
       <BulmaField
         v-slot="{ idForLabel }"
         label="Publication Date"
@@ -392,7 +395,7 @@ export default {
             <tbody>
               <tr v-for="image in images" :key="image.id">
                 <a
-                  class="is-flex p-1 has-text-black"
+                  class="is-flex-tablet p-1 has-text-black"
                   @click="setImageProps(image)"
                 >
                   <div
@@ -602,7 +605,7 @@ export default {
     </div>
 
     <progress
-      v-if="isLoading && !hideProgress"
+      v-if="isLoading || showProgress"
       class="my-5 progress is-large is-warning"
       max="100"
     >
