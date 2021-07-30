@@ -163,7 +163,7 @@ export default {
       }, 500);
     };
 
-    const { getPage, postPage } = useClient();
+    const { getPage, postPage, listImages } = useClient();
     const { apiState, exec } = makeState();
 
     const fetch = (id) => exec(() => getPage(id));
@@ -178,6 +178,9 @@ export default {
     watch(() => props.id, fetch, {
       immediate: true,
     });
+
+    const { apiState: imageState, exec: execImage } = makeState();
+    execImage(() => listImages());
 
     return {
       hideProgress,
@@ -226,6 +229,17 @@ export default {
       updateOnly() {
         page.value.scheduleFor = null;
         return post(page.value);
+      },
+
+      imageState,
+      images: computed(() =>
+        !imageState.rawData ? [] : imageState.rawData.images
+      ),
+      imgproxyURL,
+      setImageProps(image) {
+        page.value.image = image.path;
+        page.value.imageDescription = image.description;
+        page.value.imageCredit = image.credit;
       },
     };
   },
@@ -290,7 +304,7 @@ export default {
         help="Small text appearing above the page hed"
         :required="true"
       />
-      <!-- todo: topics and series -->
+
       <BulmaFieldInput
         v-model="page.title"
         label="Title"
@@ -372,7 +386,53 @@ export default {
         <img :src="page.imagePreviewURL" class="is-3x4" width="200" />
       </picture>
 
-      <!-- todo: search for image -->
+      <BulmaField v-if="images.length" label="Choose from recent photos">
+        <div class="textarea" style="height: 225px; overflow-y: auto">
+          <table class="table is-striped is-narrow is-fullwidth">
+            <tbody>
+              <tr v-for="image in images" :key="image.id">
+                <a
+                  class="is-flex p-1 has-text-black"
+                  @click="setImageProps(image)"
+                >
+                  <div
+                    class="mr-2 is-flex-shrink-0 is-clipped"
+                    style="width: 128px"
+                  >
+                    <picture class="has-ratio">
+                      <img
+                        class="is-3x4"
+                        :src="
+                          imgproxyURL(image.path, {
+                            width: 256,
+                            height: 192,
+                            extension: 'webp',
+                          })
+                        "
+                        :alt="image.path"
+                        loading="lazy"
+                      />
+                    </picture>
+                  </div>
+                  <div>
+                    <div class="clamped-3">
+                      {{ image.description }}
+                      <template v-if="image.credit">
+                        ({{ image.credit }})
+                      </template>
+                    </div>
+                  </div>
+                </a>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p>
+          <router-link :to="{ name: 'uploader' }" target="_blank">
+            Manage photos
+          </router-link>
+        </p>
+      </BulmaField>
 
       <BulmaFieldInput
         v-model="page.imageDescription"
@@ -566,3 +626,12 @@ export default {
     </div>
   </div>
 </template>
+
+<style scoped>
+.clamped-3 {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+  overflow: hidden;
+}
+</style>
