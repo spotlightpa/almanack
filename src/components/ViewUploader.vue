@@ -63,8 +63,8 @@ export default {
           path: rawImage.path,
           url: imgproxyURL(rawImage.path, {
             width: 256,
-            height: 256,
-            extension: rawImage.type,
+            height: 192,
+            extension: "webp",
           }),
           description: rawImage.description,
           credit: rawImage.credit,
@@ -133,11 +133,16 @@ export default {
                 <picture
                   class="
                     image
-                    is-square
+                    is-3x4
                     has-background-grey-lighter has-margin-bottom
                   "
                 >
-                  <img :src="image.url" width="256" height="256" />
+                  <img
+                    :src="image.url"
+                    width="256"
+                    height="192"
+                    loading="lazy"
+                  />
                 </picture>
               </div>
             </td>
