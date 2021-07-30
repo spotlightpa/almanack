@@ -5,6 +5,7 @@ import { formatDate } from "@/utils/time-format.js";
 
 import { makeState } from "@/api/service-util.js";
 import { useClient } from "@/api/client.js";
+import imgproxyURL from "@/api/imgproxy-url.js";
 
 import APILoader from "./APILoader.vue";
 
@@ -17,6 +18,7 @@ class Page {
     this.description = data["description"] || "";
     this.filePath = data["file_path"] || "";
     this.urlPath = data["url_path"] || "";
+    this.image = data["image"] || "";
     this.createdAt = Page.getDate(data, "created_at");
     this.publishedAt = Page.getDate(data, "published_at");
     this.updatedAt = Page.getDate(data, "updated_at");
@@ -67,6 +69,14 @@ class Page {
         id: "" + this.id,
       },
     };
+  }
+
+  get imgproxyURL() {
+    return imgproxyURL(this.image, {
+      width: 256,
+      height: 192,
+      extension: "webp",
+    });
   }
 }
 
@@ -136,41 +146,57 @@ export default {
         <tbody>
           <tr v-for="page of pages" :key="page.id">
             <td>
-              <router-link class="is-block my-2" :to="page.link">
-                <span class="is-inline-flex middle">
-                  <span class="tags mb-0">
-                    <span
-                      class="tag is-small has-text-weight-semibold"
-                      :class="page.statusClass"
-                    >
-                      <span class="icon is-size-6">
-                        <font-awesome-icon
-                          :icon="
-                            page.isPublished
-                              ? ['fas', 'check-circle']
-                              : ['fas', 'pen-nib']
-                          "
-                        />
+              <router-link class="is-flex-tablet my-2" :to="page.link">
+                <div class="is-flex-grow-1">
+                  <span class="is-inline-flex middle">
+                    <span class="tags mb-0">
+                      <span
+                        class="tag is-small has-text-weight-semibold"
+                        :class="page.statusClass"
+                      >
+                        <span class="icon is-size-6">
+                          <font-awesome-icon
+                            :icon="
+                              page.isPublished
+                                ? ['fas', 'check-circle']
+                                : ['fas', 'pen-nib']
+                            "
+                          />
+                        </span>
+                        <span>
+                          {{ page.statusVerbose }}
+                        </span>
                       </span>
-                      <span>
-                        {{ page.statusVerbose }}
+                      <span
+                        class="tag is-primary has-text-weight-semibold"
+                        v-text="page.internalID"
+                      ></span>
+                      <span class="tag is-light has-text-weight-semibold">
+                        {{ formatDate(page.publishedAt) }}
                       </span>
-                    </span>
-                    <span
-                      class="tag is-primary has-text-weight-semibold"
-                      v-text="page.internalID"
-                    ></span>
-                    <span class="tag is-light has-text-weight-semibold">
-                      {{ formatDate(page.publishedAt) }}
                     </span>
                   </span>
-                </span>
-                <p class="mt-0 has-text-weight-bold has-text-black">
-                  {{ page.title }}
-                </p>
-                <p class="has-text-weight-light has-text-dark">
-                  {{ page.blurb }}
-                </p>
+                  <p class="mt-0 has-text-weight-bold has-text-black">
+                    {{ page.title }}
+                  </p>
+                  <p class="has-text-weight-light has-text-dark">
+                    {{ page.blurb }}
+                  </p>
+                </div>
+                <div
+                  v-if="page.image"
+                  class="is-flex-grow-0 is-clipped"
+                  style="width: 128px"
+                >
+                  <picture class="has-ratio">
+                    <img
+                      class="is-3x4"
+                      :src="page.imgproxyURL"
+                      :alt="page.image"
+                      loading="lazy"
+                    />
+                  </picture>
+                </div>
               </router-link>
             </td>
           </tr>
