@@ -13,5 +13,5 @@ export default function imageURL(
   let quality = "75";
   let encoded_source_url = btoa(filepath);
 
-  return `${baseURL}/${signature}/rs:${resizing_type}:${width}:${height}/g:${gravity}/el:${enlarge}/q:${quality}/${encoded_source_url}.${extension}`;
+  return `${baseURL}/${signature}/rt:${resizing_type}/w:${width}/h:${height}/g:${gravity}/el:${enlarge}/q:${quality}/${encoded_source_url}.${extension}`;
 }
