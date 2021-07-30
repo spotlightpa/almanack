@@ -81,6 +81,7 @@ SELECT
   (frontmatter ->> 'title')::text AS "title",
   (frontmatter ->> 'description')::text AS "description",
   (frontmatter ->> 'blurb')::text AS "blurb",
+  (frontmatter ->> 'image')::text AS "image",
   coalesce("url_path", ''),
   "last_published",
   "created_at",
@@ -111,6 +112,7 @@ type ListPagesRow struct {
 	Title         string       `json:"title"`
 	Description   string       `json:"description"`
 	Blurb         string       `json:"blurb"`
+	Image         string       `json:"image"`
 	URLPath       string       `json:"url_path"`
 	LastPublished sql.NullTime `json:"last_published"`
 	CreatedAt     time.Time    `json:"created_at"`
@@ -135,6 +137,7 @@ func (q *Queries) ListPages(ctx context.Context, arg ListPagesParams) ([]ListPag
 			&i.Title,
 			&i.Description,
 			&i.Blurb,
+			&i.Image,
 			&i.URLPath,
 			&i.LastPublished,
 			&i.CreatedAt,

@@ -73,6 +73,7 @@ SELECT
   (frontmatter ->> 'title')::text AS "title",
   (frontmatter ->> 'description')::text AS "description",
   (frontmatter ->> 'blurb')::text AS "blurb",
+  (frontmatter ->> 'image')::text AS "image",
   coalesce("url_path", ''),
   "last_published",
   "created_at",
