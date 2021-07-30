@@ -269,7 +269,21 @@ export default {
       </ul>
     </nav>
 
-    <h1 class="title" v-text="title" />
+    <h1 class="title">
+      {{ title }}
+
+      <a
+        v-if="page && page.status === 'pub' && page.link"
+        :href="page.link"
+        class="is-size-6"
+        target="_blank"
+      >
+        <span class="icon is-size-6">
+          <font-awesome-icon :icon="['fas', 'link']" />
+        </span>
+        <span>Open live URL</span>
+      </a>
+    </h1>
 
     <div v-if="page">
       <BulmaField
