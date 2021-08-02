@@ -11,11 +11,7 @@ import (
 
 func (app *appEnv) userInfo(w http.ResponseWriter, r *http.Request) {
 	app.Println("start userInfo")
-	userinfo, err := netlifyid.FromRequest(r)
-	if err != nil {
-		app.replyErr(w, r, err)
-		return
-	}
+	userinfo := netlifyid.FromContext(r.Context())
 	app.replyJSON(http.StatusOK, w, userinfo)
 }
 

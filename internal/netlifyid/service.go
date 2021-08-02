@@ -2,9 +2,14 @@ package netlifyid
 
 import (
 	"context"
+	"encoding/base64"
+	"encoding/json"
 	"fmt"
 	"net/http"
+	"strings"
 
+	"github.com/aws/aws-lambda-go/lambdacontext"
+	"github.com/carlmjohnson/errutil"
 	"github.com/carlmjohnson/resperr"
 	"github.com/spotlightpa/almanack/pkg/common"
 )
@@ -21,28 +26,26 @@ type AuthService struct{ common.Logger }
 
 var _ common.AuthService = AuthService{}
 
-type netlifyidContextType int
-
-const netlifyidContextKey = iota
-
-func (as AuthService) AddToRequest(r *http.Request) (*http.Request, error) {
-	netID, err := FromRequest(r)
+func (as AuthService) AuthFromHeader(r *http.Request) (*http.Request, error) {
+	netID, err := FromLambdaContext(r.Context())
 	if err != nil {
 		as.Logger.Printf("could not wrap request: %v", err)
 		return nil, err
 	}
-	ctx := context.WithValue(r.Context(), netlifyidContextKey, netID)
-	return r.WithContext(ctx), nil
+	return addJWTToRequest(netID, r), nil
 }
 
-func jwtFromRequest(r *http.Request) *JWT {
-	ctx := r.Context()
-	val, _ := ctx.Value(netlifyidContextKey).(*JWT)
-	return val
+func (as AuthService) AuthFromCookie(r *http.Request) (*http.Request, error) {
+	netID, err := FromCookie(r)
+	if err != nil {
+		as.Logger.Printf("could not wrap request: %v", err)
+		return nil, err
+	}
+	return addJWTToRequest(netID, r), nil
 }
 
 func (as AuthService) HasRole(r *http.Request, role string) error {
-	if jwt := jwtFromRequest(r); jwt != nil {
+	if jwt := FromContext(r.Context()); jwt != nil {
 		hasRole := jwt.HasRole(role)
 		as.Logger.Printf("permission middleware: %s has role %s == %t",
 			jwt.User.Email, role, hasRole)
@@ -63,4 +66,56 @@ func (as AuthService) HasRole(r *http.Request, role string) error {
 		fmt.Errorf("no user info provided: is this localhost?"),
 		"no user info provided",
 	)
+}
+
+func FromLambdaContext(ctx context.Context) (*JWT, error) {
+	lc, ok := lambdacontext.FromContext(ctx)
+	if !ok {
+		return nil, resperr.WithUserMessage(
+			fmt.Errorf("no context given: is this localhost?"),
+			"no context provided",
+		)
+	}
+	encoded := lc.ClientContext.Custom["netlify"]
+	jwtBytes, err := base64.StdEncoding.DecodeString(encoded)
+	if err != nil {
+		return nil, fmt.Errorf("could not decode context %q: %v", encoded, err)
+	}
+	var netID JWT
+	if err = json.Unmarshal(jwtBytes, &netID); err != nil {
+		return nil, fmt.Errorf("could not decode identity %q: %v", encoded, err)
+	}
+	return &netID, nil
+}
+
+// Danger! Does not verify JWT! Do not use in insecure context.
+func FromCookie(r *http.Request) (id *JWT, err error) {
+	defer errutil.Prefix(&err, "problem retrieving JWT from cookie")
+
+	c, err := r.Cookie("nf_jwt")
+	if err != nil {
+		return nil, err
+	}
+	defer errutil.Prefix(&err, fmt.Sprintf("malformed cookie value: %q", c.Value))
+	s := c.Value
+	if i := strings.Index(s, "."); i == -1 {
+		return nil, fmt.Errorf("missing initial dot")
+	} else {
+		s = s[i+1:]
+	}
+	if i := strings.Index(s, "."); i == -1 {
+		return nil, fmt.Errorf("missing second dot")
+	} else {
+		s = s[:i]
+	}
+	jwtBytes, err := base64.RawStdEncoding.DecodeString(s)
+	if err != nil {
+		return nil, err
+	}
+	var user User
+	if err = json.Unmarshal(jwtBytes, &user); err != nil {
+		return nil, err
+	}
+
+	return &JWT{User: user}, nil
 }

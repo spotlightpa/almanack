@@ -21,6 +21,26 @@
   status = 200
 
 [[redirects]]
+  from = "/ssr/*"
+  to = "/.netlify/functions/almanack-api/:splat"
+  conditions = { Role = ["admin"]}
+  force = true
+  status = 200
+
+[[redirects]]
+  from = "/ssr/*"
+  to = "/.netlify/functions/almanack-api/:splat"
+  conditions = { Role = ["Spotlight PA"]}
+  force = true
+  status = 200
+
+[[redirects]]
+  from = "/ssr/*"
+  to = "/login"
+  force = true
+  status = 302
+
+[[redirects]]
   from = "/login"
   to = "/index.html"
   status = 200

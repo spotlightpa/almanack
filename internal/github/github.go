@@ -130,7 +130,7 @@ func (cl *Client) Ping(ctx context.Context) error {
 }
 
 func makeAuthor(ctx context.Context) *github.CommitAuthor {
-	jwt, _ := netlifyid.FromContext(ctx)
+	jwt := netlifyid.FromContext(ctx)
 	name := jwt.Username()
 	if name == "" {
 		name = "Almanack"
