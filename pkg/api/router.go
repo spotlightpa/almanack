@@ -24,7 +24,7 @@ func (app *appEnv) routes() http.Handler {
 	r.Get(`/api/cron`, app.getCron)
 	r.Get("/api/bookmarklet/{slug}", app.getBookmarklet)
 	r.Route("/api", func(r chi.Router) {
-		r.Use(app.authMiddleware)
+		r.Use(app.authHeaderMiddleware)
 		r.Get("/user-info", app.userInfo)
 		r.With(
 			app.hasRoleMiddleware("editor"),
@@ -64,6 +64,15 @@ func (app *appEnv) routes() http.Handler {
 			r.Post("/files-update", app.postFileUpdate)
 		})
 	})
+	r.Route("/ssr", func(r chi.Router) {
+		r.Use(app.authCookieMiddleware)
+		// Don't trust this middleware!
+		// Netlify should be verifying the role at the CDN level.
+		// This is just a fallback.
+		r.Use(app.hasRoleMiddleware("Spotlight PA"))
+		r.Get("/user-info", app.userInfo)
+	})
+
 	r.Get(`/api-background/sleep/{duration}`, app.backgroundSleep)
 	r.Get(`/api-background/cron`, app.backgroundCron)
 	r.NotFound(app.notFound)

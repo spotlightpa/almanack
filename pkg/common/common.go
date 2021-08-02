@@ -11,7 +11,8 @@ type Logger interface {
 }
 
 type AuthService interface {
-	AddToRequest(r *http.Request) (*http.Request, error)
+	AuthFromHeader(r *http.Request) (*http.Request, error)
+	AuthFromCookie(r *http.Request) (*http.Request, error)
 	HasRole(r *http.Request, role string) (err error)
 }
 

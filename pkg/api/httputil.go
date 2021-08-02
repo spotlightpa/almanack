@@ -47,7 +47,7 @@ func (app *appEnv) replyErr(w http.ResponseWriter, r *http.Request, err error) {
 func (app *appEnv) logErr(ctx context.Context, err error) {
 	if hub := sentry.GetHubFromContext(ctx); hub != nil {
 		hub.WithScope(func(scope *sentry.Scope) {
-			userinfo, _ := netlifyid.FromContext(ctx)
+			userinfo := netlifyid.FromContext(ctx)
 			scope.SetTag("username", stringutils.First(userinfo.Username(), "anonymous"))
 			scope.SetTag("email", stringutils.First(userinfo.Email(), "not set"))
 
@@ -138,14 +138,25 @@ func (app *appEnv) versionMiddleware(h http.Handler) http.Handler {
 	})
 }
 
-func (app *appEnv) authMiddleware(h http.Handler) http.Handler {
+func (app *appEnv) authHeaderMiddleware(h http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		r, err := app.auth.AddToRequest(r)
+		r2, err := app.auth.AuthFromHeader(r)
 		if err != nil {
 			app.replyErr(w, r, err)
 			return
 		}
-		h.ServeHTTP(w, r)
+		h.ServeHTTP(w, r2)
+	})
+}
+
+func (app *appEnv) authCookieMiddleware(h http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		r2, err := app.auth.AuthFromCookie(r)
+		if err != nil {
+			app.replyErr(w, r, err)
+			return
+		}
+		h.ServeHTTP(w, r2)
 	})
 }
 

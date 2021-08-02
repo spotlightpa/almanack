@@ -11,7 +11,11 @@ type MockAuthService struct{ common.Logger }
 
 var _ common.AuthService = MockAuthService{}
 
-func (mas MockAuthService) AddToRequest(r *http.Request) (*http.Request, error) {
+func (mas MockAuthService) AuthFromHeader(r *http.Request) (*http.Request, error) {
+	return r, nil
+}
+
+func (mas MockAuthService) AuthFromCookie(r *http.Request) (*http.Request, error) {
 	return r, nil
 }
 
