@@ -9,7 +9,6 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/carlmjohnson/errutil"
 	"github.com/carlmjohnson/resperr"
 	"github.com/go-chi/chi"
 	"github.com/spotlightpa/almanack/internal/db"
@@ -105,16 +104,6 @@ func (app *appEnv) getProxyImage(w http.ResponseWriter, r *http.Request) {
 }
 
 func (app *appEnv) getCron(w http.ResponseWriter, r *http.Request) {
-	if err := errutil.ExecParallel(func() error {
-		return app.svc.PopScheduledArticles(r.Context())
-	}, func() error {
-		return app.svc.PopScheduledPages(r.Context())
-	}, func() error {
-		return app.svc.UpdateMostPopular(r.Context())
-	}); err != nil {
-		app.replyErr(w, r, err)
-		return
-	}
 	app.replyJSON(http.StatusOK, w, "OK")
 }
 
