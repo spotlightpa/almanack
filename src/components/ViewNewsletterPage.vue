@@ -404,7 +404,7 @@ export default {
       </picture>
 
       <BulmaField v-if="images.length" label="Choose from recent photos">
-        <div class="textarea" style="height: 225px; overflow-y: auto">
+        <div class="textarea preview-frame">
           <table class="table is-striped is-narrow is-fullwidth">
             <tbody>
               <tr v-for="image in images" :key="image.id">
@@ -506,6 +506,11 @@ export default {
           <span> Open live URL </span>
         </a>
       </div>
+
+      <BulmaField label="Content">
+        <iframe :src="`/ssr/page/${page.id}`" class="textarea preview-frame" />
+      </BulmaField>
+
       <details class="field">
         <summary class="has-text-weight-semibold">Advanced options</summary>
 
@@ -650,5 +655,9 @@ export default {
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 3;
   overflow: hidden;
+}
+.preview-frame {
+  height: 300px;
+  overflow-y: auto;
 }
 </style>
