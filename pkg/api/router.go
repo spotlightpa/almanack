@@ -71,6 +71,7 @@ func (app *appEnv) routes() http.Handler {
 		// This is just a fallback.
 		r.Use(app.hasRoleMiddleware("Spotlight PA"))
 		r.Get("/user-info", app.userInfo)
+		r.Get(`/page/{id:\d+}`, app.renderPage)
 	})
 
 	r.Get(`/api-background/sleep/{duration}`, app.backgroundSleep)

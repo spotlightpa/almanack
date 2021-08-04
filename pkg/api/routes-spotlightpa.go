@@ -3,7 +3,6 @@ package api
 import (
 	"fmt"
 	"net/http"
-	"strconv"
 	"time"
 
 	"github.com/carlmjohnson/emailx"
@@ -595,16 +594,11 @@ func (app *appEnv) listNewsletterPages(w http.ResponseWriter, r *http.Request) {
 }
 
 func (app *appEnv) getPage(w http.ResponseWriter, r *http.Request) {
-	var (
-		id  int64
-		err error
-	)
-	if idStr := chi.URLParam(r, "id"); idStr != "" {
-		if id, err = strconv.ParseInt(idStr, 10, 64); err != nil {
-			app.replyErr(w, r, resperr.New(
-				http.StatusBadRequest, "bad argument to getPage: %w", err))
-			return
-		}
+	id, err := app.getIntParam(r, "id")
+	if err != nil {
+		errutil.Prefix(&err, "bad argument to getPage")
+		app.replyErr(w, r, err)
+		return
 	}
 
 	app.Printf("start getPage for %d", id)

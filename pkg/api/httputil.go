@@ -1,9 +1,12 @@
 package api
 
 import (
+	"bytes"
 	"context"
 	"encoding/json"
 	"errors"
+	"fmt"
+	"html/template"
 	"io"
 	"mime"
 	"net/http"
@@ -19,6 +22,7 @@ import (
 
 	"github.com/spotlightpa/almanack/internal/netlifyid"
 	"github.com/spotlightpa/almanack/internal/stringutils"
+	"github.com/spotlightpa/almanack/layouts"
 	"github.com/spotlightpa/almanack/pkg/almanack"
 )
 
@@ -195,6 +199,20 @@ func (app *appEnv) getRequestPage(r *http.Request, route string) (page int, err 
 	return
 }
 
+func (app *appEnv) getIntParam(r *http.Request, param string) (n int64, err error) {
+	pstr := chi.URLParam(r, param)
+	if pstr == "" {
+		err = fmt.Errorf("parameter %q not set", param)
+		return
+	}
+
+	if n, err = strconv.ParseInt(pstr, 10, 64); err != nil {
+		err = resperr.New(http.StatusBadRequest, "bad argument to getPage: %w", err)
+		return
+	}
+	return
+}
+
 func (app *appEnv) FetchFeed(ctx context.Context) (*almanack.ArcAPI, error) {
 	var feed almanack.ArcAPI
 	// Timeout needs to leave enough time to report errors to Sentry before
@@ -210,4 +228,41 @@ func (app *appEnv) FetchFeed(ctx context.Context) (*almanack.ArcAPI, error) {
 			http.StatusBadGateway, "could not fetch Arc feed: %w", err)
 	}
 	return &feed, nil
+}
+
+func (app *appEnv) replyHTML(w http.ResponseWriter, r *http.Request, t *template.Template, data interface{}) {
+	var buf bytes.Buffer
+	if err := t.Execute(&buf, data); err != nil {
+		app.logErr(r.Context(), err)
+		app.replyHTMLErr(w, r, err)
+		return
+	}
+	w.Header().Set("Content-Type", "text/html")
+	if _, err := buf.WriteTo(w); err != nil {
+		app.logErr(r.Context(), err)
+		return
+	}
+}
+
+func (app *appEnv) replyHTMLErr(w http.ResponseWriter, r *http.Request, err error) {
+	code := resperr.StatusCode(err)
+	var buf bytes.Buffer
+	if err := layouts.Error.Execute(&buf, struct {
+		Status     string
+		StatusCode int
+		Message    string
+	}{
+		Status:     http.StatusText(code),
+		StatusCode: code,
+		Message:    resperr.UserMessage(err),
+	}); err != nil {
+		app.logErr(r.Context(), err)
+		return
+	}
+	w.Header().Set("Content-Type", "text/html")
+	w.WriteHeader(code)
+	if _, err := buf.WriteTo(w); err != nil {
+		app.logErr(r.Context(), err)
+		return
+	}
 }
