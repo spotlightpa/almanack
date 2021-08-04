@@ -207,6 +207,8 @@ export default {
           .toLowerCase()
           .replace(/\b(the|an?)\b/g, " ")
           .replace(/\bpa\b/g, "pennsylvania")
+          .replace(/’/g, "'")
+          .replace(/.?'s/g, "s")
           .replace(/\W+/g, " ")
           .trim()
           .replace(/ /g, "-");
