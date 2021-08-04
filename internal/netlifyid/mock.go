@@ -3,7 +3,6 @@ package netlifyid
 import (
 	"net/http"
 
-	"github.com/carlmjohnson/resperr"
 	"github.com/spotlightpa/almanack/pkg/common"
 )
 
@@ -21,8 +20,12 @@ func (mas MockAuthService) AuthFromCookie(r *http.Request) (*http.Request, error
 
 func (mas MockAuthService) HasRole(r *http.Request, role string) error {
 	mas.Logger.Printf("mock auth checking for role %q", role)
-	if r.Header.Get("Authorization") == "" {
-		return resperr.New(http.StatusUnauthorized, "missing Authorization header")
+	if r.Header.Get("Authorization") != "" {
+		return nil
 	}
+	if _, err := r.Cookie("nf_jwt"); err == nil {
+		return nil
+	}
+	mas.Logger.Printf("missing Authorization header/cookie")
 	return nil
 }
