@@ -8,6 +8,12 @@ module.exports = {
       "/api": {
         target: "http://localhost:33160",
       },
+      "/api-background": {
+        target: "http://localhost:33160",
+      },
+      "/ssr": {
+        target: "http://localhost:33160",
+      },
     },
   },
   chainWebpack: (config) => {
