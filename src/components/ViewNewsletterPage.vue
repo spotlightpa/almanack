@@ -321,7 +321,6 @@ export default {
         v-model="page.kicker"
         label="Eyebrow"
         help="Small text appearing above the page hed"
-        :required="true"
       />
 
       <BulmaFieldInput
@@ -358,7 +357,6 @@ export default {
       <BulmaField
         v-slot="{ idForLabel }"
         label="Summary"
-        required
         help="Shown in social share previews and search results"
       >
         <textarea
