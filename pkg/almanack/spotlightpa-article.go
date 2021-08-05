@@ -11,6 +11,7 @@ import (
 	"github.com/carlmjohnson/errutil"
 	"github.com/spotlightpa/almanack/internal/db"
 	"github.com/spotlightpa/almanack/internal/slack"
+	"github.com/spotlightpa/almanack/internal/timeutil"
 )
 
 type SpotlightPAArticle struct {
@@ -238,11 +239,7 @@ func (splArt *SpotlightPAArticle) Notify(ctx context.Context, svc Service) error
 	color := green
 
 	if splArt.ScheduleFor != nil {
-		t := splArt.ScheduleFor.Local()
-		newYork, err := time.LoadLocation("America/New_York")
-		if err == nil {
-			t = splArt.ScheduleFor.In(newYork)
-		}
+		t := timeutil.ToEST(*splArt.ScheduleFor)
 		text = t.Format("New article scheduled for Mon, Jan 2 at 3:04pm MST…")
 		color = yellow
 	}
