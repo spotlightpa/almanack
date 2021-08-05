@@ -21,10 +21,10 @@ func FlagVar(fl *flag.FlagSet) func(l common.Logger) (common.ContentStore, error
 	owner := fl.String("github-owner", "", "owning `organization` for Github repo")
 	repo := fl.String("github-repo", "", "name of Github `repo`")
 	branch := fl.String("github-branch", "", "Github `branch` to use")
-
+	mock := fl.String("github-mock-path", "", "`path` for mock Github files")
 	return func(l common.Logger) (common.ContentStore, error) {
 		if *token == "" || *owner == "" || *repo == "" || *branch == "" {
-			return NewMockClient(l)
+			return NewMockClient(*mock, l)
 		}
 		return NewClient(*token, *owner, *repo, *branch, l)
 	}

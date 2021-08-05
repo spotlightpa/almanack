@@ -13,13 +13,16 @@ type MockClient struct {
 	l        common.Logger
 }
 
-func NewMockClient(l common.Logger) (*MockClient, error) {
-	dir, err := os.MkdirTemp("", "example")
-	if err != nil {
-		return nil, err
+func NewMockClient(dir string, l common.Logger) (*MockClient, error) {
+	if dir == "" {
+		var err error
+		// we don't clean up temp dir:
+		// good for testing but don't use this in prod!
+		dir, err = os.MkdirTemp("", "example")
+		if err != nil {
+			return nil, err
+		}
 	}
-	// we don't clean up temp dir:
-	// good for testing but don't use this in prod!
 	l.Printf("mock Github base dir is %s", dir)
 	return &MockClient{dir, l}, nil
 }
