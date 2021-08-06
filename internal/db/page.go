@@ -27,6 +27,9 @@ func (page *Page) ToTOML() (string, error) {
 		if t, ok := val.(time.Time); ok && t.IsZero() {
 			continue
 		}
+		if n, ok := val.(float64); ok && n == 0.0 {
+			continue
+		}
 		frontmatter[key] = val
 	}
 	if err := enc.Encode(frontmatter); err != nil {
