@@ -11,7 +11,7 @@ import (
 )
 
 func FlagVar(fl *flag.FlagSet) func(l common.Logger) *Service {
-	var ga Service
+	var gsvc Service
 	// Using a crazy Base64+GZIP because storing JSON containing \n in
 	//an env var breaks a lot for some reason
 	fl.Func("google-json", "GZIP Base64 JSON `credentials` for Google",
@@ -25,21 +25,23 @@ func FlagVar(fl *flag.FlagSet) func(l common.Logger) *Service {
 				return err
 			}
 			defer g.Close()
-			ga.cert, err = io.ReadAll(g)
+			gsvc.cert, err = io.ReadAll(g)
 			if err != nil {
 				return err
 			}
 			return nil
 		})
-	fl.StringVar(&ga.viewID, "ga-view-id", "", "view `ID` for Google Analytics")
+	fl.StringVar(&gsvc.viewID, "ga-view-id", "", "view `ID` for Google Analytics")
+	fl.StringVar(&gsvc.driveID, "google-drive-id", "", "`ID` for shared Google Drive")
 	return func(l common.Logger) *Service {
-		ga.l = l
-		return &ga
+		gsvc.l = l
+		return &gsvc
 	}
 }
 
 type Service struct {
-	cert   []byte
-	l      common.Logger
-	viewID string
+	cert    []byte
+	l       common.Logger
+	viewID  string
+	driveID string
 }
