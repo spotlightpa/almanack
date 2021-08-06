@@ -1,86 +1,43 @@
-package ganalytics
+package google
 
 import (
-	"bytes"
-	"compress/gzip"
 	"context"
-	"encoding/base64"
-	"flag"
 	"fmt"
-	"io"
 	"net/http"
 	"net/url"
 
-	"github.com/carlmjohnson/flagext"
+	"github.com/carlmjohnson/errutil"
 	"github.com/carlmjohnson/requests"
-	"github.com/spotlightpa/almanack/pkg/common"
 	"golang.org/x/oauth2"
 	"golang.org/x/oauth2/google"
 )
 
-func Var(fl *flag.FlagSet) func(l common.Logger) *Client {
-	var ga Client
-	// Using a crazy Base64+GZIP because storing JSON containing \n in
-	//an env var breaks a lot for some reason
-	flagext.Callback(fl, "google-json", "", "GZIP Base64 JSON credentials for Google",
-		func(s string) error {
-			b, err := base64.StdEncoding.DecodeString(s)
-			if err != nil {
-				return err
-			}
-			g, err := gzip.NewReader(bytes.NewReader(b))
-			if err != nil {
-				return err
-			}
-			defer g.Close()
-			b, err = io.ReadAll(g)
-			if err != nil {
-				return err
-			}
-			creds, err := google.CredentialsFromJSON(
-				oauth2.NoContext, b, "https://www.googleapis.com/auth/analytics.readonly",
-			)
-			if err != nil {
-				return err
-			}
-			ga.c = oauth2.NewClient(oauth2.NoContext, creds.TokenSource)
-
-			return nil
-		})
-	fl.StringVar(&ga.viewID, "ga-view-id", "", "view `ID` for Google Analytics")
-
-	return func(c common.Logger) *Client {
-		ga.l = c
-		return &ga
+func (gsvc *Service) GAClient(ctx context.Context) (cl *http.Client, err error) {
+	if len(gsvc.cert) == 0 {
+		gsvc.l.Printf("falling back to default Google credentials")
+		cl, err = google.DefaultClient(ctx, "https://www.googleapis.com/auth/analytics.readonly")
+		return
 	}
-}
-
-type Client struct {
-	c      *http.Client
-	l      common.Logger
-	viewID string
-}
-
-func (ga *Client) getClient(ctx context.Context) (err error) {
-	if ga.viewID == "" {
-		return fmt.Errorf("getClient for Google Analytics: view ID not set")
+	creds, err := google.CredentialsFromJSON(
+		ctx, gsvc.cert, "https://www.googleapis.com/auth/analytics.readonly",
+	)
+	if err != nil {
+		return
 	}
-	if ga.c != nil {
-		return nil
-	}
-	ga.l.Printf("falling back to default Google credentials")
-	ga.c, err = google.DefaultClient(ctx, "https://www.googleapis.com/auth/analytics.readonly")
+	cl = oauth2.NewClient(ctx, creds.TokenSource)
 	return
 }
 
-func (ga *Client) MostPopularNews(ctx context.Context) ([]string, error) {
-	if err := ga.getClient(ctx); err != nil {
-		return nil, err
+func (gsvc *Service) MostPopularNews(ctx context.Context, cl *http.Client) (pages []string, err error) {
+	defer errutil.Prefix(&err, "problem getting most popular news")
+
+	if gsvc.viewID == "" {
+		return nil, fmt.Errorf("view ID not set")
 	}
 
 	req := &AnalyticsRequest{
 		ReportRequests: []ReportRequest{{
-			ViewID: ga.viewID,
+			ViewID: gsvc.viewID,
 			Metrics: []Metric{{
 				Expression: "ga:uniquePageviews",
 			}},
@@ -101,9 +58,9 @@ func (ga *Client) MostPopularNews(ctx context.Context) ([]string, error) {
 	}
 
 	var data AnalyticsResponse
-	if err := requests.
+	if err = requests.
 		URL("https://analyticsreporting.googleapis.com/v4/reports:batchGet").
-		Client(ga.c).
+		Client(cl).
 		BodyJSON(req).
 		ToJSON(&data).
 		Fetch(ctx); err != nil {
@@ -114,15 +71,15 @@ func (ga *Client) MostPopularNews(ctx context.Context) ([]string, error) {
 		return nil, fmt.Errorf("got bad report length: %d", len(data.Reports))
 	}
 	report := &data.Reports[0]
-	pages := make([]string, 0, len(report.Data.Rows))
+	pages = make([]string, 0, len(report.Data.Rows))
 	pagesSet := make(map[string]bool, len(report.Data.Rows))
 	for _, row := range report.Data.Rows {
 		if len(row.Dimensions) != 1 {
 			return nil, fmt.Errorf("got bad row length: %d", len(row.Dimensions))
 		}
 		page := row.Dimensions[0]
-		u, err := url.Parse(page)
-		if err != nil {
+		u, err2 := url.Parse(page)
+		if err2 != nil {
 			continue
 		}
 		// TODO: We could go through and add up all the query string variants
@@ -133,7 +90,7 @@ func (ga *Client) MostPopularNews(ctx context.Context) ([]string, error) {
 			pages = append(pages, page)
 		}
 	}
-	ga.l.Printf("got %d most-popular pages", len(pages))
+	gsvc.l.Printf("got %d most-popular pages", len(pages))
 	return pages, nil
 }
 
