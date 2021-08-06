@@ -1,0 +1,29 @@
+HTTP/2.0 200 OK
+Cache-Control: no-cache, no-store, max-age=0, must-revalidate
+Content-Security-Policy: frame-ancestors 'self'
+Content-Type: application/json; charset=UTF-8
+Date: Fri, 06 Aug 2021 20:55:23 GMT
+Expires: Mon, 01 Jan 1990 00:00:00 GMT
+Pragma: no-cache
+Server: GSE
+Vary: Origin
+Vary: X-Origin
+X-Content-Type-Options: nosniff
+X-Frame-Options: SAMEORIGIN
+X-Xss-Protection: 1; mode=block
+
+{
+ "files": [
+  {
+   "id": "abcXYZ",
+   "name": "Doc title here",
+   "lastModifyingUser": {
+    "kind": "drive#user",
+    "displayName": "John Doe",
+    "photoLink": "https://lh3.googleusercontent.com/a-/ABC=s64",
+    "me": false,
+    "permissionId": "1234"
+   }
+  }
+ ]
+}
