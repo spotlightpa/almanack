@@ -1,0 +1,298 @@
+HTTP/2.0 200 OK
+Cache-Control: private
+Content-Type: application/json; charset=UTF-8
+Date: Fri, 06 Aug 2021 17:44:12 GMT
+Server: ESF
+Vary: Origin
+Vary: X-Origin
+Vary: Referer
+X-Content-Type-Options: nosniff
+X-Frame-Options: SAMEORIGIN
+X-Xss-Protection: 0
+
+{
+  "reports": [
+    {
+      "columnHeader": {
+        "dimensions": [
+          "ga:pagePath"
+        ],
+        "metricHeader": {
+          "metricHeaderEntries": [
+            {
+              "name": "ga:uniquePageviews",
+              "type": "INTEGER"
+            }
+          ]
+        }
+      },
+      "data": {
+        "rows": [
+          {
+            "dimensions": [
+              "/news/2021/08/margo-davidson-theft-charges-per-diems-reimbursements/"
+            ],
+            "metrics": [
+              {
+                "values": [
+                  "742"
+                ]
+              }
+            ]
+          },
+          {
+            "dimensions": [
+              "/news/2020/03/pa-coronavirus-updates-cases-map-live-tracker/"
+            ],
+            "metrics": [
+              {
+                "values": [
+                  "637"
+                ]
+              }
+            ]
+          },
+          {
+            "dimensions": [
+              "/news/2021/07/pa-2022-senate-race-candidates/"
+            ],
+            "metrics": [
+              {
+                "values": [
+                  "263"
+                ]
+              }
+            ]
+          },
+          {
+            "dimensions": [
+              "/news/2021/08/pa-eviction-rent-relief-bucks-county-order/"
+            ],
+            "metrics": [
+              {
+                "values": [
+                  "153"
+                ]
+              }
+            ]
+          },
+          {
+            "dimensions": [
+              "/news/2021/08/pa-opioid-addiction-medical-marijuana-research/"
+            ],
+            "metrics": [
+              {
+                "values": [
+                  "122"
+                ]
+              }
+            ]
+          },
+          {
+            "dimensions": [
+              "/news/2021/06/pa-2020-governor-race-candidates/"
+            ],
+            "metrics": [
+              {
+                "values": [
+                  "66"
+                ]
+              }
+            ]
+          },
+          {
+            "dimensions": [
+              "/news/2021/08/addiction-treatment-cannabis-pennsylvania-federal-rules-roll-back/"
+            ],
+            "metrics": [
+              {
+                "values": [
+                  "63"
+                ]
+              }
+            ]
+          },
+          {
+            "dimensions": [
+              "/news/2020/08/pa-campaign-dark-money-growth-opportunity-fund-jake-corman-gop/"
+            ],
+            "metrics": [
+              {
+                "values": [
+                  "43"
+                ]
+              }
+            ]
+          },
+          {
+            "dimensions": [
+              "/news/2021/07/pa-department-of-labor-unemployment-claims-overpayment-interest/"
+            ],
+            "metrics": [
+              {
+                "values": [
+                  "43"
+                ]
+              }
+            ]
+          },
+          {
+            "dimensions": [
+              "/news/2021/06/pa-medical-marijuana-insurance-drug-treatment-confusion/"
+            ],
+            "metrics": [
+              {
+                "values": [
+                  "29"
+                ]
+              }
+            ]
+          },
+          {
+            "dimensions": [
+              "/news/2021/05/pa-bedford-county-civil-rights-shooting-black-lives-matter-charges/"
+            ],
+            "metrics": [
+              {
+                "values": [
+                  "28"
+                ]
+              }
+            ]
+          },
+          {
+            "dimensions": [
+              "/news/2021/07/margo-davidson-theft-charges-pa-attorney-general/"
+            ],
+            "metrics": [
+              {
+                "values": [
+                  "24"
+                ]
+              }
+            ]
+          },
+          {
+            "dimensions": [
+              "/news/2021/04/pennsylvania-marijuana-legalization-chances-new-york-new-jersey-virginia-legislature/"
+            ],
+            "metrics": [
+              {
+                "values": [
+                  "23"
+                ]
+              }
+            ]
+          },
+          {
+            "dimensions": [
+              "/news/2021/06/pa-coronavirus-disaster-declaration-terminated-legislature/"
+            ],
+            "metrics": [
+              {
+                "values": [
+                  "10"
+                ]
+              }
+            ]
+          },
+          {
+            "dimensions": [
+              "/news/2021/07/eviction-ban-expires-pa-rental-assistance-delayed/"
+            ],
+            "metrics": [
+              {
+                "values": [
+                  "10"
+                ]
+              }
+            ]
+          },
+          {
+            "dimensions": [
+              "/news/2021/07/pa-emergency-contracts-coronavirus-by-the-numbers/"
+            ],
+            "metrics": [
+              {
+                "values": [
+                  "10"
+                ]
+              }
+            ]
+          },
+          {
+            "dimensions": [
+              "/news/2020/11/pa-eviction-cdc-ban-loophole-renters-despair/"
+            ],
+            "metrics": [
+              {
+                "values": [
+                  "7"
+                ]
+              }
+            ]
+          },
+          {
+            "dimensions": [
+              "/news/2020/12/rent-relief-pennsylvania-rrp-cares-act-eviction-mortgage-budget-doc/"
+            ],
+            "metrics": [
+              {
+                "values": [
+                  "7"
+                ]
+              }
+            ]
+          },
+          {
+            "dimensions": [
+              "/news/2021/06/pa-unemployment-new-system-errors-issues/"
+            ],
+            "metrics": [
+              {
+                "values": [
+                  "7"
+                ]
+              }
+            ]
+          },
+          {
+            "dimensions": [
+              "/news/2021/07/pennsylvania-rental-assistance-questions-answers-live-event/"
+            ],
+            "metrics": [
+              {
+                "values": [
+                  "7"
+                ]
+              }
+            ]
+          }
+        ],
+        "totals": [
+          {
+            "values": [
+              "2442"
+            ]
+          }
+        ],
+        "rowCount": 115,
+        "minimums": [
+          {
+            "values": [
+              "1"
+            ]
+          }
+        ],
+        "maximums": [
+          {
+            "values": [
+              "742"
+            ]
+          }
+        ]
+      },
+      "nextPageToken": "20"
+    }
+  ]
+}
