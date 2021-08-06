@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"testing"
+	"time"
 
 	"github.com/spotlightpa/almanack/internal/db"
 )
@@ -113,6 +114,45 @@ func TestSetURLPath(t *testing.T) {
 				Frontmatter: db.Map{
 					"slug": "567",
 					"url":  "/hello-world",
+				},
+			},
+			"/hello-world",
+		},
+		"news-date": {
+			db.Page{
+				FilePath: "content/news/123.md",
+				Frontmatter: db.Map{
+					"published": time.Date(2020, 01, 01, 0, 0, 0, 0, time.UTC),
+				},
+			},
+			"/news/2019/12/123/",
+		},
+		"news-date-string": {
+			db.Page{
+				FilePath: "content/news/123.md",
+				Frontmatter: db.Map{
+					"published": "2020-01-01T00:00:00.000Z",
+				},
+			},
+			"/news/2019/12/123/",
+		},
+		"news-date-slug": {
+			db.Page{
+				FilePath: "content/news/123.md",
+				Frontmatter: db.Map{
+					"published": time.Date(2020, 01, 01, 0, 0, 0, 0, time.UTC),
+					"slug":      "abc",
+				},
+			},
+			"/news/2019/12/abc/",
+		},
+		"news-url": {
+			db.Page{
+				FilePath: "content/news/123.md",
+				Frontmatter: db.Map{
+					"published": time.Date(2020, 01, 01, 0, 0, 0, 0, time.UTC),
+					"slug":      "abc",
+					"url":       "/hello-world",
 				},
 			},
 			"/hello-world",
