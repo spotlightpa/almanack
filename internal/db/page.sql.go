@@ -95,7 +95,7 @@ FROM
 WHERE
   "file_path" ILIKE $1
 ORDER BY
-  published_at DESC
+  frontmatter ->> 'published' DESC
 LIMIT $2 OFFSET $3
 `
 
