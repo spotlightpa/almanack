@@ -8,6 +8,7 @@ import (
 
 	"github.com/BurntSushi/toml"
 	"github.com/carlmjohnson/errutil"
+	"github.com/spotlightpa/almanack/internal/timeutil"
 )
 
 func (page *Page) ToTOML() (string, error) {
@@ -77,10 +78,19 @@ func (page *Page) SetURLPath() {
 	upath := page.FilePath
 	upath = strings.TrimPrefix(upath, "content")
 	upath = strings.TrimSuffix(upath, ".md")
-	if slug, _ := page.Frontmatter["slug"].(string); slug != "" {
-		upath = path.Join(path.Dir(upath), slug)
+	dir, fname := path.Split(upath)
+	if dir == "/news/" {
+		if pub, ok := timeutil.GetTime(page.Frontmatter, "published"); ok {
+			pub = timeutil.ToEST(pub)
+			dir = pub.Format("/news/2006/01/")
+		}
 	}
-	if upath != "" {
+	if slug, _ := page.Frontmatter["slug"].(string); slug != "" {
+		fname = slug
+	}
+
+	upath = path.Join(dir, fname)
+	if upath != "" && !strings.HasSuffix(upath, "/") {
 		upath += "/"
 	}
 	page.URLPath.String = upath
