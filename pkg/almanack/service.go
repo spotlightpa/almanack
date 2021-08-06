@@ -13,7 +13,7 @@ import (
 	"github.com/carlmjohnson/resperr"
 	"github.com/spotlightpa/almanack/internal/aws"
 	"github.com/spotlightpa/almanack/internal/db"
-	"github.com/spotlightpa/almanack/internal/ganalytics"
+	"github.com/spotlightpa/almanack/internal/google"
 	"github.com/spotlightpa/almanack/internal/index"
 	"github.com/spotlightpa/almanack/internal/mailchimp"
 	"github.com/spotlightpa/almanack/internal/slack"
@@ -69,7 +69,7 @@ type Service struct {
 	SlackClient slack.Client
 	Indexer     index.Indexer
 	common.NewletterService
-	ga *ganalytics.Client
+	gsvc *google.Service
 }
 
 func (svc Service) GetSpotlightPAArticle(ctx context.Context, dbID int32) (*SpotlightPAArticle, error) {
@@ -409,7 +409,11 @@ func (svc Service) UpdateNewsletterArchive(ctx context.Context, mcType, dbType, 
 
 func (svc Service) UpdateMostPopular(ctx context.Context) error {
 	svc.Logger.Printf("updating most popular")
-	pages, err := svc.ga.MostPopularNews(ctx)
+	cl, err := svc.gsvc.GAClient(ctx)
+	if err != nil {
+		return err
+	}
+	pages, err := svc.gsvc.MostPopularNews(ctx, cl)
 	if err != nil {
 		return err
 	}

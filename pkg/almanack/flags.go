@@ -7,8 +7,8 @@ import (
 	"github.com/carlmjohnson/flagext"
 	"github.com/spotlightpa/almanack/internal/aws"
 	"github.com/spotlightpa/almanack/internal/db"
-	"github.com/spotlightpa/almanack/internal/ganalytics"
 	"github.com/spotlightpa/almanack/internal/github"
+	"github.com/spotlightpa/almanack/internal/google"
 	"github.com/spotlightpa/almanack/internal/herokuapi"
 	"github.com/spotlightpa/almanack/internal/httpcache"
 	"github.com/spotlightpa/almanack/internal/index"
@@ -26,7 +26,7 @@ func Flags(fl *flag.FlagSet) func(common.Logger) (svc Service, err error) {
 	getGithub := github.FlagVar(fl)
 	getIndex := index.FlagVar(fl)
 	getNewsletter := mailchimp.FlagVar(fl)
-	getGA := ganalytics.Var(fl)
+	getGoogle := google.FlagVar(fl)
 
 	return func(l common.Logger) (svc Service, err error) {
 		// Get PostgreSQL URL from Heroku if possible, else get it from flag
@@ -62,7 +62,7 @@ func Flags(fl *flag.FlagSet) func(common.Logger) (svc Service, err error) {
 			FileStore:        fs,
 			Indexer:          getIndex(l),
 			NewletterService: getNewsletter(&client),
-			ga:               getGA(l),
+			gsvc:             getGoogle(l),
 		}, nil
 	}
 }
