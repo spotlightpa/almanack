@@ -1,6 +1,7 @@
 package db
 
 import (
+	"encoding/json"
 	"fmt"
 	"path"
 	"reflect"
@@ -59,7 +60,17 @@ func (page *Page) FromTOML(content string) (err error) {
 	var frontmatter, body string
 
 	if !strings.HasPrefix(content, delimiter) {
-		return fmt.Errorf("could not parse frontmatter: no prefix delimiter")
+		// try parsing as JSON
+		if !strings.HasPrefix(content, "{") {
+			return fmt.Errorf("could not parse frontmatter: no prefix delimiter")
+		}
+		m := map[string]interface{}{}
+		if err := json.Unmarshal([]byte(content), &m); err != nil {
+			return err
+		}
+		page.Frontmatter = m
+		page.Body = ""
+		return nil
 	}
 	frontmatter = content[len(delimiter):]
 	if end := strings.Index(frontmatter, delimiter); end != -1 {
