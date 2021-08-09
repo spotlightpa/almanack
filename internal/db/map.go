@@ -8,12 +8,13 @@ import (
 
 type Map map[string]interface{}
 
-// Value implements the driver Valuer interface.
+// Value implements the driver.Valuer interface.
 func (m Map) Value() (driver.Value, error) {
 	b, err := json.Marshal(m)
 	return b, err
 }
 
+// Scan implements the sql.Scanner interface.
 func (m *Map) Scan(value interface{}) error {
 	dbMap := make(map[string]interface{})
 	if value == nil {
