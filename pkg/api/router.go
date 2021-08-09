@@ -72,6 +72,7 @@ func (app *appEnv) routes() http.Handler {
 		r.Use(app.hasRoleMiddleware("Spotlight PA"))
 		r.Get("/user-info", app.userInfo)
 		r.Get(`/page/{id:\d+}`, app.renderPage)
+		r.NotFound(app.renderNotFound)
 	})
 
 	r.Get(`/api-background/sleep/{duration}`, app.backgroundSleep)
