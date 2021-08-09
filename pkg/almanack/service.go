@@ -582,3 +582,39 @@ func (svc Service) PopScheduledPages(ctx context.Context) error {
 	}
 	return errs.Merge()
 }
+
+func (svc Service) RefreshPageContents(ctx context.Context, id int64) (err error) {
+	page, err := svc.Queries.GetPageByID(ctx, id)
+	if err != nil {
+		return err
+	}
+	defer errutil.Prefix(&err, fmt.Sprintf("problem refreshing contents of %s", page.FilePath))
+
+	contentBefore, err := page.ToTOML()
+	if err != nil {
+		return err
+	}
+	err = svc.RefreshPageFromContentStore(ctx, &page)
+	if err != nil {
+		return err
+	}
+	contentAfter, err := page.ToTOML()
+	if err != nil {
+		return err
+	}
+	if contentBefore == contentAfter {
+		return nil
+	}
+
+	svc.Printf("%s changed", page.FilePath)
+
+	_, err = svc.Queries.UpdatePage(ctx, db.UpdatePageParams{
+		FilePath:       page.FilePath,
+		SetFrontmatter: true,
+		Frontmatter:    page.Frontmatter,
+		SetBody:        true,
+		Body:           page.Body,
+	})
+
+	return err
+}
