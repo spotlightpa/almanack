@@ -3,6 +3,7 @@ package db
 import (
 	"fmt"
 	"path"
+	"reflect"
 	"strings"
 	"time"
 
@@ -29,6 +30,16 @@ func (page *Page) ToTOML() (string, error) {
 		}
 		if n, ok := val.(float64); ok && n == 0.0 {
 			continue
+		}
+		if n, ok := val.(int64); ok && n == 0 {
+			continue
+		}
+		if v := reflect.ValueOf(val); v.Kind() == reflect.Slice &&
+			v.Len() == 0 {
+			continue
+		}
+		if t, ok := timeutil.GetTime(page.Frontmatter, key); ok {
+			val = t
 		}
 		frontmatter[key] = val
 	}
