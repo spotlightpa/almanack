@@ -10,6 +10,10 @@ import (
 	"github.com/spotlightpa/almanack/layouts"
 )
 
+func (app *appEnv) renderNotFound(w http.ResponseWriter, r *http.Request) {
+	app.replyHTMLErr(w, r, resperr.NotFound(r))
+}
+
 func (app *appEnv) renderPage(w http.ResponseWriter, r *http.Request) {
 	id, err := app.getIntParam(r, "id")
 	if err != nil {
