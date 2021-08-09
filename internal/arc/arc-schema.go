@@ -1,11 +1,10 @@
-package almanack
+package arc
 
 import (
+	"database/sql/driver"
 	"encoding/json"
 	"errors"
 	"time"
-
-	"github.com/spotlightpa/almanack/internal/db"
 )
 
 const (
@@ -56,57 +55,27 @@ type ArcFeedItem struct {
 	Workflow             Workflow           `json:"workflow,omitempty"`
 }
 
-type ArcStory struct {
-	ArcFeedItem
-
-	Note   string `json:"almanack-note,omitempty"`
-	Status Status `json:"almanack-status,omitempty"`
+// Value implements the driver.Valuer interface.
+func (item ArcFeedItem) Value() (driver.Value, error) {
+	b, err := json.Marshal(item)
+	return b, err
 }
 
-func (story *ArcStory) fromDB(dart *db.Article) error {
-	if err := json.Unmarshal(dart.ArcData, story); err != nil {
+// Scan implements the sql.Scanner interface.
+func (item *ArcFeedItem) Scan(value interface{}) error {
+	var newItem ArcFeedItem
+	if value == nil {
+		return nil
+	}
+	buf, ok := value.([]byte)
+	if !ok {
+		return errors.New("canot parse to bytes")
+	}
+	if err := json.Unmarshal(buf, &newItem); err != nil {
 		return err
 	}
-	var ok bool
-	if story.Status, ok = dbStatusToStatus[dart.Status]; !ok {
-		return errors.New("bad status flag in database")
-	}
-	story.Note = dart.Note
+	*item = newItem
 	return nil
-}
-
-func storiesFromDB(dbArts []db.Article) ([]ArcStory, error) {
-	stories := make([]ArcStory, len(dbArts))
-	for i := range stories {
-		if err := stories[i].fromDB(&dbArts[i]); err != nil {
-			return nil, err
-		}
-	}
-	return stories, nil
-}
-
-type Status int8
-
-const (
-	StatusUnset     Status = 0
-	StatusPlanned   Status = 1
-	StatusAvailable Status = 2
-)
-
-var dbStatusToStatus = map[string]Status{
-	"U": StatusUnset,
-	"P": StatusPlanned,
-	"A": StatusAvailable,
-}
-
-var statusToDBstring = map[Status]string{
-	StatusUnset:     "U",
-	StatusPlanned:   "P",
-	StatusAvailable: "A",
-}
-
-func (s Status) dbstring() string {
-	return statusToDBstring[s]
 }
 
 type ContentProperties struct {
@@ -115,19 +84,19 @@ type ContentProperties struct {
 	PublishDate      json.RawMessage `json:"publish_date"`
 }
 
-type _contentElement struct {
-	ID        string            `json:"_id"`
-	Type      string            `json:"type"`
-	Content   string            `json:"content"`
-	Caption   string            `json:"caption"`
-	Items     []_contentElement `json:"items,omitempty"`
-	Level     int               `json:"level"`
-	ListType  string            `json:"list_type"`
-	Owner     Owner             `json:"owner"`
-	RawOembed RawOembed         `json:"raw_oembed"`
-	URL       string            `json:"url"`
-	Width     int               `json:"width"`
-}
+// type contentElement struct {
+// 	ID        string            `json:"_id"`
+// 	Type      string            `json:"type"`
+// 	Content   string            `json:"content"`
+// 	Caption   string            `json:"caption"`
+// 	Items     []contentElement `json:"items,omitempty"`
+// 	Level     int               `json:"level"`
+// 	ListType  string            `json:"list_type"`
+// 	Owner     Owner             `json:"owner"`
+// 	RawOembed RawOembed         `json:"raw_oembed"`
+// 	URL       string            `json:"url"`
+// 	Width     int               `json:"width"`
+// }
 
 type ContentElementType struct {
 	Type *string `json:"type"`

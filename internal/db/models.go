@@ -6,6 +6,8 @@ import (
 	"database/sql"
 	"encoding/json"
 	"time"
+
+	arc "github.com/spotlightpa/almanack/internal/arc"
 )
 
 type AddressRole struct {
@@ -19,7 +21,7 @@ type AddressRole struct {
 type Article struct {
 	ID              int32           `json:"id"`
 	ArcID           sql.NullString  `json:"arc_id"`
-	ArcData         json.RawMessage `json:"arc_data"`
+	ArcData         arc.ArcFeedItem `json:"arc_data"`
 	SpotlightPAPath sql.NullString  `json:"spotlightpa_path"`
 	SpotlightPAData json.RawMessage `json:"spotlightpa_data"`
 	ScheduleFor     sql.NullTime    `json:"schedule_for"`
