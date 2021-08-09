@@ -24,6 +24,14 @@
 			"go_type": {
 				"type": "Map"
 			}
+		},
+		{
+			"column": "article.arc_data",
+			"go_type": {
+				"import": "github.com/spotlightpa/almanack/internal/arc",
+				"package": "arc",
+				"type": "ArcFeedItem"
+			}
 		}
 	],
 	"version": "1"

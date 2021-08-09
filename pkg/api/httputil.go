@@ -20,6 +20,7 @@ import (
 	"github.com/getsentry/sentry-go"
 	"github.com/go-chi/chi"
 
+	"github.com/spotlightpa/almanack/internal/arc"
 	"github.com/spotlightpa/almanack/internal/netlifyid"
 	"github.com/spotlightpa/almanack/internal/stringutils"
 	"github.com/spotlightpa/almanack/layouts"
@@ -213,8 +214,8 @@ func (app *appEnv) getIntParam(r *http.Request, param string) (n int64, err erro
 	return
 }
 
-func (app *appEnv) FetchFeed(ctx context.Context) (*almanack.ArcAPI, error) {
-	var feed almanack.ArcAPI
+func (app *appEnv) FetchFeed(ctx context.Context) (*arc.ArcAPI, error) {
+	var feed arc.ArcAPI
 	// Timeout needs to leave enough time to report errors to Sentry before
 	// AWS kills the Lambda…
 	ctx, cancel := context.WithTimeout(ctx, 6*time.Second)

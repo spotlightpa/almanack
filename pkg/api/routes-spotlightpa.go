@@ -9,6 +9,7 @@ import (
 	"github.com/carlmjohnson/errutil"
 	"github.com/carlmjohnson/resperr"
 	"github.com/go-chi/chi"
+	"github.com/spotlightpa/almanack/internal/arc"
 	"github.com/spotlightpa/almanack/internal/db"
 	"github.com/spotlightpa/almanack/pkg/almanack"
 )
@@ -42,7 +43,7 @@ func (app *appEnv) listWithArcRefresh(w http.ResponseWriter, r *http.Request) {
 		NextPage int                 `json:"next_page,omitempty"`
 	}
 	var (
-		feed *almanack.ArcAPI
+		feed *arc.ArcAPI
 		err  error
 	)
 	if feed, err = app.FetchFeed(r.Context()); err != nil {
@@ -80,7 +81,7 @@ func (app *appEnv) postAlmanackArcStory(w http.ResponseWriter, r *http.Request) 
 	)
 	if userData.RefreshArc {
 		var (
-			feed *almanack.ArcAPI
+			feed *arc.ArcAPI
 			err  error
 		)
 		if feed, err = app.FetchFeed(r.Context()); err != nil {
@@ -153,7 +154,7 @@ func (app *appEnv) postScheduledArticle(w http.ResponseWriter, r *http.Request) 
 
 	if userData.RefreshArc {
 		var (
-			feed *almanack.ArcAPI
+			feed *arc.ArcAPI
 			err  error
 		)
 		if feed, err = app.FetchFeed(r.Context()); err != nil {

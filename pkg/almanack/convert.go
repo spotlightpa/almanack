@@ -11,6 +11,7 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/spotlightpa/almanack/internal/arc"
 	"github.com/spotlightpa/almanack/internal/stringutils"
 )
 
@@ -85,7 +86,7 @@ func (arcStory *ArcStory) ToArticle(ctx context.Context, svc Service, article *S
 }
 
 // Must keep in sync with Vue's ArcArticle.authors
-func authorFrom(by *By) string {
+func authorFrom(by *arc.By) string {
 	byline := by.AdditionalProperties.Original.Byline
 	if byline != "" {
 		return byline
@@ -124,32 +125,32 @@ func slugFromURL(s string) string {
 func readContentElements(ctx context.Context, svc Service, rawels []*json.RawMessage, body *strings.Builder) (warnings []string, err error) {
 	for i, raw := range rawels {
 		var _type string
-		wrapper := ContentElementType{Type: &_type}
+		wrapper := arc.ContentElementType{Type: &_type}
 		if err := json.Unmarshal(*raw, &wrapper); err != nil {
 			log.Printf("runtime error: %v", err)
 		}
 		var graf string
 		switch _type {
 		case "text", "raw_html":
-			wrapper := ContentElementText{Content: &graf}
+			wrapper := arc.ContentElementText{Content: &graf}
 			if err := json.Unmarshal(*raw, &wrapper); err != nil {
 				return nil, err
 			}
 
 		case "header":
-			var v ContentElementHeading
+			var v arc.ContentElementHeading
 			if err := json.Unmarshal(*raw, &v); err != nil {
 				log.Printf("runtime error: %v", err)
 			}
 			graf = strings.Repeat("#", v.Level) + " " + v.Content
 		case "oembed_response":
-			var v ContentElementOembed
+			var v arc.ContentElementOembed
 			if err := json.Unmarshal(*raw, &v); err != nil {
 				return nil, err
 			}
 			graf = v.RawOembed.HTML
 		case "list":
-			var v ContentElementList
+			var v arc.ContentElementList
 			if err := json.Unmarshal(*raw, &v); err != nil {
 				return nil, err
 			}
@@ -192,7 +193,7 @@ func readContentElements(ctx context.Context, svc Service, rawels []*json.RawMes
 			graf = buf.String()
 
 		case "image":
-			var v ContentElementImage
+			var v arc.ContentElementImage
 			if err := json.Unmarshal(*raw, &v); err != nil {
 				return nil, err
 			}
@@ -262,7 +263,7 @@ func resolveFromInky(s string) string {
 	return u.String()
 }
 
-func setArticleImage(a *SpotlightPAArticle, p PromoItems) {
+func setArticleImage(a *SpotlightPAArticle, p arc.PromoItems) {
 	a.ImageURL = resolveFromInky(p.Basic.AdditionalProperties.ResizeURL)
 	if a.ImageURL == "" && strings.Contains(p.Basic.URL, "public") {
 		a.ImageURL = resolveFromInky(p.Basic.URL)

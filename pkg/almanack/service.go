@@ -11,6 +11,7 @@ import (
 
 	"github.com/carlmjohnson/errutil"
 	"github.com/carlmjohnson/resperr"
+	"github.com/spotlightpa/almanack/internal/arc"
 	"github.com/spotlightpa/almanack/internal/aws"
 	"github.com/spotlightpa/almanack/internal/db"
 	"github.com/spotlightpa/almanack/internal/google"
@@ -282,7 +283,7 @@ func (svc Service) SaveAlmanackArticle(ctx context.Context, article *ArcStory, s
 	return nil
 }
 
-func (svc Service) StoreFeed(ctx context.Context, newfeed *ArcAPI) (err error) {
+func (svc Service) StoreFeed(ctx context.Context, newfeed *arc.ArcAPI) (err error) {
 	arcItems, err := json.Marshal(&newfeed.Contents)
 	if err != nil {
 		return err
