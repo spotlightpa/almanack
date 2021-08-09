@@ -65,27 +65,58 @@ WHERE
 RETURNING
   *;
 
+-- Cannot use coalesce, see https://github.com/kyleconroy/sqlc/issues/780.
+-- Treating published_at as text because it sorts faster and we don't do
+-- date stuff on the backend, just frontend.
 -- name: ListPages :many
 SELECT
   "id",
   "file_path",
-  (frontmatter ->> 'internal-id')::text AS "internal_id",
-  (frontmatter ->> 'title')::text AS "title",
-  (frontmatter ->> 'description')::text AS "description",
-  (frontmatter ->> 'blurb')::text AS "blurb",
-  (frontmatter ->> 'image')::text AS "image",
+  (
+    CASE WHEN frontmatter ->> 'internal-id' IS NOT NULL THEN
+      frontmatter ->> 'internal-id'
+    ELSE
+      ''
+    END)::text AS "internal_id",
+  (
+    CASE WHEN frontmatter ->> 'title' IS NOT NULL THEN
+      frontmatter ->> 'title'
+    ELSE
+      ''
+    END)::text AS "title",
+  (
+    CASE WHEN frontmatter ->> 'description' IS NOT NULL THEN
+      frontmatter ->> 'description'
+    ELSE
+      ''
+    END)::text AS "description",
+  (
+    CASE WHEN frontmatter ->> 'blurb' IS NOT NULL THEN
+      frontmatter ->> 'blurb'
+    ELSE
+      ''
+    END)::text AS "blurb",
+  (
+    CASE WHEN frontmatter ->> 'image' IS NOT NULL THEN
+      frontmatter ->> 'image'
+    ELSE
+      ''
+    END)::text AS "image",
   coalesce("url_path", ''),
   "last_published",
   "created_at",
   "updated_at",
   "schedule_for",
-  to_timestamp(frontmatter ->> 'published',
-    -- ISO date
-    'YYYY-MM-DD"T"HH24:MI:SS"Z"')::timestamptz AS "published_at"
+  (
+    CASE WHEN frontmatter ->> 'published' IS NOT NULL THEN
+      frontmatter ->> 'published'
+    ELSE
+      ''
+    END)::text AS "published_at"
 FROM
   page
 WHERE
-  "file_path" ILIKE $1
+  "file_path" LIKE $1
 ORDER BY
   frontmatter ->> 'published' DESC
 LIMIT $2 OFFSET $3;
