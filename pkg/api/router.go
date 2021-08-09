@@ -75,8 +75,12 @@ func (app *appEnv) routes() http.Handler {
 		r.NotFound(app.renderNotFound)
 	})
 
-	r.Get(`/api-background/sleep/{duration}`, app.backgroundSleep)
-	r.Get(`/api-background/cron`, app.backgroundCron)
+	r.Route("/api-background", func(r chi.Router) {
+		r.Get(`/sleep/{duration}`, app.backgroundSleep)
+		r.Get(`/cron`, app.backgroundCron)
+		r.Get(`/refresh-pages`, app.backgroundRefreshPages)
+	})
+
 	r.NotFound(app.notFound)
 
 	return r

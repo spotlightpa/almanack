@@ -6,6 +6,7 @@ import (
 
 	"github.com/carlmjohnson/errutil"
 	"github.com/go-chi/chi"
+	"github.com/spotlightpa/almanack/internal/db"
 )
 
 func (app *appEnv) backgroundSleep(w http.ResponseWriter, r *http.Request) {
@@ -46,6 +47,40 @@ func (app *appEnv) backgroundCron(w http.ResponseWriter, r *http.Request) {
 		// reply shows up in dev only
 		app.replyErr(w, r, err)
 		return
+	}
+
+	app.replyJSON(http.StatusAccepted, w, "OK")
+}
+
+func (app *appEnv) backgroundRefreshPages(w http.ResponseWriter, r *http.Request) {
+	app.Println("start backgroundRefreshPages")
+
+	hasNext := true
+	for queryPage := int32(0); hasNext; queryPage++ {
+		const (
+			pageSize = 10
+			limit    = pageSize + 1
+		)
+		offset := queryPage * pageSize
+		pages, err := app.svc.Queries.ListPages(r.Context(), db.ListPagesParams{
+			FilePath: "content/news/%",
+			Offset:   offset,
+			Limit:    limit,
+		})
+		if err != nil {
+			app.replyErr(w, r, err)
+			return
+		}
+		hasNext = len(pages) == limit
+		if hasNext {
+			pages = pages[:pageSize]
+		}
+		for i := range pages {
+			if err := app.svc.RefreshPageContents(r.Context(), pages[i].ID); err != nil {
+				app.replyErr(w, r, err)
+				return
+			}
+		}
 	}
 
 	app.replyJSON(http.StatusAccepted, w, "OK")
