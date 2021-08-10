@@ -642,3 +642,41 @@ func (app *appEnv) postPage(w http.ResponseWriter, r *http.Request) {
 	}
 	app.replyJSON(http.StatusOK, w, &res)
 }
+
+func (app *appEnv) postPageForArcID(w http.ResponseWriter, r *http.Request) {
+	app.Printf("start postPageForArcID")
+	type request struct {
+		ArcID        string `json:"arc-id"`
+		ForceRefresh bool   `json:"force-refresh"`
+	}
+	var req request
+	if !app.readJSON(w, r, &req) {
+		return
+	}
+	dbArt, err := app.svc.Queries.GetArticleByArcID(r.Context(), req.ArcID)
+	if err != nil {
+		err = db.ExpectNotFound(err)
+		app.replyErr(w, r, err)
+		return
+	}
+	includeFrontmatter := true
+	if filepath := dbArt.SpotlightPAPath.String; filepath != "" {
+		if !req.ForceRefresh {
+			page, err := app.svc.Queries.GetPageByPath(r.Context(), filepath)
+			if err != nil {
+				app.replyErr(w, r, err)
+				return
+			}
+			app.replyJSON(http.StatusOK, w, page.ID)
+			return
+		}
+		includeFrontmatter = false
+	}
+	app.Printf("saving page from %s", req.ArcID)
+	page, err := app.svc.PageFromArcArticle(r.Context(), dbArt, includeFrontmatter)
+	if err != nil {
+		app.replyErr(w, r, err)
+		return
+	}
+	app.replyJSON(http.StatusOK, w, page.ID)
+}
