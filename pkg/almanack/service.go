@@ -260,7 +260,7 @@ func (svc Service) SaveAlmanackArticle(ctx context.Context, article *ArcStory, s
 		err     error
 	)
 	if setArcData {
-		if arcData, err = json.Marshal(article.ArcFeedItem); err != nil {
+		if arcData, err = json.Marshal(article.FeedItem); err != nil {
 			return err
 		}
 	}
@@ -283,7 +283,7 @@ func (svc Service) SaveAlmanackArticle(ctx context.Context, article *ArcStory, s
 	return nil
 }
 
-func (svc Service) StoreFeed(ctx context.Context, newfeed *arc.ArcAPI) (err error) {
+func (svc Service) StoreFeed(ctx context.Context, newfeed *arc.API) (err error) {
 	arcItems, err := json.Marshal(&newfeed.Contents)
 	if err != nil {
 		return err
