@@ -16,12 +16,12 @@ const (
 	StatusDone       = 6
 )
 
-type ArcAPI struct {
-	Version  string        `json:"apiVersion"`
-	Contents []ArcFeedItem `json:"contents"`
+type API struct {
+	Version  string     `json:"apiVersion"`
+	Contents []FeedItem `json:"contents"`
 }
 
-type ArcFeedItem struct {
+type FeedItem struct {
 	AdditionalProperties ContentProperties  `json:"additional_properties"`
 	CanonicalURL         string             `json:"canonical_url"`
 	CanonicalWebsite     string             `json:"canonical_website"`
@@ -56,14 +56,14 @@ type ArcFeedItem struct {
 }
 
 // Value implements the driver.Valuer interface.
-func (item ArcFeedItem) Value() (driver.Value, error) {
+func (item FeedItem) Value() (driver.Value, error) {
 	b, err := json.Marshal(item)
 	return b, err
 }
 
 // Scan implements the sql.Scanner interface.
-func (item *ArcFeedItem) Scan(value interface{}) error {
-	var newItem ArcFeedItem
+func (item *FeedItem) Scan(value interface{}) error {
+	var newItem FeedItem
 	if value == nil {
 		return nil
 	}

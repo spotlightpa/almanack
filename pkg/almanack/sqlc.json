@@ -29,8 +29,7 @@
 			"column": "article.arc_data",
 			"go_type": {
 				"import": "github.com/spotlightpa/almanack/internal/arc",
-				"package": "arc",
-				"type": "ArcFeedItem"
+				"type": "FeedItem"
 			}
 		}
 	],

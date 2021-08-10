@@ -214,8 +214,8 @@ func (app *appEnv) getIntParam(r *http.Request, param string) (n int64, err erro
 	return
 }
 
-func (app *appEnv) FetchFeed(ctx context.Context) (*arc.ArcAPI, error) {
-	var feed arc.ArcAPI
+func (app *appEnv) FetchFeed(ctx context.Context) (*arc.API, error) {
+	var feed arc.API
 	// Timeout needs to leave enough time to report errors to Sentry before
 	// AWS kills the Lambda…
 	ctx, cancel := context.WithTimeout(ctx, 6*time.Second)

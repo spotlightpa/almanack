@@ -43,7 +43,7 @@ func (app *appEnv) listWithArcRefresh(w http.ResponseWriter, r *http.Request) {
 		NextPage int                 `json:"next_page,omitempty"`
 	}
 	var (
-		feed *arc.ArcAPI
+		feed *arc.API
 		err  error
 	)
 	if feed, err = app.FetchFeed(r.Context()); err != nil {
@@ -81,7 +81,7 @@ func (app *appEnv) postAlmanackArcStory(w http.ResponseWriter, r *http.Request) 
 	)
 	if userData.RefreshArc {
 		var (
-			feed *arc.ArcAPI
+			feed *arc.API
 			err  error
 		)
 		if feed, err = app.FetchFeed(r.Context()); err != nil {
@@ -94,7 +94,7 @@ func (app *appEnv) postAlmanackArcStory(w http.ResponseWriter, r *http.Request) 
 		}
 		for i := range feed.Contents {
 			if feed.Contents[i].ID == userData.ID {
-				story.ArcFeedItem = feed.Contents[i]
+				story.FeedItem = feed.Contents[i]
 				refreshStory = true
 			}
 		}
@@ -154,7 +154,7 @@ func (app *appEnv) postScheduledArticle(w http.ResponseWriter, r *http.Request) 
 
 	if userData.RefreshArc {
 		var (
-			feed *arc.ArcAPI
+			feed *arc.API
 			err  error
 		)
 		if feed, err = app.FetchFeed(r.Context()); err != nil {

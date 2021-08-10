@@ -8,13 +8,13 @@ import (
 )
 
 type ArcStory struct {
-	arc.ArcFeedItem
+	arc.FeedItem
 	Note   string `json:"almanack-note,omitempty"`
 	Status Status `json:"almanack-status,omitempty"`
 }
 
 func (story *ArcStory) fromDB(dart *db.Article) error {
-	story.ArcFeedItem = dart.ArcData
+	story.FeedItem = dart.ArcData
 	story.Note = dart.Note
 	var ok bool
 	if story.Status, ok = dbStatusToStatus[dart.Status]; !ok {
