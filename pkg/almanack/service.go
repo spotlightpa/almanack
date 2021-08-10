@@ -622,3 +622,40 @@ func (svc Service) RefreshPageContents(ctx context.Context, id int64) (err error
 
 	return err
 }
+
+func (svc Service) PageFromArcArticle(ctx context.Context, dbArt db.Article, includeFrontmatter bool) (page *db.Page, err error) {
+	defer errutil.Prefix(&err, "problem creating page from arc")
+
+	story, err := ArcStoryFromDB(&dbArt)
+	if err != nil {
+		return nil, err
+	}
+	var splArt SpotlightPAArticle
+	if err = story.ToArticle(ctx, svc, &splArt); err != nil {
+		return nil, err
+	}
+
+	content, err := splArt.ToTOML()
+	if err != nil {
+		return nil, err
+	}
+
+	var dbPage db.Page
+	if err = dbPage.FromTOML(content); err != nil {
+		return nil, err
+	}
+	if err = svc.Queries.EnsurePage(ctx, splArt.ContentFilepath()); err != nil {
+		return nil, err
+	}
+	if dbPage, err = svc.Queries.UpdatePage(ctx, db.UpdatePageParams{
+		FilePath:       splArt.ContentFilepath(),
+		SetFrontmatter: includeFrontmatter,
+		Frontmatter:    dbPage.Frontmatter,
+		SetBody:        true,
+		Body:           dbPage.Body,
+		URLPath:        dbPage.URLPath.String,
+	}); err != nil {
+		return nil, err
+	}
+	return &dbPage, nil
+}

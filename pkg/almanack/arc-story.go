@@ -13,6 +13,15 @@ type ArcStory struct {
 	Status Status `json:"almanack-status,omitempty"`
 }
 
+func ArcStoryFromDB(dart *db.Article) (story *ArcStory, err error) {
+	var newStory ArcStory
+	if err = newStory.fromDB(dart); err != nil {
+		return
+	}
+	story = &newStory
+	return
+}
+
 func (story *ArcStory) fromDB(dart *db.Article) error {
 	story.FeedItem = dart.ArcData
 	story.Note = dart.Note
