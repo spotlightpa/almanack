@@ -73,13 +73,13 @@ WHERE
 RETURNING
   *;
 
--- name: GetArticle :one
+-- name: GetArticleByArcID :one
 SELECT
   *
 FROM
   article
 WHERE
-  arc_id = $1;
+  arc_id = @arc_id::text;
 
 -- name: GetArticleByDBID :one
 SELECT

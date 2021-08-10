@@ -12,17 +12,17 @@ import (
 	"github.com/lib/pq"
 )
 
-const getArticle = `-- name: GetArticle :one
+const getArticleByArcID = `-- name: GetArticleByArcID :one
 SELECT
   id, arc_id, arc_data, spotlightpa_path, spotlightpa_data, schedule_for, last_published, note, status, created_at, updated_at
 FROM
   article
 WHERE
-  arc_id = $1
+  arc_id = $1::text
 `
 
-func (q *Queries) GetArticle(ctx context.Context, arcID sql.NullString) (Article, error) {
-	row := q.db.QueryRowContext(ctx, getArticle, arcID)
+func (q *Queries) GetArticleByArcID(ctx context.Context, arcID string) (Article, error) {
+	row := q.db.QueryRowContext(ctx, getArticleByArcID, arcID)
 	var i Article
 	err := row.Scan(
 		&i.ID,

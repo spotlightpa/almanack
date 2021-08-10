@@ -89,8 +89,8 @@ func (svc Service) GetSpotlightPAArticle(ctx context.Context, dbID int32) (*Spot
 
 func (svc Service) GetScheduledArticle(ctx context.Context, articleID string) (*SpotlightPAArticle, error) {
 	start := time.Now()
-	dart, err := svc.Queries.GetArticle(ctx, nullString(articleID))
-	svc.Logger.Printf("queried GetArticle in %v", time.Since(start))
+	dart, err := svc.Queries.GetArticleByArcID(ctx, articleID)
+	svc.Logger.Printf("queried GetArticleByArcID in %v", time.Since(start))
 	if err != nil {
 		return nil, db.ExpectNotFound(err)
 	}
@@ -110,8 +110,8 @@ func (svc Service) GetScheduledArticle(ctx context.Context, articleID string) (*
 
 func (svc Service) ResetSpotlightPAArticleArcData(ctx context.Context, article *SpotlightPAArticle) error {
 	start := time.Now()
-	dart, err := svc.Queries.GetArticle(ctx, nullString(article.ArcID))
-	svc.Logger.Printf("queried GetArticle in %v", time.Since(start))
+	dart, err := svc.Queries.GetArticleByArcID(ctx, article.ArcID)
+	svc.Logger.Printf("queried GetArticleByArcID in %v", time.Since(start))
 	if err != nil {
 		return err
 	}
@@ -157,8 +157,8 @@ func (svc Service) SaveScheduledArticle(ctx context.Context, article *SpotlightP
 	// Get the article so we can get fields not in the user article JSON
 	// like filepath
 	start = time.Now()
-	*dart, err = svc.Queries.GetArticle(ctx, dart.ArcID)
-	svc.Logger.Printf("queried GetArticle in %v", time.Since(start))
+	*dart, err = svc.Queries.GetArticleByArcID(ctx, dart.ArcID.String)
+	svc.Logger.Printf("queried GetArticleByArcID in %v", time.Since(start))
 	if err != nil {
 		return err
 	}
@@ -215,8 +215,8 @@ func (svc Service) PopScheduledArticles(ctx context.Context) error {
 
 func (svc Service) GetArcStory(ctx context.Context, articleID string) (story *ArcStory, err error) {
 	start := time.Now()
-	dart, err := svc.Queries.GetArticle(ctx, nullString(articleID))
-	svc.Printf("GetArticle query time: %v", time.Since(start))
+	dart, err := svc.Queries.GetArticleByArcID(ctx, articleID)
+	svc.Printf("GetArticleByArcID query time: %v", time.Since(start))
 	if err != nil {
 		err = db.ExpectNotFound(err)
 		return
