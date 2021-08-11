@@ -1,6 +1,7 @@
 package almanack
 
 import (
+	"os"
 	"strings"
 	"testing"
 )
@@ -30,6 +31,9 @@ func TestMakeImageName(t *testing.T) {
 				t.Errorf("makeImageName(%q) == %q", tc.ct, got)
 			}
 		})
+		if os.Getenv("ALMANACK_BENCH_IMAGE_NAMES") == "" {
+			continue
+		}
 		var s string
 		r := testing.Benchmark(func(b *testing.B) {
 			for i := 0; i < b.N; i++ {
