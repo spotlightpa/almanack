@@ -10,6 +10,7 @@ import (
 
 	"github.com/BurntSushi/toml"
 	"github.com/carlmjohnson/errutil"
+	"github.com/spotlightpa/almanack/internal/stringutils"
 	"github.com/spotlightpa/almanack/internal/timeutil"
 )
 
@@ -57,7 +58,6 @@ func (page *Page) FromTOML(content string) (err error) {
 	defer errutil.Prefix(&err, "problem reading TOML")
 
 	const delimiter = "+++\n"
-	var frontmatter, body string
 
 	if !strings.HasPrefix(content, delimiter) {
 		// try parsing as JSON
@@ -72,11 +72,9 @@ func (page *Page) FromTOML(content string) (err error) {
 		page.Body = ""
 		return nil
 	}
-	frontmatter = content[len(delimiter):]
-	if end := strings.Index(frontmatter, delimiter); end != -1 {
-		body = frontmatter[end+len(delimiter):]
-		frontmatter = frontmatter[:end]
-	} else {
+	content = strings.TrimPrefix(content, delimiter)
+	frontmatter, body, ok := stringutils.Cut(content, delimiter)
+	if !ok {
 		return fmt.Errorf("could not parse frontmatter: no end delimiter")
 	}
 
