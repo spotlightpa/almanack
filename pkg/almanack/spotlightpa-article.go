@@ -11,6 +11,7 @@ import (
 	"github.com/carlmjohnson/errutil"
 	"github.com/spotlightpa/almanack/internal/db"
 	"github.com/spotlightpa/almanack/internal/slack"
+	"github.com/spotlightpa/almanack/internal/stringutils"
 	"github.com/spotlightpa/almanack/internal/timeutil"
 )
 
@@ -181,16 +182,13 @@ func (splArt *SpotlightPAArticle) ToTOML() (string, error) {
 
 func (splArt *SpotlightPAArticle) FromTOML(content string) error {
 	const delimiter = "+++\n"
-	var frontmatter, body string
 
 	if !strings.HasPrefix(content, delimiter) {
 		return fmt.Errorf("could not parse frontmatter: no prefix delimiter")
 	}
-	frontmatter = content[len(delimiter):]
-	if end := strings.Index(frontmatter, delimiter); end != -1 {
-		body = frontmatter[end+len(delimiter):]
-		frontmatter = frontmatter[:end]
-	} else {
+	content = strings.TrimPrefix(content, delimiter)
+	frontmatter, body, ok := stringutils.Cut(content, delimiter)
+	if !ok {
 		return fmt.Errorf("could not parse frontmatter: no end delimiter")
 	}
 

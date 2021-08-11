@@ -13,6 +13,7 @@ import (
 	"github.com/carlmjohnson/resperr"
 	"github.com/gabriel-vasile/mimetype"
 	"github.com/spotlightpa/almanack/internal/aws"
+	"github.com/spotlightpa/almanack/internal/stringutils"
 )
 
 func GetSignedImageUpload(ctx context.Context, is aws.BlobStore, ct string) (signedURL, filename string, err error) {
@@ -25,10 +26,8 @@ func GetSignedImageUpload(ctx context.Context, is aws.BlobStore, ct string) (sig
 
 func makeImageName(ct string) string {
 	ext := "bin"
-	if i := strings.Index(ct, "/"); i != -1 {
-		if tempext := ct[i+1:]; len(tempext) >= 3 {
-			ext = tempext
-		}
+	if _, tempext, ok := stringutils.Cut(ct, "/"); ok && len(tempext) >= 3 {
+		ext = tempext
 	}
 	var sb strings.Builder
 	sb.Grow(len("2006/01/1234-5678-9abc-defg.") + len(ext))

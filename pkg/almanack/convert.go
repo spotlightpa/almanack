@@ -38,10 +38,10 @@ func (arcStory *ArcStory) ToArticle(ctx context.Context, svc Service, article *S
 
 	article.Byline = commaAndJoiner(article.Authors)
 	for i := range article.Authors {
-		if pos := strings.Index(article.Authors[i], " of "); pos != -1 {
-			article.Authors[i] = article.Authors[i][:pos]
-		} else if pos := strings.Index(article.Authors[i], " for "); pos != -1 {
-			article.Authors[i] = article.Authors[i][:pos]
+		if author, _, ok := stringutils.Cut(article.Authors[i], " of "); ok {
+			article.Authors[i] = author
+		} else if author, _, ok = stringutils.Cut(article.Authors[i], " for "); ok {
+			article.Authors[i] = author
 		}
 	}
 
