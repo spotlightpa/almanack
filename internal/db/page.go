@@ -41,7 +41,7 @@ func (page *Page) ToTOML() (string, error) {
 			continue
 		}
 		if t, ok := timeutil.GetTime(page.Frontmatter, key); ok {
-			val = t
+			val = timeutil.ToEST(t)
 		}
 		frontmatter[key] = val
 	}
