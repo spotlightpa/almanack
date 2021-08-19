@@ -51,7 +51,7 @@ export default {
           text: "Homepage Editor",
         },
         {
-          to: "spotlightpa-articles",
+          to: "news-pages",
           icon: ["fas", "file-signature"],
           text: "Spotlight PA Articles",
         },

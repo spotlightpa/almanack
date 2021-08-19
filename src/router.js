@@ -16,9 +16,9 @@ import ViewFileUploader from "./components/ViewFileUploader.vue";
 import ViewLogin from "./components/ViewLogin.vue";
 import ViewNewsletterList from "./components/ViewNewsletterList.vue";
 import ViewNewsletterPage from "./components/ViewNewsletterPage.vue";
-import ViewSpotlightPAArticles from "./components/ViewSpotlightPAArticles.vue";
-import ViewSpotlightPAPage from "./components/ViewSpotlightPAPage.vue";
+import ViewNewsPagesList from "./components/ViewNewsPagesList.vue";
 import ViewRedirectArcToSpotlightPAPage from "./components/ViewRedirectArcToSpotlightPAPage.vue";
+import ViewSpotlightPAPage from "./components/ViewSpotlightPAPage.vue";
 import ViewUnauthorized from "./components/ViewUnauthorized.vue";
 import ViewUploader from "./components/ViewUploader.vue";
 
@@ -122,8 +122,9 @@ let router = new Router({
     },
     {
       path: "/admin/spotlightpa",
-      name: "spotlightpa-articles",
-      component: ViewSpotlightPAArticles,
+      name: "news-pages",
+      component: ViewNewsPagesList,
+      props: (route) => ({ page: route.query.page }),
       meta: {
         requiresAuth: isSpotlightPAUser,
       },

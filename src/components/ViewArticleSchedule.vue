@@ -39,10 +39,6 @@ export default {
           <router-link :to="{ name: 'admin' }">Admin</router-link>
         </li>
         <li>
-          <router-link exact :to="{ name: 'spotlightpa-articles' }">
-            Spotlight PA Articles
-          </router-link>
-
           (<router-link :to="article ? article.detailsRoute : ''"
             >Switch to Editor View</router-link
           >)
