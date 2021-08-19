@@ -8,7 +8,6 @@ import (
 	"github.com/carlmjohnson/emailx"
 	"github.com/carlmjohnson/errutil"
 	"github.com/carlmjohnson/resperr"
-	"github.com/go-chi/chi"
 	"github.com/spotlightpa/almanack/internal/arc"
 	"github.com/spotlightpa/almanack/internal/db"
 	"github.com/spotlightpa/almanack/pkg/almanack"
@@ -126,57 +125,6 @@ func (app *appEnv) postMessage(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	app.replyJSON(http.StatusAccepted, w, http.StatusText(http.StatusAccepted))
-}
-
-func (app *appEnv) getScheduledArticle(w http.ResponseWriter, r *http.Request) {
-	articleID := chi.URLParam(r, "id")
-	app.Printf("start getScheduledArticle %s", articleID)
-
-	article, err := app.svc.GetScheduledArticle(r.Context(), articleID)
-	if err != nil {
-		app.replyErr(w, r, err)
-		return
-	}
-
-	app.replyJSON(http.StatusOK, w, article)
-}
-
-func (app *appEnv) postScheduledArticle(w http.ResponseWriter, r *http.Request) {
-	app.Println("start postScheduledArticle")
-
-	var userData struct {
-		almanack.SpotlightPAArticle
-		RefreshArc bool `json:"almanack-refresh-arc"`
-	}
-	if !app.readJSON(w, r, &userData) {
-		return
-	}
-
-	if userData.RefreshArc {
-		var (
-			feed *arc.API
-			err  error
-		)
-		if feed, err = app.FetchFeed(r.Context()); err != nil {
-			app.replyErr(w, r, err)
-			return
-		}
-		if err = app.svc.StoreFeed(r.Context(), feed); err != nil {
-			app.replyErr(w, r, err)
-			return
-		}
-		if err = app.svc.ResetSpotlightPAArticleArcData(r.Context(), &userData.SpotlightPAArticle); err != nil {
-			app.replyErr(w, r, err)
-			return
-		}
-	}
-
-	if err := app.svc.SaveScheduledArticle(r.Context(), &userData.SpotlightPAArticle); err != nil {
-		app.replyErr(w, r, err)
-		return
-	}
-
-	app.replyJSON(http.StatusAccepted, w, &userData.SpotlightPAArticle)
 }
 
 var supportedContentTypes = map[string]string{
@@ -378,24 +326,6 @@ func (app *appEnv) postAddress(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	app.replyJSON(http.StatusOK, w, resp)
-}
-
-func (app *appEnv) listSpotlightPAArticles(w http.ResponseWriter, r *http.Request) {
-	app.Printf("starting listSpotlightPAArticles")
-	type response struct {
-		Articles []db.ListSpotlightPAArticlesRow `json:"articles"`
-	}
-	var (
-		res response
-		err error
-	)
-
-	if res.Articles, err = app.svc.Queries.ListSpotlightPAArticles(r.Context()); err != nil {
-		app.replyErr(w, r, err)
-		return
-	}
-
-	app.replyJSON(http.StatusOK, w, res)
 }
 
 func (app *appEnv) listImages(w http.ResponseWriter, r *http.Request) {
