@@ -36,10 +36,8 @@ export default {
       <font-awesome-icon :icon="['far', 'newspaper']" />
       {{ article.slug }}
     </router-link>
-
     <span class="is-inline-flex middle">
-      <span class="tags has-addons">
-        <span class="tag is-light">Status</span>
+      <span class="tags">
         <span class="tag is-small" :class="tagStyle">
           <span class="icon is-size-6">
             <font-awesome-icon
@@ -65,13 +63,13 @@ export default {
         </a>
         <router-link
           v-if="isSpotlightPAUser"
-          :to="article.scheduleRoute"
           class="tag is-light"
+          :to="article.spotlightPARedirectRoute"
         >
           <span class="icon">
             <font-awesome-icon :icon="['fas', 'user-clock']" />
           </span>
-          <span> Scheduler </span>
+          <span> Spotlight PA </span>
         </router-link>
       </span>
     </span>

@@ -46,6 +46,7 @@ const endpoints = {
   getSignupURL: `/api/mailchimp-signup-url`,
   sendMessage: `/api/message`,
   postPage: `/api/page`,
+  postPageForArcID: `/api/page-for-arc-id`,
   saveArticle: `/api/scheduled-articles`,
   listSpotlightPAArticles: `/api/spotlightpa-articles`,
 };
@@ -185,6 +186,7 @@ function makeClient($auth) {
     "postAuthorizedDomain",
     "postAuthorizedEmailAddress",
     "postPage",
+    "postPageForArcID",
     "saveArcArticle",
     "saveArticle",
     "saveEditorsPicks",

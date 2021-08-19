@@ -17,6 +17,8 @@ import ViewLogin from "./components/ViewLogin.vue";
 import ViewNewsletterList from "./components/ViewNewsletterList.vue";
 import ViewNewsletterPage from "./components/ViewNewsletterPage.vue";
 import ViewSpotlightPAArticles from "./components/ViewSpotlightPAArticles.vue";
+import ViewSpotlightPAPage from "./components/ViewSpotlightPAPage.vue";
+import ViewRedirectArcToSpotlightPAPage from "./components/ViewRedirectArcToSpotlightPAPage.vue";
 import ViewUnauthorized from "./components/ViewUnauthorized.vue";
 import ViewUploader from "./components/ViewUploader.vue";
 
@@ -122,6 +124,24 @@ let router = new Router({
       path: "/admin/spotlightpa",
       name: "spotlightpa-articles",
       component: ViewSpotlightPAArticles,
+      meta: {
+        requiresAuth: isSpotlightPAUser,
+      },
+    },
+    {
+      path: "/admin/redirect/arc-to-spotlight/:id",
+      name: "redirect-arc-spotlightpa-page",
+      component: ViewRedirectArcToSpotlightPAPage,
+      props: true,
+      meta: {
+        requiresAuth: isSpotlightPAUser,
+      },
+    },
+    {
+      path: "/admin/spotlightpa/:id",
+      name: "spotlightpa-page",
+      component: ViewSpotlightPAPage,
+      props: true,
       meta: {
         requiresAuth: isSpotlightPAUser,
       },

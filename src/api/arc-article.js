@@ -147,6 +147,9 @@ export default class ArcArticle {
   get scheduleRoute() {
     return { name: "schedule", params: { id: this.id } };
   }
+  get spotlightPARedirectRoute() {
+    return { name: "redirect-arc-spotlightpa-page", params: { id: this.id } };
+  }
   get authors() {
     return this.getProp("credits.by", { fallback: [] }).map((item) => {
       let byline = getProp(item, "additional_properties.original.byline");
