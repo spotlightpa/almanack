@@ -561,6 +561,39 @@ func (app *appEnv) postFileUpdate(w http.ResponseWriter, r *http.Request) {
 	app.replyJSON(http.StatusOK, w, &res)
 }
 
+func (app *appEnv) listNewsPages(w http.ResponseWriter, r *http.Request) {
+	page, err := app.getRequestPage(r, "listNewsPages")
+	if err != nil {
+		app.replyErr(w, r, err)
+		return
+	}
+
+	app.Printf("start listNewsPages page %d", page)
+
+	var resp struct {
+		Pages    []db.ListPagesRow `json:"pages"`
+		NextPage int               `json:"next_page,omitempty"`
+	}
+	const limit = 100
+	offset := int32(page) * limit
+
+	resp.Pages, err = app.svc.Queries.ListPages(r.Context(), db.ListPagesParams{
+		FilePath: "content/news/%",
+		Limit:    limit + 1,
+		Offset:   offset,
+	})
+	hasNext := len(resp.Pages) == limit+1
+	if hasNext {
+		resp.Pages = resp.Pages[:limit]
+		resp.NextPage = page + 1
+	}
+	if err != nil {
+		app.replyErr(w, r, err)
+		return
+	}
+	app.replyJSON(http.StatusOK, w, &resp)
+}
+
 func (app *appEnv) listNewsletterPages(w http.ResponseWriter, r *http.Request) {
 	page, err := app.getRequestPage(r, "listNewsletterPages")
 	if err != nil {
