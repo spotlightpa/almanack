@@ -20,7 +20,6 @@ const endpoints = {
   // Alphabetize lists by URL to show duplicates
   // get id endpoints
   getAvailableArc: (id) => `/api/available-articles/${id}`,
-  getScheduledArticle: (id) => `/api/scheduled-articles/${id}`,
   getPage: (id) => `/api/page/${id}`,
   // list page points
   listAnyArc: (page = "0") => `/api/list-any-arc/${page}`,
@@ -48,8 +47,6 @@ const endpoints = {
   sendMessage: `/api/message`,
   postPage: `/api/page`,
   postPageForArcID: `/api/page-for-arc-id`,
-  saveArticle: `/api/scheduled-articles`,
-  listSpotlightPAArticles: `/api/spotlightpa-articles`,
 };
 
 function makeClient($auth) {
@@ -157,7 +154,6 @@ function makeClient($auth) {
   let idGetActions = [
     // does not include proxy images…
     "getAvailableArc",
-    "getScheduledArticle",
     "getPage",
     "listAnyArc",
     "listAvailableArc",
@@ -178,7 +174,6 @@ function makeClient($auth) {
     "listFiles",
     "listImages",
     "listRefreshArc",
-    "listSpotlightPAArticles",
   ];
   for (let action of simpleGetActions) {
     let endpoint = endpoints[action];

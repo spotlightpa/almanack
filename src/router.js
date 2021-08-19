@@ -8,7 +8,6 @@ import { setDimensions, sendGAPageview } from "@/utils/google-analytics.js";
 import ViewAdmin from "./components/ViewAdmin.vue";
 import ViewArcArticle from "./components/ViewArcArticle.vue";
 import ViewArticleList from "./components/ViewArticleList.vue";
-import ViewArticleSchedule from "./components/ViewArticleSchedule.vue";
 import ViewAuthorizedDomains from "./components/ViewAuthorizedDomains.vue";
 import ViewEditorsPicks from "./components/ViewEditorsPicks.vue";
 import ViewError from "./components/ViewError.vue";
@@ -78,15 +77,6 @@ let router = new Router({
       meta: { requiresAuth: isEditor },
     },
     {
-      path: "/articles/:id/schedule",
-      name: "schedule",
-      component: ViewArticleSchedule,
-      props: true,
-      meta: {
-        requiresAuth: isSpotlightPAUser,
-      },
-    },
-    {
       path: "/admin",
       name: "admin",
       component: ViewAdmin,
@@ -130,9 +120,9 @@ let router = new Router({
       },
     },
     {
-      path: "/admin/redirect/arc-to-spotlight/:id",
-      name: "redirect-arc-spotlightpa-page",
-      component: ViewRedirectArcToSpotlightPAPage,
+      path: "/admin/redirect/arc-to-news/:id",
+      name: "redirect-arc-news-page",
+      component: ViewRedirectArcToNewsPage,
       props: true,
       meta: {
         requiresAuth: isSpotlightPAUser,
