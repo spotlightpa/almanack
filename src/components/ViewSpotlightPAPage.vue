@@ -51,7 +51,7 @@ export default {
           <router-link :to="{ name: 'admin' }">Admin</router-link>
         </li>
         <li>
-          <router-link exact :to="{ name: 'spotlightpa-articles' }">
+          <router-link exact :to="{ name: 'news-pages' }">
             Spotlight PA Pages
           </router-link>
         </li>
