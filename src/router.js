@@ -7,7 +7,7 @@ import { setDimensions, sendGAPageview } from "@/utils/google-analytics.js";
 
 import ViewAdmin from "./components/ViewAdmin.vue";
 import ViewArcArticle from "./components/ViewArcArticle.vue";
-import ViewArticleList from "./components/ViewArticleList.vue";
+import ViewSharedList from "./components/ViewSharedList.vue";
 import ViewAuthorizedDomains from "./components/ViewAuthorizedDomains.vue";
 import ViewEditorsPicks from "./components/ViewEditorsPicks.vue";
 import ViewError from "./components/ViewError.vue";
@@ -63,7 +63,7 @@ let router = new Router({
     {
       path: "/articles",
       name: "articles",
-      component: ViewArticleList,
+      component: ViewSharedList,
       props: (route) => ({ page: route.query.page }),
       meta: {
         requiresAuth: isEditor,

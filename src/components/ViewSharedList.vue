@@ -3,7 +3,7 @@ import ArticleList from "./ArticleList.vue";
 import { useAuth, useListAvailableArc, useClient } from "@/api/hooks.js";
 
 export default {
-  name: "ViewArticleList",
+  name: "ViewSharedList",
   components: {
     ArticleList,
   },
