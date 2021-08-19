@@ -10,7 +10,7 @@ import BulmaFieldInput from "./BulmaFieldInput.vue";
 import CopyWithButton from "./CopyWithButton.vue";
 
 export default {
-  name: "ViewSpotlightPAPage",
+  name: "ViewNewsPage",
   components: {
     BulmaAutocompleteArray,
     BulmaField,
@@ -56,7 +56,7 @@ export default {
           </router-link>
         </li>
         <li class="is-active">
-          <router-link exact :to="{ name: 'spotlightpa-page', params: { id } }">
+          <router-link exact :to="{ name: 'news-page', params: { id } }">
             {{ title }}
           </router-link>
         </li>

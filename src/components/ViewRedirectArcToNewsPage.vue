@@ -4,7 +4,7 @@ import { makeState } from "@/api/service-util.js";
 import { useClient } from "@/api/client.js";
 
 export default {
-  name: "ViewRedirectArcToSpotlightPAPage",
+  name: "ViewRedirectArcToNewsPage",
   components: {},
   props: {
     id: String,
@@ -39,7 +39,7 @@ export default {
           return;
         }
         root.$router.replace({
-          name: "spotlightpa-page",
+          name: "news-page",
           params: {
             id: "" + id,
           },

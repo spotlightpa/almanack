@@ -64,7 +64,7 @@ class Page {
 
   get link() {
     return {
-      name: "spotlightpa-page",
+      name: "news-page",
       params: {
         id: "" + this.id,
       },
