@@ -51,6 +51,7 @@ func (app *appEnv) routes() http.Handler {
 			r.Get("/authorized-addresses", app.listAddresses)
 			r.Post("/authorized-addresses", app.postAddress)
 			r.Get("/spotlightpa-articles", app.listSpotlightPAArticles)
+			r.Get(`/news-pages/{page:\d+}`, app.listNewsPages)
 			r.Get(`/newsletter-pages/{page:\d+}`, app.listNewsletterPages)
 			r.Get(`/page/{id:\d+}`, app.getPage)
 			r.Post(`/page`, app.postPage)
