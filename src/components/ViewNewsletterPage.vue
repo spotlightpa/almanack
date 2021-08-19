@@ -10,7 +10,7 @@ import BulmaFieldInput from "./BulmaFieldInput.vue";
 import CopyWithButton from "./CopyWithButton.vue";
 
 export default {
-  name: "ViewSpotlightPAPage",
+  name: "ViewNewsletterPage",
   components: {
     BulmaAutocompleteArray,
     BulmaField,
