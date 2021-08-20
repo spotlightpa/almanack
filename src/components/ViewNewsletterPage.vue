@@ -8,6 +8,7 @@ import BulmaAutocompleteArray from "./BulmaAutocompleteArray.vue";
 import BulmaField from "./BulmaField.vue";
 import BulmaFieldInput from "./BulmaFieldInput.vue";
 import CopyWithButton from "./CopyWithButton.vue";
+import TagStatus from "./TagStatus.vue";
 
 export default {
   name: "ViewNewsletterPage",
@@ -16,6 +17,7 @@ export default {
     BulmaField,
     BulmaFieldInput,
     CopyWithButton,
+    TagStatus,
   },
   props: {
     id: String,
@@ -65,7 +67,7 @@ export default {
 
     <h1 class="title">
       {{ title }}
-
+      <TagStatus v-if="page" :status="page.status" />
       <a
         v-if="page && page.status === 'pub' && page.link"
         :href="page.link"
