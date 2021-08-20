@@ -427,7 +427,7 @@ export default {
       Loading…
     </progress>
 
-    <div v-if="error" class="message is-danger">
+    <div v-if="error" class="my-5 message is-danger">
       <div class="message-header">{{ error.name }}</div>
       <div class="message-body">
         <p class="content">{{ error.message }}</p>

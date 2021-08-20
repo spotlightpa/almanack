@@ -21,6 +21,7 @@ const endpoints = {
   // get id endpoints
   getAvailableArc: (id) => `/api/available-articles/${id}`,
   getPage: (id) => `/api/page/${id}`,
+  getPageWithContent: (id) => `/api/page-with-content/${id}`,
   // list page points
   listAnyArc: (page = "0") => `/api/list-any-arc/${page}`,
   listAvailableArc: (page = "0") => `/api/list-available/${page}`,
@@ -155,6 +156,7 @@ function makeClient($auth) {
     // does not include proxy images…
     "getAvailableArc",
     "getPage",
+    "getPageWithContent",
     "listAnyArc",
     "listAvailableArc",
     "listNewsletterPages",
