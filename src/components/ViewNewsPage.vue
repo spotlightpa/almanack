@@ -177,14 +177,14 @@ export default {
       <BulmaAutocompleteArray
         v-model="page.topics"
         label="Topics"
-        :options="[]"
+        :options="topics"
         help="Topics are open-ended collections, e.g. “Events”, “Coronavirus”"
       />
 
       <BulmaAutocompleteArray
         v-model="page.series"
         label="Series"
-        :options="[]"
+        :options="series"
         help="Series are limited-time collections, e.g. “Legislative privilege 2020”"
       />
 

@@ -1,5 +1,5 @@
 import Vue from "vue";
-import { computed, ref, toRefs, watch } from "@vue/composition-api";
+import { computed, reactive, ref, toRefs, watch } from "@vue/composition-api";
 
 import { makeState } from "@/api/service-util.js";
 import { useClient } from "@/api/client.js";
@@ -143,6 +143,32 @@ class Page {
   }
 }
 
+function useAutocompletions() {
+  let { listAllTopics, listAllSeries } = useClient();
+  const autocomplete = reactive({
+    topics: [],
+    series: [],
+  });
+
+  listAllTopics().then(([data, err]) => {
+    if (!err) {
+      autocomplete.topics = data.topics || [];
+    } else {
+      // eslint-disable-next-line no-console
+      console.warn(err);
+    }
+  });
+  listAllSeries().then(([data, err]) => {
+    if (!err) {
+      autocomplete.series = data.series || [];
+    } else {
+      // eslint-disable-next-line no-console
+      console.warn(err);
+    }
+  });
+  return autocomplete;
+}
+
 export function usePage(id) {
   const showProgress = ref(false);
   const toggleProgress = () => {
@@ -186,6 +212,7 @@ export function usePage(id) {
     showScheduler: ref(false),
 
     ...toRefs(apiState),
+    ...toRefs(useAutocompletions()),
 
     fetch,
     post,
