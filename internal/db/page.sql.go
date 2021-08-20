@@ -73,6 +73,32 @@ func (q *Queries) GetPageByPath(ctx context.Context, filePath string) (Page, err
 	return i, err
 }
 
+const getPageByURLPath = `-- name: GetPageByURLPath :one
+SELECT
+  id, file_path, frontmatter, body, schedule_for, last_published, created_at, updated_at, url_path
+FROM
+  page
+WHERE
+  url_path LIKE $1::text
+`
+
+func (q *Queries) GetPageByURLPath(ctx context.Context, urlPath string) (Page, error) {
+	row := q.db.QueryRowContext(ctx, getPageByURLPath, urlPath)
+	var i Page
+	err := row.Scan(
+		&i.ID,
+		&i.FilePath,
+		&i.Frontmatter,
+		&i.Body,
+		&i.ScheduleFor,
+		&i.LastPublished,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+		&i.URLPath,
+	)
+	return i, err
+}
+
 const listPages = `-- name: ListPages :many
 SELECT
   "id",
