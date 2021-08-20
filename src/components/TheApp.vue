@@ -1,11 +1,11 @@
 <script>
 import "@/css/main.scss";
 
-import PageNav from "./PageNav.vue";
+import AppNav from "./AppNav.vue";
 
 export default {
   components: {
-    PageNav,
+    AppNav,
   },
   metaInfo: {
     titleTemplate: "%s • Spotlight PA Almanack",
@@ -15,7 +15,7 @@ export default {
 
 <template>
   <div class="body">
-    <PageNav id="top-nav" />
+    <AppNav id="top-nav" />
     <div>
       <main class="section">
         <div class="mx-auto content-width">
