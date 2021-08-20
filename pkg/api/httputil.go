@@ -208,7 +208,7 @@ func (app *appEnv) getIntParam(r *http.Request, param string) (n int64, err erro
 	}
 
 	if n, err = strconv.ParseInt(pstr, 10, 64); err != nil {
-		err = resperr.New(http.StatusBadRequest, "bad argument to getPage: %w", err)
+		err = resperr.New(http.StatusBadRequest, "bad integer parameter: %w", err)
 		return
 	}
 	return
