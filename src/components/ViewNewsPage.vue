@@ -312,6 +312,17 @@ export default {
         ></textarea>
       </BulmaField>
 
+      <button
+        v-if="page.arcID"
+        class="block button is-warning has-text-weight-semibold"
+        :class="{ 'is-loading': isLoading || showProgress }"
+        type="button"
+        title="Remember to update published pages after refreshing"
+        @click.prevent="arcRefresh"
+      >
+        Refresh content from Arc
+      </button>
+
       <details class="field">
         <summary class="has-text-weight-semibold">Advanced options</summary>
 
@@ -432,7 +443,7 @@ export default {
       Loading…
     </progress>
 
-    <div v-if="error" class="message is-danger">
+    <div v-if="error" class="my-5 message is-danger">
       <div class="message-header">{{ error.name }}</div>
       <div class="message-body">
         <p class="content">{{ error.message }}</p>

@@ -51,6 +51,7 @@ func (app *appEnv) routes() http.Handler {
 			r.Get(`/news-pages/{page:\d+}`, app.listNewsPages)
 			r.Get(`/newsletter-pages/{page:\d+}`, app.listNewsletterPages)
 			r.Get(`/page/{id:\d+}`, app.getPage)
+			r.Get(`/page-with-content/{id:\d+}`, app.getPageWithContent)
 			r.Post(`/page`, app.postPage)
 			r.Get("/images", app.listImages)
 			r.Get("/editors-picks", app.getEditorsPicks)

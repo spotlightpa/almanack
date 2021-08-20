@@ -574,6 +574,27 @@ func (app *appEnv) getPage(w http.ResponseWriter, r *http.Request) {
 		app.replyErr(w, r, err)
 		return
 	}
+
+	app.replyJSON(http.StatusOK, w, page)
+}
+
+func (app *appEnv) getPageWithContent(w http.ResponseWriter, r *http.Request) {
+	id, err := app.getIntParam(r, "id")
+	if err != nil {
+		errutil.Prefix(&err, "bad argument to getPage")
+		app.replyErr(w, r, err)
+		return
+	}
+
+	app.Printf("start getPage for %d", id)
+	page, err := app.svc.Queries.GetPageByID(r.Context(), id)
+	if err != nil {
+		if db.IsNotFound(err) {
+			err = resperr.New(http.StatusNotFound, "page ID not found: %d", id)
+		}
+		app.replyErr(w, r, err)
+		return
+	}
 	if warning := app.svc.RefreshPageFromContentStore(r.Context(), &page); warning != nil {
 		app.logErr(r.Context(), warning)
 	}
@@ -618,7 +639,7 @@ func (app *appEnv) postPageForArcID(w http.ResponseWriter, r *http.Request) {
 	}
 	dbArt, err := app.svc.Queries.GetArticleByArcID(r.Context(), req.ArcID)
 	if err != nil {
-		err = db.ExpectNotFound(err)
+		err = fmt.Errorf("Arc-ID %q not found: %w", req.ArcID, db.ExpectNotFound(err))
 		app.replyErr(w, r, err)
 		return
 	}

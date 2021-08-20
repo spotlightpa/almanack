@@ -17,6 +17,7 @@ class Page {
     this.updatedAt = Page.getDate(data, "updated_at");
     this.lastPublished = Page.getNullableDate(data, "last_published");
     this.scheduleFor = Page.getNullableDate(data, "schedule_for");
+    this.arcID = this.frontmatter["arc-id"] ?? "";
     this.kicker = this.frontmatter["kicker"] ?? "";
     this.title = this.frontmatter["title"] ?? "";
     this.internalID = this.frontmatter["internal-id"] ?? "";
@@ -151,12 +152,19 @@ export function usePage(id) {
     }, 1000);
   };
 
-  const { getPage, postPage, listImages } = useClient();
+  const {
+    getPage,
+    getPageWithContent,
+    postPage,
+    listImages,
+    listRefreshArc,
+    postPageForArcID,
+  } = useClient();
   const { apiState, exec } = makeState();
 
   const fetch = (id) => {
     toggleProgress();
-    return exec(() => getPage(id));
+    return exec(() => getPageWithContent(id));
   };
   const post = (page) => {
     toggleProgress();
@@ -216,7 +224,21 @@ export function usePage(id) {
       page.value.scheduleFor = null;
       return post(page.value);
     },
+    async arcRefresh() {
+      toggleProgress();
+      // ignore errors from listRefreshArc
+      await listRefreshArc();
+      let [, err] = await postPageForArcID({
+        "arc-id": page.value.arcID,
+        "force-refresh": true,
+      });
+      if (err) {
+        apiState.error = err;
+        return;
+      }
 
+      await exec(() => getPage(id.value));
+    },
     imageState,
     images: computed(() =>
       !imageState.rawData ? [] : imageState.rawData.images
