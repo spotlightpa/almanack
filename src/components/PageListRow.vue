@@ -24,7 +24,7 @@ export default {
 <template>
   <tr>
     <td>
-      <router-link class="is-flex-tablet my-2" :to="link">
+      <router-link class="is-flex-tablet my-2 is-align-items-center" :to="link">
         <div class="is-flex-grow-1">
           <span class="is-inline-flex middle">
             <span class="tags mb-0">
@@ -36,7 +36,7 @@ export default {
               <TagDate :date="date" />
             </span>
           </span>
-          <p class="mt-0 has-text-weight-bold has-text-black">
+          <p class="mt-0 has-text-weight-semibold has-text-black">
             {{ hed }}
           </p>
           <p class="has-text-weight-light has-text-dark">
@@ -45,10 +45,10 @@ export default {
         </div>
         <div
           v-if="image"
-          class="is-flex-grow-0 is-clipped"
+          class="m-2 is-flex-shrink-0 is-clipped"
           style="width: 128px"
         >
-          <picture class="has-ratio">
+          <picture class="image has-ratio">
             <img
               class="is-3x4"
               :src="imgproxyURL"
