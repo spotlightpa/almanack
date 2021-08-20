@@ -128,3 +128,49 @@ FROM
   page
 WHERE
   url_path LIKE @url_path::text;
+
+-- name: ListAllTopics :many
+WITH topics AS (
+  SELECT
+    jsonb_array_elements_text(frontmatter -> 'topics') AS topic
+  FROM
+    page
+  WHERE
+    frontmatter ->> 'topics' IS NOT NULL
+)
+SELECT DISTINCT ON (upper(topic)
+)
+  topic::text
+FROM
+  topics
+ORDER BY
+  upper(topic) ASC;
+
+-- name: ListAllSeries :many
+WITH series_dates AS (
+  SELECT
+    jsonb_array_elements_text(frontmatter -> 'series') AS series,
+    frontmatter ->> 'published' AS pub_date
+  FROM
+    page
+  WHERE
+    frontmatter ->> 'series' IS NOT NULL
+  ORDER BY
+    pub_date DESC,
+    series DESC
+),
+distinct_series_dates AS (
+  SELECT DISTINCT ON (series)
+    *
+  FROM
+    series_dates
+  ORDER BY
+    series DESC,
+    pub_date DESC
+)
+SELECT
+  series::text
+FROM
+  distinct_series_dates
+ORDER BY
+  pub_date DESC;

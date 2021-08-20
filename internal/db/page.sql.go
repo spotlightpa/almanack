@@ -99,6 +99,100 @@ func (q *Queries) GetPageByURLPath(ctx context.Context, urlPath string) (Page, e
 	return i, err
 }
 
+const listAllSeries = `-- name: ListAllSeries :many
+WITH series_dates AS (
+  SELECT
+    jsonb_array_elements_text(frontmatter -> 'series') AS series,
+    frontmatter ->> 'published' AS pub_date
+  FROM
+    page
+  WHERE
+    frontmatter ->> 'series' IS NOT NULL
+  ORDER BY
+    pub_date DESC,
+    series DESC
+),
+distinct_series_dates AS (
+  SELECT DISTINCT ON (series)
+    series, pub_date
+  FROM
+    series_dates
+  ORDER BY
+    series DESC,
+    pub_date DESC
+)
+SELECT
+  series::text
+FROM
+  distinct_series_dates
+ORDER BY
+  pub_date DESC
+`
+
+func (q *Queries) ListAllSeries(ctx context.Context) ([]string, error) {
+	rows, err := q.db.QueryContext(ctx, listAllSeries)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []string
+	for rows.Next() {
+		var series string
+		if err := rows.Scan(&series); err != nil {
+			return nil, err
+		}
+		items = append(items, series)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const listAllTopics = `-- name: ListAllTopics :many
+WITH topics AS (
+  SELECT
+    jsonb_array_elements_text(frontmatter -> 'topics') AS topic
+  FROM
+    page
+  WHERE
+    frontmatter ->> 'topics' IS NOT NULL
+)
+SELECT DISTINCT ON (upper(topic)
+)
+  topic::text
+FROM
+  topics
+ORDER BY
+  upper(topic) ASC
+`
+
+func (q *Queries) ListAllTopics(ctx context.Context) ([]string, error) {
+	rows, err := q.db.QueryContext(ctx, listAllTopics)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []string
+	for rows.Next() {
+		var topic string
+		if err := rows.Scan(&topic); err != nil {
+			return nil, err
+		}
+		items = append(items, topic)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const listPages = `-- name: ListPages :many
 SELECT
   "id",
