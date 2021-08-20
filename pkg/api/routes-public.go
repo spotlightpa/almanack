@@ -111,17 +111,16 @@ func (app *appEnv) getBookmarklet(w http.ResponseWriter, r *http.Request) {
 	slug := chi.URLParam(r, "slug")
 	app.Printf("starting getBookmarklet for %q", slug)
 
-	arcid, err := app.svc.Queries.GetArticleIDFromSlug(r.Context(), slug)
-	if err != nil && !db.IsNotFound(err) {
-		app.logErr(r.Context(), err)
-		http.Error(w, "something went wrong", http.StatusInternalServerError)
-		return
-	}
-	if arcid == "" {
-		http.NotFound(w, r)
+	page, err := app.svc.Queries.GetPageByURLPath(r.Context(), "%"+slug+"%")
+	if err != nil {
+		if db.IsNotFound(err) {
+			err = resperr.WithUserMessagef(db.ExpectNotFound(err),
+				"No matching page found for %s.", slug)
+		}
+		app.replyHTMLErr(w, r, err)
 		return
 	}
 	http.Redirect(w, r,
-		fmt.Sprintf("/articles/%s/schedule", arcid),
+		fmt.Sprintf("/admin/news/%d", page.ID),
 		http.StatusTemporaryRedirect)
 }

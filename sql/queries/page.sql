@@ -120,3 +120,11 @@ WHERE
 ORDER BY
   frontmatter ->> 'published' DESC
 LIMIT $2 OFFSET $3;
+
+-- name: GetPageByURLPath :one
+SELECT
+  *
+FROM
+  page
+WHERE
+  url_path LIKE @url_path::text;
