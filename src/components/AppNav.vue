@@ -2,7 +2,7 @@
 import { useAuth } from "@/api/hooks.js";
 
 export default {
-  name: "PageNav",
+  name: "AppNav",
   data() {
     return {
       isOpen: false,
