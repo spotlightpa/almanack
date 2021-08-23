@@ -28,6 +28,7 @@ const endpoints = {
   listNewsletterPages: (page = "0") => `/api/newsletter-pages/${page}`,
   listNewsPages: (page = "0") => `/api/news-pages/${page}`,
   // GET and POST listed as two endpoints
+  listAllPages: `/api/all-pages`,
   listAllSeries: `/api/all-series`,
   listAllTopics: `/api/all-topics`,
   postAuthorizedDomain: `/api/authorized-domains`,
@@ -169,6 +170,7 @@ function makeClient($auth) {
   let simpleGetActions = [
     "getEditorsPicks",
     "getSignupURL",
+    "listAllPages",
     "listAllSeries",
     "listAllTopics",
     "listAuthorizedDomains",
