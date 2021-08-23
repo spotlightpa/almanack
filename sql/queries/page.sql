@@ -174,3 +174,36 @@ FROM
   distinct_series_dates
 ORDER BY
   pub_date DESC;
+
+-- name: ListAllPages :many
+WITH ROWS AS (
+  SELECT
+    id,
+    file_path,
+    coalesce(frontmatter ->> 'internal-id', '') AS internal_id,
+    coalesce(frontmatter ->> 'title', '') AS hed,
+    ARRAY (
+      SELECT
+        jsonb_array_elements_text(
+          CASE WHEN frontmatter ->> 'authors' IS NOT NULL THEN
+            frontmatter -> 'authors'
+          ELSE
+            '[]'::jsonb
+          END)) AS authors,
+      to_timestamp(frontmatter ->> 'published'::text,
+        -- ISO date
+        'YYYY-MM-DD"T"HH24:MI:SS"Z"')::timestamptz AS pub_date
+    FROM
+      page
+    ORDER BY
+      pub_date DESC
+)
+SELECT
+  id,
+  file_path,
+  internal_id::text AS internal_id,
+  hed::text AS hed,
+  authors::text[] AS authors,
+  pub_date::timestamptz AS pub_date
+FROM
+  ROWS;

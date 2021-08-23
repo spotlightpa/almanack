@@ -30,7 +30,7 @@ class EditorsPicksData {
   }
 
   toJSON() {
-    const getPath = (a) => a.spotlightpa_path;
+    const getPath = (a) => a.file_path;
     return {
       featuredStories: this.featuredStories.map(getPath),
       subfeatures: this.subfeatures.map(getPath),
@@ -56,8 +56,7 @@ export default {
     title: "Homepage Editor",
   },
   setup() {
-    let { listSpotlightPAArticles, getEditorsPicks, saveEditorsPicks } =
-      useClient();
+    let { listAllPages, getEditorsPicks, saveEditorsPicks } = useClient();
 
     let { apiState: listState, exec: listExec } = makeState();
     let { apiState: edPicksState, exec: edPickExec } = makeState();
@@ -66,11 +65,11 @@ export default {
       didLoad: computed(() => listState.didLoad && edPicksState.didLoad),
       isLoading: computed(() => listState.isLoading || edPicksState.isLoading),
       error: computed(() => listState.error ?? edPicksState.error),
-      articles: computed(() =>
-        listState.rawData ? listState.rawData.articles.map(toArticle) : []
+      pages: computed(() =>
+        listState.rawData ? listState.rawData.pages.map(toArticle) : []
       ),
       articlesByPath: computed(
-        () => new Map(state.articles.map((a) => [a.spotlightpa_path, a]))
+        () => new Map(state.pages.map((a) => [a.file_path, a]))
       ),
       edPicks: computed(
         () =>
@@ -82,7 +81,7 @@ export default {
     let actions = {
       reload() {
         return Promise.all([
-          listExec(listSpotlightPAArticles),
+          listExec(listAllPages),
           edPickExec(getEditorsPicks),
         ]);
       },
@@ -128,7 +127,7 @@ export default {
 
     <EditorsPicks
       v-if="didLoad && edPicks"
-      :articles="articles"
+      :articles="pages"
       :editors-picks="edPicks"
     />
 

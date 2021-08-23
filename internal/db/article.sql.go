@@ -7,9 +7,6 @@ import (
 	"context"
 	"database/sql"
 	"encoding/json"
-	"time"
-
-	"github.com/lib/pq"
 )
 
 const getArticleByArcID = `-- name: GetArticleByArcID :one
@@ -164,68 +161,6 @@ func (q *Queries) ListAvailableArticles(ctx context.Context, arg ListAvailableAr
 			&i.Status,
 			&i.CreatedAt,
 			&i.UpdatedAt,
-		); err != nil {
-			return nil, err
-		}
-		items = append(items, i)
-	}
-	if err := rows.Close(); err != nil {
-		return nil, err
-	}
-	if err := rows.Err(); err != nil {
-		return nil, err
-	}
-	return items, nil
-}
-
-const listSpotlightPAArticles = `-- name: ListSpotlightPAArticles :many
-SELECT
-  id,
-  coalesce(arc_id, '')::text AS arc_id,
-  spotlightpa_path::text,
-  (spotlightpa_data ->> 'internal-id')::text AS internal_id,
-  (spotlightpa_data ->> 'hed')::text AS hed,
-  ARRAY (
-    SELECT
-      jsonb_array_elements_text(spotlightpa_data -> 'authors'))::text[] AS authors,
-  to_timestamp(spotlightpa_data ->> 'pub-date'::text,
-    -- ISO date
-    'YYYY-MM-DD"T"HH24:MI:SS"Z"')::timestamp WITH time zone AS pub_date
-FROM
-  article
-WHERE
-  spotlightpa_path IS NOT NULL
-ORDER BY
-  pub_date DESC
-`
-
-type ListSpotlightPAArticlesRow struct {
-	ID              int32     `json:"id"`
-	ArcID           string    `json:"arc_id"`
-	SpotlightPAPath string    `json:"spotlightpa_path"`
-	InternalID      string    `json:"internal_id"`
-	Hed             string    `json:"hed"`
-	Authors         []string  `json:"authors"`
-	PubDate         time.Time `json:"pub_date"`
-}
-
-func (q *Queries) ListSpotlightPAArticles(ctx context.Context) ([]ListSpotlightPAArticlesRow, error) {
-	rows, err := q.db.QueryContext(ctx, listSpotlightPAArticles)
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-	var items []ListSpotlightPAArticlesRow
-	for rows.Next() {
-		var i ListSpotlightPAArticlesRow
-		if err := rows.Scan(
-			&i.ID,
-			&i.ArcID,
-			&i.SpotlightPAPath,
-			&i.InternalID,
-			&i.Hed,
-			pq.Array(&i.Authors),
-			&i.PubDate,
 		); err != nil {
 			return nil, err
 		}

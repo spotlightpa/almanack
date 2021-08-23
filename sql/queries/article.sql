@@ -124,23 +124,3 @@ ORDER BY
   END ASC,
   arc_data ->> 'last_updated_date' DESC
 LIMIT $1 OFFSET $2;
-
--- name: ListSpotlightPAArticles :many
-SELECT
-  id,
-  coalesce(arc_id, '')::text AS arc_id,
-  spotlightpa_path::text,
-  (spotlightpa_data ->> 'internal-id')::text AS internal_id,
-  (spotlightpa_data ->> 'hed')::text AS hed,
-  ARRAY (
-    SELECT
-      jsonb_array_elements_text(spotlightpa_data -> 'authors'))::text[] AS authors,
-  to_timestamp(spotlightpa_data ->> 'pub-date'::text,
-    -- ISO date
-    'YYYY-MM-DD"T"HH24:MI:SS"Z"')::timestamp WITH time zone AS pub_date
-FROM
-  article
-WHERE
-  spotlightpa_path IS NOT NULL
-ORDER BY
-  pub_date DESC;
