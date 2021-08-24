@@ -20,7 +20,7 @@ export default {
     <CopyWithButton
       :value="block.content"
       :rows="4"
-      size="is-small"
+      size="is-small is-clipped"
       label="Code"
     />
   </figure>
