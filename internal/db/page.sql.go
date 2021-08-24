@@ -23,17 +23,17 @@ func (q *Queries) EnsurePage(ctx context.Context, filePath string) error {
 	return err
 }
 
-const getPageByID = `-- name: GetPageByID :one
+const getPageByFilePath = `-- name: GetPageByFilePath :one
 SELECT
   id, file_path, frontmatter, body, schedule_for, last_published, created_at, updated_at, url_path
 FROM
   "page"
 WHERE
-  id = $1
+  file_path = $1
 `
 
-func (q *Queries) GetPageByID(ctx context.Context, id int64) (Page, error) {
-	row := q.db.QueryRowContext(ctx, getPageByID, id)
+func (q *Queries) GetPageByFilePath(ctx context.Context, filePath string) (Page, error) {
+	row := q.db.QueryRowContext(ctx, getPageByFilePath, filePath)
 	var i Page
 	err := row.Scan(
 		&i.ID,
@@ -49,17 +49,17 @@ func (q *Queries) GetPageByID(ctx context.Context, id int64) (Page, error) {
 	return i, err
 }
 
-const getPageByPath = `-- name: GetPageByPath :one
+const getPageByID = `-- name: GetPageByID :one
 SELECT
   id, file_path, frontmatter, body, schedule_for, last_published, created_at, updated_at, url_path
 FROM
   "page"
 WHERE
-  file_path = $1
+  id = $1
 `
 
-func (q *Queries) GetPageByPath(ctx context.Context, filePath string) (Page, error) {
-	row := q.db.QueryRowContext(ctx, getPageByPath, filePath)
+func (q *Queries) GetPageByID(ctx context.Context, id int64) (Page, error) {
+	row := q.db.QueryRowContext(ctx, getPageByID, id)
 	var i Page
 	err := row.Scan(
 		&i.ID,

@@ -646,7 +646,7 @@ func (app *appEnv) postPageForArcID(w http.ResponseWriter, r *http.Request) {
 	includeFrontmatter := true
 	if filepath := dbArt.SpotlightPAPath.String; filepath != "" {
 		if !req.ForceRefresh {
-			page, err := app.svc.Queries.GetPageByPath(r.Context(), filepath)
+			page, err := app.svc.Queries.GetPageByFilePath(r.Context(), filepath)
 			if err != nil {
 				app.replyErr(w, r, err)
 				return
