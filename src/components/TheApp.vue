@@ -17,11 +17,9 @@ export default {
   <div class="body">
     <PageNav id="top-nav" />
     <div>
-      <main class="section container">
-        <div class="columns is-centered is-multiline">
-          <div class="column is-four-fifths">
-            <router-view />
-          </div>
+      <main class="section">
+        <div class="mx-auto content-width">
+          <router-view />
         </div>
       </main>
     </div>
@@ -49,3 +47,10 @@ export default {
     </footer>
   </div>
 </template>
+
+<style scoped>
+.content-width {
+  max-width: 80ch;
+  width: 100%;
+}
+</style>
