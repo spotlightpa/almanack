@@ -10,6 +10,7 @@ import (
 	"github.com/carlmjohnson/resperr"
 	"github.com/spotlightpa/almanack/internal/arc"
 	"github.com/spotlightpa/almanack/internal/db"
+	"github.com/spotlightpa/almanack/internal/timeutil"
 	"github.com/spotlightpa/almanack/pkg/almanack"
 )
 
@@ -609,15 +610,29 @@ func (app *appEnv) postPage(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	oldPage, err := app.svc.Queries.GetPageByFilePath(r.Context(), userUpdate.FilePath)
+	if err != nil {
+		errutil.Prefix(&err, "postPage connection problem")
+		app.replyErr(w, r, err)
+		return
+	}
+
 	res, err := app.svc.Queries.UpdatePage(r.Context(), userUpdate)
 	if err != nil {
 		errutil.Prefix(&err, "postPage update problem")
 		app.replyErr(w, r, err)
 		return
 	}
-	if userUpdate.SetScheduleFor &&
-		userUpdate.ScheduleFor.Valid &&
-		userUpdate.ScheduleFor.Time.Before(time.Now()) {
+	willPublish := userUpdate.SetScheduleFor &&
+		userUpdate.ScheduleFor.Valid
+	willPublishNow := willPublish &&
+		userUpdate.ScheduleFor.Time.Before(time.Now().Add(5*time.Minute))
+	if willPublish && !timeutil.Equalish(oldPage.ScheduleFor, res.ScheduleFor) {
+		if err = app.svc.Notify(r.Context(), &res, willPublishNow); err != nil {
+			app.logErr(r.Context(), err)
+		}
+	}
+	if willPublishNow {
 		if err = app.svc.PublishPage(r.Context(), &res); err != nil {
 			errutil.Prefix(&err, "postPage publish problem")
 			app.replyErr(w, r, err)
