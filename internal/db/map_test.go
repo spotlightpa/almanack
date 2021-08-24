@@ -23,7 +23,7 @@ func TestMap(t *testing.T) {
 	// create again
 	err = q.EnsurePage(ctx, testpath)
 	check(t, err, "creation not idempotent")
-	p1, err := q.GetPageByPath(ctx, testpath)
+	p1, err := q.GetPageByFilePath(ctx, testpath)
 	check(t, err, "could not get page")
 	eq(t, testpath, p1.FilePath)
 	p2, err := q.UpdatePage(ctx, db.UpdatePageParams{
@@ -41,7 +41,7 @@ func TestMap(t *testing.T) {
 	eq(t, testpath, p2.FilePath)
 	eq(t, "hello", p2.Body)
 	eq(t, "map[bool:true hello:world number:1]", fmt.Sprint(p2.Frontmatter))
-	p3, err := q.GetPageByPath(ctx, testpath)
+	p3, err := q.GetPageByFilePath(ctx, testpath)
 	check(t, err, "could not get page")
 	eq(t, testpath, p3.FilePath)
 	eq(t, "hello", p3.Body)

@@ -38,7 +38,7 @@ WHERE
 RETURNING
   *;
 
--- name: GetPageByPath :one
+-- name: GetPageByFilePath :one
 SELECT
   *
 FROM
