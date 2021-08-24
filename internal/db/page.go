@@ -119,3 +119,11 @@ func (page *Page) SetURLPath() {
 	page.URLPath.String = upath
 	page.URLPath.Valid = upath != ""
 }
+
+func (page *Page) FullURL() string {
+	page.SetURLPath()
+	if !page.URLPath.Valid {
+		return ""
+	}
+	return fmt.Sprintf("https://www.spotlightpa.org%s", page.URLPath.String)
+}

@@ -659,3 +659,37 @@ func (svc Service) PageFromArcArticle(ctx context.Context, dbArt db.Article, inc
 	}
 	return &dbPage, nil
 }
+
+func (svc Service) Notify(ctx context.Context, page *db.Page, publishingNow bool) error {
+	const (
+		green  = "#78bc20"
+		yellow = "#ffcb05"
+	)
+	text := "New page publishing now…"
+	color := green
+
+	if !publishingNow {
+		t := timeutil.ToEST(page.ScheduleFor.Time)
+		text = t.Format("New article scheduled for Mon, Jan 2 at 3:04pm MST…")
+		color = yellow
+	}
+
+	hed, _ := page.Frontmatter["title"].(string)
+	summary := page.Frontmatter["description"].(string)
+	url := page.FullURL()
+	return svc.SlackClient.PostCtx(ctx, slack.Message{
+		Text: text,
+		Attachments: []slack.Attachment{
+			{
+				Color: color,
+				Fallback: fmt.Sprintf("%s\n%s\n%s",
+					hed, summary, url),
+				Title:     hed,
+				TitleLink: url,
+				Text: fmt.Sprintf(
+					"%s\n%s",
+					summary, url),
+			},
+		},
+	})
+}
