@@ -6,5 +6,6 @@ FROM
   article
 WHERE
   article.spotlightpa_path IS NOT NULL
+  AND article.last_published IS NOT NULL
 RETURNING
   *;
