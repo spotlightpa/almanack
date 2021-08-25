@@ -12,5 +12,3 @@ export {
   useListAnyArc,
   useAvailableArc,
 } from "./arc-services.js";
-
-export { useScheduler } from "./scheduler.js";
