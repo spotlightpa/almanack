@@ -24,9 +24,7 @@ func (app *appEnv) renderPage(w http.ResponseWriter, r *http.Request) {
 	app.Printf("start renderPage for %d", id)
 	page, err := app.svc.Queries.GetPageByID(r.Context(), id)
 	if err != nil {
-		if db.IsNotFound(err) {
-			err = resperr.New(http.StatusNotFound, "page ID not found: %d", id)
-		}
+		err = db.NoRowsAs404(err, "could not find page ID %d", id)
 		app.replyHTMLErr(w, r, err)
 		return
 	}

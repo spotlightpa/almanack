@@ -114,7 +114,8 @@ func (app *appEnv) getBookmarklet(w http.ResponseWriter, r *http.Request) {
 	page, err := app.svc.Queries.GetPageByURLPath(r.Context(), "%"+slug+"%")
 	if err != nil {
 		if db.IsNotFound(err) {
-			err = resperr.WithUserMessagef(db.ExpectNotFound(err),
+			err = resperr.WithUserMessagef(
+				db.NoRowsAs404(err, "could not find url-path %q", slug),
 				"No matching page found for %s.", slug)
 		}
 		app.replyHTMLErr(w, r, err)

@@ -184,7 +184,7 @@ func (svc Service) GetArcStory(ctx context.Context, articleID string) (story *Ar
 	dart, err := svc.Queries.GetArticleByArcID(ctx, articleID)
 	svc.Printf("GetArticleByArcID query time: %v", time.Since(start))
 	if err != nil {
-		err = db.ExpectNotFound(err)
+		err = db.NoRowsAs404(err, "could not find arc-id %q", articleID)
 		return
 	}
 	var newstory ArcStory
