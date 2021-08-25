@@ -18,6 +18,7 @@ import (
 	"github.com/spotlightpa/almanack/internal/index"
 	"github.com/spotlightpa/almanack/internal/mailchimp"
 	"github.com/spotlightpa/almanack/internal/slack"
+	"github.com/spotlightpa/almanack/internal/stringutils"
 	"github.com/spotlightpa/almanack/internal/timeutil"
 	"github.com/spotlightpa/almanack/pkg/common"
 )
@@ -477,6 +478,9 @@ func (svc Service) SaveNewsletterPage(ctx context.Context, nl *db.Newsletter, bo
 		if err := svc.Queries.EnsurePage(ctx, path); err != nil {
 			return err
 		}
+		slug := stringutils.Slugify(
+			timeutil.ToEST(nl.PublishedAt).Format("Jan 2 ") + nl.Subject,
+		)
 		if _, err := svc.Queries.UpdatePage(ctx, db.UpdatePageParams{
 			SetFrontmatter: true,
 			Frontmatter: map[string]interface{}{
@@ -503,7 +507,7 @@ func (svc Service) SaveNewsletterPage(ctx context.Context, nl *db.Newsletter, bo
 				"published":   nl.PublishedAt,
 				"raw-content": body,
 				"series":      []string{},
-				"slug":        "",
+				"slug":        slug,
 				"title":       nl.Subject,
 				"title-tag":   "",
 				"topics":      []string{},
