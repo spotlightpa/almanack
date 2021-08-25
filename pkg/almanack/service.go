@@ -74,41 +74,6 @@ type Service struct {
 	gsvc *google.Service
 }
 
-func (svc Service) GetSpotlightPAArticle(ctx context.Context, dbID int32) (*SpotlightPAArticle, error) {
-	start := time.Now()
-	dart, err := svc.Queries.GetArticleByDBID(ctx, dbID)
-	svc.Logger.Printf("queried GetArticleByDBID in %v", time.Since(start))
-	if err != nil {
-		return nil, db.ExpectNotFound(err)
-	}
-	var splArt SpotlightPAArticle
-	if err = splArt.fromDB(dart); err != nil {
-		return nil, err
-	}
-	return &splArt, nil
-}
-
-func (svc Service) GetScheduledArticle(ctx context.Context, articleID string) (*SpotlightPAArticle, error) {
-	start := time.Now()
-	dart, err := svc.Queries.GetArticleByArcID(ctx, articleID)
-	svc.Logger.Printf("queried GetArticleByArcID in %v", time.Since(start))
-	if err != nil {
-		return nil, db.ExpectNotFound(err)
-	}
-	var schArticle SpotlightPAArticle
-	if err = schArticle.fromDB(dart); err != nil {
-		return nil, err
-	}
-	if schArticle.Empty() {
-		if err = schArticle.ResetArcData(ctx, svc, dart); err != nil {
-			return nil, err
-		}
-	} else {
-		schArticle.RefreshFromContentStore(ctx, svc)
-	}
-	return &schArticle, nil
-}
-
 func (svc Service) ResetSpotlightPAArticleArcData(ctx context.Context, article *SpotlightPAArticle) error {
 	start := time.Now()
 	dart, err := svc.Queries.GetArticleByArcID(ctx, article.ArcID)
