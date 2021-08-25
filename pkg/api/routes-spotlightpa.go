@@ -569,9 +569,7 @@ func (app *appEnv) getPage(w http.ResponseWriter, r *http.Request) {
 	app.Printf("start getPage for %d", id)
 	page, err := app.svc.Queries.GetPageByID(r.Context(), id)
 	if err != nil {
-		if db.IsNotFound(err) {
-			err = resperr.New(http.StatusNotFound, "page ID not found: %d", id)
-		}
+		err = db.NoRowsAs404(err, "could not find page ID %d", id)
 		app.replyErr(w, r, err)
 		return
 	}
@@ -590,9 +588,7 @@ func (app *appEnv) getPageWithContent(w http.ResponseWriter, r *http.Request) {
 	app.Printf("start getPage for %d", id)
 	page, err := app.svc.Queries.GetPageByID(r.Context(), id)
 	if err != nil {
-		if db.IsNotFound(err) {
-			err = resperr.New(http.StatusNotFound, "page ID not found: %d", id)
-		}
+		err = db.NoRowsAs404(err, "could not find page ID %d", id)
 		app.replyErr(w, r, err)
 		return
 	}
@@ -654,7 +650,7 @@ func (app *appEnv) postPageForArcID(w http.ResponseWriter, r *http.Request) {
 	}
 	dbArt, err := app.svc.Queries.GetArticleByArcID(r.Context(), req.ArcID)
 	if err != nil {
-		err = fmt.Errorf("Arc-ID %q not found: %w", req.ArcID, db.ExpectNotFound(err))
+		err = db.NoRowsAs404(err, "could not find arc-id %q", req.ArcID)
 		app.replyErr(w, r, err)
 		return
 	}
