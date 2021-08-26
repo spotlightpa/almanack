@@ -165,10 +165,12 @@ router.beforeEach((to, from, next) => {
   let record = to.matched.find((record) => record.meta.requiresAuth);
   if (record) {
     if (!record.meta.requiresAuth.value) {
+      let redirect = to.fullPath || from.fullPath;
       next({
         name: "login",
         hash: to.hash, // For verifying tokens etc.
-        query: { redirect: to.fullPath },
+        replace: true,
+        query: { redirect },
       });
       return;
     }
