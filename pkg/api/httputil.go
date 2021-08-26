@@ -189,29 +189,37 @@ func (app *appEnv) maxSizeMiddleware(next http.Handler) http.Handler {
 	})
 }
 
-func (app *appEnv) getRequestPage(r *http.Request, route string) (page int, err error) {
-	if pageStr := chi.URLParam(r, "page"); pageStr != "" {
-		if page, err = strconv.Atoi(pageStr); err != nil {
-			err = resperr.New(http.StatusBadRequest,
-				"bad argument to %s: %w", route, err)
-			return
-		}
-	}
-	return
-}
-
-func (app *appEnv) getIntParam(r *http.Request, param string) (n int64, err error) {
+func (app *appEnv) intParam(r *http.Request, param string, v interface{}) error {
 	pstr := chi.URLParam(r, param)
 	if pstr == "" {
-		err = fmt.Errorf("parameter %q not set", param)
-		return
+		return fmt.Errorf("parameter %q not set", param)
 	}
-
-	if n, err = strconv.ParseInt(pstr, 10, 64); err != nil {
-		err = resperr.New(http.StatusBadRequest, "bad integer parameter: %w", err)
-		return
+	bitsize := 0
+	switch v.(type) {
+	case *int:
+	case *int32:
+		bitsize = 32
+	case *int64:
+		bitsize = 64
+	default:
+		return fmt.Errorf("unsupported type %T", v)
 	}
-	return
+	n, err := strconv.ParseInt(pstr, 10, bitsize)
+	if err != nil {
+		return resperr.New(
+			http.StatusBadRequest,
+			"bad integer parameter for %s: %w",
+			param, err)
+	}
+	switch i := v.(type) {
+	case *int:
+		*i = int(n)
+	case *int32:
+		*i = int32(n)
+	case *int64:
+		*i = n
+	}
+	return nil
 }
 
 func (app *appEnv) FetchFeed(ctx context.Context) (*arc.API, error) {

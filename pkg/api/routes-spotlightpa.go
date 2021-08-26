@@ -15,7 +15,8 @@ import (
 )
 
 func (app *appEnv) listAllArcStories(w http.ResponseWriter, r *http.Request) {
-	page, err := app.getRequestPage(r, "listAllArcStories")
+	var page int32
+	err := app.intParam(r, "page", &page)
 	if err != nil {
 		app.replyErr(w, r, err)
 		return
@@ -25,7 +26,7 @@ func (app *appEnv) listAllArcStories(w http.ResponseWriter, r *http.Request) {
 
 	var resp struct {
 		Contents []almanack.ArcStory `json:"contents"`
-		NextPage int                 `json:"next_page,omitempty"`
+		NextPage int32               `json:"next_page,omitempty"`
 	}
 
 	resp.Contents, resp.NextPage, err = app.svc.ListAllArcStories(r.Context(), page)
@@ -40,7 +41,7 @@ func (app *appEnv) listWithArcRefresh(w http.ResponseWriter, r *http.Request) {
 	app.Printf("starting listWithArcRefresh")
 	type response struct {
 		Contents []almanack.ArcStory `json:"contents"`
-		NextPage int                 `json:"next_page,omitempty"`
+		NextPage int32               `json:"next_page,omitempty"`
 	}
 	var (
 		feed *arc.API
@@ -493,7 +494,8 @@ func (app *appEnv) postFileUpdate(w http.ResponseWriter, r *http.Request) {
 }
 
 func (app *appEnv) listNewsPages(w http.ResponseWriter, r *http.Request) {
-	page, err := app.getRequestPage(r, "listNewsPages")
+	var page int32
+	err := app.intParam(r, "page", &page)
 	if err != nil {
 		app.replyErr(w, r, err)
 		return
@@ -503,10 +505,10 @@ func (app *appEnv) listNewsPages(w http.ResponseWriter, r *http.Request) {
 
 	var resp struct {
 		Pages    []db.ListPagesRow `json:"pages"`
-		NextPage int               `json:"next_page,omitempty"`
+		NextPage int32             `json:"next_page,omitempty"`
 	}
 	const limit = 100
-	offset := int32(page) * limit
+	offset := page * limit
 
 	resp.Pages, err = app.svc.Queries.ListPages(r.Context(), db.ListPagesParams{
 		FilePath: "content/news/%",
@@ -526,7 +528,8 @@ func (app *appEnv) listNewsPages(w http.ResponseWriter, r *http.Request) {
 }
 
 func (app *appEnv) listNewsletterPages(w http.ResponseWriter, r *http.Request) {
-	page, err := app.getRequestPage(r, "listNewsletterPages")
+	var page int32
+	err := app.intParam(r, "page", &page)
 	if err != nil {
 		app.replyErr(w, r, err)
 		return
@@ -536,10 +539,10 @@ func (app *appEnv) listNewsletterPages(w http.ResponseWriter, r *http.Request) {
 
 	var resp struct {
 		Pages    []db.ListPagesRow `json:"pages"`
-		NextPage int               `json:"next_page,omitempty"`
+		NextPage int32             `json:"next_page,omitempty"`
 	}
 	const limit = 100
-	offset := int32(page) * limit
+	offset := page * limit
 
 	resp.Pages, err = app.svc.Queries.ListPages(r.Context(), db.ListPagesParams{
 		FilePath: "content/newsletters/%",
@@ -559,8 +562,8 @@ func (app *appEnv) listNewsletterPages(w http.ResponseWriter, r *http.Request) {
 }
 
 func (app *appEnv) getPage(w http.ResponseWriter, r *http.Request) {
-	id, err := app.getIntParam(r, "id")
-	if err != nil {
+	var id int64
+	if err := app.intParam(r, "id", &id); err != nil {
 		errutil.Prefix(&err, "bad argument to getPage")
 		app.replyErr(w, r, err)
 		return
@@ -578,8 +581,8 @@ func (app *appEnv) getPage(w http.ResponseWriter, r *http.Request) {
 }
 
 func (app *appEnv) getPageWithContent(w http.ResponseWriter, r *http.Request) {
-	id, err := app.getIntParam(r, "id")
-	if err != nil {
+	var id int64
+	if err := app.intParam(r, "id", &id); err != nil {
 		errutil.Prefix(&err, "bad argument to getPage")
 		app.replyErr(w, r, err)
 		return

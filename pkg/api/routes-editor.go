@@ -16,7 +16,8 @@ func (app *appEnv) userInfo(w http.ResponseWriter, r *http.Request) {
 }
 
 func (app *appEnv) listAvailableArcStories(w http.ResponseWriter, r *http.Request) {
-	page, err := app.getRequestPage(r, "listAvailableArcStories")
+	var page int32
+	err := app.intParam(r, "page", &page)
 	if err != nil {
 		app.replyErr(w, r, err)
 		return
@@ -25,7 +26,7 @@ func (app *appEnv) listAvailableArcStories(w http.ResponseWriter, r *http.Reques
 
 	var res struct {
 		Contents []almanack.ArcStory `json:"contents"`
-		NextPage int                 `json:"next_page,string,omitempty"`
+		NextPage int32               `json:"next_page,string,omitempty"`
 	}
 	if res.Contents, res.NextPage, err = app.svc.ListAvailableArcStories(
 		r.Context(), page,
