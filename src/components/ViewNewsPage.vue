@@ -81,7 +81,7 @@ export default {
       </a>
     </h1>
 
-    <div v-if="page">
+    <form v-if="page" ref="form">
       <BulmaField
         v-slot="{ idForLabel }"
         label="Publication Date"
@@ -115,12 +115,14 @@ export default {
         v-model="page.kicker"
         label="Eyebrow"
         help="Small text appearing above the page hed"
+        :required="true"
       />
 
       <BulmaFieldInput
         v-model="page.title"
         label="Title"
         help="Default value for title tag, link title, and share title"
+        :required="true"
       />
 
       <BulmaFieldInput
@@ -272,20 +274,20 @@ export default {
         </div>
       </BulmaField>
 
-      <b-field label="URL keywords slug">
-        <b-input
-          v-model="page.slug"
-          :disabled="page.isPublished"
-          :readonly="page.isPublished"
-        />
-      </b-field>
+      <BulmaFieldInput
+        v-model="page.slug"
+        label="URL keywords slug"
+        :disabled="page.isPublished"
+        :readonly="page.isPublished"
+        :required="true"
+      />
       <button
         class="block button is-small is-light has-text-weight-semibold"
         type="button"
         :disabled="page.isPublished"
         @click.prevent="deriveSlug"
       >
-        Derive slug from title
+        Derive keywords from title
       </button>
 
       <CopyWithButton v-if="page.link" :value="page.link" label="Page URL" />
@@ -399,7 +401,7 @@ export default {
             class="button is-success has-text-weight-semibold"
             :disabled="isLoading"
             type="button"
-            @click="publishNow"
+            @click="publishNow($refs.form)"
           >
             {{ page.status === "pub" ? "Update page" : "Publish now" }}
           </button>
@@ -408,7 +410,7 @@ export default {
             class="button is-warning has-text-weight-semibold"
             :disabled="isLoading || !page.scheduleFor"
             type="button"
-            @click="updateSchedule"
+            @click="updateSchedule($refs.form)"
           >
             {{
               page.status === "none" ? "Schedule to publish" : "Save changes"
@@ -443,7 +445,7 @@ export default {
           </button>
         </div>
       </div>
-    </div>
+    </form>
 
     <progress
       v-if="isLoading || showProgress"

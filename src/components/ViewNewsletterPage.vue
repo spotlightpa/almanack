@@ -81,7 +81,7 @@ export default {
       </a>
     </h1>
 
-    <div v-if="page">
+    <form v-if="page" ref="form">
       <BulmaField
         v-slot="{ idForLabel }"
         label="Publication Date"
@@ -121,6 +121,7 @@ export default {
         v-model="page.title"
         label="Title"
         help="Default value for title tag, link title, and share title"
+        :required="true"
       />
 
       <BulmaFieldInput
@@ -383,7 +384,7 @@ export default {
             class="button is-success has-text-weight-semibold"
             :disabled="isLoading"
             type="button"
-            @click="publishNow"
+            @click="publishNow($refs.form)"
           >
             {{ page.status === "pub" ? "Update page" : "Publish now" }}
           </button>
@@ -392,7 +393,7 @@ export default {
             class="button is-warning has-text-weight-semibold"
             :disabled="isLoading || !page.scheduleFor"
             type="button"
-            @click="updateSchedule"
+            @click="updateSchedule($refs.form)"
           >
             {{
               page.status === "none" ? "Schedule to publish" : "Save changes"
@@ -427,7 +428,7 @@ export default {
           </button>
         </div>
       </div>
-    </div>
+    </form>
 
     <progress
       v-if="isLoading || showProgress"
