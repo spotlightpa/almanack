@@ -369,19 +369,29 @@ export default {
       </p>
 
       <div v-if="page.status !== 'pub'" class="field mb-5">
-        <BulmaField
-          v-slot="{ idForLabel }"
-          label="Schedule For"
-          help="Page will be automatically published at this time if set"
-        >
-          <b-datetimepicker
-            :id="idForLabel"
-            v-model="page.scheduleFor"
-            icon="user-clock"
-            :datetime-formatter="formatDateTime"
-            locale="en-US"
-          />
-        </BulmaField>
+        <details>
+          <summary class="has-text-weight-semibold">
+            {{
+              page.status === "sked"
+                ? `Scheduled for ${formatDateTime(page.scheduleFor)}`
+                : "Schedule for"
+            }}
+          </summary>
+
+          <BulmaField
+            v-slot="{ idForLabel }"
+            help="Page will be automatically published at this time if set"
+          >
+            <b-datetimepicker
+              :id="idForLabel"
+              v-model="page.scheduleFor"
+              icon="user-clock"
+              :datetime-formatter="formatDateTime"
+              :inline="true"
+              locale="en-US"
+            />
+          </BulmaField>
+        </details>
       </div>
       <div class="field">
         <div class="buttons">
