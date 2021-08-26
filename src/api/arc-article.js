@@ -144,9 +144,6 @@ export default class ArcArticle {
   get detailsRoute() {
     return { name: "article", params: { id: this.id } };
   }
-  get scheduleRoute() {
-    return { name: "schedule", params: { id: this.id } };
-  }
   get spotlightPARedirectRoute() {
     return { name: "redirect-arc-news-page", params: { id: this.id } };
   }
