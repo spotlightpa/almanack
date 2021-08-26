@@ -189,6 +189,12 @@ func (app *appEnv) maxSizeMiddleware(next http.Handler) http.Handler {
 	})
 }
 
+func (app *appEnv) mustIntParam(r *http.Request, param string, v interface{}) {
+	if err := app.intParam(r, param, v); err != nil {
+		panic(err)
+	}
+}
+
 func (app *appEnv) intParam(r *http.Request, param string, v interface{}) error {
 	pstr := chi.URLParam(r, param)
 	if pstr == "" {

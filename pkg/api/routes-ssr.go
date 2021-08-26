@@ -4,7 +4,6 @@ import (
 	"html/template"
 	"net/http"
 
-	"github.com/carlmjohnson/errutil"
 	"github.com/carlmjohnson/resperr"
 	"github.com/spotlightpa/almanack/internal/db"
 	"github.com/spotlightpa/almanack/layouts"
@@ -16,11 +15,7 @@ func (app *appEnv) renderNotFound(w http.ResponseWriter, r *http.Request) {
 
 func (app *appEnv) renderPage(w http.ResponseWriter, r *http.Request) {
 	var id int64
-	if err := app.intParam(r, "id", &id); err != nil {
-		errutil.Prefix(&err, "bad argument to renderPage")
-		app.replyHTMLErr(w, r, err)
-		return
-	}
+	app.mustIntParam(r, "id", &id)
 	app.Printf("start renderPage for %d", id)
 	page, err := app.svc.Queries.GetPageByID(r.Context(), id)
 	if err != nil {
