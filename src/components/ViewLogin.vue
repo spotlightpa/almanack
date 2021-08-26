@@ -17,7 +17,7 @@ export default {
   beforeRouteEnter(to, from, next) {
     next((vm) => {
       if (vm.isSignedIn) {
-        next({ name: "home" });
+        next({ name: "home", replace: true });
       }
     });
   },
