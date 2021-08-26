@@ -29,7 +29,6 @@ func (app *appEnv) routes() http.Handler {
 		r.With(
 			app.hasRoleMiddleware("editor"),
 		).Group(func(r chi.Router) {
-			r.Get("/available-articles", app.listAvailableArcStories)
 			r.Get(`/list-available/{page:\d+}`, app.listAvailableArcStories)
 			r.Get("/available-articles/{id}", app.getArcStory)
 			r.Get("/mailchimp-signup-url", app.getSignupURL)
@@ -37,7 +36,6 @@ func (app *appEnv) routes() http.Handler {
 		r.With(
 			app.hasRoleMiddleware("Spotlight PA"),
 		).Group(func(r chi.Router) {
-			r.Get("/upcoming-articles", app.listAllArcStories)
 			r.Get(`/list-any-arc/{page:\d+}`, app.listAllArcStories)
 			r.Get("/list-arc-refresh", app.listWithArcRefresh)
 			r.Post("/available-articles", app.postAlmanackArcStory)
