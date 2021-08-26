@@ -196,9 +196,9 @@ func (svc Service) GetArcStory(ctx context.Context, articleID string) (story *Ar
 
 }
 
-func (svc Service) ListAvailableArcStories(ctx context.Context, page int) (stories []ArcStory, nextPage int, err error) {
+func (svc Service) ListAvailableArcStories(ctx context.Context, page int32) (stories []ArcStory, nextPage int32, err error) {
 	const limit = 20
-	offset := int32(page) * limit
+	offset := page * limit
 
 	start := time.Now()
 	var dbArts []db.Article
@@ -260,7 +260,7 @@ func (svc Service) StoreFeed(ctx context.Context, newfeed *arc.API) (err error) 
 	return err
 }
 
-func (svc Service) ListAllArcStories(ctx context.Context, page int) (stories []ArcStory, nextPage int, err error) {
+func (svc Service) ListAllArcStories(ctx context.Context, page int32) (stories []ArcStory, nextPage int32, err error) {
 	const limit = 50
 	offset := int32(page) * limit
 	start := time.Now()

@@ -15,8 +15,8 @@ func (app *appEnv) renderNotFound(w http.ResponseWriter, r *http.Request) {
 }
 
 func (app *appEnv) renderPage(w http.ResponseWriter, r *http.Request) {
-	id, err := app.getIntParam(r, "id")
-	if err != nil {
+	var id int64
+	if err := app.intParam(r, "id", &id); err != nil {
 		errutil.Prefix(&err, "bad argument to renderPage")
 		app.replyHTMLErr(w, r, err)
 		return
