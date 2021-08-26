@@ -16,19 +16,16 @@ import (
 
 func (app *appEnv) listAllArcStories(w http.ResponseWriter, r *http.Request) {
 	var page int32
-	err := app.intParam(r, "page", &page)
-	if err != nil {
-		app.replyErr(w, r, err)
-		return
-	}
-
+	app.mustIntParam(r, "page", &page)
 	app.Printf("start listAllArcStories page %d", page)
 
-	var resp struct {
-		Contents []almanack.ArcStory `json:"contents"`
-		NextPage int32               `json:"next_page,omitempty"`
-	}
-
+	var (
+		resp struct {
+			Contents []almanack.ArcStory `json:"contents"`
+			NextPage int32               `json:"next_page,omitempty"`
+		}
+		err error
+	)
 	resp.Contents, resp.NextPage, err = app.svc.ListAllArcStories(r.Context(), page)
 	if err != nil {
 		app.replyErr(w, r, err)
@@ -495,18 +492,17 @@ func (app *appEnv) postFileUpdate(w http.ResponseWriter, r *http.Request) {
 
 func (app *appEnv) listNewsPages(w http.ResponseWriter, r *http.Request) {
 	var page int32
-	err := app.intParam(r, "page", &page)
-	if err != nil {
-		app.replyErr(w, r, err)
-		return
-	}
+	app.mustIntParam(r, "page", &page)
 
 	app.Printf("start listNewsPages page %d", page)
 
-	var resp struct {
-		Pages    []db.ListPagesRow `json:"pages"`
-		NextPage int32             `json:"next_page,omitempty"`
-	}
+	var (
+		resp struct {
+			Pages    []db.ListPagesRow `json:"pages"`
+			NextPage int32             `json:"next_page,omitempty"`
+		}
+		err error
+	)
 	const limit = 100
 	offset := page * limit
 
@@ -529,18 +525,16 @@ func (app *appEnv) listNewsPages(w http.ResponseWriter, r *http.Request) {
 
 func (app *appEnv) listNewsletterPages(w http.ResponseWriter, r *http.Request) {
 	var page int32
-	err := app.intParam(r, "page", &page)
-	if err != nil {
-		app.replyErr(w, r, err)
-		return
-	}
-
+	app.mustIntParam(r, "page", &page)
 	app.Printf("start listNewsletterPages page %d", page)
 
-	var resp struct {
-		Pages    []db.ListPagesRow `json:"pages"`
-		NextPage int32             `json:"next_page,omitempty"`
-	}
+	var (
+		resp struct {
+			Pages    []db.ListPagesRow `json:"pages"`
+			NextPage int32             `json:"next_page,omitempty"`
+		}
+		err error
+	)
 	const limit = 100
 	offset := page * limit
 
@@ -563,12 +557,7 @@ func (app *appEnv) listNewsletterPages(w http.ResponseWriter, r *http.Request) {
 
 func (app *appEnv) getPage(w http.ResponseWriter, r *http.Request) {
 	var id int64
-	if err := app.intParam(r, "id", &id); err != nil {
-		errutil.Prefix(&err, "bad argument to getPage")
-		app.replyErr(w, r, err)
-		return
-	}
-
+	app.mustIntParam(r, "id", &id)
 	app.Printf("start getPage for %d", id)
 	page, err := app.svc.Queries.GetPageByID(r.Context(), id)
 	if err != nil {
@@ -582,12 +571,7 @@ func (app *appEnv) getPage(w http.ResponseWriter, r *http.Request) {
 
 func (app *appEnv) getPageWithContent(w http.ResponseWriter, r *http.Request) {
 	var id int64
-	if err := app.intParam(r, "id", &id); err != nil {
-		errutil.Prefix(&err, "bad argument to getPage")
-		app.replyErr(w, r, err)
-		return
-	}
-
+	app.mustIntParam(r, "id", &id)
 	app.Printf("start getPage for %d", id)
 	page, err := app.svc.Queries.GetPageByID(r.Context(), id)
 	if err != nil {

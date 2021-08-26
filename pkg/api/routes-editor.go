@@ -17,17 +17,17 @@ func (app *appEnv) userInfo(w http.ResponseWriter, r *http.Request) {
 
 func (app *appEnv) listAvailableArcStories(w http.ResponseWriter, r *http.Request) {
 	var page int32
-	err := app.intParam(r, "page", &page)
-	if err != nil {
-		app.replyErr(w, r, err)
-		return
-	}
+	app.mustIntParam(r, "page", &page)
+
 	app.Printf("starting listAvailableArcStories page %d", page)
 
-	var res struct {
-		Contents []almanack.ArcStory `json:"contents"`
-		NextPage int32               `json:"next_page,string,omitempty"`
-	}
+	var (
+		res struct {
+			Contents []almanack.ArcStory `json:"contents"`
+			NextPage int32               `json:"next_page,string,omitempty"`
+		}
+		err error
+	)
 	if res.Contents, res.NextPage, err = app.svc.ListAvailableArcStories(
 		r.Context(), page,
 	); err != nil {
