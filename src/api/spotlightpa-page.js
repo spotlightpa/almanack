@@ -234,11 +234,17 @@ export function usePage(id) {
         fetch(id.value);
       }
     },
-    publishNow() {
+    publishNow(formEl) {
+      if (!formEl.reportValidity()) {
+        return;
+      }
       page.value.scheduleFor = new Date();
       return post(page.value);
     },
-    updateSchedule() {
+    updateSchedule(formEl) {
+      if (!formEl.reportValidity()) {
+        return;
+      }
       const msg =
         "Scheduled publication date is in the past. Do you want to publish now?";
       let isPostDated = page.value.scheduleFor - new Date() > 0;
