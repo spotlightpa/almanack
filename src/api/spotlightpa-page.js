@@ -97,6 +97,13 @@ class Page {
     return imgproxyURL(this.image);
   }
 
+  get arcURL() {
+    if (!this.arcID) {
+      return "";
+    }
+    return `https://pmn.arcpublishing.com/composer/edit/${this.arcID}/`;
+  }
+
   toJSON() {
     return {
       file_path: this.filePath,
