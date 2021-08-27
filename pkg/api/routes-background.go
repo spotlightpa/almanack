@@ -60,7 +60,7 @@ func (app *appEnv) backgroundRefreshPages(w http.ResponseWriter, r *http.Request
 		const pageSize = 10
 
 		offset := queryPage * pageSize
-		pages, err := app.svc.Queries.ListPages(r.Context(), db.ListPagesParams{
+		pageIDs, err := app.svc.Queries.ListPageIDs(r.Context(), db.ListPageIDsParams{
 			FilePath: "content/news/%",
 			Offset:   offset,
 			Limit:    pageSize + 1,
@@ -69,12 +69,12 @@ func (app *appEnv) backgroundRefreshPages(w http.ResponseWriter, r *http.Request
 			app.replyErr(w, r, err)
 			return
 		}
-		hasNext = len(pages) > pageSize
+		hasNext = len(pageIDs) > pageSize
 		if hasNext {
-			pages = pages[:pageSize]
+			pageIDs = pageIDs[:pageSize]
 		}
-		for i := range pages {
-			if err := app.svc.RefreshPageContents(r.Context(), pages[i].ID); err != nil {
+		for _, id := range pageIDs {
+			if err := app.svc.RefreshPageContents(r.Context(), id); err != nil {
 				app.replyErr(w, r, err)
 				return
 			}

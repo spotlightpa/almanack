@@ -268,6 +268,47 @@ func (q *Queries) ListAllTopics(ctx context.Context) ([]string, error) {
 	return items, nil
 }
 
+const listPageIDs = `-- name: ListPageIDs :many
+SELECT
+  "id"
+FROM
+  page
+WHERE
+  "file_path" LIKE $1
+ORDER BY
+  id ASC
+LIMIT $2 OFFSET $3
+`
+
+type ListPageIDsParams struct {
+	FilePath string `json:"file_path"`
+	Limit    int32  `json:"limit"`
+	Offset   int32  `json:"offset"`
+}
+
+func (q *Queries) ListPageIDs(ctx context.Context, arg ListPageIDsParams) ([]int64, error) {
+	rows, err := q.db.QueryContext(ctx, listPageIDs, arg.FilePath, arg.Limit, arg.Offset)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []int64
+	for rows.Next() {
+		var id int64
+		if err := rows.Scan(&id); err != nil {
+			return nil, err
+		}
+		items = append(items, id)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const listPages = `-- name: ListPages :many
 SELECT
   "id",

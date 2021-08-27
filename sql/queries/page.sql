@@ -121,6 +121,17 @@ ORDER BY
   frontmatter ->> 'published' DESC
 LIMIT $2 OFFSET $3;
 
+-- name: ListPageIDs :many
+SELECT
+  "id"
+FROM
+  page
+WHERE
+  "file_path" LIKE $1
+ORDER BY
+  id ASC
+LIMIT $2 OFFSET $3;
+
 -- name: GetPageByURLPath :one
 SELECT
   *
