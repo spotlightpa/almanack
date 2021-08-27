@@ -610,7 +610,13 @@ func (app *appEnv) postPage(w http.ResponseWriter, r *http.Request) {
 		userUpdate.ScheduleFor.Valid
 	willPublishNow := willPublish &&
 		userUpdate.ScheduleFor.Time.Before(time.Now().Add(5*time.Minute))
-	if willPublish && !timeutil.Equalish(oldPage.ScheduleFor, res.ScheduleFor) {
+	var shouldNotify bool
+	if willPublishNow {
+		shouldNotify = !oldPage.LastPublished.Valid
+	} else {
+		shouldNotify = willPublish && !timeutil.Equalish(oldPage.ScheduleFor, res.ScheduleFor)
+	}
+	if shouldNotify {
 		if err = app.svc.Notify(r.Context(), &res, willPublishNow); err != nil {
 			app.logErr(r.Context(), err)
 		}
