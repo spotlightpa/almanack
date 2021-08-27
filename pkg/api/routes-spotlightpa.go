@@ -503,17 +503,17 @@ func (app *appEnv) listNewsPages(w http.ResponseWriter, r *http.Request) {
 		}
 		err error
 	)
-	const limit = 100
-	offset := page * limit
+	const pageSize = 100
+	offset := page * pageSize
 
 	resp.Pages, err = app.svc.Queries.ListPages(r.Context(), db.ListPagesParams{
 		FilePath: "content/news/%",
-		Limit:    limit + 1,
+		Limit:    pageSize + 1,
 		Offset:   offset,
 	})
-	hasNext := len(resp.Pages) == limit+1
-	if hasNext {
-		resp.Pages = resp.Pages[:limit]
+
+	if len(resp.Pages) > pageSize {
+		resp.Pages = resp.Pages[:pageSize]
 		resp.NextPage = page + 1
 	}
 	if err != nil {
@@ -535,17 +535,17 @@ func (app *appEnv) listNewsletterPages(w http.ResponseWriter, r *http.Request) {
 		}
 		err error
 	)
-	const limit = 100
-	offset := page * limit
+	const pageSize = 100
+	offset := page * pageSize
 
 	resp.Pages, err = app.svc.Queries.ListPages(r.Context(), db.ListPagesParams{
 		FilePath: "content/newsletters/%",
-		Limit:    limit + 1,
+		Limit:    pageSize + 1,
 		Offset:   offset,
 	})
-	hasNext := len(resp.Pages) == limit+1
-	if hasNext {
-		resp.Pages = resp.Pages[:limit]
+
+	if len(resp.Pages) > pageSize {
+		resp.Pages = resp.Pages[:pageSize]
 		resp.NextPage = page + 1
 	}
 	if err != nil {
