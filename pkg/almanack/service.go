@@ -559,6 +559,7 @@ func (svc Service) RefreshPageContents(ctx context.Context, id int64) (err error
 	}
 	defer errutil.Prefix(&err, fmt.Sprintf("problem refreshing contents of %s", page.FilePath))
 
+	oldURLPath := page.URLPath.String
 	contentBefore, err := page.ToTOML()
 	if err != nil {
 		return err
@@ -571,7 +572,9 @@ func (svc Service) RefreshPageContents(ctx context.Context, id int64) (err error
 	if err != nil {
 		return err
 	}
-	if contentBefore == contentAfter {
+	page.SetURLPath()
+	newURLPath := page.URLPath.String
+	if contentBefore == contentAfter && oldURLPath == newURLPath {
 		return nil
 	}
 
@@ -583,6 +586,7 @@ func (svc Service) RefreshPageContents(ctx context.Context, id int64) (err error
 		Frontmatter:    page.Frontmatter,
 		SetBody:        true,
 		Body:           page.Body,
+		URLPath:        page.URLPath.String,
 	})
 
 	return err
