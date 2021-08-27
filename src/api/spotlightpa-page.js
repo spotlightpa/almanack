@@ -276,7 +276,6 @@ export function usePage(id) {
     images: computed(() =>
       !imageState.rawData ? [] : imageState.rawData.images
     ),
-    imgproxyURL,
     setImageProps(image) {
       page.value.image = image.path;
       page.value.imageDescription = image.description;
