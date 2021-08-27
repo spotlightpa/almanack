@@ -81,7 +81,7 @@ SELECT
 FROM
   page
 WHERE
-  url_path LIKE $1::text
+  url_path ILIKE $1::text
 `
 
 func (q *Queries) GetPageByURLPath(ctx context.Context, urlPath string) (Page, error) {

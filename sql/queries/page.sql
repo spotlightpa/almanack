@@ -138,7 +138,7 @@ SELECT
 FROM
   page
 WHERE
-  url_path LIKE @url_path::text;
+  url_path ILIKE @url_path::text;
 
 -- name: ListAllTopics :many
 WITH topics AS (
