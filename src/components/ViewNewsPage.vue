@@ -67,20 +67,35 @@ export default {
       </ul>
     </nav>
 
-    <h1 class="title">
-      {{ title }}
-      <TagStatus v-if="page" :status="page.status" />
-      <a
-        v-if="page && page.status === 'pub' && page.link"
-        :href="page.link"
-        class="is-size-6"
-        target="_blank"
-      >
-        <span class="icon is-size-6">
-          <font-awesome-icon :icon="['fas', 'link']" />
-        </span>
-        <span>Open live URL</span>
-      </a>
+    <h1 class="title is-flex-desktop">
+      <span class="mr-2">
+        {{ title }}
+      </span>
+      <span class="tags">
+        <TagStatus v-if="page" :status="page.status" />
+        <a
+          v-if="page && page.arcURL"
+          class="tag is-warning"
+          :href="page.arcURL"
+          target="_blank"
+        >
+          <span class="icon is-size-6">
+            <font-awesome-icon :icon="['fas', 'link']" />
+          </span>
+          <span>View in Arc</span>
+        </a>
+        <a
+          v-if="page && page.status === 'pub' && page.link"
+          :href="page.link"
+          class="tag is-primary"
+          target="_blank"
+        >
+          <span class="icon is-size-6">
+            <font-awesome-icon :icon="['fas', 'link']" />
+          </span>
+          <span>Open live URL</span>
+        </a>
+      </span>
     </h1>
 
     <form v-if="page" ref="form">
