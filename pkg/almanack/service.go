@@ -504,7 +504,9 @@ func (svc Service) PublishPage(ctx context.Context, page *db.Page) error {
 		return err
 	}
 
-	msg := fmt.Sprintf("Content: publishing %q", page.FilePath)
+	internalID, _ := page.Frontmatter["internal-id"].(string)
+	title := stringutils.First(internalID, page.FilePath)
+	msg := fmt.Sprintf("Content: publishing %q", title)
 	if err = svc.ContentStore.UpdateFile(ctx, msg, page.FilePath, []byte(data)); err != nil {
 		return err
 	}
