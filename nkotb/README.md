@@ -14,5 +14,9 @@ GOBIN="$(pwd)" go install github.com/spotlightpa/nkotb@latest
 
 ## Screenshots
 
-```bash
+```
+$ echo '<h1>Hello, <a href="http://example.com">World</a>!</h1><p>This is an <b>example</b>.</p>' | nkotb
+# Hello, <a href="http://example.com">World</a>!
+
+This is an <b>example</b>.
 ```
