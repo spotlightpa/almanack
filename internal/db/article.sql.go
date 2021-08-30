@@ -316,6 +316,41 @@ func (q *Queries) UpdateAlmanackArticle(ctx context.Context, arg UpdateAlmanackA
 	return i, err
 }
 
+const updateArcArticleSpotlightPAPath = `-- name: UpdateArcArticleSpotlightPAPath :one
+UPDATE
+  article
+SET
+  spotlightpa_path = $1::text
+WHERE
+  arc_id = $2::text
+RETURNING
+  id, arc_id, arc_data, spotlightpa_path, spotlightpa_data, schedule_for, last_published, note, status, created_at, updated_at
+`
+
+type UpdateArcArticleSpotlightPAPathParams struct {
+	SpotlightPAPath string `json:"spotlightpa_path"`
+	ArcID           string `json:"arc_id"`
+}
+
+func (q *Queries) UpdateArcArticleSpotlightPAPath(ctx context.Context, arg UpdateArcArticleSpotlightPAPathParams) (Article, error) {
+	row := q.db.QueryRowContext(ctx, updateArcArticleSpotlightPAPath, arg.SpotlightPAPath, arg.ArcID)
+	var i Article
+	err := row.Scan(
+		&i.ID,
+		&i.ArcID,
+		&i.ArcData,
+		&i.SpotlightPAPath,
+		&i.SpotlightPAData,
+		&i.ScheduleFor,
+		&i.LastPublished,
+		&i.Note,
+		&i.Status,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+	)
+	return i, err
+}
+
 const updateArcArticles = `-- name: UpdateArcArticles :exec
 WITH arc_table AS (
   SELECT
