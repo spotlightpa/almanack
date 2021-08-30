@@ -3,6 +3,7 @@ package api
 import (
 	"fmt"
 	"net/http"
+	"strings"
 	"time"
 
 	"github.com/carlmjohnson/emailx"
@@ -615,6 +616,9 @@ func (app *appEnv) postPage(w http.ResponseWriter, r *http.Request) {
 		shouldNotify = !oldPage.LastPublished.Valid
 	} else {
 		shouldNotify = willPublish && !timeutil.Equalish(oldPage.ScheduleFor, res.ScheduleFor)
+	}
+	if !strings.HasPrefix(res.FilePath, "content/news/") {
+		shouldNotify = false
 	}
 	if shouldNotify {
 		if err = app.svc.Notify(r.Context(), &res, willPublishNow); err != nil {
