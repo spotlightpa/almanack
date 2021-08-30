@@ -124,3 +124,13 @@ ORDER BY
   END ASC,
   arc_data ->> 'last_updated_date' DESC
 LIMIT $1 OFFSET $2;
+
+-- name: UpdateArcArticleSpotlightPAPath :one
+UPDATE
+  article
+SET
+  spotlightpa_path = @spotlightpa_path::text
+WHERE
+  arc_id = @arc_id::text
+RETURNING
+  *;

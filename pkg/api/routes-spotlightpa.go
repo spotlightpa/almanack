@@ -647,24 +647,31 @@ func (app *appEnv) postPageForArcID(w http.ResponseWriter, r *http.Request) {
 		app.replyErr(w, r, err)
 		return
 	}
-	includeFrontmatter := true
-	if filepath := dbArt.SpotlightPAPath.String; filepath != "" {
-		if !req.ForceRefresh {
-			page, err := app.svc.Queries.GetPageByFilePath(r.Context(), filepath)
-			if err != nil {
-				app.replyErr(w, r, err)
-				return
-			}
-			app.replyJSON(http.StatusOK, w, page.ID)
+	filepath := dbArt.SpotlightPAPath.String
+	firstConversion := filepath == ""
+	if !firstConversion && !req.ForceRefresh {
+		page, err := app.svc.Queries.GetPageByFilePath(r.Context(), filepath)
+		if err != nil {
+			app.replyErr(w, r, err)
 			return
 		}
-		includeFrontmatter = false
+		app.replyJSON(http.StatusOK, w, page.ID)
+		return
 	}
 	app.Printf("saving page from %s", req.ArcID)
-	page, err := app.svc.PageFromArcArticle(r.Context(), dbArt, includeFrontmatter)
+	page, err := app.svc.PageFromArcArticle(r.Context(), dbArt, firstConversion)
 	if err != nil {
 		app.replyErr(w, r, err)
 		return
+	}
+	if firstConversion {
+		if _, err = app.svc.Queries.UpdateArcArticleSpotlightPAPath(r.Context(), db.UpdateArcArticleSpotlightPAPathParams{
+			ArcID:           req.ArcID,
+			SpotlightPAPath: page.FilePath,
+		}); err != nil {
+			app.replyErr(w, r, err)
+			return
+		}
 	}
 	app.replyJSON(http.StatusOK, w, page.ID)
 }
