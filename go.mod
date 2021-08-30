@@ -1,6 +1,6 @@
 module github.com/spotlightpa/almanack
 
-go 1.16
+go 1.17
 
 require (
 	github.com/BurntSushi/toml v0.4.1
@@ -21,9 +21,35 @@ require (
 	github.com/go-chi/chi v1.5.4
 	github.com/google/go-github/v33 v33.0.0
 	github.com/gorilla/feeds v1.1.1
-	github.com/lib/pq v1.10.2
+	github.com/jackc/pgconn v1.10.0
+	github.com/jackc/pgx/v4 v4.13.0
 	github.com/mattbaird/gochimp v0.0.0-20200820164431-f1082bcdf63f
 	gocloud.dev v0.23.0
 	golang.org/x/net v0.0.0-20210805182204-aaa1db679c0d
 	golang.org/x/oauth2 v0.0.0-20210805134026-6f1e6394065a
+)
+
+require (
+	cloud.google.com/go v0.81.0 // indirect
+	github.com/golang/groupcache v0.0.0-20210331224755-41bb18bfe9da // indirect
+	github.com/golang/protobuf v1.5.2 // indirect
+	github.com/google/go-querystring v1.0.0 // indirect
+	github.com/google/wire v0.5.0 // indirect
+	github.com/googleapis/gax-go/v2 v2.0.5 // indirect
+	github.com/jackc/chunkreader/v2 v2.0.1 // indirect
+	github.com/jackc/pgio v1.0.0 // indirect
+	github.com/jackc/pgpassfile v1.0.0 // indirect
+	github.com/jackc/pgproto3/v2 v2.1.1 // indirect
+	github.com/jackc/pgservicefile v0.0.0-20200714003250-2b9c44734f2b // indirect
+	github.com/jackc/pgtype v1.8.1 // indirect
+	github.com/jmespath/go-jmespath v0.4.0 // indirect
+	go.opencensus.io v0.23.0 // indirect
+	golang.org/x/crypto v0.0.0-20210711020723-a769d52b0f97 // indirect
+	golang.org/x/sys v0.0.0-20210615035016-665e8c7367d1 // indirect
+	golang.org/x/text v0.3.6 // indirect
+	golang.org/x/xerrors v0.0.0-20200804184101-5ec99f83aff1 // indirect
+	google.golang.org/appengine v1.6.7 // indirect
+	google.golang.org/genproto v0.0.0-20210506142907-4a47615972c2 // indirect
+	google.golang.org/grpc v1.37.0 // indirect
+	google.golang.org/protobuf v1.26.0 // indirect
 )

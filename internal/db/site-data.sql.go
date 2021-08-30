@@ -18,7 +18,7 @@ WHERE
 `
 
 func (q *Queries) GetSiteData(ctx context.Context, key string) (json.RawMessage, error) {
-	row := q.db.QueryRowContext(ctx, getSiteData, key)
+	row := q.db.QueryRow(ctx, getSiteData, key)
 	var data json.RawMessage
 	err := row.Scan(&data)
 	return data, err
@@ -39,6 +39,6 @@ type SetSiteDataParams struct {
 }
 
 func (q *Queries) SetSiteData(ctx context.Context, arg SetSiteDataParams) error {
-	_, err := q.db.ExecContext(ctx, setSiteData, arg.Key, arg.Data)
+	_, err := q.db.Exec(ctx, setSiteData, arg.Key, arg.Data)
 	return err
 }

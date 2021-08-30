@@ -2,9 +2,10 @@ package db
 
 import (
 	"context"
-	"database/sql"
 	"flag"
 	"time"
+
+	"github.com/jackc/pgx/v4"
 )
 
 // FlagVar adds an option to the specified FlagSet (or flag.CommandLine if nil)
@@ -23,14 +24,14 @@ func FlagVar(fl *flag.FlagSet, name, usage string) (q *Queries) {
 }
 
 func Open(dbURL string) (q *Queries, err error) {
-	db, err := sql.Open("postgres", dbURL)
+	ctx, cancel := context.WithTimeout(context.Background(), 1*time.Second)
+	defer cancel()
+	db, err := pgx.Connect(ctx, dbURL)
 	if err != nil {
 		return nil, err
 	}
-	ctx, cancel := context.WithTimeout(context.Background(), 1*time.Second)
-	defer cancel()
 
-	if err := db.PingContext(ctx); err != nil {
+	if err := db.Ping(ctx); err != nil {
 		return nil, err
 	}
 

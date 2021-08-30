@@ -19,7 +19,7 @@ WHERE
 `
 
 func (q *Queries) GetArticleByArcID(ctx context.Context, arcID string) (Article, error) {
-	row := q.db.QueryRowContext(ctx, getArticleByArcID, arcID)
+	row := q.db.QueryRow(ctx, getArticleByArcID, arcID)
 	var i Article
 	err := row.Scan(
 		&i.ID,
@@ -47,7 +47,7 @@ WHERE
 `
 
 func (q *Queries) GetArticleByDBID(ctx context.Context, id int32) (Article, error) {
-	row := q.db.QueryRowContext(ctx, getArticleByDBID, id)
+	row := q.db.QueryRow(ctx, getArticleByDBID, id)
 	var i Article
 	err := row.Scan(
 		&i.ID,
@@ -83,7 +83,7 @@ type ListAllArcArticlesParams struct {
 }
 
 func (q *Queries) ListAllArcArticles(ctx context.Context, arg ListAllArcArticlesParams) ([]Article, error) {
-	rows, err := q.db.QueryContext(ctx, listAllArcArticles, arg.Limit, arg.Offset)
+	rows, err := q.db.Query(ctx, listAllArcArticles, arg.Limit, arg.Offset)
 	if err != nil {
 		return nil, err
 	}
@@ -107,9 +107,6 @@ func (q *Queries) ListAllArcArticles(ctx context.Context, arg ListAllArcArticles
 			return nil, err
 		}
 		items = append(items, i)
-	}
-	if err := rows.Close(); err != nil {
-		return nil, err
 	}
 	if err := rows.Err(); err != nil {
 		return nil, err
@@ -141,7 +138,7 @@ type ListAvailableArticlesParams struct {
 }
 
 func (q *Queries) ListAvailableArticles(ctx context.Context, arg ListAvailableArticlesParams) ([]Article, error) {
-	rows, err := q.db.QueryContext(ctx, listAvailableArticles, arg.Limit, arg.Offset)
+	rows, err := q.db.Query(ctx, listAvailableArticles, arg.Limit, arg.Offset)
 	if err != nil {
 		return nil, err
 	}
@@ -165,9 +162,6 @@ func (q *Queries) ListAvailableArticles(ctx context.Context, arg ListAvailableAr
 			return nil, err
 		}
 		items = append(items, i)
-	}
-	if err := rows.Close(); err != nil {
-		return nil, err
 	}
 	if err := rows.Err(); err != nil {
 		return nil, err
@@ -185,7 +179,7 @@ ORDER BY
 `
 
 func (q *Queries) ListUpcoming(ctx context.Context) ([]Article, error) {
-	rows, err := q.db.QueryContext(ctx, listUpcoming)
+	rows, err := q.db.Query(ctx, listUpcoming)
 	if err != nil {
 		return nil, err
 	}
@@ -209,9 +203,6 @@ func (q *Queries) ListUpcoming(ctx context.Context) ([]Article, error) {
 			return nil, err
 		}
 		items = append(items, i)
-	}
-	if err := rows.Close(); err != nil {
-		return nil, err
 	}
 	if err := rows.Err(); err != nil {
 		return nil, err
@@ -232,7 +223,7 @@ RETURNING
 `
 
 func (q *Queries) PopScheduled(ctx context.Context) ([]Article, error) {
-	rows, err := q.db.QueryContext(ctx, popScheduled)
+	rows, err := q.db.Query(ctx, popScheduled)
 	if err != nil {
 		return nil, err
 	}
@@ -256,9 +247,6 @@ func (q *Queries) PopScheduled(ctx context.Context) ([]Article, error) {
 			return nil, err
 		}
 		items = append(items, i)
-	}
-	if err := rows.Close(); err != nil {
-		return nil, err
 	}
 	if err := rows.Err(); err != nil {
 		return nil, err
@@ -292,7 +280,7 @@ type UpdateAlmanackArticleParams struct {
 }
 
 func (q *Queries) UpdateAlmanackArticle(ctx context.Context, arg UpdateAlmanackArticleParams) (Article, error) {
-	row := q.db.QueryRowContext(ctx, updateAlmanackArticle,
+	row := q.db.QueryRow(ctx, updateAlmanackArticle,
 		arg.Status,
 		arg.Note,
 		arg.SetArcData,
@@ -333,7 +321,7 @@ type UpdateArcArticleSpotlightPAPathParams struct {
 }
 
 func (q *Queries) UpdateArcArticleSpotlightPAPath(ctx context.Context, arg UpdateArcArticleSpotlightPAPathParams) (Article, error) {
-	row := q.db.QueryRowContext(ctx, updateArcArticleSpotlightPAPath, arg.SpotlightPAPath, arg.ArcID)
+	row := q.db.QueryRow(ctx, updateArcArticleSpotlightPAPath, arg.SpotlightPAPath, arg.ArcID)
 	var i Article
 	err := row.Scan(
 		&i.ID,
@@ -369,7 +357,7 @@ ON CONFLICT (arc_id)
 `
 
 func (q *Queries) UpdateArcArticles(ctx context.Context, arcItems json.RawMessage) error {
-	_, err := q.db.ExecContext(ctx, updateArcArticles, arcItems)
+	_, err := q.db.Exec(ctx, updateArcArticles, arcItems)
 	return err
 }
 
@@ -401,7 +389,7 @@ type UpdateSpotlightPAArticleParams struct {
 }
 
 func (q *Queries) UpdateSpotlightPAArticle(ctx context.Context, arg UpdateSpotlightPAArticleParams) (sql.NullTime, error) {
-	row := q.db.QueryRowContext(ctx, updateSpotlightPAArticle,
+	row := q.db.QueryRow(ctx, updateSpotlightPAArticle,
 		arg.SpotlightPAData,
 		arg.ScheduleFor,
 		arg.SpotlightPAPath,
@@ -427,7 +415,7 @@ RETURNING
 `
 
 func (q *Queries) UpdateSpotlightPAArticleLastPublished(ctx context.Context, arcID string) (sql.NullTime, error) {
-	row := q.db.QueryRowContext(ctx, updateSpotlightPAArticleLastPublished, arcID)
+	row := q.db.QueryRow(ctx, updateSpotlightPAArticleLastPublished, arcID)
 	var last_published sql.NullTime
 	err := row.Scan(&last_published)
 	return last_published, err

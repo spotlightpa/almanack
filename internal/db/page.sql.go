@@ -7,8 +7,6 @@ import (
 	"context"
 	"database/sql"
 	"time"
-
-	"github.com/lib/pq"
 )
 
 const ensurePage = `-- name: EnsurePage :exec
@@ -19,7 +17,7 @@ ON CONFLICT (file_path)
 `
 
 func (q *Queries) EnsurePage(ctx context.Context, filePath string) error {
-	_, err := q.db.ExecContext(ctx, ensurePage, filePath)
+	_, err := q.db.Exec(ctx, ensurePage, filePath)
 	return err
 }
 
@@ -33,7 +31,7 @@ WHERE
 `
 
 func (q *Queries) GetPageByFilePath(ctx context.Context, filePath string) (Page, error) {
-	row := q.db.QueryRowContext(ctx, getPageByFilePath, filePath)
+	row := q.db.QueryRow(ctx, getPageByFilePath, filePath)
 	var i Page
 	err := row.Scan(
 		&i.ID,
@@ -59,7 +57,7 @@ WHERE
 `
 
 func (q *Queries) GetPageByID(ctx context.Context, id int64) (Page, error) {
-	row := q.db.QueryRowContext(ctx, getPageByID, id)
+	row := q.db.QueryRow(ctx, getPageByID, id)
 	var i Page
 	err := row.Scan(
 		&i.ID,
@@ -85,7 +83,7 @@ WHERE
 `
 
 func (q *Queries) GetPageByURLPath(ctx context.Context, urlPath string) (Page, error) {
-	row := q.db.QueryRowContext(ctx, getPageByURLPath, urlPath)
+	row := q.db.QueryRow(ctx, getPageByURLPath, urlPath)
 	var i Page
 	err := row.Scan(
 		&i.ID,
@@ -147,7 +145,7 @@ type ListAllPagesRow struct {
 }
 
 func (q *Queries) ListAllPages(ctx context.Context) ([]ListAllPagesRow, error) {
-	rows, err := q.db.QueryContext(ctx, listAllPages)
+	rows, err := q.db.Query(ctx, listAllPages)
 	if err != nil {
 		return nil, err
 	}
@@ -160,15 +158,12 @@ func (q *Queries) ListAllPages(ctx context.Context) ([]ListAllPagesRow, error) {
 			&i.FilePath,
 			&i.InternalID,
 			&i.Hed,
-			pq.Array(&i.Authors),
+			&i.Authors,
 			&i.PubDate,
 		); err != nil {
 			return nil, err
 		}
 		items = append(items, i)
-	}
-	if err := rows.Close(); err != nil {
-		return nil, err
 	}
 	if err := rows.Err(); err != nil {
 		return nil, err
@@ -207,7 +202,7 @@ ORDER BY
 `
 
 func (q *Queries) ListAllSeries(ctx context.Context) ([]string, error) {
-	rows, err := q.db.QueryContext(ctx, listAllSeries)
+	rows, err := q.db.Query(ctx, listAllSeries)
 	if err != nil {
 		return nil, err
 	}
@@ -219,9 +214,6 @@ func (q *Queries) ListAllSeries(ctx context.Context) ([]string, error) {
 			return nil, err
 		}
 		items = append(items, series)
-	}
-	if err := rows.Close(); err != nil {
-		return nil, err
 	}
 	if err := rows.Err(); err != nil {
 		return nil, err
@@ -248,7 +240,7 @@ ORDER BY
 `
 
 func (q *Queries) ListAllTopics(ctx context.Context) ([]string, error) {
-	rows, err := q.db.QueryContext(ctx, listAllTopics)
+	rows, err := q.db.Query(ctx, listAllTopics)
 	if err != nil {
 		return nil, err
 	}
@@ -260,9 +252,6 @@ func (q *Queries) ListAllTopics(ctx context.Context) ([]string, error) {
 			return nil, err
 		}
 		items = append(items, topic)
-	}
-	if err := rows.Close(); err != nil {
-		return nil, err
 	}
 	if err := rows.Err(); err != nil {
 		return nil, err
@@ -289,7 +278,7 @@ type ListPageIDsParams struct {
 }
 
 func (q *Queries) ListPageIDs(ctx context.Context, arg ListPageIDsParams) ([]int64, error) {
-	rows, err := q.db.QueryContext(ctx, listPageIDs, arg.FilePath, arg.Limit, arg.Offset)
+	rows, err := q.db.Query(ctx, listPageIDs, arg.FilePath, arg.Limit, arg.Offset)
 	if err != nil {
 		return nil, err
 	}
@@ -301,9 +290,6 @@ func (q *Queries) ListPageIDs(ctx context.Context, arg ListPageIDsParams) ([]int
 			return nil, err
 		}
 		items = append(items, id)
-	}
-	if err := rows.Close(); err != nil {
-		return nil, err
 	}
 	if err := rows.Err(); err != nil {
 		return nil, err
@@ -391,7 +377,7 @@ type ListPagesRow struct {
 // Treating published_at as text because it sorts faster and we don't do
 // date stuff on the backend, just frontend.
 func (q *Queries) ListPages(ctx context.Context, arg ListPagesParams) ([]ListPagesRow, error) {
-	rows, err := q.db.QueryContext(ctx, listPages, arg.FilePath, arg.Limit, arg.Offset)
+	rows, err := q.db.Query(ctx, listPages, arg.FilePath, arg.Limit, arg.Offset)
 	if err != nil {
 		return nil, err
 	}
@@ -418,9 +404,6 @@ func (q *Queries) ListPages(ctx context.Context, arg ListPagesParams) ([]ListPag
 		}
 		items = append(items, i)
 	}
-	if err := rows.Close(); err != nil {
-		return nil, err
-	}
 	if err := rows.Err(); err != nil {
 		return nil, err
 	}
@@ -440,7 +423,7 @@ RETURNING
 `
 
 func (q *Queries) PopScheduledPages(ctx context.Context) ([]Page, error) {
-	rows, err := q.db.QueryContext(ctx, popScheduledPages)
+	rows, err := q.db.Query(ctx, popScheduledPages)
 	if err != nil {
 		return nil, err
 	}
@@ -462,9 +445,6 @@ func (q *Queries) PopScheduledPages(ctx context.Context) ([]Page, error) {
 			return nil, err
 		}
 		items = append(items, i)
-	}
-	if err := rows.Close(); err != nil {
-		return nil, err
 	}
 	if err := rows.Err(); err != nil {
 		return nil, err
@@ -520,7 +500,7 @@ type UpdatePageParams struct {
 }
 
 func (q *Queries) UpdatePage(ctx context.Context, arg UpdatePageParams) (Page, error) {
-	row := q.db.QueryRowContext(ctx, updatePage,
+	row := q.db.QueryRow(ctx, updatePage,
 		arg.SetFrontmatter,
 		arg.Frontmatter,
 		arg.SetBody,

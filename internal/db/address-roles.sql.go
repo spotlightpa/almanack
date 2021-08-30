@@ -5,8 +5,6 @@ package db
 
 import (
 	"context"
-
-	"github.com/lib/pq"
 )
 
 const getRolesForAddress = `-- name: GetRolesForAddress :one
@@ -19,9 +17,9 @@ WHERE
 `
 
 func (q *Queries) GetRolesForAddress(ctx context.Context, emailAddress string) ([]string, error) {
-	row := q.db.QueryRowContext(ctx, getRolesForAddress, emailAddress)
+	row := q.db.QueryRow(ctx, getRolesForAddress, emailAddress)
 	var roles []string
-	err := row.Scan(pq.Array(&roles))
+	err := row.Scan(&roles)
 	return roles, err
 }
 
@@ -37,7 +35,7 @@ ORDER BY
 `
 
 func (q *Queries) ListAddressesWithRole(ctx context.Context, role string) ([]string, error) {
-	rows, err := q.db.QueryContext(ctx, listAddressesWithRole, role)
+	rows, err := q.db.Query(ctx, listAddressesWithRole, role)
 	if err != nil {
 		return nil, err
 	}
@@ -49,9 +47,6 @@ func (q *Queries) ListAddressesWithRole(ctx context.Context, role string) ([]str
 			return nil, err
 		}
 		items = append(items, email_address)
-	}
-	if err := rows.Close(); err != nil {
-		return nil, err
 	}
 	if err := rows.Err(); err != nil {
 		return nil, err
@@ -75,12 +70,12 @@ type SetRolesForAddressParams struct {
 }
 
 func (q *Queries) SetRolesForAddress(ctx context.Context, arg SetRolesForAddressParams) (AddressRole, error) {
-	row := q.db.QueryRowContext(ctx, setRolesForAddress, arg.EmailAddress, pq.Array(arg.Roles))
+	row := q.db.QueryRow(ctx, setRolesForAddress, arg.EmailAddress, arg.Roles)
 	var i AddressRole
 	err := row.Scan(
 		&i.ID,
 		&i.EmailAddress,
-		pq.Array(&i.Roles),
+		&i.Roles,
 		&i.CreatedAt,
 		&i.UpdatedAt,
 	)

@@ -28,7 +28,7 @@ type ListNewslettersParams struct {
 }
 
 func (q *Queries) ListNewsletters(ctx context.Context, arg ListNewslettersParams) ([]Newsletter, error) {
-	rows, err := q.db.QueryContext(ctx, listNewsletters, arg.Type, arg.Limit, arg.Offset)
+	rows, err := q.db.Query(ctx, listNewsletters, arg.Type, arg.Limit, arg.Offset)
 	if err != nil {
 		return nil, err
 	}
@@ -51,9 +51,6 @@ func (q *Queries) ListNewsletters(ctx context.Context, arg ListNewslettersParams
 			return nil, err
 		}
 		items = append(items, i)
-	}
-	if err := rows.Close(); err != nil {
-		return nil, err
 	}
 	if err := rows.Err(); err != nil {
 		return nil, err
@@ -79,7 +76,7 @@ type ListNewslettersWithoutPageParams struct {
 }
 
 func (q *Queries) ListNewslettersWithoutPage(ctx context.Context, arg ListNewslettersWithoutPageParams) ([]Newsletter, error) {
-	rows, err := q.db.QueryContext(ctx, listNewslettersWithoutPage, arg.Limit, arg.Offset)
+	rows, err := q.db.Query(ctx, listNewslettersWithoutPage, arg.Limit, arg.Offset)
 	if err != nil {
 		return nil, err
 	}
@@ -102,9 +99,6 @@ func (q *Queries) ListNewslettersWithoutPage(ctx context.Context, arg ListNewsle
 			return nil, err
 		}
 		items = append(items, i)
-	}
-	if err := rows.Close(); err != nil {
-		return nil, err
 	}
 	if err := rows.Err(); err != nil {
 		return nil, err
@@ -129,7 +123,7 @@ type SetNewsletterPageParams struct {
 }
 
 func (q *Queries) SetNewsletterPage(ctx context.Context, arg SetNewsletterPageParams) (Newsletter, error) {
-	row := q.db.QueryRowContext(ctx, setNewsletterPage, arg.ID, arg.SpotlightPAPath)
+	row := q.db.QueryRow(ctx, setNewsletterPage, arg.ID, arg.SpotlightPAPath)
 	var i Newsletter
 	err := row.Scan(
 		&i.Subject,
@@ -183,9 +177,9 @@ type UpdateNewsletterArchivesParams struct {
 }
 
 func (q *Queries) UpdateNewsletterArchives(ctx context.Context, arg UpdateNewsletterArchivesParams) (int64, error) {
-	result, err := q.db.ExecContext(ctx, updateNewsletterArchives, arg.Type, arg.Data)
+	result, err := q.db.Exec(ctx, updateNewsletterArchives, arg.Type, arg.Data)
 	if err != nil {
 		return 0, err
 	}
-	return result.RowsAffected()
+	return result.RowsAffected(), nil
 }

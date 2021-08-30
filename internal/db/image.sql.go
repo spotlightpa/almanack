@@ -37,7 +37,7 @@ type CreateImageParams struct {
 }
 
 func (q *Queries) CreateImage(ctx context.Context, arg CreateImageParams) (int64, error) {
-	result, err := q.db.ExecContext(ctx, createImage,
+	result, err := q.db.Exec(ctx, createImage,
 		arg.Path,
 		arg.Type,
 		arg.Description,
@@ -48,7 +48,7 @@ func (q *Queries) CreateImage(ctx context.Context, arg CreateImageParams) (int64
 	if err != nil {
 		return 0, err
 	}
-	return result.RowsAffected()
+	return result.RowsAffected(), nil
 }
 
 const createImagePlaceholder = `-- name: CreateImagePlaceholder :execrows
@@ -64,11 +64,11 @@ type CreateImagePlaceholderParams struct {
 }
 
 func (q *Queries) CreateImagePlaceholder(ctx context.Context, arg CreateImagePlaceholderParams) (int64, error) {
-	result, err := q.db.ExecContext(ctx, createImagePlaceholder, arg.Path, arg.Type)
+	result, err := q.db.Exec(ctx, createImagePlaceholder, arg.Path, arg.Type)
 	if err != nil {
 		return 0, err
 	}
-	return result.RowsAffected()
+	return result.RowsAffected(), nil
 }
 
 const getImageBySourceURL = `-- name: GetImageBySourceURL :one
@@ -84,7 +84,7 @@ LIMIT 1
 `
 
 func (q *Queries) GetImageBySourceURL(ctx context.Context, srcUrl string) (Image, error) {
-	row := q.db.QueryRowContext(ctx, getImageBySourceURL, srcUrl)
+	row := q.db.QueryRow(ctx, getImageBySourceURL, srcUrl)
 	var i Image
 	err := row.Scan(
 		&i.ID,
@@ -118,7 +118,7 @@ type ListImagesParams struct {
 }
 
 func (q *Queries) ListImages(ctx context.Context, arg ListImagesParams) ([]Image, error) {
-	rows, err := q.db.QueryContext(ctx, listImages, arg.Limit, arg.Offset)
+	rows, err := q.db.Query(ctx, listImages, arg.Limit, arg.Offset)
 	if err != nil {
 		return nil, err
 	}
@@ -140,9 +140,6 @@ func (q *Queries) ListImages(ctx context.Context, arg ListImagesParams) ([]Image
 			return nil, err
 		}
 		items = append(items, i)
-	}
-	if err := rows.Close(); err != nil {
-		return nil, err
 	}
 	if err := rows.Err(); err != nil {
 		return nil, err
@@ -186,7 +183,7 @@ type UpdateImageParams struct {
 }
 
 func (q *Queries) UpdateImage(ctx context.Context, arg UpdateImageParams) (Image, error) {
-	row := q.db.QueryRowContext(ctx, updateImage,
+	row := q.db.QueryRow(ctx, updateImage,
 		arg.SetCredit,
 		arg.Credit,
 		arg.SetDescription,

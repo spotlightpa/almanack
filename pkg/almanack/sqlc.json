@@ -7,7 +7,8 @@
 			"name": "db",
 			"path": "../../internal/db",
 			"queries": "../../sql/queries/",
-			"schema": "../../sql/schema/"
+			"schema": "../../sql/schema/",
+			"sql_package": "pgx/v4"
 		}
 	],
 	"rename": {
