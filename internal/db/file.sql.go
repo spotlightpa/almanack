@@ -21,11 +21,11 @@ type CreateFilePlaceholderParams struct {
 }
 
 func (q *Queries) CreateFilePlaceholder(ctx context.Context, arg CreateFilePlaceholderParams) (int64, error) {
-	result, err := q.db.ExecContext(ctx, createFilePlaceholder, arg.Filename, arg.URL, arg.Type)
+	result, err := q.db.Exec(ctx, createFilePlaceholder, arg.Filename, arg.URL, arg.Type)
 	if err != nil {
 		return 0, err
 	}
-	return result.RowsAffected()
+	return result.RowsAffected(), nil
 }
 
 const listFiles = `-- name: ListFiles :many
@@ -46,7 +46,7 @@ type ListFilesParams struct {
 }
 
 func (q *Queries) ListFiles(ctx context.Context, arg ListFilesParams) ([]File, error) {
-	rows, err := q.db.QueryContext(ctx, listFiles, arg.Limit, arg.Offset)
+	rows, err := q.db.Query(ctx, listFiles, arg.Limit, arg.Offset)
 	if err != nil {
 		return nil, err
 	}
@@ -67,9 +67,6 @@ func (q *Queries) ListFiles(ctx context.Context, arg ListFilesParams) ([]File, e
 			return nil, err
 		}
 		items = append(items, i)
-	}
-	if err := rows.Close(); err != nil {
-		return nil, err
 	}
 	if err := rows.Err(); err != nil {
 		return nil, err
@@ -100,7 +97,7 @@ type UpdateFileParams struct {
 }
 
 func (q *Queries) UpdateFile(ctx context.Context, arg UpdateFileParams) (File, error) {
-	row := q.db.QueryRowContext(ctx, updateFile, arg.SetDescription, arg.Description, arg.URL)
+	row := q.db.QueryRow(ctx, updateFile, arg.SetDescription, arg.Description, arg.URL)
 	var i File
 	err := row.Scan(
 		&i.ID,

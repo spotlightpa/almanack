@@ -5,8 +5,6 @@ package db
 
 import (
 	"context"
-
-	"github.com/lib/pq"
 )
 
 const appendRoleToDomain = `-- name: AppendRoleToDomain :one
@@ -29,12 +27,12 @@ type AppendRoleToDomainParams struct {
 }
 
 func (q *Queries) AppendRoleToDomain(ctx context.Context, arg AppendRoleToDomainParams) (DomainRole, error) {
-	row := q.db.QueryRowContext(ctx, appendRoleToDomain, arg.Domain, arg.Role)
+	row := q.db.QueryRow(ctx, appendRoleToDomain, arg.Domain, arg.Role)
 	var i DomainRole
 	err := row.Scan(
 		&i.ID,
 		&i.Domain,
-		pq.Array(&i.Roles),
+		&i.Roles,
 		&i.CreatedAt,
 		&i.UpdatedAt,
 	)
@@ -51,9 +49,9 @@ WHERE
 `
 
 func (q *Queries) GetRolesForDomain(ctx context.Context, domain string) ([]string, error) {
-	row := q.db.QueryRowContext(ctx, getRolesForDomain, domain)
+	row := q.db.QueryRow(ctx, getRolesForDomain, domain)
 	var roles []string
-	err := row.Scan(pq.Array(&roles))
+	err := row.Scan(&roles)
 	return roles, err
 }
 
@@ -69,7 +67,7 @@ ORDER BY
 `
 
 func (q *Queries) ListDomainsWithRole(ctx context.Context, role string) ([]string, error) {
-	rows, err := q.db.QueryContext(ctx, listDomainsWithRole, role)
+	rows, err := q.db.Query(ctx, listDomainsWithRole, role)
 	if err != nil {
 		return nil, err
 	}
@@ -81,9 +79,6 @@ func (q *Queries) ListDomainsWithRole(ctx context.Context, role string) ([]strin
 			return nil, err
 		}
 		items = append(items, domain)
-	}
-	if err := rows.Close(); err != nil {
-		return nil, err
 	}
 	if err := rows.Err(); err != nil {
 		return nil, err
@@ -107,12 +102,12 @@ type SetRolesForDomainParams struct {
 }
 
 func (q *Queries) SetRolesForDomain(ctx context.Context, arg SetRolesForDomainParams) (DomainRole, error) {
-	row := q.db.QueryRowContext(ctx, setRolesForDomain, arg.Domain, pq.Array(arg.Roles))
+	row := q.db.QueryRow(ctx, setRolesForDomain, arg.Domain, arg.Roles)
 	var i DomainRole
 	err := row.Scan(
 		&i.ID,
 		&i.Domain,
-		pq.Array(&i.Roles),
+		&i.Roles,
 		&i.CreatedAt,
 		&i.UpdatedAt,
 	)
