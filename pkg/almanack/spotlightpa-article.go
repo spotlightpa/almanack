@@ -36,8 +36,8 @@ type SpotlightPAArticle struct {
 	Topics           []string   `toml:"topics"`
 	Series           []string   `toml:"series"`
 	LinkTitle        string     `toml:"linktitle"`
-	SuppressFeatured bool       `toml:"suppress-featured"`
-	Weight           int        `toml:"weight"`
+	SuppressFeatured bool       `toml:"-"`
+	Weight           int        `toml:"-"`
 	OverrideURL      string     `toml:"url"`
 	Aliases          []string   `toml:"aliases"`
 	ModalExclude     bool       `toml:"modal-exclude"`
