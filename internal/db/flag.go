@@ -5,7 +5,7 @@ import (
 	"flag"
 	"time"
 
-	"github.com/jackc/pgx/v4"
+	"github.com/jackc/pgx/v4/pgxpool"
 )
 
 // FlagVar adds an option to the specified FlagSet (or flag.CommandLine if nil)
@@ -26,7 +26,7 @@ func FlagVar(fl *flag.FlagSet, name, usage string) (q *Queries) {
 func Open(dbURL string) (q *Queries, err error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 1*time.Second)
 	defer cancel()
-	db, err := pgx.Connect(ctx, dbURL)
+	db, err := pgxpool.Connect(ctx, dbURL)
 	if err != nil {
 		return nil, err
 	}
