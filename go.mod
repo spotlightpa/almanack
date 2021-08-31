@@ -6,7 +6,7 @@ require (
 	github.com/BurntSushi/toml v0.4.1
 	github.com/algolia/algoliasearch-client-go/v3 v3.21.0
 	github.com/aws/aws-lambda-go v1.26.0
-	github.com/aws/aws-sdk-go v1.40.16
+	github.com/aws/aws-sdk-go v1.40.33
 	github.com/carlmjohnson/crockford v0.21.3
 	github.com/carlmjohnson/emailx v0.20.2
 	github.com/carlmjohnson/errutil v0.21.3
@@ -25,8 +25,8 @@ require (
 	github.com/jackc/pgx/v4 v4.13.0
 	github.com/mattbaird/gochimp v0.0.0-20200820164431-f1082bcdf63f
 	gocloud.dev v0.23.0
-	golang.org/x/net v0.0.0-20210805182204-aaa1db679c0d
-	golang.org/x/oauth2 v0.0.0-20210805134026-6f1e6394065a
+	golang.org/x/net v0.0.0-20210825183410-e898025ed96a
+	golang.org/x/oauth2 v0.0.0-20210819190943-2bc19b11175f
 )
 
 require (
