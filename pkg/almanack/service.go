@@ -683,3 +683,36 @@ func (svc Service) Notify(ctx context.Context, page *db.Page, publishingNow bool
 		},
 	})
 }
+
+func (svc Service) PopScheduledSiteChanges(ctx context.Context) (err error) {
+	defer errutil.Prefix(&err, "problem in PopScheduledSiteChanges")
+
+	configs, err := svc.Queries.PopScheduledSiteChanges(ctx, EditorsPicksLoc)
+	if err != nil {
+		return err
+	}
+
+	var currentConfig *db.SiteDatum
+	for _, config := range configs {
+		if currentConfig == nil || config.ScheduleFor.After(currentConfig.ScheduleFor) {
+			currentConfig = &config
+		}
+	}
+	if currentConfig == nil {
+		svc.Printf("site data: no changes to %s", EditorsPicksLoc)
+		return nil
+	}
+	svc.Printf("site data: updating %s", EditorsPicksLoc)
+
+	data, err := json.MarshalIndent(currentConfig.Data, "", "  ")
+	if err != nil {
+		return err
+	}
+	msg := fmt.Sprintf("Setting %s", currentConfig.Name)
+	if err = svc.ContentStore.UpdateFile(ctx, msg, currentConfig.Key, data); err != nil {
+		// TODO: rollback
+		return err
+	}
+
+	return svc.Queries.CleanSiteData(ctx, EditorsPicksLoc)
+}

@@ -43,6 +43,8 @@ func (app *appEnv) backgroundCron(w http.ResponseWriter, r *http.Request) {
 		errs.Push(app.svc.UpdateNewsletterArchives(r.Context()))
 		errs.Push(app.svc.ImportNewsletterPages(r.Context()))
 		return errs.Merge()
+	}, func() error {
+		return app.svc.PopScheduledSiteChanges(r.Context())
 	}); err != nil {
 		// reply shows up in dev only
 		app.replyErr(w, r, err)
