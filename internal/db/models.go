@@ -111,6 +111,7 @@ type SiteDatum struct {
 	Data        Map          `json:"data"`
 	CreatedAt   time.Time    `json:"created_at"`
 	UpdatedAt   time.Time    `json:"updated_at"`
+	Name        string       `json:"name"`
 	ScheduleFor time.Time    `json:"schedule_for"`
 	PublishedAt sql.NullTime `json:"published_at"`
 }
