@@ -352,30 +352,32 @@ func (app *appEnv) listImages(w http.ResponseWriter, r *http.Request) {
 
 func (app *appEnv) getEditorsPicks(w http.ResponseWriter, r *http.Request) {
 	app.Printf("starting getEditorsPicks")
-	resp, err := almanack.GetEditorsPicks(r.Context(), app.svc.Queries)
+	type response struct {
+		Datums []db.SiteDatum `json:"datums"`
+	}
+	var (
+		res response
+		err error
+	)
+	res.Datums, err = app.svc.Queries.GetSiteData(r.Context(), almanack.EditorsPicksLoc)
 	if err != nil {
 		app.replyErr(w, r, err)
 		return
 	}
-	app.replyJSON(http.StatusOK, w, resp)
+	app.replyJSON(http.StatusOK, w, res)
 }
 
 func (app *appEnv) postEditorsPicks(w http.ResponseWriter, r *http.Request) {
 	app.Printf("starting postEditorsPicks")
-	var req almanack.EditorsPicks
+	var req db.SetSiteDataParams
 	if !app.readJSON(w, r, &req) {
 		return
 	}
-	if err := almanack.SetEditorsPicks(
-		r.Context(),
-		app.svc.Queries,
-		app.svc.ContentStore,
-		&req,
-	); err != nil {
+	if err := app.svc.Queries.SetSiteData(r.Context(), req); err != nil {
 		app.replyErr(w, r, err)
 		return
 	}
-	resp, err := almanack.GetEditorsPicks(r.Context(), app.svc.Queries)
+	resp, err := app.svc.Queries.GetSiteData(r.Context(), almanack.EditorsPicksLoc)
 	if err != nil {
 		app.replyErr(w, r, err)
 		return

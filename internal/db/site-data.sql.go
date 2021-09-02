@@ -5,23 +5,55 @@ package db
 
 import (
 	"context"
-	"encoding/json"
 )
 
-const getSiteData = `-- name: GetSiteData :one
+const getSiteData = `-- name: GetSiteData :many
 SELECT
-  "data"
+  id, key, data, created_at, updated_at, schedule_for, published_at
 FROM
   site_data
 WHERE
-  "key" = $1
+  key = $1::text
+  AND published_at IS NULL
+  OR published_at = (
+    SELECT
+      max(published_at) AS max
+    FROM
+      site_data
+    WHERE
+      key = $1::text
+    GROUP BY
+      key)
+ORDER BY
+  schedule_for ASC
 `
 
-func (q *Queries) GetSiteData(ctx context.Context, key string) (json.RawMessage, error) {
-	row := q.db.QueryRow(ctx, getSiteData, key)
-	var data json.RawMessage
-	err := row.Scan(&data)
-	return data, err
+func (q *Queries) GetSiteData(ctx context.Context, key string) ([]SiteDatum, error) {
+	rows, err := q.db.Query(ctx, getSiteData, key)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []SiteDatum
+	for rows.Next() {
+		var i SiteDatum
+		if err := rows.Scan(
+			&i.ID,
+			&i.Key,
+			&i.Data,
+			&i.CreatedAt,
+			&i.UpdatedAt,
+			&i.ScheduleFor,
+			&i.PublishedAt,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
 }
 
 const setSiteData = `-- name: SetSiteData :exec
@@ -34,8 +66,8 @@ WHERE
 `
 
 type SetSiteDataParams struct {
-	Key  string          `json:"key"`
-	Data json.RawMessage `json:"data"`
+	Key  string `json:"key"`
+	Data Map    `json:"data"`
 }
 
 func (q *Queries) SetSiteData(ctx context.Context, arg SetSiteDataParams) error {

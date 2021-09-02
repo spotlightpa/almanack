@@ -106,9 +106,11 @@ type Page struct {
 }
 
 type SiteDatum struct {
-	ID        int32           `json:"id"`
-	Key       string          `json:"key"`
-	Data      json.RawMessage `json:"data"`
-	CreatedAt time.Time       `json:"created_at"`
-	UpdatedAt time.Time       `json:"updated_at"`
+	ID          int32        `json:"id"`
+	Key         string       `json:"key"`
+	Data        Map          `json:"data"`
+	CreatedAt   time.Time    `json:"created_at"`
+	UpdatedAt   time.Time    `json:"updated_at"`
+	ScheduleFor time.Time    `json:"schedule_for"`
+	PublishedAt sql.NullTime `json:"published_at"`
 }

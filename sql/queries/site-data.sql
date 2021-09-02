@@ -1,10 +1,22 @@
--- name: GetSiteData :one
+-- name: GetSiteData :many
 SELECT
-  "data"
+  *
 FROM
   site_data
 WHERE
-  "key" = $1;
+  key = @key::text
+  AND published_at IS NULL
+  OR published_at = (
+    SELECT
+      max(published_at) AS max
+    FROM
+      site_data
+    WHERE
+      key = @key::text
+    GROUP BY
+      key)
+ORDER BY
+  schedule_for ASC;
 
 -- name: SetSiteData :exec
 UPDATE
