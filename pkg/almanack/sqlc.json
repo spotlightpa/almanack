@@ -21,6 +21,12 @@
 	},
 	"overrides": [
 		{
+			"column": "site_data.data",
+			"go_type": {
+				"type": "Map"
+			}
+		},
+		{
 			"column": "page.frontmatter",
 			"go_type": {
 				"type": "Map"
