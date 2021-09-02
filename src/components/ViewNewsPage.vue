@@ -121,10 +121,7 @@ export default {
           </a>
         </p>
       </BulmaField>
-      <p
-        v-if="page.publishedAt - new Date() > 0"
-        class="content has-text-primary is-small"
-      >
+      <p v-if="page.isFutureDated" class="content has-text-warning is-small">
         Article publication date is in the future.
       </p>
 
@@ -342,29 +339,32 @@ export default {
       </p>
 
       <div v-if="page.status !== 'pub'" class="field mb-5">
-        <details>
-          <summary class="has-text-weight-semibold">
-            {{
-              page.status === "sked"
-                ? `Scheduled for ${formatDateTime(page.scheduleFor)}`
-                : "Schedule for"
-            }}
-          </summary>
-
-          <BulmaField
-            v-slot="{ idForLabel }"
-            help="Page will be automatically published at this time if set"
-          >
-            <b-datetimepicker
-              :id="idForLabel"
-              v-model="page.scheduleFor"
-              icon="user-clock"
-              :datetime-formatter="formatDateTime"
-              :inline="true"
-              locale="en-US"
-            />
-          </BulmaField>
-        </details>
+        <BulmaField
+          v-slot="{ idForLabel }"
+          :label="
+            page.status === 'sked'
+              ? `Scheduled for ${formatDateTime(page.scheduleFor)}`
+              : `Schedule for`
+          "
+        >
+          <b-datetimepicker
+            :id="idForLabel"
+            v-model="page.scheduleFor"
+            icon="user-clock"
+            :datetime-formatter="formatDateTime"
+            :inline="true"
+            locale="en-US"
+          />
+          <p v-if="page.isFutureDated" class="mt-2 content is-small">
+            <a
+              href="#"
+              class="has-text-info"
+              @click.prevent="page.scheduleFor = page.publishedAt"
+            >
+              Schedule for publication date
+            </a>
+          </p>
+        </BulmaField>
       </div>
       <div class="field">
         <div class="buttons">
@@ -379,7 +379,9 @@ export default {
           <button
             v-if="page.status !== 'pub'"
             class="button is-warning has-text-weight-semibold"
-            :disabled="isLoading || !page.scheduleFor"
+            :disabled="
+              isLoading || !page.scheduleFor || page.scheduleFor < new Date()
+            "
             type="button"
             @click="updateSchedule($refs.form)"
           >
