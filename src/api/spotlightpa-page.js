@@ -64,6 +64,10 @@ class Page {
     return !!this.lastPublished;
   }
 
+  get isFutureDated() {
+    return this.publishedAt && this.publishedAt > new Date();
+  }
+
   get statusVerbose() {
     return {
       pub: "published",
