@@ -594,13 +594,14 @@ func (svc Service) RefreshPageContents(ctx context.Context, id int64) (err error
 	return err
 }
 
-func (svc Service) PageFromArcArticle(ctx context.Context, dbArt db.Article, includeFrontmatter bool) (page *db.Page, err error) {
+func (svc Service) PageFromArcArticle(ctx context.Context, dbArt *db.Article) (page *db.Page, err error) {
 	defer errutil.Prefix(&err, "problem creating page from arc")
 
-	story, err := ArcStoryFromDB(&dbArt)
+	story, err := ArcStoryFromDB(dbArt)
 	if err != nil {
 		return nil, err
 	}
+
 	var splArt SpotlightPAArticle
 	if err = story.ToArticle(ctx, svc, &splArt); err != nil {
 		return nil, err
@@ -620,7 +621,7 @@ func (svc Service) PageFromArcArticle(ctx context.Context, dbArt db.Article, inc
 	}
 	if dbPage, err = svc.Queries.UpdatePage(ctx, db.UpdatePageParams{
 		FilePath:       splArt.ContentFilepath(),
-		SetFrontmatter: includeFrontmatter,
+		SetFrontmatter: true,
 		Frontmatter:    dbPage.Frontmatter,
 		SetBody:        true,
 		Body:           dbPage.Body,
@@ -628,7 +629,25 @@ func (svc Service) PageFromArcArticle(ctx context.Context, dbArt db.Article, inc
 	}); err != nil {
 		return nil, err
 	}
+	if _, err = svc.Queries.UpdateArcArticleSpotlightPAPath(ctx, db.UpdateArcArticleSpotlightPAPathParams{
+		ArcID:           dbArt.ArcID.String,
+		SpotlightPAPath: splArt.ContentFilepath(),
+	}); err != nil {
+		return nil, err
+	}
 	return &dbPage, nil
+}
+
+func (svc Service) RefreshPageFromArcStory(ctx context.Context, story *ArcStory, page *db.Page) (err error) {
+	defer errutil.Prefix(&err, "problem refreshing page from arc")
+
+	var splArt SpotlightPAArticle
+	if err = story.ToArticle(ctx, svc, &splArt); err != nil {
+		return err
+	}
+
+	page.Body = splArt.Body
+	return nil
 }
 
 func (svc Service) Notify(ctx context.Context, page *db.Page, publishingNow bool) error {

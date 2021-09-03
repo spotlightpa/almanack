@@ -23,8 +23,7 @@ export default {
     const { postPageForArcID } = useClient();
     const { apiState, exec } = makeState();
 
-    const fetch = (id) =>
-      exec(() => postPageForArcID({ "arc-id": id, "force-refresh": false }));
+    const fetch = (id) => exec(() => postPageForArcID(id));
 
     watch(() => props.id, fetch, {
       immediate: true,

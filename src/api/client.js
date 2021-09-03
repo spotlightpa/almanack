@@ -22,6 +22,9 @@ const endpoints = {
   getAvailableArc: (id) => `/api/available-articles/${id}`,
   getPage: (id) => `/api/page/${id}`,
   getPageWithContent: (id) => `/api/page-with-content/${id}`,
+  // post id endpoints
+  postPageForArcID: (id) => `/api/page-for-arc-id/${id}`,
+  postRefreshPageFromArc: (id) => `/api/refresh-page-from-arc/${id}`,
   // list page points
   listAnyArc: (page = "0") => `/api/list-any-arc/${page}`,
   listAvailableArc: (page = "0") => `/api/list-available/${page}`,
@@ -48,7 +51,6 @@ const endpoints = {
   getSignupURL: `/api/mailchimp-signup-url`,
   sendMessage: `/api/message`,
   postPage: `/api/page`,
-  postPageForArcID: `/api/page-for-arc-id`,
 };
 
 function makeClient($auth) {
@@ -167,6 +169,12 @@ function makeClient($auth) {
     let endpointFn = endpoints[action];
     actions[action] = (id) => tryTo(request(endpointFn(id)));
   }
+  let idPostActions = ["postPageForArcID", "postRefreshPageFromArc"];
+  for (let action of idPostActions) {
+    let endpointFn = endpoints[action];
+    actions[action] = (id) => tryTo(post(endpointFn(id)));
+  }
+
   let simpleGetActions = [
     "getEditorsPicks",
     "getSignupURL",
@@ -187,7 +195,6 @@ function makeClient($auth) {
     "postAuthorizedDomain",
     "postAuthorizedEmailAddress",
     "postPage",
-    "postPageForArcID",
     "saveArcArticle",
     "saveArticle",
     "saveEditorsPicks",
