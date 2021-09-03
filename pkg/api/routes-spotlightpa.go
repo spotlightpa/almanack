@@ -9,6 +9,7 @@ import (
 	"github.com/carlmjohnson/emailx"
 	"github.com/carlmjohnson/errutil"
 	"github.com/carlmjohnson/resperr"
+	"github.com/go-chi/chi"
 	"github.com/spotlightpa/almanack/internal/arc"
 	"github.com/spotlightpa/almanack/internal/db"
 	"github.com/spotlightpa/almanack/internal/timeutil"
@@ -636,24 +637,18 @@ func (app *appEnv) postPage(w http.ResponseWriter, r *http.Request) {
 }
 
 func (app *appEnv) postPageForArcID(w http.ResponseWriter, r *http.Request) {
-	app.Printf("start postPageForArcID")
-	type request struct {
-		ArcID        string `json:"arc-id"`
-		ForceRefresh bool   `json:"force-refresh"`
-	}
-	var req request
-	if !app.readJSON(w, r, &req) {
-		return
-	}
-	dbArt, err := app.svc.Queries.GetArticleByArcID(r.Context(), req.ArcID)
+	arcID := chi.URLParam(r, "arcID")
+	app.Printf("start postPageForArcID for %s", arcID)
+
+	dbArt, err := app.svc.Queries.GetArticleByArcID(r.Context(), arcID)
 	if err != nil {
-		err = db.NoRowsAs404(err, "could not find arc-id %q", req.ArcID)
+		err = db.NoRowsAs404(err, "could not find Arc ID %q", arcID)
 		app.replyErr(w, r, err)
 		return
 	}
 	filepath := dbArt.SpotlightPAPath.String
 	firstConversion := filepath == ""
-	if !firstConversion && !req.ForceRefresh {
+	if !firstConversion {
 		page, err := app.svc.Queries.GetPageByFilePath(r.Context(), filepath)
 		if err != nil {
 			app.replyErr(w, r, err)
@@ -662,22 +657,73 @@ func (app *appEnv) postPageForArcID(w http.ResponseWriter, r *http.Request) {
 		app.replyJSON(http.StatusOK, w, page.ID)
 		return
 	}
-	app.Printf("saving page from %s", req.ArcID)
-	page, err := app.svc.PageFromArcArticle(r.Context(), dbArt, firstConversion)
+	app.Printf("saving page from %s", arcID)
+	page, err := app.svc.PageFromArcArticle(r.Context(), &dbArt)
 	if err != nil {
 		app.replyErr(w, r, err)
 		return
 	}
-	if firstConversion {
-		if _, err = app.svc.Queries.UpdateArcArticleSpotlightPAPath(r.Context(), db.UpdateArcArticleSpotlightPAPathParams{
-			ArcID:           req.ArcID,
-			SpotlightPAPath: page.FilePath,
-		}); err != nil {
+
+	app.replyJSON(http.StatusOK, w, page.ID)
+}
+
+func (app *appEnv) postRefreshPageFromArc(w http.ResponseWriter, r *http.Request) {
+	var id int64
+	app.mustIntParam(r, "id", &id)
+	app.Printf("start postRefreshPageFromArc for %d", id)
+
+	page, err := app.svc.Queries.GetPageByID(r.Context(), id)
+	if err != nil {
+		err = db.NoRowsAs404(err, "could not find page ID %d", id)
+		app.replyErr(w, r, err)
+		return
+	}
+
+	arcID, _ := page.Frontmatter["arc-id"].(string)
+	if arcID == "" {
+		app.replyErr(w, r, resperr.New(http.StatusBadRequest,
+			"no arc-id on page %d", id))
+		return
+	}
+	var story *almanack.ArcStory
+	feed, feedErr := app.FetchFeed(r.Context())
+	if feedErr != nil {
+		// Keep trucking even if you can't load feed
+		app.logErr(r.Context(), feedErr)
+	}
+	if feedErr == nil {
+		if err = app.svc.StoreFeed(r.Context(), feed); err != nil {
+			app.replyErr(w, r, err)
+			return
+		}
+		for _, rawStory := range feed.Contents {
+			if rawStory.ID == arcID {
+				app.Printf("Arc ID %q found in feed", arcID)
+				story = &almanack.ArcStory{FeedItem: rawStory}
+				break
+			}
+		}
+	}
+	if story == nil {
+		app.Printf("Arc ID %q not found in feed; trying DB", arcID)
+		dbArt, err := app.svc.Queries.GetArticleByArcID(r.Context(), arcID)
+		if err != nil {
+			err = db.NoRowsAs404(err, "could not find Arc ID %q", arcID)
+			app.replyErr(w, r, err)
+			return
+		}
+		story, err = almanack.ArcStoryFromDB(&dbArt)
+		if err != nil {
 			app.replyErr(w, r, err)
 			return
 		}
 	}
-	app.replyJSON(http.StatusOK, w, page.ID)
+
+	if err = app.svc.RefreshPageFromArcStory(r.Context(), story, &page); err != nil {
+		app.replyErr(w, r, err)
+		return
+	}
+	app.replyJSON(http.StatusOK, w, page)
 }
 
 func (app *appEnv) listAllPages(w http.ResponseWriter, r *http.Request) {

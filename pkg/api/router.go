@@ -60,7 +60,8 @@ func (app *appEnv) routes() http.Handler {
 			r.Get("/files-list", app.listFiles)
 			r.Post("/files-create", app.postFileCreate)
 			r.Post("/files-update", app.postFileUpdate)
-			r.Post("/page-for-arc-id", app.postPageForArcID)
+			r.Post(`/page-for-arc-id/{arcID}`, app.postPageForArcID)
+			r.Post(`/refresh-page-from-arc/{id:\d+}`, app.postRefreshPageFromArc)
 		})
 	})
 	r.Route("/ssr", func(r chi.Router) {

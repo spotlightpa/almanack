@@ -189,14 +189,8 @@ export function usePage(id) {
     }, 1000);
   };
 
-  const {
-    getPage,
-    getPageWithContent,
-    postPage,
-    listImages,
-    listRefreshArc,
-    postPageForArcID,
-  } = useClient();
+  const { getPageWithContent, postPage, listImages, postRefreshPageFromArc } =
+    useClient();
   const { apiState, exec } = makeState();
 
   const fetch = (id) => {
@@ -268,20 +262,9 @@ export function usePage(id) {
       page.value.scheduleFor = null;
       return post(page.value);
     },
-    async arcRefresh() {
+    arcRefresh() {
       toggleProgress();
-      // ignore errors from listRefreshArc
-      await listRefreshArc();
-      let [, err] = await postPageForArcID({
-        "arc-id": page.value.arcID,
-        "force-refresh": true,
-      });
-      if (err) {
-        apiState.error = err;
-        return;
-      }
-
-      await exec(() => getPage(id.value));
+      return exec(() => postRefreshPageFromArc(id.value));
     },
     imageState,
     images: computed(() =>
