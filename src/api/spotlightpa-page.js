@@ -108,6 +108,13 @@ class Page {
     return `https://pmn.arcpublishing.com/composer/edit/${this.arcID}/`;
   }
 
+  get sharedViewRoute() {
+    if (!this.arcID) {
+      return "";
+    }
+    return { name: "article", params: { id: this.arcID } };
+  }
+
   toJSON() {
     return {
       file_path: this.filePath,
