@@ -10,7 +10,7 @@ export default {
     EditorsPicksDraggable,
   },
   props: {
-    articles: Array,
+    pages: Array,
     editorsPicks: Object,
   },
   data() {
@@ -19,12 +19,12 @@ export default {
     };
   },
   computed: {
-    filteredArticles() {
+    filteredPages() {
       if (!this.filterText) {
-        return this.articles;
+        return this.pages;
       }
-      return this.articles.filter((a) =>
-        fuzzyMatch(a.filterableProps, this.filterText)
+      return this.pages.filter((p) =>
+        fuzzyMatch(p.filterableProps, this.filterText)
       );
     },
   },
@@ -49,26 +49,29 @@ export default {
 
       <draggable
         class="dropdown-content"
-        :value="filteredArticles"
+        :value="filteredPages"
         :sort="false"
         :group="{ name: 'articles', pull: 'clone', put: false }"
         ghost-class="is-info"
         chosen-class="is-active"
       >
         <a
-          v-for="(article, i) of filteredArticles.slice(0, 10)"
+          v-for="(article, i) of filteredPages.slice(0, 10)"
           :key="i"
           class="dropdown-item select-none"
           @click="push(article)"
         >
           <span class="overflow">
-            <b>{{ article.internal_id }}</b
+            <b>{{ article.internalID }}</b
             >: {{ article.hed }}
           </span>
         </a>
         <template v-slot:footer>
-          <div v-if="filteredArticles.length > 10" class="dropdown-item">
+          <div v-if="filteredPages.length > 10" class="dropdown-item">
             More results hidden…
+          </div>
+          <div v-if="filteredPages.length === 0" class="dropdown-item">
+            No results
           </div>
         </template>
       </draggable>
@@ -82,20 +85,6 @@ export default {
         <EditorsPicksDraggable v-model="editorsPicks.subfeatures" />
 
         Bulleted items under the top story
-      </b-field>
-      <label class="checkbox">
-        <input v-model="editorsPicks.limitSubfeatures" type="checkbox" />
-        Limit the number of subfeatured stories
-      </label>
-      <b-field v-if="editorsPicks.limitSubfeatures">
-        <b-numberinput
-          v-model="editorsPicks.subfeaturesLimit"
-          class="has-margin-top-thin"
-          controls-position="compact"
-          min="0"
-          type="is-light"
-        ></b-numberinput>
-        Subfeatured story limit
       </b-field>
       <b-field label="Pinned stories">
         <EditorsPicksDraggable v-model="editorsPicks.topSlots" />

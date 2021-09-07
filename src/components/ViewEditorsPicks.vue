@@ -1,51 +1,67 @@
 <script>
 import Vue from "vue";
-import { reactive, computed, toRefs } from "@vue/composition-api";
+import { reactive, computed, toRefs, watch } from "@vue/composition-api";
 
 import { useClient, makeState } from "@/api/hooks.js";
 
 import EditorsPicks from "./EditorsPicks.vue";
 
+class Page {
+  constructor(data) {
+    this.id = data.id;
+    this.filePath = data.file_path ?? "";
+    this.internalID = data.internal_id ?? "";
+    this.hed = data.hed ?? "";
+    this.authors = data.authors ?? [];
+    this.filterableProps = `${this.internalID} ${this.hed} ${this.authors.join(
+      " "
+    )}`;
+  }
+}
+
 class EditorsPicksData {
-  constructor(data, articlesByPath) {
-    this._initialData = { data, articlesByPath };
+  constructor(siteConfig, pagesByPath) {
+    this._initialData = { siteConfig, pagesByPath };
     this.reset();
     Vue.observable(this);
   }
 
   reset() {
-    let { data, articlesByPath } = this._initialData;
+    let { siteConfig, pagesByPath } = this._initialData;
     for (let prop of [
       "featuredStories",
       "subfeatures",
       "topSlots",
       "sidebarPicks",
     ]) {
-      let a = data?.[prop] ?? [];
-      this[prop] = a.map((s) => articlesByPath.get(s)).filter((a) => a);
+      let a = siteConfig.data?.[prop] ?? [];
+      this[prop] = a.map((s) => pagesByPath.get(s)).filter((a) => !!a);
     }
-
-    this.limitSubfeatures = data?.limitSubfeatures ?? false;
-    this.subfeaturesLimit = data?.subfeaturesLimit ?? 0;
+    this.id = siteConfig.id;
+    this.scheduleFor = siteConfig.schedule_for;
+    this.limitSubfeatures = siteConfig.data?.limitSubfeatures ?? false;
+    this.subfeaturesLimit = siteConfig.data?.subfeaturesLimit ?? 0;
+    let pub = siteConfig.published_at;
+    this.publishedAt = pub.Valid ? new Date(pub.Time) : null;
+    this.isCurrent = !!this.publishedAt;
   }
 
   toJSON() {
-    const getPath = (a) => a.file_path;
+    const getPath = (a) => a.filePath;
     return {
-      featuredStories: this.featuredStories.map(getPath),
-      subfeatures: this.subfeatures.map(getPath),
-      topSlots: this.topSlots.map(getPath),
-      sidebarPicks: this.sidebarPicks.map(getPath),
-      limitSubfeatures: !!this.limitSubfeatures,
-      subfeaturesLimit: +this.subfeaturesLimit,
+      id: this.id,
+      p: this.publishedAt,
+      data: {
+        featuredStories: this.featuredStories.map(getPath),
+        subfeatures: this.subfeatures.map(getPath),
+        topSlots: this.topSlots.map(getPath),
+        sidebarPicks: this.sidebarPicks.map(getPath),
+        limitSubfeatures: !!this.limitSubfeatures,
+        subfeaturesLimit: +this.subfeaturesLimit,
+      },
     };
   }
 }
-
-const toArticle = (a) => ({
-  ...a,
-  filterableProps: `${a.internal_id} ${a.hed} ${a.authors.join(" ")}`,
-});
 
 export default {
   name: "ViewEditorsPicks",
@@ -66,16 +82,16 @@ export default {
       isLoading: computed(() => listState.isLoading || edPicksState.isLoading),
       error: computed(() => listState.error ?? edPicksState.error),
       pages: computed(() =>
-        listState.rawData ? listState.rawData.pages.map(toArticle) : []
+        listState.rawData ? listState.rawData.pages.map((p) => new Page(p)) : []
       ),
-      articlesByPath: computed(
-        () => new Map(state.pages.map((a) => [a.file_path, a]))
+      pagesByPath: computed(
+        () => new Map(state.pages.map((p) => [p.filePath, p]))
       ),
-      edPicks: computed(
-        () =>
-          state.didLoad &&
-          new EditorsPicksData(edPicksState.rawData, state.articlesByPath)
-      ),
+      pagesAndPicks: computed(() => ({
+        pages: state.pages,
+        rawPicks: edPicksState.rawData?.datums ?? [],
+      })),
+      allEdPicks: [],
     });
 
     let actions = {
@@ -89,6 +105,17 @@ export default {
         return edPickExec(() => saveEditorsPicks(state.edPicks));
       },
     };
+    watch(
+      () => state.pagesAndPicks,
+      ({ pages, rawPicks }) => {
+        if (!pages.length || !rawPicks.length) {
+          return;
+        }
+        state.allEdPicks = rawPicks.map(
+          (data) => new EditorsPicksData(data, state.pagesByPath)
+        );
+      }
+    );
 
     actions.reload();
 
@@ -117,6 +144,13 @@ export default {
 
     <h1 class="title">Homepage Editor</h1>
 
+    <template v-if="allEdPicks.length">
+      <div v-for="edpick of allEdPicks" :key="edpick.id">
+        <h2 v-if="edpick.isCurrent" class="title">Current Homepage</h2>
+        <EditorsPicks :pages="pages" :editors-picks="edpick" />
+      </div>
+      button to add a thingie
+    </template>
     <progress
       v-if="!didLoad && isLoading"
       class="progress is-large is-warning"
@@ -124,12 +158,6 @@ export default {
     >
       Loading…
     </progress>
-
-    <EditorsPicks
-      v-if="didLoad && edPicks"
-      :articles="pages"
-      :editors-picks="edPicks"
-    />
 
     <div v-if="error" class="message is-danger">
       <div class="message-header">{{ error.name }}</div>
