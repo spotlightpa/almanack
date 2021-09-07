@@ -34,11 +34,11 @@ export default {
     :component-data="getComponentData()"
   >
     <span
-      v-for="(article, i) of value"
+      v-for="(page, i) of value"
       :key="i"
       class="tag is-medium spacer select-none"
     >
-      {{ article.internal_id }}
+      {{ page.internalID }}
       <button class="delete" @click="remove(i)"></button>
     </span>
     <template v-slot:header>
