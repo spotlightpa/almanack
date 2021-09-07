@@ -52,14 +52,14 @@ export default {
         </span>
         <a
           v-if="isArcUser"
-          class="tag is-primary"
+          class="tag is-light"
           :href="article.arcURL"
           target="_blank"
         >
           <span class="icon is-size-6">
             <font-awesome-icon :icon="['fas', 'link']" />
           </span>
-          <span> View in Arc </span>
+          <span>Arc view</span>
         </a>
         <router-link
           v-if="isSpotlightPAUser"
@@ -69,7 +69,7 @@ export default {
           <span class="icon">
             <font-awesome-icon :icon="['fas', 'user-clock']" />
           </span>
-          <span> Spotlight PA </span>
+          <span>Spotlight PA view</span>
         </router-link>
       </span>
     </span>

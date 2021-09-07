@@ -67,36 +67,46 @@ export default {
       </ul>
     </nav>
 
-    <h1 class="title is-flex-desktop">
-      <span class="mr-2">
-        {{ title }}
-      </span>
+    <h1 class="mb-2 is-spaced title is-flex-desktop">
+      {{ title }}
+    </h1>
+    <h2 class="subtitle">
       <span class="tags">
         <TagStatus v-if="page" :status="page.status" />
+        <router-link
+          v-if="page && page.sharedViewRoute"
+          class="tag is-light has-text-weight-semibold"
+          :to="page.sharedViewRoute"
+        >
+          <span class="icon is-size-6">
+            <font-awesome-icon :icon="['fas', 'link']" />
+          </span>
+          <span>External Editor view</span>
+        </router-link>
         <a
           v-if="page && page.arcURL"
-          class="tag is-warning"
+          class="tag is-light has-text-weight-semibold"
           :href="page.arcURL"
           target="_blank"
         >
           <span class="icon is-size-6">
             <font-awesome-icon :icon="['fas', 'link']" />
           </span>
-          <span>View in Arc</span>
+          <span>Arc view</span>
         </a>
         <a
           v-if="page && page.status === 'pub' && page.link"
           :href="page.link"
-          class="tag is-primary"
+          class="tag is-primary has-text-weight-semibold"
           target="_blank"
         >
           <span class="icon is-size-6">
             <font-awesome-icon :icon="['fas', 'link']" />
           </span>
-          <span>Open live URL</span>
+          <span>Live URL</span>
         </a>
       </span>
-    </h1>
+    </h2>
 
     <form v-if="page" ref="form">
       <BulmaField
