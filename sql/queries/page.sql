@@ -217,4 +217,6 @@ SELECT
   authors::text[] AS authors,
   pub_date::timestamptz AS pub_date
 FROM
-  ROWS;
+  ROWS
+WHERE
+  pub_date IS NOT NULL;

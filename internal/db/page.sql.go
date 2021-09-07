@@ -133,6 +133,8 @@ SELECT
   pub_date::timestamptz AS pub_date
 FROM
   ROWS
+WHERE
+  pub_date IS NOT NULL
 `
 
 type ListAllPagesRow struct {
