@@ -32,8 +32,6 @@ func (app *appEnv) backgroundCron(w http.ResponseWriter, r *http.Request) {
 	app.Println("start background cron")
 
 	if err := errutil.ExecParallel(func() error {
-		return app.svc.PopScheduledArticles(r.Context())
-	}, func() error {
 		var errs errutil.Slice
 		// Publish any scheduled pages before pushing new site config
 		errs.Push(app.svc.PopScheduledPages(r.Context()))
