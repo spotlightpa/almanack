@@ -157,28 +157,6 @@ func (svc Service) SaveScheduledArticle(ctx context.Context, article *SpotlightP
 	return nil
 }
 
-func (svc Service) PopScheduledArticles(ctx context.Context) error {
-	start := time.Now()
-	poppedArts, err := svc.Queries.PopScheduled(ctx)
-	svc.Logger.Printf("queried PopScheduled in %v", time.Since(start))
-	if err != nil {
-		return err
-	}
-	overdueArts := make([]*SpotlightPAArticle, len(poppedArts))
-	for i := range overdueArts {
-		overdueArts[i] = new(SpotlightPAArticle)
-		if err = overdueArts[i].fromDB(poppedArts[i]); err != nil {
-			return err
-		}
-	}
-	// If the status of the article changed, publish it
-	var errs errutil.Slice
-	for _, art := range overdueArts {
-		errs.Push(art.Publish(ctx, svc))
-	}
-	return errs.Merge()
-}
-
 func (svc Service) GetArcStory(ctx context.Context, articleID string) (story *ArcStory, err error) {
 	start := time.Now()
 	dart, err := svc.Queries.GetArticleByArcID(ctx, articleID)
