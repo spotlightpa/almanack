@@ -3,7 +3,9 @@ import Vue from "vue";
 import { reactive, computed, toRefs, watch } from "@vue/composition-api";
 
 import { useClient, makeState } from "@/api/hooks.js";
+import { formatDateTime } from "@/utils/time-format.js";
 
+import BulmaField from "./BulmaField.vue";
 import EditorsPicks from "./EditorsPicks.vue";
 
 class Page {
@@ -39,25 +41,35 @@ class EditorsPicksData {
     }
     this.id = siteConfig.id;
     this.scheduleFor = siteConfig.schedule_for;
-    this.limitSubfeatures = siteConfig.data?.limitSubfeatures ?? false;
-    this.subfeaturesLimit = siteConfig.data?.subfeaturesLimit ?? 0;
     let pub = siteConfig.published_at;
     this.publishedAt = pub.Valid ? new Date(pub.Time) : null;
     this.isCurrent = !!this.publishedAt;
+  }
+
+  clone(scheduleFor) {
+    let { siteConfig, pagesByPath } = this._initialData;
+    let newPick = new EditorsPicksData(
+      {
+        ...siteConfig,
+        id: 0,
+        published_at: { Valid: false },
+        schedule_for: scheduleFor,
+      },
+      pagesByPath
+    );
+    return newPick;
   }
 
   toJSON() {
     const getPath = (a) => a.filePath;
     return {
       id: this.id,
-      p: this.publishedAt,
+      schedule_for: this.scheduleFor,
       data: {
         featuredStories: this.featuredStories.map(getPath),
         subfeatures: this.subfeatures.map(getPath),
         topSlots: this.topSlots.map(getPath),
         sidebarPicks: this.sidebarPicks.map(getPath),
-        limitSubfeatures: !!this.limitSubfeatures,
-        subfeaturesLimit: +this.subfeaturesLimit,
       },
     };
   }
@@ -66,12 +78,14 @@ class EditorsPicksData {
 export default {
   name: "ViewEditorsPicks",
   components: {
+    BulmaField,
     EditorsPicks,
   },
   metaInfo: {
     title: "Homepage Editor",
   },
   setup() {
+    let removedItems = [];
     let { listAllPages, getEditorsPicks, saveEditorsPicks } = useClient();
 
     let { apiState: listState, exec: listExec } = makeState();
@@ -92,6 +106,7 @@ export default {
         rawPicks: edPicksState.rawData?.datums ?? [],
       })),
       allEdPicks: [],
+      nextSchedule: null,
     });
 
     let actions = {
@@ -102,7 +117,12 @@ export default {
         ]);
       },
       save() {
-        return edPickExec(() => saveEditorsPicks(state.edPicks));
+        return edPickExec(() =>
+          saveEditorsPicks({
+            datums: state.allEdPicks,
+            removed_items: removedItems,
+          })
+        );
       },
     };
     watch(
@@ -111,6 +131,7 @@ export default {
         if (!pages.length || !rawPicks.length) {
           return;
         }
+        removedItems = [];
         state.allEdPicks = rawPicks.map(
           (data) => new EditorsPicksData(data, state.pagesByPath)
         );
@@ -122,6 +143,28 @@ export default {
     return {
       ...toRefs(state),
       ...actions,
+
+      formatDateTime,
+
+      async addScheduledPicks() {
+        let lastPick = state.allEdPicks[state.allEdPicks.length - 1];
+        state.allEdPicks.push(lastPick.clone(state.nextSchedule));
+        state.nextSchedule = null;
+        await this.$nextTick();
+        // TODO: Fix this array if we ever upgrade to Vue 3
+        // https://vueuse.org/core/useTemplateRefsList/
+        this.$refs.edPicksEls[this.$refs.edPicksEls.length - 1].scrollIntoView({
+          behavior: "smooth",
+          block: "start",
+        });
+      },
+      removeScheduledPick(i) {
+        let id = state.allEdPicks[i].id;
+        if (id) {
+          removedItems.push(id);
+        }
+        state.allEdPicks.splice(i, 1);
+      },
     };
   },
 };
@@ -145,11 +188,46 @@ export default {
     <h1 class="title">Homepage Editor</h1>
 
     <template v-if="allEdPicks.length">
-      <div v-for="edpick of allEdPicks" :key="edpick.id">
-        <h2 v-if="edpick.isCurrent" class="title">Current Homepage</h2>
+      <div v-for="(edpick, i) of allEdPicks" :key="i" class="p-4 zebra-row">
+        <h2 ref="edPicksEls" class="title">
+          {{
+            edpick.isCurrent
+              ? "Current Homepage"
+              : `Scheduled for ${formatDateTime(edpick.scheduleFor)}`
+          }}
+        </h2>
         <EditorsPicks :pages="pages" :editors-picks="edpick" />
+        <button
+          v-if="!edpick.isCurrent"
+          type="button"
+          class="button is-danger has-text-weight-semibold"
+          @click="removeScheduledPick(i)"
+        >
+          Remove
+        </button>
       </div>
-      button to add a thingie
+      <h2 class="mt-2 title">Add a scheduled change</h2>
+      <BulmaField v-slot="{ idForLabel }" label="Schedule for">
+        <b-datetimepicker
+          :id="idForLabel"
+          v-model="nextSchedule"
+          icon="user-clock"
+          :datetime-formatter="formatDateTime"
+          :inline="true"
+          locale="en-US"
+        />
+        <button
+          type="button"
+          :disabled="!nextSchedule || nextSchedule < new Date()"
+          class="mt-3 button is-success has-text-weight-semibold"
+          @click="addScheduledPicks"
+        >
+          <span class="icon is-size-6">
+            <font-awesome-icon :icon="['fas', 'plus']" />
+          </span>
+          <span>Add</span>
+        </button>
+      </BulmaField>
     </template>
     <progress
       v-if="!didLoad && isLoading"
@@ -233,3 +311,17 @@ export default {
     </details>
   </div>
 </template>
+
+<style scoped>
+.zebra-row {
+  background-color: #fff;
+}
+
+.zebra-row:nth-child(even) {
+  background-color: #fafafa;
+}
+
+.zebra-row + .zebra-row {
+  border-top: 1px solid #dbdbdb;
+}
+</style>
