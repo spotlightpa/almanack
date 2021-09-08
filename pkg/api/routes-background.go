@@ -34,7 +34,11 @@ func (app *appEnv) backgroundCron(w http.ResponseWriter, r *http.Request) {
 	if err := errutil.ExecParallel(func() error {
 		return app.svc.PopScheduledArticles(r.Context())
 	}, func() error {
-		return app.svc.PopScheduledPages(r.Context())
+		var errs errutil.Slice
+		// Publish any scheduled pages before pushing new site config
+		errs.Push(app.svc.PopScheduledPages(r.Context()))
+		errs.Push(app.svc.PopScheduledSiteChanges(r.Context()))
+		return errs.Merge()
 	}, func() error {
 		return app.svc.UpdateMostPopular(r.Context())
 	}, func() error {
@@ -43,8 +47,6 @@ func (app *appEnv) backgroundCron(w http.ResponseWriter, r *http.Request) {
 		errs.Push(app.svc.UpdateNewsletterArchives(r.Context()))
 		errs.Push(app.svc.ImportNewsletterPages(r.Context()))
 		return errs.Merge()
-	}, func() error {
-		return app.svc.PopScheduledSiteChanges(r.Context())
 	}); err != nil {
 		// reply shows up in dev only
 		app.replyErr(w, r, err)
