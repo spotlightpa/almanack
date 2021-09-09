@@ -47,13 +47,14 @@ class EditorsPicksData {
   }
 
   clone(scheduleFor) {
-    let { siteConfig, pagesByPath } = this._initialData;
+    let { pagesByPath } = this._initialData;
+    let { data } = this.toJSON();
     let newPick = new EditorsPicksData(
       {
-        ...siteConfig,
         id: 0,
-        published_at: { Valid: false },
         schedule_for: scheduleFor,
+        data,
+        published_at: { Valid: false },
       },
       pagesByPath
     );
@@ -124,18 +125,21 @@ export default {
           })
         );
       },
-    };
-    watch(
-      () => state.pagesAndPicks,
-      ({ pages, rawPicks }) => {
+      reset() {
+        let { pages, rawPicks } = state.pagesAndPicks;
         if (!pages.length || !rawPicks.length) {
           return;
         }
+
         removedItems = [];
         state.allEdPicks = rawPicks.map(
           (data) => new EditorsPicksData(data, state.pagesByPath)
         );
-      }
+      },
+    };
+    watch(
+      () => state.pagesAndPicks,
+      () => actions.reset()
     );
 
     actions.reload();
@@ -267,7 +271,7 @@ export default {
         class="button is-light has-text-weight-semibold"
         :disabled="isLoading"
         :class="{ 'is-loading': isLoading }"
-        @click="edPicks.reset()"
+        @click="reset"
       >
         Revert
       </button>
