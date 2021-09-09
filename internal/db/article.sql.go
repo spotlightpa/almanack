@@ -267,17 +267,17 @@ SET
     arc_data
   END
 WHERE
-  arc_id = $5
+  arc_id = $5::text
 RETURNING
   id, arc_id, arc_data, spotlightpa_path, spotlightpa_data, schedule_for, last_published, note, status, created_at, updated_at
 `
 
 type UpdateAlmanackArticleParams struct {
-	Status     string         `json:"status"`
-	Note       string         `json:"note"`
-	SetArcData bool           `json:"set_arc_data"`
-	ArcData    pgtype.JSONB   `json:"arc_data"`
-	ArcID      sql.NullString `json:"arc_id"`
+	Status     string       `json:"status"`
+	Note       string       `json:"note"`
+	SetArcData bool         `json:"set_arc_data"`
+	ArcData    pgtype.JSONB `json:"arc_data"`
+	ArcID      string       `json:"arc_id"`
 }
 
 func (q *Queries) UpdateAlmanackArticle(ctx context.Context, arg UpdateAlmanackArticleParams) (Article, error) {

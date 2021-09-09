@@ -2,7 +2,6 @@ package almanack
 
 import (
 	"context"
-	"database/sql"
 	"encoding/json"
 	"fmt"
 	"net/http"
@@ -23,13 +22,6 @@ import (
 	"github.com/spotlightpa/almanack/internal/timeutil"
 	"github.com/spotlightpa/almanack/pkg/common"
 )
-
-func nullString(s string) sql.NullString {
-	if s == "" {
-		return sql.NullString{}
-	}
-	return sql.NullString{String: s, Valid: true}
-}
 
 type Service struct {
 	common.Logger
@@ -97,7 +89,7 @@ func (svc Service) SaveAlmanackArticle(ctx context.Context, article *ArcStory, s
 	}
 	start := time.Now()
 	dart, err := svc.Queries.UpdateAlmanackArticle(ctx, db.UpdateAlmanackArticleParams{
-		ArcID:      nullString(article.ID),
+		ArcID:      article.ID,
 		Status:     article.Status.dbstring(),
 		Note:       article.Note,
 		SetArcData: setArcData,

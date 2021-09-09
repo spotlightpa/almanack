@@ -26,7 +26,7 @@ SET
     arc_data
   END
 WHERE
-  arc_id = @arc_id
+  arc_id = @arc_id::text
 RETURNING
   *;
 
