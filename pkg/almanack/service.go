@@ -30,37 +30,6 @@ func nullString(s string) sql.NullString {
 	return sql.NullString{String: s, Valid: true}
 }
 
-func nullTime(t *time.Time) sql.NullTime {
-	if t != nil {
-		return sql.NullTime{Time: *t, Valid: true}
-	}
-	return sql.NullTime{}
-}
-
-func timeNull(nt sql.NullTime) *time.Time {
-	if nt.Valid {
-		t := nt.Time
-		return &t
-	}
-	return nil
-}
-
-const timeWindow = 5 * time.Minute
-
-func diffTime(old, new sql.NullTime) bool {
-	if old.Valid != new.Valid {
-		return true
-	}
-	if !old.Valid {
-		return false
-	}
-	diff := old.Time.Sub(new.Time)
-	if diff < 0 {
-		diff = -diff
-	}
-	return diff > timeWindow
-}
-
 type Service struct {
 	common.Logger
 	Client  *http.Client
@@ -72,89 +41,6 @@ type Service struct {
 	Indexer     index.Indexer
 	common.NewletterService
 	gsvc *google.Service
-}
-
-func (svc Service) ResetSpotlightPAArticleArcData(ctx context.Context, article *SpotlightPAArticle) error {
-	start := time.Now()
-	dart, err := svc.Queries.GetArticleByArcID(ctx, article.ArcID)
-	svc.Logger.Printf("queried GetArticleByArcID in %v", time.Since(start))
-	if err != nil {
-		return err
-	}
-
-	return article.ResetArcData(ctx, svc, dart)
-}
-
-func (svc Service) SaveScheduledArticle(ctx context.Context, article *SpotlightPAArticle) error {
-	now := time.Now()
-	publishNow := false
-	shouldNotify := false
-
-	// TODO: Make less racey
-	if article.ScheduleFor != nil &&
-		article.ScheduleFor.Before(time.Now().Add(5*time.Minute)) {
-		article.ScheduleFor = nil
-		publishNow = true
-	}
-	article.LastSaved = &now
-	dart, err := article.toDB()
-	if err != nil {
-		return err
-	}
-
-	start := time.Now()
-	var oldSchedule sql.NullTime
-	oldSchedule, err = svc.Queries.UpdateSpotlightPAArticle(ctx, db.UpdateSpotlightPAArticleParams{
-		ArcID:           dart.ArcID,
-		SpotlightPAPath: dart.SpotlightPAPath,
-		SpotlightPAData: dart.SpotlightPAData,
-		ScheduleFor:     dart.ScheduleFor,
-	})
-	svc.Logger.Printf("queried UpdateSpotlightPAArticle in %v", time.Since(start))
-	if err != nil {
-		return err
-	}
-
-	// If it was scheduled for a new time, notify
-	if dart.ScheduleFor.Valid && diffTime(dart.ScheduleFor, oldSchedule) {
-		shouldNotify = true
-	}
-
-	// Get the article so we can get fields not in the user article JSON
-	// like filepath
-	start = time.Now()
-	*dart, err = svc.Queries.GetArticleByArcID(ctx, dart.ArcID.String)
-	svc.Logger.Printf("queried GetArticleByArcID in %v", time.Since(start))
-	if err != nil {
-		return err
-	}
-	if err = article.fromDB(*dart); err != nil {
-		return err
-	}
-
-	if publishNow {
-		if err = article.Publish(ctx, svc); err != nil {
-			// TODO rollback?
-			return err
-		}
-		var oldTime sql.NullTime
-		oldTime, err = svc.Queries.UpdateSpotlightPAArticleLastPublished(ctx, article.ArcID)
-		if err != nil {
-			return err
-		}
-		if !oldTime.Valid {
-			shouldNotify = true
-		}
-	}
-
-	if shouldNotify {
-		// TODO: Warning only?
-		if err = article.Notify(ctx, svc); err != nil {
-			return err
-		}
-	}
-
-	return nil
 }
 
 func (svc Service) GetArcStory(ctx context.Context, articleID string) (story *ArcStory, err error) {
@@ -690,10 +576,6 @@ func (svc Service) PopScheduledSiteChanges(ctx context.Context) (err error) {
 	return svc.Queries.CleanSiteData(ctx, EditorsPicksLoc)
 }
 
-var msgForLoc = map[string]string{
-	EditorsPicksLoc: "Setting homepage configuration",
-}
-
 func (svc Service) PublishSiteConfig(ctx context.Context, siteConfig *db.SiteDatum) (err error) {
 	defer errutil.Trace(&err)
 
@@ -701,7 +583,7 @@ func (svc Service) PublishSiteConfig(ctx context.Context, siteConfig *db.SiteDat
 	if err != nil {
 		return err
 	}
-	msg := stringutils.First(msgForLoc[siteConfig.Key], siteConfig.Key)
+	msg := stringutils.First(MessageForLoc[siteConfig.Key], siteConfig.Key)
 	if err = svc.ContentStore.UpdateFile(ctx, msg, siteConfig.Key, data); err != nil {
 
 		return err
