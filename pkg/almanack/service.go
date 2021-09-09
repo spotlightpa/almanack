@@ -663,7 +663,7 @@ func (svc Service) Notify(ctx context.Context, page *db.Page, publishingNow bool
 }
 
 func (svc Service) PopScheduledSiteChanges(ctx context.Context) (err error) {
-	defer errutil.Prefix(&err, "problem in PopScheduledSiteChanges")
+	defer errutil.Trace(&err)
 
 	configs, err := svc.Queries.PopScheduledSiteChanges(ctx, EditorsPicksLoc)
 	if err != nil {
@@ -682,15 +682,29 @@ func (svc Service) PopScheduledSiteChanges(ctx context.Context) (err error) {
 	}
 	svc.Printf("site data: updating %s", EditorsPicksLoc)
 
-	data, err := json.MarshalIndent(currentConfig.Data, "", "  ")
-	if err != nil {
-		return err
-	}
-	msg := fmt.Sprintf("Setting %s", currentConfig.Name)
-	if err = svc.ContentStore.UpdateFile(ctx, msg, currentConfig.Key, data); err != nil {
-		// TODO: rollback
+	// TODO: rollback
+	if err = svc.PublishSiteConfig(ctx, currentConfig); err != nil {
 		return err
 	}
 
 	return svc.Queries.CleanSiteData(ctx, EditorsPicksLoc)
+}
+
+var msgForLoc = map[string]string{
+	EditorsPicksLoc: "Setting homepage configuration",
+}
+
+func (svc Service) PublishSiteConfig(ctx context.Context, siteConfig *db.SiteDatum) (err error) {
+	defer errutil.Trace(&err)
+
+	data, err := json.MarshalIndent(siteConfig.Data, "", "  ")
+	if err != nil {
+		return err
+	}
+	msg := stringutils.First(msgForLoc[siteConfig.Key], siteConfig.Key)
+	if err = svc.ContentStore.UpdateFile(ctx, msg, siteConfig.Key, data); err != nil {
+
+		return err
+	}
+	return nil
 }
