@@ -86,7 +86,6 @@ export default {
     title: "Homepage Editor",
   },
   setup() {
-    let removedItems = [];
     let { listAllPages, getEditorsPicks, saveEditorsPicks } = useClient();
 
     let { apiState: listState, exec: listExec } = makeState();
@@ -96,17 +95,16 @@ export default {
       didLoad: computed(() => listState.didLoad && edPicksState.didLoad),
       isLoading: computed(() => listState.isLoading || edPicksState.isLoading),
       error: computed(() => listState.error ?? edPicksState.error),
-      pages: computed(() =>
-        listState.rawData ? listState.rawData.pages.map((p) => new Page(p)) : []
+      pages: computed(
+        () => listState.rawData?.pages.map((p) => new Page(p)) ?? []
       ),
       pagesByPath: computed(
         () => new Map(state.pages.map((p) => [p.filePath, p]))
       ),
-      pagesAndPicks: computed(() => ({
-        pages: state.pages,
-        rawPicks: edPicksState.rawData?.datums ?? [],
-      })),
+      rawPicks: computed(() => edPicksState.rawData?.datums ?? []),
+
       allEdPicks: [],
+      removedItems: [],
       nextSchedule: null,
     });
 
@@ -121,24 +119,25 @@ export default {
         return edPickExec(() =>
           saveEditorsPicks({
             datums: state.allEdPicks,
-            removed_items: removedItems,
+            removed_items: state.removedItems,
           })
         );
       },
       reset() {
-        let { pages, rawPicks } = state.pagesAndPicks;
+        let { pages, rawPicks } = state;
+
         if (!pages.length || !rawPicks.length) {
           return;
         }
 
-        removedItems = [];
         state.allEdPicks = rawPicks.map(
           (data) => new EditorsPicksData(data, state.pagesByPath)
         );
+        state.removedItems = [];
       },
     };
     watch(
-      () => state.pagesAndPicks,
+      () => [state.pages, state.rawPicks],
       () => actions.reset()
     );
 
@@ -165,7 +164,7 @@ export default {
       removeScheduledPick(i) {
         let id = state.allEdPicks[i].id;
         if (id) {
-          removedItems.push(id);
+          state.removedItems.push(id);
         }
         state.allEdPicks.splice(i, 1);
       },
