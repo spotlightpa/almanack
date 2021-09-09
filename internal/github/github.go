@@ -103,6 +103,10 @@ func (cl *Client) UpdateFile(ctx context.Context, msg, path string, content []by
 	var sha *string
 	if err == nil {
 		sha = fileInfo.SHA
+		if oldcontent, err2 := fileInfo.GetContent(); err2 == nil && string(content) == oldcontent {
+			cl.printf("file %s already updated", path)
+			return nil
+		}
 	} else {
 		resp := new(github.ErrorResponse)
 		if !errors.As(err, &resp) || resp.Response.StatusCode != http.StatusNotFound {
