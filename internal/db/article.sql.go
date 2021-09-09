@@ -6,7 +6,8 @@ package db
 import (
 	"context"
 	"database/sql"
-	"encoding/json"
+
+	"github.com/jackc/pgtype"
 )
 
 const getArticleByArcID = `-- name: GetArticleByArcID :one
@@ -272,11 +273,11 @@ RETURNING
 `
 
 type UpdateAlmanackArticleParams struct {
-	Status     string          `json:"status"`
-	Note       string          `json:"note"`
-	SetArcData bool            `json:"set_arc_data"`
-	ArcData    json.RawMessage `json:"arc_data"`
-	ArcID      sql.NullString  `json:"arc_id"`
+	Status     string         `json:"status"`
+	Note       string         `json:"note"`
+	SetArcData bool           `json:"set_arc_data"`
+	ArcData    pgtype.JSONB   `json:"arc_data"`
+	ArcID      sql.NullString `json:"arc_id"`
 }
 
 func (q *Queries) UpdateAlmanackArticle(ctx context.Context, arg UpdateAlmanackArticleParams) (Article, error) {
@@ -356,7 +357,7 @@ ON CONFLICT (arc_id)
     article.status = 'U'
 `
 
-func (q *Queries) UpdateArcArticles(ctx context.Context, arcItems json.RawMessage) error {
+func (q *Queries) UpdateArcArticles(ctx context.Context, arcItems pgtype.JSONB) error {
 	_, err := q.db.Exec(ctx, updateArcArticles, arcItems)
 	return err
 }
@@ -382,10 +383,10 @@ RETURNING
 `
 
 type UpdateSpotlightPAArticleParams struct {
-	SpotlightPAData json.RawMessage `json:"spotlightpa_data"`
-	ScheduleFor     sql.NullTime    `json:"schedule_for"`
-	SpotlightPAPath sql.NullString  `json:"spotlightpa_path"`
-	ArcID           sql.NullString  `json:"arc_id"`
+	SpotlightPAData pgtype.JSONB   `json:"spotlightpa_data"`
+	ScheduleFor     sql.NullTime   `json:"schedule_for"`
+	SpotlightPAPath sql.NullString `json:"spotlightpa_path"`
+	ArcID           sql.NullString `json:"arc_id"`
 }
 
 func (q *Queries) UpdateSpotlightPAArticle(ctx context.Context, arg UpdateSpotlightPAArticleParams) (sql.NullTime, error) {

@@ -22,6 +22,7 @@ require (
 	github.com/google/go-github/v33 v33.0.0
 	github.com/gorilla/feeds v1.1.1
 	github.com/jackc/pgconn v1.10.0
+	github.com/jackc/pgtype v1.8.1
 	github.com/jackc/pgx/v4 v4.13.0
 	github.com/mattbaird/gochimp v0.0.0-20200820164431-f1082bcdf63f
 	gocloud.dev v0.24.0
@@ -50,7 +51,6 @@ require (
 	github.com/jackc/pgpassfile v1.0.0 // indirect
 	github.com/jackc/pgproto3/v2 v2.1.1 // indirect
 	github.com/jackc/pgservicefile v0.0.0-20200714003250-2b9c44734f2b // indirect
-	github.com/jackc/pgtype v1.8.1 // indirect
 	github.com/jackc/puddle v1.1.3 // indirect
 	github.com/jmespath/go-jmespath v0.4.0 // indirect
 	go.opencensus.io v0.23.0 // indirect

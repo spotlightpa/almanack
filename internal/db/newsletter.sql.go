@@ -6,7 +6,8 @@ package db
 import (
 	"context"
 	"database/sql"
-	"encoding/json"
+
+	"github.com/jackc/pgtype"
 )
 
 const listNewsletters = `-- name: ListNewsletters :many
@@ -172,8 +173,8 @@ campaign AS (
 `
 
 type UpdateNewsletterArchivesParams struct {
-	Type string          `json:"type"`
-	Data json.RawMessage `json:"data"`
+	Type string       `json:"type"`
+	Data pgtype.JSONB `json:"data"`
 }
 
 func (q *Queries) UpdateNewsletterArchives(ctx context.Context, arg UpdateNewsletterArchivesParams) (int64, error) {
