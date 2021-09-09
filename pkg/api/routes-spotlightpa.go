@@ -369,20 +369,64 @@ func (app *appEnv) getEditorsPicks(w http.ResponseWriter, r *http.Request) {
 
 func (app *appEnv) postEditorsPicks(w http.ResponseWriter, r *http.Request) {
 	app.Printf("starting postEditorsPicks")
-	var req db.SetSiteDataParams
+
+	type Datum struct {
+		ID          int64     `json:"id"`
+		Data        db.Map    `json:"data"`
+		ScheduleFor time.Time `json:"schedule_for"`
+	}
+	var req struct {
+		Datums       []Datum `json:"datums"`
+		RemovedItems []int64 `json:"removed_items"`
+	}
 	if !app.readJSON(w, r, &req) {
 		return
 	}
-	if err := app.svc.Queries.SetSiteData(r.Context(), req); err != nil {
-		app.replyErr(w, r, err)
+	if len(req.Datums) < 1 {
+		app.replyErr(w, r, resperr.New(
+			http.StatusBadRequest, "no schedulable items provided"))
 		return
 	}
-	resp, err := app.svc.Queries.GetSiteData(r.Context(), almanack.EditorsPicksLoc)
+	// TODO: Add transactions
+	for _, datum := range req.Datums {
+		if err := app.svc.Queries.UpsertSiteData(r.Context(), db.UpsertSiteDataParams{
+			Key:         almanack.EditorsPicksLoc,
+			Data:        datum.Data,
+			ScheduleFor: datum.ScheduleFor,
+		}); err != nil {
+			app.replyErr(w, r, err)
+			return
+		}
+	}
+	for _, id := range req.RemovedItems {
+		if err := app.svc.Queries.DeleteSiteData(r.Context(), id); err != nil {
+			app.replyErr(w, r, err)
+			return
+		}
+	}
+	var (
+		res struct {
+			Datums []db.SiteDatum `json:"datums"`
+		}
+		err error
+	)
+	res.Datums, err = app.svc.Queries.GetSiteData(r.Context(), almanack.EditorsPicksLoc)
 	if err != nil {
 		app.replyErr(w, r, err)
 		return
 	}
-	app.replyJSON(http.StatusOK, w, resp)
+	if len(res.Datums) == 0 {
+		app.replyErr(w, r,
+			fmt.Errorf("no item is currently scheduled for the homepage"))
+		return
+	}
+	// GetSiteData must return presorted items!
+	currentItem := &res.Datums[0]
+	if err = app.svc.PublishSiteConfig(r.Context(), currentItem); err != nil {
+		app.replyErr(w, r, err)
+		return
+	}
+	app.replyJSON(http.StatusOK, w, res)
 }
 
 func (app *appEnv) listAllTopics(w http.ResponseWriter, r *http.Request) {

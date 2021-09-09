@@ -5,6 +5,7 @@ package db
 
 import (
 	"context"
+	"time"
 )
 
 const cleanSiteData = `-- name: CleanSiteData :exec
@@ -26,23 +27,33 @@ func (q *Queries) CleanSiteData(ctx context.Context, key string) error {
 	return err
 }
 
+const deleteSiteData = `-- name: DeleteSiteData :exec
+DELETE FROM site_data
+WHERE "id" = $1
+`
+
+func (q *Queries) DeleteSiteData(ctx context.Context, id int64) error {
+	_, err := q.db.Exec(ctx, deleteSiteData, id)
+	return err
+}
+
 const getSiteData = `-- name: GetSiteData :many
 SELECT
-  id, key, data, created_at, updated_at, name, schedule_for, published_at
+  id, key, data, created_at, updated_at, schedule_for, published_at
 FROM
   site_data
 WHERE
   key = $1::text
-  AND published_at IS NULL
-  OR published_at = (
-    SELECT
-      max(published_at) AS max
-    FROM
-      site_data
-    WHERE
-      key = $1::text
-    GROUP BY
-      key)
+  AND (published_at IS NULL
+    OR published_at = (
+      SELECT
+        max(published_at) AS max
+      FROM
+        site_data
+      WHERE
+        key = $1::text
+      GROUP BY
+        key))
 ORDER BY
   schedule_for ASC
 `
@@ -62,7 +73,6 @@ func (q *Queries) GetSiteData(ctx context.Context, key string) ([]SiteDatum, err
 			&i.Data,
 			&i.CreatedAt,
 			&i.UpdatedAt,
-			&i.Name,
 			&i.ScheduleFor,
 			&i.PublishedAt,
 		); err != nil {
@@ -86,7 +96,7 @@ WHERE
   AND published_at IS NULL
   AND schedule_for < (CURRENT_TIMESTAMP + '5 minutes'::interval)
 RETURNING
-  id, key, data, created_at, updated_at, name, schedule_for, published_at
+  id, key, data, created_at, updated_at, schedule_for, published_at
 `
 
 func (q *Queries) PopScheduledSiteChanges(ctx context.Context, key string) ([]SiteDatum, error) {
@@ -104,7 +114,6 @@ func (q *Queries) PopScheduledSiteChanges(ctx context.Context, key string) ([]Si
 			&i.Data,
 			&i.CreatedAt,
 			&i.UpdatedAt,
-			&i.Name,
 			&i.ScheduleFor,
 			&i.PublishedAt,
 		); err != nil {
@@ -118,21 +127,21 @@ func (q *Queries) PopScheduledSiteChanges(ctx context.Context, key string) ([]Si
 	return items, nil
 }
 
-const setSiteData = `-- name: SetSiteData :exec
-UPDATE
-  site_data
-SET
-  "data" = $2
-WHERE
-  "key" = $1
+const upsertSiteData = `-- name: UpsertSiteData :exec
+INSERT INTO site_data ("key", "data", "schedule_for")
+  VALUES ($1, $2, $3)
+ON CONFLICT ("key", "schedule_for")
+  DO UPDATE SET
+    data = excluded.data
 `
 
-type SetSiteDataParams struct {
-	Key  string `json:"key"`
-	Data Map    `json:"data"`
+type UpsertSiteDataParams struct {
+	Key         string    `json:"key"`
+	Data        Map       `json:"data"`
+	ScheduleFor time.Time `json:"schedule_for"`
 }
 
-func (q *Queries) SetSiteData(ctx context.Context, arg SetSiteDataParams) error {
-	_, err := q.db.Exec(ctx, setSiteData, arg.Key, arg.Data)
+func (q *Queries) UpsertSiteData(ctx context.Context, arg UpsertSiteDataParams) error {
+	_, err := q.db.Exec(ctx, upsertSiteData, arg.Key, arg.Data, arg.ScheduleFor)
 	return err
 }
