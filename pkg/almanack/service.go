@@ -11,6 +11,7 @@ import (
 
 	"github.com/carlmjohnson/errutil"
 	"github.com/carlmjohnson/resperr"
+	"github.com/jackc/pgtype"
 	"github.com/spotlightpa/almanack/internal/arc"
 	"github.com/spotlightpa/almanack/internal/aws"
 	"github.com/spotlightpa/almanack/internal/db"
@@ -86,11 +87,11 @@ func (svc Service) ListAvailableArcStories(ctx context.Context, page int32) (sto
 
 func (svc Service) SaveAlmanackArticle(ctx context.Context, article *ArcStory, setArcData bool) error {
 	var (
-		arcData = json.RawMessage("{}")
+		arcData pgtype.JSONB
 		err     error
 	)
 	if setArcData {
-		if arcData, err = json.Marshal(article.FeedItem); err != nil {
+		if err = arcData.Set(article.FeedItem); err != nil {
 			return err
 		}
 	}
@@ -114,8 +115,8 @@ func (svc Service) SaveAlmanackArticle(ctx context.Context, article *ArcStory, s
 }
 
 func (svc Service) StoreFeed(ctx context.Context, newfeed *arc.API) (err error) {
-	arcItems, err := json.Marshal(&newfeed.Contents)
-	if err != nil {
+	var arcItems pgtype.JSONB
+	if err := arcItems.Set(&newfeed.Contents); err != nil {
 		return err
 	}
 	start := time.Now()
@@ -204,8 +205,8 @@ func (svc Service) UpdateNewsletterArchive(ctx context.Context, mcType, dbType, 
 		return err
 	}
 	// update DB
-	data, err := json.Marshal(newItems)
-	if err != nil {
+	var data pgtype.JSONB
+	if err = data.Set(newItems); err != nil {
 		return err
 	}
 	if n, err := svc.Queries.UpdateNewsletterArchives(ctx, db.UpdateNewsletterArchivesParams{

@@ -4,9 +4,9 @@ package db
 
 import (
 	"database/sql"
-	"encoding/json"
 	"time"
 
+	"github.com/jackc/pgtype"
 	"github.com/spotlightpa/almanack/internal/arc"
 )
 
@@ -19,17 +19,17 @@ type AddressRole struct {
 }
 
 type Article struct {
-	ID              int32           `json:"id"`
-	ArcID           sql.NullString  `json:"arc_id"`
-	ArcData         arc.FeedItem    `json:"arc_data"`
-	SpotlightPAPath sql.NullString  `json:"spotlightpa_path"`
-	SpotlightPAData json.RawMessage `json:"spotlightpa_data"`
-	ScheduleFor     sql.NullTime    `json:"schedule_for"`
-	LastPublished   sql.NullTime    `json:"last_published"`
-	Note            string          `json:"note"`
-	Status          string          `json:"status"`
-	CreatedAt       time.Time       `json:"created_at"`
-	UpdatedAt       time.Time       `json:"updated_at"`
+	ID              int32          `json:"id"`
+	ArcID           sql.NullString `json:"arc_id"`
+	ArcData         arc.FeedItem   `json:"arc_data"`
+	SpotlightPAPath sql.NullString `json:"spotlightpa_path"`
+	SpotlightPAData pgtype.JSONB   `json:"spotlightpa_data"`
+	ScheduleFor     sql.NullTime   `json:"schedule_for"`
+	LastPublished   sql.NullTime   `json:"last_published"`
+	Note            string         `json:"note"`
+	Status          string         `json:"status"`
+	CreatedAt       time.Time      `json:"created_at"`
+	UpdatedAt       time.Time      `json:"updated_at"`
 }
 
 type ArticleStatus struct {
