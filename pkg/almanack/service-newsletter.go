@@ -119,61 +119,63 @@ func (svc Service) SaveNewsletterPage(ctx context.Context, nl *db.Newsletter, bo
 	}
 
 	// create or update the page
-	if needsUpdate {
-		path := nl.SpotlightPAPath.String
-		if err := svc.Queries.EnsurePage(ctx, path); err != nil {
-			return err
-		}
-		slug := stringutils.Slugify(
-			timeutil.ToEST(nl.PublishedAt).Format("Jan 2 ") + nl.Subject,
-		)
-		if _, err := svc.Queries.UpdatePage(ctx, db.UpdatePageParams{
-			SetFrontmatter: true,
-			Frontmatter: map[string]interface{}{
-				"aliases":           []string{},
-				"authors":           []string{},
-				"blurb":             nl.Blurb,
-				"byline":            "",
-				"description":       nl.Description,
-				"draft":             false,
-				"extended-kicker":   "",
-				"image":             "",
-				"image-caption":     "",
-				"image-credit":      "",
-				"image-description": "",
-				"image-size":        "",
-				"internal-id": fmt.Sprintf("%s-%s",
-					strings.ToUpper(nl.Type),
-					nl.PublishedAt.Format("01-02-06")),
-				//TODO: proper kicker lookup
-				"kicker":      kickerFor[nl.Type],
-				"layout":      "mailchimp-page",
-				"linktitle":   "",
-				"no-index":    false,
-				"published":   nl.PublishedAt,
-				"raw-content": body,
-				"series":      []string{},
-				"slug":        slug,
-				"title":       nl.Subject,
-				"title-tag":   "",
-				"topics":      []string{},
-				"url":         "",
-			},
-			SetBody:  true,
-			Body:     "",
-			FilePath: path,
-		}); err != nil {
-			return err
-		}
-
-		if nl2, err := svc.Queries.SetNewsletterPage(ctx, db.SetNewsletterPageParams{
-			ID:              nl.ID,
-			SpotlightPAPath: nl.SpotlightPAPath,
-		}); err != nil {
-			return err
-		} else {
-			*nl = nl2
-		}
+	if !needsUpdate {
+		return nil
 	}
+	path := nl.SpotlightPAPath.String
+	if err := svc.Queries.EnsurePage(ctx, path); err != nil {
+		return err
+	}
+	slug := stringutils.Slugify(
+		timeutil.ToEST(nl.PublishedAt).Format("Jan 2 ") + nl.Subject,
+	)
+	if _, err := svc.Queries.UpdatePage(ctx, db.UpdatePageParams{
+		SetFrontmatter: true,
+		Frontmatter: map[string]interface{}{
+			"aliases":           []string{},
+			"authors":           []string{},
+			"blurb":             nl.Blurb,
+			"byline":            "",
+			"description":       nl.Description,
+			"draft":             false,
+			"extended-kicker":   "",
+			"image":             "",
+			"image-caption":     "",
+			"image-credit":      "",
+			"image-description": "",
+			"image-size":        "",
+			"internal-id": fmt.Sprintf("%s-%s",
+				strings.ToUpper(nl.Type),
+				nl.PublishedAt.Format("01-02-06")),
+			//TODO: proper kicker lookup
+			"kicker":      kickerFor[nl.Type],
+			"layout":      "mailchimp-page",
+			"linktitle":   "",
+			"no-index":    false,
+			"published":   nl.PublishedAt,
+			"raw-content": body,
+			"series":      []string{},
+			"slug":        slug,
+			"title":       nl.Subject,
+			"title-tag":   "",
+			"topics":      []string{},
+			"url":         "",
+		},
+		SetBody:  true,
+		Body:     "",
+		FilePath: path,
+	}); err != nil {
+		return err
+	}
+
+	if nl2, err := svc.Queries.SetNewsletterPage(ctx, db.SetNewsletterPageParams{
+		ID:              nl.ID,
+		SpotlightPAPath: nl.SpotlightPAPath,
+	}); err != nil {
+		return err
+	} else {
+		*nl = nl2
+	}
+
 	return nil
 }
