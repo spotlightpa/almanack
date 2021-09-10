@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	"github.com/carlmjohnson/errutil"
+	"github.com/jackc/pgtype"
 	"github.com/spotlightpa/almanack/internal/db"
 	"github.com/spotlightpa/almanack/internal/slack"
 	"github.com/spotlightpa/almanack/internal/stringutils"
@@ -31,6 +32,7 @@ func (svc Service) PublishPage(ctx context.Context, page *db.Page) error {
 		SetFrontmatter:   false,
 		SetBody:          false,
 		SetScheduleFor:   false,
+		ScheduleFor:      db.NullTime,
 	})
 	if err != nil {
 		return err
@@ -42,7 +44,7 @@ func (svc Service) PublishPage(ctx context.Context, page *db.Page) error {
 func (svc Service) RefreshPageFromContentStore(ctx context.Context, page *db.Page) (err error) {
 	defer errutil.Prefix(&err, "problem refreshing page content from Github")
 
-	if !page.LastPublished.Valid {
+	if page.LastPublished.Status != pgtype.Present {
 		return
 	}
 	content, err := svc.ContentStore.GetFile(ctx, page.FilePath)
@@ -103,6 +105,7 @@ func (svc Service) RefreshPageContents(ctx context.Context, id int64) (err error
 		SetBody:        true,
 		Body:           page.Body,
 		URLPath:        page.URLPath.String,
+		ScheduleFor:    db.NullTime,
 	})
 
 	return err
@@ -140,6 +143,7 @@ func (svc Service) PageFromArcArticle(ctx context.Context, dbArt *db.Article) (p
 		SetBody:        true,
 		Body:           dbPage.Body,
 		URLPath:        dbPage.URLPath.String,
+		ScheduleFor:    db.NullTime,
 	}); err != nil {
 		return nil, err
 	}

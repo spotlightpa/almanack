@@ -5,8 +5,9 @@ package db
 
 import (
 	"context"
-	"database/sql"
 	"time"
+
+	"github.com/jackc/pgtype"
 )
 
 const ensurePage = `-- name: EnsurePage :exec
@@ -358,19 +359,19 @@ type ListPagesParams struct {
 }
 
 type ListPagesRow struct {
-	ID            int64        `json:"id"`
-	FilePath      string       `json:"file_path"`
-	InternalID    string       `json:"internal_id"`
-	Title         string       `json:"title"`
-	Description   string       `json:"description"`
-	Blurb         string       `json:"blurb"`
-	Image         string       `json:"image"`
-	URLPath       string       `json:"url_path"`
-	LastPublished sql.NullTime `json:"last_published"`
-	CreatedAt     time.Time    `json:"created_at"`
-	UpdatedAt     time.Time    `json:"updated_at"`
-	ScheduleFor   sql.NullTime `json:"schedule_for"`
-	PublishedAt   string       `json:"published_at"`
+	ID            int64              `json:"id"`
+	FilePath      string             `json:"file_path"`
+	InternalID    string             `json:"internal_id"`
+	Title         string             `json:"title"`
+	Description   string             `json:"description"`
+	Blurb         string             `json:"blurb"`
+	Image         string             `json:"image"`
+	URLPath       string             `json:"url_path"`
+	LastPublished pgtype.Timestamptz `json:"last_published"`
+	CreatedAt     time.Time          `json:"created_at"`
+	UpdatedAt     time.Time          `json:"updated_at"`
+	ScheduleFor   pgtype.Timestamptz `json:"schedule_for"`
+	PublishedAt   string             `json:"published_at"`
 }
 
 // Cannot use coalesce, see https://github.com/kyleconroy/sqlc/issues/780.
@@ -488,15 +489,15 @@ RETURNING
 `
 
 type UpdatePageParams struct {
-	SetFrontmatter   bool         `json:"set_frontmatter"`
-	Frontmatter      Map          `json:"frontmatter"`
-	SetBody          bool         `json:"set_body"`
-	Body             string       `json:"body"`
-	SetScheduleFor   bool         `json:"set_schedule_for"`
-	ScheduleFor      sql.NullTime `json:"schedule_for"`
-	URLPath          string       `json:"url_path"`
-	SetLastPublished bool         `json:"set_last_published"`
-	FilePath         string       `json:"file_path"`
+	SetFrontmatter   bool               `json:"set_frontmatter"`
+	Frontmatter      Map                `json:"frontmatter"`
+	SetBody          bool               `json:"set_body"`
+	Body             string             `json:"body"`
+	SetScheduleFor   bool               `json:"set_schedule_for"`
+	ScheduleFor      pgtype.Timestamptz `json:"schedule_for"`
+	URLPath          string             `json:"url_path"`
+	SetLastPublished bool               `json:"set_last_published"`
+	FilePath         string             `json:"file_path"`
 }
 
 func (q *Queries) UpdatePage(ctx context.Context, arg UpdatePageParams) (Page, error) {

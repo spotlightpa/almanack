@@ -1,8 +1,9 @@
 package timeutil
 
 import (
-	"database/sql"
 	"time"
+
+	"github.com/jackc/pgtype"
 )
 
 func ToEST(t time.Time) time.Time {
@@ -32,11 +33,11 @@ func ToTime(v interface{}) (t time.Time, ok bool) {
 
 const timeWindow = 5 * time.Minute
 
-func Equalish(old, new sql.NullTime) bool {
-	if old.Valid != new.Valid {
+func Equalish(old, new pgtype.Timestamptz) bool {
+	if old.Status != new.Status {
 		return false
 	}
-	if !old.Valid {
+	if old.Status != pgtype.Present || new.Status != pgtype.Present {
 		return true
 	}
 	diff := old.Time.Sub(new.Time)

@@ -161,9 +161,10 @@ func (svc Service) SaveNewsletterPage(ctx context.Context, nl *db.Newsletter, bo
 			"topics":      []string{},
 			"url":         "",
 		},
-		SetBody:  true,
-		Body:     "",
-		FilePath: path,
+		SetBody:     true,
+		Body:        "",
+		FilePath:    path,
+		ScheduleFor: db.NullTime,
 	}); err != nil {
 		return err
 	}

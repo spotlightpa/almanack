@@ -3,7 +3,6 @@
 package db
 
 import (
-	"database/sql"
 	"time"
 
 	"github.com/jackc/pgtype"
@@ -19,17 +18,17 @@ type AddressRole struct {
 }
 
 type Article struct {
-	ID              int32          `json:"id"`
-	ArcID           sql.NullString `json:"arc_id"`
-	ArcData         arc.FeedItem   `json:"arc_data"`
-	SpotlightPAPath sql.NullString `json:"spotlightpa_path"`
-	SpotlightPAData pgtype.JSONB   `json:"spotlightpa_data"`
-	ScheduleFor     sql.NullTime   `json:"schedule_for"`
-	LastPublished   sql.NullTime   `json:"last_published"`
-	Note            string         `json:"note"`
-	Status          string         `json:"status"`
-	CreatedAt       time.Time      `json:"created_at"`
-	UpdatedAt       time.Time      `json:"updated_at"`
+	ID              int32              `json:"id"`
+	ArcID           pgtype.Text        `json:"arc_id"`
+	ArcData         arc.FeedItem       `json:"arc_data"`
+	SpotlightPAPath pgtype.Text        `json:"spotlightpa_path"`
+	SpotlightPAData pgtype.JSONB       `json:"spotlightpa_data"`
+	ScheduleFor     pgtype.Timestamptz `json:"schedule_for"`
+	LastPublished   pgtype.Timestamptz `json:"last_published"`
+	Note            string             `json:"note"`
+	Status          string             `json:"status"`
+	CreatedAt       time.Time          `json:"created_at"`
+	UpdatedAt       time.Time          `json:"updated_at"`
 }
 
 type ArticleStatus struct {
@@ -94,23 +93,23 @@ type NewsletterType struct {
 }
 
 type Page struct {
-	ID            int64        `json:"id"`
-	FilePath      string       `json:"file_path"`
-	Frontmatter   Map          `json:"frontmatter"`
-	Body          string       `json:"body"`
-	ScheduleFor   sql.NullTime `json:"schedule_for"`
-	LastPublished sql.NullTime `json:"last_published"`
-	CreatedAt     time.Time    `json:"created_at"`
-	UpdatedAt     time.Time    `json:"updated_at"`
-	URLPath       pgtype.Text  `json:"url_path"`
+	ID            int64              `json:"id"`
+	FilePath      string             `json:"file_path"`
+	Frontmatter   Map                `json:"frontmatter"`
+	Body          string             `json:"body"`
+	ScheduleFor   pgtype.Timestamptz `json:"schedule_for"`
+	LastPublished pgtype.Timestamptz `json:"last_published"`
+	CreatedAt     time.Time          `json:"created_at"`
+	UpdatedAt     time.Time          `json:"updated_at"`
+	URLPath       pgtype.Text        `json:"url_path"`
 }
 
 type SiteDatum struct {
-	ID          int64        `json:"id"`
-	Key         string       `json:"key"`
-	Data        Map          `json:"data"`
-	CreatedAt   time.Time    `json:"created_at"`
-	UpdatedAt   time.Time    `json:"updated_at"`
-	ScheduleFor time.Time    `json:"schedule_for"`
-	PublishedAt sql.NullTime `json:"published_at"`
+	ID          int64              `json:"id"`
+	Key         string             `json:"key"`
+	Data        Map                `json:"data"`
+	CreatedAt   time.Time          `json:"created_at"`
+	UpdatedAt   time.Time          `json:"updated_at"`
+	ScheduleFor time.Time          `json:"schedule_for"`
+	PublishedAt pgtype.Timestamptz `json:"published_at"`
 }
