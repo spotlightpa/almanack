@@ -4,12 +4,15 @@ import (
 	"context"
 	"time"
 
+	"github.com/carlmjohnson/errutil"
 	"github.com/jackc/pgtype"
 	"github.com/spotlightpa/almanack/internal/arc"
 	"github.com/spotlightpa/almanack/internal/db"
 )
 
 func (svc Service) GetArcStory(ctx context.Context, articleID string) (story *ArcStory, err error) {
+	defer errutil.Trace(&err)
+
 	start := time.Now()
 	dart, err := svc.Queries.GetArticleByArcID(ctx, articleID)
 	svc.Printf("GetArticleByArcID query time: %v", time.Since(start))
@@ -27,6 +30,8 @@ func (svc Service) GetArcStory(ctx context.Context, articleID string) (story *Ar
 }
 
 func (svc Service) ListAvailableArcStories(ctx context.Context, page int32) (stories []ArcStory, nextPage int32, err error) {
+	defer errutil.Trace(&err)
+
 	const pageSize = 20
 	offset := page * pageSize
 
@@ -50,11 +55,10 @@ func (svc Service) ListAvailableArcStories(ctx context.Context, page int32) (sto
 	return
 }
 
-func (svc Service) SaveAlmanackArticle(ctx context.Context, article *ArcStory, setArcData bool) error {
-	var (
-		arcData = db.NullJSONB
-		err     error
-	)
+func (svc Service) SaveAlmanackArticle(ctx context.Context, article *ArcStory, setArcData bool) (err error) {
+	defer errutil.Trace(&err)
+
+	arcData := db.NullJSONB
 	if setArcData {
 		if err = arcData.Set(article.FeedItem); err != nil {
 			return err
@@ -80,6 +84,8 @@ func (svc Service) SaveAlmanackArticle(ctx context.Context, article *ArcStory, s
 }
 
 func (svc Service) StoreFeed(ctx context.Context, newfeed *arc.API) (err error) {
+	defer errutil.Trace(&err)
+
 	var arcItems pgtype.JSONB
 	if err := arcItems.Set(&newfeed.Contents); err != nil {
 		return err
@@ -91,6 +97,8 @@ func (svc Service) StoreFeed(ctx context.Context, newfeed *arc.API) (err error) 
 }
 
 func (svc Service) ListAllArcStories(ctx context.Context, page int32) (stories []ArcStory, nextPage int32, err error) {
+	defer errutil.Trace(&err)
+
 	const pageSize = 50
 	offset := page * pageSize
 	start := time.Now()

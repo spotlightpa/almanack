@@ -5,11 +5,14 @@ import (
 	"fmt"
 	"net/http"
 
+	"github.com/carlmjohnson/errutil"
 	"github.com/carlmjohnson/resperr"
 	"github.com/spotlightpa/almanack/internal/db"
 )
 
-func (svc Service) ReplaceImageURL(ctx context.Context, srcURL, description, credit string) (string, error) {
+func (svc Service) ReplaceImageURL(ctx context.Context, srcURL, description, credit string) (s string, err error) {
+	defer errutil.Trace(&err)
+
 	if srcURL == "" {
 		return "", fmt.Errorf("no image provided")
 	}
@@ -38,7 +41,9 @@ func (svc Service) ReplaceImageURL(ctx context.Context, srcURL, description, cre
 	return path, err
 }
 
-func (svc Service) UpdateMostPopular(ctx context.Context) error {
+func (svc Service) UpdateMostPopular(ctx context.Context) (err error) {
+	defer errutil.Trace(&err)
+
 	svc.Logger.Printf("updating most popular")
 	cl, err := svc.gsvc.GAClient(ctx)
 	if err != nil {
