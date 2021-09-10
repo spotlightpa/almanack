@@ -155,6 +155,12 @@ func (page *Page) ToIndex() interface{} {
 	aliases, _ := page.Frontmatter["aliases"].([]string)
 	rawContent, _ := page.Frontmatter["raw-content"].(string)
 
+	body := stringutils.First(page.Body, rawContent)
+	// See https://www.algolia.com/doc/guides/sending-and-managing-data/prepare-your-data/in-depth/index-and-records-size-and-usage-limitations/#record-size-limits
+	const maxLen = 90_000
+	if len(body) > maxLen {
+		body = body[:maxLen]
+	}
 	return struct {
 		ObjectID         string    `json:"objectID"`
 		URL              string    `json:"URL"`
@@ -200,6 +206,6 @@ func (page *Page) ToIndex() interface{} {
 		series,
 		linkTitle,
 		aliases,
-		stringutils.First(page.Body, rawContent),
+		body,
 	}
 }
