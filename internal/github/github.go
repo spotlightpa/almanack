@@ -6,7 +6,7 @@ import (
 	"flag"
 	"net/http"
 
-	"github.com/google/go-github/v33/github"
+	"github.com/google/go-github/v39/github"
 	"github.com/spotlightpa/almanack/internal/netlifyid"
 	"github.com/spotlightpa/almanack/pkg/common"
 	"golang.org/x/oauth2"
@@ -129,7 +129,7 @@ func (cl *Client) UpdateFile(ctx context.Context, msg, path string, content []by
 
 func (cl *Client) Ping(ctx context.Context) error {
 	cl.printf("pinging Github %s/%s@%s", cl.owner, cl.repo, cl.branch)
-	_, _, err := cl.client.Repositories.GetBranch(ctx, cl.owner, cl.repo, cl.branch)
+	_, _, err := cl.client.Repositories.GetBranch(ctx, cl.owner, cl.repo, cl.branch, true)
 	return err
 }
 

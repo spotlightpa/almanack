@@ -19,7 +19,7 @@ require (
 	github.com/gabriel-vasile/mimetype v1.3.1
 	github.com/getsentry/sentry-go v0.11.0
 	github.com/go-chi/chi v1.5.4
-	github.com/google/go-github/v33 v33.0.0
+	github.com/google/go-github/v39 v39.0.0
 	github.com/gorilla/feeds v1.1.1
 	github.com/jackc/pgconn v1.10.0
 	github.com/jackc/pgtype v1.8.1
@@ -43,7 +43,7 @@ require (
 	github.com/aws/smithy-go v1.8.0 // indirect
 	github.com/golang/groupcache v0.0.0-20210331224755-41bb18bfe9da // indirect
 	github.com/golang/protobuf v1.5.2 // indirect
-	github.com/google/go-querystring v1.0.0 // indirect
+	github.com/google/go-querystring v1.1.0 // indirect
 	github.com/google/wire v0.5.0 // indirect
 	github.com/googleapis/gax-go/v2 v2.1.0 // indirect
 	github.com/jackc/chunkreader/v2 v2.0.1 // indirect
