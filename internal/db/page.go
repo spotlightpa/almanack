@@ -130,3 +130,76 @@ func (page *Page) FullURL() string {
 	}
 	return fmt.Sprintf("https://www.spotlightpa.org%s", page.URLPath.String)
 }
+
+func (page *Page) ToIndex() interface{} {
+
+	internalID, _ := page.Frontmatter["internal-id"].(string)
+	imageURL, _ := page.Frontmatter["image"].(string)
+	imageDescription, _ := page.Frontmatter["image-description"].(string)
+	imageCaption, _ := page.Frontmatter["image-caption"].(string)
+	imageCredit, _ := page.Frontmatter["image-credit"].(string)
+	imageSize, _ := page.Frontmatter["image-size"].(string)
+	pubDate, _ := timeutil.GetTime(page.Frontmatter, "published")
+	slug, _ := page.Frontmatter["slug"].(string)
+	authors, _ := page.Frontmatter["authors"].([]string)
+	byline, _ := page.Frontmatter["byline"].(string)
+	hed, _ := page.Frontmatter["title"].(string)
+	// subhead is unused?
+	subhead, _ := page.Frontmatter["description"].(string)
+	summary, _ := page.Frontmatter["summary"].(string)
+	blurb, _ := page.Frontmatter["blurb"].(string)
+	kicker, _ := page.Frontmatter["kicker"].(string)
+	topics, _ := page.Frontmatter["topics"].([]string)
+	series, _ := page.Frontmatter["series"].([]string)
+	linkTitle, _ := page.Frontmatter["linkTitle"].(string)
+	aliases, _ := page.Frontmatter["aliases"].([]string)
+	rawContent, _ := page.Frontmatter["raw-content"].(string)
+
+	return struct {
+		ObjectID         string    `json:"objectID"`
+		URL              string    `json:"URL"`
+		InternalID       string    `json:"internal-id"`
+		ImageURL         string    `json:"image-url"`
+		ImageDescription string    `json:"image-description"`
+		ImageCaption     string    `json:"image-caption"`
+		ImageCredit      string    `json:"image-credit"`
+		ImageSize        string    `json:"image-size"`
+		PubDate          time.Time `json:"pub-date"`
+		Slug             string    `json:"slug"`
+		Authors          []string  `json:"authors"`
+		Byline           string    `json:"byline"`
+		Hed              string    `json:"hed"`
+		Subhead          string    `json:"subhead"`
+		Summary          string    `json:"summary"`
+		Blurb            string    `json:"blurb"`
+		Kicker           string    `json:"kicker"`
+		Topics           []string  `json:"topics"`
+		Series           []string  `json:"series"`
+		LinkTitle        string    `json:"link-title"`
+		Aliases          []string  `json:"aliases"`
+		Body             string    `json:"body"`
+	}{
+		page.FullURL(),
+		page.FullURL(),
+		internalID,
+		imageURL,
+		imageDescription,
+		imageCaption,
+		imageCredit,
+		imageSize,
+		pubDate,
+		slug,
+		authors,
+		byline,
+		hed,
+		subhead,
+		summary,
+		blurb,
+		kicker,
+		topics,
+		series,
+		linkTitle,
+		aliases,
+		stringutils.First(page.Body, rawContent),
+	}
+}
