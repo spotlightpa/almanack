@@ -42,7 +42,7 @@ class EditorsPicksData {
     this.id = siteConfig.id;
     this.scheduleFor = siteConfig.schedule_for;
     let pub = siteConfig.published_at;
-    this.publishedAt = pub.Valid ? new Date(pub.Time) : null;
+    this.publishedAt = pub ? new Date(pub) : null;
     this.isCurrent = !!this.publishedAt;
   }
 

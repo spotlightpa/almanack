@@ -21,17 +21,13 @@ export default class PageListItem {
     this.createdAt = PageListItem.getDate(data, "created_at");
     this.publishedAt = PageListItem.getDate(data, "published_at");
     this.updatedAt = PageListItem.getDate(data, "updated_at");
-    this.lastPublished = PageListItem.getNullableDate(data, "last_published");
-    this.scheduleFor = PageListItem.getNullableDate(data, "schedule_for");
+    this.lastPublished = PageListItem.getDate(data, "last_published");
+    this.scheduleFor = PageListItem.getDate(data, "schedule_for");
   }
 
   static getDate(data, prop) {
     let date = data[prop] ?? null;
     return date && new Date(date);
-  }
-
-  static getNullableDate(data, prop) {
-    return data[prop]?.Valid ? new Date(data[prop].Time) : null;
   }
 
   get isPublished() {

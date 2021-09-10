@@ -5,7 +5,6 @@ package db
 
 import (
 	"context"
-	"database/sql"
 
 	"github.com/jackc/pgtype"
 )
@@ -383,20 +382,20 @@ RETURNING
 `
 
 type UpdateSpotlightPAArticleParams struct {
-	SpotlightPAData pgtype.JSONB   `json:"spotlightpa_data"`
-	ScheduleFor     sql.NullTime   `json:"schedule_for"`
-	SpotlightPAPath sql.NullString `json:"spotlightpa_path"`
-	ArcID           sql.NullString `json:"arc_id"`
+	SpotlightPAData pgtype.JSONB       `json:"spotlightpa_data"`
+	ScheduleFor     pgtype.Timestamptz `json:"schedule_for"`
+	SpotlightPAPath pgtype.Text        `json:"spotlightpa_path"`
+	ArcID           pgtype.Text        `json:"arc_id"`
 }
 
-func (q *Queries) UpdateSpotlightPAArticle(ctx context.Context, arg UpdateSpotlightPAArticleParams) (sql.NullTime, error) {
+func (q *Queries) UpdateSpotlightPAArticle(ctx context.Context, arg UpdateSpotlightPAArticleParams) (pgtype.Timestamptz, error) {
 	row := q.db.QueryRow(ctx, updateSpotlightPAArticle,
 		arg.SpotlightPAData,
 		arg.ScheduleFor,
 		arg.SpotlightPAPath,
 		arg.ArcID,
 	)
-	var schedule_for sql.NullTime
+	var schedule_for pgtype.Timestamptz
 	err := row.Scan(&schedule_for)
 	return schedule_for, err
 }
@@ -415,9 +414,9 @@ RETURNING
   "old".last_published
 `
 
-func (q *Queries) UpdateSpotlightPAArticleLastPublished(ctx context.Context, arcID string) (sql.NullTime, error) {
+func (q *Queries) UpdateSpotlightPAArticleLastPublished(ctx context.Context, arcID string) (pgtype.Timestamptz, error) {
 	row := q.db.QueryRow(ctx, updateSpotlightPAArticleLastPublished, arcID)
-	var last_published sql.NullTime
+	var last_published pgtype.Timestamptz
 	err := row.Scan(&last_published)
 	return last_published, err
 }

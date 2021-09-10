@@ -52,7 +52,7 @@ func (svc Service) ListAvailableArcStories(ctx context.Context, page int32) (sto
 
 func (svc Service) SaveAlmanackArticle(ctx context.Context, article *ArcStory, setArcData bool) error {
 	var (
-		arcData pgtype.JSONB
+		arcData = db.NullJSONB
 		err     error
 	)
 	if setArcData {

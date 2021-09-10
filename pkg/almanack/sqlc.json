@@ -21,6 +21,26 @@
 	},
 	"overrides": [
 		{
+			"db_type": "pg_catalog.varchar",
+			"go_type": "github.com/jackc/pgtype.Text",
+			"nullable": true
+		},
+		{
+			"db_type": "text",
+			"go_type": "github.com/jackc/pgtype.Text",
+			"nullable": true
+		},
+		{
+			"db_type": "timestamptz",
+			"go_type": "github.com/jackc/pgtype.Timestamptz",
+			"nullable": true
+		},
+		{
+			"db_type": "pg_catalog.timestamptz",
+			"go_type": "github.com/jackc/pgtype.Timestamptz",
+			"nullable": true
+		},
+		{
 			"db_type": "citext",
 			"go_type": "github.com/jackc/pgtype.Text",
 			"nullable": true

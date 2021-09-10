@@ -15,8 +15,8 @@ class Page {
     this.createdAt = data["created_at"] ?? "";
     this.publishedAt = Page.getDate(this.frontmatter, "published");
     this.updatedAt = Page.getDate(data, "updated_at");
-    this.lastPublished = Page.getNullableDate(data, "last_published");
-    this.scheduleFor = Page.getNullableDate(data, "schedule_for");
+    this.lastPublished = Page.getDate(data, "last_published");
+    this.scheduleFor = Page.getDate(data, "schedule_for");
     this.arcID = this.frontmatter["arc-id"] ?? "";
     this.kicker = this.frontmatter["kicker"] ?? "";
     this.title = this.frontmatter["title"] ?? "";
@@ -54,10 +54,6 @@ class Page {
   static getDate(data, prop) {
     let date = data[prop] ?? null;
     return date && new Date(date);
-  }
-
-  static getNullableDate(data, prop) {
-    return data[prop]?.Valid ? new Date(data[prop].Time) : null;
   }
 
   get isPublished() {
@@ -151,10 +147,7 @@ class Page {
       set_body: true,
       body: this.body,
       set_schedule_for: true,
-      schedule_for: {
-        Valid: !!this.scheduleFor,
-        Time: this.scheduleFor,
-      },
+      schedule_for: this.scheduleFor,
       url_path: "", // leave blank to prevent changes
       set_last_published: false,
     };

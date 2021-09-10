@@ -10,6 +10,7 @@ import (
 	"github.com/carlmjohnson/errutil"
 	"github.com/carlmjohnson/resperr"
 	"github.com/go-chi/chi"
+	"github.com/jackc/pgtype"
 	"github.com/spotlightpa/almanack/internal/arc"
 	"github.com/spotlightpa/almanack/internal/db"
 	"github.com/spotlightpa/almanack/internal/timeutil"
@@ -655,12 +656,12 @@ func (app *appEnv) postPage(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	willPublish := userUpdate.SetScheduleFor &&
-		userUpdate.ScheduleFor.Valid
+		userUpdate.ScheduleFor.Status == pgtype.Present
 	willPublishNow := willPublish &&
 		userUpdate.ScheduleFor.Time.Before(time.Now().Add(5*time.Minute))
 	var shouldNotify bool
 	if willPublishNow {
-		shouldNotify = !oldPage.LastPublished.Valid
+		shouldNotify = oldPage.LastPublished.Status == pgtype.Present
 	} else {
 		shouldNotify = willPublish && !timeutil.Equalish(oldPage.ScheduleFor, res.ScheduleFor)
 	}

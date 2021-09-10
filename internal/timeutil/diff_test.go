@@ -1,17 +1,21 @@
 package timeutil_test
 
 import (
-	"database/sql"
 	"testing"
 	"time"
 
+	"github.com/jackc/pgtype"
 	"github.com/spotlightpa/almanack/internal/timeutil"
 )
 
 func TestEqualish(t *testing.T) {
-	parseTime := func(s string) sql.NullTime {
+	parseTime := func(s string) pgtype.Timestamptz {
 		t, err := time.Parse("15:04:05", s)
-		return sql.NullTime{Time: t, Valid: err == nil}
+		status := pgtype.Present
+		if err != nil {
+			status = pgtype.Null
+		}
+		return pgtype.Timestamptz{Time: t, Status: status}
 	}
 	cases := map[string]struct {
 		a, b string
