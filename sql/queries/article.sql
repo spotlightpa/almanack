@@ -30,49 +30,6 @@ WHERE
 RETURNING
   *;
 
--- name: UpdateSpotlightPAArticle :one
-UPDATE
-  article AS "new"
-SET
-  spotlightpa_data = @spotlightpa_data,
-  schedule_for = @schedule_for,
-  spotlightpa_path = CASE WHEN "new".spotlightpa_path IS NULL THEN
-    @spotlightpa_path
-  ELSE
-    "new".spotlightpa_path
-  END
-FROM
-  article AS "old"
-WHERE
-  "new".id = "old".id
-  AND "old".arc_id = @arc_id
-RETURNING
-  "old".schedule_for;
-
--- name: UpdateSpotlightPAArticleLastPublished :one
-UPDATE
-  article AS "new"
-SET
-  last_published = CURRENT_TIMESTAMP
-FROM
-  article AS "old"
-WHERE
-  "new".id = "old".id
-  AND "old".arc_id = @arc_id::text
-RETURNING
-  "old".last_published;
-
--- name: PopScheduled :many
-UPDATE
-  article
-SET
-  last_published = CURRENT_TIMESTAMP
-WHERE
-  last_published IS NULL
-  AND schedule_for < (CURRENT_TIMESTAMP + '5 minutes'::interval)
-RETURNING
-  *;
-
 -- name: GetArticleByArcID :one
 SELECT
   *
@@ -80,14 +37,6 @@ FROM
   article
 WHERE
   arc_id = @arc_id::text;
-
--- name: GetArticleByDBID :one
-SELECT
-  *
-FROM
-  article
-WHERE
-  id = $1;
 
 -- name: ListUpcoming :many
 SELECT
