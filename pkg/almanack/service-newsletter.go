@@ -36,7 +36,9 @@ func (svc Service) UpdateNewsletterArchives(ctx context.Context) error {
 	)
 }
 
-func (svc Service) UpdateNewsletterArchive(ctx context.Context, mcType, dbType, feedtitle, path string) error {
+func (svc Service) UpdateNewsletterArchive(ctx context.Context, mcType, dbType, feedtitle, path string) (err error) {
+	defer errutil.Trace(&err)
+
 	// get the latest from MC
 	newItems, err := svc.NewletterService.ListNewletters(ctx, mcType)
 	if err != nil {
@@ -78,7 +80,7 @@ func (svc Service) UpdateNewsletterArchive(ctx context.Context, mcType, dbType, 
 }
 
 func (svc Service) ImportNewsletterPages(ctx context.Context) (err error) {
-	defer errutil.Prefix(&err, "problem importing newsletter pages")
+	defer errutil.Trace(&err)
 
 	nls, err := svc.Queries.ListNewslettersWithoutPage(ctx, db.ListNewslettersWithoutPageParams{
 		Offset: 0,
@@ -106,7 +108,7 @@ var kickerFor = map[string]string{
 }
 
 func (svc Service) SaveNewsletterPage(ctx context.Context, nl *db.Newsletter, body string) (err error) {
-	defer errutil.Prefix(&err, "problem saving newsletter page")
+	defer errutil.Trace(&err)
 
 	needsUpdate := false
 	if nl.SpotlightPAPath.String == "" {

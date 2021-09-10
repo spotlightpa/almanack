@@ -12,7 +12,9 @@ import (
 	"github.com/spotlightpa/almanack/internal/timeutil"
 )
 
-func (svc Service) PublishPage(ctx context.Context, page *db.Page) error {
+func (svc Service) PublishPage(ctx context.Context, page *db.Page) (err error) {
+	defer errutil.Trace(&err)
+
 	page.SetURLPath()
 	data, err := page.ToTOML()
 	if err != nil {
@@ -42,7 +44,7 @@ func (svc Service) PublishPage(ctx context.Context, page *db.Page) error {
 }
 
 func (svc Service) RefreshPageFromContentStore(ctx context.Context, page *db.Page) (err error) {
-	defer errutil.Prefix(&err, "problem refreshing page content from Github")
+	defer errutil.Trace(&err)
 
 	if page.LastPublished.Status != pgtype.Present {
 		return
@@ -71,6 +73,8 @@ func (svc Service) PopScheduledPages(ctx context.Context) error {
 }
 
 func (svc Service) RefreshPageContents(ctx context.Context, id int64) (err error) {
+	defer errutil.Trace(&err)
+
 	page, err := svc.Queries.GetPageByID(ctx, id)
 	if err != nil {
 		return err
@@ -112,7 +116,7 @@ func (svc Service) RefreshPageContents(ctx context.Context, id int64) (err error
 }
 
 func (svc Service) PageFromArcArticle(ctx context.Context, dbArt *db.Article) (page *db.Page, err error) {
-	defer errutil.Prefix(&err, "problem creating page from arc")
+	defer errutil.Trace(&err)
 
 	story, err := ArcStoryFromDB(dbArt)
 	if err != nil {
@@ -157,7 +161,7 @@ func (svc Service) PageFromArcArticle(ctx context.Context, dbArt *db.Article) (p
 }
 
 func (svc Service) RefreshPageFromArcStory(ctx context.Context, story *ArcStory, page *db.Page) (err error) {
-	defer errutil.Prefix(&err, "problem refreshing page from arc")
+	defer errutil.Trace(&err)
 
 	var splArt SpotlightPAArticle
 	if err = story.ToArticle(ctx, svc, &splArt); err != nil {
@@ -168,7 +172,9 @@ func (svc Service) RefreshPageFromArcStory(ctx context.Context, story *ArcStory,
 	return nil
 }
 
-func (svc Service) Notify(ctx context.Context, page *db.Page, publishingNow bool) error {
+func (svc Service) Notify(ctx context.Context, page *db.Page, publishingNow bool) (err error) {
+	defer errutil.Trace(&err)
+
 	const (
 		green  = "#78bc20"
 		yellow = "#ffcb05"
