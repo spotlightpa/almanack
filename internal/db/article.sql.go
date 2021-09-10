@@ -37,34 +37,6 @@ func (q *Queries) GetArticleByArcID(ctx context.Context, arcID string) (Article,
 	return i, err
 }
 
-const getArticleByDBID = `-- name: GetArticleByDBID :one
-SELECT
-  id, arc_id, arc_data, spotlightpa_path, spotlightpa_data, schedule_for, last_published, note, status, created_at, updated_at
-FROM
-  article
-WHERE
-  id = $1
-`
-
-func (q *Queries) GetArticleByDBID(ctx context.Context, id int32) (Article, error) {
-	row := q.db.QueryRow(ctx, getArticleByDBID, id)
-	var i Article
-	err := row.Scan(
-		&i.ID,
-		&i.ArcID,
-		&i.ArcData,
-		&i.SpotlightPAPath,
-		&i.SpotlightPAData,
-		&i.ScheduleFor,
-		&i.LastPublished,
-		&i.Note,
-		&i.Status,
-		&i.CreatedAt,
-		&i.UpdatedAt,
-	)
-	return i, err
-}
-
 const listAllArcArticles = `-- name: ListAllArcArticles :many
 SELECT
   id, arc_id, arc_data, spotlightpa_path, spotlightpa_data, schedule_for, last_published, note, status, created_at, updated_at
@@ -210,50 +182,6 @@ func (q *Queries) ListUpcoming(ctx context.Context) ([]Article, error) {
 	return items, nil
 }
 
-const popScheduled = `-- name: PopScheduled :many
-UPDATE
-  article
-SET
-  last_published = CURRENT_TIMESTAMP
-WHERE
-  last_published IS NULL
-  AND schedule_for < (CURRENT_TIMESTAMP + '5 minutes'::interval)
-RETURNING
-  id, arc_id, arc_data, spotlightpa_path, spotlightpa_data, schedule_for, last_published, note, status, created_at, updated_at
-`
-
-func (q *Queries) PopScheduled(ctx context.Context) ([]Article, error) {
-	rows, err := q.db.Query(ctx, popScheduled)
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-	var items []Article
-	for rows.Next() {
-		var i Article
-		if err := rows.Scan(
-			&i.ID,
-			&i.ArcID,
-			&i.ArcData,
-			&i.SpotlightPAPath,
-			&i.SpotlightPAData,
-			&i.ScheduleFor,
-			&i.LastPublished,
-			&i.Note,
-			&i.Status,
-			&i.CreatedAt,
-			&i.UpdatedAt,
-		); err != nil {
-			return nil, err
-		}
-		items = append(items, i)
-	}
-	if err := rows.Err(); err != nil {
-		return nil, err
-	}
-	return items, nil
-}
-
 const updateAlmanackArticle = `-- name: UpdateAlmanackArticle :one
 UPDATE
   article
@@ -359,64 +287,4 @@ ON CONFLICT (arc_id)
 func (q *Queries) UpdateArcArticles(ctx context.Context, arcItems pgtype.JSONB) error {
 	_, err := q.db.Exec(ctx, updateArcArticles, arcItems)
 	return err
-}
-
-const updateSpotlightPAArticle = `-- name: UpdateSpotlightPAArticle :one
-UPDATE
-  article AS "new"
-SET
-  spotlightpa_data = $1,
-  schedule_for = $2,
-  spotlightpa_path = CASE WHEN "new".spotlightpa_path IS NULL THEN
-    $3
-  ELSE
-    "new".spotlightpa_path
-  END
-FROM
-  article AS "old"
-WHERE
-  "new".id = "old".id
-  AND "old".arc_id = $4
-RETURNING
-  "old".schedule_for
-`
-
-type UpdateSpotlightPAArticleParams struct {
-	SpotlightPAData pgtype.JSONB       `json:"spotlightpa_data"`
-	ScheduleFor     pgtype.Timestamptz `json:"schedule_for"`
-	SpotlightPAPath pgtype.Text        `json:"spotlightpa_path"`
-	ArcID           pgtype.Text        `json:"arc_id"`
-}
-
-func (q *Queries) UpdateSpotlightPAArticle(ctx context.Context, arg UpdateSpotlightPAArticleParams) (pgtype.Timestamptz, error) {
-	row := q.db.QueryRow(ctx, updateSpotlightPAArticle,
-		arg.SpotlightPAData,
-		arg.ScheduleFor,
-		arg.SpotlightPAPath,
-		arg.ArcID,
-	)
-	var schedule_for pgtype.Timestamptz
-	err := row.Scan(&schedule_for)
-	return schedule_for, err
-}
-
-const updateSpotlightPAArticleLastPublished = `-- name: UpdateSpotlightPAArticleLastPublished :one
-UPDATE
-  article AS "new"
-SET
-  last_published = CURRENT_TIMESTAMP
-FROM
-  article AS "old"
-WHERE
-  "new".id = "old".id
-  AND "old".arc_id = $1::text
-RETURNING
-  "old".last_published
-`
-
-func (q *Queries) UpdateSpotlightPAArticleLastPublished(ctx context.Context, arcID string) (pgtype.Timestamptz, error) {
-	row := q.db.QueryRow(ctx, updateSpotlightPAArticleLastPublished, arcID)
-	var last_published pgtype.Timestamptz
-	err := row.Scan(&last_published)
-	return last_published, err
 }
