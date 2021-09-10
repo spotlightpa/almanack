@@ -10,6 +10,7 @@ import (
 
 	"github.com/BurntSushi/toml"
 	"github.com/carlmjohnson/errutil"
+	"github.com/jackc/pgtype"
 	"github.com/spotlightpa/almanack/internal/stringutils"
 	"github.com/spotlightpa/almanack/internal/timeutil"
 )
@@ -90,12 +91,12 @@ func (page *Page) FromTOML(content string) (err error) {
 }
 
 func (page *Page) SetURLPath() {
-	if page.URLPath.Valid && page.URLPath.String != "" {
+	if page.URLPath.Status == pgtype.Present && page.URLPath.String != "" {
 		return
 	}
 	if u, _ := page.Frontmatter["url"].(string); u != "" {
 		page.URLPath.String = u
-		page.URLPath.Valid = true
+		page.URLPath.Status = pgtype.Present
 		return
 	}
 	upath := page.FilePath
@@ -117,12 +118,14 @@ func (page *Page) SetURLPath() {
 		upath += "/"
 	}
 	page.URLPath.String = upath
-	page.URLPath.Valid = upath != ""
+	if upath != "" {
+		page.URLPath.Status = pgtype.Present
+	}
 }
 
 func (page *Page) FullURL() string {
 	page.SetURLPath()
-	if !page.URLPath.Valid {
+	if page.URLPath.Status != pgtype.Present {
 		return ""
 	}
 	return fmt.Sprintf("https://www.spotlightpa.org%s", page.URLPath.String)

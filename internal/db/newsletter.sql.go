@@ -5,7 +5,6 @@ package db
 
 import (
 	"context"
-	"database/sql"
 
 	"github.com/jackc/pgtype"
 )
@@ -119,8 +118,8 @@ RETURNING
 `
 
 type SetNewsletterPageParams struct {
-	ID              int64          `json:"id"`
-	SpotlightPAPath sql.NullString `json:"spotlightpa_path"`
+	ID              int64       `json:"id"`
+	SpotlightPAPath pgtype.Text `json:"spotlightpa_path"`
 }
 
 func (q *Queries) SetNewsletterPage(ctx context.Context, arg SetNewsletterPageParams) (Newsletter, error) {

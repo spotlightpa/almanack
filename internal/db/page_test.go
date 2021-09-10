@@ -1,12 +1,12 @@
 package db_test
 
 import (
-	"database/sql"
 	"fmt"
 	"os"
 	"testing"
 	"time"
 
+	"github.com/jackc/pgtype"
 	"github.com/spotlightpa/almanack/internal/db"
 )
 
@@ -92,8 +92,8 @@ func TestSetURLPath(t *testing.T) {
 		"already-set": {
 			db.Page{
 				FilePath: "content/abc/123.md",
-				URLPath: sql.NullString{
-					Valid:  true,
+				URLPath: pgtype.Text{
+					Status: pgtype.Present,
 					String: "/xyz/345/",
 				},
 			},
@@ -161,7 +161,7 @@ func TestSetURLPath(t *testing.T) {
 	for name, tc := range cases {
 		t.Run(name, func(t *testing.T) {
 			tc.Page.SetURLPath()
-			if tc.Page.URLPath.Valid != (tc.Page.URLPath.String != "") {
+			if tc.Page.URLPath.Status == pgtype.Present != (tc.Page.URLPath.String != "") {
 				t.Fatalf("bad validity")
 			}
 
