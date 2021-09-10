@@ -21,12 +21,19 @@ func (svc Service) PublishPage(ctx context.Context, page *db.Page) (err error) {
 		return err
 	}
 
-	internalID, _ := page.Frontmatter["internal-id"].(string)
-	title := stringutils.First(internalID, page.FilePath)
-	msg := fmt.Sprintf("Content: publishing %q", title)
-	if err = svc.ContentStore.UpdateFile(ctx, msg, page.FilePath, []byte(data)); err != nil {
+	err = errutil.ExecParallel(func() error {
+		internalID, _ := page.Frontmatter["internal-id"].(string)
+		title := stringutils.First(internalID, page.FilePath)
+		msg := fmt.Sprintf("Content: publishing %q", title)
+		return svc.ContentStore.UpdateFile(ctx, msg, page.FilePath, []byte(data))
+	}, func() error {
+		_, err = svc.Indexer.SaveObject(page.ToIndex(), ctx)
+		return err
+	})
+	if err != nil {
 		return err
 	}
+
 	p2, err := svc.Queries.UpdatePage(ctx, db.UpdatePageParams{
 		FilePath:         page.FilePath,
 		URLPath:          page.URLPath.String,
@@ -94,6 +101,11 @@ func (svc Service) RefreshPageContents(ctx context.Context, id int64) (err error
 	if err != nil {
 		return err
 	}
+
+	if _, err = svc.Indexer.SaveObject(page.ToIndex(), ctx); err != nil {
+		return err
+	}
+
 	page.SetURLPath()
 	newURLPath := page.URLPath.String
 	if contentBefore == contentAfter && oldURLPath == newURLPath {
