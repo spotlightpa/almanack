@@ -5,7 +5,6 @@ import (
 	"fmt"
 
 	"github.com/carlmjohnson/errutil"
-	"github.com/jackc/pgtype"
 	"github.com/spotlightpa/almanack/internal/db"
 	"github.com/spotlightpa/almanack/internal/slack"
 	"github.com/spotlightpa/almanack/internal/stringutils"
@@ -53,7 +52,7 @@ func (svc Service) PublishPage(ctx context.Context, page *db.Page) (err error) {
 func (svc Service) RefreshPageFromContentStore(ctx context.Context, page *db.Page) (err error) {
 	defer errutil.Trace(&err)
 
-	if page.LastPublished.Status != pgtype.Present {
+	if db.IsNull(page.LastPublished) {
 		return
 	}
 	content, err := svc.ContentStore.GetFile(ctx, page.FilePath)
