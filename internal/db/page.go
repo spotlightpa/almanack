@@ -91,7 +91,7 @@ func (page *Page) FromTOML(content string) (err error) {
 }
 
 func (page *Page) SetURLPath() {
-	if page.URLPath.Status == pgtype.Present && page.URLPath.String != "" {
+	if IsPresent(page.URLPath) && page.URLPath.String != "" {
 		return
 	}
 	if u, _ := page.Frontmatter["url"].(string); u != "" {
@@ -125,7 +125,7 @@ func (page *Page) SetURLPath() {
 
 func (page *Page) FullURL() string {
 	page.SetURLPath()
-	if page.URLPath.Status != pgtype.Present {
+	if IsNull(page.URLPath) {
 		return ""
 	}
 	return fmt.Sprintf("https://www.spotlightpa.org%s", page.URLPath.String)
