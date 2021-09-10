@@ -11,7 +11,7 @@ class Page {
     this.body = data["body"] ?? "";
     this.frontmatter = data["frontmatter"] ?? {};
     this.filePath = data["file_path"] ?? "";
-    this.urlPath = data["url_path"]?.String ?? "";
+    this.urlPath = data["url_path"] ?? "";
     this.createdAt = data["created_at"] ?? "";
     this.publishedAt = Page.getDate(this.frontmatter, "published");
     this.updatedAt = Page.getDate(data, "updated_at");

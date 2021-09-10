@@ -75,16 +75,16 @@ type ImageType struct {
 }
 
 type Newsletter struct {
-	Subject         string         `json:"subject"`
-	ArchiveURL      string         `json:"archive_url"`
-	PublishedAt     time.Time      `json:"published_at"`
-	Type            string         `json:"type"`
-	CreatedAt       time.Time      `json:"created_at"`
-	UpdatedAt       time.Time      `json:"updated_at"`
-	ID              int64          `json:"id"`
-	Description     string         `json:"description"`
-	Blurb           string         `json:"blurb"`
-	SpotlightPAPath sql.NullString `json:"spotlightpa_path"`
+	Subject         string      `json:"subject"`
+	ArchiveURL      string      `json:"archive_url"`
+	PublishedAt     time.Time   `json:"published_at"`
+	Type            string      `json:"type"`
+	CreatedAt       time.Time   `json:"created_at"`
+	UpdatedAt       time.Time   `json:"updated_at"`
+	ID              int64       `json:"id"`
+	Description     string      `json:"description"`
+	Blurb           string      `json:"blurb"`
+	SpotlightPAPath pgtype.Text `json:"spotlightpa_path"`
 }
 
 type NewsletterType struct {
@@ -94,15 +94,15 @@ type NewsletterType struct {
 }
 
 type Page struct {
-	ID            int64          `json:"id"`
-	FilePath      string         `json:"file_path"`
-	Frontmatter   Map            `json:"frontmatter"`
-	Body          string         `json:"body"`
-	ScheduleFor   sql.NullTime   `json:"schedule_for"`
-	LastPublished sql.NullTime   `json:"last_published"`
-	CreatedAt     time.Time      `json:"created_at"`
-	UpdatedAt     time.Time      `json:"updated_at"`
-	URLPath       sql.NullString `json:"url_path"`
+	ID            int64        `json:"id"`
+	FilePath      string       `json:"file_path"`
+	Frontmatter   Map          `json:"frontmatter"`
+	Body          string       `json:"body"`
+	ScheduleFor   sql.NullTime `json:"schedule_for"`
+	LastPublished sql.NullTime `json:"last_published"`
+	CreatedAt     time.Time    `json:"created_at"`
+	UpdatedAt     time.Time    `json:"updated_at"`
+	URLPath       pgtype.Text  `json:"url_path"`
 }
 
 type SiteDatum struct {

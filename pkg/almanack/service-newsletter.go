@@ -111,7 +111,7 @@ func (svc Service) SaveNewsletterPage(ctx context.Context, nl *db.Newsletter, bo
 	needsUpdate := false
 	if nl.SpotlightPAPath.String == "" {
 		nl.PublishedAt = timeutil.ToEST(nl.PublishedAt)
-		nl.SpotlightPAPath.Valid = true
+		nl.SpotlightPAPath.Status = pgtype.Present
 		nl.SpotlightPAPath.String = fmt.Sprintf("content/newsletters/%s/%s.md",
 			nl.Type, nl.PublishedAt.Format("2006-01-02-1504"),
 		)
