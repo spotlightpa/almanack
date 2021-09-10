@@ -406,7 +406,7 @@ func (svc Service) SaveNewsletterPage(ctx context.Context, nl *db.Newsletter, bo
 	defer errutil.Prefix(&err, "problem saving newsletter page")
 
 	needsUpdate := false
-	if !nl.SpotlightPAPath.Valid {
+	if nl.SpotlightPAPath.String == "" {
 		nl.PublishedAt = timeutil.ToEST(nl.PublishedAt)
 		nl.SpotlightPAPath.Valid = true
 		nl.SpotlightPAPath.String = fmt.Sprintf("content/newsletters/%s/%s.md",
