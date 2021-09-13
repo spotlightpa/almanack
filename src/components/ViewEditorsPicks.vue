@@ -54,7 +54,7 @@ class EditorsPicksData {
         id: 0,
         schedule_for: scheduleFor,
         data,
-        published_at: { Valid: false },
+        published_at: null,
       },
       pagesByPath
     );
@@ -162,9 +162,9 @@ export default {
         });
       },
       removeScheduledPick(i) {
-        let id = state.allEdPicks[i].id;
-        if (id) {
-          state.removedItems.push(id);
+        let item = state.allEdPicks[i];
+        if (item.id) {
+          state.removedItems.push(item.scheduleFor);
         }
         state.allEdPicks.splice(i, 1);
       },
@@ -206,7 +206,7 @@ export default {
           class="button is-danger has-text-weight-semibold"
           @click="removeScheduledPick(i)"
         >
-          Remove
+          Remove {{ formatDateTime(edpick.scheduleFor) }}
         </button>
       </div>
       <h2 class="mt-2 title">Add a scheduled change</h2>
