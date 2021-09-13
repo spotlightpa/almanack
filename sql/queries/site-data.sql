@@ -52,4 +52,11 @@ ON CONFLICT ("key", "schedule_for")
 
 -- name: DeleteSiteData :exec
 DELETE FROM site_data
-WHERE "id" = $1;
+WHERE "schedule_for" = ANY (
+    SELECT
+      "t"
+    FROM (
+      SELECT
+        unnest(@scheduled_times::timestamptz[]) AS "t") AS "times"
+    WHERE
+      "t" > (CURRENT_TIMESTAMP + '5 minutes'::interval));

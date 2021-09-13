@@ -376,8 +376,8 @@ func (app *appEnv) postEditorsPicks(w http.ResponseWriter, r *http.Request) {
 		ScheduleFor time.Time `json:"schedule_for"`
 	}
 	var req struct {
-		Datums       []Datum `json:"datums"`
-		RemovedItems []int64 `json:"removed_items"`
+		Datums       []Datum     `json:"datums"`
+		RemovedItems []time.Time `json:"removed_items"`
 	}
 	if !app.readJSON(w, r, &req) {
 		return
@@ -398,11 +398,9 @@ func (app *appEnv) postEditorsPicks(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 	}
-	for _, id := range req.RemovedItems {
-		if err := app.svc.Queries.DeleteSiteData(r.Context(), id); err != nil {
-			app.replyErr(w, r, err)
-			return
-		}
+	if err := app.svc.Queries.DeleteSiteData(r.Context(), req.RemovedItems); err != nil {
+		app.replyErr(w, r, err)
+		return
 	}
 	var (
 		res struct {
