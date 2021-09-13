@@ -18,13 +18,18 @@ const tzNameLookup = new Intl.DateTimeFormat("en-US", {
   timeZoneName: "short",
 });
 
+function getTimeZoneName(d) {
+  let { value = "" } = tzNameLookup
+    .formatToParts(d)
+    .find((part) => part.type === "timeZoneName");
+  return value;
+}
+
 export function formatTime(d) {
   if (typeof d === "string") {
     d = new Date(d);
   }
-  let { value: tzname } = tzNameLookup
-    .formatToParts(d)
-    .find((part) => part.type === "timeZoneName") ?? { value: "" };
+  let tzname = getTimeZoneName(d);
   if (tzname) {
     tzname = " " + tzname;
   }
@@ -42,6 +47,7 @@ export function formatDateTime(d) {
   if (typeof d === "string") {
     d = new Date(d);
   }
-
-  return toShortWeekday.format(d) + "., " + apdate(d) + " " + formatTime(d);
+  let tz = getTimeZoneName(d);
+  tz = tz && " " + tz;
+  return aptime(d) + " " + toShortWeekday.format(d) + "., " + apdate(d) + tz;
 }
