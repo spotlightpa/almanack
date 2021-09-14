@@ -658,7 +658,7 @@ func (app *appEnv) postPage(w http.ResponseWriter, r *http.Request) {
 		userUpdate.ScheduleFor.Time.Before(time.Now().Add(5*time.Minute))
 	var shouldNotify bool
 	if willPublishNow {
-		shouldNotify = db.IsPresent(oldPage.LastPublished)
+		shouldNotify = db.IsNull(oldPage.LastPublished)
 	} else {
 		shouldNotify = willPublish && !timeutil.Equalish(oldPage.ScheduleFor, res.ScheduleFor)
 	}
