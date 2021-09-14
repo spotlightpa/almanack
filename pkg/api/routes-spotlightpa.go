@@ -370,12 +370,8 @@ func (app *appEnv) getEditorsPicks(w http.ResponseWriter, r *http.Request) {
 func (app *appEnv) postEditorsPicks(w http.ResponseWriter, r *http.Request) {
 	app.Printf("starting postEditorsPicks")
 
-	type Datum struct {
-		Data        db.Map    `json:"data"`
-		ScheduleFor time.Time `json:"schedule_for"`
-	}
 	var req struct {
-		Datums []Datum `json:"datums"`
+		Datums []almanack.ScheduledSiteConfig `json:"datums"`
 	}
 	if !app.readJSON(w, r, &req) {
 		return
@@ -385,43 +381,19 @@ func (app *appEnv) postEditorsPicks(w http.ResponseWriter, r *http.Request) {
 			http.StatusBadRequest, "no schedulable items provided"))
 		return
 	}
-	// TODO: Add transactions
-	if err := app.svc.Queries.DeleteSiteData(r.Context(), almanack.EditorsPicksLoc); err != nil {
-		app.replyErr(w, r, err)
-		return
-	}
-	for _, datum := range req.Datums {
-		if err := app.svc.Queries.UpsertSiteData(r.Context(), db.UpsertSiteDataParams{
-			Key:         almanack.EditorsPicksLoc,
-			Data:        datum.Data,
-			ScheduleFor: datum.ScheduleFor,
-		}); err != nil {
-			app.replyErr(w, r, err)
-			return
-		}
-	}
+
 	var (
 		res struct {
 			Datums []db.SiteDatum `json:"datums"`
 		}
 		err error
 	)
-	res.Datums, err = app.svc.Queries.GetSiteData(r.Context(), almanack.EditorsPicksLoc)
+	res.Datums, err = app.svc.UpdateSiteConfig(r.Context(), almanack.EditorsPicksLoc, req.Datums)
 	if err != nil {
 		app.replyErr(w, r, err)
 		return
 	}
-	if len(res.Datums) == 0 {
-		app.replyErr(w, r,
-			fmt.Errorf("no item is currently scheduled for the homepage"))
-		return
-	}
-	// GetSiteData must return presorted items!
-	currentItem := &res.Datums[0]
-	if err = app.svc.PublishSiteConfig(r.Context(), currentItem); err != nil {
-		app.replyErr(w, r, err)
-		return
-	}
+
 	app.replyJSON(http.StatusOK, w, res)
 }
 
