@@ -29,18 +29,14 @@ func (q *Queries) CleanSiteData(ctx context.Context, key string) error {
 
 const deleteSiteData = `-- name: DeleteSiteData :exec
 DELETE FROM site_data
-WHERE "schedule_for" = ANY (
-    SELECT
-      "t"
-    FROM (
-      SELECT
-        unnest($1::timestamptz[]) AS "t") AS "times"
-    WHERE
-      "t" > (CURRENT_TIMESTAMP + '5 minutes'::interval))
+WHERE "key" = $1
+  AND "schedule_for" > (CURRENT_TIMESTAMP + '5 minutes'::interval)
 `
 
-func (q *Queries) DeleteSiteData(ctx context.Context, scheduledTimes []time.Time) error {
-	_, err := q.db.Exec(ctx, deleteSiteData, scheduledTimes)
+// DeleteSiteData only removes future scheduled items.
+// To remove past scheduled items, use CleanSiteData
+func (q *Queries) DeleteSiteData(ctx context.Context, key string) error {
+	_, err := q.db.Exec(ctx, deleteSiteData, key)
 	return err
 }
 

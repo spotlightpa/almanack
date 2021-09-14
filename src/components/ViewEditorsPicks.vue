@@ -39,7 +39,6 @@ class EditorsPicksData {
       let a = siteConfig.data?.[prop] ?? [];
       this[prop] = a.map((s) => pagesByPath.get(s)).filter((a) => !!a);
     }
-    this.id = siteConfig.id;
     this.scheduleFor = siteConfig.schedule_for;
     let pub = siteConfig.published_at;
     this.publishedAt = pub ? new Date(pub) : null;
@@ -51,7 +50,6 @@ class EditorsPicksData {
     let { data } = this.toJSON();
     let newPick = new EditorsPicksData(
       {
-        id: 0,
         schedule_for: scheduleFor,
         data,
         published_at: null,
@@ -64,7 +62,6 @@ class EditorsPicksData {
   toJSON() {
     const getPath = (a) => a.filePath;
     return {
-      id: this.id,
       schedule_for: this.scheduleFor,
       data: {
         featuredStories: this.featuredStories.map(getPath),
@@ -104,7 +101,6 @@ export default {
       rawPicks: computed(() => edPicksState.rawData?.datums ?? []),
 
       allEdPicks: [],
-      removedItems: [],
       nextSchedule: null,
     });
 
@@ -119,7 +115,6 @@ export default {
         return edPickExec(() =>
           saveEditorsPicks({
             datums: state.allEdPicks,
-            removed_items: state.removedItems,
           })
         );
       },
@@ -133,7 +128,6 @@ export default {
         state.allEdPicks = rawPicks.map(
           (data) => new EditorsPicksData(data, state.pagesByPath)
         );
-        state.removedItems = [];
       },
     };
     watch(
@@ -162,10 +156,6 @@ export default {
         });
       },
       removeScheduledPick(i) {
-        let item = state.allEdPicks[i];
-        if (item.id) {
-          state.removedItems.push(item.scheduleFor);
-        }
         state.allEdPicks.splice(i, 1);
       },
     };

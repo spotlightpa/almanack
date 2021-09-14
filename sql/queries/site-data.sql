@@ -50,13 +50,9 @@ ON CONFLICT ("key", "schedule_for")
   DO UPDATE SET
     data = excluded.data;
 
+-- DeleteSiteData only removes future scheduled items.
+-- To remove past scheduled items, use CleanSiteData
 -- name: DeleteSiteData :exec
 DELETE FROM site_data
-WHERE "schedule_for" = ANY (
-    SELECT
-      "t"
-    FROM (
-      SELECT
-        unnest(@scheduled_times::timestamptz[]) AS "t") AS "times"
-    WHERE
-      "t" > (CURRENT_TIMESTAMP + '5 minutes'::interval));
+WHERE "key" = @key
+  AND "schedule_for" > (CURRENT_TIMESTAMP + '5 minutes'::interval);
