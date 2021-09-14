@@ -8,7 +8,6 @@ import (
 
 	"github.com/carlmjohnson/errutil"
 	"github.com/spotlightpa/almanack/internal/db"
-	"github.com/spotlightpa/almanack/internal/stringutils"
 )
 
 func (svc Service) PopScheduledSiteChanges(ctx context.Context) (err error) {
@@ -46,7 +45,7 @@ func (svc Service) PublishSiteConfig(ctx context.Context, siteConfig *db.SiteDat
 	if err != nil {
 		return err
 	}
-	msg := stringutils.First(MessageForLoc[siteConfig.Key], siteConfig.Key)
+	msg := MessageForLoc(siteConfig.Key)
 	if err = svc.ContentStore.UpdateFile(ctx, msg, siteConfig.Key, data); err != nil {
 
 		return err

@@ -62,6 +62,8 @@ func (app *appEnv) routes() http.Handler {
 			r.Post(`/page-for-arc-id/{arcID}`, app.postPageForArcID)
 			r.Get(`/page-with-content/{id:\d+}`, app.getPageWithContent)
 			r.Post(`/refresh-page-from-arc/{id:\d+}`, app.postRefreshPageFromArc)
+			r.Get(`/site-params`, app.getSiteParams)
+			r.Post(`/site-params`, app.postSiteParams)
 		})
 	})
 	r.Route("/ssr", func(r chi.Router) {

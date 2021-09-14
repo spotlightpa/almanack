@@ -747,3 +747,51 @@ func (app *appEnv) listAllPages(w http.ResponseWriter, r *http.Request) {
 
 	app.replyJSON(http.StatusOK, w, res)
 }
+
+func (app *appEnv) getSiteParams(w http.ResponseWriter, r *http.Request) {
+	app.Printf("starting getSiteParams")
+
+	type response struct {
+		Params []db.SiteDatum `json:"params"`
+	}
+	var (
+		res response
+		err error
+	)
+	res.Params, err = app.svc.Queries.GetSiteData(r.Context(), almanack.SiteParamsLoc)
+	if err != nil {
+		app.replyErr(w, r, err)
+		return
+	}
+	app.replyJSON(http.StatusOK, w, res)
+}
+
+func (app *appEnv) postSiteParams(w http.ResponseWriter, r *http.Request) {
+	app.Printf("starting postSiteParams")
+
+	var req struct {
+		Params []almanack.ScheduledSiteConfig `json:"params"`
+	}
+	if !app.readJSON(w, r, &req) {
+		return
+	}
+	if len(req.Params) < 1 {
+		app.replyErr(w, r, resperr.New(
+			http.StatusBadRequest, "no schedulable items provided"))
+		return
+	}
+
+	var (
+		res struct {
+			Params []db.SiteDatum `json:"params"`
+		}
+		err error
+	)
+	res.Params, err = app.svc.UpdateSiteConfig(r.Context(), almanack.SiteParamsLoc, req.Params)
+	if err != nil {
+		app.replyErr(w, r, err)
+		return
+	}
+
+	app.replyJSON(http.StatusOK, w, res)
+}
