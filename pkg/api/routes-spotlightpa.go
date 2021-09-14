@@ -371,13 +371,11 @@ func (app *appEnv) postEditorsPicks(w http.ResponseWriter, r *http.Request) {
 	app.Printf("starting postEditorsPicks")
 
 	type Datum struct {
-		ID          int64     `json:"id"`
 		Data        db.Map    `json:"data"`
 		ScheduleFor time.Time `json:"schedule_for"`
 	}
 	var req struct {
-		Datums       []Datum     `json:"datums"`
-		RemovedItems []time.Time `json:"removed_items"`
+		Datums []Datum `json:"datums"`
 	}
 	if !app.readJSON(w, r, &req) {
 		return
@@ -388,6 +386,10 @@ func (app *appEnv) postEditorsPicks(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	// TODO: Add transactions
+	if err := app.svc.Queries.DeleteSiteData(r.Context(), almanack.EditorsPicksLoc); err != nil {
+		app.replyErr(w, r, err)
+		return
+	}
 	for _, datum := range req.Datums {
 		if err := app.svc.Queries.UpsertSiteData(r.Context(), db.UpsertSiteDataParams{
 			Key:         almanack.EditorsPicksLoc,
@@ -397,10 +399,6 @@ func (app *appEnv) postEditorsPicks(w http.ResponseWriter, r *http.Request) {
 			app.replyErr(w, r, err)
 			return
 		}
-	}
-	if err := app.svc.Queries.DeleteSiteData(r.Context(), req.RemovedItems); err != nil {
-		app.replyErr(w, r, err)
-		return
 	}
 	var (
 		res struct {
