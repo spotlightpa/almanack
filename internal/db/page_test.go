@@ -171,3 +171,99 @@ func TestSetURLPath(t *testing.T) {
 		})
 	}
 }
+
+func TestShouldPublishShouldNotify(t *testing.T) {
+	past := pgtype.Timestamptz{
+		Status: pgtype.Present}
+	future := pgtype.Timestamptz{
+		Status: pgtype.Present,
+		Time:   time.Now().Add(24 * time.Hour)}
+	cases := map[string]struct {
+		old, new    db.Page
+		pub, notify bool
+	}{
+		"blank": {
+			old:    db.Page{},
+			new:    db.Page{},
+			pub:    false,
+			notify: false,
+		},
+		"scheduled-news": {
+			old: db.Page{
+				FilePath: "content/news/whatever.md"},
+			new: db.Page{
+				FilePath:    "content/news/whatever.md",
+				ScheduleFor: future},
+			pub:    false,
+			notify: true,
+		},
+		"rescheduled-news": {
+			old: db.Page{
+				FilePath:    "content/news/whatever.md",
+				ScheduleFor: past},
+			new: db.Page{
+				FilePath:    "content/news/whatever.md",
+				ScheduleFor: future},
+			pub:    false,
+			notify: true,
+		},
+		"pub-news": {
+			old: db.Page{
+				FilePath: "content/news/whatever.md"},
+			new: db.Page{
+				FilePath:    "content/news/whatever.md",
+				ScheduleFor: past},
+			pub:    true,
+			notify: true,
+		},
+		"repub-news": {
+			old: db.Page{
+				FilePath:      "content/news/whatever.md",
+				LastPublished: past},
+			new: db.Page{
+				FilePath:    "content/news/whatever.md",
+				ScheduleFor: past},
+			pub:    true,
+			notify: false,
+		},
+		"scheduled-non-news": {
+			old: db.Page{},
+			new: db.Page{
+				ScheduleFor: future},
+			pub:    false,
+			notify: false,
+		},
+		"rescheduled-non-news": {
+			old: db.Page{
+				ScheduleFor: past},
+			new: db.Page{
+				ScheduleFor: future},
+			pub:    false,
+			notify: false,
+		},
+		"pub-non-news": {
+			old: db.Page{},
+			new: db.Page{
+				ScheduleFor: past},
+			pub:    true,
+			notify: false,
+		},
+		"repub-non-news": {
+			old: db.Page{
+				LastPublished: past},
+			new: db.Page{
+				ScheduleFor: past},
+			pub:    true,
+			notify: false,
+		},
+	}
+	for name, tc := range cases {
+		t.Run(name, func(t *testing.T) {
+			pub := tc.new.ShouldPublish()
+			notify := tc.new.ShouldNotify(&tc.old)
+			if pub != tc.pub || notify != tc.notify {
+				t.Fatalf("want %v, %v; got %v, %v", tc.pub, tc.notify, pub, notify)
+			}
+		})
+	}
+}

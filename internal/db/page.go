@@ -209,3 +209,24 @@ func (page *Page) ToIndex() interface{} {
 		body,
 	}
 }
+
+func (page *Page) ShouldPublish() bool {
+	soon := time.Now().Add(5 * time.Minute)
+	isScheduled := IsPresent(page.ScheduleFor)
+	return isScheduled && page.ScheduleFor.Time.Before(soon)
+}
+
+func (page *Page) IsNewsPage() bool {
+	return strings.HasPrefix(page.FilePath, "content/news/")
+}
+
+func (page *Page) ShouldNotify(oldPage *Page) bool {
+	if !page.IsNewsPage() || !IsPresent(page.ScheduleFor) {
+		return false
+	}
+	if page.ShouldPublish() {
+		return IsNull(oldPage.LastPublished)
+	}
+
+	return !timeutil.Equalish(oldPage.ScheduleFor, page.ScheduleFor)
+}
