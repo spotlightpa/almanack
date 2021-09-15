@@ -3,8 +3,6 @@ package api
 import (
 	"fmt"
 	"net/http"
-	"strings"
-	"time"
 
 	"github.com/carlmjohnson/emailx"
 	"github.com/carlmjohnson/errutil"
@@ -12,7 +10,6 @@ import (
 	"github.com/go-chi/chi"
 	"github.com/spotlightpa/almanack/internal/arc"
 	"github.com/spotlightpa/almanack/internal/db"
-	"github.com/spotlightpa/almanack/internal/timeutil"
 	"github.com/spotlightpa/almanack/pkg/almanack"
 )
 
@@ -622,25 +619,14 @@ func (app *appEnv) postPage(w http.ResponseWriter, r *http.Request) {
 		app.replyErr(w, r, err)
 		return
 	}
-	willPublish := userUpdate.SetScheduleFor &&
-		db.IsPresent(userUpdate.ScheduleFor)
-	willPublishNow := willPublish &&
-		userUpdate.ScheduleFor.Time.Before(time.Now().Add(5*time.Minute))
-	var shouldNotify bool
-	if willPublishNow {
-		shouldNotify = db.IsNull(oldPage.LastPublished)
-	} else {
-		shouldNotify = willPublish && !timeutil.Equalish(oldPage.ScheduleFor, res.ScheduleFor)
-	}
-	if !strings.HasPrefix(res.FilePath, "content/news/") {
-		shouldNotify = false
-	}
+	shouldPublish := res.ShouldPublish()
+	shouldNotify := res.ShouldNotify(&oldPage)
 	if shouldNotify {
-		if err = app.svc.Notify(r.Context(), &res, willPublishNow); err != nil {
+		if err = app.svc.Notify(r.Context(), &res, shouldPublish); err != nil {
 			app.logErr(r.Context(), err)
 		}
 	}
-	if willPublishNow {
+	if shouldPublish {
 		if err = app.svc.PublishPage(r.Context(), &res); err != nil {
 			errutil.Prefix(&err, "postPage publish problem")
 			app.replyErr(w, r, err)
