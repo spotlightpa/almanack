@@ -12,7 +12,7 @@ import (
 )
 
 func (svc Service) PublishPage(ctx context.Context, page *db.Page) (err error) {
-	defer errutil.Trace(&err)
+	defer errutil.Prefix(&err, "Service.PublishPage(%d)", page.ID)
 
 	page.SetURLPath()
 	data, err := page.ToTOML()
@@ -50,7 +50,7 @@ func (svc Service) PublishPage(ctx context.Context, page *db.Page) (err error) {
 }
 
 func (svc Service) RefreshPageFromContentStore(ctx context.Context, page *db.Page) (err error) {
-	defer errutil.Trace(&err)
+	defer errutil.Prefix(&err, "Service.RefreshPageFromContentStore(%d)", page.ID)
 
 	if db.IsNull(page.LastPublished) {
 		return
@@ -65,7 +65,9 @@ func (svc Service) RefreshPageFromContentStore(ctx context.Context, page *db.Pag
 	return nil
 }
 
-func (svc Service) PopScheduledPages(ctx context.Context) error {
+func (svc Service) PopScheduledPages(ctx context.Context) (err error) {
+	defer errutil.Trace(&err)
+
 	pages, err := svc.Queries.PopScheduledPages(ctx)
 	if err != nil {
 		return err
