@@ -5,6 +5,7 @@ import { usePage } from "../api/spotlightpa-page.js";
 import { formatDateTime } from "@/utils/time-format.js";
 
 import BulmaAutocompleteArray from "./BulmaAutocompleteArray.vue";
+import BulmaBreadcrumbs from "./BulmaBreadcrumbs.vue";
 import BulmaField from "./BulmaField.vue";
 import BulmaFieldInput from "./BulmaFieldInput.vue";
 import CopyWithButton from "./CopyWithButton.vue";
@@ -15,6 +16,7 @@ export default {
   name: "ViewNewsletterPage",
   components: {
     BulmaAutocompleteArray,
+    BulmaBreadcrumbs,
     BulmaField,
     BulmaFieldInput,
     CopyWithButton,
@@ -49,23 +51,13 @@ export default {
 
 <template>
   <div>
-    <nav class="breadcrumb has-succeeds-separator" aria-label="breadcrumbs">
-      <ul>
-        <li>
-          <router-link :to="{ name: 'admin' }">Admin</router-link>
-        </li>
-        <li>
-          <router-link exact :to="{ name: 'newsletters' }">
-            Newsletter Pages
-          </router-link>
-        </li>
-        <li class="is-active">
-          <router-link exact :to="{ name: 'newsletter-page', params: { id } }">
-            {{ title }}
-          </router-link>
-        </li>
-      </ul>
-    </nav>
+    <BulmaBreadcrumbs
+      :links="[
+        { name: 'Admin', to: { name: 'admin' } },
+        { name: 'Newsletter Pages', to: { name: 'newsletters' } },
+        { name: title, to: { name: 'newsletter-page', params: { id } } },
+      ]"
+    />
 
     <h1 class="title">
       {{ title }}
