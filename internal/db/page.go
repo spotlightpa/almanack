@@ -132,7 +132,6 @@ func (page *Page) FullURL() string {
 }
 
 func (page *Page) ToIndex() interface{} {
-
 	internalID, _ := page.Frontmatter["internal-id"].(string)
 	imageURL, _ := page.Frontmatter["image"].(string)
 	imageDescription, _ := page.Frontmatter["image-description"].(string)
@@ -157,7 +156,7 @@ func (page *Page) ToIndex() interface{} {
 
 	body := stringutils.First(page.Body, rawContent)
 	// See https://www.algolia.com/doc/guides/sending-and-managing-data/prepare-your-data/in-depth/index-and-records-size-and-usage-limitations/#record-size-limits
-	const maxLen = 90_000
+	const maxLen = 80_000
 	if len(body) > maxLen {
 		body = body[:maxLen]
 	}
