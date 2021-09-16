@@ -11,13 +11,13 @@ import (
 	"github.com/spotlightpa/almanack/internal/timeutil"
 )
 
-func (svc Service) PublishPage(ctx context.Context, page *db.Page) (err error) {
+func (svc Service) PublishPage(ctx context.Context, page *db.Page) (err, warning error) {
 	defer errutil.Prefix(&err, "Service.PublishPage(%d)", page.ID)
 
 	page.SetURLPath()
 	data, err := page.ToTOML()
 	if err != nil {
-		return err
+		return
 	}
 
 	err = errutil.ExecParallel(func() error {
@@ -26,11 +26,11 @@ func (svc Service) PublishPage(ctx context.Context, page *db.Page) (err error) {
 		msg := fmt.Sprintf("Content: publishing %q", title)
 		return svc.ContentStore.UpdateFile(ctx, msg, page.FilePath, []byte(data))
 	}, func() error {
-		_, err = svc.Indexer.SaveObject(page.ToIndex(), ctx)
-		return err
+		_, warning = svc.Indexer.SaveObject(page.ToIndex(), ctx)
+		return nil
 	})
 	if err != nil {
-		return err
+		return
 	}
 
 	p2, err := svc.Queries.UpdatePage(ctx, db.UpdatePageParams{
@@ -43,10 +43,10 @@ func (svc Service) PublishPage(ctx context.Context, page *db.Page) (err error) {
 		ScheduleFor:      db.NullTime,
 	})
 	if err != nil {
-		return err
+		return
 	}
 	*page = p2
-	return nil
+	return
 }
 
 func (svc Service) RefreshPageFromContentStore(ctx context.Context, page *db.Page) (err error) {
@@ -65,19 +65,21 @@ func (svc Service) RefreshPageFromContentStore(ctx context.Context, page *db.Pag
 	return nil
 }
 
-func (svc Service) PopScheduledPages(ctx context.Context) (err error) {
+func (svc Service) PopScheduledPages(ctx context.Context) (err, warning error) {
 	defer errutil.Trace(&err)
 
 	pages, err := svc.Queries.PopScheduledPages(ctx)
 	if err != nil {
-		return err
+		return
 	}
 
-	var errs errutil.Slice
+	var errs, warnings errutil.Slice
 	for _, page := range pages {
-		errs.Push(svc.PublishPage(ctx, &page))
+		err, warning = svc.PublishPage(ctx, &page)
+		errs.Push(err)
+		warnings.Push(warning)
 	}
-	return errs.Merge()
+	return errs.Merge(), warnings.Merge()
 }
 
 func (svc Service) RefreshPageContents(ctx context.Context, id int64) (err error) {

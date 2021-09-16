@@ -34,7 +34,9 @@ func (app *appEnv) backgroundCron(w http.ResponseWriter, r *http.Request) {
 	if err := errutil.ExecParallel(func() error {
 		var errs errutil.Slice
 		// Publish any scheduled pages before pushing new site config
-		errs.Push(app.svc.PopScheduledPages(r.Context()))
+		poperr, warning := app.svc.PopScheduledPages(r.Context())
+		app.logErr(r.Context(), warning)
+		errs.Push(poperr)
 		errs.Push(app.svc.PopScheduledSiteChanges(r.Context()))
 		return errs.Merge()
 	}, func() error {
