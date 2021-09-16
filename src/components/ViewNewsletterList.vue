@@ -7,11 +7,12 @@ import { useClient } from "@/api/client.js";
 import PageListItem from "@/api/spotlightpa-page-list-item.js";
 
 import APILoader from "./APILoader.vue";
+import BulmaBreadcrumbs from "./BulmaBreadcrumbs.vue";
 import PageListRow from "./PageListRow.vue";
 
 export default {
   name: "ViewNewsletterList",
-  components: { APILoader, PageListRow },
+  components: { APILoader, BulmaBreadcrumbs, PageListRow },
   props: ["page"],
   metaInfo: {
     title: "Newsletter Pages",
@@ -55,18 +56,12 @@ export default {
 
 <template>
   <div>
-    <nav class="breadcrumb has-succeeds-separator" aria-label="breadcrumbs">
-      <ul>
-        <li>
-          <router-link :to="{ name: 'admin' }">Admin</router-link>
-        </li>
-        <li class="is-active">
-          <router-link exact :to="{ name: 'newsletters' }">
-            Newsletter Pages
-          </router-link>
-        </li>
-      </ul>
-    </nav>
+    <BulmaBreadcrumbs
+      :links="[
+        { name: 'Admin', to: { name: 'admin' } },
+        { name: 'Newsletter Pages', to: { name: 'newsletters' } },
+      ]"
+    />
 
     <h1 class="title">
       Newsletter Pages

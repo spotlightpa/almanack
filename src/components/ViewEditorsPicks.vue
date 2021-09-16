@@ -5,6 +5,7 @@ import { reactive, computed, toRefs, watch } from "@vue/composition-api";
 import { useClient, makeState } from "@/api/hooks.js";
 import { formatDateTime } from "@/utils/time-format.js";
 
+import BulmaBreadcrumbs from "./BulmaBreadcrumbs.vue";
 import BulmaField from "./BulmaField.vue";
 import EditorsPicks from "./EditorsPicks.vue";
 
@@ -76,6 +77,7 @@ class EditorsPicksData {
 export default {
   name: "ViewEditorsPicks",
   components: {
+    BulmaBreadcrumbs,
     BulmaField,
     EditorsPicks,
   },
@@ -165,18 +167,12 @@ export default {
 
 <template>
   <div>
-    <nav class="breadcrumb has-succeeds-separator" aria-label="breadcrumbs">
-      <ul>
-        <li>
-          <router-link :to="{ name: 'admin' }">Admin</router-link>
-        </li>
-        <li class="is-active">
-          <router-link exact :to="{ name: 'editors-picks' }">
-            Homepage Editor
-          </router-link>
-        </li>
-      </ul>
-    </nav>
+    <BulmaBreadcrumbs
+      :links="[
+        { name: 'Admin', to: { name: 'admin' } },
+        { name: 'Homepage Editor', to: { name: 'editors-picks' } },
+      ]"
+    />
 
     <h1 class="title">Homepage Editor</h1>
 
