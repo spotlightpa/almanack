@@ -411,3 +411,10 @@ export default {
     </div>
   </div>
 </template>
+
+<style scoped>
+.preview-frame {
+  height: 300px;
+  overflow-y: auto;
+}
+</style>
