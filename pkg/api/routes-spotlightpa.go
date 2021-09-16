@@ -627,7 +627,11 @@ func (app *appEnv) postPage(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 	if shouldPublish {
-		if err = app.svc.PublishPage(r.Context(), &res); err != nil {
+		err, warning := app.svc.PublishPage(r.Context(), &res)
+		if warning != nil {
+			app.logErr(r.Context(), warning)
+		}
+		if err != nil {
 			errutil.Prefix(&err, "postPage publish problem")
 			app.replyErr(w, r, err)
 			return
