@@ -11,6 +11,7 @@ import (
 	"github.com/BurntSushi/toml"
 	"github.com/carlmjohnson/errutil"
 	"github.com/jackc/pgtype"
+	"github.com/microcosm-cc/bluemonday"
 	"github.com/spotlightpa/almanack/internal/stringutils"
 	"github.com/spotlightpa/almanack/internal/timeutil"
 )
@@ -155,6 +156,9 @@ func (page *Page) ToIndex() interface{} {
 	rawContent, _ := page.Frontmatter["raw-content"].(string)
 
 	body := stringutils.First(page.Body, rawContent)
+	// Strip any unorthodox HTML
+	sanitizer := bluemonday.UGCPolicy()
+	body = sanitizer.Sanitize(body)
 	// See https://www.algolia.com/doc/guides/sending-and-managing-data/prepare-your-data/in-depth/index-and-records-size-and-usage-limitations/#record-size-limits
 	const maxLen = 80_000
 	if len(body) > maxLen {
