@@ -23,7 +23,7 @@ function _installed() {
 function _git-xargs() {
 	local PATTERN=$1
 	shift
-	git ls-files --exclude="$PATTERN" --ignored -z | xargs -0 -I _ "$@"
+	git ls-files --exclude="$PATTERN" -ciz | xargs -0 -I _ "$@"
 }
 
 function help() {
