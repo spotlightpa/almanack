@@ -9,7 +9,7 @@ import BulmaBreadcrumbs from "./BulmaBreadcrumbs.vue";
 import BulmaField from "./BulmaField.vue";
 import BulmaFieldInput from "./BulmaFieldInput.vue";
 import CopyWithButton from "./CopyWithButton.vue";
-import PageImagePicker from "./PageImagePicker.vue";
+import PickerImages from "./PickerImages.vue";
 import TagStatus from "./TagStatus.vue";
 
 export default {
@@ -20,7 +20,7 @@ export default {
     BulmaField,
     BulmaFieldInput,
     CopyWithButton,
-    PageImagePicker,
+    PickerImages,
     TagStatus,
   },
   props: {
@@ -192,7 +192,7 @@ export default {
         <img :src="page.imagePreviewURL" class="is-3x4" width="200" />
       </picture>
 
-      <PageImagePicker :images="images" @select-image="setImageProps($event)" />
+      <PickerImages :images="images" @select-image="setImageProps($event)" />
 
       <BulmaFieldInput
         v-model="page.imageDescription"
