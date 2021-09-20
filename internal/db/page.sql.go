@@ -299,56 +299,56 @@ func (q *Queries) ListPageIDs(ctx context.Context, arg ListPageIDsParams) ([]int
 }
 
 const listPages = `-- name: ListPages :many
-SELECT
-  "id",
-  "file_path",
-  (
-    CASE WHEN frontmatter ->> 'internal-id' IS NOT NULL THEN
-      frontmatter ->> 'internal-id'
-    ELSE
-      ''
-    END)::text AS "internal_id",
-  (
-    CASE WHEN frontmatter ->> 'title' IS NOT NULL THEN
-      frontmatter ->> 'title'
-    ELSE
-      ''
-    END)::text AS "title",
-  (
-    CASE WHEN frontmatter ->> 'description' IS NOT NULL THEN
-      frontmatter ->> 'description'
-    ELSE
-      ''
-    END)::text AS "description",
-  (
-    CASE WHEN frontmatter ->> 'blurb' IS NOT NULL THEN
-      frontmatter ->> 'blurb'
-    ELSE
-      ''
-    END)::text AS "blurb",
-  (
-    CASE WHEN frontmatter ->> 'image' IS NOT NULL THEN
-      frontmatter ->> 'image'
-    ELSE
-      ''
-    END)::text AS "image",
-  coalesce("url_path", ''),
+WITH paths AS (
+  SELECT
+    id, file_path, frontmatter, body, schedule_for, last_published, created_at, updated_at, url_path
+  FROM
+    page
+  WHERE
+    "file_path" LIKE $1
+),
+ordered AS (
+  SELECT
+    id, file_path, frontmatter, body, schedule_for, last_published, created_at, updated_at, url_path
+  FROM
+    paths
+  ORDER BY
+    frontmatter ->> 'published' DESC
+),
+selected AS (
+  SELECT
+    "id",
+    "file_path",
+    coalesce(frontmatter ->> 'internal-id', '') AS "internal_id",
+    coalesce(frontmatter ->> 'title', '') AS "title",
+  coalesce(frontmatter ->> 'description', '') AS "description",
+  coalesce(frontmatter ->> 'blurb', '') AS "blurb",
+  coalesce(frontmatter ->> 'image', '') AS "image",
+  coalesce(url_path, '') AS "url_path",
   "last_published",
   "created_at",
   "updated_at",
   "schedule_for",
-  (
-    CASE WHEN frontmatter ->> 'published' IS NOT NULL THEN
-      frontmatter ->> 'published'
-    ELSE
-      ''
-    END)::text AS "published_at"
+  coalesce(frontmatter ->> 'published', '') AS "published_at"
 FROM
-  page
-WHERE
-  "file_path" LIKE $1
-ORDER BY
-  frontmatter ->> 'published' DESC
+  ordered
+)
+SELECT
+  id,
+  file_path::text,
+  internal_id::text,
+  title::text,
+  description::text,
+  blurb::text,
+  image::text,
+  url_path::text,
+  last_published,
+  created_at,
+  updated_at,
+  schedule_for,
+  published_at::text
+FROM
+  selected
 LIMIT $2 OFFSET $3
 `
 
@@ -374,7 +374,8 @@ type ListPagesRow struct {
 	PublishedAt   string             `json:"published_at"`
 }
 
-// Cannot use coalesce, see https://github.com/kyleconroy/sqlc/issues/780.
+// ListPages by file path.
+// Cannot use coalesce directly, see https://github.com/kyleconroy/sqlc/issues/780.
 // Treating published_at as text because it sorts faster and we don't do
 // date stuff on the backend, just frontend.
 func (q *Queries) ListPages(ctx context.Context, arg ListPagesParams) ([]ListPagesRow, error) {
