@@ -4,7 +4,6 @@ import imgproxyURL from "@/api/imgproxy-url.js";
 import BulmaField from "./BulmaField.vue";
 
 export default {
-  name: "TagStatus",
   components: {
     BulmaField,
   },
