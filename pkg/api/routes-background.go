@@ -7,6 +7,7 @@ import (
 	"github.com/carlmjohnson/errutil"
 	"github.com/go-chi/chi"
 	"github.com/spotlightpa/almanack/internal/db"
+	"github.com/spotlightpa/almanack/pkg/almanack"
 )
 
 func (app *appEnv) backgroundSleep(w http.ResponseWriter, r *http.Request) {
@@ -37,7 +38,8 @@ func (app *appEnv) backgroundCron(w http.ResponseWriter, r *http.Request) {
 		poperr, warning := app.svc.PopScheduledPages(r.Context())
 		app.logErr(r.Context(), warning)
 		errs.Push(poperr)
-		errs.Push(app.svc.PopScheduledSiteChanges(r.Context()))
+		errs.Push(app.svc.PopScheduledSiteChanges(r.Context(), almanack.EditorsPicksLoc))
+		errs.Push(app.svc.PopScheduledSiteChanges(r.Context(), almanack.SiteParamsLoc))
 		return errs.Merge()
 	}, func() error {
 		return app.svc.UpdateMostPopular(r.Context())
