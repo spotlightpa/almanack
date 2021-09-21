@@ -10,10 +10,10 @@ import (
 	"github.com/spotlightpa/almanack/internal/db"
 )
 
-func (svc Service) PopScheduledSiteChanges(ctx context.Context) (err error) {
+func (svc Service) PopScheduledSiteChanges(ctx context.Context, loc string) (err error) {
 	defer errutil.Trace(&err)
 
-	configs, err := svc.Queries.PopScheduledSiteChanges(ctx, EditorsPicksLoc)
+	configs, err := svc.Queries.PopScheduledSiteChanges(ctx, loc)
 	if err != nil {
 		return err
 	}
@@ -25,17 +25,17 @@ func (svc Service) PopScheduledSiteChanges(ctx context.Context) (err error) {
 		}
 	}
 	if currentConfig == nil {
-		svc.Printf("site data: no changes to %s", EditorsPicksLoc)
+		svc.Printf("site data: no changes to %s", loc)
 		return nil
 	}
-	svc.Printf("site data: updating %s", EditorsPicksLoc)
+	svc.Printf("site data: updating %s", loc)
 
 	// TODO: rollback
 	if err = svc.PublishSiteConfig(ctx, currentConfig); err != nil {
 		return err
 	}
 
-	return svc.Queries.CleanSiteData(ctx, EditorsPicksLoc)
+	return svc.Queries.CleanSiteData(ctx, loc)
 }
 
 func (svc Service) PublishSiteConfig(ctx context.Context, siteConfig *db.SiteDatum) (err error) {
