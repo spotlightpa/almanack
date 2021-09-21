@@ -15,9 +15,10 @@ import ViewFileUploader from "./components/ViewFileUploader.vue";
 import ViewLogin from "./components/ViewLogin.vue";
 import ViewNewsletterList from "./components/ViewNewsletterList.vue";
 import ViewNewsletterPage from "./components/ViewNewsletterPage.vue";
+import ViewNewsPage from "./components/ViewNewsPage.vue";
 import ViewNewsPagesList from "./components/ViewNewsPagesList.vue";
 import ViewRedirectArcToNewsPage from "./components/ViewRedirectArcToNewsPage.vue";
-import ViewNewsPage from "./components/ViewNewsPage.vue";
+import ViewSiteParams from "./components/ViewSiteParams.vue";
 import ViewUnauthorized from "./components/ViewUnauthorized.vue";
 import ViewUploader from "./components/ViewUploader.vue";
 
@@ -81,6 +82,14 @@ let router = new Router({
       name: "admin",
       component: ViewAdmin,
       props: (route) => ({ page: route.query.page }),
+      meta: {
+        requiresAuth: isSpotlightPAUser,
+      },
+    },
+    {
+      path: "/admin/site-params",
+      name: "site-params",
+      component: ViewSiteParams,
       meta: {
         requiresAuth: isSpotlightPAUser,
       },

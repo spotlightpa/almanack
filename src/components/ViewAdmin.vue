@@ -60,7 +60,11 @@ export default {
           icon: ["fas", "mail-bulk"],
           text: "Newsletter pages",
         },
-
+        {
+          to: "site-params",
+          icon: ["fas", "sliders-h"],
+          text: "Sitewide Settings",
+        },
         {
           to: "uploader",
           icon: ["fa", "file-image"],

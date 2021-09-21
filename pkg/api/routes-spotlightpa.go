@@ -752,13 +752,13 @@ func (app *appEnv) getSiteParams(w http.ResponseWriter, r *http.Request) {
 	app.Printf("starting getSiteParams")
 
 	type response struct {
-		Params []db.SiteDatum `json:"params"`
+		Configs []db.SiteDatum `json:"configs"`
 	}
 	var (
 		res response
 		err error
 	)
-	res.Params, err = app.svc.Queries.GetSiteData(r.Context(), almanack.SiteParamsLoc)
+	res.Configs, err = app.svc.Queries.GetSiteData(r.Context(), almanack.SiteParamsLoc)
 	if err != nil {
 		app.replyErr(w, r, err)
 		return
@@ -770,12 +770,12 @@ func (app *appEnv) postSiteParams(w http.ResponseWriter, r *http.Request) {
 	app.Printf("starting postSiteParams")
 
 	var req struct {
-		Params []almanack.ScheduledSiteConfig `json:"params"`
+		Configs []almanack.ScheduledSiteConfig `json:"configs"`
 	}
 	if !app.readJSON(w, r, &req) {
 		return
 	}
-	if len(req.Params) < 1 {
+	if len(req.Configs) < 1 {
 		app.replyErr(w, r, resperr.New(
 			http.StatusBadRequest, "no schedulable items provided"))
 		return
@@ -783,11 +783,11 @@ func (app *appEnv) postSiteParams(w http.ResponseWriter, r *http.Request) {
 
 	var (
 		res struct {
-			Params []db.SiteDatum `json:"params"`
+			Configs []db.SiteDatum `json:"configs"`
 		}
 		err error
 	)
-	res.Params, err = app.svc.UpdateSiteConfig(r.Context(), almanack.SiteParamsLoc, req.Params)
+	res.Configs, err = app.svc.UpdateSiteConfig(r.Context(), almanack.SiteParamsLoc, req.Configs)
 	if err != nil {
 		app.replyErr(w, r, err)
 		return
