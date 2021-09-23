@@ -379,7 +379,7 @@ export default {
     </form>
 
     <progress
-      v-if="isLoading || showProgress"
+      v-if="isLoadingThrottled"
       class="my-5 progress is-large is-warning"
       max="100"
     >

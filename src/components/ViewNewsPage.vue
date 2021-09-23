@@ -287,7 +287,7 @@ export default {
       <button
         v-if="page.arcID"
         class="block button is-warning has-text-weight-semibold"
-        :class="{ 'is-loading': isLoading || showProgress }"
+        :class="{ 'is-loading': isLoadingThrottled }"
         type="button"
         title="Remember to update published pages after refreshing"
         @click.prevent="arcRefresh"
@@ -423,7 +423,7 @@ export default {
     </form>
 
     <progress
-      v-if="isLoading || showProgress"
+      v-if="isLoadingThrottled"
       class="my-5 progress is-large is-warning"
       max="100"
     >

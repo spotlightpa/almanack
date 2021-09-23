@@ -1,11 +1,18 @@
 import { reactive } from "@vue/composition-api";
 
+import { useThrottleToggle } from "@/utils/throttle.js";
+
 export function makeState() {
   const apiState = reactive({
     rawData: null,
     isLoading: false,
     error: null,
     didLoad: false,
+    isLoadingThrottled: null,
+  });
+
+  apiState.isLoadingThrottled = useThrottleToggle(apiState, {
+    prop: "isLoading",
   });
 
   return {

@@ -7,7 +7,6 @@ import { useFileList } from "@/api/file-list.js";
 
 import { formatDateTime } from "@/utils/time-format.js";
 import sanitizeText from "@/utils/sanitize-text.js";
-import { useThrottleToggle } from "@/utils/throttle.js";
 
 import BulmaBreadcrumbs from "./BulmaBreadcrumbs.vue";
 import BulmaField from "./BulmaField.vue";
@@ -198,13 +197,10 @@ export default {
 
     actions.fetch();
 
-    const { isLoading } = toRefs(apiState);
-
     return {
       ...toRefs(state),
       ...actions,
 
-      isLoadingThrottled: useThrottleToggle(isLoading),
       formatDateTime,
       files: useFileList(),
     };
