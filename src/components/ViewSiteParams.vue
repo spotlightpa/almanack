@@ -7,10 +7,12 @@ import { useFileList } from "@/api/file-list.js";
 
 import { formatDateTime } from "@/utils/time-format.js";
 import sanitizeText from "@/utils/sanitize-text.js";
+import { useThrottleToggle } from "@/utils/throttle.js";
 
 import BulmaBreadcrumbs from "./BulmaBreadcrumbs.vue";
 import BulmaField from "./BulmaField.vue";
 import SiteParamsComp from "./SiteParams.vue";
+import SpinnerProgress from "./SpinnerProgress.vue";
 
 class SiteParams {
   constructor(config) {
@@ -26,6 +28,19 @@ class SiteParams {
     this.bannerLink = SiteParams.link(data, "banner-link");
     this.bannerBgColor = data["banner-bg-color"] ?? "";
     this.bannerTextColor = data["banner-text-color"] ?? "";
+
+    this.topperActive = data["topper-active"] ?? false;
+    this.topperBgColor = data["topper-bg-color"] ?? "";
+    this.topperDividerColor = data["topper-divider-color"] ?? "";
+    this.topperLink = SiteParams.link(data, "topper-link");
+    this.topperImageDescription = data["topper-image-description"] ?? "";
+    this.topperDesktopHeight = data["topper-desktop-height"] ?? 0;
+    this.topperDesktopWidth = data["topper-desktop-width"] ?? 0;
+    this.topperDesktopImages = data["topper-desktop-images"] ?? [];
+    this.topperMobileHeight = data["topper-mobile-height"] ?? 0;
+    this.topperMobileWidth = data["topper-mobile-width"] ?? 0;
+    this.topperMobileImages = data["topper-mobile-images"] ?? [];
+
     this.promoActive = data["promo-active"] ?? false;
     this.promoType = data["promo-type"] ?? "";
     this.promoImageDescription = data["promo-image-description"] ?? "";
@@ -37,10 +52,12 @@ class SiteParams {
     this.promoMobileHeight = data["promo-mobile-height"] ?? 0;
     this.promoLink = SiteParams.link(data, "promo-link");
     this.promoText = data["promo-text"] ?? "";
+
     this.stickyActive = data["sticky-active"] ?? false;
     this.stickyImageDescription = data["sticky-image-description"] ?? "";
     this.stickyImages = data["sticky-images"] ?? [];
     this.stickyLink = SiteParams.link(data, "sticky-link");
+
     this.newsletterActive = data["newsletter-active"] ?? false;
     Vue.observable(this);
   }
@@ -58,6 +75,9 @@ class SiteParams {
   }
 
   static unlink(url) {
+    if (!url) {
+      return "";
+    }
     let u = new URL(url);
     if (
       u.hostname === "www.spotlightpa.org" ||
@@ -77,6 +97,17 @@ class SiteParams {
         ["banner-link"]: SiteParams.unlink(this.bannerLink),
         ["banner-bg-color"]: this.bannerBgColor,
         ["banner-text-color"]: this.bannerTextColor,
+        ["topper-active"]: this.topperActive,
+        ["topper-bg-color"]: this.topperBgColor,
+        ["topper-divider-color"]: this.topperDividerColor,
+        ["topper-link"]: SiteParams.unlink(this.topperLink),
+        ["topper-image-description"]: this.topperImageDescription,
+        ["topper-desktop-height"]: this.topperDesktopHeight,
+        ["topper-desktop-width"]: this.topperDesktopWidth,
+        ["topper-desktop-images"]: this.topperDesktopImages,
+        ["topper-mobile-height"]: this.topperMobileHeight,
+        ["topper-mobile-width"]: this.topperMobileWidth,
+        ["topper-mobile-images"]: this.topperMobileImages,
         ["promo-active"]: this.promoActive,
         ["promo-type"]: this.promoType,
         ["promo-image-description"]: this.promoImageDescription,
@@ -103,6 +134,7 @@ export default {
     BulmaBreadcrumbs,
     BulmaField,
     SiteParams: SiteParamsComp,
+    SpinnerProgress,
   },
   metaInfo: {
     title: "Sitewide Settings",
@@ -112,7 +144,7 @@ export default {
     const { apiState, exec } = makeState();
 
     const state = reactive({
-      ...apiState,
+      ...toRefs(apiState),
 
       configs: [],
       nextSchedule: null,
@@ -166,10 +198,13 @@ export default {
 
     actions.fetch();
 
+    const { isLoading } = toRefs(apiState);
+
     return {
       ...toRefs(state),
       ...actions,
 
+      isLoadingThrottled: useThrottleToggle(isLoading),
       formatDateTime,
       files: useFileList(),
     };
@@ -231,13 +266,29 @@ export default {
         </button>
       </BulmaField>
     </template>
-    <progress
-      v-if="!didLoad && isLoading"
-      class="progress is-large is-warning"
-      max="100"
-    >
-      Loading…
-    </progress>
+
+    <div class="buttons">
+      <button
+        type="button"
+        class="button is-primary has-text-weight-semibold"
+        :disabled="isLoading"
+        :class="{ 'is-loading': isLoadingThrottled }"
+        @click="save"
+      >
+        Save
+      </button>
+      <button
+        type="button"
+        class="button is-light has-text-weight-semibold"
+        :disabled="isLoading"
+        :class="{ 'is-loading': isLoadingThrottled }"
+        @click="fetch"
+      >
+        Revert
+      </button>
+    </div>
+
+    <SpinnerProgress :is-loading="isLoadingThrottled" />
 
     <div v-if="error" class="message is-danger">
       <div class="message-header">{{ error.name }}</div>
@@ -252,27 +303,6 @@ export default {
           </button>
         </div>
       </div>
-    </div>
-
-    <div class="buttons">
-      <button
-        type="button"
-        class="button is-primary has-text-weight-semibold"
-        :disabled="isLoading"
-        :class="{ 'is-loading': isLoading }"
-        @click="save"
-      >
-        Save
-      </button>
-      <button
-        type="button"
-        class="button is-light has-text-weight-semibold"
-        :disabled="isLoading"
-        :class="{ 'is-loading': isLoading }"
-        @click="fetch"
-      >
-        Revert
-      </button>
     </div>
   </div>
 </template>
