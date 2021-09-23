@@ -1,13 +1,12 @@
 <script>
 import draggable from "vuedraggable";
+
 import fuzzyMatch from "@/utils/fuzzy-match.js";
-import EditorsPicksDraggable from "./EditorsPicksDraggable.vue";
 
 export default {
   name: "EditorsPicks",
   components: {
     draggable,
-    EditorsPicksDraggable,
   },
   props: {
     pages: Array,

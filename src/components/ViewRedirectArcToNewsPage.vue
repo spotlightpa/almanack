@@ -5,7 +5,6 @@ import { useClient } from "@/api/client.js";
 
 export default {
   name: "ViewRedirectArcToNewsPage",
-  components: {},
   props: {
     id: String,
   },

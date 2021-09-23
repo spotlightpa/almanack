@@ -5,10 +5,6 @@ import { reactive, computed, toRefs, watch } from "@vue/composition-api";
 import { useClient, makeState } from "@/api/hooks.js";
 import { formatDateTime } from "@/utils/time-format.js";
 
-import BulmaBreadcrumbs from "./BulmaBreadcrumbs.vue";
-import BulmaField from "./BulmaField.vue";
-import EditorsPicks from "./EditorsPicks.vue";
-
 class Page {
   constructor(data) {
     this.id = data.id;
@@ -76,11 +72,6 @@ class EditorsPicksData {
 
 export default {
   name: "ViewEditorsPicks",
-  components: {
-    BulmaBreadcrumbs,
-    BulmaField,
-    EditorsPicks,
-  },
   metaInfo: {
     title: "Homepage Editor",
   },

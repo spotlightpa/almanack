@@ -1,28 +1,12 @@
 <script>
 import { computed, toRefs } from "@vue/composition-api";
-import { usePage } from "../api/spotlightpa-page.js";
+
+import { usePage } from "@/api/spotlightpa-page.js";
 
 import { formatDateTime } from "@/utils/time-format.js";
 
-import BulmaAutocompleteArray from "./BulmaAutocompleteArray.vue";
-import BulmaBreadcrumbs from "./BulmaBreadcrumbs.vue";
-import BulmaField from "./BulmaField.vue";
-import BulmaFieldInput from "./BulmaFieldInput.vue";
-import CopyWithButton from "./CopyWithButton.vue";
-import PickerImages from "./PickerImages.vue";
-import TagStatus from "./TagStatus.vue";
-
 export default {
   name: "ViewNewsPage",
-  components: {
-    BulmaAutocompleteArray,
-    BulmaBreadcrumbs,
-    BulmaField,
-    BulmaFieldInput,
-    CopyWithButton,
-    PickerImages,
-    TagStatus,
-  },
   props: {
     id: String,
   },

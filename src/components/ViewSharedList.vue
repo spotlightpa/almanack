@@ -1,12 +1,8 @@
 <script>
-import ArticleList from "./ArticleList.vue";
 import { useAuth, useListAvailableArc, useClient } from "@/api/hooks.js";
 
 export default {
   name: "ViewSharedList",
-  components: {
-    ArticleList,
-  },
   props: ["page"],
   metaInfo: {
     title: "Available Articles",

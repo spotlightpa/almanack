@@ -1,16 +1,7 @@
 <script>
 import sanitizeText from "@/utils/sanitize-text.js";
 
-import BulmaField from "./BulmaField.vue";
-import BulmaFieldInput from "./BulmaFieldInput.vue";
-import SiteParamsFiles from "./SiteParamsFiles.vue";
-
 export default {
-  components: {
-    BulmaField,
-    BulmaFieldInput,
-    SiteParamsFiles,
-  },
   props: { params: Object, fileProps: Object },
   setup() {
     return {

@@ -1,11 +1,6 @@
 <script>
-import BulmaField from "./BulmaField.vue";
-
 export default {
   name: "BulmaFieldInput",
-  components: {
-    BulmaField,
-  },
   props: {
     label: String,
     labelClass: {

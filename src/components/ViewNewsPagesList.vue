@@ -3,16 +3,10 @@ import { computed, toRefs, watch } from "@vue/composition-api";
 
 import { makeState } from "@/api/service-util.js";
 import { useClient } from "@/api/client.js";
-
 import PageListItem from "@/api/spotlightpa-page-list-item.js";
-
-import APILoader from "./APILoader.vue";
-import BulmaBreadcrumbs from "./BulmaBreadcrumbs.vue";
-import PageListRow from "./PageListRow.vue";
 
 export default {
   name: "ViewNewsPagesList",
-  components: { APILoader, BulmaBreadcrumbs, PageListRow },
   props: ["page"],
   metaInfo: {
     title: "Spotlight PA News Pages",

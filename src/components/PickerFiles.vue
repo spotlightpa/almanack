@@ -1,12 +1,7 @@
 <script>
 import { formatDate, formatTime } from "@/utils/time-format.js";
 
-import BulmaField from "./BulmaField.vue";
-
 export default {
-  components: {
-    BulmaField,
-  },
   props: { files: Array },
   setup() {
     return {

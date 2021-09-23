@@ -1,12 +1,7 @@
 <script>
 import "@/css/main.scss";
 
-import AppNav from "./AppNav.vue";
-
 export default {
-  components: {
-    AppNav,
-  },
   metaInfo: {
     titleTemplate: "%s • Spotlight PA Almanack",
   },

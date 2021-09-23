@@ -1,15 +1,8 @@
 <script>
-import ArticleSlugLine from "./ArticleSlugLine.vue";
-import ArticleWordCount from "./ArticleWordCount.vue";
-
 import { formatDate } from "@/utils/time-format.js";
 
 export default {
   name: "ArticleList",
-  components: {
-    ArticleSlugLine,
-    ArticleWordCount,
-  },
   props: {
     articles: Array,
     title: String,

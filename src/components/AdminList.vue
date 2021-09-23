@@ -1,13 +1,8 @@
 <script>
 import { ref, computed } from "@vue/composition-api";
 
-import AdminListPanel from "./AdminListPanel.vue";
-
 export default {
   name: "AdminList",
-  components: {
-    AdminListPanel,
-  },
   props: {
     articles: Array,
     title: String,

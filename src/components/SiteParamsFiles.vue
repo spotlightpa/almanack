@@ -1,12 +1,7 @@
 <script>
 import { ref } from "@vue/composition-api";
 
-import PickerFiles from "./PickerFiles.vue";
-
 export default {
-  components: {
-    PickerFiles,
-  },
   props: { files: Array, fileProps: Object },
   setup() {
     const inputText = ref("");

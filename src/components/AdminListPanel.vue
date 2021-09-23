@@ -3,15 +3,8 @@ import { reactive, ref, toRefs } from "@vue/composition-api";
 import { useClient } from "@/api/hooks.js";
 import { formatDate } from "@/utils/time-format.js";
 
-import ArticleSlugLine from "./ArticleSlugLine.vue";
-import EmailComposer from "./EmailComposer.vue";
-
 export default {
   name: "AdminListPanel",
-  components: {
-    ArticleSlugLine,
-    EmailComposer,
-  },
   props: {
     article: Object,
   },

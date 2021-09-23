@@ -1,12 +1,7 @@
 <script>
 import imgproxyURL from "@/api/imgproxy-url.js";
 
-import BulmaField from "./BulmaField.vue";
-
 export default {
-  components: {
-    BulmaField,
-  },
   props: { images: Array },
   setup() {
     return {

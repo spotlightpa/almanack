@@ -3,20 +3,12 @@ import { reactive, computed, toRefs } from "@vue/composition-api";
 
 import { useClient } from "@/api/hooks.js";
 import imgproxyURL from "@/api/imgproxy-url.js";
+
 import fuzzyMatch from "@/utils/fuzzy-match.js";
 import { formatDate } from "@/utils/time-format.js";
 
-import APILoader from "./APILoader.vue";
-import CopyWithButton from "./CopyWithButton.vue";
-import ImageUploader from "./ImageUploader.vue";
-
 export default {
   name: "ViewUploader",
-  components: {
-    APILoader,
-    CopyWithButton,
-    ImageUploader,
-  },
   metaInfo: {
     title: "Photos",
   },

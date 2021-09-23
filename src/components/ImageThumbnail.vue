@@ -1,12 +1,7 @@
 <script>
 import commaAnd from "@/utils/comma-and.js";
-import CopyWithButton from "./CopyWithButton.vue";
-
 export default {
   name: "ImageThumbnail",
-  components: {
-    CopyWithButton,
-  },
   props: {
     url: String,
     caption: String,

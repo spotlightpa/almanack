@@ -5,15 +5,8 @@ import { useClient, makeState } from "@/api/hooks.js";
 
 import { formatDate } from "@/utils/time-format.js";
 
-import APILoader from "./APILoader.vue";
-import CopyWithButton from "./CopyWithButton.vue";
-
 export default {
   name: "ViewUploader",
-  components: {
-    APILoader,
-    CopyWithButton,
-  },
   props: ["page"],
   metaInfo: {
     title: "File Uploads",

@@ -1,12 +1,8 @@
 <script>
 import imgproxyURL from "@/api/imgproxy-url.js";
 
-import TagDate from "./TagDate.vue";
-import TagStatus from "./TagStatus.vue";
-
 export default {
   name: "PageListRow",
-  components: { TagStatus, TagDate },
   props: ["link", "status", "label", "date", "hed", "dek", "image", "imageAlt"],
 
   computed: {
