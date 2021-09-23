@@ -6,13 +6,8 @@ import { useClient } from "@/api/client.js";
 
 import PageListItem from "@/api/spotlightpa-page-list-item.js";
 
-import APILoader from "./APILoader.vue";
-import BulmaBreadcrumbs from "./BulmaBreadcrumbs.vue";
-import PageListRow from "./PageListRow.vue";
-
 export default {
   name: "ViewNewsletterList",
-  components: { APILoader, BulmaBreadcrumbs, PageListRow },
   props: ["page"],
   metaInfo: {
     title: "Newsletter Pages",

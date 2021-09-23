@@ -90,7 +90,6 @@ function addressState() {
 
 export default {
   name: "ViewAuthorizedDomains",
-  components: {},
   metaInfo: {
     title: "Preauthorized Domains and Addresses",
   },

@@ -1,11 +1,6 @@
 <script>
-import CopyTextarea from "./CopyTextarea.vue";
-
 export default {
   name: "CopyWithButton",
-  components: {
-    CopyTextarea,
-  },
   props: {
     value: String,
     label: {

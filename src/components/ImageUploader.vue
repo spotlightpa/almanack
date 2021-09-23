@@ -4,13 +4,8 @@ import { reactive, toRefs, computed } from "@vue/composition-api";
 import { useClient } from "@/api/hooks.js";
 import imgproxyURL from "@/api/imgproxy-url.js";
 
-import CopyWithButton from "./CopyWithButton.vue";
-
 export default {
   name: "ImageUploader",
-  components: {
-    CopyWithButton,
-  },
   setup(props, { emit }) {
     let { uploadImage } = useClient();
 

@@ -1,18 +1,7 @@
 <script>
 import { formatDate } from "@/utils/time-format.js";
 
-import ArticleSlugLine from "./ArticleSlugLine.vue";
-import ArticleWordCount from "./ArticleWordCount.vue";
-import ImageThumbnail from "./ImageThumbnail.vue";
-import NoCopyTextArea from "./NoCopyTextArea.vue";
-
 export default {
-  components: {
-    ArticleSlugLine,
-    ArticleWordCount,
-    ImageThumbnail,
-    NoCopyTextArea,
-  },
   props: {
     article: { type: Object, required: true },
   },

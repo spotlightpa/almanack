@@ -1,10 +1,5 @@
 <script>
-import ImageThumbnail from "./ImageThumbnail.vue";
-
 export default {
-  components: {
-    ImageThumbnail,
-  },
   props: {
     block: Object,
     n: Number,

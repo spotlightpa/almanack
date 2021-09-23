@@ -1,10 +1,5 @@
 <script>
-import CopyWithButton from "./CopyWithButton.vue";
-
 export default {
-  components: {
-    CopyWithButton,
-  },
   props: {
     block: Object,
     n: Number,

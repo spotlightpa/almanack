@@ -1,13 +1,8 @@
 <script>
-import BulmaField from "./BulmaField.vue";
-
 let labelIDCounter = 0;
 
 export default {
   name: "BulmaAutocompleteArray",
-  components: {
-    BulmaField,
-  },
   props: {
     label: String,
     labelClass: {

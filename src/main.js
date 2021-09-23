@@ -15,6 +15,8 @@ import "./plugins/buefy.js";
 import VueMeta from "vue-meta";
 Vue.use(VueMeta);
 
+import "./plugins/autoimport.js";
+
 import App from "./components/TheApp.vue";
 
 Vue.config.ignoredElements = ["raw-html"];

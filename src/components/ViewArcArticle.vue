@@ -1,16 +1,8 @@
 <script>
 import { useAvailableArc } from "@/api/hooks.js";
-import APILoader from "./APILoader.vue";
-import ArcArticleAvailable from "./ArcArticleAvailable.vue";
-import ArcArticlePlanned from "./ArcArticlePlanned.vue";
 
 export default {
   name: "ViewArcArticle",
-  components: {
-    APILoader,
-    ArcArticleAvailable,
-    ArcArticlePlanned,
-  },
   metaInfo() {
     return {
       title: this.article ? this.article.slug : "Article",

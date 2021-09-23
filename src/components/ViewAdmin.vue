@@ -1,20 +1,10 @@
 <script>
 import { ref } from "@vue/composition-api";
 
-import AdminList from "./AdminList.vue";
-import EmailComposer from "./EmailComposer.vue";
-
 import { useListAnyArc } from "@/api/hooks.js";
-
-import ImageUploader from "./ImageUploader.vue";
 
 export default {
   name: "ViewAdmin",
-  components: {
-    AdminList,
-    EmailComposer,
-    ImageUploader,
-  },
   props: ["page"],
   metaInfo: {
     title: "Admin",

@@ -8,11 +8,6 @@ import { useFileList } from "@/api/file-list.js";
 import { formatDateTime } from "@/utils/time-format.js";
 import sanitizeText from "@/utils/sanitize-text.js";
 
-import BulmaBreadcrumbs from "./BulmaBreadcrumbs.vue";
-import BulmaField from "./BulmaField.vue";
-import SiteParamsComp from "./SiteParams.vue";
-import SpinnerProgress from "./SpinnerProgress.vue";
-
 class SiteParams {
   constructor(config) {
     let scheduleFor = config.schedule_for;
@@ -129,12 +124,6 @@ class SiteParams {
 }
 
 export default {
-  components: {
-    BulmaBreadcrumbs,
-    BulmaField,
-    SiteParams: SiteParamsComp,
-    SpinnerProgress,
-  },
   metaInfo: {
     title: "Sitewide Settings",
   },

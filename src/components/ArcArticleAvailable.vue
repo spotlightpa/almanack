@@ -3,22 +3,7 @@ import { reactive, toRefs } from "@vue/composition-api";
 import { sendGAEvent } from "@/utils/google-analytics.js";
 import { formatDate } from "@/utils/time-format.js";
 
-import ArticleSlugLine from "./ArticleSlugLine.vue";
-import ArticleWordCount from "./ArticleWordCount.vue";
-import CopyTextarea from "./CopyTextarea.vue";
-import CopyWithButton from "./CopyWithButton.vue";
-import DOMInnerHTML from "./DOMInnerHTML.vue";
-import ImageThumbnail from "./ImageThumbnail.vue";
-
 export default {
-  components: {
-    ArticleSlugLine,
-    ArticleWordCount,
-    CopyTextarea,
-    CopyWithButton,
-    DOMInnerHTML,
-    ImageThumbnail,
-  },
   props: {
     article: { type: Object, required: true },
   },
