@@ -10,15 +10,22 @@ export default {
     title: "Admin",
   },
   setup(props) {
-    let { articles, didLoad, isLoading, load, nextPage, error } = useListAnyArc(
-      () => props.page
-    );
+    let {
+      articles,
+      didLoad,
+      isLoading,
+      isLoadingThrottled,
+      load,
+      nextPage,
+      error,
+    } = useListAnyArc(() => props.page);
 
     return {
       showComposer: ref(false),
 
       didLoad,
       isLoading,
+      isLoadingThrottled,
       load,
       error,
       articles,
@@ -163,14 +170,6 @@ export default {
       />
     </keep-alive>
 
-    <progress
-      v-if="!didLoad && isLoading"
-      class="progress is-large is-warning"
-      max="100"
-    >
-      Loading…
-    </progress>
-
     <div v-if="error" class="message is-danger">
       <div class="message-header">{{ error.name }}</div>
       <div class="message-body">
@@ -202,5 +201,7 @@ export default {
         Show Older Stories…
       </router-link>
     </div>
+
+    <SpinnerProgress :is-loading="isLoadingThrottled" />
   </div>
 </template>

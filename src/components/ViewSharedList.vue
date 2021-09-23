@@ -58,13 +58,7 @@ export default {
       <a href="#" @click.prevent="redirectToSignup">resubscribe here</a>.
     </p>
 
-    <progress
-      v-if="!didLoad && isLoading"
-      class="progress is-large is-warning"
-      max="100"
-    >
-      Loading…
-    </progress>
+    <SpinnerProgress :is-loading="!didLoad && isLoading" />
 
     <div v-if="error" class="message is-danger">
       <div class="message-header">{{ error.name }}</div>

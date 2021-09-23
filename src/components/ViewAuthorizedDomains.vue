@@ -108,13 +108,7 @@ export default {
   <div>
     <div>
       <h2 class="title">Preauthorized domains</h2>
-      <progress
-        v-if="domain.isLoading.value"
-        class="progress is-large is-warning"
-        max="100"
-      >
-        Loading…
-      </progress>
+      <SpinnerProgress :is-loading="domain.isLoading.value" />
 
       <div class="field is-grouped is-grouped-multiline">
         <div v-for="d of domain.domains.value" :key="d" class="control">
@@ -167,13 +161,7 @@ export default {
     </div>
     <div class="mt-6">
       <h2 class="title">Preauthorized email adddresses</h2>
-      <progress
-        v-if="address.isLoading.value"
-        class="progress is-large is-warning"
-        max="100"
-      >
-        Loading…
-      </progress>
+      <SpinnerProgress :is-loading="address.isLoading.value" />
 
       <div class="field is-grouped is-grouped-multiline">
         <div

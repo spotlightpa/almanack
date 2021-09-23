@@ -361,13 +361,7 @@ export default {
       </div>
     </form>
 
-    <progress
-      v-if="isLoadingThrottled"
-      class="my-5 progress is-large is-warning"
-      max="100"
-    >
-      Loading…
-    </progress>
+    <SpinnerProgress :is-loading="isLoadingThrottled" />
 
     <div v-if="error" class="my-5 message is-danger">
       <div class="message-header">{{ error.name }}</div>
