@@ -58,13 +58,7 @@ export default {
 
 <template>
   <div>
-    <progress
-      v-if="isLoading"
-      class="my-5 progress is-large is-warning"
-      max="100"
-    >
-      Loading…
-    </progress>
+    <SpinnerProgress :is-loading="isLoading" />
 
     <div v-if="error" class="message is-danger">
       <div class="message-header">{{ error.name }}</div>
