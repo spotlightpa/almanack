@@ -181,26 +181,13 @@ function useAutocompletions() {
 }
 
 export function usePage(id) {
-  const showProgress = ref(false);
-  const toggleProgress = () => {
-    showProgress.value = true;
-    window.setTimeout(() => {
-      showProgress.value = false;
-    }, 1000);
-  };
-
   const { getPageWithContent, postPage, listImages, postRefreshPageFromArc } =
     useClient();
   const { apiState, exec } = makeState();
 
-  const fetch = (id) => {
-    toggleProgress();
-    return exec(() => getPageWithContent(id));
-  };
-  const post = (page) => {
-    toggleProgress();
-    return exec(() => postPage(page));
-  };
+  const fetch = (id) => exec(() => getPageWithContent(id));
+  const post = (page) => exec(() => postPage(page));
+
   const page = computed(() =>
     apiState.rawData ? new Page(apiState.rawData) : null
   );
@@ -213,7 +200,6 @@ export function usePage(id) {
   execImage(() => listImages());
 
   return {
-    showProgress,
     showScheduler: ref(false),
 
     ...toRefs(apiState),
@@ -263,7 +249,6 @@ export function usePage(id) {
       return post(page.value);
     },
     arcRefresh() {
-      toggleProgress();
       return exec(() => postRefreshPageFromArc(id.value));
     },
     imageState,
