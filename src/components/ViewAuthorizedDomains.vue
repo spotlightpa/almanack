@@ -119,23 +119,8 @@ export default {
         </div>
       </div>
 
-      <div
-        v-for="error of domain.errors.value"
-        :key="error.name"
-        class="message is-danger"
-      >
-        <div class="message-header">{{ error.name }}</div>
-        <div class="message-body">
-          <p class="content">{{ error.message }}</p>
-          <div class="buttons">
-            <button
-              class="button is-danger has-text-weight-semibold"
-              @click="domain.list()"
-            >
-              Reload?
-            </button>
-          </div>
-        </div>
+      <div v-for="error of domain.errors.value" :key="error.name">
+        <ErrorReloader :error="error" @reload="domain.list()" />
       </div>
 
       <form
@@ -176,23 +161,8 @@ export default {
         </div>
       </div>
 
-      <div
-        v-for="error of address.errors.value"
-        :key="error.name"
-        class="message is-danger"
-      >
-        <div class="message-header">{{ error.name }}</div>
-        <div class="message-body">
-          <p class="content">{{ error.message }}</p>
-          <div class="buttons">
-            <button
-              class="button is-danger has-text-weight-semibold"
-              @click="address.list()"
-            >
-              Reload?
-            </button>
-          </div>
-        </div>
+      <div v-for="error of address.errors.value" :key="error.name">
+        <ErrorReloader :error="error" @reload="address.list()" />
       </div>
 
       <form
