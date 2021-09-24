@@ -232,21 +232,7 @@ export default {
     </div>
 
     <SpinnerProgress :is-loading="isLoading" />
-
-    <div v-if="error" class="message is-danger">
-      <div class="message-header">{{ error.name }}</div>
-      <div class="message-body">
-        <p class="content">{{ error.message }}</p>
-        <div class="buttons">
-          <button
-            class="button is-danger has-text-weight-semibold"
-            @click="reload"
-          >
-            Reload?
-          </button>
-        </div>
-      </div>
-    </div>
+    <ErrorReloader :error="error" @reload="reload" />
   </div>
 </template>
 

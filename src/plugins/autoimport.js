@@ -56,6 +56,8 @@ import EmailComposer from "@/components/EmailComposer.vue";
 Vue.component("EmailComposer", EmailComposer);
 import ErrorSimple from "@/components/ErrorSimple.vue";
 Vue.component("ErrorSimple", ErrorSimple);
+import ErrorReloader from "@/components/ErrorReloader.vue";
+Vue.component("ErrorReloader", ErrorReloader);
 import ImageThumbnail from "@/components/ImageThumbnail.vue";
 Vue.component("ImageThumbnail", ImageThumbnail);
 import ImageUploader from "@/components/ImageUploader.vue";

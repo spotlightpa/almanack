@@ -407,21 +407,8 @@ export default {
     </form>
 
     <SpinnerProgress :is-loading="isLoadingThrottled" />
-
-    <div v-if="error" class="my-5 message is-danger">
-      <div class="message-header">{{ error.name }}</div>
-      <div class="message-body">
-        <p class="content">{{ error.message }}</p>
-        <div class="buttons">
-          <button
-            class="button is-danger has-text-weight-semibold"
-            type="button"
-            @click="fetch(id)"
-          >
-            Reload?
-          </button>
-        </div>
-      </div>
+    <div class="my-5">
+      <ErrorReloader :error="error" @reload="fetch(id)" />
     </div>
   </div>
 </template>

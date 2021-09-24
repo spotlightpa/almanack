@@ -170,20 +170,7 @@ export default {
       />
     </keep-alive>
 
-    <div v-if="error" class="message is-danger">
-      <div class="message-header">{{ error.name }}</div>
-      <div class="message-body">
-        <p class="content">{{ error.message }}</p>
-        <div class="buttons">
-          <button
-            class="button is-danger has-text-weight-semibold"
-            @click="load"
-          >
-            Reload?
-          </button>
-        </div>
-      </div>
-    </div>
+    <ErrorReloader :error="error" @reload="load" />
 
     <AdminList
       v-if="articles.length"
