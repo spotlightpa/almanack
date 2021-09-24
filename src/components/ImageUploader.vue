@@ -115,11 +115,8 @@ export default {
         </div>
       </div>
     </div>
-    <div v-if="error" class="message is-danger">
-      <p class="message-header" v-text="error.name"></p>
-      <p class="message-body" v-text="error.message"></p>
-    </div>
-    <CopyWithButton v-else-if="filename" :value="filename" label="image path" />
+    <ErrorSimple :error="error" />
+    <CopyWithButton v-if="filename" :value="filename" label="image path" />
     <picture v-if="imageURL && !isUploading" class="has-ratio">
       <img :src="imageURL" class="is-3x4" width="200" />
     </picture>

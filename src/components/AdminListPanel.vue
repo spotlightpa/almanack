@@ -91,10 +91,7 @@ export default {
         </button>
       </div>
     </div>
-    <div v-if="error" class="message is-danger">
-      <p class="message-header">{{ error.name }}</p>
-      <p class="message-body">{{ error.message }}</p>
-    </div>
+    <ErrorSimple :error="error" />
     <div class="buttons has-margin-top-thin">
       <button
         v-if="!article.isPlanned || article.isAvailable"
