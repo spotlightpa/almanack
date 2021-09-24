@@ -133,47 +133,35 @@ export default {
       </p>
     </details>
 
-    <div class="level">
-      <div class="level-left">
-        <div class="level-item">
-          <div class="control">
-            <label class="label">Upload an image</label>
-            <ImageUploader />
-          </div>
-        </div>
-        <div class="level-item">
-          <div class="control">
-            <label class="label">Compose a message</label>
-            <button
-              type="button"
-              class="button is-primary has-text-weight-semibold"
-              @click="showComposer = !showComposer"
-            >
-              <span class="icon">
-                <font-awesome-icon :icon="['fas', 'paper-plane']" />
-              </span>
-              <span
-                v-text="!showComposer ? 'Compose Message' : 'Hide Message'"
-              />
-            </button>
-          </div>
-        </div>
-      </div>
+    <div class="control">
+      <label class="label">Compose a message</label>
+      <button
+        type="button"
+        class="button is-primary has-text-weight-semibold"
+        @click="showComposer = !showComposer"
+      >
+        <span class="icon">
+          <font-awesome-icon :icon="['fas', 'paper-plane']" />
+        </span>
+        <span v-text="!showComposer ? 'Compose Message' : 'Hide Message'" />
+      </button>
     </div>
 
     <keep-alive>
       <EmailComposer
         v-if="showComposer"
+        class="mt-5"
         initial-subject="Subject"
         initial-body="Email body"
         @hide="showComposer = false"
       />
     </keep-alive>
 
-    <ErrorReloader :error="error" @reload="load" />
+    <ErrorReloader class="mt-5" :error="error" @reload="load" />
 
     <AdminList
       v-if="articles.length"
+      class="mt-5"
       :articles="articles"
       title="Arc Articles"
       @refresh="refresh"
