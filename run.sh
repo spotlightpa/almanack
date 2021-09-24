@@ -40,18 +40,14 @@ EOF
 	exit 2
 }
 
-function redis-start() {
-	docker run --name redis-container --rm -p 6379:6379 redis:latest
-}
-
-function redis-cli() {
-	docker run --name redis-cli -it --rm \
-		--link redis-container:redis \
-		redis:latest \
-		redis-cli -h redis -p 6379
-}
-
 function sql() {
+	set -x
+	format:sql
+	sql:sqlc
+	set +x
+}
+
+function sql:sqlc() {
 	_installed sqlc || _die "sqlc not installed"
 	go generate ./...
 }
@@ -73,10 +69,11 @@ function build:frontend() {
 function build:backend() {
 	go version
 	set -x
-	echo "$(git rev-parse --short HEAD)" >pkg/almanack/build-version.txt
+	git rev-parse --short HEAD >pkg/almanack/build-version.txt
 	echo "${DEPLOY_PRIME_URL:-http://local.dev}" >pkg/almanack/deploy-url.txt
 	GOBIN=$THIS_DIR/functions go install ./funcs/...
-	cp $THIS_DIR/functions/almanack-api $THIS_DIR/functions/almanack-api-background
+	cp "$THIS_DIR/functions/almanack-api" "$THIS_DIR/functions/almanack-api-background"
+	set +x
 }
 
 function build:prod() {
@@ -85,9 +82,11 @@ function build:prod() {
 }
 
 function test() {
+	set -x
 	test:backend
 	test:frontend
 	test:misc
+	set +x
 }
 
 function test:frontend() {
@@ -103,12 +102,27 @@ function test:misc() {
 }
 
 function format() {
-	yarn run lint
-	gofmt -s -w .
-	format:misc
+	set -x
+	format:js
+	format:go
+	format:sh
+	format:sql
+	set +x
 }
 
-function format:misc() {
+function format:js() {
+	yarn run lint
+}
+
+function format:go() {
+	gofmt -s -w .
+}
+
+function format:sh() {
+	_git-xargs '*.sh' shfmt -w _
+}
+
+function format:sql() {
 	_git-xargs '*.sh' shfmt -w _
 	_git-xargs '*.sql' pg_format -w 80 -s 2 _ -o _
 }
@@ -118,10 +132,21 @@ function db:copy-prod() {
 	local DATE_NAME
 	echo "Using $PG_BIN"
 	set -x
-	heroku pg:backups:capture
 	DATE_NAME=$(date -u +"%Y-%m-%dT%H:%M:%S")
 	DUMP_FILE="$(mktemp -d)/dump-$DATE_NAME.sql"
+	db:dump-prod "$DUMP_FILE"
+	db:load-dump "$DUMP_FILE"
+	set +x
+}
+
+function db:dump-prod() {
+	local DUMP_FILE=$1
+	heroku pg:backups:capture
 	heroku pg:backups:download --output "$DUMP_FILE"
+}
+
+function db:load-dump() {
+	local DUMP_FILE=$1
 	"$PG_BIN"/pg_restore \
 		-d 'postgres://localhost/almanack?sslmode=disable' \
 		--clean \
@@ -130,6 +155,8 @@ function db:copy-prod() {
 }
 
 function api() {
+	# shellcheck disable=SC1091
+	[[ -f .env ]] && echo "Using .env file" && source .env
 	go run ./funcs/almanack-api "$@"
 }
 
