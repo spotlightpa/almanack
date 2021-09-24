@@ -54,6 +54,8 @@ import EditorsPicksDraggable from "@/components/EditorsPicksDraggable.vue";
 Vue.component("EditorsPicksDraggable", EditorsPicksDraggable);
 import EmailComposer from "@/components/EmailComposer.vue";
 Vue.component("EmailComposer", EmailComposer);
+import ErrorSimple from "@/components/ErrorSimple.vue";
+Vue.component("ErrorSimple", ErrorSimple);
 import ImageThumbnail from "@/components/ImageThumbnail.vue";
 Vue.component("ImageThumbnail", ImageThumbnail);
 import ImageUploader from "@/components/ImageUploader.vue";

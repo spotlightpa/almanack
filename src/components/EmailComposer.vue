@@ -70,10 +70,7 @@ export default {
       <label class="label">Body</label>
       <textarea v-model="body" class="textarea" :rows="rows"></textarea>
     </div>
-    <div v-if="error" class="message is-danger">
-      <p class="message-header" v-text="error.name"></p>
-      <p class="message-body" v-text="error.message"></p>
-    </div>
+    <ErrorSimple :error="error" />
     <div class="buttons">
       <button
         class="button has-text-weight-semibold is-primary"

@@ -128,10 +128,7 @@ export default {
         </div>
       </div>
     </div>
-    <div v-if="uploadError" class="message is-danger">
-      <p class="message-header" v-text="uploadError.name"></p>
-      <p class="message-body" v-text="uploadError.message"></p>
-    </div>
+    <ErrorSimple :error="uploadError" />
 
     <h2 class="title has-margin-top">Existing files</h2>
     <APILoader :is-loading="isLoading" :reload="fetch" :error="error">
