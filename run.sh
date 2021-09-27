@@ -49,7 +49,11 @@ function sql() {
 
 function sql:sqlc() {
 	_installed sqlc || _die "sqlc not installed"
-	go generate ./...
+	{
+		cd sql
+		sqlc generate
+		sqlc compile
+	}
 }
 
 function migrate() {

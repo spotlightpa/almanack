@@ -5,9 +5,9 @@
 			"emit_json_tags": true,
 			"emit_prepared_queries": false,
 			"name": "db",
-			"path": "../../internal/db",
-			"queries": "../../sql/queries/",
-			"schema": "../../sql/schema/",
+			"path": "../internal/db",
+			"queries": "queries/",
+			"schema": "schema/",
 			"sql_package": "pgx/v4"
 		}
 	],
