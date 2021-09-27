@@ -53,14 +53,20 @@ func (svc Service) UpdateMostPopular(ctx context.Context) (err error) {
 	if err != nil {
 		return err
 	}
-	data := struct {
-		Pages []string `json:"pages"`
-	}{pages}
+	data, err := svc.Queries.ListPagesByURLPaths(ctx, pages)
+	if err != nil {
+		return err
+	}
+
 	return UploadJSON(
 		ctx,
 		svc.FileStore,
-		"feeds/most-popular.json",
+		"feeds/most-popular-items.json",
 		"public, max-age=300",
-		&data,
+		struct {
+			Pages []db.ListPagesByURLPathsRow `json:"pages"`
+		}{
+			data,
+		},
 	)
 }
