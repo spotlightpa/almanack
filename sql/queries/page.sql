@@ -221,3 +221,50 @@ FROM
   ROWS
 WHERE
   pub_date IS NOT NULL;
+
+-- name: ListPagesByURLPaths :many
+WITH query_paths AS (
+  SELECT
+    @paths::text[] AS "paths"
+),
+page_paths AS (
+  SELECT
+    *
+  FROM
+    page
+  WHERE
+    url_path IN (
+      SELECT
+        unnest("paths")::citext
+      FROM
+        query_paths)
+),
+selected AS (
+  SELECT
+    "file_path",
+    coalesce(frontmatter ->> 'internal-id', '') AS "internal_id",
+    coalesce(frontmatter ->> 'title', '') AS "title",
+  coalesce(frontmatter ->> 'link-title', '') AS "link_title",
+  coalesce(frontmatter ->> 'description', '') AS "description",
+  coalesce(frontmatter ->> 'blurb', '') AS "blurb",
+  coalesce(frontmatter ->> 'image', '') AS "image",
+  coalesce(url_path, '') AS "url_path",
+  coalesce(frontmatter ->> 'published', '') AS "published_at"
+FROM
+  page_paths
+)
+SELECT
+  "file_path"::text,
+  "internal_id"::text,
+  "title"::text,
+  "link_title"::text,
+  "description"::text,
+  "blurb"::text,
+  "image"::text,
+  "url_path"::text,
+  "published_at"::text
+FROM
+  selected
+  CROSS JOIN query_paths
+ORDER BY
+  array_position(query_paths.paths, selected.url_path::text);

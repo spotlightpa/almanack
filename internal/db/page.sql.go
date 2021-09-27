@@ -412,6 +412,96 @@ func (q *Queries) ListPages(ctx context.Context, arg ListPagesParams) ([]ListPag
 	return items, nil
 }
 
+const listPagesByURLPaths = `-- name: ListPagesByURLPaths :many
+WITH query_paths AS (
+  SELECT
+    $1::text[] AS "paths"
+),
+page_paths AS (
+  SELECT
+    id, file_path, frontmatter, body, schedule_for, last_published, created_at, updated_at, url_path
+  FROM
+    page
+  WHERE
+    url_path IN (
+      SELECT
+        unnest("paths")::citext
+      FROM
+        query_paths)
+),
+selected AS (
+  SELECT
+    "file_path",
+    coalesce(frontmatter ->> 'internal-id', '') AS "internal_id",
+    coalesce(frontmatter ->> 'title', '') AS "title",
+  coalesce(frontmatter ->> 'link-title', '') AS "link_title",
+  coalesce(frontmatter ->> 'description', '') AS "description",
+  coalesce(frontmatter ->> 'blurb', '') AS "blurb",
+  coalesce(frontmatter ->> 'image', '') AS "image",
+  coalesce(url_path, '') AS "url_path",
+  coalesce(frontmatter ->> 'published', '') AS "published_at"
+FROM
+  page_paths
+)
+SELECT
+  "file_path"::text,
+  "internal_id"::text,
+  "title"::text,
+  "link_title"::text,
+  "description"::text,
+  "blurb"::text,
+  "image"::text,
+  "url_path"::text,
+  "published_at"::text
+FROM
+  selected
+  CROSS JOIN query_paths
+ORDER BY
+  array_position(query_paths.paths, selected.url_path::text)
+`
+
+type ListPagesByURLPathsRow struct {
+	FilePath    string `json:"file_path"`
+	InternalID  string `json:"internal_id"`
+	Title       string `json:"title"`
+	LinkTitle   string `json:"link_title"`
+	Description string `json:"description"`
+	Blurb       string `json:"blurb"`
+	Image       string `json:"image"`
+	URLPath     string `json:"url_path"`
+	PublishedAt string `json:"published_at"`
+}
+
+func (q *Queries) ListPagesByURLPaths(ctx context.Context, paths []string) ([]ListPagesByURLPathsRow, error) {
+	rows, err := q.db.Query(ctx, listPagesByURLPaths, paths)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []ListPagesByURLPathsRow
+	for rows.Next() {
+		var i ListPagesByURLPathsRow
+		if err := rows.Scan(
+			&i.FilePath,
+			&i.InternalID,
+			&i.Title,
+			&i.LinkTitle,
+			&i.Description,
+			&i.Blurb,
+			&i.Image,
+			&i.URLPath,
+			&i.PublishedAt,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const popScheduledPages = `-- name: PopScheduledPages :many
 UPDATE
   page
