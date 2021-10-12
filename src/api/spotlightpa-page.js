@@ -17,6 +17,7 @@ class Page {
     this.updatedAt = Page.getDate(data, "updated_at");
     this.lastPublished = Page.getDate(data, "last_published");
     this.scheduleFor = Page.getDate(data, "schedule_for");
+    this.eventDate = Page.getDate(this.frontmatter, "event-date");
     this.arcID = this.frontmatter["arc-id"] ?? "";
     this.kicker = this.frontmatter["kicker"] ?? "";
     this.title = this.frontmatter["title"] ?? "";
@@ -120,6 +121,7 @@ class Page {
         ...this.frontmatter,
         // copy others
         published: this.publishedAt,
+        "event-date": this.eventDate,
         kicker: this.kicker,
         title: this.title,
         "internal-id": this.internalID,
