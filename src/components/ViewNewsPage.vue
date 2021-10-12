@@ -183,6 +183,21 @@ export default {
         help="Topics are open-ended collections, e.g. “Events”, “Coronavirus”"
       />
 
+      <BulmaField
+        v-if="page.topics.includes('Events')"
+        v-slot="{ idForLabel }"
+        label="Event Date"
+        help="If present, the events landing page will show this date for the event"
+      >
+        <b-datetimepicker
+          :id="idForLabel"
+          v-model="page.eventDate"
+          icon="user-clock"
+          :datetime-formatter="formatDateTime"
+          locale="en-US"
+        />
+      </BulmaField>
+
       <BulmaAutocompleteArray
         v-model="page.series"
         label="Series"
