@@ -14,7 +14,6 @@ import (
 	"github.com/getsentry/sentry-go"
 	sentryhttp "github.com/getsentry/sentry-go/http"
 
-	"github.com/spotlightpa/almanack/internal/mailchimp"
 	"github.com/spotlightpa/almanack/internal/netlifyid"
 	"github.com/spotlightpa/almanack/pkg/almanack"
 	"github.com/spotlightpa/almanack/pkg/common"
@@ -48,8 +47,6 @@ func (app *appEnv) parseArgs(args []string) error {
 		"silent",
 		`don't log debug output`,
 	)
-	mcAPIKey := fl.String("mc-api-key", "", "API `key` for MailChimp")
-	mcListID := fl.String("mc-list-id", "", "List `ID` MailChimp campaign")
 	sentryDSN := fl.String("sentry-dsn", "", "DSN `pseudo-URL` for Sentry")
 	fl.Usage = func() {
 		fmt.Fprintf(fl.Output(), "almanack-api help\n\n")
@@ -67,7 +64,6 @@ func (app *appEnv) parseArgs(args []string) error {
 	if err := app.initSentry(*sentryDSN, app.Logger); err != nil {
 		return err
 	}
-	app.email = mailchimp.NewMailService(*mcAPIKey, *mcListID, app.Logger)
 	app.auth = netlifyid.NewService(app.isLambda, app.Logger)
 	var err error
 	if app.svc, err = getService(app.Logger); err != nil {
@@ -82,9 +78,8 @@ type appEnv struct {
 	isLambda           bool
 	mailchimpSignupURL string
 	*log.Logger
-	auth  common.AuthService
-	email common.EmailService
-	svc   almanack.Service
+	auth common.AuthService
+	svc  almanack.Service
 }
 
 func (app *appEnv) exec() error {

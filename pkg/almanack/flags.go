@@ -27,6 +27,8 @@ func Flags(fl *flag.FlagSet) func(common.Logger) (svc Service, err error) {
 	getIndex := index.FlagVar(fl)
 	getNewsletter := mailchimp.FlagVar(fl)
 	getGoogle := google.FlagVar(fl)
+	mailServiceAPIKey := fl.String("mc-api-key", "", "API `key` for MailChimp v2")
+	mailServiceListID := fl.String("mc-list-id", "", "List `ID` MailChimp v2 campaign")
 
 	return func(l common.Logger) (svc Service, err error) {
 		// Get PostgreSQL URL from Heroku if possible, else get it from flag
@@ -51,6 +53,7 @@ func Flags(fl *flag.FlagSet) func(common.Logger) (svc Service, err error) {
 		}
 
 		is, fs := getS3Store(l)
+		mc := mailchimp.NewMailService(*mailServiceAPIKey, *mailServiceListID, l, &client)
 
 		return Service{
 			Logger:           l,
@@ -63,6 +66,7 @@ func Flags(fl *flag.FlagSet) func(common.Logger) (svc Service, err error) {
 			Indexer:          getIndex(l),
 			NewletterService: getNewsletter(&client),
 			gsvc:             getGoogle(l),
+			EmailService:     mc,
 		}, nil
 	}
 }

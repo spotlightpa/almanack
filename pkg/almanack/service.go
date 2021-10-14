@@ -22,4 +22,5 @@ type Service struct {
 	Indexer     index.Indexer
 	common.NewletterService
 	gsvc *google.Service
+	common.EmailService
 }

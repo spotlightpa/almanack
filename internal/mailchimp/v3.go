@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/carlmjohnson/requests"
+	"github.com/spotlightpa/almanack/internal/stringutils"
 	"github.com/spotlightpa/almanack/pkg/common"
 )
 
@@ -27,10 +28,7 @@ type V3 struct {
 
 func NewV3(apiKey, listID string, c *http.Client) V3 {
 	// API keys end with 123XYZ-us1, where us1 is the datacenter
-	var datacenter string
-	if n := strings.LastIndex(apiKey, "-"); n != -1 {
-		datacenter = apiKey[n+1:]
-	}
+	_, datacenter, _ := stringutils.Cut(apiKey, "-")
 
 	return V3{
 		requests.URL("https://dc.api.mailchimp.com/3.0/campaigns?count=10&offset=0&status=sent&fields=campaigns.archive_url,campaigns.send_time,campaigns.settings.subject_line,campaigns.settings.title,campaigns.settings.preview_text&sort_field=send_time&sort_dir=desc").
