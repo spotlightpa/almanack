@@ -22,7 +22,7 @@ type ContentStore interface {
 }
 
 type EmailService interface {
-	SendEmail(subject, body string) error
+	SendEmail(ctx context.Context, subject, body string) error
 }
 
 type Newsletter struct {

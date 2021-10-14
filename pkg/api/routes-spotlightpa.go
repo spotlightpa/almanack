@@ -118,7 +118,11 @@ func (app *appEnv) postMessage(w http.ResponseWriter, r *http.Request) {
 	if !app.readJSON(w, r, &req) {
 		return
 	}
-	if err := app.email.SendEmail(req.Subject, req.Body); err != nil {
+	if err := app.svc.EmailService.SendEmail(
+		r.Context(),
+		req.Subject,
+		req.Body,
+	); err != nil {
 		app.replyErr(w, r, err)
 		return
 	}
