@@ -20,21 +20,21 @@ class Page {
 
 class EditorsPicksData {
   constructor(siteConfig, pagesByPath) {
-    this._initialData = { siteConfig, pagesByPath };
-    this.reset();
+    this.pagesByPath = pagesByPath;
+    this.reset(siteConfig);
     Vue.observable(this);
   }
 
-  reset() {
-    let { siteConfig, pagesByPath } = this._initialData;
+  reset(siteConfig) {
     for (let prop of [
       "featuredStories",
       "subfeatures",
       "topSlots",
       "sidebarPicks",
+      "topper",
     ]) {
       let a = siteConfig.data?.[prop] ?? [];
-      this[prop] = a.map((s) => pagesByPath.get(s)).filter((a) => !!a);
+      this[prop] = a.map((s) => this.pagesByPath.get(s)).filter((a) => !!a);
     }
     this.scheduleFor = siteConfig.schedule_for;
     let pub = siteConfig.published_at;
@@ -43,7 +43,6 @@ class EditorsPicksData {
   }
 
   clone(scheduleFor) {
-    let { pagesByPath } = this._initialData;
     let { data } = this.toJSON();
     let newPick = new EditorsPicksData(
       {
@@ -51,7 +50,7 @@ class EditorsPicksData {
         data,
         published_at: null,
       },
-      pagesByPath
+      this.pagesByPath
     );
     return newPick;
   }
@@ -65,6 +64,7 @@ class EditorsPicksData {
         subfeatures: this.subfeatures.map(getPath),
         topSlots: this.topSlots.map(getPath),
         sidebarPicks: this.sidebarPicks.map(getPath),
+        topper: this.topper.map(getPath),
       },
     };
   }
