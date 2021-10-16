@@ -112,6 +112,11 @@ export default {
       </p>
 
       <BulmaFieldInput
+        v-model="page.extendedKicker"
+        label="Homepage extended eyebrow (e.g. “Top News” if blank)"
+      />
+
+      <BulmaFieldInput
         v-model="page.kicker"
         label="Eyebrow"
         help="Small text appearing above the page hed"
@@ -234,15 +239,6 @@ export default {
         </b-select>
       </b-field>
 
-      <BulmaField v-slot="{ idForLabel }" label="Language">
-        <div class="select is-fullwidth">
-          <select :id="idForLabel" v-model="page.languageCode" class="select">
-            <option value="">English</option>
-            <option value="es">Spanish</option>
-          </select>
-        </div>
-      </BulmaField>
-
       <BulmaFieldInput
         v-model="page.slug"
         label="URL keywords slug"
@@ -297,10 +293,14 @@ export default {
       <details class="field">
         <summary class="has-text-weight-semibold">Advanced options</summary>
 
-        <BulmaFieldInput
-          v-model="page.extendedKicker"
-          label="Homepage extended kicker (e.g. Top News)"
-        />
+        <BulmaField v-slot="{ idForLabel }" label="Language">
+          <div class="select is-fullwidth">
+            <select :id="idForLabel" v-model="page.languageCode" class="select">
+              <option value="">English</option>
+              <option value="es">Spanish</option>
+            </select>
+          </div>
+        </BulmaField>
 
         <BulmaField label="Hide newsletters pop-up">
           <div>
@@ -329,7 +329,13 @@ export default {
           :options="[]"
         />
 
-        <BulmaFieldInput v-model="page.layout" label="Layout override" />
+        <BulmaField v-slot="{ idForLabel }" label="Layout override">
+          <input v-model="page.layout" class="input" :list="idForLabel" />
+          <datalist :id="idForLabel">
+            <option value="blank" />
+            <option value="featured" />
+          </datalist>
+        </BulmaField>
       </details>
 
       <p class="my-4 has-text-weight-semibold">
