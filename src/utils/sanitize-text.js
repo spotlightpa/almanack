@@ -10,7 +10,8 @@ export default function sanitizeText(text) {
     .replace(/&lt;b&gt;/g, "<strong>")
     .replace(/&lt;\/b&gt;/g, "</strong>")
     .replace(/&lt;i&gt;/g, "<em>")
-    .replace(/&lt;\/i&gt;/g, "</em>");
+    .replace(/&lt;\/i&gt;/g, "</em>")
+    .replace(/<br>/g, "\n");
   el.innerHTML = text;
   return el.innerHTML;
 }
