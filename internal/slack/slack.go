@@ -14,7 +14,7 @@ type Logger interface {
 }
 
 type Client struct {
-	*slackhook.Client
+	c *slackhook.Client
 	l Logger
 }
 
@@ -28,15 +28,15 @@ func New(hookURL string, l Logger) Client {
 	return Client{slackhook.New(hookURL, nil), l}
 }
 
-func (sc Client) PostCtx(ctx context.Context, msg Message) error {
-	if sc.Client == nil {
+func (sc Client) Post(ctx context.Context, msg Message) error {
+	if sc.c == nil {
 		sc.printf("no slack client; skipping posting message")
 		b, _ := json.MarshalIndent(&msg, "", "  ")
 		fmt.Fprintf(os.Stderr, "%s\n", b)
 		return nil
 	}
 	sc.printf("posting Slack message")
-	return sc.Client.PostCtx(ctx, msg)
+	return sc.c.PostCtx(ctx, msg)
 }
 
 func (sc Client) printf(format string, args ...interface{}) {
