@@ -17,10 +17,10 @@ func ImportPage(ctx context.Context, cl *http.Client, page string) (body string,
 	err = requests.
 		URL(page).
 		Client(cl).
-		ToBufioReader(func(r *bufio.Reader) error {
+		Handle(requests.ToBufioReader(func(r *bufio.Reader) error {
 			body, err = PageContent(r)
 			return err
-		}).
+		})).
 		Fetch(ctx)
 	if err != nil {
 		return "", fmt.Errorf("problem importing MailChimp page: %w", err)

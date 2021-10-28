@@ -5,21 +5,21 @@ go 1.17
 require (
 	github.com/BurntSushi/toml v0.4.1
 	github.com/algolia/algoliasearch-client-go/v3 v3.21.0
-	github.com/aws/aws-lambda-go v1.26.0
-	github.com/aws/aws-sdk-go v1.40.40
+	github.com/aws/aws-lambda-go v1.27.0
+	github.com/aws/aws-sdk-go v1.41.12
 	github.com/carlmjohnson/crockford v0.21.3
 	github.com/carlmjohnson/emailx v0.20.2
 	github.com/carlmjohnson/errutil v0.21.5
 	github.com/carlmjohnson/exitcode v0.20.2
 	github.com/carlmjohnson/flagext v0.21.0
 	github.com/carlmjohnson/gateway v1.20.7
-	github.com/carlmjohnson/requests v0.21.9
+	github.com/carlmjohnson/requests v0.21.11
 	github.com/carlmjohnson/resperr v0.20.5
-	github.com/carlmjohnson/slackhook v0.21.1
-	github.com/gabriel-vasile/mimetype v1.3.1
+	github.com/carlmjohnson/slackhook v0.21.2
+	github.com/gabriel-vasile/mimetype v1.4.0
 	github.com/getsentry/sentry-go v0.11.0
 	github.com/go-chi/chi v1.5.4
-	github.com/google/go-github/v39 v39.0.0
+	github.com/google/go-github/v39 v39.2.0
 	github.com/gorilla/feeds v1.1.1
 	github.com/jackc/pgconn v1.10.0
 	github.com/jackc/pgtype v1.8.1
@@ -27,8 +27,8 @@ require (
 	github.com/mattbaird/gochimp v0.0.0-20200820164431-f1082bcdf63f
 	github.com/microcosm-cc/bluemonday v1.0.16
 	gocloud.dev v0.24.0
-	golang.org/x/net v0.0.0-20210908191846-a5e095526f91
-	golang.org/x/oauth2 v0.0.0-20210819190943-2bc19b11175f
+	golang.org/x/net v0.0.0-20211020060615-d418f374d309
+	golang.org/x/oauth2 v0.0.0-20211005180243-6b3c2da341f1
 )
 
 require (

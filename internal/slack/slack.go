@@ -28,11 +28,6 @@ func New(hookURL string, l Logger) Client {
 	return Client{slackhook.New(hookURL, nil), l}
 }
 
-func (sc Client) Post(msg Message) error {
-	ctx := context.Background()
-	return sc.PostCtx(ctx, msg)
-}
-
 func (sc Client) PostCtx(ctx context.Context, msg Message) error {
 	if sc.Client == nil {
 		sc.printf("no slack client; skipping posting message")

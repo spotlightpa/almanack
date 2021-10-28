@@ -24,7 +24,7 @@ import (
 
 func main() {
 	if err := globalEnv.parseEnv(); err != nil {
-		globalEnv.sc.Post(slack.Message{
+		globalEnv.sc.PostCtx(context.Background(), slack.Message{
 			Attachments: []slack.Attachment{
 				{
 					Title: "Could not start identity-signup",
@@ -119,7 +119,7 @@ func whitelistEmails(ctx context.Context, request events.APIGatewayProxyRequest)
 	if len(data.User.AppMetadata.Roles) < 1 {
 		color = colorRed
 	}
-	globalEnv.sc.Post(
+	globalEnv.sc.PostCtx(context.Background(),
 		slack.Message{
 			Attachments: []slack.Attachment{
 				{
