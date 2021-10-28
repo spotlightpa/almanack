@@ -206,7 +206,7 @@ func (svc Service) Notify(ctx context.Context, page *db.Page, publishingNow bool
 	hed, _ := page.Frontmatter["title"].(string)
 	summary := page.Frontmatter["description"].(string)
 	url := page.FullURL()
-	return svc.SlackClient.PostCtx(ctx, slack.Message{
+	return svc.SlackClient.Post(ctx, slack.Message{
 		Text: text,
 		Attachments: []slack.Attachment{
 			{
