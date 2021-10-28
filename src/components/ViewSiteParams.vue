@@ -52,12 +52,50 @@ class SiteParams {
     this.stickyImages = data["sticky-images"] ?? [];
     this.stickyLink = SiteParams.link(data, "sticky-link");
 
+    this.riverDescription = data["river-promo-description"] ?? "";
+    this.riverLink = SiteParams.link(data, "river-promo-link");
+    this.riverDesktopImages = data["river-promo-desktop-images"] ?? [];
+    this.riverDesktopWidth = data["river-promo-desktop-width"] ?? 0;
+    this.riverDesktopHeight = data["river-promo-desktop-height"] ?? 0;
+    this.riverMobileImages = data["river-promo-mobile-images"] ?? [];
+    this.riverMobileWidth = data["river-promo-mobile-width"] ?? 0;
+    this.riverMobileHeight = data["river-promo-mobile-height"] ?? 0;
+
+    this.sidebarTopDescription = data["sidebar-top-description"] ?? "";
+    this.sidebarTopLink = SiteParams.link(data, "sidebar-top-link");
+    this.sidebarTopImages = data["sidebar-top-images"] ?? [];
+    this.sidebarTopWidth = data["sidebar-top-width"] ?? 0;
+    this.sidebarTopHeight = data["sidebar-top-height"] ?? 0;
+
+    this.sidebarStickyDescription = data["sidebar-sticky-description"] ?? "";
+    this.sidebarStickyLink = SiteParams.link(data, "sidebar-sticky-link");
+    this.sidebarStickyImages = data["sidebar-sticky-images"] ?? [];
+    this.sidebarStickyWidth = data["sidebar-sticky-width"] ?? 0;
+    this.sidebarStickyHeight = data["sidebar-sticky-height"] ?? 0;
+
+    this.footerDescription = data["footer-promo-description"] ?? "";
+    this.footerLink = SiteParams.link(data, "footer-promo-link");
+    this.footerDesktopImages = data["footer-promo-desktop-images"] ?? [];
+    this.footerDesktopWidth = data["footer-promo-desktop-width"] ?? 0;
+    this.footerDesktopHeight = data["footer-promo-desktop-height"] ?? 0;
+    this.footerMobileImages = data["footer-promo-mobile-images"] ?? [];
+    this.footerMobileWidth = data["footer-promo-mobile-width"] ?? 0;
+    this.footerMobileHeight = data["footer-promo-mobile-height"] ?? 0;
+
+    this.supportHed = data["support-hed"] ?? "";
+    this.supportText = data["support-text"] ?? "";
+    this.supportCTA = data["support-cta"] ?? "";
+
     this.newsletterActive = data["newsletter-active"] ?? false;
     Vue.observable(this);
   }
 
   get bannerHTML() {
     return sanitizeText(this.bannerText);
+  }
+
+  get supportHTML() {
+    return sanitizeText(this.supportText);
   }
 
   static link(data, key) {
@@ -118,6 +156,35 @@ class SiteParams {
         ["sticky-images"]: this.stickyImages,
         ["sticky-link"]: SiteParams.unlink(this.stickyLink),
         ["newsletter-active"]: this.newsletterActive,
+        ["river-promo-description"]: this.riverDescription,
+        ["river-promo-link"]: SiteParams.unlink(this.riverLink),
+        ["river-promo-desktop-images"]: this.riverDesktopImages,
+        ["river-promo-desktop-width"]: this.riverDesktopWidth,
+        ["river-promo-desktop-height"]: this.riverDesktopHeight,
+        ["river-promo-mobile-images"]: this.riverMobileImages,
+        ["river-promo-mobile-width"]: this.riverMobileWidth,
+        ["river-promo-mobile-height"]: this.riverMobileHeight,
+        ["sidebar-top-description"]: this.sidebarTopDescription,
+        ["sidebar-top-link"]: SiteParams.unlink(this.sidebarTopLink),
+        ["sidebar-top-images"]: this.sidebarTopImages,
+        ["sidebar-top-width"]: this.sidebarTopWidth,
+        ["sidebar-top-height"]: this.sidebarTopHeight,
+        ["sidebar-sticky-description"]: this.sidebarStickyDescription,
+        ["sidebar-sticky-link"]: SiteParams.unlink(this.sidebarStickyLink),
+        ["sidebar-sticky-images"]: this.sidebarStickyImages,
+        ["sidebar-sticky-width"]: this.sidebarStickyWidth,
+        ["sidebar-sticky-height"]: this.sidebarStickyHeight,
+        ["footer-promo-description"]: this.footerDescription,
+        ["footer-promo-link"]: SiteParams.unlink(this.footerLink),
+        ["footer-promo-desktop-images"]: this.footerDesktopImages,
+        ["footer-promo-desktop-width"]: this.footerDesktopWidth,
+        ["footer-promo-desktop-height"]: this.footerDesktopHeight,
+        ["footer-promo-mobile-images"]: this.footerMobileImages,
+        ["footer-promo-mobile-width"]: this.footerMobileWidth,
+        ["footer-promo-mobile-height"]: this.footerMobileHeight,
+        ["support-hed"]: this.supportHed,
+        ["support-text"]: this.supportHTML,
+        ["support-cta"]: this.supportCTA,
       },
     };
   }
