@@ -43,7 +43,7 @@ class EditorsPicksData {
   }
 
   clone(scheduleFor) {
-    let { data } = this.toJSON();
+    let { data } = JSON.parse(JSON.stringify(this));
     let newPick = new EditorsPicksData(
       {
         schedule_for: scheduleFor,
