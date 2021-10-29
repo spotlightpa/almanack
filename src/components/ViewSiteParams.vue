@@ -228,7 +228,7 @@ export default {
         let lastParams = state.configs[state.configs.length - 1];
         state.configs.push(
           new SiteParams({
-            ...lastParams.toJSON(),
+            ...JSON.parse(JSON.stringify(lastParams)),
             schedule_for: state.nextSchedule,
           })
         );
