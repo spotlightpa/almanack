@@ -10,6 +10,7 @@ import (
 	"testing"
 
 	"github.com/spotlightpa/almanack/internal/mailchimp"
+	"golang.org/x/net/html"
 )
 
 func assert(t *testing.T, v bool, format string, args ...interface{}) {
@@ -34,8 +35,16 @@ func assertNotContains(t *testing.T, s, substr string) {
 	assert(t, !strings.Contains(s, substr), "%q present in %q", substr, s)
 }
 
+func readContent(r io.Reader) (string, error) {
+	doc, err := html.Parse(r)
+	if err != nil {
+		return "", err
+	}
+	return mailchimp.PageContent(doc)
+}
+
 func TestSimpleParse(t *testing.T) {
-	doc, err := mailchimp.PageContent(strings.NewReader(`
+	doc, err := readContent(strings.NewReader(`
 <html>
 <script>s1</script>
 <body>
@@ -77,7 +86,7 @@ func parseResponse() (string, error) {
 	if rsp.StatusCode != http.StatusOK {
 		return "", fmt.Errorf("bad status: %s", rsp.Status)
 	}
-	return mailchimp.PageContent(rsp.Body)
+	return readContent(rsp.Body)
 }
 
 func BenchmarkParseBytes(b *testing.B) {
@@ -104,7 +113,7 @@ func parseBytes() (string, error) {
 	if err != nil {
 		return "", err
 	}
-	return mailchimp.PageContent(bytes.NewReader(b))
+	return readContent(bytes.NewReader(b))
 }
 
 func BenchmarkParseBuf(b *testing.B) {
@@ -127,5 +136,5 @@ func parseBuf(u string) (string, error) {
 	if rsp.StatusCode != http.StatusOK {
 		return "", fmt.Errorf("bad status: %s", rsp.Status)
 	}
-	return mailchimp.PageContent(bufio.NewReader(rsp.Body))
+	return readContent(bufio.NewReader(rsp.Body))
 }
