@@ -9,6 +9,7 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/carlmjohnson/requests"
 	"github.com/carlmjohnson/resperr"
 	"github.com/go-chi/chi"
 	"github.com/spotlightpa/almanack/internal/db"
@@ -69,26 +70,11 @@ func (app *appEnv) getProxyImage(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	app.Printf("requested %q", u)
-	inWhitelist := false
-	for _, domain := range []string{
-		".inquirer.com",
-		".arcpublishing.com",
-	} {
-		if strings.HasSuffix(u.Host, domain) {
-			inWhitelist = true
-			break
-		}
-	}
-	if u.Host == "arc-anglerfish-arc2-prod-pmn.s3.amazonaws.com" {
-		inWhitelist = true
-	}
-	if !inWhitelist {
-		app.replyErr(w, r, resperr.New(
-			http.StatusBadRequest, "untrusted image URL: %s", u,
-		))
-		return
-	}
-	body, ctype, err := almanack.FetchImageURL(r.Context(), app.svc.Client, u.String())
+
+	const urlWhitelist = `^https://[^/]*(.inquirer.com|.arcpublishing.com|arc-anglerfish-arc2-prod-pmn.s3.amazonaws.com)/`
+	cl := *app.svc.Client
+	cl.Transport = requests.PermitURLTransport(cl.Transport, urlWhitelist)
+	body, ctype, err := almanack.FetchImageURL(r.Context(), &cl, u.String())
 	if err != nil {
 		app.replyErr(w, r, err)
 		return
