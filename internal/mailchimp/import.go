@@ -1,38 +1,34 @@
 package mailchimp
 
 import (
-	"bufio"
 	"context"
 	"fmt"
-	"io"
 	"net/http"
 	"strings"
 
+	"github.com/carlmjohnson/errutil"
 	"github.com/carlmjohnson/requests"
 	"golang.org/x/net/html"
 	"golang.org/x/net/html/atom"
 )
 
 func ImportPage(ctx context.Context, cl *http.Client, page string) (body string, err error) {
+	defer errutil.Trace(&err)
+
+	var node html.Node
 	err = requests.
 		URL(page).
 		Client(cl).
-		Handle(requests.ToBufioReader(func(r *bufio.Reader) error {
-			body, err = PageContent(r)
-			return err
-		})).
+		Handle(requests.ToHTML(&node)).
 		Fetch(ctx)
 	if err != nil {
-		return "", fmt.Errorf("problem importing MailChimp page: %w", err)
+		return "", err
 	}
-	return
+
+	return PageContent(&node)
 }
 
-func PageContent(r io.Reader) (body string, err error) {
-	doc, err := html.Parse(r)
-	if err != nil {
-		return
-	}
+func PageContent(doc *html.Node) (body string, err error) {
 	var bNode *html.Node
 	if !findNode(doc, func(n *html.Node) bool {
 		if n.DataAtom != atom.Body {
