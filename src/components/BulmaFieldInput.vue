@@ -103,6 +103,7 @@ export default {
       @blur="updateValidationMessage"
       @invalid="updateValidationMessage"
       @input="updateValue"
+      @focusout="$emit('focusout', $event)"
     />
   </BulmaField>
 </template>

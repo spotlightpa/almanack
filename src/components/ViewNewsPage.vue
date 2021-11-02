@@ -111,8 +111,38 @@ export default {
         Article publication date is in the future.
       </p>
 
+      <BulmaAutocompleteArray
+        v-model="page.topics"
+        label="Topics"
+        :options="topics"
+        help="Topics are open-ended collections, e.g. “Events”, “Coronavirus”"
+      />
+
+      <BulmaField
+        v-if="page.topics.includes('Events')"
+        v-slot="{ idForLabel }"
+        label="Event Date"
+        help="If present, the events landing page will show this date for the event"
+      >
+        <b-datetimepicker
+          :id="idForLabel"
+          v-model="page.eventDate"
+          icon="user-clock"
+          :datetime-formatter="formatDateTime"
+          locale="en-US"
+        />
+      </BulmaField>
+
+      <BulmaAutocompleteArray
+        v-model="page.series"
+        label="Series"
+        :options="series"
+        help="Series are limited-time collections, e.g. “Legislative privilege 2020”"
+      />
+
       <BulmaFieldInput
         v-model="page.extendedKicker"
+        placeholder="Top News"
         label="Homepage extended eyebrow (e.g. “Top News” if blank)"
       />
 
@@ -120,7 +150,13 @@ export default {
         v-model="page.kicker"
         label="Eyebrow"
         help="Small text appearing above the page hed"
-        :required="true"
+        :placeholder="page.mainTopic"
+        autocomplete="off"
+        @focusout="
+          if (!page.kicker) {
+            page.kicker = page.mainTopic;
+          }
+        "
       />
 
       <BulmaFieldInput
@@ -180,35 +216,6 @@ export default {
           rows="2"
         ></textarea>
       </BulmaField>
-
-      <BulmaAutocompleteArray
-        v-model="page.topics"
-        label="Topics"
-        :options="topics"
-        help="Topics are open-ended collections, e.g. “Events”, “Coronavirus”"
-      />
-
-      <BulmaField
-        v-if="page.topics.includes('Events')"
-        v-slot="{ idForLabel }"
-        label="Event Date"
-        help="If present, the events landing page will show this date for the event"
-      >
-        <b-datetimepicker
-          :id="idForLabel"
-          v-model="page.eventDate"
-          icon="user-clock"
-          :datetime-formatter="formatDateTime"
-          locale="en-US"
-        />
-      </BulmaField>
-
-      <BulmaAutocompleteArray
-        v-model="page.series"
-        label="Series"
-        :options="series"
-        help="Series are limited-time collections, e.g. “Legislative privilege 2020”"
-      />
 
       <BulmaFieldInput
         v-model="page.image"
