@@ -112,6 +112,10 @@ class Page {
     return { name: "article", params: { id: this.arcID } };
   }
 
+  get mainTopic() {
+    return this.topics[0] || "";
+  }
+
   toJSON() {
     return {
       file_path: this.filePath,
@@ -122,7 +126,7 @@ class Page {
         // copy others
         published: this.publishedAt,
         "event-date": this.eventDate,
-        kicker: this.kicker,
+        kicker: this.kicker || this.mainTopic,
         title: this.title,
         "internal-id": this.internalID,
         linktitle: this.linkTitle,
