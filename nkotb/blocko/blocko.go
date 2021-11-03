@@ -72,31 +72,19 @@ type appEnv struct {
 func (app *appEnv) Exec() (err error) {
 	defer app.src.Close()
 	buf := bufio.NewReader(app.src)
-	doc, err := html.Parse(buf)
+	return Blockerize(os.Stdout, buf)
+}
+
+func Blockerize(w io.Writer, r io.Reader) error {
+	bNode, err := prep(r)
 	if err != nil {
 		return err
 	}
-	bNode := findNode(doc, func(n *html.Node) *html.Node {
-		if n.DataAtom == atom.Body {
-			return n
-		}
-		return nil
-	})
-	if bNode == nil {
-		return fmt.Errorf("could not find body")
-	}
-	visitAll(bNode, func(n *html.Node) {
-		if n.Type != html.TextNode {
-			return
-		}
-		n.Data = strings.ReplaceAll(n.Data, "\n", " ")
-		n.Data = strings.ReplaceAll(n.Data, "\r", " ")
-	})
 
-	return outputBlocks(bNode, 0)
+	return outputBlocks(w, bNode, 0)
 }
 
-func outputBlocks(bNode *html.Node, depth int) (err error) {
+func outputBlocks(w io.Writer, bNode *html.Node, depth int) (err error) {
 	var (
 		wbuf    strings.Builder
 		needsNL = false
@@ -104,24 +92,24 @@ func outputBlocks(bNode *html.Node, depth int) (err error) {
 loop:
 	for p := bNode.FirstChild; p != nil; p = p.NextSibling {
 		if needsNL {
-			fmt.Print("\n\n")
+			fmt.Fprint(w, "\n\n")
 		}
 		if depth > 0 {
 			if p == bNode.FirstChild {
-				fmt.Print("- ")
+				fmt.Fprint(w, "- ")
 			} else {
-				fmt.Print(strings.Repeat("    ", depth))
+				fmt.Fprint(w, strings.Repeat("    ", depth))
 			}
 		}
 		if !blockElements[p.DataAtom] {
 			if err = html.Render(&wbuf, p); err != nil {
 				return err
 			}
-			needsNL = output(&wbuf)
+			needsNL = output(w, &wbuf)
 			continue
 		}
 		if isEmpty(p) {
-			fmt.Print("")
+			fmt.Fprint(w, "")
 			needsNL = false
 			continue
 		}
@@ -140,10 +128,10 @@ loop:
 			wbuf.WriteString("###### ")
 		case atom.Ul, atom.Ol:
 			for c := p.FirstChild; c != nil; c = c.NextSibling {
-				if err = outputBlocks(c, depth+1); err != nil {
+				if err = outputBlocks(w, c, depth+1); err != nil {
 					return err
 				}
-				fmt.Print("\n")
+				fmt.Fprint(w, "\n")
 			}
 			continue loop
 		}
@@ -152,16 +140,16 @@ loop:
 				return err
 			}
 		}
-		needsNL = output(&wbuf)
+		needsNL = output(w, &wbuf)
 	}
 	return nil
 }
 
-func output(wbuf *strings.Builder) bool {
+func output(w io.Writer, wbuf *strings.Builder) bool {
 	s := wbuf.String()
 	s = strings.TrimSpace(s)
 	wbuf.Reset()
-	fmt.Print(s)
+	fmt.Fprint(w, s)
 	return s != ""
 }
 

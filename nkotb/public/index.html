@@ -1,0 +1,30 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Google Docs to Markdown</title>
+    <link href="https://unpkg.com/tailwindcss@^2/dist/tailwind.min.css" rel="stylesheet">
+  </head>
+  <body class="p-2 min-h-screen flex justify-center font-mono">
+    <form class="my-auto flex-grow" action="/api/auth-doc" method="post" target="_blank">
+      <div class="mx-auto px-4 py-4 max-w-screen-sm rounded shadow bg-pink-200 space-y-4">
+        <h1 class="font-semibold">Google Docs Converter</h1>
+        <div class="flex space-x-1">
+          <input 
+            class="pl-4 py-2 w-full rounded border-2 border-purple-500 text-gray-800 placeholder-gray-500 placeholder-opacity-100 tracking-wider appearance-none block bg-white focus:outline-none focus:ring-2 focus:ring-purple-600 focus:ring-opacity-50"
+            type="url" 
+            name="docID" 
+            placeholder="Google Docs URL"
+          />
+          <button 
+            class="px-4 py-2 appearance-none shadow hover:shadow-lg rounded bg-purple-600 hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-600 focus:ring-opacity-50 text-white uppercase tracking-wider"
+            type="submit"
+          >
+            Convert
+          </button>
+        </div>
+      </div>
+    </form>
+  </body>
+</html>
