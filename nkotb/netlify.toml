@@ -1,0 +1,9 @@
+[build]
+  command = "./build.sh"
+  functions = "functions"
+  publish = "public"
+
+[[redirects]]
+  from = "/api/*"
+  to = "/.netlify/functions/nkotbweb/:splat"
+  status = 200
