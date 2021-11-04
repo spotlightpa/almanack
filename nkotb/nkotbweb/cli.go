@@ -40,6 +40,7 @@ func (app *appEnv) ParseArgs(args []string) error {
 	sentryDSN := fl.String("sentry-dsn", "", "DSN `pseudo-URL` for Sentry")
 	fl.StringVar(&app.oauthClientID, "client-id", "", "Google `Oauth client ID`")
 	fl.StringVar(&app.oauthClientSecret, "client-secret", "", "Google `Oauth client secret`")
+	secret := fl.String("signing-secret", "", "`secret` for HMAC cookie signing")
 	if err := fl.Parse(args); err != nil {
 		return err
 	}
@@ -49,6 +50,7 @@ func (app *appEnv) ParseArgs(args []string) error {
 	if err := app.initSentry(*sentryDSN); err != nil {
 		return err
 	}
+	app.signingSecret = []byte(*secret)
 	return nil
 }
 
@@ -64,6 +66,7 @@ type appEnv struct {
 	port              int
 	oauthClientID     string
 	oauthClientSecret string
+	signingSecret     []byte
 }
 
 func (app *appEnv) Exec() (err error) {
