@@ -164,6 +164,9 @@ func (app *appEnv) googleClient(r *http.Request) *http.Client {
 	if !app.getCookie(r, tokenCookie, &tok) {
 		return nil
 	}
+	if !tok.Valid() && tok.RefreshToken == "" {
+		return nil
+	}
 	conf := app.googleConfig()
 	return conf.Client(r.Context(), &tok)
 }
@@ -177,6 +180,7 @@ func (app *appEnv) convert(w http.ResponseWriter, r *http.Request) {
 	}
 	n, err := getDoc(r.Context(), cl, docID)
 	if err != nil {
+		app.deleteCookie(w, tokenCookie)
 		app.replyErr(w, r, err)
 		return
 	}
@@ -202,10 +206,6 @@ func (app *appEnv) authRedirect(w http.ResponseWriter, r *http.Request) {
 	url := conf.AuthCodeURL(stateToken)
 	w.Header().Set("Cache-Control", "no-cache")
 	http.Redirect(w, r, url, http.StatusSeeOther)
-}
-
-type callbackValues struct {
-	State, Code string
 }
 
 func (app *appEnv) authCallback(w http.ResponseWriter, r *http.Request) {
