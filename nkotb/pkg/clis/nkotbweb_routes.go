@@ -7,9 +7,11 @@ import (
 	"crypto/sha256"
 	"encoding/base64"
 	"encoding/gob"
+	"fmt"
 	"net/http"
 	"net/url"
 
+	"github.com/carlmjohnson/requests"
 	"github.com/carlmjohnson/resperr"
 	"github.com/carlmjohnson/rootdown"
 	"github.com/getsentry/sentry-go"
@@ -180,6 +182,11 @@ func (app *nkotbWebAppEnv) convert(w http.ResponseWriter, r *http.Request) {
 	}
 	doc, err := gdocs.Request(r.Context(), cl, docID)
 	if err != nil {
+		if requests.HasStatusErr(err, http.StatusForbidden) {
+			msg := fmt.Sprintf("You are not authorized to view %s", docID)
+			http.Error(w, msg, http.StatusForbidden)
+			return
+		}
 		app.deleteCookie(w, tokenCookie)
 		app.replyErr(w, r, err)
 		return
