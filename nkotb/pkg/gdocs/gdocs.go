@@ -1,9 +1,8 @@
-package nkotbweb
+// Package gdocs converts Google Documents to HTML.
+package gdocs
 
 import (
 	"context"
-	"crypto/rand"
-	"encoding/base64"
 	"net/http"
 	"strings"
 
@@ -12,8 +11,8 @@ import (
 	"google.golang.org/api/docs/v1"
 )
 
-func getDoc(ctx context.Context, cl *http.Client, docID string) (n *html.Node, err error) {
-	docID = normalizeID(docID)
+func Request(ctx context.Context, cl *http.Client, docID string) (d *docs.Document, err error) {
+	docID = NormalizeID(docID)
 	var doc docs.Document
 	if err = requests.
 		URL("https://docs.googleapis.com").
@@ -23,18 +22,16 @@ func getDoc(ctx context.Context, cl *http.Client, docID string) (n *html.Node, e
 		Fetch(ctx); err != nil {
 		return nil, err
 	}
-
-	n = convert(&doc)
-	return n, nil
+	return &doc, nil
 }
 
-func normalizeID(id string) string {
+func NormalizeID(id string) string {
 	id = strings.TrimPrefix(id, "https://docs.google.com/document/d/")
 	id, _, _ = cut(id, "/")
 	return id
 }
 
-func convert(doc *docs.Document) (n *html.Node) {
+func Convert(doc *docs.Document) (n *html.Node) {
 	n = &html.Node{
 		Type: html.DocumentNode,
 	}
@@ -219,22 +216,6 @@ func appendText(n *html.Node, text string) {
 		Type: html.TextNode,
 		Data: text,
 	})
-}
-
-var scopes = []string{
-	"https://www.googleapis.com/auth/documents",
-	"https://www.googleapis.com/auth/documents.readonly",
-	"https://www.googleapis.com/auth/drive",
-	"https://www.googleapis.com/auth/drive.file",
-	"https://www.googleapis.com/auth/drive.readonly",
-}
-
-func makeStateToken() (string, error) {
-	var b [15]byte
-	if _, err := rand.Read(b[:]); err != nil {
-		return "", err
-	}
-	return base64.StdEncoding.EncodeToString(b[:]), nil
 }
 
 // See https://github.com/golang/go/issues/46336

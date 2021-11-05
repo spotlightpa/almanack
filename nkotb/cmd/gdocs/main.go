@@ -4,9 +4,9 @@ import (
 	"os"
 
 	"github.com/carlmjohnson/exitcode"
-	"github.com/spotlightpa/nkotb/blocko"
+	"github.com/spotlightpa/nkotb/pkg/clis"
 )
 
 func main() {
-	exitcode.Exit(blocko.CLI(os.Args[1:]))
+	exitcode.Exit(clis.GDocs(os.Args[1:]))
 }

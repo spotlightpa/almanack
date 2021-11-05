@@ -1,11 +1,11 @@
-package nkotbweb
+package clis
 
 import (
 	"flag"
 	"fmt"
+	"log"
 	"net/http"
 	"os"
-	"runtime/debug"
 	"time"
 
 	"github.com/carlmjohnson/flagext"
@@ -15,10 +15,10 @@ import (
 	"github.com/spotlightpa/nkotb/build"
 )
 
-const AppName = "nkotbweb"
+const NKOTBWebApp = "nkotbweb"
 
-func CLI(args []string) error {
-	var app appEnv
+func NKOTBWeb(args []string) error {
+	var app nkotbWebAppEnv
 	err := app.ParseArgs(args)
 	if err != nil {
 		return err
@@ -30,10 +30,10 @@ func CLI(args []string) error {
 	return err
 }
 
-func (app *appEnv) ParseArgs(args []string) error {
-	fl := flag.NewFlagSet(AppName, flag.ContinueOnError)
+func (app *nkotbWebAppEnv) ParseArgs(args []string) error {
+	fl := flag.NewFlagSet(NKOTBWebApp, flag.ContinueOnError)
 	fl.Usage = func() {
-		fmt.Fprintf(fl.Output(), `%s - %s`, AppName, getVersion())
+		fmt.Fprintf(fl.Output(), "%s - %s\n\n", NKOTBWebApp, getVersion())
 		fl.PrintDefaults()
 	}
 	fl.IntVar(&app.port, "port", -1, "specify a port to use http rather than AWS Lambda")
@@ -44,32 +44,26 @@ func (app *appEnv) ParseArgs(args []string) error {
 	if err := fl.Parse(args); err != nil {
 		return err
 	}
-	if err := flagext.ParseEnv(fl, AppName); err != nil {
+	if err := flagext.ParseEnv(fl, NKOTBWebApp); err != nil {
 		return err
 	}
 	if err := app.initSentry(*sentryDSN); err != nil {
 		return err
 	}
 	app.signingSecret = []byte(*secret)
+	logger.SetPrefix(NKOTBWebApp + " ")
+	logger.SetFlags(log.LstdFlags | log.Lshortfile)
 	return nil
 }
 
-func getVersion() string {
-	if i, ok := debug.ReadBuildInfo(); ok {
-		return i.Main.Version
-	}
-
-	return "(unknown)"
-}
-
-type appEnv struct {
+type nkotbWebAppEnv struct {
 	port              int
 	oauthClientID     string
 	oauthClientSecret string
 	signingSecret     []byte
 }
 
-func (app *appEnv) Exec() (err error) {
+func (app *nkotbWebAppEnv) Exec() (err error) {
 	listener := gateway.ListenAndServe
 	var portStr string
 	if app.isLambda() {
@@ -91,7 +85,7 @@ func (app *appEnv) Exec() (err error) {
 	return listener(portStr, routes)
 }
 
-func (app *appEnv) initSentry(dsn string) error {
+func (app *nkotbWebAppEnv) initSentry(dsn string) error {
 	var transport sentry.Transport
 	if app.isLambda() {
 		logger.Printf("setting sentry sync with timeout")
@@ -108,6 +102,6 @@ func (app *appEnv) initSentry(dsn string) error {
 	})
 }
 
-func (app *appEnv) isLambda() bool {
+func (app *nkotbWebAppEnv) isLambda() bool {
 	return app.port == -1
 }

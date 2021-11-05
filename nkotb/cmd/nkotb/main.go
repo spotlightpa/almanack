@@ -8,5 +8,5 @@ import (
 )
 
 func main() {
-	exitcode.Exit(clis.NKOTBWeb(os.Args[1:]))
+	exitcode.Exit(clis.NKOTB(os.Args[1:]))
 }

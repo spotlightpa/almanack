@@ -1,81 +1,16 @@
+// Package blocko converts HTML to Markdownish text.
 package blocko
 
 import (
-	"bufio"
-	"flag"
 	"fmt"
 	"io"
-	"os"
-	"runtime/debug"
 	"strings"
 
-	"github.com/carlmjohnson/flagext"
 	"golang.org/x/net/html"
 	"golang.org/x/net/html/atom"
 )
 
-const AppName = "NKOTB"
-
-func CLI(args []string) error {
-	var app appEnv
-	err := app.ParseArgs(args)
-	if err != nil {
-		return err
-	}
-	if err = app.Exec(); err != nil {
-		fmt.Fprintf(os.Stderr, "Error: %v\n", err)
-	}
-	return err
-}
-
-func (app *appEnv) ParseArgs(args []string) error {
-	fl := flag.NewFlagSet(AppName, flag.ContinueOnError)
-	fl.Usage = func() {
-		version := "(unknown)"
-		if i, ok := debug.ReadBuildInfo(); ok {
-			version = i.Main.Version
-		}
-
-		fmt.Fprintf(fl.Output(), `NKOTB %s - extract blocks of Markdownish content from HTML
-		
-Usage:
-
-	nkotb [options] <src>
-
-If not set, src is stdin.
-
-Options:
-`, version)
-		fl.PrintDefaults()
-		fmt.Fprintln(fl.Output())
-	}
-	src := flagext.FileOrURL(flagext.StdIO, nil)
-	app.src = src
-	if err := fl.Parse(args); err != nil {
-		return err
-	}
-	if err := flagext.ParseEnv(fl, AppName); err != nil {
-		return err
-	}
-	if fl.NArg() > 0 {
-		if err := src.Set(fl.Arg(0)); err != nil {
-			return err
-		}
-	}
-	return nil
-}
-
-type appEnv struct {
-	src io.ReadCloser
-}
-
-func (app *appEnv) Exec() (err error) {
-	defer app.src.Close()
-	buf := bufio.NewReader(app.src)
-	return Blockerize(os.Stdout, buf)
-}
-
-func Blockerize(w io.Writer, r io.Reader) error {
+func HTMLToMarkdown(w io.Writer, r io.Reader) error {
 	bNode, err := prep(r)
 	if err != nil {
 		return err

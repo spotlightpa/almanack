@@ -1,4 +1,4 @@
-package nkotbweb
+package clis
 
 import (
 	"bytes"
@@ -13,14 +13,15 @@ import (
 	"github.com/carlmjohnson/resperr"
 	"github.com/carlmjohnson/rootdown"
 	"github.com/getsentry/sentry-go"
-	"github.com/spotlightpa/nkotb/blocko"
 	"github.com/spotlightpa/nkotb/build"
+	"github.com/spotlightpa/nkotb/pkg/blocko"
+	"github.com/spotlightpa/nkotb/pkg/gdocs"
 	"golang.org/x/net/html"
 	"golang.org/x/oauth2"
 	"golang.org/x/oauth2/google"
 )
 
-func (app *appEnv) routes() http.Handler {
+func (app *nkotbWebAppEnv) routes() http.Handler {
 	var rr rootdown.Router
 	rr.Get("/api/convert", app.convert, rootdown.RedirectFromSlash)
 	rr.Get("/api/auth-callback", app.authCallback, rootdown.RedirectFromSlash)
@@ -30,21 +31,21 @@ func (app *appEnv) routes() http.Handler {
 	return app.logRoute(&rr)
 }
 
-func (app *appEnv) logRoute(h http.Handler) http.Handler {
+func (app *nkotbWebAppEnv) logRoute(h http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		logger.Printf("[%s] %q - %s", r.Method, r.URL.Path, r.RemoteAddr)
 		h.ServeHTTP(w, r)
 	})
 }
 
-func (app *appEnv) replyErr(w http.ResponseWriter, r *http.Request, err error) {
+func (app *nkotbWebAppEnv) replyErr(w http.ResponseWriter, r *http.Request, err error) {
 	app.logErr(r.Context(), err)
 	code := resperr.StatusCode(err)
 	msg := resperr.UserMessage(err)
 	http.Error(w, msg, code)
 }
 
-func (app *appEnv) logErr(ctx context.Context, err error) {
+func (app *nkotbWebAppEnv) logErr(ctx context.Context, err error) {
 	if hub := sentry.GetHubFromContext(ctx); hub != nil {
 		hub.CaptureException(err)
 	} else {
@@ -57,11 +58,10 @@ func (app *appEnv) logErr(ctx context.Context, err error) {
 const (
 	tokenCookie       = "google-token"
 	stateCookie       = "google-state"
-	callbackCookie    = "google-callback"
 	redirectURLCookie = "google-redirect-url"
 )
 
-func (app *appEnv) setCookie(w http.ResponseWriter, name string, v interface{}) {
+func (app *nkotbWebAppEnv) setCookie(w http.ResponseWriter, name string, v interface{}) {
 	const oneMonth = 60 * 60 * 24 * 31
 	var buf bytes.Buffer
 	enc := gob.NewEncoder(&buf)
@@ -95,7 +95,7 @@ func (app *appEnv) setCookie(w http.ResponseWriter, name string, v interface{}) 
 
 }
 
-func (app *appEnv) deleteCookie(w http.ResponseWriter, name string) {
+func (app *nkotbWebAppEnv) deleteCookie(w http.ResponseWriter, name string) {
 	http.SetCookie(w, &http.Cookie{
 		Name:     name,
 		Value:    "",
@@ -116,7 +116,7 @@ func (app *appEnv) deleteCookie(w http.ResponseWriter, name string) {
 	})
 }
 
-func (app *appEnv) getCookie(r *http.Request, name string, v interface{}) bool {
+func (app *nkotbWebAppEnv) getCookie(r *http.Request, name string, v interface{}) bool {
 	c, err := r.Cookie(name)
 	if err != nil {
 		return false
@@ -147,7 +147,7 @@ func (app *appEnv) getCookie(r *http.Request, name string, v interface{}) bool {
 	return err == nil
 }
 
-func (app *appEnv) googleConfig() *oauth2.Config {
+func (app *nkotbWebAppEnv) googleConfig() *oauth2.Config {
 	u := build.URL
 	u.Path = "/api/auth-callback"
 	return &oauth2.Config{
@@ -159,7 +159,7 @@ func (app *appEnv) googleConfig() *oauth2.Config {
 	}
 }
 
-func (app *appEnv) googleClient(r *http.Request) *http.Client {
+func (app *nkotbWebAppEnv) googleClient(r *http.Request) *http.Client {
 	var tok oauth2.Token
 	if !app.getCookie(r, tokenCookie, &tok) {
 		return nil
@@ -171,27 +171,28 @@ func (app *appEnv) googleClient(r *http.Request) *http.Client {
 	return conf.Client(r.Context(), &tok)
 }
 
-func (app *appEnv) convert(w http.ResponseWriter, r *http.Request) {
+func (app *nkotbWebAppEnv) convert(w http.ResponseWriter, r *http.Request) {
 	docID := r.FormValue("docID")
 	cl := app.googleClient(r)
 	if cl == nil {
 		app.authRedirect(w, r)
 		return
 	}
-	n, err := getDoc(r.Context(), cl, docID)
+	doc, err := gdocs.Request(r.Context(), cl, docID)
 	if err != nil {
 		app.deleteCookie(w, tokenCookie)
 		app.replyErr(w, r, err)
 		return
 	}
+	n := gdocs.Convert(doc)
 	var buf bytes.Buffer
 	html.Render(&buf, n)
 	w.Header().Set("Cache-Control", "no-cache")
 	w.Header().Set("Content-Type", "text/plain; charset=UTF-8")
-	blocko.Blockerize(w, &buf)
+	blocko.HTMLToMarkdown(w, &buf)
 }
 
-func (app *appEnv) authRedirect(w http.ResponseWriter, r *http.Request) {
+func (app *nkotbWebAppEnv) authRedirect(w http.ResponseWriter, r *http.Request) {
 	app.setCookie(w, redirectURLCookie, r.URL)
 
 	stateToken, err := makeStateToken()
@@ -208,7 +209,7 @@ func (app *appEnv) authRedirect(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, url, http.StatusSeeOther)
 }
 
-func (app *appEnv) authCallback(w http.ResponseWriter, r *http.Request) {
+func (app *nkotbWebAppEnv) authCallback(w http.ResponseWriter, r *http.Request) {
 	var state string
 	if !app.getCookie(r, stateCookie, &state) {
 		app.replyErr(w, r, resperr.New(http.StatusUnauthorized, "no saved state"))
