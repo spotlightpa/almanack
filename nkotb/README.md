@@ -1,5 +1,7 @@
 # NKOTB [![GoDoc](https://godoc.org/github.com/spotlightpa/nkotb?status.svg)](https://godoc.org/github.com/spotlightpa/nkotb) [![Go Report Card](https://goreportcard.com/badge/github.com/spotlightpa/nkotb)](https://goreportcard.com/report/github.com/spotlightpa/nkotb)
 
+![NKOTB Logo](https://user-images.githubusercontent.com/222245/140567261-8d163d22-ca22-47e5-84aa-d9cca427da5e.jpeg)
+
 Turn Google Docs into (new kids on the) blocks of (marky) Markdownish content.
 
 Project consists of three executables: `gdocs`, `nkotb`, and `nkotbweb`.
