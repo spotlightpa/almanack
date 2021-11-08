@@ -133,14 +133,6 @@ func (app *gdocsAppEnv) Exec() (err error) {
 	return html.Render(os.Stdout, n)
 }
 
-var scopes = []string{
-	"https://www.googleapis.com/auth/documents",
-	"https://www.googleapis.com/auth/documents.readonly",
-	"https://www.googleapis.com/auth/drive",
-	"https://www.googleapis.com/auth/drive.file",
-	"https://www.googleapis.com/auth/drive.readonly",
-}
-
 func (app *gdocsAppEnv) defaultCredentials(ctx context.Context) (*http.Client, error) {
 	app.Printf("using default credentials")
 	return google.DefaultClient(ctx, scopes...)

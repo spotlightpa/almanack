@@ -12,3 +12,7 @@ func makeStateToken() (string, error) {
 	}
 	return base64.StdEncoding.EncodeToString(b[:]), nil
 }
+
+var scopes = []string{
+	"https://www.googleapis.com/auth/documents.readonly",
+}
