@@ -12,6 +12,7 @@ import (
 	"os/exec"
 
 	"github.com/carlmjohnson/flagext"
+	"github.com/carlmjohnson/versioninfo"
 	"github.com/spotlightpa/nkotb/pkg/gdocs"
 	"golang.org/x/net/html"
 	"golang.org/x/oauth2"
@@ -62,7 +63,7 @@ https://developers.google.com/accounts/docs/application-default-credentials
 https://developers.google.com/identity/protocols/oauth2
 
 Options:
-`, getVersion())
+`, versioninfo.Version)
 		fl.PrintDefaults()
 		fmt.Fprintln(fl.Output(), "")
 	}

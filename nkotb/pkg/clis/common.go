@@ -3,7 +3,6 @@ package clis
 import (
 	"crypto/rand"
 	"encoding/base64"
-	"runtime/debug"
 )
 
 func makeStateToken() (string, error) {
@@ -12,12 +11,4 @@ func makeStateToken() (string, error) {
 		return "", err
 	}
 	return base64.StdEncoding.EncodeToString(b[:]), nil
-}
-
-func getVersion() string {
-	if i, ok := debug.ReadBuildInfo(); ok {
-		return i.Main.Version
-	}
-
-	return "(unknown)"
 }
