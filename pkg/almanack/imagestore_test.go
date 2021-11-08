@@ -1,7 +1,6 @@
 package almanack
 
 import (
-	"os"
 	"strings"
 	"testing"
 )
@@ -31,17 +30,12 @@ func TestMakeImageName(t *testing.T) {
 				t.Errorf("makeImageName(%q) == %q", tc.ct, got)
 			}
 		})
-		if os.Getenv("ALMANACK_BENCH_IMAGE_NAMES") == "" {
-			continue
-		}
 		var s string
-		r := testing.Benchmark(func(b *testing.B) {
-			for i := 0; i < b.N; i++ {
-				s = makeImageName(tc.ct)
-			}
+		allocs := testing.AllocsPerRun(10, func() {
+			s = makeImageName(tc.ct)
 		})
-		if r.AllocsPerOp() > 3 {
-			t.Errorf("benchmark regression %q: %v", s, r.MemString())
+		if allocs > 3 {
+			t.Errorf("benchmark regression %q: %v", s, allocs)
 		}
 	}
 }
