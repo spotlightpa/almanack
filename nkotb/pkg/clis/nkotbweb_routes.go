@@ -182,6 +182,11 @@ func (app *nkotbWebAppEnv) convert(w http.ResponseWriter, r *http.Request) {
 	}
 	doc, err := gdocs.Request(r.Context(), cl, docID)
 	if err != nil {
+		if requests.HasStatusErr(err, http.StatusNotFound) {
+			msg := fmt.Sprintf("Document not found: %s", docID)
+			http.Error(w, msg, http.StatusNotFound)
+			return
+		}
 		if requests.HasStatusErr(err, http.StatusForbidden) {
 			msg := fmt.Sprintf("You are not authorized to view %s", docID)
 			http.Error(w, msg, http.StatusForbidden)
