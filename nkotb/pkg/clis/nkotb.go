@@ -6,9 +6,9 @@ import (
 	"fmt"
 	"io"
 	"os"
-	"runtime/debug"
 
 	"github.com/carlmjohnson/flagext"
+	"github.com/carlmjohnson/versioninfo"
 	"github.com/spotlightpa/nkotb/pkg/blocko"
 )
 
@@ -29,13 +29,8 @@ func NKOTB(args []string) error {
 func (app *nkotbAppEnv) ParseArgs(args []string) error {
 	fl := flag.NewFlagSet(NKOTBApp, flag.ContinueOnError)
 	fl.Usage = func() {
-		version := "(unknown)"
-		if i, ok := debug.ReadBuildInfo(); ok {
-			version = i.Main.Version
-		}
-
 		fmt.Fprintf(fl.Output(), `NKOTB %s - extract blocks of Markdownish content from HTML
-		
+
 Usage:
 
 	nkotb [options] <src>
@@ -43,7 +38,7 @@ Usage:
 If not set, src is stdin.
 
 Options:
-`, version)
+`, versioninfo.Version)
 		fl.PrintDefaults()
 		fmt.Fprintln(fl.Output())
 	}

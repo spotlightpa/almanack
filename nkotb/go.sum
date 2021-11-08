@@ -71,6 +71,8 @@ github.com/carlmjohnson/resperr v0.20.5 h1:LBw+jsFSiGsb+kdJBmRtS9ky5CZmiLqWgj3Qt
 github.com/carlmjohnson/resperr v0.20.5/go.mod h1:UD4WLdpQTfUt4pl0wZsKF/7MuZIoi78qWloEDXV5Rw0=
 github.com/carlmjohnson/rootdown v0.0.0-20211012133543-3544ecc243ee h1:hM5CZl3Sn4mZG+PIQeYLeeFRT+QNUJqTGJdoAJsQAMM=
 github.com/carlmjohnson/rootdown v0.0.0-20211012133543-3544ecc243ee/go.mod h1:xMZvbIXPxImsJPzXVZaOH96HnrbhKP+iUQ0nNc58yRM=
+github.com/carlmjohnson/versioninfo v0.21.0 h1:KgfrgIqQQO1kft6Lj9bmlwPcQGFGvXXB8TCNwe4mjIc=
+github.com/carlmjohnson/versioninfo v0.21.0/go.mod h1:QT9mph3wcVfISUKd0i9sZfVrPviHuSF+cUtLjm2WSf8=
 github.com/census-instrumentation/opencensus-proto v0.2.1/go.mod h1:f6KPmirojxKA12rnyqOA5BBL4O983OfeGPqjHWSTneU=
 github.com/cespare/xxhash v1.1.0/go.mod h1:XrSqR1VqqWfGrhpAt58auRo0WTKS1nRRg3ghfAqPWnc=
 github.com/cheekybits/is v0.0.0-20150225183255-68e9c0620927/go.mod h1:h/aW8ynjgkuj+NQRlZcDbAbM1ORAbXjXX77sX7T289U=

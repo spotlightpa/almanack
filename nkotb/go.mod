@@ -9,6 +9,7 @@ require (
 	github.com/carlmjohnson/requests v0.21.11
 	github.com/carlmjohnson/resperr v0.20.5
 	github.com/carlmjohnson/rootdown v0.0.0-20211012133543-3544ecc243ee
+	github.com/carlmjohnson/versioninfo v0.21.0
 	github.com/getsentry/sentry-go v0.11.0
 	github.com/tdewolff/minify/v2 v2.9.22
 	golang.org/x/net v0.0.0-20211104170005-ce137452f963

@@ -10,6 +10,7 @@ import (
 
 	"github.com/carlmjohnson/flagext"
 	"github.com/carlmjohnson/gateway"
+	"github.com/carlmjohnson/versioninfo"
 	"github.com/getsentry/sentry-go"
 	sentryhttp "github.com/getsentry/sentry-go/http"
 	"github.com/spotlightpa/nkotb/build"
@@ -33,7 +34,7 @@ func NKOTBWeb(args []string) error {
 func (app *nkotbWebAppEnv) ParseArgs(args []string) error {
 	fl := flag.NewFlagSet(NKOTBWebApp, flag.ContinueOnError)
 	fl.Usage = func() {
-		fmt.Fprintf(fl.Output(), "%s - %s\n\n", NKOTBWebApp, getVersion())
+		fmt.Fprintf(fl.Output(), "%s - %s\n\n", NKOTBWebApp, versioninfo.Version)
 		fl.PrintDefaults()
 	}
 	fl.IntVar(&app.port, "port", -1, "specify a port to use http rather than AWS Lambda")
