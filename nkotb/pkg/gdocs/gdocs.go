@@ -4,6 +4,7 @@ package gdocs
 import (
 	"context"
 	"net/http"
+	"net/url"
 	"strings"
 
 	"github.com/carlmjohnson/requests"
@@ -26,6 +27,11 @@ func Request(ctx context.Context, cl *http.Client, docID string) (d *docs.Docume
 }
 
 func NormalizeID(id string) string {
+	if strings.Contains(id, "docID=") {
+		if u, err := url.Parse(id); err == nil {
+			id = u.Query().Get("docID")
+		}
+	}
 	id = strings.TrimPrefix(id, "https://docs.google.com/document/d/")
 	id, _, _ = cut(id, "/")
 	return id
