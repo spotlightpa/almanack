@@ -182,6 +182,12 @@ func (app *nkotbWebAppEnv) googleClient(r *http.Request) *http.Client {
 
 func (app *nkotbWebAppEnv) convert(w http.ResponseWriter, r *http.Request) {
 	docID := r.FormValue("docID")
+	if canonicalID := gdocs.NormalizeID(docID); canonicalID != docID {
+		url := "/api/convert?docID=" + url.QueryEscape(canonicalID)
+		http.Redirect(w, r, url, http.StatusFound)
+		return
+	}
+
 	cl := app.googleClient(r)
 	if cl == nil {
 		app.authRedirect(w, r)
