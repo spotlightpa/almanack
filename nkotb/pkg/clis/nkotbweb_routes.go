@@ -35,7 +35,14 @@ func (app *nkotbWebAppEnv) routes() http.Handler {
 
 func (app *nkotbWebAppEnv) logRoute(h http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		logger.Printf("[%s] %q - %s", r.Method, r.URL.Path, r.RemoteAddr)
+		url := r.URL.Path
+		if r.URL.RawQuery != "" {
+			q := r.URL.Query()
+			q.Del("code")
+			q.Del("state")
+			url = url + "?" + q.Encode()
+		}
+		logger.Printf("[%s] %q - %s", r.Method, url, r.RemoteAddr)
 		h.ServeHTTP(w, r)
 	})
 }
