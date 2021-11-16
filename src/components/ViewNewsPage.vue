@@ -237,7 +237,7 @@ export default {
       <b-field label="Image size">
         <b-select v-model="page.imageSize" expanded>
           <option
-            v-for="size in ['inline', 'full', 'hidden']"
+            v-for="size in ['inline', 'hidden']"
             :key="size"
             :value="size"
           >
