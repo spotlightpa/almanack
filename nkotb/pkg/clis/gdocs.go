@@ -101,7 +101,7 @@ func (app *gdocsAppEnv) Exec() (err error) {
 			return err
 		}
 		app.Printf("getting %q", app.docid)
-		doc, err := gdocs.Request(ctx, client, app.docid)
+		doc, err = gdocs.Request(ctx, client, app.docid)
 		if err != nil {
 			return err
 		}
