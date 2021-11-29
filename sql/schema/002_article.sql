@@ -4,7 +4,8 @@ CREATE TABLE article_status (
 );
 
 INSERT INTO article_status ("status_id", "description")
-  VALUES ('U', 'Unset'), ('P', 'Planned'), ('A', 'Available');
+  VALUES ('U', 'Unset'), ('P', 'Planned'),
+    ('A', 'Available');
 
 CREATE TABLE article (
   id serial PRIMARY KEY,
@@ -18,7 +19,8 @@ CREATE TABLE article (
   last_published timestamp with time zone,
   -- Almanack fields
   note text NOT NULL DEFAULT '',
-  status character (1) NOT NULL DEFAULT 'U' REFERENCES article_status (status_id),
+  status character (1) NOT NULL DEFAULT 'U' REFERENCES
+    article_status (status_id),
   created_at timestamp with time zone NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updated_at timestamp with time zone NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
