@@ -35,6 +35,7 @@ WHERE "key" = $1
 
 // DeleteSiteData only removes future scheduled items.
 // To remove past scheduled items, use CleanSiteData
+
 func (q *Queries) DeleteSiteData(ctx context.Context, key string) error {
 	_, err := q.db.Exec(ctx, deleteSiteData, key)
 	return err

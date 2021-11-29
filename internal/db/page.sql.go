@@ -314,41 +314,23 @@ ordered AS (
     paths
   ORDER BY
     frontmatter ->> 'published' DESC
-),
-selected AS (
-  SELECT
-    "id",
-    "file_path",
-    coalesce(frontmatter ->> 'internal-id', '') AS "internal_id",
-    coalesce(frontmatter ->> 'title', '') AS "title",
-  coalesce(frontmatter ->> 'description', '') AS "description",
-  coalesce(frontmatter ->> 'blurb', '') AS "blurb",
-  coalesce(frontmatter ->> 'image', '') AS "image",
-  coalesce(url_path, '') AS "url_path",
-  "last_published",
-  "created_at",
-  "updated_at",
-  "schedule_for",
-  coalesce(frontmatter ->> 'published', '') AS "published_at"
-FROM
-  ordered
 )
 SELECT
   id,
   file_path::text,
-  internal_id::text,
-  title::text,
-  description::text,
-  blurb::text,
-  image::text,
-  url_path::text,
+  coalesce(frontmatter ->> 'internal-id', '')::text AS "internal_id",
+  coalesce(frontmatter ->> 'title', '')::text AS "title",
+  coalesce(frontmatter ->> 'description', '')::text AS "description",
+  coalesce(frontmatter ->> 'blurb', '')::text AS "blurb",
+  coalesce(frontmatter ->> 'image', '')::text AS "image",
+  coalesce(url_path, '')::text AS "url_path",
   last_published,
   created_at,
   updated_at,
   schedule_for,
-  published_at::text
+  coalesce(frontmatter ->> 'published', '')::text AS "published_at"
 FROM
-  selected
+  ordered
 LIMIT $2 OFFSET $3
 `
 
@@ -374,10 +356,9 @@ type ListPagesRow struct {
 	PublishedAt   string             `json:"published_at"`
 }
 
-// ListPages by file path.
-// Cannot use coalesce directly, see https://github.com/kyleconroy/sqlc/issues/780.
 // Treating published_at as text because it sorts faster and we don't do
 // date stuff on the backend, just frontend.
+
 func (q *Queries) ListPages(ctx context.Context, arg ListPagesParams) ([]ListPagesRow, error) {
 	rows, err := q.db.Query(ctx, listPages, arg.FilePath, arg.Limit, arg.Offset)
 	if err != nil {
@@ -427,37 +408,22 @@ page_paths AS (
       SELECT
         unnest("paths")::citext
       FROM
-        query_paths)
-),
-selected AS (
-  SELECT
-    "file_path",
-    coalesce(frontmatter ->> 'internal-id', '') AS "internal_id",
-    coalesce(frontmatter ->> 'title', '') AS "title",
-  coalesce(frontmatter ->> 'link-title', '') AS "link_title",
-  coalesce(frontmatter ->> 'description', '') AS "description",
-  coalesce(frontmatter ->> 'blurb', '') AS "blurb",
-  coalesce(frontmatter ->> 'image', '') AS "image",
-  coalesce(url_path, '') AS "url_path",
-  coalesce(frontmatter ->> 'published', '') AS "published_at"
-FROM
-  page_paths
-)
+        query_paths))
 SELECT
   "file_path"::text,
-  "internal_id"::text,
-  "title"::text,
-  "link_title"::text,
-  "description"::text,
-  "blurb"::text,
-  "image"::text,
-  "url_path"::text,
-  "published_at"::text
+  coalesce(frontmatter ->> 'internal-id', '')::text AS "internal_id",
+  coalesce(frontmatter ->> 'title', '')::text AS "title",
+  coalesce(frontmatter ->> 'link-title', '')::text AS "link_title",
+  coalesce(frontmatter ->> 'description', '')::text AS "description",
+  coalesce(frontmatter ->> 'blurb', '')::text AS "blurb",
+  coalesce(frontmatter ->> 'image', '')::text AS "image",
+  coalesce(url_path, '')::text AS "url_path",
+  coalesce(frontmatter ->> 'published', '')::text AS "published_at"
 FROM
-  selected
+  page_paths
   CROSS JOIN query_paths
 ORDER BY
-  array_position(query_paths.paths, selected.url_path::text)
+  array_position(query_paths.paths, url_path::text)
 `
 
 type ListPagesByURLPathsRow struct {
