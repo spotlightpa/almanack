@@ -123,11 +123,7 @@ export default {
             <td>
               <div class="max-128">
                 <picture
-                  class="
-                    image
-                    is-3x4
-                    has-background-grey-lighter has-margin-bottom
-                  "
+                  class="image is-3x4 has-background-grey-lighter has-margin-bottom"
                 >
                   <img
                     :src="image.url"
