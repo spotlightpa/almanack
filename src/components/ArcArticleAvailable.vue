@@ -156,11 +156,7 @@ export default {
           <transition name="fade">
             <div
               v-if="copied"
-              class="
-                tag
-                is-rounded is-success is-light
-                has-text-weight-semibold
-              "
+              class="tag is-rounded is-success is-light has-text-weight-semibold"
             >
               Copied
             </div>
