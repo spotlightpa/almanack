@@ -96,6 +96,7 @@ export default {
           icon="user-clock"
           :datetime-formatter="formatDateTime"
           locale="en-US"
+          :datepicker="{ required: false }"
         />
         <p class="content is-small">
           <a
