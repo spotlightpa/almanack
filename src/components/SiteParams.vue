@@ -367,6 +367,11 @@ export default {
         </div>
       </BulmaField>
       <template v-if="params.stickyActive">
+        <BulmaFieldInput
+          v-model="params.stickyLink"
+          label="Sticky link"
+          type="url"
+        />
         <BulmaField
           v-slot="{ idForLabel }"
           label="Sticky image description"
