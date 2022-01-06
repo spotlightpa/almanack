@@ -39,7 +39,7 @@ export default {
       :links="[
         { name: 'Admin', to: { name: 'admin' } },
         { name: 'Spotlight PA Pages', to: { name: 'news-pages' } },
-        { name: title, to: { name: 'newsletter-page', params: { id } } },
+        { name: title, to: { name: 'news-page', params: { id } } },
       ]"
     />
 
