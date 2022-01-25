@@ -17,7 +17,9 @@ func FlagVar(fl *flag.FlagSet, name, usage string) (q *Queries) {
 	q = new(Queries)
 	fl.Func(name, usage, func(dbURL string) error {
 		q2, err := Open(dbURL)
-		*q = *q2
+		if q2 != nil {
+			*q = *q2
+		}
 		return err
 	})
 	return
