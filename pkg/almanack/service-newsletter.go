@@ -33,6 +33,15 @@ func (svc Service) UpdateNewsletterArchives(ctx context.Context) error {
 				"feeds/newsletters/papost.json",
 			)
 		},
+		func() error {
+			return svc.UpdateNewsletterArchive(
+				ctx,
+				"PA Local",
+				"palocal",
+				"PA Local Newsletter Archive",
+				"feeds/newsletters/palocal.json",
+			)
+		},
 	)
 }
 
@@ -105,6 +114,7 @@ func (svc Service) ImportNewsletterPages(ctx context.Context) (err error) {
 var kickerFor = map[string]string{
 	"investigator": "The Investigator",
 	"papost":       "PA Post",
+	"palocal":      "PA Local",
 }
 
 func (svc Service) SaveNewsletterPage(ctx context.Context, nl *db.Newsletter, body string) (err error) {
