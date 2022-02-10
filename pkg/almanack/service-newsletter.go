@@ -20,8 +20,6 @@ func (svc Service) UpdateNewsletterArchives(ctx context.Context) error {
 				ctx,
 				"The Investigator",
 				"investigator",
-				"The Investigator Newsletter Archive",
-				"feeds/newsletters/investigator.json",
 			)
 		},
 		func() error {
@@ -29,8 +27,6 @@ func (svc Service) UpdateNewsletterArchives(ctx context.Context) error {
 				ctx,
 				"PA Post",
 				"papost",
-				"PA Post Newsletter Archive",
-				"feeds/newsletters/papost.json",
 			)
 		},
 		func() error {
@@ -38,14 +34,12 @@ func (svc Service) UpdateNewsletterArchives(ctx context.Context) error {
 				ctx,
 				"PA Local",
 				"palocal",
-				"PA Local Newsletter Archive",
-				"feeds/newsletters/palocal.json",
 			)
 		},
 	)
 }
 
-func (svc Service) UpdateNewsletterArchive(ctx context.Context, mcType, dbType, feedtitle, path string) (err error) {
+func (svc Service) UpdateNewsletterArchive(ctx context.Context, mcType, dbType string) (err error) {
 	defer errutil.Trace(&err)
 
 	// get the latest from MC
@@ -69,20 +63,6 @@ func (svc Service) UpdateNewsletterArchive(ctx context.Context, mcType, dbType, 
 		return nil
 	} else {
 		svc.Logger.Printf("%q got %d new items", mcType, n)
-	}
-	// get old items list from DB
-	items, err := svc.Queries.ListNewsletters(ctx, db.ListNewslettersParams{
-		Type:   dbType,
-		Limit:  100,
-		Offset: 0,
-	})
-	if err != nil {
-		return err
-	}
-	// push to S3
-	feed := db.NewsletterToFeed(feedtitle, items)
-	if err = UploadJSON(ctx, svc.FileStore, path, "public, max-age=300", feed); err != nil {
-		return err
 	}
 
 	return nil

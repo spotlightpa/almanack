@@ -20,7 +20,6 @@ require (
 	github.com/getsentry/sentry-go v0.12.0
 	github.com/go-chi/chi v1.5.4
 	github.com/google/go-github/v39 v39.2.0
-	github.com/gorilla/feeds v1.1.1
 	github.com/jackc/pgconn v1.10.1
 	github.com/jackc/pgtype v1.9.1
 	github.com/jackc/pgx/v4 v4.14.1
