@@ -358,7 +358,6 @@ type ListPagesRow struct {
 
 // Treating published_at as text because it sorts faster and we don't do
 // date stuff on the backend, just frontend.
-
 func (q *Queries) ListPages(ctx context.Context, arg ListPagesParams) ([]ListPagesRow, error) {
 	rows, err := q.db.Query(ctx, listPages, arg.FilePath, arg.Limit, arg.Offset)
 	if err != nil {
