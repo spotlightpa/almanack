@@ -183,27 +183,6 @@ export default {
       />
       <BulmaFieldInput v-model="page.imageCredit" label="Image credit" />
 
-      <b-field label="Image size">
-        <b-select v-model="page.imageSize" expanded>
-          <option
-            v-for="size in ['inline', 'hidden']"
-            :key="size"
-            :value="size"
-          >
-            {{ size }}
-          </option>
-        </b-select>
-      </b-field>
-
-      <BulmaField v-slot="{ idForLabel }" label="Language">
-        <div class="select is-fullwidth">
-          <select :id="idForLabel" v-model="page.languageCode" class="select">
-            <option value="">English</option>
-            <option value="es">Spanish</option>
-          </select>
-        </div>
-      </BulmaField>
-
       <b-field label="URL keywords slug">
         <b-input
           v-model="page.slug"

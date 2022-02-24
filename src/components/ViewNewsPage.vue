@@ -238,11 +238,15 @@ export default {
       <b-field label="Image size">
         <b-select v-model="page.imageSize" expanded>
           <option
-            v-for="size in ['inline', 'hidden']"
-            :key="size"
-            :value="size"
+            v-for="[val, desc] in [
+              ['inline', 'Normal'],
+              ['hidden', 'Hidden'],
+              ['wide', 'Suppress Right Rail'],
+            ]"
+            :key="val"
+            :value="val"
           >
-            {{ size }}
+            {{ desc }}
           </option>
         </b-select>
       </b-field>
