@@ -314,6 +314,15 @@ export default {
           </div>
         </BulmaField>
 
+        <BulmaField label="Evergreen content">
+          <div>
+            <label class="checkbox">
+              <input v-model="page.suppressDate" type="checkbox" />
+              Don't show date on page
+            </label>
+          </div>
+        </BulmaField>
+
         <BulmaField label="Hide newsletters pop-up">
           <div>
             <label class="checkbox">

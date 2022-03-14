@@ -37,7 +37,8 @@ class Page {
     this.languageCode = this.frontmatter["language-code"] ?? "";
     this.slug = this.frontmatter["slug"] ?? "";
     this.extendedKicker = this.frontmatter["extended-kicker"] ?? "";
-    this.modalExclude = this.frontmatter["modal-exclude"] ?? "";
+    this.modalExclude = this.frontmatter["modal-exclude"] ?? false;
+    this.suppressDate = this.frontmatter["suppress-date"] ?? false;
     this.noIndex = this.frontmatter["no-index"] ?? "";
     this.overrideURL = this.frontmatter["url"] ?? "";
     this.aliases = this.frontmatter["aliases"] ?? [];
@@ -145,6 +146,7 @@ class Page {
         slug: this.slug,
         "extended-kicker": this.extendedKicker,
         "modal-exclude": this.modalExclude,
+        "suppress-date": this.suppressDate,
         "no-index": this.noIndex,
         url: this.overrideURL,
         aliases: this.aliases,
