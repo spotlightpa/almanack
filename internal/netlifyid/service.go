@@ -6,11 +6,11 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"strings"
 
 	"github.com/aws/aws-lambda-go/lambdacontext"
 	"github.com/carlmjohnson/errutil"
 	"github.com/carlmjohnson/resperr"
-	"github.com/spotlightpa/almanack/internal/stringutils"
 	"github.com/spotlightpa/almanack/pkg/common"
 )
 
@@ -97,11 +97,11 @@ func FromCookie(r *http.Request) (id *JWT, err error) {
 		return nil, err
 	}
 	defer errutil.Prefix(&err, fmt.Sprintf("malformed cookie value: %q", c.Value))
-	_, s, ok := stringutils.Cut(c.Value, ".")
+	_, s, ok := strings.Cut(c.Value, ".")
 	if !ok {
 		return nil, fmt.Errorf("missing initial dot")
 	}
-	s, _, ok = stringutils.Cut(s, ".")
+	s, _, ok = strings.Cut(s, ".")
 	if !ok {
 		return nil, fmt.Errorf("missing second dot")
 	}

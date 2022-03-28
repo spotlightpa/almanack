@@ -4,13 +4,13 @@ import (
 	"context"
 	"fmt"
 	"net/http"
+	"strings"
 
 	"github.com/carlmjohnson/errutil"
 	"github.com/carlmjohnson/requests"
 	"github.com/carlmjohnson/resperr"
 	"github.com/mattbaird/gochimp"
 
-	"github.com/spotlightpa/almanack/internal/stringutils"
 	"github.com/spotlightpa/almanack/pkg/common"
 )
 
@@ -39,7 +39,7 @@ func (mc EmailService) SendEmail(ctx context.Context, subject, body string) (err
 	defer errutil.Trace(&err)
 
 	// API keys end with 123XYZ-us1, where us1 is the datacenter
-	_, datacenter, _ := stringutils.Cut(mc.apiKey, "-")
+	_, datacenter, _ := strings.Cut(mc.apiKey, "-")
 	var resp gochimp.CampaignResponse
 	err = requests.
 		URL("https://test.api.mailchimp.com/2.0/campaigns/create.json").

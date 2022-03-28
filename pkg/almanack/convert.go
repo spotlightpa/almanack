@@ -38,9 +38,9 @@ func (arcStory *ArcStory) ToArticle(ctx context.Context, svc Service, article *S
 
 	article.Byline = commaAndJoiner(article.Authors)
 	for i := range article.Authors {
-		if author, _, ok := stringutils.Cut(article.Authors[i], " of "); ok {
+		if author, _, ok := strings.Cut(article.Authors[i], " of "); ok {
 			article.Authors[i] = author
-		} else if author, _, ok = stringutils.Cut(article.Authors[i], " for "); ok {
+		} else if author, _, ok = strings.Cut(article.Authors[i], " for "); ok {
 			article.Authors[i] = author
 		}
 	}
