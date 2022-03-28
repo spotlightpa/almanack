@@ -75,7 +75,7 @@ func (page *Page) FromTOML(content string) (err error) {
 		return nil
 	}
 	content = strings.TrimPrefix(content, delimiter)
-	frontmatter, body, ok := stringutils.Cut(content, delimiter)
+	frontmatter, body, ok := strings.Cut(content, delimiter)
 	if !ok {
 		return fmt.Errorf("could not parse frontmatter: no end delimiter")
 	}

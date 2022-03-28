@@ -8,7 +8,6 @@ import (
 
 	"github.com/BurntSushi/toml"
 	"github.com/spotlightpa/almanack/internal/db"
-	"github.com/spotlightpa/almanack/internal/stringutils"
 )
 
 type SpotlightPAArticle struct {
@@ -109,7 +108,7 @@ func (splArt *SpotlightPAArticle) FromTOML(content string) error {
 		return fmt.Errorf("could not parse frontmatter: no prefix delimiter")
 	}
 	content = strings.TrimPrefix(content, delimiter)
-	frontmatter, body, ok := stringutils.Cut(content, delimiter)
+	frontmatter, body, ok := strings.Cut(content, delimiter)
 	if !ok {
 		return fmt.Errorf("could not parse frontmatter: no end delimiter")
 	}
