@@ -16,7 +16,7 @@
     "@sentry/browser": "^6.17.1",
     "@vue/composition-api": "^1.4.4",
     "axios": "^0.25.0",
-    "buefy": "^0.9.14",
+    "buefy": "^0.9.19",
     "bulma": "^0.9.3",
     "core-js": "^3.20.3",
     "journalize": "^2.5.1",
