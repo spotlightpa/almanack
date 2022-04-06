@@ -33,7 +33,7 @@ export default {
       <span v-if="required" class="has-text-danger">*</span>
     </label>
     <div class="control" :class="controlClass">
-      <slot :required="required" :idForLabel="idForLabel"></slot>
+      <slot :required="required" :id-for-label="idForLabel"></slot>
     </div>
     <p v-if="help" class="help" v-text="help"></p>
     <p
