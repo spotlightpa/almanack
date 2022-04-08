@@ -4,6 +4,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/carlmjohnson/be"
 	"github.com/jackc/pgtype"
 	"github.com/spotlightpa/almanack/internal/timeutil"
 )
@@ -34,9 +35,7 @@ func TestEqualish(t *testing.T) {
 		t.Run(name, func(t *testing.T) {
 			a, b := parseTime(tc.a), parseTime(tc.b)
 			got := timeutil.Equalish(a, b)
-			if got != tc.want {
-				t.Errorf("timeutil.Equalish(%q, %q) != %v", tc.a, tc.b, tc.want)
-			}
+			be.Equal(t, tc.want, got)
 		})
 	}
 }

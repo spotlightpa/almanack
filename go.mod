@@ -7,6 +7,7 @@ require (
 	github.com/algolia/algoliasearch-client-go/v3 v3.24.0
 	github.com/aws/aws-lambda-go v1.28.0
 	github.com/aws/aws-sdk-go v1.43.27
+	github.com/carlmjohnson/be v0.22.4-0.20220408161603-5f4fe2113644
 	github.com/carlmjohnson/crockford v0.21.3
 	github.com/carlmjohnson/emailx v0.20.2
 	github.com/carlmjohnson/errutil v0.21.5

@@ -7,6 +7,7 @@ import (
 	"os"
 	"testing"
 
+	"github.com/carlmjohnson/be"
 	"github.com/carlmjohnson/requests"
 	"github.com/spotlightpa/almanack/internal/stringutils"
 )
@@ -20,16 +21,10 @@ func TestMostPopularNews(t *testing.T) {
 	cl.Transport = requests.Replay("testdata")
 	if os.Getenv("ALMANACK_GOOGLE_TEST_RECORD_REQUEST") != "" {
 		gcl, err := svc.GAClient(ctx)
-		if err != nil {
-			t.Fatal(err)
-		}
+		be.NilErr(t, err)
 		cl.Transport = requests.Record(gcl.Transport, "testdata")
 	}
 	pages, err := svc.MostPopularNews(ctx, &cl)
-	if err != nil {
-		t.Fatal(err)
-	}
-	if len(pages) < 20 {
-		t.Fatalf("wrong number of pages: %d", len(pages))
-	}
+	be.NilErr(t, err)
+	be.True(t, len(pages) >= 20)
 }

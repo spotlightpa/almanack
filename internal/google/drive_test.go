@@ -7,6 +7,7 @@ import (
 	"os"
 	"testing"
 
+	"github.com/carlmjohnson/be"
 	"github.com/carlmjohnson/requests"
 	"github.com/spotlightpa/almanack/internal/stringutils"
 )
@@ -26,10 +27,6 @@ func TestListDriveFiles(t *testing.T) {
 		cl.Transport = requests.Record(gcl.Transport, "testdata")
 	}
 	files, err := svc.Files(ctx, &cl)
-	if err != nil {
-		t.Fatal(err)
-	}
-	if len(files) < 1 {
-		t.Fatal("got no files")
-	}
+	be.NilErr(t, err)
+	be.Nonzero(t, files)
 }

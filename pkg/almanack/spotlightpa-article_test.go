@@ -1,8 +1,9 @@
 package almanack
 
 import (
-	"reflect"
 	"testing"
+
+	"github.com/carlmjohnson/be"
 )
 
 func TestToFromTOML(t *testing.T) {
@@ -19,16 +20,11 @@ func TestToFromTOML(t *testing.T) {
 	for name, art := range cases {
 		t.Run(name, func(t *testing.T) {
 			toml, err := art.ToTOML()
-			if err != nil {
-				t.Fatalf("err ToTOML: %v", err)
-			}
+			be.NilErr(t, err)
 			var art2 SpotlightPAArticle
-			if err = art2.FromTOML(toml); err != nil {
-				t.Fatalf("err FromTOML: %v", err)
-			}
-			if !reflect.DeepEqual(art, art2) {
-				t.Errorf("article did not round trip")
-			}
+			err = art2.FromTOML(toml)
+			be.NilErr(t, err)
+			be.DeepEqual(t, art, art2)
 		})
 	}
 }
@@ -134,24 +130,14 @@ more~~
 			var art SpotlightPAArticle
 			err := art.FromTOML(tc.content)
 			if !tc.ok {
-				if err == nil {
-					t.Error("expected err FromTOML")
-				}
+				be.Nonzero(t, err)
 				return
 			}
-			if err != nil {
-				t.Fatalf("err FromTOML: %v", err)
-			}
+			be.NilErr(t, err)
 
 			toml, err := art.ToTOML()
-			if err != nil {
-				t.Fatalf("err ToTOML: %v", err)
-			}
-			if tc.content != toml {
-				t.Errorf("article did not round trip: %q != %q",
-					tc.content, toml,
-				)
-			}
+			be.NilErr(t, err)
+			be.Equal(t, tc.content, toml)
 		})
 	}
 }
