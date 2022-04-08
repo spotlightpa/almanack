@@ -7,6 +7,7 @@ import (
 	"os"
 	"testing"
 
+	"github.com/carlmjohnson/be"
 	"github.com/carlmjohnson/requests"
 	"github.com/spotlightpa/almanack/internal/mailchimp"
 )
@@ -22,40 +23,26 @@ func TestV3(t *testing.T) {
 	}
 	v3 := mailchimp.NewV3(apiKey, listID, &cl)
 	res, err := v3.ListCampaigns(context.Background())
-	if err != nil {
-		t.Fatalf("err != nil: %v", err)
-	}
-	if len(res.Campaigns) == 0 {
-		t.Fatal("no campaigns found")
-	}
+	be.NilErr(t, err)
+	be.Nonzero(t, res.Campaigns)
+
 	for _, c := range res.Campaigns {
-		if _, err := url.Parse(c.ArchiveURL); c.ArchiveURL == "" || err != nil {
-			t.Errorf("received bad archive URL: %q", c.ArchiveURL)
-		}
-		if c.SentAt.IsZero() {
-			t.Errorf("missing send time for %q", c.ArchiveURL)
-		}
-		if c.Settings.Subject == "" {
-			t.Errorf("missing subject line for %q", c.ArchiveURL)
-		}
-		if c.Settings.Title == "" {
-			t.Errorf("missing title for %q", c.ArchiveURL)
-		}
-		if c.Settings.PreviewText == "" {
-			t.Errorf("missing preview_text for %q", c.ArchiveURL)
-		}
+		be.Nonzero(t, c.ArchiveURL)
+		_, err := url.Parse(c.ArchiveURL)
+		be.NilErr(t, err)
+		be.Nonzero(t, c.ArchiveURL)
+		be.Nonzero(t, c.SentAt)
+		be.Nonzero(t, c.Settings.Subject)
+		be.Nonzero(t, c.Settings.Title)
+		be.Nonzero(t, c.Settings.PreviewText)
 	}
 	camp := res.Campaigns[0]
 	body, err := mailchimp.ImportPage(context.Background(), &cl, camp.ArchiveURL)
-	if err != nil {
-		t.Fatalf("problem getting campaign page: %v", err)
-	}
+	be.NilErr(t, err)
 	expect, err := os.ReadFile("testdata/body.html")
-	if err != nil {
-		t.Fatalf("problem reading campaign example: %v", err)
-	}
-	if string(expect) != body {
+	be.NilErr(t, err)
+	be.Debug(t, func() {
 		os.WriteFile("testdata/got.html", []byte(body), 0644)
-		t.Fatal("unexpected body")
-	}
+	})
+	be.Equal(t, string(expect), body)
 }

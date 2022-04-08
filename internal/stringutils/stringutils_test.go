@@ -3,6 +3,7 @@ package stringutils_test
 import (
 	"testing"
 
+	"github.com/carlmjohnson/be"
 	"github.com/spotlightpa/almanack/internal/stringutils"
 )
 
@@ -19,10 +20,7 @@ func TestSlugify(t *testing.T) {
 	}
 	for _, tc := range cases {
 		t.Run(tc.input, func(t *testing.T) {
-			got := stringutils.Slugify(tc.input)
-			if got != tc.want {
-				t.Fatalf("got %q", got)
-			}
+			be.Equal(t, tc.want, stringutils.Slugify(tc.input))
 		})
 	}
 }

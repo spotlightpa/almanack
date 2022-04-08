@@ -1,8 +1,10 @@
 package almanack
 
 import (
-	"strings"
+	"path"
 	"testing"
+
+	"github.com/carlmjohnson/be"
 )
 
 func TestMakeImageName(t *testing.T) {
@@ -23,12 +25,8 @@ func TestMakeImageName(t *testing.T) {
 	for name, tc := range cases {
 		t.Run(name, func(t *testing.T) {
 			got := makeImageName(tc.ct)
-			if !strings.HasSuffix(got, tc.want) {
-				t.Errorf("makeImageName(%q) == %q != *%q$", tc.ct, got, tc.want)
-			}
-			if strings.Contains(got, "..") {
-				t.Errorf("makeImageName(%q) == %q", tc.ct, got)
-			}
+			be.Equal(t, tc.want, path.Ext(got))
+			be.NotIn(t, "..", got)
 		})
 		var s string
 		allocs := testing.AllocsPerRun(10, func() {

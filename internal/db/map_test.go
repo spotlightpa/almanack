@@ -6,6 +6,7 @@ import (
 	"os"
 	"testing"
 
+	"github.com/carlmjohnson/be"
 	"github.com/spotlightpa/almanack/internal/db"
 )
 
@@ -15,17 +16,17 @@ func TestMap(t *testing.T) {
 		t.Skip("ALMANACK_TEST_DATABASE not set")
 	}
 	q, err := db.Open(dbURL)
-	check(t, err, "could not open DB")
+	be.NilErr(t, err)
 	ctx := context.Background()
 	const testpath = "test/hello.md"
 	err = q.EnsurePage(ctx, testpath)
-	check(t, err, "could not create page")
+	be.NilErr(t, err)
 	// create again
 	err = q.EnsurePage(ctx, testpath)
-	check(t, err, "creation not idempotent")
+	be.NilErr(t, err)
 	p1, err := q.GetPageByFilePath(ctx, testpath)
-	check(t, err, "could not get page")
-	eq(t, testpath, p1.FilePath)
+	be.NilErr(t, err)
+	be.Equal(t, testpath, p1.FilePath)
 	p2, err := q.UpdatePage(ctx, db.UpdatePageParams{
 		SetFrontmatter: true,
 		Frontmatter: db.Map{
@@ -33,17 +34,18 @@ func TestMap(t *testing.T) {
 			"bool":   true,
 			"number": 1,
 		},
-		SetBody:  true,
-		Body:     "hello",
-		FilePath: testpath,
+		SetBody:     true,
+		Body:        "hello",
+		FilePath:    testpath,
+		ScheduleFor: db.NullTime,
 	})
-	check(t, err, "could not update page")
-	eq(t, testpath, p2.FilePath)
-	eq(t, "hello", p2.Body)
-	eq(t, "map[bool:true hello:world number:1]", fmt.Sprint(p2.Frontmatter))
+	be.NilErr(t, err)
+	be.Equal(t, testpath, p2.FilePath)
+	be.Equal(t, "hello", p2.Body)
+	be.Equal(t, "map[bool:true hello:world number:1]", fmt.Sprint(p2.Frontmatter))
 	p3, err := q.GetPageByFilePath(ctx, testpath)
-	check(t, err, "could not get page")
-	eq(t, testpath, p3.FilePath)
-	eq(t, "hello", p3.Body)
-	eq(t, "map[bool:true hello:world number:1]", fmt.Sprint(p3.Frontmatter))
+	be.NilErr(t, err)
+	be.Equal(t, testpath, p3.FilePath)
+	be.Equal(t, "hello", p3.Body)
+	be.Equal(t, "map[bool:true hello:world number:1]", fmt.Sprint(p3.Frontmatter))
 }

@@ -9,31 +9,10 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/carlmjohnson/be"
 	"github.com/spotlightpa/almanack/internal/mailchimp"
 	"golang.org/x/net/html"
 )
-
-func assert(t *testing.T, v bool, format string, args ...interface{}) {
-	t.Helper()
-	if !v {
-		t.Fatalf(format, args...)
-	}
-}
-
-func assertErrNil(t *testing.T, err error) {
-	t.Helper()
-	assert(t, err == nil, "err != nil: %v", err)
-}
-
-func assertContains(t *testing.T, s, substr string) {
-	t.Helper()
-	assert(t, strings.Contains(s, substr), "%q missing from %q", substr, s)
-}
-
-func assertNotContains(t *testing.T, s, substr string) {
-	t.Helper()
-	assert(t, !strings.Contains(s, substr), "%q present in %q", substr, s)
-}
 
 func readContent(r io.Reader) (string, error) {
 	doc, err := html.Parse(r)
@@ -58,10 +37,10 @@ func TestSimpleParse(t *testing.T) {
 </body>
 </html>
 	`))
-	assertErrNil(t, err)
-	assertContains(t, doc, "p2")
-	assertNotContains(t, doc, "p3")
-	assertNotContains(t, doc, "script")
+	be.NilErr(t, err)
+	be.In(t, "p2", doc)
+	be.NotIn(t, "p3", doc)
+	be.NotIn(t, "script", doc)
 }
 
 var globalDoc string
