@@ -160,10 +160,8 @@ github.com/aws/smithy-go v1.11.2/go.mod h1:3xHYmszWVx2c0kIwQeEVf9uSm4fYZt67FBJnw
 github.com/aymerick/douceur v0.2.0 h1:Mv+mAeH1Q+n9Fr+oyamOlAkUNPWPlA8PPGR0QAaYuPk=
 github.com/aymerick/douceur v0.2.0/go.mod h1:wlT5vV2O3h55X9m7iVYN0TBM0NH/MmbLnd30/FjWUq4=
 github.com/benbjohnson/clock v1.1.0/go.mod h1:J11/hYXuz8f4ySSvYwY0FKfm+ezbsZBKZxNJlLklBHA=
-github.com/carlmjohnson/be v0.22.4-0.20220408161603-5f4fe2113644 h1:O2K7DJh97ASSJ11CV4bmgxeBMzNeLg8HeyNZJvyTBOg=
-github.com/carlmjohnson/be v0.22.4-0.20220408161603-5f4fe2113644/go.mod h1:KAgPUh0HpzWYZZI+IABdo80wTgY43YhbdsiLYAaSI/Q=
-github.com/carlmjohnson/crockford v0.21.3 h1:C8YDx63IqTDY/UgoILjmahBivgOGnDFUcdum8ZO+B88=
-github.com/carlmjohnson/crockford v0.21.3/go.mod h1:Ry0l3g9KMB919ee2CjzhPH8FccE9xZNgcPBi8TQm6LM=
+github.com/carlmjohnson/be v0.22.4 h1:CEYQrjQu8ABgEryNXibdk9gvJb7I0yg3iTAK7L4c2bk=
+github.com/carlmjohnson/be v0.22.4/go.mod h1:KAgPUh0HpzWYZZI+IABdo80wTgY43YhbdsiLYAaSI/Q=
 github.com/carlmjohnson/crockford v0.22.1 h1:hd6hTYSTu1ZvTIfaOo8gOCpE8HDSN4h2GxkacpjKvH4=
 github.com/carlmjohnson/crockford v0.22.1/go.mod h1:Ry0l3g9KMB919ee2CjzhPH8FccE9xZNgcPBi8TQm6LM=
 github.com/carlmjohnson/emailx v0.20.2 h1:0euWTGWnz5zwxXaDwLjP/egV7kACYGUvO5Wqu/5RqL0=
