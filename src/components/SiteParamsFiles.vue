@@ -1,14 +1,15 @@
 <script>
 import { ref } from "@vue/composition-api";
 
+const canPaste = !!navigator.clipboard.readText;
+
 export default {
   props: { files: Array, fileProps: Object },
   setup() {
     const inputText = ref("");
 
     return {
-      canPaste: !!navigator.clipboard.readText,
-
+      canPaste,
       inputText,
       addText() {
         let text = inputText.value;
