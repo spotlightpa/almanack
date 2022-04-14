@@ -123,7 +123,7 @@ func (svc Service) SaveNewsletterPage(ctx context.Context, nl *db.Newsletter, bo
 	)
 	if _, err := svc.Queries.UpdatePage(ctx, db.UpdatePageParams{
 		SetFrontmatter: true,
-		Frontmatter: map[string]interface{}{
+		Frontmatter: map[string]any{
 			"aliases":           []string{},
 			"authors":           []string{},
 			"blurb":             nl.Blurb,

@@ -10,7 +10,7 @@ import (
 )
 
 type Logger interface {
-	Printf(format string, v ...interface{})
+	Printf(format string, v ...any)
 }
 
 type Client struct {
@@ -39,7 +39,7 @@ func (sc Client) Post(ctx context.Context, msg Message) error {
 	return sc.c.PostCtx(ctx, msg)
 }
 
-func (sc Client) printf(format string, args ...interface{}) {
+func (sc Client) printf(format string, args ...any) {
 	if sc.l != nil {
 		sc.l.Printf(format, args...)
 	}

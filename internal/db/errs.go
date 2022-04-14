@@ -13,7 +13,7 @@ func IsNotFound(err error) bool {
 	return errors.Is(err, pgx.ErrNoRows)
 }
 
-func NoRowsAs404(err error, format string, a ...interface{}) error {
+func NoRowsAs404(err error, format string, a ...any) error {
 	if !IsNotFound(err) {
 		return err
 	}

@@ -27,7 +27,7 @@ import (
 	"github.com/spotlightpa/almanack/pkg/almanack"
 )
 
-func (app *appEnv) replyJSON(statusCode int, w http.ResponseWriter, data interface{}) {
+func (app *appEnv) replyJSON(statusCode int, w http.ResponseWriter, data any) {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(statusCode)
 	enc := json.NewEncoder(w)
@@ -66,7 +66,7 @@ func (app *appEnv) logErr(ctx context.Context, err error) {
 	app.Printf("err: %+v", err)
 }
 
-func (app *appEnv) tryReadJSON(w http.ResponseWriter, r *http.Request, dst interface{}) error {
+func (app *appEnv) tryReadJSON(w http.ResponseWriter, r *http.Request, dst any) error {
 	// Thanks to https://www.alexedwards.net/blog/how-to-properly-parse-a-json-request-body
 	if ct := r.Header.Get("Content-Type"); ct != "" {
 		value, _, _ := mime.ParseMediaType(ct)
@@ -119,7 +119,7 @@ func (app *appEnv) tryReadJSON(w http.ResponseWriter, r *http.Request, dst inter
 		}
 	}
 
-	var discard interface{}
+	var discard any
 	if err := dec.Decode(&discard); !errors.Is(err, io.EOF) {
 		return resperr.New(http.StatusBadRequest,
 			"request body must only contain a single JSON object")
@@ -128,7 +128,7 @@ func (app *appEnv) tryReadJSON(w http.ResponseWriter, r *http.Request, dst inter
 	return nil
 }
 
-func (app *appEnv) readJSON(w http.ResponseWriter, r *http.Request, dst interface{}) bool {
+func (app *appEnv) readJSON(w http.ResponseWriter, r *http.Request, dst any) bool {
 	if err := app.tryReadJSON(w, r, dst); err != nil {
 		app.replyErr(w, r, err)
 		return false
@@ -189,13 +189,13 @@ func (app *appEnv) maxSizeMiddleware(next http.Handler) http.Handler {
 	})
 }
 
-func (app *appEnv) mustIntParam(r *http.Request, param string, v interface{}) {
+func (app *appEnv) mustIntParam(r *http.Request, param string, v any) {
 	if err := app.intParam(r, param, v); err != nil {
 		panic(err)
 	}
 }
 
-func (app *appEnv) intParam(r *http.Request, param string, v interface{}) error {
+func (app *appEnv) intParam(r *http.Request, param string, v any) error {
 	pstr := chi.URLParam(r, param)
 	if pstr == "" {
 		return fmt.Errorf("parameter %q not set", param)
@@ -245,7 +245,7 @@ func (app *appEnv) FetchFeed(ctx context.Context) (*arc.API, error) {
 	return &feed, nil
 }
 
-func (app *appEnv) replyHTML(w http.ResponseWriter, r *http.Request, t *template.Template, data interface{}) {
+func (app *appEnv) replyHTML(w http.ResponseWriter, r *http.Request, t *template.Template, data any) {
 	var buf bytes.Buffer
 	if err := t.Execute(&buf, data); err != nil {
 		app.logErr(r.Context(), err)
