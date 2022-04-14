@@ -66,7 +66,7 @@ func (page *Page) FromTOML(content string) (err error) {
 		if !strings.HasPrefix(content, "{") {
 			return fmt.Errorf("could not parse frontmatter: no prefix delimiter")
 		}
-		m := map[string]interface{}{}
+		m := map[string]any{}
 		if err := json.Unmarshal([]byte(content), &m); err != nil {
 			return err
 		}
@@ -80,7 +80,7 @@ func (page *Page) FromTOML(content string) (err error) {
 		return fmt.Errorf("could not parse frontmatter: no end delimiter")
 	}
 
-	m := map[string]interface{}{}
+	m := map[string]any{}
 	if _, err := toml.Decode(frontmatter, &m); err != nil {
 		return err
 	}
@@ -132,7 +132,7 @@ func (page *Page) FullURL() string {
 	return fmt.Sprintf("https://www.spotlightpa.org%s", page.URLPath.String)
 }
 
-func (page *Page) ToIndex() interface{} {
+func (page *Page) ToIndex() any {
 	internalID, _ := page.Frontmatter["internal-id"].(string)
 	imageURL, _ := page.Frontmatter["image"].(string)
 	imageDescription, _ := page.Frontmatter["image-description"].(string)

@@ -62,7 +62,7 @@ func (item FeedItem) Value() (driver.Value, error) {
 }
 
 // Scan implements the sql.Scanner interface.
-func (item *FeedItem) Scan(value interface{}) error {
+func (item *FeedItem) Scan(value any) error {
 	var newItem FeedItem
 	if value == nil {
 		return nil
@@ -285,8 +285,8 @@ type Credits struct {
 }
 
 type ScheduledOperations struct {
-	PublishEdition   []interface{} `json:"publish_edition"`
-	UnpublishEdition []interface{} `json:"unpublish_edition"`
+	PublishEdition   []any `json:"publish_edition"`
+	UnpublishEdition []any `json:"unpublish_edition"`
 }
 
 type Publishing struct {
@@ -294,11 +294,11 @@ type Publishing struct {
 }
 
 type Revision struct {
-	RevisionID string        `json:"revision_id"`
-	ParentID   string        `json:"parent_id"`
-	Editions   []interface{} `json:"editions"`
-	Branch     string        `json:"branch"`
-	UserID     string        `json:"user_id"`
+	RevisionID string `json:"revision_id"`
+	ParentID   string `json:"parent_id"`
+	Editions   []any  `json:"editions"`
+	Branch     string `json:"branch"`
+	UserID     string `json:"user_id"`
 }
 
 type Taxonomy struct {
@@ -309,17 +309,17 @@ type PromoItems struct {
 	Basic struct {
 		ID                   string `json:"_id"`
 		AdditionalProperties struct {
-			FullSizeResizeURL string        `json:"fullSizeResizeUrl"`
-			Galleries         []interface{} `json:"galleries"`
-			MimeType          string        `json:"mime_type"`
-			OriginalName      string        `json:"originalName"`
-			OriginalURL       string        `json:"originalUrl"`
-			ProxyURL          string        `json:"proxyUrl"`
-			Published         bool          `json:"published"`
-			ResizeURL         string        `json:"resizeUrl"`
-			Restricted        bool          `json:"restricted"`
-			TakenOn           time.Time     `json:"takenOn"`
-			Version           int           `json:"version"`
+			FullSizeResizeURL string    `json:"fullSizeResizeUrl"`
+			Galleries         []any     `json:"galleries"`
+			MimeType          string    `json:"mime_type"`
+			OriginalName      string    `json:"originalName"`
+			OriginalURL       string    `json:"originalUrl"`
+			ProxyURL          string    `json:"proxyUrl"`
+			Published         bool      `json:"published"`
+			ResizeURL         string    `json:"resizeUrl"`
+			Restricted        bool      `json:"restricted"`
+			TakenOn           time.Time `json:"takenOn"`
+			Version           int       `json:"version"`
 		} `json:"additional_properties"`
 		Caption     string      `json:"caption"`
 		CreatedDate time.Time   `json:"created_date"`

@@ -51,7 +51,7 @@ func NewClient(token, owner, repo, branch string, l common.Logger) (*Client, err
 	return cl, nil
 }
 
-func (cl *Client) printf(format string, v ...interface{}) {
+func (cl *Client) printf(format string, v ...any) {
 	if cl.l != nil {
 		cl.l.Printf(format, v...)
 	}

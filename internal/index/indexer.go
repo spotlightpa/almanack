@@ -26,18 +26,18 @@ func FlagVar(fl *flag.FlagSet) func(Logger) Indexer {
 }
 
 type Logger interface {
-	Printf(string, ...interface{})
+	Printf(string, ...any)
 }
 
 type Indexer interface {
-	SaveObject(object interface{}, opts ...interface{}) (res search.SaveObjectRes, err error)
+	SaveObject(object any, opts ...any) (res search.SaveObjectRes, err error)
 }
 
 type MockIndexer struct {
 	l Logger
 }
 
-func (mi MockIndexer) SaveObject(object interface{}, opts ...interface{}) (res search.SaveObjectRes, err error) {
+func (mi MockIndexer) SaveObject(object any, opts ...any) (res search.SaveObjectRes, err error) {
 	mi.l.Printf("mock indexing")
 	return
 }

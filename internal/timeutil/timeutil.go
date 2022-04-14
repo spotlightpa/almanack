@@ -14,11 +14,11 @@ func ToEST(t time.Time) time.Time {
 	return t.In(newYork)
 }
 
-func GetTime(m map[string]interface{}, key string) (t time.Time, ok bool) {
+func GetTime(m map[string]any, key string) (t time.Time, ok bool) {
 	return ToTime(m[key])
 }
 
-func ToTime(v interface{}) (t time.Time, ok bool) {
+func ToTime(v any) (t time.Time, ok bool) {
 	if t, _ = v.(time.Time); !t.IsZero() {
 		ok = true
 		return

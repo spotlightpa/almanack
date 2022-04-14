@@ -66,7 +66,7 @@ func slugify(s string) string {
 	return strings.Map(f, s)
 }
 
-func UploadJSON(ctx context.Context, is aws.BlobStore, filepath, cachecontrol string, data interface{}) error {
+func UploadJSON(ctx context.Context, is aws.BlobStore, filepath, cachecontrol string, data any) error {
 	b, err := json.Marshal(data)
 	if err != nil {
 		return err

@@ -57,7 +57,7 @@ func (bs BlobStore) GetSignedURL(ctx context.Context, srcPath string, h http.Hea
 		Method:                   http.MethodPut,
 		ContentType:              h.Get("Content-Type"),
 		EnforceAbsentContentType: true,
-		BeforeSign: func(as func(interface{}) bool) error {
+		BeforeSign: func(as func(any) bool) error {
 			var opts *s3.PutObjectInput
 			if as(&opts) {
 				if disposition := h.Get("Content-Disposition"); disposition != "" {

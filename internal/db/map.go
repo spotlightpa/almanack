@@ -6,7 +6,7 @@ import (
 	"errors"
 )
 
-type Map map[string]interface{}
+type Map map[string]any
 
 // Value implements the driver.Valuer interface.
 func (m Map) Value() (driver.Value, error) {
@@ -15,8 +15,8 @@ func (m Map) Value() (driver.Value, error) {
 }
 
 // Scan implements the sql.Scanner interface.
-func (m *Map) Scan(value interface{}) error {
-	dbMap := make(map[string]interface{})
+func (m *Map) Scan(value any) error {
+	dbMap := make(map[string]any)
 	if value == nil {
 		*m = dbMap
 		return nil

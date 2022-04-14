@@ -12,12 +12,12 @@ var (
 	NullText  = pgtype.Text{Status: pgtype.Null}
 )
 
-func IsPresent(s interface{}) bool {
+func IsPresent(s any) bool {
 	v := reflect.ValueOf(s)
 	status := v.FieldByName("Status").Interface().(pgtype.Status)
 	return status == pgtype.Present
 }
 
-func IsNull(s interface{}) bool {
+func IsNull(s any) bool {
 	return !IsPresent(s)
 }
