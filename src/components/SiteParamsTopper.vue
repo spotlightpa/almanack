@@ -26,43 +26,16 @@ export default {
           type="url"
         />
 
-        <BulmaField v-slot="{ idForLabel }" label="Topper Background Color">
-          <div class="is-flex is-align-items-center">
-            <input
-              :id="idForLabel"
-              v-model="params.topperBgColor"
-              type="color"
-            />
-            <span class="ml-4 is-flex-grow-0">
-              <input
-                v-model="params.topperBgColor"
-                type="text"
-                class="input is-small"
-              />
-            </span>
-          </div>
-        </BulmaField>
+        <BulmaFieldColor
+          v-model="params.topperBgColor"
+          label="Topper Background Color"
+        />
 
-        <BulmaField
-          v-slot="{ idForLabel }"
+        <BulmaFieldColor
+          v-model="params.topperDividerColor"
           label="Navbar Divider Color"
           help="If banner is turned off, this will separate the topper from the navbar. Our orange is #ff6c36. Our yellow is #ffcb05. Our dark blue is #009edb. Our light blue is #99d9f1."
-        >
-          <div class="is-flex is-align-items-center">
-            <input
-              :id="idForLabel"
-              v-model="params.topperDividerColor"
-              type="color"
-            />
-            <span class="ml-4 is-flex-grow-0">
-              <input
-                v-model="params.topperDividerColor"
-                type="text"
-                class="input is-small"
-              />
-            </span>
-          </div>
-        </BulmaField>
+        />
 
         <BulmaField
           v-slot="{ idForLabel }"
