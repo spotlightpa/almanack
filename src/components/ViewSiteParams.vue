@@ -90,36 +90,6 @@ class SiteParams {
     Vue.observable(this);
   }
 
-  get bannerHTML() {
-    return sanitizeText(this.bannerText);
-  }
-
-  get supportHTML() {
-    return sanitizeText(this.supportText);
-  }
-
-  static link(data, key) {
-    let link = data[key];
-    if (!link) {
-      return "";
-    }
-    return new URL(link, "https://www.spotlightpa.org").href;
-  }
-
-  static unlink(url) {
-    if (!url) {
-      return "";
-    }
-    let u = new URL(url);
-    if (
-      u.hostname === "www.spotlightpa.org" ||
-      u.hostname === "spotlightpa.org"
-    ) {
-      return u.pathname;
-    }
-    return url;
-  }
-
   toJSON() {
     return {
       schedule_for: this.scheduleFor,
@@ -187,6 +157,36 @@ class SiteParams {
         ["support-cta"]: this.supportCTA,
       },
     };
+  }
+
+  get bannerHTML() {
+    return sanitizeText(this.bannerText);
+  }
+
+  get supportHTML() {
+    return sanitizeText(this.supportText);
+  }
+
+  static link(data, key) {
+    let link = data[key];
+    if (!link) {
+      return "";
+    }
+    return new URL(link, "https://www.spotlightpa.org").href;
+  }
+
+  static unlink(url) {
+    if (!url) {
+      return "";
+    }
+    let u = new URL(url);
+    if (
+      u.hostname === "www.spotlightpa.org" ||
+      u.hostname === "spotlightpa.org"
+    ) {
+      return u.pathname;
+    }
+    return url;
   }
 }
 
