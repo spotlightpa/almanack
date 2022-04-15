@@ -34,42 +34,15 @@ export default {
           label="Banner link"
           type="url"
         />
-        <BulmaField v-slot="{ idForLabel }" label="Banner Text Color">
-          <div class="is-flex is-align-items-center">
-            <input
-              :id="idForLabel"
-              v-model="params.bannerTextColor"
-              type="color"
-            />
-            <span class="ml-4 is-flex-grow-0">
-              <input
-                v-model="params.bannerTextColor"
-                type="text"
-                class="input is-small"
-              />
-            </span>
-          </div>
-        </BulmaField>
-        <BulmaField
-          v-slot="{ idForLabel }"
+        <BulmaFieldColor
+          v-model="params.bannerTextColor"
+          label="Banner Text Color"
+        />
+        <BulmaFieldColor
+          v-model="params.bannerBgColor"
           label="Banner Background Color"
           help="Our orange is #ff6c36. Our yellow is #ffcb05. Our dark blue is #009edb. Our light blue is #99d9f1."
-        >
-          <div class="is-flex is-align-items-center">
-            <input
-              :id="idForLabel"
-              v-model="params.bannerBgColor"
-              type="color"
-            />
-            <span class="ml-4 is-flex-grow-0">
-              <input
-                v-model="params.bannerBgColor"
-                type="text"
-                class="input is-small"
-              />
-            </span>
-          </div>
-        </BulmaField>
+        />
         <BulmaField label="Banner Preview">
           <div
             class="has-radius-padding"

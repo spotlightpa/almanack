@@ -40,6 +40,8 @@ import BulmaBreadcrumbs from "@/components/BulmaBreadcrumbs.vue";
 Vue.component("BulmaBreadcrumbs", BulmaBreadcrumbs);
 import BulmaField from "@/components/BulmaField.vue";
 Vue.component("BulmaField", BulmaField);
+import BulmaFieldColor from "@/components/BulmaFieldColor.vue";
+Vue.component("BulmaFieldColor", BulmaFieldColor);
 import BulmaFieldInput from "@/components/BulmaFieldInput.vue";
 Vue.component("BulmaFieldInput", BulmaFieldInput);
 import CopyTextarea from "@/components/CopyTextarea.vue";
