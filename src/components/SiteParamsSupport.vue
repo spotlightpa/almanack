@@ -26,15 +26,6 @@ export default {
         label="Support Us Box call to action"
       />
 
-      <BulmaField
-        label="Newsletter"
-        help="Pop up is full screen newsletter takeover"
-      >
-        <div>
-          <label class="checkbox">
-            <input v-model="params.newsletterActive" type="checkbox" />
-            Show newsletter pop up
-          </label>
         </div>
       </BulmaField>
     </details>
