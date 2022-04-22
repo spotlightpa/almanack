@@ -82,9 +82,16 @@ class SiteParams {
     this.footerMobileWidth = data["footer-promo-mobile-width"] ?? 0;
     this.footerMobileHeight = data["footer-promo-mobile-height"] ?? 0;
 
+    this.supportActive = data["support-active"] ?? false;
+    this.supportLink = SiteParams.link(data, "support-link");
     this.supportHed = data["support-hed"] ?? "";
     this.supportText = data["support-text"] ?? "";
     this.supportCTA = data["support-cta"] ?? "";
+    this.supportHedColor = data["support-hed-color"] ?? "";
+    this.supportTextColor = data["support-text-color"] ?? "";
+    this.supportBgColor = data["support-bg-color"] ?? "";
+    this.supportButtonBgColor = data["support-button-bg-color"] ?? "";
+    this.supportButtonTextColor = data["support-button-text-color"] ?? "";
 
     this.newsletterActive = data["newsletter-active"] ?? false;
     Vue.observable(this);
@@ -152,9 +159,16 @@ class SiteParams {
         ["footer-promo-mobile-images"]: this.footerMobileImages,
         ["footer-promo-mobile-width"]: this.footerMobileWidth,
         ["footer-promo-mobile-height"]: this.footerMobileHeight,
+        ["support-active"]: this.supportActive,
+        ["support-link"]: SiteParams.unlink(this.supportLink),
         ["support-hed"]: this.supportHed,
         ["support-text"]: this.supportHTML,
         ["support-cta"]: this.supportCTA,
+        ["support-hed-color"]: this.supportHedColor,
+        ["support-text-color"]: this.supportTextColor,
+        ["support-bg-color"]: this.supportBgColor,
+        ["support-button-bg-color"]: this.supportButtonBgColor,
+        ["support-button-text-color"]: this.supportButtonTextColor,
       },
     };
   }
