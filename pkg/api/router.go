@@ -5,6 +5,7 @@ import (
 
 	"github.com/go-chi/chi"
 	"github.com/go-chi/chi/middleware"
+	"github.com/spotlightpa/almanack/pkg/almanack"
 )
 
 func (app *appEnv) routes() http.Handler {
@@ -45,8 +46,8 @@ func (app *appEnv) routes() http.Handler {
 			r.Post(`/authorized-domains`, app.postDomain)
 			r.Post(`/available-articles`, app.postAlmanackArcStory)
 			r.Post(`/create-signed-upload`, app.postSignedUpload)
-			r.Get(`/editors-picks`, app.getEditorsPicks)
-			r.Post(`/editors-picks`, app.postEditorsPicks)
+			r.Get(`/editors-picks`, app.getSiteData(almanack.EditorsPicksLoc))
+			r.Post(`/editors-picks`, app.setSiteData((almanack.EditorsPicksLoc)))
 			r.Post(`/files-create`, app.postFileCreate)
 			r.Get(`/files-list`, app.listFiles)
 			r.Post(`/files-update`, app.postFileUpdate)
@@ -62,8 +63,8 @@ func (app *appEnv) routes() http.Handler {
 			r.Post(`/page-for-arc-id/{arcID}`, app.postPageForArcID)
 			r.Get(`/page-with-content/{id:\d+}`, app.getPageWithContent)
 			r.Post(`/refresh-page-from-arc/{id:\d+}`, app.postRefreshPageFromArc)
-			r.Get(`/site-params`, app.getSiteParams)
-			r.Post(`/site-params`, app.postSiteParams)
+			r.Get(`/site-params`, app.getSiteData(almanack.SiteParamsLoc))
+			r.Post(`/site-params`, app.setSiteData((almanack.SiteParamsLoc)))
 		})
 	})
 	r.Route("/ssr", func(r chi.Router) {
