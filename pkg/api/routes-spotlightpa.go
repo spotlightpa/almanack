@@ -351,53 +351,6 @@ func (app *appEnv) listImages(w http.ResponseWriter, r *http.Request) {
 	app.replyJSON(http.StatusOK, w, res)
 }
 
-func (app *appEnv) getEditorsPicks(w http.ResponseWriter, r *http.Request) {
-	app.Printf("starting getEditorsPicks")
-	type response struct {
-		Datums []db.SiteDatum `json:"datums"`
-	}
-	var (
-		res response
-		err error
-	)
-	res.Datums, err = app.svc.Queries.GetSiteData(r.Context(), almanack.EditorsPicksLoc)
-	if err != nil {
-		app.replyErr(w, r, err)
-		return
-	}
-	app.replyJSON(http.StatusOK, w, res)
-}
-
-func (app *appEnv) postEditorsPicks(w http.ResponseWriter, r *http.Request) {
-	app.Printf("starting postEditorsPicks")
-
-	var req struct {
-		Datums []almanack.ScheduledSiteConfig `json:"datums"`
-	}
-	if !app.readJSON(w, r, &req) {
-		return
-	}
-	if len(req.Datums) < 1 {
-		app.replyErr(w, r, resperr.New(
-			http.StatusBadRequest, "no schedulable items provided"))
-		return
-	}
-
-	var (
-		res struct {
-			Datums []db.SiteDatum `json:"datums"`
-		}
-		err error
-	)
-	res.Datums, err = app.svc.UpdateSiteConfig(r.Context(), almanack.EditorsPicksLoc, req.Datums)
-	if err != nil {
-		app.replyErr(w, r, err)
-		return
-	}
-
-	app.replyJSON(http.StatusOK, w, res)
-}
-
 func (app *appEnv) listAllTopics(w http.ResponseWriter, r *http.Request) {
 	app.Printf("starting listAllTopics")
 	t, err := app.svc.Queries.ListAllTopics(r.Context())
@@ -752,50 +705,54 @@ func (app *appEnv) listAllPages(w http.ResponseWriter, r *http.Request) {
 	app.replyJSON(http.StatusOK, w, res)
 }
 
-func (app *appEnv) getSiteParams(w http.ResponseWriter, r *http.Request) {
-	app.Printf("starting getSiteParams")
+func (app *appEnv) getSiteData(loc string) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		app.Printf("starting getSiteData(%q)", loc)
 
-	type response struct {
-		Configs []db.SiteDatum `json:"configs"`
-	}
-	var (
-		res response
-		err error
-	)
-	res.Configs, err = app.svc.Queries.GetSiteData(r.Context(), almanack.SiteParamsLoc)
-	if err != nil {
-		app.replyErr(w, r, err)
-		return
-	}
-	app.replyJSON(http.StatusOK, w, res)
-}
-
-func (app *appEnv) postSiteParams(w http.ResponseWriter, r *http.Request) {
-	app.Printf("starting postSiteParams")
-
-	var req struct {
-		Configs []almanack.ScheduledSiteConfig `json:"configs"`
-	}
-	if !app.readJSON(w, r, &req) {
-		return
-	}
-	if len(req.Configs) < 1 {
-		app.replyErr(w, r, resperr.New(
-			http.StatusBadRequest, "no schedulable items provided"))
-		return
-	}
-
-	var (
-		res struct {
+		type response struct {
 			Configs []db.SiteDatum `json:"configs"`
 		}
-		err error
-	)
-	res.Configs, err = app.svc.UpdateSiteConfig(r.Context(), almanack.SiteParamsLoc, req.Configs)
-	if err != nil {
-		app.replyErr(w, r, err)
-		return
+		var (
+			res response
+			err error
+		)
+		res.Configs, err = app.svc.Queries.GetSiteData(r.Context(), loc)
+		if err != nil {
+			app.replyErr(w, r, err)
+			return
+		}
+		app.replyJSON(http.StatusOK, w, res)
 	}
+}
 
-	app.replyJSON(http.StatusOK, w, res)
+func (app *appEnv) setSiteData(loc string) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		app.Printf("starting setSiteData(%q)", loc)
+
+		var req struct {
+			Configs []almanack.ScheduledSiteConfig `json:"configs"`
+		}
+		if !app.readJSON(w, r, &req) {
+			return
+		}
+		if len(req.Configs) < 1 {
+			app.replyErr(w, r, resperr.New(
+				http.StatusBadRequest, "no schedulable items provided"))
+			return
+		}
+
+		var (
+			res struct {
+				Configs []db.SiteDatum `json:"configs"`
+			}
+			err error
+		)
+		res.Configs, err = app.svc.UpdateSiteConfig(r.Context(), loc, req.Configs)
+		if err != nil {
+			app.replyErr(w, r, err)
+			return
+		}
+
+		app.replyJSON(http.StatusOK, w, res)
+	}
 }
