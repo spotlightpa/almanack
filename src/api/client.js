@@ -51,6 +51,8 @@ const endpoints = {
   getSignupURL: `/api/mailchimp-signup-url`,
   sendMessage: `/api/message`,
   postPage: `/api/page`,
+  getSidebar: `/api/sidebar`,
+  saveSidebar: `/api/sidebar`,
   getSiteParams: `/api/site-params`,
   postSiteParams: `/api/site-params`,
 };
@@ -183,7 +185,7 @@ function makeClient($auth) {
 
   let simpleGetActions = [
     "getEditorsPicks",
-    "getSignupURL",
+    "getSidebar",
     "getSiteParams",
     "listAllPages",
     "listAllSeries",
@@ -206,6 +208,7 @@ function makeClient($auth) {
     "saveArcArticle",
     "saveArticle",
     "saveEditorsPicks",
+    "saveSidebar",
     "sendMessage",
   ];
   for (let action of simplePostActions) {
