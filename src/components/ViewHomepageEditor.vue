@@ -71,7 +71,7 @@ class EditorsPicksData {
 }
 
 export default {
-  name: "ViewEditorsPicks",
+  name: "ViewHomepageEditor",
   metaInfo: {
     title: "Homepage Editor",
   },
