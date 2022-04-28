@@ -7,15 +7,15 @@ import { setDimensions, sendGAPageview } from "@/utils/google-analytics.js";
 
 import ViewAdmin from "./components/ViewAdmin.vue";
 import ViewArcArticle from "./components/ViewArcArticle.vue";
-import ViewSharedList from "./components/ViewSharedList.vue";
 import ViewAuthorizedDomains from "./components/ViewAuthorizedDomains.vue";
-import ViewEditorsPicks from "./components/ViewEditorsPicks.vue";
 import ViewError from "./components/ViewError.vue";
 import ViewFileUploader from "./components/ViewFileUploader.vue";
+import ViewHomepageEditor from "./components/ViewHomepageEditor.vue";
 import ViewLogin from "./components/ViewLogin.vue";
 import ViewNewsletterList from "./components/ViewNewsletterList.vue";
 import ViewNewsletterPage from "./components/ViewNewsletterPage.vue";
 import ViewNewsPage from "./components/ViewNewsPage.vue";
+import ViewSharedList from "./components/ViewSharedList.vue";
 import ViewNewsPagesList from "./components/ViewNewsPagesList.vue";
 import ViewRedirectArcToNewsPage from "./components/ViewRedirectArcToNewsPage.vue";
 import ViewSiteParams from "./components/ViewSiteParams.vue";
@@ -97,7 +97,7 @@ let router = new Router({
     {
       path: "/admin/editors-picks",
       name: "editors-picks",
-      component: ViewEditorsPicks,
+      component: ViewHomepageEditor,
       meta: {
         requiresAuth: isSpotlightPAUser,
       },
