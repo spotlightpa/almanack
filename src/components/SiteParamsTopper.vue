@@ -1,6 +1,26 @@
 <script>
+import useData from "@/utils/use-data.js";
+import { toRel, toAbs } from "@/utils/link.js";
+
 export default {
   props: { params: Object, fileProps: Object },
+  setup(props, { emit }) {
+    return {
+      ...useData(emit, props.params.data, {
+        topperActive: ["topper-active"],
+        topperBgColor: ["topper-bg-color"],
+        topperDividerColor: ["topper-divider-color"],
+        topperLink: ["topper-link", toAbs, toRel],
+        topperImageDescription: ["topper-image-description"],
+        topperDesktopHeight: ["topper-desktop-height"],
+        topperDesktopWidth: ["topper-desktop-width"],
+        topperDesktopImages: ["topper-desktop-images"],
+        topperMobileHeight: ["topper-mobile-height"],
+        topperMobileWidth: ["topper-mobile-width"],
+        topperMobileImages: ["topper-mobile-images"],
+      }),
+    };
+  },
 };
 </script>
 
@@ -14,25 +34,21 @@ export default {
       >
         <div>
           <label class="checkbox">
-            <input v-model="params.topperActive" type="checkbox" />
+            <input v-model="topperActive" type="checkbox" />
             Show topper
           </label>
         </div>
       </BulmaField>
-      <template v-if="params.topperActive">
-        <BulmaFieldInput
-          v-model="params.topperLink"
-          label="Topper link"
-          type="url"
-        />
+      <template v-if="topperActive">
+        <BulmaFieldInput v-model="topperLink" label="Topper link" type="url" />
 
         <BulmaFieldColor
-          v-model="params.topperBgColor"
+          v-model="topperBgColor"
           label="Topper Background Color"
         />
 
         <BulmaFieldColor
-          v-model="params.topperDividerColor"
+          v-model="topperDividerColor"
           label="Navbar Divider Color"
           help="If banner is turned off, this will separate the topper from the navbar. Our orange is #ff6c36. Our yellow is #ffcb05. Our dark blue is #009edb. Our light blue is #99d9f1."
         />
@@ -44,7 +60,7 @@ export default {
         >
           <textarea
             :id="idForLabel"
-            v-model="params.topperImageDescription"
+            v-model="topperImageDescription"
             class="textarea"
             rows="2"
           ></textarea>
@@ -53,7 +69,7 @@ export default {
           <BulmaField v-slot="{ idForLabel }" label="Desktop Image Width">
             <input
               :id="idForLabel"
-              v-model.number="params.topperDesktopWidth"
+              v-model.number="topperDesktopWidth"
               class="input"
               inputmode="numeric"
             />
@@ -65,7 +81,7 @@ export default {
           >
             <input
               :id="idForLabel"
-              v-model.number="params.topperDesktopHeight"
+              v-model.number="topperDesktopHeight"
               class="input"
               inputmode="numeric"
             />
@@ -76,10 +92,10 @@ export default {
           help="If multiple images are provided, each page load will select one randomly"
         >
           <SiteParamsFiles
-            :files="params.topperDesktopImages"
+            :files="topperDesktopImages"
             :file-props="fileProps"
-            @add="params.topperDesktopImages.push($event)"
-            @remove="params.topperDesktopImages.splice($event, 1)"
+            @add="topperDesktopImages.push($event)"
+            @remove="topperDesktopImages.splice($event, 1)"
           />
         </BulmaField>
 
@@ -87,7 +103,7 @@ export default {
           <BulmaField v-slot="{ idForLabel }" label="Mobile Image Width">
             <input
               :id="idForLabel"
-              v-model.number="params.topperMobileWidth"
+              v-model.number="topperMobileWidth"
               class="input"
               inputmode="numeric"
             />
@@ -99,7 +115,7 @@ export default {
           >
             <input
               :id="idForLabel"
-              v-model.number="params.topperMobileHeight"
+              v-model.number="topperMobileHeight"
               class="input"
               inputmode="numeric"
             />
@@ -111,10 +127,10 @@ export default {
           help="If multiple images are provided, each page load will select one randomly"
         >
           <SiteParamsFiles
-            :files="params.topperMobileImages"
+            :files="topperMobileImages"
             :file-props="fileProps"
-            @add="params.topperMobileImages.push($event)"
-            @remove="params.topperMobileImages.splice($event, 1)"
+            @add="topperMobileImages.push($event)"
+            @remove="topperMobileImages.splice($event, 1)"
           />
         </BulmaField>
       </template>

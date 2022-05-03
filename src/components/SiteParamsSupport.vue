@@ -1,6 +1,33 @@
 <script>
+import useData from "@/utils/use-data.js";
+import { toRel, toAbs } from "@/utils/link.js";
+import sanitizeText from "@/utils/sanitize-text.js";
+
+function cleanText(text) {
+  return text
+    .split("\n")
+    .map((p) => sanitizeText(p))
+    .join("\n");
+}
+
 export default {
   props: { params: Object, fileProps: Object },
+  setup(props, { emit }) {
+    return {
+      ...useData(emit, props.params.data, {
+        supportActive: ["support-active"],
+        supportLink: ["support-link", toAbs, toRel],
+        supportHed: ["support-hed"],
+        supportText: ["support-text", undefined, cleanText],
+        supportCTA: ["support-cta"],
+        supportHedColor: ["support-hed-color"],
+        supportTextColor: ["support-text-color"],
+        supportBgColor: ["support-bg-color"],
+        supportButtonBgColor: ["support-button-bg-color"],
+        supportButtonTextColor: ["support-button-text-color"],
+      }),
+    };
+  },
 };
 </script>
 
@@ -11,21 +38,18 @@ export default {
       <BulmaField label="Support Us Box">
         <div>
           <label class="checkbox">
-            <input v-model="params.supportActive" type="checkbox" />
+            <input v-model="supportActive" type="checkbox" />
             Show support box in footer of articles
           </label>
         </div>
       </BulmaField>
-      <template v-if="params.supportActive">
+      <template v-if="supportActive">
         <BulmaFieldInput
-          v-model="params.supportLink"
+          v-model="supportLink"
           label="Support box link"
           type="url"
         />
-        <BulmaFieldInput
-          v-model="params.supportHed"
-          label="Support Us Box hed"
-        />
+        <BulmaFieldInput v-model="supportHed" label="Support Us Box hed" />
         <BulmaField
           v-slot="{ idForLabel }"
           label="Support Us Box text"
@@ -33,13 +57,13 @@ export default {
         >
           <textarea
             :id="idForLabel"
-            v-model="params.supportText"
+            v-model="supportText"
             class="textarea"
             rows="2"
           ></textarea>
         </BulmaField>
         <BulmaFieldInput
-          v-model="params.supportCTA"
+          v-model="supportCTA"
           label="Support Us Box call to action"
         />
         <p class="label">Some common colors</p>
@@ -49,24 +73,21 @@ export default {
           Our CTA orange is #ff6c36. Our green is #78bc20. Our yellow is
           #ffcb05. Our goldenrod is #fff1bd. Our beige is #f4f1ee.
         </p>
+        <BulmaFieldColor v-model="supportHedColor" label="Support Hed Color" />
         <BulmaFieldColor
-          v-model="params.supportHedColor"
-          label="Support Hed Color"
-        />
-        <BulmaFieldColor
-          v-model="params.supportTextColor"
+          v-model="supportTextColor"
           label="Support Text Color"
         />
         <BulmaFieldColor
-          v-model="params.supportBgColor"
+          v-model="supportBgColor"
           label="Support Background Color"
         />
         <BulmaFieldColor
-          v-model="params.supportButtonBgColor"
+          v-model="supportButtonBgColor"
           label="Support Button Background Color"
         />
         <BulmaFieldColor
-          v-model="params.supportButtonTextColor"
+          v-model="supportButtonTextColor"
           label="Support Button Text Color"
         />
 
@@ -74,29 +95,29 @@ export default {
           <div class="support-wrapper">
             <div
               class="support-content"
-              :style="{ 'background-color': params.supportBgColor }"
+              :style="{ 'background-color': supportBgColor }"
             >
               <h2
                 class="support-header"
-                :style="{ color: params.supportHedColor }"
-                v-text="params.supportHed"
+                :style="{ color: supportHedColor }"
+                v-text="supportHed"
               ></h2>
               <p
-                v-for="(p, i) of params.supportHTML.split('\n')"
+                v-for="(p, i) of params.data['support-text'].split('\n')"
                 :key="i"
                 class="support-p"
-                :style="{ color: params.supportTextColor }"
+                :style="{ color: supportTextColor }"
                 v-html="p"
               ></p>
               <div class="mt-6 has-text-centered">
                 <span
                   class="button has-text-weight-semibold is-uppercase"
                   :style="{
-                    color: params.supportButtonTextColor,
-                    backgroundColor: params.supportButtonBgColor,
-                    borderColor: params.supportButtonBgColor,
+                    color: supportButtonTextColor,
+                    backgroundColor: supportButtonBgColor,
+                    borderColor: supportButtonBgColor,
                   }"
-                  v-text="params.supportCTA"
+                  v-text="supportCTA"
                 >
                 </span>
               </div>

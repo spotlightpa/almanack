@@ -1,6 +1,26 @@
 <script>
+import useData from "@/utils/use-data.js";
+import { toRel, toAbs } from "@/utils/link.js";
+
 export default {
   props: { params: Object, fileProps: Object },
+  setup(props, { emit }) {
+    return {
+      ...useData(emit, props.params.data, {
+        promoActive: ["promo-active"],
+        promoType: ["promo-type"],
+        promoImageDescription: ["promo-image-description"],
+        promoDesktopImages: ["promo-desktop-images"],
+        promoDesktopWidth: ["promo-desktop-width"],
+        promoDesktopHeight: ["promo-desktop-height"],
+        promoMobileImages: ["promo-mobile-images"],
+        promoMobileWidth: ["promo-mobile-width"],
+        promoMobileHeight: ["promo-mobile-height"],
+        promoLink: ["promo-link", toAbs, toRel],
+        promoText: ["promo-text"],
+      }),
+    };
+  },
 };
 </script>
 
@@ -11,20 +31,20 @@ export default {
       <BulmaField label="Top promo">
         <div>
           <label class="checkbox">
-            <input v-model="params.promoActive" type="checkbox" />
+            <input v-model="promoActive" type="checkbox" />
             Top promo is the native ad-like slot at top of the page
           </label>
         </div>
       </BulmaField>
-      <template v-if="params.promoActive">
+      <template v-if="promoActive">
         <BulmaFieldInput
-          v-model="params.promoLink"
+          v-model="promoLink"
           label="Top promo link"
           type="url"
         />
         <BulmaField v-slot="{ idForLabel }" label="Top promo kind">
           <div class="select is-fullwidth">
-            <select :id="idForLabel" v-model="params.promoType" class="select">
+            <select :id="idForLabel" v-model="promoType" class="select">
               <option value="image">Image</option>
               <option value="text">Text</option>
             </select>
@@ -32,20 +52,20 @@ export default {
         </BulmaField>
 
         <BulmaField
-          v-if="params.promoType === 'text'"
+          v-if="promoType === 'text'"
           v-slot="{ idForLabel }"
           label="Top promo text"
           help="Text will appear between navbar and page content"
         >
           <textarea
             :id="idForLabel"
-            v-model="params.promoText"
+            v-model="promoText"
             class="textarea"
             rows="2"
           ></textarea>
         </BulmaField>
 
-        <template v-if="params.promoType === 'image'">
+        <template v-if="promoType === 'image'">
           <BulmaField
             v-slot="{ idForLabel }"
             label="Top promo image description"
@@ -53,7 +73,7 @@ export default {
           >
             <textarea
               :id="idForLabel"
-              v-model="params.promoImageDescription"
+              v-model="promoImageDescription"
               class="textarea"
               rows="2"
             ></textarea>
@@ -62,7 +82,7 @@ export default {
             <BulmaField v-slot="{ idForLabel }" label="Desktop Image Width">
               <input
                 :id="idForLabel"
-                v-model.number="params.promoDesktopWidth"
+                v-model.number="promoDesktopWidth"
                 class="input"
                 inputmode="numeric"
               />
@@ -74,7 +94,7 @@ export default {
             >
               <input
                 :id="idForLabel"
-                v-model.number="params.promoDesktopHeight"
+                v-model.number="promoDesktopHeight"
                 class="input"
                 inputmode="numeric"
               />
@@ -85,10 +105,10 @@ export default {
             help="If multiple images are provided, each page load will select one randomly"
           >
             <SiteParamsFiles
-              :files="params.promoDesktopImages"
+              :files="promoDesktopImages"
               :file-props="fileProps"
-              @add="params.promoDesktopImages.push($event)"
-              @remove="params.promoDesktopImages.splice($event, 1)"
+              @add="promoDesktopImages.push($event)"
+              @remove="promoDesktopImages.splice($event, 1)"
             />
           </BulmaField>
 
@@ -96,7 +116,7 @@ export default {
             <BulmaField v-slot="{ idForLabel }" label="Mobile Image Width">
               <input
                 :id="idForLabel"
-                v-model.number="params.promoMobileWidth"
+                v-model.number="promoMobileWidth"
                 class="input"
                 inputmode="numeric"
               />
@@ -108,7 +128,7 @@ export default {
             >
               <input
                 :id="idForLabel"
-                v-model.number="params.promoMobileHeight"
+                v-model.number="promoMobileHeight"
                 class="input"
                 inputmode="numeric"
               />
@@ -120,10 +140,10 @@ export default {
             help="If multiple images are provided, each page load will select one randomly"
           >
             <SiteParamsFiles
-              :files="params.promoMobileImages"
+              :files="promoMobileImages"
               :file-props="fileProps"
-              @add="params.promoMobileImages.push($event)"
-              @remove="params.promoMobileImages.splice($event, 1)"
+              @add="promoMobileImages.push($event)"
+              @remove="promoMobileImages.splice($event, 1)"
             />
           </BulmaField>
         </template>
