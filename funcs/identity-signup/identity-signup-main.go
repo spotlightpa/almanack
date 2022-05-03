@@ -14,7 +14,7 @@ import (
 	"github.com/aws/aws-lambda-go/lambda"
 	"github.com/getsentry/sentry-go"
 
-	"github.com/carlmjohnson/flagext"
+	"github.com/carlmjohnson/flagx"
 	"github.com/spotlightpa/almanack/internal/db"
 	"github.com/spotlightpa/almanack/internal/herokuapi"
 	"github.com/spotlightpa/almanack/internal/netlifyid"
@@ -53,7 +53,7 @@ func (app *appEnv) parseEnv() error {
 	if err := fl.Parse([]string{}); err != nil {
 		return err
 	}
-	if err := flagext.ParseEnv(fl, "almanack"); err != nil {
+	if err := flagx.ParseEnv(fl, "almanack"); err != nil {
 		return err
 	}
 	if err := heroku.Configure(app.logger, map[string]string{
@@ -70,7 +70,7 @@ func (app *appEnv) parseEnv() error {
 	}
 
 	app.sc = slack.New(*slackHookURL, app.logger)
-	if err := flagext.MustHave(fl, "postgres"); err != nil {
+	if err := flagx.MustHave(fl, "postgres"); err != nil {
 		return err
 	}
 

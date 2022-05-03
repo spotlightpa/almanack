@@ -4,7 +4,7 @@ import (
 	"flag"
 	"net/http"
 
-	"github.com/carlmjohnson/flagext"
+	"github.com/carlmjohnson/flagx"
 	"github.com/spotlightpa/almanack/internal/aws"
 	"github.com/spotlightpa/almanack/internal/db"
 	"github.com/spotlightpa/almanack/internal/github"
@@ -38,7 +38,7 @@ func Flags(fl *flag.FlagSet) func(common.Logger) (svc Service, err error) {
 		}); err != nil {
 			return
 		}
-		if err = flagext.MustHave(fl, "postgres"); err != nil {
+		if err = flagx.MustHave(fl, "postgres"); err != nil {
 			return
 		}
 

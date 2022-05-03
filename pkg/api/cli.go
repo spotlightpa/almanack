@@ -3,13 +3,14 @@ package api
 import (
 	"flag"
 	"fmt"
+	"io"
 	"log"
 	"net/http"
 	"net/url"
 	"os"
 	"time"
 
-	"github.com/carlmjohnson/flagext"
+	"github.com/carlmjohnson/flagx"
 	"github.com/carlmjohnson/gateway"
 	"github.com/getsentry/sentry-go"
 	sentryhttp "github.com/getsentry/sentry-go/http"
@@ -41,12 +42,8 @@ func (app *appEnv) parseArgs(args []string) error {
 	fl.BoolVar(&app.isLambda, "lambda", false, "use AWS Lambda rather than HTTP")
 	fl.StringVar(&app.port, "port", ":33160", "listen on port (HTTP only)")
 	fl.StringVar(&app.mailchimpSignupURL, "mc-signup-url", "http://example.com", "`URL` to redirect users to for MailChimp signup")
-	app.Logger = log.New(nil, AppName+" ", log.LstdFlags)
-	fl.Var(
-		flagext.Logger(app.Logger, flagext.LogSilent),
-		"silent",
-		`don't log debug output`,
-	)
+	app.Logger = log.New(os.Stderr, AppName+" ", log.LstdFlags)
+	silent := fl.Bool("silent", false, "don't log debug output")
 	sentryDSN := fl.String("sentry-dsn", "", "DSN `pseudo-URL` for Sentry")
 	fl.Usage = func() {
 		fmt.Fprintf(fl.Output(), "almanack-api help\n\n")
@@ -57,10 +54,12 @@ func (app *appEnv) parseArgs(args []string) error {
 	if err := fl.Parse(args); err != nil {
 		return err
 	}
-	if err := flagext.ParseEnv(fl, "almanack"); err != nil {
+	if err := flagx.ParseEnv(fl, "almanack"); err != nil {
 		return err
 	}
-
+	if *silent {
+		app.Logger.SetOutput(io.Discard)
+	}
 	if err := app.initSentry(*sentryDSN, app.Logger); err != nil {
 		return err
 	}
