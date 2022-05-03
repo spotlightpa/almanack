@@ -183,8 +183,8 @@ github.com/carlmjohnson/errutil v0.21.5 h1:4WpeYOqUXCg1LVrc3qp7Tzr0SJgpipupdVIpN
 github.com/carlmjohnson/errutil v0.21.5/go.mod h1:DMNW3MBHsaV/EPm8pjs4sA/gNjNsG4rUzbAfOh++gSM=
 github.com/carlmjohnson/exitcode v0.20.2 h1:vE6rmkCGNA4kO4m1qwWIa77PKlUBVg46cNjs22eAOXE=
 github.com/carlmjohnson/exitcode v0.20.2/go.mod h1:MZ6ThCDx517DQcrpYnnns1pLh8onjFl+B/AsrOrdmpc=
-github.com/carlmjohnson/flagext v0.22.1 h1:EdIj8NCAOZKikL1Ux55oc3JUJeeAUrsC+A2OaUCdVL0=
-github.com/carlmjohnson/flagext v0.22.1/go.mod h1:SKojRbVQTvw04RKgb+4Y1mSlAPFC3p76pUNXGUaJZuQ=
+github.com/carlmjohnson/flagx v0.22.1 h1:vg8y7Kl4rUJXwhlcVmvJAm1YEtyxXLLtEKQLHiGykzc=
+github.com/carlmjohnson/flagx v0.22.1/go.mod h1:obobISvBnxgEXPLBITVXhRUOlSlzza1SGt34M64CPJc=
 github.com/carlmjohnson/gateway v1.20.7 h1:YAh975ebqncs2CnHUcauq0DtQcWbI1d/bRi5KhqWdCc=
 github.com/carlmjohnson/gateway v1.20.7/go.mod h1:6D9xs2uAFs8UbCawK3gDCRkPRvZHuKI+HSs29zwFsHs=
 github.com/carlmjohnson/requests v0.22.2 h1:hccG5g9ITJlnDip54OVa810AkB366kthFjvA90N4owM=
