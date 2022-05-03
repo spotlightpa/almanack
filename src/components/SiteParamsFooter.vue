@@ -1,6 +1,23 @@
 <script>
+import useData from "@/utils/use-data.js";
+import { toRel, toAbs } from "@/utils/link.js";
+
 export default {
   props: { params: Object, fileProps: Object },
+  setup(props, { emit }) {
+    return {
+      ...useData(emit, props.params.data, {
+        footerDescription: ["footer-promo-description"],
+        footerLink: ["footer-promo-link", toAbs, toRel],
+        footerDesktopImages: ["footer-promo-desktop-images"],
+        footerDesktopWidth: ["footer-promo-desktop-width"],
+        footerDesktopHeight: ["footer-promo-desktop-height"],
+        footerMobileImages: ["footer-promo-mobile-images"],
+        footerMobileWidth: ["footer-promo-mobile-width"],
+        footerMobileHeight: ["footer-promo-mobile-height"],
+      }),
+    };
+  },
 };
 </script>
 
@@ -9,7 +26,7 @@ export default {
     <details class="mt-4">
       <summary class="title is-4">Footer promo</summary>
       <BulmaFieldInput
-        v-model="params.footerLink"
+        v-model="footerLink"
         label="Footer promo link"
         type="url"
       />
@@ -21,7 +38,7 @@ export default {
       >
         <textarea
           :id="idForLabel"
-          v-model="params.footerDescription"
+          v-model="footerDescription"
           class="textarea"
           rows="2"
         ></textarea>
@@ -30,7 +47,7 @@ export default {
         <BulmaField v-slot="{ idForLabel }" label="Desktop Image Width">
           <input
             :id="idForLabel"
-            v-model.number="params.footerDesktopWidth"
+            v-model.number="footerDesktopWidth"
             class="input"
             inputmode="numeric"
           />
@@ -42,7 +59,7 @@ export default {
         >
           <input
             :id="idForLabel"
-            v-model.number="params.footerDesktopHeight"
+            v-model.number="footerDesktopHeight"
             class="input"
             inputmode="numeric"
           />
@@ -53,10 +70,10 @@ export default {
         help="If multiple images are provided, each page load will select one randomly"
       >
         <SiteParamsFiles
-          :files="params.footerDesktopImages"
+          :files="footerDesktopImages"
           :file-props="fileProps"
-          @add="params.footerDesktopImages.push($event)"
-          @remove="params.footerDesktopImages.splice($event, 1)"
+          @add="footerDesktopImages.push($event)"
+          @remove="footerDesktopImages.splice($event, 1)"
         />
       </BulmaField>
 
@@ -64,7 +81,7 @@ export default {
         <BulmaField v-slot="{ idForLabel }" label="Mobile Image Width">
           <input
             :id="idForLabel"
-            v-model.number="params.footerMobileWidth"
+            v-model.number="footerMobileWidth"
             class="input"
             inputmode="numeric"
           />
@@ -76,7 +93,7 @@ export default {
         >
           <input
             :id="idForLabel"
-            v-model.number="params.footerMobileHeight"
+            v-model.number="footerMobileHeight"
             class="input"
             inputmode="numeric"
           />
@@ -88,10 +105,10 @@ export default {
         help="If multiple images are provided, each page load will select one randomly"
       >
         <SiteParamsFiles
-          :files="params.footerMobileImages"
+          :files="footerMobileImages"
           :file-props="fileProps"
-          @add="params.footerMobileImages.push($event)"
-          @remove="params.footerMobileImages.splice($event, 1)"
+          @add="footerMobileImages.push($event)"
+          @remove="footerMobileImages.splice($event, 1)"
         />
       </BulmaField>
     </details>

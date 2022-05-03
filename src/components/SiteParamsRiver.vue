@@ -1,6 +1,23 @@
 <script>
+import useData from "@/utils/use-data.js";
+import { toRel, toAbs } from "@/utils/link.js";
+
 export default {
   props: { params: Object, fileProps: Object },
+  setup(props, { emit }) {
+    return {
+      ...useData(emit, props.params.data, {
+        riverDescription: ["river-promo-description"],
+        riverLink: ["river-promo-link", toAbs, toRel],
+        riverDesktopImages: ["river-promo-desktop-images"],
+        riverDesktopWidth: ["river-promo-desktop-width"],
+        riverDesktopHeight: ["river-promo-desktop-height"],
+        riverMobileImages: ["river-promo-mobile-images"],
+        riverMobileWidth: ["river-promo-mobile-width"],
+        riverMobileHeight: ["river-promo-mobile-height"],
+      }),
+    };
+  },
 };
 </script>
 
@@ -9,7 +26,7 @@ export default {
     <details class="mt-4">
       <summary class="title is-4">Homepage river</summary>
       <BulmaFieldInput
-        v-model="params.riverLink"
+        v-model="riverLink"
         label="Homepage river promo link"
         type="url"
       />
@@ -20,7 +37,7 @@ export default {
       >
         <textarea
           :id="idForLabel"
-          v-model="params.riverDescription"
+          v-model="riverDescription"
           class="textarea"
           rows="2"
         ></textarea>
@@ -29,7 +46,7 @@ export default {
         <BulmaField v-slot="{ idForLabel }" label="Desktop Image Width">
           <input
             :id="idForLabel"
-            v-model.number="params.riverDesktopWidth"
+            v-model.number="riverDesktopWidth"
             class="input"
             inputmode="numeric"
           />
@@ -41,7 +58,7 @@ export default {
         >
           <input
             :id="idForLabel"
-            v-model.number="params.riverDesktopHeight"
+            v-model.number="riverDesktopHeight"
             class="input"
             inputmode="numeric"
           />
@@ -52,10 +69,10 @@ export default {
         help="If multiple images are provided, each page load will select one randomly"
       >
         <SiteParamsFiles
-          :files="params.riverDesktopImages"
+          :files="riverDesktopImages"
           :file-props="fileProps"
-          @add="params.riverDesktopImages.push($event)"
-          @remove="params.riverDesktopImages.splice($event, 1)"
+          @add="riverDesktopImages.push($event)"
+          @remove="riverDesktopImages.splice($event, 1)"
         />
       </BulmaField>
 
@@ -63,7 +80,7 @@ export default {
         <BulmaField v-slot="{ idForLabel }" label="Mobile Image Width">
           <input
             :id="idForLabel"
-            v-model.number="params.riverMobileWidth"
+            v-model.number="riverMobileWidth"
             class="input"
             inputmode="numeric"
           />
@@ -75,7 +92,7 @@ export default {
         >
           <input
             :id="idForLabel"
-            v-model.number="params.riverMobileHeight"
+            v-model.number="riverMobileHeight"
             class="input"
             inputmode="numeric"
           />
@@ -87,10 +104,10 @@ export default {
         help="If multiple images are provided, each page load will select one randomly"
       >
         <SiteParamsFiles
-          :files="params.riverMobileImages"
+          :files="riverMobileImages"
           :file-props="fileProps"
-          @add="params.riverMobileImages.push($event)"
-          @remove="params.riverMobileImages.splice($event, 1)"
+          @add="riverMobileImages.push($event)"
+          @remove="riverMobileImages.splice($event, 1)"
         />
       </BulmaField>
     </details>

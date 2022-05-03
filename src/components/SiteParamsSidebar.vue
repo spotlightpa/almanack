@@ -1,6 +1,26 @@
 <script>
+import useData from "@/utils/use-data.js";
+import { toRel, toAbs } from "@/utils/link.js";
+
 export default {
   props: { params: Object, fileProps: Object },
+  setup(props, { emit }) {
+    return {
+      ...useData(emit, props.params.data, {
+        sidebarTopDescription: ["sidebar-top-description"],
+        sidebarTopLink: ["sidebar-top-link", toAbs, toRel],
+        sidebarTopImages: ["sidebar-top-images"],
+        sidebarTopWidth: ["sidebar-top-width"],
+        sidebarTopHeight: ["sidebar-top-height"],
+
+        sidebarStickyDescription: ["sidebar-sticky-description"],
+        sidebarStickyLink: ["sidebar-sticky-link", toAbs, toRel],
+        sidebarStickyImages: ["sidebar-sticky-images"],
+        sidebarStickyWidth: ["sidebar-sticky-width"],
+        sidebarStickyHeight: ["sidebar-sticky-height"],
+      }),
+    };
+  },
 };
 </script>
 
@@ -9,7 +29,7 @@ export default {
     <details class="mt-4">
       <summary class="title is-4">Sidebar top</summary>
       <BulmaFieldInput
-        v-model="params.sidebarTopLink"
+        v-model="sidebarTopLink"
         label="Sidebar top promo link"
         type="url"
       />
@@ -20,7 +40,7 @@ export default {
       >
         <textarea
           :id="idForLabel"
-          v-model="params.sidebarTopDescription"
+          v-model="sidebarTopDescription"
           class="textarea"
           rows="2"
         ></textarea>
@@ -29,7 +49,7 @@ export default {
         <BulmaField v-slot="{ idForLabel }" label="Image Width">
           <input
             :id="idForLabel"
-            v-model.number="params.sidebarTopWidth"
+            v-model.number="sidebarTopWidth"
             class="input"
             inputmode="numeric"
           />
@@ -37,7 +57,7 @@ export default {
         <BulmaField v-slot="{ idForLabel }" class="ml-2" label="Image Height">
           <input
             :id="idForLabel"
-            v-model.number="params.sidebarTopHeight"
+            v-model.number="sidebarTopHeight"
             class="input"
             inputmode="numeric"
           />
@@ -48,17 +68,17 @@ export default {
         help="If multiple images are provided, each page load will select one randomly"
       >
         <SiteParamsFiles
-          :files="params.sidebarTopImages"
+          :files="sidebarTopImages"
           :file-props="fileProps"
-          @add="params.sidebarTopImages.push($event)"
-          @remove="params.sidebarTopImages.splice($event, 1)"
+          @add="sidebarTopImages.push($event)"
+          @remove="sidebarTopImages.splice($event, 1)"
         />
       </BulmaField>
     </details>
     <details class="mt-4">
       <summary class="title is-4">Sidebar sticky</summary>
       <BulmaFieldInput
-        v-model="params.sidebarStickyLink"
+        v-model="sidebarStickyLink"
         label="Sidebar sticky bottom promo link"
         type="url"
       />
@@ -69,7 +89,7 @@ export default {
       >
         <textarea
           :id="idForLabel"
-          v-model="params.sidebarStickyDescription"
+          v-model="sidebarStickyDescription"
           class="textarea"
           rows="2"
         ></textarea>
@@ -78,7 +98,7 @@ export default {
         <BulmaField v-slot="{ idForLabel }" label="Image Width">
           <input
             :id="idForLabel"
-            v-model.number="params.sidebarStickyWidth"
+            v-model.number="sidebarStickyWidth"
             class="input"
             inputmode="numeric"
           />
@@ -86,7 +106,7 @@ export default {
         <BulmaField v-slot="{ idForLabel }" class="ml-2" label="Image Height">
           <input
             :id="idForLabel"
-            v-model.number="params.sidebarStickyHeight"
+            v-model.number="sidebarStickyHeight"
             class="input"
             inputmode="numeric"
           />
@@ -97,10 +117,10 @@ export default {
         help="If multiple images are provided, each page load will select one randomly"
       >
         <SiteParamsFiles
-          :files="params.sidebarStickyImages"
+          :files="sidebarStickyImages"
           :file-props="fileProps"
-          @add="params.sidebarStickyImages.push($event)"
-          @remove="params.sidebarStickyImages.splice($event, 1)"
+          @add="sidebarStickyImages.push($event)"
+          @remove="sidebarStickyImages.splice($event, 1)"
         />
       </BulmaField>
     </details>

@@ -1,6 +1,20 @@
 <script>
+import useData from "@/utils/use-data.js";
+import { toRel, toAbs } from "@/utils/link.js";
+
 export default {
   props: { params: Object, fileProps: Object },
+  setup(props, { emit }) {
+    return {
+      ...useData(emit, props.params.data, {
+        stickyActive: ["sticky-active"],
+        stickyImageDescription: ["sticky-image-description"],
+        stickyImages: ["sticky-images"],
+        stickyLink: ["sticky-link", toAbs, toRel],
+        newsletterActive: ["newsletter-active"],
+      }),
+    };
+  },
 };
 </script>
 
@@ -11,17 +25,13 @@ export default {
       <BulmaField label="Sticky" help="Pop up is a bottom-right sticky slider">
         <div>
           <label class="checkbox">
-            <input v-model="params.stickyActive" type="checkbox" />
+            <input v-model="stickyActive" type="checkbox" />
             Show corner sticky to all visitors
           </label>
         </div>
       </BulmaField>
-      <template v-if="params.stickyActive">
-        <BulmaFieldInput
-          v-model="params.stickyLink"
-          label="Sticky link"
-          type="url"
-        />
+      <template v-if="stickyActive">
+        <BulmaFieldInput v-model="stickyLink" label="Sticky link" type="url" />
         <BulmaField
           v-slot="{ idForLabel }"
           label="Sticky image description"
@@ -29,7 +39,7 @@ export default {
         >
           <textarea
             :id="idForLabel"
-            v-model="params.stickyImageDescription"
+            v-model="stickyImageDescription"
             class="textarea"
             rows="2"
           ></textarea>
@@ -39,10 +49,10 @@ export default {
           help="If multiple images are provided, each page load will select one randomly"
         >
           <SiteParamsFiles
-            :files="params.stickyImages"
+            :files="stickyImages"
             :file-props="fileProps"
-            @add="params.stickyImages.push($event)"
-            @remove="params.stickyImages.splice($event, 1)"
+            @add="stickyImages.push($event)"
+            @remove="stickyImages.splice($event, 1)"
           />
         </BulmaField>
       </template>
@@ -53,7 +63,7 @@ export default {
       >
         <div>
           <label class="checkbox">
-            <input v-model="params.newsletterActive" type="checkbox" />
+            <input v-model="newsletterActive" type="checkbox" />
             Show newsletter pop up
           </label>
         </div>
