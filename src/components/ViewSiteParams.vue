@@ -43,14 +43,13 @@ export default {
 
     let actions = {
       fetch() {
+        state.configs = [];
         return exec(() => getSiteParams());
       },
       save() {
-        return exec(() =>
-          postSiteParams({
-            configs: state.configs,
-          })
-        );
+        let { configs } = state;
+        state.configs = [];
+        return exec(() => postSiteParams({ configs }));
       },
       init() {
         if (!apiState.rawData) {
