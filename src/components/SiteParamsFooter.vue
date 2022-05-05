@@ -4,9 +4,9 @@ import { toRel, toAbs } from "@/utils/link.js";
 
 export default {
   props: { params: Object, fileProps: Object },
-  setup(props, { emit }) {
+  setup(props) {
     return {
-      ...useData(emit, props.params.data, {
+      ...useData(() => props.params.data, {
         footerDescription: ["footer-promo-description"],
         footerLink: ["footer-promo-link", toAbs, toRel],
         footerDesktopImages: ["footer-promo-desktop-images"],

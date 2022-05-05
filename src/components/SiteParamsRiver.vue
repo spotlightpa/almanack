@@ -4,9 +4,9 @@ import { toRel, toAbs } from "@/utils/link.js";
 
 export default {
   props: { params: Object, fileProps: Object },
-  setup(props, { emit }) {
+  setup(props) {
     return {
-      ...useData(emit, props.params.data, {
+      ...useData(() => props.params.data, {
         riverDescription: ["river-promo-description"],
         riverLink: ["river-promo-link", toAbs, toRel],
         riverDesktopImages: ["river-promo-desktop-images"],
