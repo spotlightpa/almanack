@@ -5,9 +5,9 @@ import { toRel, toAbs } from "@/utils/link.js";
 
 export default {
   props: { params: Object, fileProps: Object },
-  setup(props, { emit }) {
+  setup(props) {
     return {
-      ...useData(emit, props.params.data, {
+      ...useData(() => props.params.data, {
         bannerActive: ["banner-active"],
         bannerText: ["banner", undefined, sanitizeText],
         bannerLink: ["banner-link", (v) => toAbs(v), (v) => toRel(v)],
@@ -57,7 +57,7 @@ export default {
             class="has-radius-padding"
             :style="{ 'background-color': bannerBgColor }"
           >
-            <a :href="params.data['banner-link']" target="_blank">
+            <a :href="bannerLink" target="_blank">
               <div
                 class="is-size-3-fullscreen is-size-4 has-text-centered"
                 :style="{ color: bannerTextColor }"

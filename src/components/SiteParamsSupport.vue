@@ -12,9 +12,9 @@ function cleanText(text) {
 
 export default {
   props: { params: Object, fileProps: Object },
-  setup(props, { emit }) {
+  setup(props) {
     return {
-      ...useData(emit, props.params.data, {
+      ...useData(() => props.params.data, {
         supportActive: ["support-active"],
         supportLink: ["support-link", toAbs, toRel],
         supportHed: ["support-hed"],
@@ -59,7 +59,7 @@ export default {
             :id="idForLabel"
             v-model="supportText"
             class="textarea"
-            rows="2"
+            rows="5"
           ></textarea>
         </BulmaField>
         <BulmaFieldInput

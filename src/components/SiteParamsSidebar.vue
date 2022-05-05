@@ -4,9 +4,9 @@ import { toRel, toAbs } from "@/utils/link.js";
 
 export default {
   props: { params: Object, fileProps: Object },
-  setup(props, { emit }) {
+  setup(props) {
     return {
-      ...useData(emit, props.params.data, {
+      ...useData(() => props.params.data, {
         sidebarTopDescription: ["sidebar-top-description"],
         sidebarTopLink: ["sidebar-top-link", toAbs, toRel],
         sidebarTopImages: ["sidebar-top-images"],
