@@ -107,7 +107,7 @@ export default {
       save() {
         return edPickExec(() =>
           saveEditorsPicks({
-            datums: state.allEdPicks,
+            configs: state.allEdPicks,
           })
         );
       },
