@@ -91,7 +91,7 @@ export default {
       pagesByPath: computed(
         () => new Map(state.pages.map((p) => [p.filePath, p]))
       ),
-      rawPicks: computed(() => edPicksState.rawData?.datums ?? []),
+      rawPicks: computed(() => edPicksState.rawData?.configs ?? []),
 
       allEdPicks: [],
       nextSchedule: null,
