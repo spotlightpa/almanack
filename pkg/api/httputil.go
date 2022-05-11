@@ -189,26 +189,26 @@ func (app *appEnv) maxSizeMiddleware(next http.Handler) http.Handler {
 	})
 }
 
-func (app *appEnv) mustIntParam(r *http.Request, param string, v any) {
-	if err := app.intParam(r, param, v); err != nil {
+func mustIntParam[Int int | int32 | int64](r *http.Request, param string, p *Int) {
+	if err := intParam(r, param, p); err != nil {
 		panic(err)
 	}
 }
 
-func (app *appEnv) intParam(r *http.Request, param string, v any) error {
+func intParam[Int int | int32 | int64](r *http.Request, param string, p *Int) error {
 	pstr := chi.URLParam(r, param)
 	if pstr == "" {
 		return fmt.Errorf("parameter %q not set", param)
 	}
 	bitsize := 0
-	switch v.(type) {
+	switch any(p).(type) {
 	case *int:
 	case *int32:
 		bitsize = 32
 	case *int64:
 		bitsize = 64
 	default:
-		return fmt.Errorf("unsupported type %T", v)
+		panic("unreachable")
 	}
 	n, err := strconv.ParseInt(pstr, 10, bitsize)
 	if err != nil {
@@ -217,14 +217,7 @@ func (app *appEnv) intParam(r *http.Request, param string, v any) error {
 			"bad integer parameter for %s: %w",
 			param, err)
 	}
-	switch i := v.(type) {
-	case *int:
-		*i = int(n)
-	case *int32:
-		*i = int32(n)
-	case *int64:
-		*i = n
-	}
+	*p = Int(n)
 	return nil
 }
 

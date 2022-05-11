@@ -15,7 +15,7 @@ func (app *appEnv) renderNotFound(w http.ResponseWriter, r *http.Request) {
 
 func (app *appEnv) renderPage(w http.ResponseWriter, r *http.Request) {
 	var id int64
-	app.mustIntParam(r, "id", &id)
+	mustIntParam(r, "id", &id)
 	app.Printf("start renderPage for %d", id)
 	page, err := app.svc.Queries.GetPageByID(r.Context(), id)
 	if err != nil {
