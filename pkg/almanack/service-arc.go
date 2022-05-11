@@ -32,24 +32,21 @@ func (svc Service) GetArcStory(ctx context.Context, articleID string) (story *Ar
 func (svc Service) ListAvailableArcStories(ctx context.Context, page int32) (stories []ArcStory, nextPage int32, err error) {
 	defer errutil.Trace(&err)
 
-	const pageSize = 20
-	offset := page * pageSize
-
+	pager := db.PageNumSize(page, 20)
 	start := time.Now()
-	var dbArts []db.Article
-	dbArts, err = svc.Queries.ListAvailableArticles(ctx, db.ListAvailableArticlesParams{
-		Offset: offset,
-		Limit:  pageSize + 1,
-	})
+	dbArts, err := db.Paginate(
+		pager, ctx,
+		svc.Queries.ListAvailableArticles,
+		db.ListAvailableArticlesParams{
+			Offset: pager.Offset(),
+			Limit:  pager.Limit(),
+		})
 	svc.Printf("ListAvailableArticles query time: %v", time.Since(start))
 	if err != nil {
 		return
 	}
 
-	if len(dbArts) > pageSize {
-		dbArts = dbArts[:pageSize]
-		nextPage = page + 1
-	}
+	nextPage = pager.NextPage
 
 	stories, err = storiesFromDB(dbArts)
 	return
@@ -99,22 +96,20 @@ func (svc Service) StoreFeed(ctx context.Context, newfeed *arc.API) (err error) 
 func (svc Service) ListAllArcStories(ctx context.Context, page int32) (stories []ArcStory, nextPage int32, err error) {
 	defer errutil.Trace(&err)
 
-	const pageSize = 50
-	offset := page * pageSize
+	pager := db.PageNumSize(page, 50)
 	start := time.Now()
-	var dbArts []db.Article
-	dbArts, err = svc.Queries.ListAllArcArticles(ctx, db.ListAllArcArticlesParams{
-		Limit:  pageSize + 1,
-		Offset: offset,
-	})
+	dbArts, err := db.Paginate(
+		pager, ctx,
+		svc.Queries.ListAllArcArticles,
+		db.ListAllArcArticlesParams{
+			Limit:  pager.Limit(),
+			Offset: pager.Offset(),
+		})
 	svc.Printf("ListAllArticles query time: %v", time.Since(start))
 	if err != nil {
 		return
 	}
-	if len(dbArts) > pageSize {
-		dbArts = dbArts[:pageSize]
-		nextPage = page + 1
-	}
+	nextPage = pager.NextPage
 	stories, err = storiesFromDB(dbArts)
 	return
 }

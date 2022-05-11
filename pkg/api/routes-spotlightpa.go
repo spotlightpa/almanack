@@ -473,19 +473,15 @@ func (app *appEnv) listNewsPages(w http.ResponseWriter, r *http.Request) {
 		}
 		err error
 	)
-	const pageSize = 100
-	offset := page * pageSize
-
-	resp.Pages, err = app.svc.Queries.ListPages(r.Context(), db.ListPagesParams{
-		FilePath: "content/news/%",
-		Limit:    pageSize + 1,
-		Offset:   offset,
-	})
-
-	if len(resp.Pages) > pageSize {
-		resp.Pages = resp.Pages[:pageSize]
-		resp.NextPage = page + 1
-	}
+	pager := db.PageNumSize(page, 100)
+	resp.Pages, err = db.Paginate(pager, r.Context(),
+		app.svc.Queries.ListPages,
+		db.ListPagesParams{
+			FilePath: "content/news/%",
+			Limit:    pager.Limit(),
+			Offset:   pager.Offset(),
+		})
+	resp.NextPage = pager.NextPage
 	if err != nil {
 		app.replyErr(w, r, err)
 		return
@@ -505,19 +501,15 @@ func (app *appEnv) listNewsletterPages(w http.ResponseWriter, r *http.Request) {
 		}
 		err error
 	)
-	const pageSize = 100
-	offset := page * pageSize
-
-	resp.Pages, err = app.svc.Queries.ListPages(r.Context(), db.ListPagesParams{
-		FilePath: "content/newsletters/%",
-		Limit:    pageSize + 1,
-		Offset:   offset,
-	})
-
-	if len(resp.Pages) > pageSize {
-		resp.Pages = resp.Pages[:pageSize]
-		resp.NextPage = page + 1
-	}
+	pager := db.PageNumSize(page, 100)
+	resp.Pages, err = db.Paginate(pager, r.Context(),
+		app.svc.Queries.ListPages,
+		db.ListPagesParams{
+			FilePath: "content/newsletters/%",
+			Limit:    pager.Limit(),
+			Offset:   pager.Offset(),
+		})
+	resp.NextPage = pager.NextPage
 	if err != nil {
 		app.replyErr(w, r, err)
 		return

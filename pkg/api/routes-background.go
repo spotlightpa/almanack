@@ -61,23 +61,20 @@ func (app *appEnv) backgroundCron(w http.ResponseWriter, r *http.Request) {
 func (app *appEnv) backgroundRefreshPages(w http.ResponseWriter, r *http.Request) {
 	app.Println("start backgroundRefreshPages")
 
-	hasNext := true
-	for queryPage := int32(0); hasNext; queryPage++ {
-		const pageSize = 10
-
-		offset := queryPage * pageSize
-		pageIDs, err := app.svc.Queries.ListPageIDs(r.Context(), db.ListPageIDsParams{
-			FilePath: "content/news/%",
-			Offset:   offset,
-			Limit:    pageSize + 1,
-		})
+	hasMore := true
+	for queryPage := int32(0); hasMore; queryPage++ {
+		pager := db.PageNumSize(queryPage, 10)
+		pageIDs, err := db.Paginate(
+			pager, r.Context(),
+			app.svc.Queries.ListPageIDs,
+			db.ListPageIDsParams{
+				FilePath: "content/news/%",
+				Offset:   pager.Offset(),
+				Limit:    pager.Limit(),
+			})
 		if err != nil {
 			app.replyErr(w, r, err)
 			return
-		}
-		hasNext = len(pageIDs) > pageSize
-		if hasNext {
-			pageIDs = pageIDs[:pageSize]
 		}
 		for _, id := range pageIDs {
 			if err := app.svc.RefreshPageContents(r.Context(), id); err != nil {
@@ -85,6 +82,7 @@ func (app *appEnv) backgroundRefreshPages(w http.ResponseWriter, r *http.Request
 				return
 			}
 		}
+		hasMore = pager.HasMore()
 	}
 
 	app.replyJSON(http.StatusAccepted, w, "OK")
