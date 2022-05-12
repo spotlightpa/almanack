@@ -15,7 +15,7 @@ import (
 
 func (app *appEnv) listAllArcStories(w http.ResponseWriter, r *http.Request) {
 	var page int32
-	app.mustIntParam(r, "page", &page)
+	mustIntParam(r, "page", &page)
 	app.Printf("start listAllArcStories page %d", page)
 
 	var (
@@ -462,7 +462,7 @@ func (app *appEnv) postFileUpdate(w http.ResponseWriter, r *http.Request) {
 
 func (app *appEnv) listNewsPages(w http.ResponseWriter, r *http.Request) {
 	var page int32
-	app.mustIntParam(r, "page", &page)
+	mustIntParam(r, "page", &page)
 
 	app.Printf("start listNewsPages page %d", page)
 
@@ -491,7 +491,7 @@ func (app *appEnv) listNewsPages(w http.ResponseWriter, r *http.Request) {
 
 func (app *appEnv) listNewsletterPages(w http.ResponseWriter, r *http.Request) {
 	var page int32
-	app.mustIntParam(r, "page", &page)
+	mustIntParam(r, "page", &page)
 	app.Printf("start listNewsletterPages page %d", page)
 
 	var (
@@ -519,7 +519,7 @@ func (app *appEnv) listNewsletterPages(w http.ResponseWriter, r *http.Request) {
 
 func (app *appEnv) getPage(w http.ResponseWriter, r *http.Request) {
 	var id int64
-	app.mustIntParam(r, "id", &id)
+	mustIntParam(r, "id", &id)
 	app.Printf("start getPage for %d", id)
 	page, err := app.svc.Queries.GetPageByID(r.Context(), id)
 	if err != nil {
@@ -533,7 +533,7 @@ func (app *appEnv) getPage(w http.ResponseWriter, r *http.Request) {
 
 func (app *appEnv) getPageWithContent(w http.ResponseWriter, r *http.Request) {
 	var id int64
-	app.mustIntParam(r, "id", &id)
+	mustIntParam(r, "id", &id)
 	app.Printf("start getPage for %d", id)
 	page, err := app.svc.Queries.GetPageByID(r.Context(), id)
 	if err != nil {
@@ -622,7 +622,7 @@ func (app *appEnv) postPageForArcID(w http.ResponseWriter, r *http.Request) {
 
 func (app *appEnv) postRefreshPageFromArc(w http.ResponseWriter, r *http.Request) {
 	var id int64
-	app.mustIntParam(r, "id", &id)
+	mustIntParam(r, "id", &id)
 	app.Printf("start postRefreshPageFromArc for %d", id)
 
 	page, err := app.svc.Queries.GetPageByID(r.Context(), id)

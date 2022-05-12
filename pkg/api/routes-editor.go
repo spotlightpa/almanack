@@ -17,7 +17,7 @@ func (app *appEnv) userInfo(w http.ResponseWriter, r *http.Request) {
 
 func (app *appEnv) listAvailableArcStories(w http.ResponseWriter, r *http.Request) {
 	var page int32
-	app.mustIntParam(r, "page", &page)
+	mustIntParam(r, "page", &page)
 
 	app.Printf("starting listAvailableArcStories page %d", page)
 
