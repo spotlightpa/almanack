@@ -1,7 +1,6 @@
-// eslint-disable-next-line no-unused-vars
-const webpack = require("webpack");
+const { defineConfig } = require("@vue/cli-service");
 
-module.exports = {
+module.exports = defineConfig({
   devServer: {
     port: 33159,
     proxy: {
@@ -17,8 +16,11 @@ module.exports = {
     },
   },
   chainWebpack: (config) => {
-    config.module.rule("eslint").use("eslint-loader").options({
-      fix: true,
+    config.plugin("eslint").tap((options) => {
+      options[0].fix = true;
+      return options;
     });
   },
-};
+  lintOnSave: "warning",
+  transpileDependencies: true,
+});
