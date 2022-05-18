@@ -69,6 +69,10 @@ function makeClient($auth) {
     let defaultOpts = {
       headers,
     };
+    if (options.params) {
+      url += `?${options.params}`;
+      delete options.params;
+    }
     options = { ...defaultOpts, ...options };
     let resp = await fetch(url, options);
     let err = responseError(resp);
@@ -192,7 +196,7 @@ function makeClient($auth) {
   ];
   for (let action of simpleGetActions) {
     let endpoint = endpoints[action];
-    actions[action] = () => tryTo(request(endpoint));
+    actions[action] = (options) => tryTo(request(endpoint, options));
   }
   let simplePostActions = [
     "postAuthorizedDomain",
