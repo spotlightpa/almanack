@@ -44,6 +44,8 @@ import BulmaFieldColor from "@/components/BulmaFieldColor.vue";
 Vue.component("BulmaFieldColor", BulmaFieldColor);
 import BulmaFieldInput from "@/components/BulmaFieldInput.vue";
 Vue.component("BulmaFieldInput", BulmaFieldInput);
+import BulmaPaste from "@/components/BulmaPaste.vue";
+Vue.component("BulmaPaste", BulmaPaste);
 import CopyTextarea from "@/components/CopyTextarea.vue";
 Vue.component("CopyTextarea", CopyTextarea);
 import CopyWithButton from "@/components/CopyWithButton.vue";
