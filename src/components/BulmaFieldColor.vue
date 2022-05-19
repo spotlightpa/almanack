@@ -58,6 +58,10 @@ export default {
           @input="$emit('input', $event.target.value)"
         />
       </span>
+      <BulmaPaste
+        button-class="ml-2 button is-primary is-small has-text-weight-semibold"
+        @paste="$emit('input', $event)"
+      />
     </div>
   </BulmaField>
 </template>
