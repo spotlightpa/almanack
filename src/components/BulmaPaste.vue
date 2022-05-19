@@ -2,6 +2,12 @@
 const canPaste = !!navigator.clipboard.readText;
 
 export default {
+  props: {
+    buttonClass: {
+      type: String,
+      default: "ml-2 button is-primary has-text-weight-semibold",
+    },
+  },
   setup() {
     return {
       canPaste,
@@ -23,7 +29,7 @@ export default {
     <button
       v-if="canPaste"
       type="button"
-      class="ml-2 button is-primary has-text-weight-semibold"
+      :class="buttonClass"
       @click="pasteText"
     >
       <font-awesome-icon :icon="['fas', 'paste']" />
