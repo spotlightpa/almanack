@@ -1,27 +1,15 @@
 <script>
 import { ref } from "@vue/composition-api";
 
-const canPaste = !!navigator.clipboard.readText;
-
 export default {
   props: { files: Array, fileProps: Object },
   setup() {
     const inputText = ref("");
-
     return {
-      canPaste,
       inputText,
       addText() {
         let text = inputText.value;
         inputText.value = "";
-        this.$emit("add", text);
-      },
-      async pasteText() {
-        let text = await navigator.clipboard.readText().catch(() => "");
-        if (!text) {
-          alert("Could not paste");
-          return;
-        }
         this.$emit("add", text);
       },
     };
@@ -63,14 +51,7 @@ export default {
       >
         Add
       </button>
-      <button
-        v-if="canPaste"
-        type="button"
-        class="ml-2 button is-primary has-text-weight-semibold"
-        @click="pasteText"
-      >
-        Paste
-      </button>
+      <BulmaPaste @paste="$emit('add', $event)" />
     </div>
     <PickerFiles
       :files="fileProps.files.value"
