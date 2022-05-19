@@ -71,6 +71,8 @@ Vue.component("NoCopyTextArea", NoCopyTextArea);
 import PageListRow from "@/components/PageListRow.vue";
 Vue.component("PageListRow", PageListRow);
 import PickerFiles from "@/components/PickerFiles.vue";
+import PageSelector from "@/components/PageSelector.vue";
+Vue.component("PageSelector", PageSelector);
 Vue.component("PickerFiles", PickerFiles);
 import PickerImages from "@/components/PickerImages.vue";
 Vue.component("PickerImages", PickerImages);
