@@ -48,6 +48,11 @@ export default {
           text: "Homepage Editor",
         },
         {
+          to: "sidebar-items",
+          icon: ["fas", "check-circle"],
+          text: "Sidebar Items",
+        },
+        {
           to: "news-pages",
           icon: ["fas", "file-signature"],
           text: "Spotlight PA Articles",
