@@ -77,10 +77,8 @@ export default {
   },
   setup() {
     let { listAllPages, getEditorsPicks, saveEditorsPicks } = useClient();
-
     let { apiState: listState, exec: listExec } = makeState();
     let { apiState: edPicksState, exec: edPickExec } = makeState();
-
     let state = reactive({
       didLoad: computed(() => listState.didLoad && edPicksState.didLoad),
       isLoading: computed(() => listState.isLoading || edPicksState.isLoading),
@@ -92,11 +90,9 @@ export default {
         () => new Map(state.pages.map((p) => [p.filePath, p]))
       ),
       rawPicks: computed(() => edPicksState.rawData?.configs ?? []),
-
       allEdPicks: [],
       nextSchedule: null,
     });
-
     let actions = {
       reload() {
         return Promise.all([
@@ -113,11 +109,9 @@ export default {
       },
       reset() {
         let { pages, rawPicks } = state;
-
         if (!pages.length || !rawPicks.length) {
           return;
         }
-
         state.allEdPicks = rawPicks.map(
           (data) => new EditorsPicksData(data, state.pagesByPath)
         );
@@ -127,15 +121,11 @@ export default {
       () => [state.pages, state.rawPicks],
       () => actions.reset()
     );
-
     actions.reload();
-
     return {
       ...toRefs(state),
       ...actions,
-
       formatDateTime,
-
       async addScheduledPicks() {
         let lastPick = state.allEdPicks[state.allEdPicks.length - 1];
         state.allEdPicks.push(lastPick.clone(state.nextSchedule));
@@ -176,7 +166,7 @@ export default {
               : `Scheduled for ${formatDateTime(edpick.scheduleFor)}`
           }}
         </h2>
-        <EditorsPicks :pages="pages" :editors-picks="edpick" />
+        <HomepageEditor :pages="pages" :editors-picks="edpick" />
         <button
           v-if="!edpick.isCurrent"
           type="button"
