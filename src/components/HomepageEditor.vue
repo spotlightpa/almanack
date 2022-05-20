@@ -4,7 +4,6 @@ import draggable from "vuedraggable";
 import fuzzyMatch from "@/utils/fuzzy-match.js";
 
 export default {
-  name: "EditorsPicks",
   components: {
     draggable,
   },
@@ -77,24 +76,24 @@ export default {
     </div>
     <div class="column is-half">
       <b-field label="Homepage featured article">
-        <EditorsPicksDraggable v-model="editorsPicks.featuredStories" />
+        <HomepageEditorDraggable v-model="editorsPicks.featuredStories" />
         Pin top story on homepage
       </b-field>
       <b-field label="Subfeatures stories">
-        <EditorsPicksDraggable v-model="editorsPicks.subfeatures" />
+        <HomepageEditorDraggable v-model="editorsPicks.subfeatures" />
 
         Bulleted items under the top story
       </b-field>
       <b-field label="Pinned stories">
-        <EditorsPicksDraggable v-model="editorsPicks.topSlots" />
+        <HomepageEditorDraggable v-model="editorsPicks.topSlots" />
         Pin stories at the top of homepage
       </b-field>
       <b-field label="Editor's Pick sidebar">
-        <EditorsPicksDraggable v-model="editorsPicks.sidebarPicks" />
+        <HomepageEditorDraggable v-model="editorsPicks.sidebarPicks" />
         Pin story in the homepage sidebar under Most Popular
       </b-field>
       <b-field label="Homepage topper">
-        <EditorsPicksDraggable v-model="editorsPicks.topper" />
+        <HomepageEditorDraggable v-model="editorsPicks.topper" />
         If populated, a topper will appear on the homepage with the first story
         as its featured item and the other stories as bulleted items underneath
       </b-field>
