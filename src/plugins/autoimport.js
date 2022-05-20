@@ -130,6 +130,8 @@ import ViewRedirectArcToNewsPage from "@/components/ViewRedirectArcToNewsPage.vu
 Vue.component("ViewRedirectArcToNewsPage", ViewRedirectArcToNewsPage);
 import ViewSharedList from "@/components/ViewSharedList.vue";
 Vue.component("ViewSharedList", ViewSharedList);
+import ViewSidebarItems from "@/components/ViewSidebarItems.vue";
+Vue.component("ViewSidebarItems", ViewSidebarItems);
 import ViewSiteParams from "@/components/ViewSiteParams.vue";
 Vue.component("ViewSiteParams", ViewSiteParams);
 import ViewUnauthorized from "@/components/ViewUnauthorized.vue";

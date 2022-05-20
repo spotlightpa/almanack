@@ -18,6 +18,7 @@ import ViewNewsPage from "./components/ViewNewsPage.vue";
 import ViewSharedList from "./components/ViewSharedList.vue";
 import ViewNewsPagesList from "./components/ViewNewsPagesList.vue";
 import ViewRedirectArcToNewsPage from "./components/ViewRedirectArcToNewsPage.vue";
+import ViewSidebarItems from "./components/ViewSidebarItems.vue";
 import ViewSiteParams from "./components/ViewSiteParams.vue";
 import ViewUnauthorized from "./components/ViewUnauthorized.vue";
 import ViewUploader from "./components/ViewUploader.vue";
@@ -98,6 +99,14 @@ let router = new Router({
       path: "/admin/editors-picks",
       name: "editors-picks",
       component: ViewHomepageEditor,
+      meta: {
+        requiresAuth: isSpotlightPAUser,
+      },
+    },
+    {
+      path: "/admin/sidebar-items",
+      name: "sidebar-items",
+      component: ViewSidebarItems,
       meta: {
         requiresAuth: isSpotlightPAUser,
       },

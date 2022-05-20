@@ -32,10 +32,6 @@ export default {
         <HomepageEditorDraggable v-model="editorsPicks.topSlots" />
         Pin stories at the top of homepage
       </b-field>
-      <b-field label="Editor's Pick sidebar">
-        <HomepageEditorDraggable v-model="editorsPicks.sidebarPicks" />
-        Pin story in the homepage sidebar under Most Popular
-      </b-field>
       <b-field label="Homepage topper">
         <HomepageEditorDraggable v-model="editorsPicks.topper" />
         If populated, a topper will appear on the homepage with the first story
