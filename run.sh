@@ -127,8 +127,7 @@ function format:sh() {
 }
 
 function format:sql() {
-	_git-xargs '*.sh' shfmt -w _
-	_git-xargs '*.sql' pg_format -w 80 -s 2 _ -o _
+	_git-xargs '*.sql' pg_format -w 80 -s 2 -i _
 }
 
 function db:copy-prod() {
