@@ -11,6 +11,7 @@ import (
 	"github.com/spotlightpa/almanack/internal/arc"
 	"github.com/spotlightpa/almanack/internal/db"
 	"github.com/spotlightpa/almanack/pkg/almanack"
+	"golang.org/x/exp/slices"
 )
 
 func (app *appEnv) listAllArcStories(w http.ResponseWriter, r *http.Request) {
@@ -510,6 +511,22 @@ func (app *appEnv) getPage(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	app.replyJSON(http.StatusOK, w, page)
+}
+
+func (app *appEnv) getPageByFilePath(w http.ResponseWriter, r *http.Request) {
+	q := r.URL.Query()
+	path := q.Get("path")
+	app.Printf("start getPageByFilePath for %q", path)
+	page, err := app.svc.Queries.GetPageByFilePath(r.Context(), path)
+	if err != nil {
+		err = db.NoRowsAs404(err, "could not find page %q", path)
+		app.replyErr(w, r, err)
+		return
+	}
+	if slices.Contains(q["select"], "-body") {
+		page.Body = ""
+	}
 	app.replyJSON(http.StatusOK, w, page)
 }
 
