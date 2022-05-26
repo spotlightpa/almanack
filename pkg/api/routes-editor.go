@@ -4,7 +4,7 @@ import (
 	"net/http"
 
 	"github.com/carlmjohnson/resperr"
-	"github.com/go-chi/chi"
+	"github.com/go-chi/chi/v5"
 	"github.com/spotlightpa/almanack/internal/netlifyid"
 	"github.com/spotlightpa/almanack/pkg/almanack"
 )

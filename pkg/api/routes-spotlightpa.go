@@ -7,7 +7,7 @@ import (
 	"github.com/carlmjohnson/emailx"
 	"github.com/carlmjohnson/errutil"
 	"github.com/carlmjohnson/resperr"
-	"github.com/go-chi/chi"
+	"github.com/go-chi/chi/v5"
 	"github.com/spotlightpa/almanack/internal/arc"
 	"github.com/spotlightpa/almanack/internal/db"
 	"github.com/spotlightpa/almanack/pkg/almanack"
