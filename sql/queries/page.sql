@@ -182,9 +182,7 @@ WITH ROWS AS (
           ELSE
             '[]'::jsonb
           END)) AS authors,
-      to_timestamp(frontmatter ->> 'published'::text,
-        -- ISO date
-        'YYYY-MM-DD"T"HH24:MI:SS"Z"')::timestamptz AS pub_date
+      iso_to_timestamptz (frontmatter ->> 'published') AS pub_date
     FROM
       page
     ORDER BY
