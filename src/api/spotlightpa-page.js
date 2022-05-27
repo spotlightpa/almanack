@@ -5,7 +5,7 @@ import { makeState } from "@/api/service-util.js";
 import { useClient } from "@/api/client.js";
 import imgproxyURL from "@/api/imgproxy-url.js";
 
-class Page {
+export class Page {
   constructor(data) {
     this.id = data["id"] ?? "";
     this.body = data["body"] ?? "";
@@ -92,11 +92,15 @@ class Page {
     return new URL(`/${dir}/${slug}/`, "https://www.spotlightpa.org").href;
   }
 
-  get imagePreviewURL() {
+  getImagePreviewURL(options) {
     if (!this.image || this.image.match(/^http/)) {
       return "";
     }
-    return imgproxyURL(this.image);
+    return imgproxyURL(this.image, options);
+  }
+
+  get imagePreviewURL() {
+    return this.getImagePreviewURL();
   }
 
   get arcURL() {

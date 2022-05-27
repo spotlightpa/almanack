@@ -76,6 +76,8 @@ Vue.component("PageSelector", PageSelector);
 Vue.component("PickerFiles", PickerFiles);
 import PickerImages from "@/components/PickerImages.vue";
 Vue.component("PickerImages", PickerImages);
+import SidebarItem from "@/components/SidebarItem.vue";
+Vue.component("SidebarItem", SidebarItem);
 import SiteParams from "@/components/SiteParams.vue";
 Vue.component("SiteParams", SiteParams);
 import SiteParamsBanner from "@/components/SiteParamsBanner.vue";

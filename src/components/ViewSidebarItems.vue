@@ -19,8 +19,7 @@ class Page {
 }
 
 class SidebarData {
-  constructor(siteConfig, pagesByPath) {
-    this.pagesByPath = pagesByPath;
+  constructor(siteConfig) {
     this.reset(siteConfig);
     Vue.observable(this);
   }
@@ -35,14 +34,11 @@ class SidebarData {
 
   clone(scheduleFor) {
     let { data } = JSON.parse(JSON.stringify(this));
-    let newPicks = new SidebarData(
-      {
-        schedule_for: scheduleFor,
-        data,
-        published_at: null,
-      },
-      this.pagesByPath
-    );
+    let newPicks = new SidebarData({
+      schedule_for: scheduleFor,
+      data,
+      published_at: null,
+    });
     return newPicks;
   }
 
@@ -63,13 +59,11 @@ export default {
   },
   setup() {
     let { listAllPages, getSidebar, saveSidebar } = useClient();
-
     let { apiState: listState, exec: listExec } = makeState();
     let { apiState: sidebarState, exec: sidebarExec } = makeState();
-
     let state = reactive({
-      didLoad: computed(() => listState.didLoad && sidebarState.didLoad),
-      isLoading: computed(() => listState.isLoading || sidebarState.isLoading),
+      didLoad: computed(() => sidebarState.didLoad),
+      isLoading: computed(() => sidebarState.isLoading),
       error: computed(() => listState.error ?? sidebarState.error),
       pages: computed(
         () => listState.rawData?.pages.map((p) => new Page(p)) ?? []
@@ -78,14 +72,12 @@ export default {
         () => new Map(state.pages.map((p) => [p.filePath, p]))
       ),
       rawSidebars: computed(() => sidebarState.rawData?.configs ?? []),
-
       allSidebars: [],
       nextSchedule: null,
     });
-
     let actions = {
       reload() {
-        return Promise.all([listExec(listAllPages), sidebarExec(getSidebar)]);
+        return Promise.race([listExec(listAllPages), sidebarExec(getSidebar)]);
       },
       save() {
         return sidebarExec(() =>
@@ -96,29 +88,21 @@ export default {
       },
       reset() {
         let { pages, rawSidebars } = state;
-
         if (!pages.length || !rawSidebars.length) {
           return;
         }
-
-        state.allSidebars = rawSidebars.map(
-          (data) => new SidebarData(data, state.pagesByPath)
-        );
+        state.allSidebars = rawSidebars.map((data) => new SidebarData(data));
       },
     };
     watch(
       () => [state.pages, state.rawSidebars],
       () => actions.reset()
     );
-
     actions.reload();
-
     return {
       ...toRefs(state),
       ...actions,
-
       formatDateTime,
-
       async addScheduledPicks() {
         let lastPick =
           state.allSidebars[state.allSidebars.length - 1] ??
@@ -161,8 +145,15 @@ export default {
               : `Scheduled for ${formatDateTime(sidebar.scheduleFor)}`
           }}
         </h2>
-        <div class="columns">
-          <div class="column is-half">
+        <div class="columns is-multiline">
+          <div class="column is-full">
+            <SidebarItem
+              v-for="(item, i) of sidebar.items"
+              :key="i"
+              :item="item"
+            />
+          </div>
+          <div class="column is-full">
             <PageSelector :pages="pages" />
           </div>
         </div>
