@@ -460,12 +460,7 @@ func (app *appEnv) postFileUpdate(w http.ResponseWriter, r *http.Request) {
 	app.replyJSON(http.StatusOK, w, &res)
 }
 
-func (app *appEnv) listNewsPages(w http.ResponseWriter, r *http.Request) {
-	var page int32
-	mustIntParam(r, "page", &page)
-
-	app.Printf("start listNewsPages page %d", page)
-
+func (app *appEnv) listPages(w http.ResponseWriter, r *http.Request, page int32, prefix string) {
 	var (
 		resp struct {
 			Pages    []db.ListPagesRow `json:"pages"`
@@ -477,7 +472,7 @@ func (app *appEnv) listNewsPages(w http.ResponseWriter, r *http.Request) {
 	resp.Pages, err = db.Paginate(pager, r.Context(),
 		app.svc.Queries.ListPages,
 		db.ListPagesParams{
-			FilePath: "content/news/%",
+			FilePath: prefix + "%",
 			Limit:    pager.Limit(),
 			Offset:   pager.Offset(),
 		})
@@ -489,32 +484,19 @@ func (app *appEnv) listNewsPages(w http.ResponseWriter, r *http.Request) {
 	app.replyJSON(http.StatusOK, w, &resp)
 }
 
+func (app *appEnv) listNewsPages(w http.ResponseWriter, r *http.Request) {
+	var page int32
+	mustIntParam(r, "page", &page)
+
+	app.Printf("start listNewsPages page %d", page)
+	app.listPages(w, r, page, "content/news/")
+}
+
 func (app *appEnv) listNewsletterPages(w http.ResponseWriter, r *http.Request) {
 	var page int32
 	mustIntParam(r, "page", &page)
 	app.Printf("start listNewsletterPages page %d", page)
-
-	var (
-		resp struct {
-			Pages    []db.ListPagesRow `json:"pages"`
-			NextPage int32             `json:"next_page,omitempty"`
-		}
-		err error
-	)
-	pager := db.PageNumSize(page, 100)
-	resp.Pages, err = db.Paginate(pager, r.Context(),
-		app.svc.Queries.ListPages,
-		db.ListPagesParams{
-			FilePath: "content/newsletters/%",
-			Limit:    pager.Limit(),
-			Offset:   pager.Offset(),
-		})
-	resp.NextPage = pager.NextPage
-	if err != nil {
-		app.replyErr(w, r, err)
-		return
-	}
-	app.replyJSON(http.StatusOK, w, &resp)
+	app.listPages(w, r, page, "content/newsletters/")
 }
 
 func (app *appEnv) getPage(w http.ResponseWriter, r *http.Request) {
