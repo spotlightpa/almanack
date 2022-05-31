@@ -20,7 +20,6 @@ func (app *appEnv) routes() http.Handler {
 	r.Use(app.versionMiddleware)
 	r.Use(app.maxSizeMiddleware)
 	r.Get(`/api/bookmarklet/{slug}`, app.getBookmarklet)
-	r.Get(`/api/cron`, app.getCron)
 	r.Get(`/api/healthcheck`, app.ping)
 	r.Get(`/api/healthcheck/{code:\d{3}}`, app.pingErr)
 	r.Get(`/api/proxy-image/{encURL}`, app.getProxyImage)
