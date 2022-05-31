@@ -89,10 +89,6 @@ func (app *appEnv) getProxyImage(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func (app *appEnv) getCron(w http.ResponseWriter, r *http.Request) {
-	app.replyJSON(http.StatusOK, w, "OK")
-}
-
 func (app *appEnv) getBookmarklet(w http.ResponseWriter, r *http.Request) {
 	slug := chi.URLParam(r, "slug")
 	app.Printf("starting getBookmarklet for %q", slug)
