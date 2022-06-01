@@ -73,7 +73,8 @@ function makeClient($auth) {
       headers,
     };
     if (options.params) {
-      url += `?${options.params}`;
+      let params = new URLSearchParams(options.params);
+      url += `?${params}`;
       delete options.params;
     }
     options = { ...defaultOpts, ...options };
