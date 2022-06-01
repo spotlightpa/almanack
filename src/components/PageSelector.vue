@@ -31,8 +31,8 @@ export default {
 
 <template>
   <div>
-    <b-field label="Recent Spotlight PA Articles">
-      <input v-model="filterText" class="input" placeholder="Filter articles" />
+    <b-field label="Spotlight PA Pages">
+      <input v-model="filterText" class="input" placeholder="Filter pages" />
     </b-field>
 
     <draggable
@@ -55,10 +55,11 @@ export default {
         </span>
       </a>
       <template v-slot:footer>
-        <div v-if="filteredPages.length > 10" class="dropdown-item">
+        <div v-if="pages.length === 0" class="dropdown-item">Loading…</div>
+        <div v-else-if="filteredPages.length > 10" class="dropdown-item">
           More results hidden…
         </div>
-        <div v-if="filteredPages.length === 0" class="dropdown-item">
+        <div v-else-if="filteredPages.length === 0" class="dropdown-item">
           No results
         </div>
       </template>

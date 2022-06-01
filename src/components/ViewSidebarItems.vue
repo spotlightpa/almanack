@@ -18,6 +18,8 @@ class Page {
   }
 }
 
+let itemIds = 0;
+
 class SidebarData {
   constructor(siteConfig) {
     this.reset(siteConfig);
@@ -25,11 +27,29 @@ class SidebarData {
   }
 
   reset(siteConfig) {
-    this.items = siteConfig?.data.items ?? [];
+    let items = siteConfig?.data.items ?? [];
+    this.items = items.map((item) => ({
+      item,
+      id: itemIds++,
+    }));
     this.scheduleFor = siteConfig.schedule_for;
     let pub = siteConfig.published_at;
     this.publishedAt = pub ? new Date(pub) : null;
     this.isCurrent = !!this.publishedAt;
+  }
+
+  add({ filePath }) {
+    let item = {
+      title: "Editor’s Pick",
+      labelColor: "#ff6c36",
+      linkColor: "#000000",
+      backgroundColor: "#f5f5f5",
+      item: filePath,
+    };
+    this.items.push({
+      item,
+      id: itemIds++,
+    });
   }
 
   clone(scheduleFor) {
@@ -46,27 +66,23 @@ class SidebarData {
     return {
       schedule_for: this.scheduleFor,
       data: {
-        items: this.items,
+        items: this.items.map((obj) => obj.item),
       },
     };
   }
 }
 
 export default {
-  name: "ViewSidebarItems",
   metaInfo: {
     title: "Sidebar Editor",
   },
   setup() {
     let { listAllPages, getSidebar, saveSidebar } = useClient();
-    let { apiState: listState, exec: listExec } = makeState();
+    let { apiState: pagesState, exec: pagesExec } = makeState();
     let { apiState: sidebarState, exec: sidebarExec } = makeState();
     let state = reactive({
-      didLoad: computed(() => sidebarState.didLoad),
-      isLoading: computed(() => sidebarState.isLoading),
-      error: computed(() => listState.error ?? sidebarState.error),
       pages: computed(
-        () => listState.rawData?.pages.map((p) => new Page(p)) ?? []
+        () => pagesState.rawData?.pages.map((p) => new Page(p)) ?? []
       ),
       pagesByPath: computed(
         () => new Map(state.pages.map((p) => [p.filePath, p]))
@@ -76,8 +92,11 @@ export default {
       nextSchedule: null,
     });
     let actions = {
-      reload() {
-        return Promise.race([listExec(listAllPages), sidebarExec(getSidebar)]);
+      reloadSidebars() {
+        return sidebarExec(getSidebar);
+      },
+      reloadPages() {
+        return pagesExec(listAllPages);
       },
       save() {
         return sidebarExec(() =>
@@ -86,27 +105,28 @@ export default {
           })
         );
       },
-      reset() {
-        let { pages, rawSidebars } = state;
-        if (!pages.length || !rawSidebars.length) {
+      initSidebars() {
+        let { rawSidebars } = state;
+        if (!rawSidebars.length) {
           return;
         }
         state.allSidebars = rawSidebars.map((data) => new SidebarData(data));
       },
     };
     watch(
-      () => [state.pages, state.rawSidebars],
-      () => actions.reset()
+      () => [state.rawSidebars],
+      () => actions.initSidebars()
     );
-    actions.reload();
+    actions.reloadSidebars();
+    actions.reloadPages();
     return {
+      sidebarState,
+      pagesState,
       ...toRefs(state),
       ...actions,
       formatDateTime,
       async addScheduledPicks() {
-        let lastPick =
-          state.allSidebars[state.allSidebars.length - 1] ??
-          new SidebarData({ data: { items: [] } }, state.pages);
+        let lastPick = state.allSidebars[state.allSidebars.length - 1];
         state.allSidebars.push(lastPick.clone(state.nextSchedule));
         state.nextSchedule = null;
         await this.$nextTick();
@@ -148,13 +168,19 @@ export default {
         <div class="columns is-multiline">
           <div class="column is-full">
             <SidebarItem
-              v-for="(item, i) of sidebar.items"
-              :key="i"
+              v-for="({ item, id }, pos) of sidebar.items"
+              :key="id"
+              class="p-4 zebra-row"
               :item="item"
+              :pos="pos"
+              :length="sidebar.items.length"
             />
           </div>
           <div class="column is-full">
-            <PageSelector :pages="pages" />
+            <h2 class="title">Add new item</h2>
+            <PageSelector :pages="pages" @select="sidebar.add($event)" />
+            <SpinnerProgress :is-loading="pagesState.isLoading" />
+            <ErrorReloader :error="pagesState.error" @reload="reloadPages" />
           </div>
         </div>
         <button
@@ -167,7 +193,7 @@ export default {
         </button>
       </div>
     </template>
-    <template v-if="!isLoading">
+    <template v-if="!sidebarState.isLoading">
       <h2 class="mt-2 title">Add a scheduled change</h2>
       <BulmaField v-slot="{ idForLabel }" label="Schedule for">
         <b-datetimepicker
@@ -196,8 +222,8 @@ export default {
       <button
         type="button"
         class="button is-primary has-text-weight-semibold"
-        :disabled="isLoading"
-        :class="{ 'is-loading': isLoading }"
+        :disabled="sidebarState.isLoading"
+        :class="{ 'is-loading': sidebarState.isLoading }"
         @click="save"
       >
         Save
@@ -205,16 +231,16 @@ export default {
       <button
         type="button"
         class="button is-light has-text-weight-semibold"
-        :disabled="isLoading"
-        :class="{ 'is-loading': isLoading }"
-        @click="reset"
+        :disabled="sidebarState.isLoading"
+        :class="{ 'is-loading': sidebarState.isLoading }"
+        @click="initSidebars"
       >
         Revert
       </button>
     </div>
 
-    <SpinnerProgress :is-loading="isLoading" />
-    <ErrorReloader :error="error" @reload="reload" />
+    <SpinnerProgress :is-loading="sidebarState.isLoading" />
+    <ErrorReloader :error="sidebarState.error" @reload="reloadSidebars" />
   </div>
 </template>
 

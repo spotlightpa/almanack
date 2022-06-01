@@ -116,6 +116,7 @@ export default {
     </details>
   </div>
 </template>
+
 <style scoped>
 .plain-notification {
   max-width: 350px;
