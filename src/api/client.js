@@ -51,6 +51,7 @@ const endpoints = {
   getSignupURL: `/api/mailchimp-signup-url`,
   sendMessage: `/api/message`,
   postPage: `/api/page`,
+  getPageByFilePath: `/api/page-by-file-path`,
   getSidebar: `/api/sidebar`,
   saveSidebar: `/api/sidebar`,
   getSiteParams: `/api/site-params`,
@@ -185,6 +186,7 @@ function makeClient($auth) {
 
   let simpleGetActions = [
     "getEditorsPicks",
+    "getPageByFilePath",
     "getSidebar",
     "getSiteParams",
     "listAllPages",
