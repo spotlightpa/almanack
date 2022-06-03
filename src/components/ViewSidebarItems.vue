@@ -52,6 +52,24 @@ class SidebarData {
     });
   }
 
+  swap({ pos, dir }) {
+    let target = pos + dir;
+    if (target < 0 || target >= this.items.length) {
+      // eslint-disable-next-line no-console
+      console.error("bad swap", pos, target);
+      return;
+    }
+    let firstIndex = Math.min(pos, target);
+    let first = this.items[firstIndex];
+    let last = this.items[Math.max(pos, target)];
+    // Must use splice for Vue reactivity
+    this.items.splice(firstIndex, 2, last, first);
+  }
+
+  remove(pos) {
+    this.items.splice(pos, 1);
+  }
+
   clone(scheduleFor) {
     let { data } = JSON.parse(JSON.stringify(this));
     let newPicks = new SidebarData({
@@ -174,6 +192,8 @@ export default {
               :item="item"
               :pos="pos"
               :length="sidebar.items.length"
+              @swap="sidebar.swap($event)"
+              @remove="sidebar.remove($event)"
             />
           </div>
           <div class="column is-full">
