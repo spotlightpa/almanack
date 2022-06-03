@@ -11,7 +11,7 @@ WITH edpicks AS (
 ),
 items AS (
   SELECT
-    jsonb_array_elements_text(data -> 'sidebarPicks') AS item
+    jsonb_array_elements_text(data -> 'sidebarPicks') AS page
 FROM
   edpicks
 ),
@@ -21,7 +21,7 @@ blob AS (
         SELECT
           json_agg(row_to_json("items")::jsonb || '
             {
-              "title": "Editor’s Pick",
+              "label": "Editor’s Pick",
               "labelColor": "#ff6c36",
               "linkColor": "#000000",
               "backgroundColor": "#f5f5f5"

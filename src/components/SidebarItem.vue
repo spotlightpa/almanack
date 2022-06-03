@@ -12,9 +12,7 @@ export default {
     let { apiState, exec } = makeState();
 
     async function load() {
-      let params = new URLSearchParams();
-      params.set("path", props.item.item);
-      params.set("select", "-body");
+      let params = { path: props.item.page, select: "-body" };
       return await exec(() => getPageByFilePath({ params }));
     }
     const page = computed(() =>
@@ -27,7 +25,7 @@ export default {
       page,
 
       ...useData(() => props.item, {
-        label: ["title"],
+        label: ["label"],
         labelColor: ["labelColor"],
         bgColor: ["backgroundColor"],
         linkColor: ["linkColor"],
