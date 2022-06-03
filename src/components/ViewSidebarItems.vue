@@ -40,11 +40,11 @@ class SidebarData {
 
   add({ filePath }) {
     let item = {
-      title: "Editor’s Pick",
+      label: "Editor’s Pick",
       labelColor: "#ff6c36",
       linkColor: "#000000",
       backgroundColor: "#f5f5f5",
-      item: filePath,
+      page: filePath,
     };
     this.items.push({
       item,
