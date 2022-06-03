@@ -130,7 +130,7 @@ export default {
           Remove {{ formatDateTime(params.scheduleFor) }}
         </button>
       </div>
-      <h2 class="mt-2 title">Add a scheduled change</h2>
+      <h2 class="mt-2 title">Create a scheduled change</h2>
       <BulmaField v-slot="{ idForLabel }" label="Schedule for">
         <b-datetimepicker
           :id="idForLabel"
