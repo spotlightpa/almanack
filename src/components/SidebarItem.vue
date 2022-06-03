@@ -6,7 +6,7 @@ import { Page } from "@/api/spotlightpa-page.js";
 import useData from "@/utils/use-data.js";
 
 export default {
-  props: { item: Object },
+  props: { item: Object, pos: Number, length: Number },
   setup(props) {
     let { getPageByFilePath } = useClient();
     let { apiState, exec } = makeState();
@@ -37,6 +37,7 @@ export default {
 
 <template>
   <div>
+    <h3 class="title is-4">#{{ pos + 1 }} {{ page.internalID || "" }}</h3>
     <details open>
       <summary>Settings</summary>
 
@@ -112,6 +113,40 @@ export default {
         </div>
       </div>
     </details>
+    <div class="mt-2 buttons are-small">
+      <button
+        v-if="length > 1 && pos > 0"
+        class="button has-text-weight-semibold is-success"
+        type="button"
+        @click="$emit('swap', { pos, dir: -1 })"
+      >
+        <span>Move up</span>
+        <span class="icon">
+          <font-awesome-icon :icon="['fas', 'arrow-up']" />
+        </span>
+      </button>
+      <button
+        v-if="length > 1 && pos < length - 1"
+        class="button has-text-weight-semibold is-success"
+        type="button"
+        @click="$emit('swap', { pos, dir: 1 })"
+      >
+        <span class="icon">
+          <font-awesome-icon :icon="['fas', 'arrow-down']" />
+        </span>
+        <span>Move down</span>
+      </button>
+      <button
+        class="button has-text-weight-semibold is-danger"
+        type="button"
+        @click="$emit('remove', pos)"
+      >
+        <span class="icon">
+          <font-awesome-icon :icon="['fas', 'trash-alt']" />
+        </span>
+        <span>Remove</span>
+      </button>
+    </div>
   </div>
 </template>
 
