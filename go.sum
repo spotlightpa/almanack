@@ -198,6 +198,8 @@ github.com/carlmjohnson/resperr v0.20.5 h1:LBw+jsFSiGsb+kdJBmRtS9ky5CZmiLqWgj3Qt
 github.com/carlmjohnson/resperr v0.20.5/go.mod h1:UD4WLdpQTfUt4pl0wZsKF/7MuZIoi78qWloEDXV5Rw0=
 github.com/carlmjohnson/slackhook v0.21.2 h1:jeifWRM+d0rgiDe+rWV8olFEbsN30v17CbCG2xMnMfc=
 github.com/carlmjohnson/slackhook v0.21.2/go.mod h1:MJQwIJ3MGJ4WUqQgocXjkvCVHN+V0rw6r+s+TQWUA1k=
+github.com/carlmjohnson/versioninfo v0.22.2 h1:spbjbb+r5OE8Vct/8UQXGBxajHgjS5DYZQOQ39v2G5Y=
+github.com/carlmjohnson/versioninfo v0.22.2/go.mod h1:QT9mph3wcVfISUKd0i9sZfVrPviHuSF+cUtLjm2WSf8=
 github.com/census-instrumentation/opencensus-proto v0.2.1/go.mod h1:f6KPmirojxKA12rnyqOA5BBL4O983OfeGPqjHWSTneU=
 github.com/census-instrumentation/opencensus-proto v0.3.0/go.mod h1:f6KPmirojxKA12rnyqOA5BBL4O983OfeGPqjHWSTneU=
 github.com/cespare/xxhash v1.1.0/go.mod h1:XrSqR1VqqWfGrhpAt58auRo0WTKS1nRRg3ghfAqPWnc=
