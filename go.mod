@@ -6,7 +6,7 @@ require (
 	github.com/BurntSushi/toml v1.1.0
 	github.com/algolia/algoliasearch-client-go/v3 v3.25.0
 	github.com/aws/aws-lambda-go v1.32.0
-	github.com/aws/aws-sdk-go v1.44.23
+	github.com/aws/aws-sdk-go v1.44.27
 	github.com/carlmjohnson/be v0.22.4
 	github.com/carlmjohnson/crockford v0.22.1
 	github.com/carlmjohnson/emailx v0.20.2
@@ -14,7 +14,7 @@ require (
 	github.com/carlmjohnson/exitcode v0.20.2
 	github.com/carlmjohnson/flagx v0.22.1
 	github.com/carlmjohnson/gateway v1.22.2
-	github.com/carlmjohnson/requests v0.22.2
+	github.com/carlmjohnson/requests v0.22.3
 	github.com/carlmjohnson/resperr v0.20.5
 	github.com/carlmjohnson/slackhook v0.21.2
 	github.com/gabriel-vasile/mimetype v1.4.0
@@ -27,8 +27,8 @@ require (
 	github.com/mattbaird/gochimp v0.0.0-20200820164431-f1082bcdf63f
 	github.com/microcosm-cc/bluemonday v1.0.18
 	gocloud.dev v0.25.0
-	golang.org/x/exp v0.0.0-20220518171630-0b5c67f07fdf
-	golang.org/x/net v0.0.0-20220526153639-5463443f8c37
+	golang.org/x/exp v0.0.0-20220602145555-4a0574d9293f
+	golang.org/x/net v0.0.0-20220531201128-c960675eff93
 	golang.org/x/oauth2 v0.0.0-20220524215830-622c5d57e401
 )
 
@@ -71,9 +71,9 @@ require (
 	golang.org/x/sys v0.0.0-20220520151302-bc2c85ada10a // indirect
 	golang.org/x/text v0.3.7 // indirect
 	golang.org/x/xerrors v0.0.0-20220517211312-f3a8303e98df // indirect
-	google.golang.org/api v0.81.0 // indirect
+	google.golang.org/api v0.82.0 // indirect
 	google.golang.org/appengine v1.6.7 // indirect
-	google.golang.org/genproto v0.0.0-20220526192754-51939a95c655 // indirect
-	google.golang.org/grpc v1.46.2 // indirect
+	google.golang.org/genproto v0.0.0-20220602131408-e326c6e8e9c8 // indirect
+	google.golang.org/grpc v1.47.0 // indirect
 	google.golang.org/protobuf v1.28.0 // indirect
 )
