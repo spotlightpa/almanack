@@ -120,10 +120,10 @@ export default {
         type="button"
         @click="$emit('swap', { pos, dir: -1 })"
       >
-        <span>Move up</span>
         <span class="icon">
           <font-awesome-icon :icon="['fas', 'arrow-up']" />
         </span>
+        <span>Move up</span>
       </button>
       <button
         v-if="length > 1 && pos < length - 1"
