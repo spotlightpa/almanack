@@ -19,10 +19,8 @@ export default {
       nextPage,
       error,
     } = useListAnyArc(() => props.page);
-
     return {
       showComposer: ref(false),
-
       didLoad,
       isLoading,
       isLoadingThrottled,
@@ -30,59 +28,10 @@ export default {
       error,
       articles,
       nextPage,
-
       async refresh({ apiStatus, ref }) {
         await load();
         apiStatus[ref] = false;
       },
-
-      navLinks: [
-        {
-          to: "articles",
-          icon: ["fas", "file-invoice"],
-          text: "External Editor View",
-        },
-        {
-          to: "editors-picks",
-          icon: ["fas", "newspaper"],
-          text: "Homepage Editor",
-        },
-        {
-          to: "sidebar-items",
-          icon: ["fas", "check-circle"],
-          text: "Sidebar Items",
-        },
-        {
-          to: "news-pages",
-          icon: ["fas", "file-signature"],
-          text: "Spotlight PA Articles",
-        },
-        {
-          to: "newsletters",
-          icon: ["fas", "mail-bulk"],
-          text: "Newsletter pages",
-        },
-        {
-          to: "site-params",
-          icon: ["fas", "sliders-h"],
-          text: "Sitewide Settings",
-        },
-        {
-          to: "uploader",
-          icon: ["fa", "file-image"],
-          text: "Photo manager",
-        },
-        {
-          to: "file-uploader",
-          icon: ["fa", "file-upload"],
-          text: "File manager",
-        },
-        {
-          to: "domains",
-          icon: ["fas", "user-circle"],
-          text: "Preauthorization",
-        },
-      ],
     };
   },
 };
@@ -95,19 +44,62 @@ export default {
       <template v-if="page">(page {{ page }})</template>
     </h1>
 
-    <nav class="buttons">
-      <router-link
-        v-for="(link, i) in navLinks"
-        :key="i"
-        :to="{ name: link.to }"
-        class="button is-small is-light has-text-weight-semibold"
-      >
-        <span class="icon">
-          <font-awesome-icon :icon="link.icon" />
-        </span>
-        <span v-text="link.text" />
-      </router-link>
-    </nav>
+    <LinkButtons label="News Partners">
+      <LinkButton
+        label="External Editor View"
+        to="articles"
+        :icon="['fas', 'file-invoice']"
+      />
+      <LinkButton
+        label="Preauthorization"
+        to="domains"
+        :icon="['fas', 'user-circle']"
+      />
+    </LinkButtons>
+
+    <LinkButtons label="Spotlight PA promotions">
+      <LinkButton
+        label="Homepage Editor"
+        to="editors-picks"
+        :icon="['fas', 'newspaper']"
+      />
+      <LinkButton
+        label="Sidebar Items"
+        to="sidebar-items"
+        :icon="['fas', 'check-circle']"
+      />
+      <LinkButton
+        label="Sitewide Settings"
+        to="site-params"
+        :icon="['fas', 'sliders-h']"
+      />
+    </LinkButtons>
+
+    <LinkButtons label="Spotlight PA pages">
+      <LinkButton
+        label="Spotlight PA Articles"
+        to="news-pages"
+        :icon="['fas', 'file-signature']"
+      />
+      <LinkButton
+        label="Newsletter pages"
+        to="newsletters"
+        :icon="['fas', 'mail-bulk']"
+      />
+    </LinkButtons>
+
+    <LinkButtons label="Uploads">
+      <LinkButton
+        label="Photo manager"
+        to="uploader"
+        :icon="['fa', 'file-image']"
+      />
+      <LinkButton
+        label="File manager"
+        to="file-uploader"
+        :icon="['fa', 'file-upload']"
+      />
+    </LinkButtons>
 
     <details class="content">
       <summary>Tools</summary>
