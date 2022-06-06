@@ -253,7 +253,7 @@ export default {
         class="button is-light has-text-weight-semibold"
         :disabled="sidebarState.isLoading"
         :class="{ 'is-loading': sidebarState.isLoading }"
-        @click="initSidebars"
+        @click="reloadSidebars"
       >
         Revert
       </button>
