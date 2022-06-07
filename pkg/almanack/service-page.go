@@ -130,7 +130,7 @@ func (svc Service) RefreshPageContents(ctx context.Context, id int64) (err error
 	return err
 }
 
-func (svc Service) PageFromArcArticle(ctx context.Context, dbArt *db.Article) (page *db.Page, err error) {
+func (svc Service) PageFromArcArticle(ctx context.Context, dbArt *db.Article, pagekind string) (page *db.Page, err error) {
 	defer errutil.Trace(&err)
 
 	story, err := ArcStoryFromDB(dbArt)
@@ -139,6 +139,7 @@ func (svc Service) PageFromArcArticle(ctx context.Context, dbArt *db.Article) (p
 	}
 
 	var splArt SpotlightPAArticle
+	splArt.PageKind = pagekind
 	if err = story.ToArticle(ctx, svc, &splArt); err != nil {
 		return nil, err
 	}
