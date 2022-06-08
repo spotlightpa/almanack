@@ -38,14 +38,6 @@ FROM
 WHERE
   arc_id = @arc_id::text;
 
--- name: ListUpcoming :many
-SELECT
-  *
-FROM
-  article
-ORDER BY
-  arc_data ->> 'last_updated_date' DESC;
-
 -- name: ListAllArcArticles :many
 SELECT
   *
