@@ -1,13 +1,11 @@
 package almanack
 
 import (
-	"context"
 	"fmt"
 	"strings"
 	"time"
 
 	"github.com/BurntSushi/toml"
-	"github.com/spotlightpa/almanack/internal/db"
 )
 
 type SpotlightPAArticle struct {
@@ -50,39 +48,11 @@ type SpotlightPAArticle struct {
 	PageKind         string     `toml:"-"`
 }
 
-func (splArt *SpotlightPAArticle) ResetArcData(ctx context.Context, svc Service, dbArticle db.Article) (err error) {
-	var arcStory ArcStory
-	if err = arcStory.fromDB(&dbArticle); err != nil {
-		return err
-	}
-
-	if err = arcStory.ToArticle(ctx, svc, splArt); err == nil {
-		splArt.LastArcSync = dbArticle.UpdatedAt
-	}
-	return nil
-}
-
 func (splArt *SpotlightPAArticle) String() string {
 	if splArt == nil {
 		return "<nil article>"
 	}
 	return fmt.Sprintf("%#v", *splArt)
-}
-
-func (splArt *SpotlightPAArticle) URL() string {
-	if splArt.Slug == "" || splArt.PubDate.IsZero() {
-		return ""
-	}
-	pagekind := "news"
-	if splArt.PageKind != "" {
-		pagekind = splArt.PageKind
-	}
-	year := splArt.PubDate.Year()
-	month := splArt.PubDate.Month()
-	return fmt.Sprintf(
-		"https://www.spotlightpa.org/%s/%d/%02d/%s/",
-		pagekind, year, month, splArt.Slug,
-	)
 }
 
 func (splArt *SpotlightPAArticle) ContentFilepath() string {
