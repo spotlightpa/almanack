@@ -1,3 +1,4 @@
+name: Go deps
 env:
   GO_VERSION: 1.18
 
