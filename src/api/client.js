@@ -6,13 +6,20 @@ const tryTo = (promise) =>
     .then((data) => [data, null])
     .catch((error) => [null, error]);
 
-const responseError = (rsp) => {
+const responseError = async (rsp) => {
   if (rsp.ok) {
     return;
   }
+  let details = {};
+  try {
+    details = (await rsp.json())?.details ?? {};
+    // eslint-disable-next-line no-empty
+  } catch (e) {}
+
   let msg = `${rsp.status} ${rsp.statusText}`;
   let err = new Error("Unexpected response from server: " + msg);
   err.name = msg;
+  err.details = details;
   return err;
 };
 
@@ -80,7 +87,7 @@ function makeClient($auth) {
     }
     options = { ...defaultOpts, ...options };
     let resp = await fetch(url, options);
-    let err = responseError(resp);
+    let err = await responseError(resp);
     if (err) throw err;
 
     return await resp.json();
@@ -107,7 +114,7 @@ function makeClient($auth) {
       let rsp;
       [rsp, err] = await tryTo(fetch(signedURL, { method: "PUT", body }));
       if (err ?? !rsp.ok) {
-        return ["", err ?? responseError(rsp)];
+        return ["", err ?? (await responseError(rsp))];
       }
       [, err] = await actions.updateImage(filename);
       if (err) {
@@ -149,7 +156,7 @@ function makeClient($auth) {
       let rsp;
       [rsp, err] = await tryTo(fetch(signedURL, opts));
       if (err ?? !rsp.ok) {
-        return ["", err ?? responseError(rsp)];
+        return ["", err ?? (await responseError(rsp))];
       }
       [, err] = await actions.updateFile(fileURL);
       if (err) {
