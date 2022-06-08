@@ -134,44 +134,6 @@ func (q *Queries) ListAvailableArticles(ctx context.Context, arg ListAvailableAr
 	return items, nil
 }
 
-const listUpcoming = `-- name: ListUpcoming :many
-SELECT
-  id, arc_id, arc_data, spotlightpa_path, note, status, created_at, updated_at
-FROM
-  article
-ORDER BY
-  arc_data ->> 'last_updated_date' DESC
-`
-
-func (q *Queries) ListUpcoming(ctx context.Context) ([]Article, error) {
-	rows, err := q.db.Query(ctx, listUpcoming)
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-	var items []Article
-	for rows.Next() {
-		var i Article
-		if err := rows.Scan(
-			&i.ID,
-			&i.ArcID,
-			&i.ArcData,
-			&i.SpotlightPAPath,
-			&i.Note,
-			&i.Status,
-			&i.CreatedAt,
-			&i.UpdatedAt,
-		); err != nil {
-			return nil, err
-		}
-		items = append(items, i)
-	}
-	if err := rows.Err(); err != nil {
-		return nil, err
-	}
-	return items, nil
-}
-
 const updateAlmanackArticle = `-- name: UpdateAlmanackArticle :one
 UPDATE
   article
