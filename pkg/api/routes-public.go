@@ -57,15 +57,15 @@ func (app *appEnv) getProxyImage(w http.ResponseWriter, r *http.Request) {
 	encURL := chi.URLParam(r, "encURL")
 	decURL, err := base64.URLEncoding.DecodeString(encURL)
 	if err != nil {
-		app.replyErr(w, r, resperr.New(
-			http.StatusBadRequest, "could not decode URL param: %w", err,
+		app.replyErr(w, r, resperr.WithUserMessagef(
+			nil, "Could not decode URL param: %q", encURL,
 		))
 		return
 	}
 	u, err := inkyURL.Parse(string(decURL))
 	if err != nil {
-		app.replyErr(w, r, resperr.New(
-			http.StatusBadRequest, "bad image URL: %s", decURL,
+		app.replyErr(w, r, resperr.WithUserMessagef(
+			nil, "Bad image URL: %q", decURL,
 		))
 		return
 	}

@@ -10,6 +10,7 @@ import (
 	"io"
 	"mime"
 	"net/http"
+	"net/url"
 	"strconv"
 	"strings"
 	"time"
@@ -39,13 +40,16 @@ func (app *appEnv) replyJSON(statusCode int, w http.ResponseWriter, data any) {
 func (app *appEnv) replyErr(w http.ResponseWriter, r *http.Request, err error) {
 	app.logErr(r.Context(), err)
 	code := resperr.StatusCode(err)
-	msg := resperr.UserMessage(err)
+	details := url.Values{"message": []string{resperr.UserMessage(err)}}
+	if v := resperr.ValidationErrors(err); len(v) != 0 {
+		details = v
+	}
 	app.replyJSON(code, w, struct {
-		Status  int    `json:"status"`
-		Message string `json:"message"`
+		Status  int        `json:"status"`
+		Details url.Values `json:"details"`
 	}{
 		code,
-		msg,
+		details,
 	})
 }
 
@@ -87,42 +91,41 @@ func (app *appEnv) tryReadJSON(w http.ResponseWriter, r *http.Request, dst any) 
 
 		switch {
 		case errors.As(err, &syntaxError):
-			return resperr.New(http.StatusBadRequest,
-				"request body contains badly-formed JSON (at position %d): %w",
-				syntaxError.Offset, err)
+			return resperr.WithUserMessagef(err,
+				"Request body contains badly-formed JSON (at position %d)",
+				syntaxError.Offset)
 
 		case errors.Is(err, io.ErrUnexpectedEOF):
-			return resperr.New(http.StatusBadRequest,
-				"request body contains badly-formed JSON: %w", err)
+			return resperr.WithUserMessage(err,
+				"Request body contains badly-formed JSON")
 
 		case errors.As(err, &unmarshalTypeError):
-			return resperr.New(http.StatusBadRequest,
-				"request body contains an invalid value for the %q field (at position %d): %w",
-				unmarshalTypeError.Field, unmarshalTypeError.Offset, err)
+			return resperr.WithUserMessagef(err,
+				"Request body contains an invalid value for the %q field (at position %d)",
+				unmarshalTypeError.Field, unmarshalTypeError.Offset)
 
 		case strings.HasPrefix(err.Error(), "json: unknown field "):
 			fieldName := strings.TrimPrefix(err.Error(), "json: unknown field ")
-			return resperr.New(http.StatusBadRequest,
-				"Request body contains unknown field %s: %w",
-				fieldName, err)
+			return resperr.WithUserMessagef(err,
+				"Request body contains unknown field %s", fieldName)
 
 		case errors.Is(err, io.EOF):
-			return resperr.New(http.StatusBadRequest,
-				"request body must not be empty")
+			return resperr.WithUserMessage(nil,
+				"Request body must not be empty")
 
 		case err.Error() == "http: request body too large":
 			return resperr.New(http.StatusRequestEntityTooLarge,
 				"request body too large: %w", err)
 
 		default:
-			return resperr.New(http.StatusBadRequest, "unexpected error: %w", err)
+			return resperr.New(http.StatusBadRequest, "tryReadJSON: %w", err)
 		}
 	}
 
 	var discard any
 	if err := dec.Decode(&discard); !errors.Is(err, io.EOF) {
-		return resperr.New(http.StatusBadRequest,
-			"request body must only contain a single JSON object")
+		return resperr.WithUserMessagef(nil,
+			"Request body must only contain a single JSON object")
 	}
 
 	return nil
@@ -212,10 +215,8 @@ func intParam[Int int | int32 | int64](r *http.Request, param string, p *Int) er
 	}
 	n, err := strconv.ParseInt(pstr, 10, bitsize)
 	if err != nil {
-		return resperr.New(
-			http.StatusBadRequest,
-			"bad integer parameter for %s: %w",
-			param, err)
+		return resperr.WithUserMessagef(
+			err, "Bad integer parameter for %s", param)
 	}
 	*p = Int(n)
 	return nil

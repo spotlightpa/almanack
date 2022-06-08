@@ -146,8 +146,8 @@ func (app *appEnv) postSignedUpload(w http.ResponseWriter, r *http.Request) {
 
 	ext, ok := supportedContentTypes[userData.Type]
 	if !ok {
-		app.replyErr(w, r, resperr.New(
-			http.StatusBadRequest, "unsupported content type: %q", ext,
+		app.replyErr(w, r, resperr.WithUserMessagef(
+			nil, "File has an unsupported content type: %q", ext,
 		))
 		return
 	}
@@ -228,15 +228,11 @@ func (app *appEnv) postDomain(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if req.Domain == "" {
-		app.replyErr(w, r, resperr.New(http.StatusBadRequest,
-			"can't add nothing!"))
-		return
-	}
-
-	if req.Domain == "spotlightpa.org" {
-		app.replyErr(w, r, resperr.New(http.StatusBadRequest,
-			"can't change spotlightpa.org!"))
+	var v resperr.Validator
+	v.AddIf("domain", req.Domain == "", "Can't add nothing")
+	v.AddIf("domain", req.Domain == "spotlightpa.org", "Can't change spotlightpa.org!")
+	if err := v.Err(); err != nil {
+		app.replyErr(w, r, err)
 		return
 	}
 
@@ -297,8 +293,8 @@ func (app *appEnv) postAddress(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if !emailx.Valid(req.Address) {
-		app.replyErr(w, r, resperr.New(http.StatusBadRequest,
-			"invalid email address: %q", req.Address))
+		app.replyErr(w, r, resperr.WithUserMessagef(nil,
+			"Invalid email address: %q", req.Address))
 		return
 	}
 
@@ -671,7 +667,7 @@ func (app *appEnv) postRefreshPageFromArc(w http.ResponseWriter, r *http.Request
 
 	arcID, _ := page.Frontmatter["arc-id"].(string)
 	if arcID == "" {
-		app.replyErr(w, r, resperr.New(http.StatusBadRequest,
+		app.replyErr(w, r, resperr.New(http.StatusConflict,
 			"no arc-id on page %d", id))
 		return
 	}
@@ -765,8 +761,8 @@ func (app *appEnv) setSiteData(loc string) http.HandlerFunc {
 			return
 		}
 		if len(req.Configs) < 1 {
-			app.replyErr(w, r, resperr.New(
-				http.StatusBadRequest, "no schedulable items provided"))
+			app.replyErr(w, r, resperr.WithUserMessage(
+				nil, "No schedulable items provided"))
 			return
 		}
 
