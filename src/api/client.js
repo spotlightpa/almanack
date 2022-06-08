@@ -23,7 +23,6 @@ const endpoints = {
   getPage: (id) => `/api/page/${id}`,
   getPageWithContent: (id) => `/api/page-with-content/${id}`,
   // post id endpoints
-  postPageForArcID: (id) => `/api/page-for-arc-id/${id}`,
   postRefreshPageFromArc: (id) => `/api/refresh-page-from-arc/${id}`,
   // list page points
   listAnyArc: (page = "0") => `/api/list-any-arc/${page}`,
@@ -52,6 +51,8 @@ const endpoints = {
   sendMessage: `/api/message`,
   postPage: `/api/page`,
   getPageByFilePath: `/api/page-by-file-path`,
+  getPageForArcID: `/api/page-for-arc-id`,
+  postPageForArcID: `/api/page-for-arc-id`,
   getSidebar: `/api/sidebar`,
   saveSidebar: `/api/sidebar`,
   getSiteParams: `/api/site-params`,
@@ -179,7 +180,7 @@ function makeClient($auth) {
     let endpointFn = endpoints[action];
     actions[action] = (id) => tryTo(request(endpointFn(id)));
   }
-  let idPostActions = ["postPageForArcID", "postRefreshPageFromArc"];
+  let idPostActions = ["postRefreshPageFromArc"];
   for (let action of idPostActions) {
     let endpointFn = endpoints[action];
     actions[action] = (id) => tryTo(post(endpointFn(id)));
@@ -188,6 +189,7 @@ function makeClient($auth) {
   let simpleGetActions = [
     "getEditorsPicks",
     "getPageByFilePath",
+    "getPageForArcID",
     "getSidebar",
     "getSiteParams",
     "listAllPages",
@@ -207,6 +209,7 @@ function makeClient($auth) {
     "postAuthorizedDomain",
     "postAuthorizedEmailAddress",
     "postPage",
+    "postPageForArcID",
     "postSiteParams",
     "saveArcArticle",
     "saveArticle",

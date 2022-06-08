@@ -14,15 +14,18 @@ export default {
     };
   },
   setup(props, { root }) {
+    const needsCreation = ref(false);
+
     const isLoading = ref(false);
     window.setTimeout(() => {
       isLoading.value = true;
     }, 500);
 
-    const { postPageForArcID } = useClient();
+    const { getPageForArcID, postPageForArcID } = useClient();
     const { apiState, exec } = makeState();
 
-    const fetch = (id) => exec(() => postPageForArcID(id));
+    const fetch = (id) =>
+      exec(() => getPageForArcID({ params: { arc_id: id } }));
 
     watch(() => props.id, fetch, {
       immediate: true,
@@ -32,8 +35,7 @@ export default {
       () => apiState.rawData,
       (id) => {
         if (!id) {
-          apiState.error = new Error("Could not load page");
-          apiState.error.message = "No response from server";
+          needsCreation.value = true;
           return;
         }
         root.$router.replace({
@@ -48,9 +50,16 @@ export default {
     const { error } = toRefs(apiState);
 
     return {
+      isDev: window.location.href.match(/localhost/),
+      needsCreation,
+      apiState,
       fetch,
       error,
       isLoading,
+
+      convert(pagekind) {
+        exec(() => postPageForArcID({ arc_id: props.id, page_kind: pagekind }));
+      },
     };
   },
 };
@@ -58,7 +67,37 @@ export default {
 
 <template>
   <div>
-    <SpinnerProgress :is-loading="isLoading" />
+    <div v-if="needsCreation">
+      <h1 class="title">Convert article?</h1>
+      <p>
+        The article has not been converted from an Arc article to a Spotlight PA
+        page. Convert now?
+      </p>
+      <p class="mt-2">
+        <i>
+          Note that after conversion, metadata such as article titles, images,
+          and URL slugs must be manually updated to match Arc.
+        </i>
+      </p>
+      <div class="mt-4 buttons">
+        <button
+          class="button is-primary has-text-weight-semibold"
+          type="button"
+          @click="convert('news')"
+        >
+          Convert as a News article
+        </button>
+        <button
+          class="button is-primary has-text-weight-semibold"
+          type="button"
+          :disabled="!isDev"
+          @click="convert('statecollege')"
+        >
+          Convert as a State College article
+        </button>
+      </div>
+    </div>
+    <SpinnerProgress :is-loading="isLoading && apiState.isLoading" />
     <ErrorReloader :error="error" @reload="fetch(id)" />
   </div>
 </template>

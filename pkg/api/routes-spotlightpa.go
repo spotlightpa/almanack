@@ -7,7 +7,6 @@ import (
 	"github.com/carlmjohnson/emailx"
 	"github.com/carlmjohnson/errutil"
 	"github.com/carlmjohnson/resperr"
-	"github.com/go-chi/chi/v5"
 	"github.com/spotlightpa/almanack/internal/arc"
 	"github.com/spotlightpa/almanack/internal/db"
 	"github.com/spotlightpa/almanack/pkg/almanack"
@@ -588,9 +587,9 @@ func (app *appEnv) postPage(w http.ResponseWriter, r *http.Request) {
 	app.replyJSON(http.StatusOK, w, &res)
 }
 
-func (app *appEnv) postPageForArcID(w http.ResponseWriter, r *http.Request) {
-	arcID := chi.URLParam(r, "arcID")
-	app.Printf("start postPageForArcID for %s", arcID)
+func (app *appEnv) getPageForArcID(w http.ResponseWriter, r *http.Request) {
+	arcID := r.URL.Query().Get("arc_id")
+	app.Printf("start getPageForArcID for %q", arcID)
 
 	dbArt, err := app.svc.Queries.GetArticleByArcID(r.Context(), arcID)
 	if err != nil {
@@ -599,18 +598,57 @@ func (app *appEnv) postPageForArcID(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	filepath := dbArt.SpotlightPAPath.String
-	firstConversion := filepath == ""
-	if !firstConversion {
-		page, err := app.svc.Queries.GetPageByFilePath(r.Context(), filepath)
-		if err != nil {
-			app.replyErr(w, r, err)
-			return
-		}
-		app.replyJSON(http.StatusOK, w, page.ID)
+	if filepath == "" {
+		// Empty string signals to bring up creation page
+		app.replyJSON(http.StatusOK, w, "")
 		return
 	}
-	app.Printf("saving page from %s", arcID)
-	page, err := app.svc.PageFromArcArticle(r.Context(), &dbArt)
+	app.pageIDForFilepath(w, r, filepath)
+	return
+}
+
+func (app *appEnv) pageIDForFilepath(w http.ResponseWriter, r *http.Request, filepath string) {
+	page, err := app.svc.Queries.GetPageByFilePath(r.Context(), filepath)
+	if err != nil {
+		app.replyErr(w, r, err)
+		return
+	}
+	app.replyJSON(http.StatusOK, w, page.ID)
+	return
+}
+
+func (app *appEnv) postPageForArcID(w http.ResponseWriter, r *http.Request) {
+	app.Print("start postPageForArcID")
+
+	var req struct {
+		ArcID    string `json:"arc_id"`
+		PageKind string `json:"page_kind"`
+	}
+	if !app.readJSON(w, r, &req) {
+		return
+	}
+	if !slices.Contains([]string{"news", "statecollege"}, req.PageKind) {
+		app.replyErr(w, r, resperr.WithUserMessage(nil, "Invalid page_kind"))
+		return
+	}
+
+	app.Printf("saving page for %q", req.ArcID)
+	dbArt, err := app.svc.Queries.GetArticleByArcID(r.Context(), req.ArcID)
+	if err != nil {
+		err = db.NoRowsAs404(err, "could not find Arc ID %q", req.ArcID)
+		app.replyErr(w, r, err)
+		return
+	}
+	filepath := dbArt.SpotlightPAPath.String
+	if filepath != "" {
+		app.logErr(r.Context(), fmt.Errorf(
+			"can't create new page for %q; page %q already exists",
+			req.ArcID, filepath))
+		app.pageIDForFilepath(w, r, filepath)
+		return
+	}
+
+	page, err := app.svc.PageFromArcArticle(r.Context(), &dbArt, req.PageKind)
 	if err != nil {
 		app.replyErr(w, r, err)
 		return

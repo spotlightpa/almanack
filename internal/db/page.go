@@ -104,10 +104,10 @@ func (page *Page) SetURLPath() {
 	upath = strings.TrimPrefix(upath, "content")
 	upath = strings.TrimSuffix(upath, ".md")
 	dir, fname := path.Split(upath)
-	if dir == "/news/" {
+	if dir == "/news/" || dir == "/statecollege/" {
 		if pub, ok := timeutil.GetTime(page.Frontmatter, "published"); ok {
 			pub = timeutil.ToEST(pub)
-			dir = pub.Format("/news/2006/01/")
+			dir = pub.Format(dir + "2006/01/")
 		}
 	}
 	if slug, _ := page.Frontmatter["slug"].(string); slug != "" {

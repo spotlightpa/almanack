@@ -47,6 +47,7 @@ type SpotlightPAArticle struct {
 	LastSaved        *time.Time `toml:"-"`
 	LastPublished    *time.Time `toml:"-"`
 	Warnings         []string   `toml:"-"`
+	PageKind         string     `toml:"-"`
 }
 
 func (splArt *SpotlightPAArticle) ResetArcData(ctx context.Context, svc Service, dbArticle db.Article) (err error) {
@@ -72,18 +73,27 @@ func (splArt *SpotlightPAArticle) URL() string {
 	if splArt.Slug == "" || splArt.PubDate.IsZero() {
 		return ""
 	}
+	pagekind := "news"
+	if splArt.PageKind != "" {
+		pagekind = splArt.PageKind
+	}
 	year := splArt.PubDate.Year()
 	month := splArt.PubDate.Month()
 	return fmt.Sprintf(
-		"https://www.spotlightpa.org/news/%d/%02d/%s/",
-		year, month, splArt.Slug,
+		"https://www.spotlightpa.org/%s/%d/%02d/%s/",
+		pagekind, year, month, splArt.Slug,
 	)
 }
 
 func (splArt *SpotlightPAArticle) ContentFilepath() string {
+	pagekind := "news"
+	if splArt.PageKind != "" {
+		pagekind = splArt.PageKind
+	}
 	if splArt.Filepath == "" {
 		date := splArt.PubDate.Format("2006-01-02")
-		splArt.Filepath = fmt.Sprintf("content/news/%s-%s.md", date, splArt.InternalID)
+		splArt.Filepath = fmt.Sprintf("content/%s/%s-%s.md",
+			pagekind, date, splArt.InternalID)
 	}
 	return splArt.Filepath
 }

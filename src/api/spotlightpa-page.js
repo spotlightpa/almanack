@@ -83,11 +83,11 @@ export class Page {
     }
     let [, dir, fname] = this.filePath.match(/^content\/(.+)\/([^/]+)\.md/);
     let slug = this.slug || fname;
-    if (dir === "news") {
+    if (dir === "news" || dir === "statecollege") {
       let date = this.scheduleFor ? new Date(this.scheduleFor) : new Date();
       let year = date.getFullYear();
       let month = (date.getMonth() + 1).toString().padStart(2, "0");
-      dir = `news/${year}/${month}`;
+      dir = `${dir}/${year}/${month}`;
     }
     return new URL(`/${dir}/${slug}/`, "https://www.spotlightpa.org").href;
   }
