@@ -20,17 +20,14 @@ type AddressRole struct {
 }
 
 type Article struct {
-	ID              int32              `json:"id"`
-	ArcID           pgtype.Text        `json:"arc_id"`
-	ArcData         arc.FeedItem       `json:"arc_data"`
-	SpotlightPAPath pgtype.Text        `json:"spotlightpa_path"`
-	SpotlightPAData pgtype.JSONB       `json:"spotlightpa_data"`
-	ScheduleFor     pgtype.Timestamptz `json:"schedule_for"`
-	LastPublished   pgtype.Timestamptz `json:"last_published"`
-	Note            string             `json:"note"`
-	Status          string             `json:"status"`
-	CreatedAt       time.Time          `json:"created_at"`
-	UpdatedAt       time.Time          `json:"updated_at"`
+	ID              int32        `json:"id"`
+	ArcID           pgtype.Text  `json:"arc_id"`
+	ArcData         arc.FeedItem `json:"arc_data"`
+	SpotlightPAPath pgtype.Text  `json:"spotlightpa_path"`
+	Note            string       `json:"note"`
+	Status          string       `json:"status"`
+	CreatedAt       time.Time    `json:"created_at"`
+	UpdatedAt       time.Time    `json:"updated_at"`
 }
 
 type ArticleStatus struct {
