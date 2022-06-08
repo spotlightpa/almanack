@@ -85,10 +85,9 @@ func FetchImageURL(ctx context.Context, c *http.Client, srcurl string) (body []b
 				ctype = ct.String()
 				return nil
 			}
-			return resperr.WithCodeAndMessage(
+			return resperr.WithUserMessage(
 				fmt.Errorf("%q did not have proper MIME type: %s",
 					srcurl, ct.String()),
-				http.StatusBadRequest,
 				"URL must be an image",
 			)
 		}).

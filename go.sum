@@ -197,8 +197,8 @@ github.com/carlmjohnson/gateway v1.22.2 h1:Nr7JVUSruWG3I6PGGxUTaIGLHSEhCcoppFX0z
 github.com/carlmjohnson/gateway v1.22.2/go.mod h1:C2xSaIo4kkvdbTQQI5EhmzzWC1wB/+f5COhlpQ4O8fA=
 github.com/carlmjohnson/requests v0.22.3 h1:ip16AKXNYuArdw9L5/1mL+mNorlZO5XhkLg617yOumc=
 github.com/carlmjohnson/requests v0.22.3/go.mod h1:iTsaX9TdFg2+L4WtZO/HFyDMPEfBnogV3i4A4gjDnvs=
-github.com/carlmjohnson/resperr v0.20.5 h1:LBw+jsFSiGsb+kdJBmRtS9ky5CZmiLqWgj3QtiKYGC0=
-github.com/carlmjohnson/resperr v0.20.5/go.mod h1:UD4WLdpQTfUt4pl0wZsKF/7MuZIoi78qWloEDXV5Rw0=
+github.com/carlmjohnson/resperr v0.22.0 h1:oSliyZLmyncmPLEZXydy6gNhJgQ/9AaVpaGQLDRQ/NM=
+github.com/carlmjohnson/resperr v0.22.0/go.mod h1:iEKmv4gBlxjy4iLy7ExxLjdCBJ5wSaRlDZDnqGfBtls=
 github.com/carlmjohnson/slackhook v0.21.2 h1:jeifWRM+d0rgiDe+rWV8olFEbsN30v17CbCG2xMnMfc=
 github.com/carlmjohnson/slackhook v0.21.2/go.mod h1:MJQwIJ3MGJ4WUqQgocXjkvCVHN+V0rw6r+s+TQWUA1k=
 github.com/carlmjohnson/versioninfo v0.22.2 h1:spbjbb+r5OE8Vct/8UQXGBxajHgjS5DYZQOQ39v2G5Y=
