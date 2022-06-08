@@ -13,7 +13,7 @@ import (
 
 const getArticleByArcID = `-- name: GetArticleByArcID :one
 SELECT
-  id, arc_id, arc_data, spotlightpa_path, spotlightpa_data, schedule_for, last_published, note, status, created_at, updated_at
+  id, arc_id, arc_data, spotlightpa_path, note, status, created_at, updated_at
 FROM
   article
 WHERE
@@ -28,9 +28,6 @@ func (q *Queries) GetArticleByArcID(ctx context.Context, arcID string) (Article,
 		&i.ArcID,
 		&i.ArcData,
 		&i.SpotlightPAPath,
-		&i.SpotlightPAData,
-		&i.ScheduleFor,
-		&i.LastPublished,
 		&i.Note,
 		&i.Status,
 		&i.CreatedAt,
@@ -41,7 +38,7 @@ func (q *Queries) GetArticleByArcID(ctx context.Context, arcID string) (Article,
 
 const listAllArcArticles = `-- name: ListAllArcArticles :many
 SELECT
-  id, arc_id, arc_data, spotlightpa_path, spotlightpa_data, schedule_for, last_published, note, status, created_at, updated_at
+  id, arc_id, arc_data, spotlightpa_path, note, status, created_at, updated_at
 FROM
   article
 WHERE
@@ -70,9 +67,6 @@ func (q *Queries) ListAllArcArticles(ctx context.Context, arg ListAllArcArticles
 			&i.ArcID,
 			&i.ArcData,
 			&i.SpotlightPAPath,
-			&i.SpotlightPAData,
-			&i.ScheduleFor,
-			&i.LastPublished,
 			&i.Note,
 			&i.Status,
 			&i.CreatedAt,
@@ -90,7 +84,7 @@ func (q *Queries) ListAllArcArticles(ctx context.Context, arg ListAllArcArticles
 
 const listAvailableArticles = `-- name: ListAvailableArticles :many
 SELECT
-  id, arc_id, arc_data, spotlightpa_path, spotlightpa_data, schedule_for, last_published, note, status, created_at, updated_at
+  id, arc_id, arc_data, spotlightpa_path, note, status, created_at, updated_at
 FROM
   article
 WHERE
@@ -125,9 +119,6 @@ func (q *Queries) ListAvailableArticles(ctx context.Context, arg ListAvailableAr
 			&i.ArcID,
 			&i.ArcData,
 			&i.SpotlightPAPath,
-			&i.SpotlightPAData,
-			&i.ScheduleFor,
-			&i.LastPublished,
 			&i.Note,
 			&i.Status,
 			&i.CreatedAt,
@@ -145,7 +136,7 @@ func (q *Queries) ListAvailableArticles(ctx context.Context, arg ListAvailableAr
 
 const listUpcoming = `-- name: ListUpcoming :many
 SELECT
-  id, arc_id, arc_data, spotlightpa_path, spotlightpa_data, schedule_for, last_published, note, status, created_at, updated_at
+  id, arc_id, arc_data, spotlightpa_path, note, status, created_at, updated_at
 FROM
   article
 ORDER BY
@@ -166,9 +157,6 @@ func (q *Queries) ListUpcoming(ctx context.Context) ([]Article, error) {
 			&i.ArcID,
 			&i.ArcData,
 			&i.SpotlightPAPath,
-			&i.SpotlightPAData,
-			&i.ScheduleFor,
-			&i.LastPublished,
 			&i.Note,
 			&i.Status,
 			&i.CreatedAt,
@@ -198,7 +186,7 @@ SET
 WHERE
   arc_id = $5::text
 RETURNING
-  id, arc_id, arc_data, spotlightpa_path, spotlightpa_data, schedule_for, last_published, note, status, created_at, updated_at
+  id, arc_id, arc_data, spotlightpa_path, note, status, created_at, updated_at
 `
 
 type UpdateAlmanackArticleParams struct {
@@ -223,9 +211,6 @@ func (q *Queries) UpdateAlmanackArticle(ctx context.Context, arg UpdateAlmanackA
 		&i.ArcID,
 		&i.ArcData,
 		&i.SpotlightPAPath,
-		&i.SpotlightPAData,
-		&i.ScheduleFor,
-		&i.LastPublished,
 		&i.Note,
 		&i.Status,
 		&i.CreatedAt,
@@ -242,7 +227,7 @@ SET
 WHERE
   arc_id = $2::text
 RETURNING
-  id, arc_id, arc_data, spotlightpa_path, spotlightpa_data, schedule_for, last_published, note, status, created_at, updated_at
+  id, arc_id, arc_data, spotlightpa_path, note, status, created_at, updated_at
 `
 
 type UpdateArcArticleSpotlightPAPathParams struct {
@@ -258,9 +243,6 @@ func (q *Queries) UpdateArcArticleSpotlightPAPath(ctx context.Context, arg Updat
 		&i.ArcID,
 		&i.ArcData,
 		&i.SpotlightPAPath,
-		&i.SpotlightPAData,
-		&i.ScheduleFor,
-		&i.LastPublished,
 		&i.Note,
 		&i.Status,
 		&i.CreatedAt,
