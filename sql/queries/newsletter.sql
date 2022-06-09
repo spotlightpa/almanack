@@ -26,17 +26,6 @@ campaign AS (
   ON CONFLICT
     DO NOTHING;
 
--- name: ListNewsletters :many
-SELECT
-  *
-FROM
-  newsletter
-WHERE
-  "type" = $1
-ORDER BY
-  published_at DESC
-LIMIT $2 OFFSET $3;
-
 -- name: ListNewslettersWithoutPage :many
 SELECT
   *

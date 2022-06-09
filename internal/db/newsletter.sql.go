@@ -11,55 +11,6 @@ import (
 	"github.com/jackc/pgtype"
 )
 
-const listNewsletters = `-- name: ListNewsletters :many
-SELECT
-  subject, archive_url, published_at, type, created_at, updated_at, id, description, blurb, spotlightpa_path
-FROM
-  newsletter
-WHERE
-  "type" = $1
-ORDER BY
-  published_at DESC
-LIMIT $2 OFFSET $3
-`
-
-type ListNewslettersParams struct {
-	Type   string `json:"type"`
-	Limit  int32  `json:"limit"`
-	Offset int32  `json:"offset"`
-}
-
-func (q *Queries) ListNewsletters(ctx context.Context, arg ListNewslettersParams) ([]Newsletter, error) {
-	rows, err := q.db.Query(ctx, listNewsletters, arg.Type, arg.Limit, arg.Offset)
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-	var items []Newsletter
-	for rows.Next() {
-		var i Newsletter
-		if err := rows.Scan(
-			&i.Subject,
-			&i.ArchiveURL,
-			&i.PublishedAt,
-			&i.Type,
-			&i.CreatedAt,
-			&i.UpdatedAt,
-			&i.ID,
-			&i.Description,
-			&i.Blurb,
-			&i.SpotlightPAPath,
-		); err != nil {
-			return nil, err
-		}
-		items = append(items, i)
-	}
-	if err := rows.Err(); err != nil {
-		return nil, err
-	}
-	return items, nil
-}
-
 const listNewslettersWithoutPage = `-- name: ListNewslettersWithoutPage :many
 SELECT
   subject, archive_url, published_at, type, created_at, updated_at, id, description, blurb, spotlightpa_path
