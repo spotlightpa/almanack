@@ -203,6 +203,20 @@ func intParam[Int int | int32 | int64](r *http.Request, param string, p *Int) er
 	if pstr == "" {
 		return fmt.Errorf("parameter %q not set", param)
 	}
+	if err := intFromString(pstr, p); err != nil {
+		return resperr.WithUserMessagef(
+			err, "Bad integer parameter for %s", param)
+	}
+	return nil
+}
+
+func intFromQuery[Int int | int32 | int64](r *http.Request, param string, p *Int) bool {
+	s := r.URL.Query().Get(param)
+	err := intFromString(s, p)
+	return err == nil
+}
+
+func intFromString[Int int | int32 | int64](s string, p *Int) error {
 	bitsize := 0
 	switch any(p).(type) {
 	case *int:
@@ -213,10 +227,9 @@ func intParam[Int int | int32 | int64](r *http.Request, param string, p *Int) er
 	default:
 		panic("unreachable")
 	}
-	n, err := strconv.ParseInt(pstr, 10, bitsize)
+	n, err := strconv.ParseInt(s, 10, bitsize)
 	if err != nil {
-		return resperr.WithUserMessagef(
-			err, "Bad integer parameter for %s", param)
+		return err
 	}
 	*p = Int(n)
 	return nil
