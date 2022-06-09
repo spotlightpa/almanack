@@ -1,31 +1,44 @@
 <script>
-import { reactive, computed, toRefs } from "@vue/composition-api";
+import { reactive, computed, toRefs, watch } from "@vue/composition-api";
 
 import { useClient, makeState } from "@/api/hooks.js";
 
 import { formatDate } from "@/utils/time-format.js";
 
 export default {
-  props: ["page"],
+  props: { page: { type: String, default: "0" } },
   metaInfo: {
     title: "File Uploads",
   },
-  setup() {
+  setup(props) {
     let { listFiles, updateFile, uploadFile } = useClient();
-    let { apiState, exec } = makeState();
+    let { apiStateRefs, exec } = makeState();
+
+    const { rawData } = apiStateRefs;
 
     let state = reactive({
       files: computed(() => {
-        return apiState.rawData?.files || [];
+        return rawData.value?.files || [];
       }),
       isDragging: false,
       isUploading: false,
       uploadError: null,
+      nextPage: computed(() => {
+        if (!rawData.value?.next_page) {
+          return null;
+        }
+        return {
+          name: "file-uploader",
+          query: {
+            page: "" + rawData.value.next_page,
+          },
+        };
+      }),
     });
 
     let actions = {
       async fetch() {
-        exec(listFiles);
+        exec(() => listFiles({ params: { page: props.page } }));
       },
       updateDescription(file) {
         let description = window.prompt("Update description", file.description);
@@ -33,7 +46,7 @@ export default {
           exec(() =>
             Promise.resolve()
               .then(() => updateFile(file.url, { description }))
-              .then(listFiles)
+              .then(() => listFiles({ params: { page: props.page } }))
           );
         }
       },
@@ -58,10 +71,14 @@ export default {
       },
     };
 
-    actions.fetch();
+    watch(
+      () => props.page,
+      () => actions.fetch(),
+      { immediate: true }
+    );
 
     return {
-      ...toRefs(apiState),
+      ...apiStateRefs,
       ...toRefs(state),
       ...actions,
 
@@ -73,7 +90,10 @@ export default {
 
 <template>
   <div>
-    <h1 class="title">Upload a file</h1>
+    <h1 class="title">
+      Upload a file
+      <template v-if="page !== '0'">(overflow page {{ page }})</template>
+    </h1>
     <div class="level">
       <div class="level-left">
         <div class="level-item">
@@ -169,6 +189,15 @@ export default {
           </tr>
         </tbody>
       </table>
+      <div class="buttons mt-5">
+        <router-link
+          v-if="nextPage"
+          :to="nextPage"
+          class="button is-primary has-text-weight-semibold"
+        >
+          Show Older Files…
+        </router-link>
+      </div>
     </APILoader>
   </div>
 </template>
