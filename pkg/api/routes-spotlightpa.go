@@ -373,21 +373,33 @@ func (app *appEnv) listAllSeries(w http.ResponseWriter, r *http.Request) {
 
 func (app *appEnv) listFiles(w http.ResponseWriter, r *http.Request) {
 	app.Printf("starting listFiles")
+	var page int32
+	if !intFromQuery(r, "page", &page) || page < 0 {
+		app.replyErr(w, r, resperr.WithUserMessage(nil, "Invalid page"))
+		return
+	}
 	type response struct {
-		Files []db.File `json:"files"`
+		Files    []db.File `json:"files"`
+		NextPage int32     `json:"next_page,omitempty"`
 	}
 	var (
 		res response
 		err error
 	)
 
-	if res.Files, err = app.svc.Queries.ListFiles(r.Context(), db.ListFilesParams{
-		Offset: 0,
-		Limit:  100,
-	}); err != nil {
+	pager := db.PageNumSize(page, 100)
+	if res.Files, err = db.Paginate(
+		pager,
+		r.Context(),
+		app.svc.Queries.ListFiles,
+		db.ListFilesParams{
+			Offset: pager.Offset(),
+			Limit:  pager.Limit(),
+		}); err != nil {
 		app.replyErr(w, r, err)
 		return
 	}
+	res.NextPage = pager.NextPage
 
 	app.replyJSON(http.StatusOK, w, res)
 }
