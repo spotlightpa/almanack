@@ -6,7 +6,6 @@ import { useClient, makeState } from "@/api/hooks.js";
 import { formatDate } from "@/utils/time-format.js";
 
 export default {
-  name: "ViewUploader",
   props: ["page"],
   metaInfo: {
     title: "File Uploads",

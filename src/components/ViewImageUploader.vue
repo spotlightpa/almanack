@@ -8,7 +8,6 @@ import fuzzyMatch from "@/utils/fuzzy-match.js";
 import { formatDate } from "@/utils/time-format.js";
 
 export default {
-  name: "ViewUploader",
   metaInfo: {
     title: "Photos",
   },
