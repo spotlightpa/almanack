@@ -11,17 +11,17 @@ import ViewAuthorizedDomains from "./components/ViewAuthorizedDomains.vue";
 import ViewError from "./components/ViewError.vue";
 import ViewFileUploader from "./components/ViewFileUploader.vue";
 import ViewHomepageEditor from "./components/ViewHomepageEditor.vue";
+import ViewImageUploader from "./components/ViewImageUploader.vue";
 import ViewLogin from "./components/ViewLogin.vue";
 import ViewNewsletterList from "./components/ViewNewsletterList.vue";
 import ViewNewsletterPage from "./components/ViewNewsletterPage.vue";
 import ViewNewsPage from "./components/ViewNewsPage.vue";
-import ViewSharedList from "./components/ViewSharedList.vue";
 import ViewNewsPagesList from "./components/ViewNewsPagesList.vue";
 import ViewRedirectArcToNewsPage from "./components/ViewRedirectArcToNewsPage.vue";
+import ViewSharedList from "./components/ViewSharedList.vue";
 import ViewSidebarItems from "./components/ViewSidebarItems.vue";
 import ViewSiteParams from "./components/ViewSiteParams.vue";
 import ViewUnauthorized from "./components/ViewUnauthorized.vue";
-import ViewUploader from "./components/ViewUploader.vue";
 
 Vue.use(Router);
 
@@ -114,7 +114,7 @@ let router = new Router({
     {
       path: "/admin/uploader",
       name: "uploader",
-      component: ViewUploader,
+      component: ViewImageUploader,
       meta: {
         requiresAuth: isSpotlightPAUser,
       },
