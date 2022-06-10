@@ -91,7 +91,7 @@ export default {
     <LinkButtons label="Uploads">
       <LinkButton
         label="Photo manager"
-        to="uploader"
+        to="image-uploader"
         :icon="['fa', 'file-image']"
       />
       <LinkButton

@@ -1,27 +1,45 @@
 <script>
-import { reactive, computed, toRefs } from "@vue/composition-api";
+import { reactive, computed, toRefs, watch } from "@vue/composition-api";
 
-import { useClient } from "@/api/hooks.js";
+import { useClient, makeState } from "@/api/hooks.js";
 import imgproxyURL from "@/api/imgproxy-url.js";
 
 import fuzzyMatch from "@/utils/fuzzy-match.js";
 import { formatDate } from "@/utils/time-format.js";
 
+const toImageObj = (rawImage) => ({
+  id: rawImage.id,
+  path: rawImage.path,
+  url: imgproxyURL(rawImage.path, {
+    width: 256,
+    height: 192,
+    extension: "webp",
+  }),
+  description: rawImage.description,
+  credit: rawImage.credit,
+  srcURL: rawImage.src_url,
+  date: new Date(rawImage.created_at),
+});
+const imageProps = (image) => [image.description, image.credit];
+
 export default {
+  props: { page: { type: String, default: "0" } },
   metaInfo: {
     title: "Photos",
   },
-  setup() {
+  setup(props) {
     let { listImages, updateImage } = useClient();
-
-    const imageProps = (image) => [image.description, image.credit];
+    const { apiStateRefs, exec } = makeState();
+    const { rawData } = apiStateRefs;
 
     let state = reactive({
-      isLoading: false,
-      images: [],
-      error: null,
+      images: computed(() => {
+        if (!rawData.value?.images) {
+          return [];
+        }
+        return rawData.value.images.map((obj) => toImageObj(obj));
+      }),
       rawFilter: "",
-
       imageProps: computed(() =>
         Array.from(
           new Set(state.images.flatMap((article) => imageProps(article)))
@@ -38,30 +56,22 @@ export default {
       filterOptions: computed(() =>
         state.imageProps.filter((prop) => fuzzyMatch(prop, state.rawFilter))
       ),
+      nextPage: computed(() => {
+        if (!rawData.value?.next_page) {
+          return null;
+        }
+        return {
+          name: "image-uploader",
+          query: {
+            page: "" + rawData.value.next_page,
+          },
+        };
+      }),
     });
 
     let actions = {
       async fetch() {
-        state.isLoading = true;
-        let data;
-        [data, state.error] = await listImages();
-        state.isLoading = false;
-        if (state.error) {
-          return;
-        }
-        state.images = data.images.map((rawImage) => ({
-          id: rawImage.id,
-          path: rawImage.path,
-          url: imgproxyURL(rawImage.path, {
-            width: 256,
-            height: 192,
-            extension: "webp",
-          }),
-          description: rawImage.description,
-          credit: rawImage.credit,
-          srcURL: rawImage.src_url,
-          date: new Date(rawImage.created_at),
-        }));
+        return exec(() => listImages({ params: { page: props.page } }));
       },
       updateDescription(image) {
         let description = window.prompt(
@@ -79,18 +89,23 @@ export default {
         }
       },
       async doUpdate(image, opt) {
-        state.isLoading = true;
-        await updateImage(image.path, opt);
-        await actions.fetch();
+        return exec(async () => {
+          await updateImage(image.path, opt);
+          return listImages({ params: { page: props.page } });
+        });
       },
     };
 
-    actions.fetch();
+    watch(
+      () => props.page,
+      () => actions.fetch(),
+      { immediate: true }
+    );
 
     return {
+      ...apiStateRefs,
       ...toRefs(state),
       ...actions,
-
       formatDate,
     };
   },
@@ -99,7 +114,10 @@ export default {
 
 <template>
   <div>
-    <h1 class="title">Upload an image</h1>
+    <h1 class="title">
+      Upload an image
+      <template v-if="page !== '0'">(overflow page {{ page }})</template>
+    </h1>
 
     <ImageUploader @update-image-list="fetch" />
 
@@ -169,6 +187,15 @@ export default {
           </tr>
         </tbody>
       </table>
+      <div class="buttons mt-5">
+        <router-link
+          v-if="nextPage"
+          :to="nextPage"
+          class="button is-primary has-text-weight-semibold"
+        >
+          Show Older Images…
+        </router-link>
+      </div>
     </APILoader>
   </div>
 </template>

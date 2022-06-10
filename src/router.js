@@ -113,8 +113,9 @@ let router = new Router({
     },
     {
       path: "/admin/uploader",
-      name: "uploader",
+      name: "image-uploader",
       component: ViewImageUploader,
+      props: (route) => ({ page: route.query.page }),
       meta: {
         requiresAuth: isSpotlightPAUser,
       },

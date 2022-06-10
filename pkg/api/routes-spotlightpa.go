@@ -328,23 +328,35 @@ func (app *appEnv) postAddress(w http.ResponseWriter, r *http.Request) {
 
 func (app *appEnv) listImages(w http.ResponseWriter, r *http.Request) {
 	app.Printf("starting listImages")
-	type response struct {
-		Images []db.Image `json:"images"`
+	var page int32
+	if !intFromQuery(r, "page", &page) || page < 0 {
+		app.replyErr(w, r, resperr.WithUserMessage(nil, "Invalid page"))
+		return
 	}
-	var (
-		res response
-		err error
-	)
 
-	if res.Images, err = app.svc.Queries.ListImages(r.Context(), db.ListImagesParams{
-		Offset: 0,
-		Limit:  100,
-	}); err != nil {
+	type response struct {
+		Images   []db.Image `json:"images"`
+		NextPage int32      `json:"next_page,omitempty"`
+	}
+
+	pager := db.PageNumSize(page, 100)
+	images, err := db.Paginate(
+		pager,
+		r.Context(),
+		app.svc.Queries.ListImages,
+		db.ListImagesParams{
+			Offset: pager.Offset(),
+			Limit:  pager.Limit(),
+		})
+	if err != nil {
 		app.replyErr(w, r, err)
 		return
 	}
 
-	app.replyJSON(http.StatusOK, w, res)
+	app.replyJSON(http.StatusOK, w, response{
+		Images:   images,
+		NextPage: pager.NextPage,
+	})
 }
 
 func (app *appEnv) listAllTopics(w http.ResponseWriter, r *http.Request) {
