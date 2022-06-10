@@ -328,15 +328,11 @@ func (app *appEnv) postAddress(w http.ResponseWriter, r *http.Request) {
 
 func (app *appEnv) listImages(w http.ResponseWriter, r *http.Request) {
 	app.Printf("starting listImages")
+
 	var page int32
 	if !intFromQuery(r, "page", &page) || page < 0 {
 		app.replyErr(w, r, resperr.WithUserMessage(nil, "Invalid page"))
 		return
-	}
-
-	type response struct {
-		Images   []db.Image `json:"images"`
-		NextPage int32      `json:"next_page,omitempty"`
 	}
 
 	pager := db.PageNumSize(page, 100)
@@ -353,7 +349,10 @@ func (app *appEnv) listImages(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	app.replyJSON(http.StatusOK, w, response{
+	app.replyJSON(http.StatusOK, w, struct {
+		Images   []db.Image `json:"images"`
+		NextPage int32      `json:"next_page,omitempty"`
+	}{
 		Images:   images,
 		NextPage: pager.NextPage,
 	})
@@ -385,35 +384,34 @@ func (app *appEnv) listAllSeries(w http.ResponseWriter, r *http.Request) {
 
 func (app *appEnv) listFiles(w http.ResponseWriter, r *http.Request) {
 	app.Printf("starting listFiles")
+
 	var page int32
 	if !intFromQuery(r, "page", &page) || page < 0 {
 		app.replyErr(w, r, resperr.WithUserMessage(nil, "Invalid page"))
 		return
 	}
-	type response struct {
-		Files    []db.File `json:"files"`
-		NextPage int32     `json:"next_page,omitempty"`
-	}
-	var (
-		res response
-		err error
-	)
 
 	pager := db.PageNumSize(page, 100)
-	if res.Files, err = db.Paginate(
+	files, err := db.Paginate(
 		pager,
 		r.Context(),
 		app.svc.Queries.ListFiles,
 		db.ListFilesParams{
 			Offset: pager.Offset(),
 			Limit:  pager.Limit(),
-		}); err != nil {
+		})
+	if err != nil {
 		app.replyErr(w, r, err)
 		return
 	}
-	res.NextPage = pager.NextPage
 
-	app.replyJSON(http.StatusOK, w, res)
+	app.replyJSON(http.StatusOK, w, struct {
+		Files    []db.File `json:"files"`
+		NextPage int32     `json:"next_page,omitempty"`
+	}{
+		Files:    files,
+		NextPage: pager.NextPage,
+	})
 }
 
 func (app *appEnv) postFileCreate(w http.ResponseWriter, r *http.Request) {
