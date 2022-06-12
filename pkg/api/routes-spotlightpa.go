@@ -330,7 +330,8 @@ func (app *appEnv) listImages(w http.ResponseWriter, r *http.Request) {
 	app.Printf("starting listImages")
 
 	var page int32
-	if !intFromQuery(r, "page", &page) || page < 0 {
+	_ = intFromQuery(r, "page", &page)
+	if page < 0 {
 		app.replyErr(w, r, resperr.WithUserMessage(nil, "Invalid page"))
 		return
 	}
@@ -386,7 +387,8 @@ func (app *appEnv) listFiles(w http.ResponseWriter, r *http.Request) {
 	app.Printf("starting listFiles")
 
 	var page int32
-	if !intFromQuery(r, "page", &page) || page < 0 {
+	_ = intFromQuery(r, "page", &page)
+	if page < 0 {
 		app.replyErr(w, r, resperr.WithUserMessage(nil, "Invalid page"))
 		return
 	}
