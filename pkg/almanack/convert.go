@@ -12,7 +12,7 @@ import (
 	"strings"
 
 	"github.com/spotlightpa/almanack/internal/arc"
-	"github.com/spotlightpa/almanack/internal/stringutils"
+	"github.com/spotlightpa/almanack/internal/stringx"
 )
 
 func (arcStory *ArcStory) ToArticle(ctx context.Context, svc Service, article *SpotlightPAArticle) (err error) {
@@ -270,7 +270,7 @@ func setArticleImage(a *SpotlightPAArticle, p arc.PromoItems) {
 	}
 	var credits []string
 	for _, credit := range p.Basic.Credits.By {
-		credits = append(credits, stringutils.First(credit.Name, credit.Byline))
+		credits = append(credits, stringx.First(credit.Name, credit.Byline))
 	}
 	a.ImageCredit = fixCredit(strings.Join(credits, " / "))
 	a.ImageDescription = p.Basic.Caption

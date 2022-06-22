@@ -9,7 +9,7 @@ import (
 	"github.com/jackc/pgtype"
 	"github.com/spotlightpa/almanack/internal/db"
 	"github.com/spotlightpa/almanack/internal/mailchimp"
-	"github.com/spotlightpa/almanack/internal/stringutils"
+	"github.com/spotlightpa/almanack/internal/stringx"
 	"github.com/spotlightpa/almanack/internal/timex"
 )
 
@@ -94,7 +94,7 @@ func (svc Service) SaveNewsletterPage(ctx context.Context, nl *db.Newsletter, bo
 	if err := svc.Queries.EnsurePage(ctx, path); err != nil {
 		return err
 	}
-	slug := stringutils.Slugify(
+	slug := stringx.Slugify(
 		timex.ToEST(nl.PublishedAt).Format("Jan 2 ") + nl.Subject,
 	)
 	kicker := "Newsletter"

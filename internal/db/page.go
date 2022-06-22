@@ -12,7 +12,7 @@ import (
 	"github.com/carlmjohnson/errutil"
 	"github.com/jackc/pgtype"
 	"github.com/microcosm-cc/bluemonday"
-	"github.com/spotlightpa/almanack/internal/stringutils"
+	"github.com/spotlightpa/almanack/internal/stringx"
 	"github.com/spotlightpa/almanack/internal/timex"
 )
 
@@ -155,7 +155,7 @@ func (page *Page) ToIndex() any {
 	aliases, _ := page.Frontmatter["aliases"].([]string)
 	rawContent, _ := page.Frontmatter["raw-content"].(string)
 
-	body := stringutils.First(page.Body, rawContent)
+	body := stringx.First(page.Body, rawContent)
 	// Strip any unorthodox HTML
 	sanitizer := bluemonday.UGCPolicy()
 	body = sanitizer.Sanitize(body)
