@@ -77,7 +77,7 @@ type appEnv struct {
 	isLambda           bool
 	mailchimpSignupURL string
 	*log.Logger
-	auth common.AuthService
+	auth netlifyid.AuthService
 	svc  almanack.Service
 }
 

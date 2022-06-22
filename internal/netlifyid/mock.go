@@ -8,7 +8,7 @@ import (
 
 type MockAuthService struct{ common.Logger }
 
-var _ common.AuthService = MockAuthService{}
+var _ AuthService = MockAuthService{}
 
 func (mas MockAuthService) AuthFromHeader(r *http.Request) (*http.Request, error) {
 	return r, nil
