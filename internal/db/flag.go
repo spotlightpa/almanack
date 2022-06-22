@@ -8,12 +8,8 @@ import (
 	"github.com/jackc/pgx/v4/pgxpool"
 )
 
-// AddFlags adds an option to the specified FlagSet (or flag.CommandLine if nil)
-// that creates and tests a DB
+// AddFlags adds an option to the specified FlagSet that creates and tests a DB
 func AddFlags(fl *flag.FlagSet, name, usage string) (q *Queries) {
-	if fl == nil {
-		fl = flag.CommandLine
-	}
 	q = new(Queries)
 	fl.Func(name, usage, func(dbURL string) error {
 		q2, err := Open(dbURL)
