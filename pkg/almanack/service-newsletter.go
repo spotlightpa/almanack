@@ -13,47 +13,16 @@ import (
 	"github.com/spotlightpa/almanack/internal/timeutil"
 )
 
-func (svc Service) UpdateNewsletterArchives(ctx context.Context) error {
+func (svc Service) UpdateNewsletterArchives(ctx context.Context, types []db.NewsletterType) (err error) {
 	campaigns, err := svc.NewletterService.ListCampaigns(ctx)
 	if err != nil {
 		return err
 	}
-
-	// TODO: Get NL name pairs from database lazily then use single query
-	return errutil.ExecParallel(
-		func() error {
-			return svc.UpdateNewsletterArchive(
-				ctx,
-				campaigns,
-				"The Investigator",
-				"investigator",
-			)
-		},
-		func() error {
-			return svc.UpdateNewsletterArchive(
-				ctx,
-				campaigns,
-				"PA Post",
-				"papost",
-			)
-		},
-		func() error {
-			return svc.UpdateNewsletterArchive(
-				ctx,
-				campaigns,
-				"PA Local",
-				"palocal",
-			)
-		},
-		func() error {
-			return svc.UpdateNewsletterArchive(
-				ctx,
-				campaigns,
-				"Talk of the Town",
-				"talkofthetown",
-			)
-		},
-	)
+	var errs errutil.Slice
+	for _, nltype := range types {
+		errs.Push(svc.UpdateNewsletterArchive(ctx, campaigns, nltype.Name, nltype.Shortname))
+	}
+	return errs.Merge()
 }
 
 func (svc Service) UpdateNewsletterArchive(ctx context.Context, campaigns *mailchimp.ListCampaignsResp, mcType, dbType string) (err error) {
@@ -81,7 +50,7 @@ func (svc Service) UpdateNewsletterArchive(ctx context.Context, campaigns *mailc
 	return nil
 }
 
-func (svc Service) ImportNewsletterPages(ctx context.Context) (err error) {
+func (svc Service) ImportNewsletterPages(ctx context.Context, types []db.NewsletterType) (err error) {
 	defer errutil.Trace(&err)
 
 	nls, err := svc.Queries.ListNewslettersWithoutPage(ctx, db.ListNewslettersWithoutPageParams{
@@ -97,21 +66,14 @@ func (svc Service) ImportNewsletterPages(ctx context.Context) (err error) {
 		if err != nil {
 			return err
 		}
-		if err = svc.SaveNewsletterPage(ctx, &nl, body); err != nil {
+		if err = svc.SaveNewsletterPage(ctx, &nl, body, types); err != nil {
 			return err
 		}
 	}
 	return nil
 }
 
-var kickerFor = map[string]string{
-	"investigator":  "The Investigator",
-	"papost":        "PA Post",
-	"palocal":       "PA Local",
-	"talkofthetown": "Talk of the Town",
-}
-
-func (svc Service) SaveNewsletterPage(ctx context.Context, nl *db.Newsletter, body string) (err error) {
+func (svc Service) SaveNewsletterPage(ctx context.Context, nl *db.Newsletter, body string, types []db.NewsletterType) (err error) {
 	defer errutil.Trace(&err)
 
 	needsUpdate := false
@@ -135,6 +97,12 @@ func (svc Service) SaveNewsletterPage(ctx context.Context, nl *db.Newsletter, bo
 	slug := stringutils.Slugify(
 		timeutil.ToEST(nl.PublishedAt).Format("Jan 2 ") + nl.Subject,
 	)
+	kicker := "Newsletter"
+	for _, nltype := range types {
+		if nltype.Shortname == nl.Type {
+			kicker = nltype.Name
+		}
+	}
 	if _, err := svc.Queries.UpdatePage(ctx, db.UpdatePageParams{
 		SetFrontmatter: true,
 		Frontmatter: map[string]any{
@@ -153,8 +121,7 @@ func (svc Service) SaveNewsletterPage(ctx context.Context, nl *db.Newsletter, bo
 			"internal-id": fmt.Sprintf("%s-%s",
 				strings.ToUpper(nl.Type),
 				nl.PublishedAt.Format("01-02-06")),
-			//TODO: proper kicker lookup
-			"kicker":      kickerFor[nl.Type],
+			"kicker":      kicker,
 			"layout":      "mailchimp-page",
 			"linktitle":   "",
 			"no-index":    false,
