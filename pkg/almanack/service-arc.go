@@ -34,9 +34,7 @@ func (svc Service) FetchArcFeed(ctx context.Context) (*arc.API, error) {
 func (svc Service) GetArcStory(ctx context.Context, articleID string) (story *ArcStory, err error) {
 	defer errutil.Trace(&err)
 
-	start := time.Now()
 	dart, err := svc.Queries.GetArticleByArcID(ctx, articleID)
-	svc.Printf("GetArticleByArcID query time: %v", time.Since(start))
 	if err != nil {
 		err = db.NoRowsAs404(err, "could not find arc-id %q", articleID)
 		return
@@ -54,7 +52,6 @@ func (svc Service) ListAvailableArcStories(ctx context.Context, page int32) (sto
 	defer errutil.Trace(&err)
 
 	pager := db.PageNumSize(page, 20)
-	start := time.Now()
 	dbArts, err := db.Paginate(
 		pager, ctx,
 		svc.Queries.ListAvailableArticles,
@@ -62,7 +59,6 @@ func (svc Service) ListAvailableArcStories(ctx context.Context, page int32) (sto
 			Offset: pager.Offset(),
 			Limit:  pager.Limit(),
 		})
-	svc.Printf("ListAvailableArticles query time: %v", time.Since(start))
 	if err != nil {
 		return
 	}
@@ -82,7 +78,6 @@ func (svc Service) SaveAlmanackArticle(ctx context.Context, article *ArcStory, s
 			return err
 		}
 	}
-	start := time.Now()
 	dart, err := svc.Queries.UpdateAlmanackArticle(ctx, db.UpdateAlmanackArticleParams{
 		ArcID:      article.ID,
 		Status:     article.Status.dbstring(),
@@ -90,7 +85,6 @@ func (svc Service) SaveAlmanackArticle(ctx context.Context, article *ArcStory, s
 		SetArcData: setArcData,
 		ArcData:    arcData,
 	})
-	svc.Printf("UpdateAlmanackArticle query time: %v", time.Since(start))
 	if err != nil {
 		return err
 	}
@@ -108,17 +102,13 @@ func (svc Service) StoreFeed(ctx context.Context, newfeed *arc.API) (err error) 
 	if err := arcItems.Set(&newfeed.Contents); err != nil {
 		return err
 	}
-	start := time.Now()
-	err = svc.Queries.UpdateArcArticles(ctx, arcItems)
-	svc.Printf("StoreFeed query time: %v", time.Since(start))
-	return err
+	return svc.Queries.UpdateArcArticles(ctx, arcItems)
 }
 
 func (svc Service) ListAllArcStories(ctx context.Context, page int32) (stories []ArcStory, nextPage int32, err error) {
 	defer errutil.Trace(&err)
 
 	pager := db.PageNumSize(page, 50)
-	start := time.Now()
 	dbArts, err := db.Paginate(
 		pager, ctx,
 		svc.Queries.ListAllArcArticles,
@@ -126,7 +116,6 @@ func (svc Service) ListAllArcStories(ctx context.Context, page int32) (stories [
 			Limit:  pager.Limit(),
 			Offset: pager.Offset(),
 		})
-	svc.Printf("ListAllArticles query time: %v", time.Since(start))
 	if err != nil {
 		return
 	}

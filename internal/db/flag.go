@@ -33,6 +33,6 @@ func Open(dbURL string) (q *Queries, err error) {
 		return nil, err
 	}
 
-	q = New(db)
+	q = New(Logger(db))
 	return q, nil
 }
