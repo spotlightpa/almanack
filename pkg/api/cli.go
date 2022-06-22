@@ -40,7 +40,6 @@ func (app *appEnv) parseArgs(args []string) error {
 
 	fl.BoolVar(&app.isLambda, "lambda", false, "use AWS Lambda rather than HTTP")
 	fl.StringVar(&app.port, "port", ":33160", "listen on port (HTTP only)")
-	fl.StringVar(&app.mailchimpSignupURL, "mc-signup-url", "http://example.com", "`URL` to redirect users to for MailChimp signup")
 	app.Logger = log.New(os.Stderr, AppName+" ", log.LstdFlags)
 	silent := fl.Bool("silent", false, "don't log debug output")
 	sentryDSN := fl.String("sentry-dsn", "", "DSN `pseudo-URL` for Sentry")
@@ -71,9 +70,8 @@ func (app *appEnv) parseArgs(args []string) error {
 }
 
 type appEnv struct {
-	port               string
-	isLambda           bool
-	mailchimpSignupURL string
+	port     string
+	isLambda bool
 	*log.Logger
 	auth netlifyid.AuthService
 	svc  almanack.Service

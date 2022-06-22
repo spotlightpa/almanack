@@ -14,7 +14,8 @@ import (
 )
 
 type Service struct {
-	arcFeedURL string
+	arcFeedURL         string
+	MailchimpSignupURL string
 	common.Logger
 	Client  *http.Client
 	Queries *db.Queries

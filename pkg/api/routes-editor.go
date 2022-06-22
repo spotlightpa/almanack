@@ -64,5 +64,5 @@ func (app *appEnv) getArcStory(w http.ResponseWriter, r *http.Request) {
 
 func (app *appEnv) getSignupURL(w http.ResponseWriter, r *http.Request) {
 	app.Println("start getSignupURL")
-	app.replyJSON(http.StatusOK, w, app.mailchimpSignupURL)
+	app.replyJSON(http.StatusOK, w, app.svc.MailchimpSignupURL)
 }
