@@ -12,7 +12,7 @@ import (
 )
 
 type AddressRole struct {
-	ID           int32     `json:"id"`
+	ID           int64     `json:"id"`
 	EmailAddress string    `json:"email_address"`
 	Roles        []string  `json:"roles"`
 	CreatedAt    time.Time `json:"created_at"`
@@ -36,7 +36,7 @@ type ArticleStatus struct {
 }
 
 type DomainRole struct {
-	ID        int32     `json:"id"`
+	ID        int64     `json:"id"`
 	Domain    string    `json:"domain"`
 	Roles     []string  `json:"roles"`
 	CreatedAt time.Time `json:"created_at"`
@@ -44,7 +44,7 @@ type DomainRole struct {
 }
 
 type File struct {
-	ID          int32     `json:"id"`
+	ID          int64     `json:"id"`
 	URL         string    `json:"url"`
 	Filename    string    `json:"filename"`
 	MimeType    string    `json:"mime_type"`
@@ -55,7 +55,7 @@ type File struct {
 }
 
 type Image struct {
-	ID          int32     `json:"id"`
+	ID          int64     `json:"id"`
 	Path        string    `json:"path"`
 	Type        string    `json:"type"`
 	Description string    `json:"description"`
