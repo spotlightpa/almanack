@@ -20,7 +20,7 @@ import (
 	"github.com/go-chi/chi/v5"
 
 	"github.com/spotlightpa/almanack/internal/netlifyid"
-	"github.com/spotlightpa/almanack/internal/stringutils"
+	"github.com/spotlightpa/almanack/internal/stringx"
 	"github.com/spotlightpa/almanack/layouts"
 	"github.com/spotlightpa/almanack/pkg/almanack"
 )
@@ -54,8 +54,8 @@ func (app *appEnv) logErr(ctx context.Context, err error) {
 	if hub := sentry.GetHubFromContext(ctx); hub != nil {
 		hub.WithScope(func(scope *sentry.Scope) {
 			userinfo := netlifyid.FromContext(ctx)
-			scope.SetTag("username", stringutils.First(userinfo.Username(), "anonymous"))
-			scope.SetTag("email", stringutils.First(userinfo.Email(), "not set"))
+			scope.SetTag("username", stringx.First(userinfo.Username(), "anonymous"))
+			scope.SetTag("email", stringx.First(userinfo.Email(), "not set"))
 
 			for _, suberr := range errutil.AsSlice(err) {
 				hub.CaptureException(suberr)

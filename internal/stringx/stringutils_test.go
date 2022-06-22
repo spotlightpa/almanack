@@ -1,10 +1,10 @@
-package stringutils_test
+package stringx_test
 
 import (
 	"testing"
 
 	"github.com/carlmjohnson/be"
-	"github.com/spotlightpa/almanack/internal/stringutils"
+	"github.com/spotlightpa/almanack/internal/stringx"
 )
 
 func TestSlugify(t *testing.T) {
@@ -20,7 +20,7 @@ func TestSlugify(t *testing.T) {
 	}
 	for _, tc := range cases {
 		t.Run(tc.input, func(t *testing.T) {
-			be.Equal(t, tc.want, stringutils.Slugify(tc.input))
+			be.Equal(t, tc.want, stringx.Slugify(tc.input))
 		})
 	}
 }

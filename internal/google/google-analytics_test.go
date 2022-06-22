@@ -9,13 +9,13 @@ import (
 
 	"github.com/carlmjohnson/be"
 	"github.com/carlmjohnson/requests"
-	"github.com/spotlightpa/almanack/internal/stringutils"
+	"github.com/spotlightpa/almanack/internal/stringx"
 )
 
 func TestMostPopularNews(t *testing.T) {
 	svc := Service{}
 	svc.l = log.Default()
-	svc.viewID = stringutils.First(os.Getenv("ALMANACK_GOOGLE_TEST_VIEW"), "1")
+	svc.viewID = stringx.First(os.Getenv("ALMANACK_GOOGLE_TEST_VIEW"), "1")
 	ctx := context.Background()
 	cl := *http.DefaultClient
 	cl.Transport = requests.Replay("testdata")

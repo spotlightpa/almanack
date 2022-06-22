@@ -7,7 +7,7 @@ import (
 	"github.com/carlmjohnson/errutil"
 	"github.com/spotlightpa/almanack/internal/db"
 	"github.com/spotlightpa/almanack/internal/slack"
-	"github.com/spotlightpa/almanack/internal/stringutils"
+	"github.com/spotlightpa/almanack/internal/stringx"
 	"github.com/spotlightpa/almanack/internal/timex"
 )
 
@@ -22,7 +22,7 @@ func (svc Service) PublishPage(ctx context.Context, page *db.Page) (err, warning
 
 	err = errutil.ExecParallel(func() error {
 		internalID, _ := page.Frontmatter["internal-id"].(string)
-		title := stringutils.First(internalID, page.FilePath)
+		title := stringx.First(internalID, page.FilePath)
 		msg := fmt.Sprintf("Content: publishing %q", title)
 		return svc.ContentStore.UpdateFile(ctx, msg, page.FilePath, []byte(data))
 	}, func() error {
