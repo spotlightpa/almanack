@@ -10,7 +10,7 @@ import (
 	"github.com/spotlightpa/almanack/internal/db"
 	"github.com/spotlightpa/almanack/internal/mailchimp"
 	"github.com/spotlightpa/almanack/internal/stringutils"
-	"github.com/spotlightpa/almanack/internal/timeutil"
+	"github.com/spotlightpa/almanack/internal/timex"
 )
 
 func (svc Service) UpdateNewsletterArchives(ctx context.Context, types []db.NewsletterType) (err error) {
@@ -78,7 +78,7 @@ func (svc Service) SaveNewsletterPage(ctx context.Context, nl *db.Newsletter, bo
 
 	needsUpdate := false
 	if nl.SpotlightPAPath.String == "" {
-		nl.PublishedAt = timeutil.ToEST(nl.PublishedAt)
+		nl.PublishedAt = timex.ToEST(nl.PublishedAt)
 		nl.SpotlightPAPath.Status = pgtype.Present
 		nl.SpotlightPAPath.String = fmt.Sprintf("content/newsletters/%s/%s.md",
 			nl.Type, nl.PublishedAt.Format("2006-01-02-1504"),
@@ -95,7 +95,7 @@ func (svc Service) SaveNewsletterPage(ctx context.Context, nl *db.Newsletter, bo
 		return err
 	}
 	slug := stringutils.Slugify(
-		timeutil.ToEST(nl.PublishedAt).Format("Jan 2 ") + nl.Subject,
+		timex.ToEST(nl.PublishedAt).Format("Jan 2 ") + nl.Subject,
 	)
 	kicker := "Newsletter"
 	for _, nltype := range types {
