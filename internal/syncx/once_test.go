@@ -8,9 +8,11 @@ import (
 )
 
 func ExampleOnce() {
+	fourtytwo := 6 * 9
 	var getMoL = syncx.Once(func() int {
 		fmt.Println("calculating meaning of life...")
-		return 42
+		fourtytwo -= 12
+		return fourtytwo
 	})
 	var wg sync.WaitGroup
 	for i := 0; i < 5; i++ {
