@@ -1,4 +1,4 @@
-package mailchimp_test
+package mailchimp
 
 import (
 	"context"
@@ -9,7 +9,6 @@ import (
 
 	"github.com/carlmjohnson/be"
 	"github.com/carlmjohnson/requests"
-	"github.com/spotlightpa/almanack/internal/mailchimp"
 )
 
 func TestV3(t *testing.T) {
@@ -21,8 +20,8 @@ func TestV3(t *testing.T) {
 	if os.Getenv("ALMANACK_MC_TEST_RECORD_REQUEST") != "" {
 		cl.Transport = requests.Record(nil, "testdata")
 	}
-	v3 := mailchimp.NewV3(apiKey, listID, &cl)
-	res, err := v3.ListCampaigns(context.Background())
+	v3 := NewV3(apiKey, listID, &cl)
+	res, err := v3.listCampaigns(context.Background())
 	be.NilErr(t, err)
 	be.Nonzero(t, res.Campaigns)
 
@@ -37,7 +36,7 @@ func TestV3(t *testing.T) {
 		be.Nonzero(t, c.Settings.PreviewText)
 	}
 	camp := res.Campaigns[0]
-	body, err := mailchimp.ImportPage(context.Background(), &cl, camp.ArchiveURL)
+	body, err := ImportPage(context.Background(), &cl, camp.ArchiveURL)
 	be.NilErr(t, err)
 	expect, err := os.ReadFile("testdata/body.html")
 	be.NilErr(t, err)
