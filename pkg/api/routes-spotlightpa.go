@@ -43,7 +43,7 @@ func (app *appEnv) listWithArcRefresh(w http.ResponseWriter, r *http.Request) {
 		feed *arc.API
 		err  error
 	)
-	if feed, err = app.FetchFeed(r.Context()); err != nil {
+	if feed, err = app.svc.FetchArcFeed(r.Context()); err != nil {
 		// Keep trucking even if you can't load feed
 		app.logErr(r.Context(), err)
 	} else if err = app.svc.StoreFeed(r.Context(), feed); err != nil {
@@ -81,7 +81,7 @@ func (app *appEnv) postAlmanackArcStory(w http.ResponseWriter, r *http.Request) 
 			feed *arc.API
 			err  error
 		)
-		if feed, err = app.FetchFeed(r.Context()); err != nil {
+		if feed, err = app.svc.FetchArcFeed(r.Context()); err != nil {
 			app.replyErr(w, r, err)
 			return
 		}
@@ -696,7 +696,7 @@ func (app *appEnv) postRefreshPageFromArc(w http.ResponseWriter, r *http.Request
 		return
 	}
 	var story *almanack.ArcStory
-	feed, feedErr := app.FetchFeed(r.Context())
+	feed, feedErr := app.svc.FetchArcFeed(r.Context())
 	if feedErr != nil {
 		// Keep trucking even if you can't load feed
 		app.logErr(r.Context(), feedErr)

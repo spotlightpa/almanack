@@ -14,6 +14,7 @@ import (
 )
 
 type Service struct {
+	arcFeedURL string
 	common.Logger
 	Client  *http.Client
 	Queries *db.Queries

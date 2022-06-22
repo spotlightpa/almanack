@@ -38,7 +38,6 @@ func CLI(args []string) error {
 func (app *appEnv) parseArgs(args []string) error {
 	fl := flag.NewFlagSet(AppName, flag.ContinueOnError)
 
-	fl.StringVar(&app.srcFeedURL, "src-feed", "", "source `URL` for Arc feed")
 	fl.BoolVar(&app.isLambda, "lambda", false, "use AWS Lambda rather than HTTP")
 	fl.StringVar(&app.port, "port", ":33160", "listen on port (HTTP only)")
 	fl.StringVar(&app.mailchimpSignupURL, "mc-signup-url", "http://example.com", "`URL` to redirect users to for MailChimp signup")
@@ -72,7 +71,6 @@ func (app *appEnv) parseArgs(args []string) error {
 }
 
 type appEnv struct {
-	srcFeedURL         string
 	port               string
 	isLambda           bool
 	mailchimpSignupURL string
