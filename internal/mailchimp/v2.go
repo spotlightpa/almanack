@@ -14,23 +14,27 @@ import (
 	"github.com/spotlightpa/almanack/pkg/common"
 )
 
-func NewMailService(apiKey, listID string, l common.Logger, c *http.Client) common.EmailService {
+type EmailService interface {
+	SendEmail(ctx context.Context, subject, body string) error
+}
+
+func NewMailService(apiKey, listID string, l common.Logger, c *http.Client) EmailService {
 	if apiKey == "" || listID == "" {
 		l.Printf("using mock mail service")
 		return MockEmailService{l}
 	}
-	return EmailService{apiKey, listID, l, c}
+	return V2{apiKey, listID, l, c}
 }
 
-// EmailService uses MC APIv2 because in v3 they decided REST means
+// V2 uses MC APIv2 because in v3 they decided REST means
 // not being able to create and send a campign in any efficient way
-type EmailService struct {
+type V2 struct {
 	apiKey, listID string
 	l              common.Logger
 	c              *http.Client
 }
 
-func (mc EmailService) SendEmail(ctx context.Context, subject, body string) (err error) {
+func (v2 V2) SendEmail(ctx context.Context, subject, body string) (err error) {
 	defer func() {
 		if err != nil {
 			err = resperr.New(http.StatusBadGateway, "MailChimp problem: %w", err)
@@ -39,18 +43,18 @@ func (mc EmailService) SendEmail(ctx context.Context, subject, body string) (err
 	defer errutil.Trace(&err)
 
 	// API keys end with 123XYZ-us1, where us1 is the datacenter
-	_, datacenter, _ := strings.Cut(mc.apiKey, "-")
+	_, datacenter, _ := strings.Cut(v2.apiKey, "-")
 	var resp gochimp.CampaignResponse
 	err = requests.
 		URL("https://test.api.mailchimp.com/2.0/campaigns/create.json").
 		Hostf("%s.api.mailchimp.com", datacenter).
-		Client(mc.c).
+		Client(v2.c).
 		BodyJSON(gochimp.CampaignCreate{
-			ApiKey: mc.apiKey,
+			ApiKey: v2.apiKey,
 			Type:   "plaintext",
 			Options: gochimp.CampaignCreateOptions{
 				Subject:   subject,
-				ListID:    mc.listID,
+				ListID:    v2.listID,
 				FromEmail: "press@spotlightpa.org",
 				FromName:  "Spotlight PA",
 			},
@@ -63,7 +67,7 @@ func (mc EmailService) SendEmail(ctx context.Context, subject, body string) (err
 	if err != nil {
 		return err
 	}
-	mc.l.Printf("created campaign %q", resp.Id)
+	v2.l.Printf("created campaign %q", resp.Id)
 	type v2CampaignSend struct {
 		APIKey     string `json:"apikey"`
 		CampaignID string `json:"cid"`
@@ -72,14 +76,14 @@ func (mc EmailService) SendEmail(ctx context.Context, subject, body string) (err
 	err = requests.
 		URL("https://test.api.mailchimp.com/2.0/campaigns/send.json").
 		Hostf("%s.api.mailchimp.com", datacenter).
-		Client(mc.c).
+		Client(v2.c).
 		BodyJSON(v2CampaignSend{
-			APIKey:     mc.apiKey,
+			APIKey:     v2.apiKey,
 			CampaignID: resp.Id,
 		}).
 		ToJSON(&resp2).
 		Fetch(ctx)
-	mc.l.Printf("sent %v", resp2.Complete)
+	v2.l.Printf("sent %v", resp2.Complete)
 	return err
 }
 
