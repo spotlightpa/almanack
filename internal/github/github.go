@@ -17,7 +17,7 @@ type ContentStore interface {
 	UpdateFile(ctx context.Context, msg, path string, content []byte) error
 }
 
-func FlagVar(fl *flag.FlagSet) func(l common.Logger) (ContentStore, error) {
+func AddFlags(fl *flag.FlagSet) func(l common.Logger) (ContentStore, error) {
 	if fl == nil {
 		fl = flag.CommandLine
 	}

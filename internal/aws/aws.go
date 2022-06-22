@@ -16,7 +16,7 @@ import (
 	"github.com/spotlightpa/almanack/pkg/common"
 )
 
-func FlagVar(fl *flag.FlagSet) func(l common.Logger) (imageStore, fileStore BlobStore) {
+func AddFlags(fl *flag.FlagSet) func(l common.Logger) (imageStore, fileStore BlobStore) {
 	accessKeyID := fl.String("aws-access-key", "", "AWS access `key` ID")
 	secretAccessKey := fl.String("aws-secret-key", "", "AWS secret access `key`")
 	region := fl.String("aws-s3-region", "us-east-2", "AWS `region` to use for S3")

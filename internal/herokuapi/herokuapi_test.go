@@ -26,7 +26,7 @@ func TestHerokuAPI(t *testing.T) {
 		apiKey = "testing123"
 	}
 	fs := flag.NewFlagSet("test", flag.ContinueOnError)
-	conf := herokuapi.ConfigureFlagSet(fs)
+	conf := herokuapi.AddFlags(fs)
 	dbstr := fs.String("db", "", "")
 	xxstr := fs.String("xx", "initial", "")
 	err := fs.Parse([]string{

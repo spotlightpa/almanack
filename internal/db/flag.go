@@ -8,9 +8,9 @@ import (
 	"github.com/jackc/pgx/v4/pgxpool"
 )
 
-// FlagVar adds an option to the specified FlagSet (or flag.CommandLine if nil)
+// AddFlags adds an option to the specified FlagSet (or flag.CommandLine if nil)
 // that creates and tests a DB
-func FlagVar(fl *flag.FlagSet, name, usage string) (q *Queries) {
+func AddFlags(fl *flag.FlagSet, name, usage string) (q *Queries) {
 	if fl == nil {
 		fl = flag.CommandLine
 	}

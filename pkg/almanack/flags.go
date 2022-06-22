@@ -17,19 +17,19 @@ import (
 	"github.com/spotlightpa/almanack/pkg/common"
 )
 
-func Flags(fl *flag.FlagSet) func(common.Logger) (svc Service, err error) {
+func AddFlags(fl *flag.FlagSet) func(common.Logger) (svc Service, err error) {
 	arcFeedURL := fl.String("src-feed", "", "source `URL` for Arc feed")
 	mailchimpSignupURL := fl.String("mc-signup-url", "http://example.com", "`URL` to redirect users to for MailChimp signup")
 
 	cache := fl.Bool("cache", false, "use in-memory cache for http requests")
-	pg := db.FlagVar(fl, "postgres", "PostgreSQL database `URL`")
+	pg := db.AddFlags(fl, "postgres", "PostgreSQL database `URL`")
 	slackURL := fl.String("slack-social-url", "", "Slack hook endpoint `URL` for social")
-	heroku := herokuapi.ConfigureFlagSet(fl)
-	getS3Store := aws.FlagVar(fl)
-	getGithub := github.FlagVar(fl)
-	getIndex := index.FlagVar(fl)
-	getNewsletter := mailchimp.FlagVar(fl)
-	getGoogle := google.FlagVar(fl)
+	heroku := herokuapi.AddFlags(fl)
+	getS3Store := aws.AddFlags(fl)
+	getGithub := github.AddFlags(fl)
+	getIndex := index.AddFlags(fl)
+	getNewsletter := mailchimp.AddFlags(fl)
+	getGoogle := google.AddFlags(fl)
 	mailServiceAPIKey := fl.String("mc-api-key", "", "API `key` for MailChimp v2")
 	mailServiceListID := fl.String("mc-list-id", "", "List `ID` MailChimp v2 campaign")
 

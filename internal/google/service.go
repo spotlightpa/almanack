@@ -10,7 +10,7 @@ import (
 	"github.com/spotlightpa/almanack/pkg/common"
 )
 
-func FlagVar(fl *flag.FlagSet) func(l common.Logger) *Service {
+func AddFlags(fl *flag.FlagSet) func(l common.Logger) *Service {
 	var gsvc Service
 	// Using a crazy Base64+GZIP because storing JSON containing \n in
 	//an env var breaks a lot for some reason
