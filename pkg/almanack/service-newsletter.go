@@ -14,11 +14,17 @@ import (
 )
 
 func (svc Service) UpdateNewsletterArchives(ctx context.Context) error {
+	campaigns, err := svc.NewletterService.ListCampaigns(ctx)
+	if err != nil {
+		return err
+	}
+
 	// TODO: Get NL name pairs from database lazily then use single query
 	return errutil.ExecParallel(
 		func() error {
 			return svc.UpdateNewsletterArchive(
 				ctx,
+				campaigns,
 				"The Investigator",
 				"investigator",
 			)
@@ -26,6 +32,7 @@ func (svc Service) UpdateNewsletterArchives(ctx context.Context) error {
 		func() error {
 			return svc.UpdateNewsletterArchive(
 				ctx,
+				campaigns,
 				"PA Post",
 				"papost",
 			)
@@ -33,6 +40,7 @@ func (svc Service) UpdateNewsletterArchives(ctx context.Context) error {
 		func() error {
 			return svc.UpdateNewsletterArchive(
 				ctx,
+				campaigns,
 				"PA Local",
 				"palocal",
 			)
@@ -40,6 +48,7 @@ func (svc Service) UpdateNewsletterArchives(ctx context.Context) error {
 		func() error {
 			return svc.UpdateNewsletterArchive(
 				ctx,
+				campaigns,
 				"Talk of the Town",
 				"talkofthetown",
 			)
@@ -47,14 +56,10 @@ func (svc Service) UpdateNewsletterArchives(ctx context.Context) error {
 	)
 }
 
-func (svc Service) UpdateNewsletterArchive(ctx context.Context, mcType, dbType string) (err error) {
+func (svc Service) UpdateNewsletterArchive(ctx context.Context, campaigns *mailchimp.ListCampaignsResp, mcType, dbType string) (err error) {
 	defer errutil.Trace(&err)
 
-	// get the latest from MC
-	newItems, err := svc.NewletterService.ListNewletters(ctx, mcType)
-	if err != nil {
-		return err
-	}
+	newItems := campaigns.ToNewsletters(mcType)
 	// update DB
 	var data pgtype.JSONB
 	if err = data.Set(newItems); err != nil {

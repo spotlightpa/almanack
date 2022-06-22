@@ -37,7 +37,7 @@ func NewV3(apiKey, listID string, c *http.Client) V3 {
 	}
 }
 
-func (v3 V3) listCampaigns(ctx context.Context) (*ListCampaignsResp, error) {
+func (v3 V3) ListCampaigns(ctx context.Context) (*ListCampaignsResp, error) {
 	var data ListCampaignsResp
 	if err := v3.listCampaignBuilder.
 		Clone().
@@ -70,15 +70,11 @@ type Newsletter struct {
 	PublishedAt time.Time `json:"published_at"`
 }
 
-func (v3 V3) ListNewletters(ctx context.Context, kind string) ([]Newsletter, error) {
-	resp, err := v3.listCampaigns(ctx)
-	if err != nil {
-		return nil, err
-	}
+func (resp *ListCampaignsResp) ToNewsletters(mcKind string) []Newsletter {
 	newsletters := make([]Newsletter, 0, len(resp.Campaigns))
 	for _, camp := range resp.Campaigns {
 		// Hacky but probably the best method?
-		if strings.Contains(camp.Settings.Title, kind) {
+		if strings.Contains(camp.Settings.Title, mcKind) {
 			newsletters = append(newsletters, Newsletter{
 				Subject:     camp.Settings.Subject,
 				Blurb:       camp.Settings.PreviewText,
@@ -88,5 +84,5 @@ func (v3 V3) ListNewletters(ctx context.Context, kind string) ([]Newsletter, err
 			})
 		}
 	}
-	return newsletters, nil
+	return newsletters
 }
