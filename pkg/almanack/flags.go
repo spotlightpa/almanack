@@ -19,6 +19,8 @@ import (
 
 func Flags(fl *flag.FlagSet) func(common.Logger) (svc Service, err error) {
 	arcFeedURL := fl.String("src-feed", "", "source `URL` for Arc feed")
+	mailchimpSignupURL := fl.String("mc-signup-url", "http://example.com", "`URL` to redirect users to for MailChimp signup")
+
 	cache := fl.Bool("cache", false, "use in-memory cache for http requests")
 	pg := db.FlagVar(fl, "postgres", "PostgreSQL database `URL`")
 	slackURL := fl.String("slack-social-url", "", "Slack hook endpoint `URL` for social")
@@ -57,18 +59,19 @@ func Flags(fl *flag.FlagSet) func(common.Logger) (svc Service, err error) {
 		mc := mailchimp.NewMailService(*mailServiceAPIKey, *mailServiceListID, l, &client)
 
 		return Service{
-			arcFeedURL:       *arcFeedURL,
-			Logger:           l,
-			Client:           &client,
-			Queries:          pg,
-			ContentStore:     svc.ContentStore,
-			SlackClient:      slack.New(*slackURL, l),
-			ImageStore:       is,
-			FileStore:        fs,
-			Indexer:          getIndex(l),
-			NewletterService: getNewsletter(&client),
-			gsvc:             getGoogle(l),
-			EmailService:     mc,
+			arcFeedURL:         *arcFeedURL,
+			MailchimpSignupURL: *mailchimpSignupURL,
+			Logger:             l,
+			Client:             &client,
+			Queries:            pg,
+			ContentStore:       svc.ContentStore,
+			SlackClient:        slack.New(*slackURL, l),
+			ImageStore:         is,
+			FileStore:          fs,
+			Indexer:            getIndex(l),
+			NewletterService:   getNewsletter(&client),
+			gsvc:               getGoogle(l),
+			EmailService:       mc,
 		}, nil
 	}
 }
