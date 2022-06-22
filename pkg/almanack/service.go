@@ -23,5 +23,5 @@ type Service struct {
 	Indexer          index.Indexer
 	NewletterService mailchimp.V3
 	gsvc             *google.Service
-	common.EmailService
+	mailchimp.EmailService
 }
