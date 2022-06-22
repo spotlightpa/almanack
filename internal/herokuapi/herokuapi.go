@@ -10,7 +10,7 @@ import (
 	"github.com/spotlightpa/almanack/pkg/common"
 )
 
-func ConfigureFlagSet(fl *flag.FlagSet) *Configurator {
+func AddFlags(fl *flag.FlagSet) *Configurator {
 	conf := Configurator{fl: fl}
 	fl.StringVar(&conf.apiKey, "heroku-api-key", "", "`API key` for retrieving config from Heroku")
 	fl.StringVar(&conf.appName, "heroku-app-name", "", "`name` for Heroku app to get config from")

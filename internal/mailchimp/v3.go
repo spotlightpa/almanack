@@ -11,7 +11,7 @@ import (
 	"github.com/carlmjohnson/requests"
 )
 
-func FlagVar(fs *flag.FlagSet) func(c *http.Client) V3 {
+func AddFlags(fs *flag.FlagSet) func(c *http.Client) V3 {
 	apiKey := fs.String("mcnl-api-key", "", "`API key` for MailChimp newsletter archive")
 	listID := fs.String("mcnl-list-id", "", "List `ID` for MailChimp newsletter archive")
 

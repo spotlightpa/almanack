@@ -47,7 +47,7 @@ func (app *appEnv) parseArgs(args []string) error {
 		fmt.Fprintf(fl.Output(), "almanack-api help\n\n")
 		fl.PrintDefaults()
 	}
-	getService := almanack.Flags(fl)
+	getService := almanack.AddFlags(fl)
 
 	if err := fl.Parse(args); err != nil {
 		return err
