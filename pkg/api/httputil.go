@@ -13,15 +13,12 @@ import (
 	"net/url"
 	"strconv"
 	"strings"
-	"time"
 
 	"github.com/carlmjohnson/errutil"
-	"github.com/carlmjohnson/requests"
 	"github.com/carlmjohnson/resperr"
 	"github.com/getsentry/sentry-go"
 	"github.com/go-chi/chi/v5"
 
-	"github.com/spotlightpa/almanack/internal/arc"
 	"github.com/spotlightpa/almanack/internal/netlifyid"
 	"github.com/spotlightpa/almanack/internal/stringutils"
 	"github.com/spotlightpa/almanack/layouts"
@@ -233,23 +230,6 @@ func intFromString[Int int | int32 | int64](s string, p *Int) error {
 	}
 	*p = Int(n)
 	return nil
-}
-
-func (app *appEnv) FetchFeed(ctx context.Context) (*arc.API, error) {
-	var feed arc.API
-	// Timeout needs to leave enough time to report errors to Sentry before
-	// AWS kills the Lambda…
-	ctx, cancel := context.WithTimeout(ctx, 6*time.Second)
-	defer cancel()
-
-	if err := requests.URL(app.srcFeedURL).
-		Client(app.svc.Client).
-		ToJSON(&feed).
-		Fetch(ctx); err != nil {
-		return nil, resperr.New(
-			http.StatusBadGateway, "could not fetch Arc feed: %w", err)
-	}
-	return &feed, nil
 }
 
 func (app *appEnv) replyHTML(w http.ResponseWriter, r *http.Request, t *template.Template, data any) {
