@@ -14,19 +14,25 @@ import (
 	"github.com/spotlightpa/almanack/pkg/common"
 )
 
-func NewService(isLambda bool, l common.Logger) common.AuthService {
+func NewService(isLambda bool, l common.Logger) AuthService {
 	if isLambda {
-		return AuthService{l}
+		return NetlifyAuth{l}
 	}
 	l.Printf("mocking auth")
 	return MockAuthService{l}
 }
 
-type AuthService struct{ common.Logger }
+type AuthService interface {
+	AuthFromHeader(r *http.Request) (*http.Request, error)
+	AuthFromCookie(r *http.Request) (*http.Request, error)
+	HasRole(r *http.Request, role string) (err error)
+}
 
-var _ common.AuthService = AuthService{}
+type NetlifyAuth struct{ common.Logger }
 
-func (as AuthService) AuthFromHeader(r *http.Request) (*http.Request, error) {
+var _ AuthService = NetlifyAuth{}
+
+func (as NetlifyAuth) AuthFromHeader(r *http.Request) (*http.Request, error) {
 	netID, err := FromLambdaContext(r.Context())
 	if err != nil {
 		as.Logger.Printf("could not wrap request: %v", err)
@@ -35,7 +41,7 @@ func (as AuthService) AuthFromHeader(r *http.Request) (*http.Request, error) {
 	return addJWTToRequest(netID, r), nil
 }
 
-func (as AuthService) AuthFromCookie(r *http.Request) (*http.Request, error) {
+func (as NetlifyAuth) AuthFromCookie(r *http.Request) (*http.Request, error) {
 	netID, err := FromCookie(r)
 	if err != nil {
 		as.Logger.Printf("could not wrap request: %v", err)
@@ -44,7 +50,7 @@ func (as AuthService) AuthFromCookie(r *http.Request) (*http.Request, error) {
 	return addJWTToRequest(netID, r), nil
 }
 
-func (as AuthService) HasRole(r *http.Request, role string) error {
+func (as NetlifyAuth) HasRole(r *http.Request, role string) error {
 	if jwt := FromContext(r.Context()); jwt != nil {
 		hasRole := jwt.HasRole(role)
 		as.Logger.Printf("permission middleware: %s has role %s == %t",
