@@ -1,4 +1,4 @@
-package timeutil
+package timex
 
 import (
 	"time"
@@ -14,7 +14,7 @@ func ToEST(t time.Time) time.Time {
 	return t.In(newYork)
 }
 
-func ToTime(v any) (t time.Time, ok bool) {
+func Unwrap(v any) (t time.Time, ok bool) {
 	if t, _ = v.(time.Time); !t.IsZero() {
 		ok = true
 		return

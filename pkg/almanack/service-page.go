@@ -8,7 +8,7 @@ import (
 	"github.com/spotlightpa/almanack/internal/db"
 	"github.com/spotlightpa/almanack/internal/slack"
 	"github.com/spotlightpa/almanack/internal/stringutils"
-	"github.com/spotlightpa/almanack/internal/timeutil"
+	"github.com/spotlightpa/almanack/internal/timex"
 )
 
 func (svc Service) PublishPage(ctx context.Context, page *db.Page) (err, warning error) {
@@ -199,7 +199,7 @@ func (svc Service) Notify(ctx context.Context, page *db.Page, publishingNow bool
 	color := green
 
 	if !publishingNow {
-		t := timeutil.ToEST(page.ScheduleFor.Time)
+		t := timex.ToEST(page.ScheduleFor.Time)
 		text = t.Format("New article scheduled for Mon, Jan 2 at 3:04pm MST…")
 		color = yellow
 	}

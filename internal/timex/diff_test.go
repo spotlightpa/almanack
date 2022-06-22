@@ -1,4 +1,4 @@
-package timeutil_test
+package timex_test
 
 import (
 	"testing"
@@ -6,7 +6,7 @@ import (
 
 	"github.com/carlmjohnson/be"
 	"github.com/jackc/pgtype"
-	"github.com/spotlightpa/almanack/internal/timeutil"
+	"github.com/spotlightpa/almanack/internal/timex"
 )
 
 func TestEqualish(t *testing.T) {
@@ -34,7 +34,7 @@ func TestEqualish(t *testing.T) {
 	for name, tc := range cases {
 		t.Run(name, func(t *testing.T) {
 			a, b := parseTime(tc.a), parseTime(tc.b)
-			got := timeutil.Equalish(a, b)
+			got := timex.Equalish(a, b)
 			be.Equal(t, tc.want, got)
 		})
 	}
