@@ -32,3 +32,10 @@ func Slugify(s string) string {
 	s = nonasciiRe.ReplaceAllString(s, "-")
 	return s
 }
+
+func LastCut(s, sep string) (before, after string, found bool) {
+	if i := strings.LastIndex(s, sep); i >= 0 {
+		return s[:i], s[i+len(sep):], true
+	}
+	return "", s, false
+}
