@@ -14,6 +14,7 @@ import (
 )
 
 func (svc Service) UpdateNewsletterArchives(ctx context.Context) error {
+	// TODO: Get NL name pairs from database lazily then use single query
 	return errutil.ExecParallel(
 		func() error {
 			return svc.UpdateNewsletterArchive(
@@ -34,6 +35,13 @@ func (svc Service) UpdateNewsletterArchives(ctx context.Context) error {
 				ctx,
 				"PA Local",
 				"palocal",
+			)
+		},
+		func() error {
+			return svc.UpdateNewsletterArchive(
+				ctx,
+				"Talk of the Town",
+				"talkofthetown",
 			)
 		},
 	)
@@ -92,9 +100,10 @@ func (svc Service) ImportNewsletterPages(ctx context.Context) (err error) {
 }
 
 var kickerFor = map[string]string{
-	"investigator": "The Investigator",
-	"papost":       "PA Post",
-	"palocal":      "PA Local",
+	"investigator":  "The Investigator",
+	"papost":        "PA Post",
+	"palocal":       "PA Local",
+	"talkofthetown": "Talk of the Town",
 }
 
 func (svc Service) SaveNewsletterPage(ctx context.Context, nl *db.Newsletter, body string) (err error) {
