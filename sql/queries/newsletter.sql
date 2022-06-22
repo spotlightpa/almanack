@@ -46,3 +46,9 @@ WHERE
   id = $1
 RETURNING
   *;
+
+-- name: ListNewsletterTypes :many
+SELECT
+  *
+FROM
+  newsletter_type;

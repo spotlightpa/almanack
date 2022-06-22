@@ -11,6 +11,33 @@ import (
 	"github.com/jackc/pgtype"
 )
 
+const listNewsletterTypes = `-- name: ListNewsletterTypes :many
+SELECT
+  shortname, name, description
+FROM
+  newsletter_type
+`
+
+func (q *Queries) ListNewsletterTypes(ctx context.Context) ([]NewsletterType, error) {
+	rows, err := q.db.Query(ctx, listNewsletterTypes)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []NewsletterType
+	for rows.Next() {
+		var i NewsletterType
+		if err := rows.Scan(&i.Shortname, &i.Name, &i.Description); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const listNewslettersWithoutPage = `-- name: ListNewslettersWithoutPage :many
 SELECT
   subject, archive_url, published_at, type, created_at, updated_at, id, description, blurb, spotlightpa_path
