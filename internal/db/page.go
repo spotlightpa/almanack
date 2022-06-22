@@ -42,7 +42,7 @@ func (page *Page) ToTOML() (string, error) {
 			v.Len() == 0 {
 			continue
 		}
-		if t, ok := timeutil.GetTime(page.Frontmatter, key); ok {
+		if t, ok := timeutil.ToTime(page.Frontmatter[key]); ok {
 			val = timeutil.ToEST(t)
 		}
 		frontmatter[key] = val
@@ -105,7 +105,7 @@ func (page *Page) SetURLPath() {
 	upath = strings.TrimSuffix(upath, ".md")
 	dir, fname := path.Split(upath)
 	if dir == "/news/" || dir == "/statecollege/" {
-		if pub, ok := timeutil.GetTime(page.Frontmatter, "published"); ok {
+		if pub, ok := timeutil.ToTime(page.Frontmatter["published"]); ok {
 			pub = timeutil.ToEST(pub)
 			dir = pub.Format(dir + "2006/01/")
 		}
@@ -139,7 +139,7 @@ func (page *Page) ToIndex() any {
 	imageCaption, _ := page.Frontmatter["image-caption"].(string)
 	imageCredit, _ := page.Frontmatter["image-credit"].(string)
 	imageSize, _ := page.Frontmatter["image-size"].(string)
-	pubDate, _ := timeutil.GetTime(page.Frontmatter, "published")
+	pubDate, _ := timeutil.ToTime(page.Frontmatter["published"])
 	slug, _ := page.Frontmatter["slug"].(string)
 	authors, _ := page.Frontmatter["authors"].([]string)
 	byline, _ := page.Frontmatter["byline"].(string)
