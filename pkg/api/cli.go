@@ -40,8 +40,12 @@ func (app *appEnv) parseArgs(args []string) error {
 
 	fl.BoolVar(&app.isLambda, "lambda", false, "use AWS Lambda rather than HTTP")
 	fl.StringVar(&app.port, "port", ":33160", "listen on port (HTTP only)")
-	app.Logger = log.New(os.Stderr, AppName+" ", log.LstdFlags)
-	silent := fl.Bool("silent", false, "don't log debug output")
+	app.Logger = log.Default()
+	app.Logger.SetPrefix(AppName + " ")
+	flagx.BoolFunc(fl, "silent", "don't log debug output", func() error {
+		app.Logger.SetOutput(io.Discard)
+		return nil
+	})
 	sentryDSN := fl.String("sentry-dsn", "", "DSN `pseudo-URL` for Sentry")
 	fl.Usage = func() {
 		fmt.Fprintf(fl.Output(), "almanack-api help\n\n")
@@ -54,9 +58,6 @@ func (app *appEnv) parseArgs(args []string) error {
 	}
 	if err := flagx.ParseEnv(fl, "almanack"); err != nil {
 		return err
-	}
-	if *silent {
-		app.Logger.SetOutput(io.Discard)
 	}
 	if err := app.initSentry(*sentryDSN, app.Logger); err != nil {
 		return err
