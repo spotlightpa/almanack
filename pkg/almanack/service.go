@@ -7,6 +7,7 @@ import (
 	"github.com/spotlightpa/almanack/internal/db"
 	"github.com/spotlightpa/almanack/internal/google"
 	"github.com/spotlightpa/almanack/internal/index"
+	"github.com/spotlightpa/almanack/internal/mailchimp"
 	"github.com/spotlightpa/almanack/internal/slack"
 	"github.com/spotlightpa/almanack/pkg/common"
 )
@@ -16,11 +17,11 @@ type Service struct {
 	Client  *http.Client
 	Queries *db.Queries
 	common.ContentStore
-	ImageStore  aws.BlobStore
-	FileStore   aws.BlobStore
-	SlackClient slack.Client
-	Indexer     index.Indexer
-	common.NewletterService
-	gsvc *google.Service
+	ImageStore       aws.BlobStore
+	FileStore        aws.BlobStore
+	SlackClient      slack.Client
+	Indexer          index.Indexer
+	NewletterService mailchimp.V3
+	gsvc             *google.Service
 	common.EmailService
 }

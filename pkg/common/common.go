@@ -3,7 +3,6 @@ package common
 import (
 	"context"
 	"net/http"
-	"time"
 )
 
 type Logger interface {
@@ -23,16 +22,4 @@ type ContentStore interface {
 
 type EmailService interface {
 	SendEmail(ctx context.Context, subject, body string) error
-}
-
-type Newsletter struct {
-	Subject     string    `json:"subject"`
-	Blurb       string    `json:"blurb"`
-	Description string    `json:"description"`
-	ArchiveURL  string    `json:"archive_url"`
-	PublishedAt time.Time `json:"published_at"`
-}
-
-type NewletterService interface {
-	ListNewletters(ctx context.Context, kind string) ([]Newsletter, error)
 }

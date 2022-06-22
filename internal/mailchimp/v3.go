@@ -9,7 +9,6 @@ import (
 	"time"
 
 	"github.com/carlmjohnson/requests"
-	"github.com/spotlightpa/almanack/pkg/common"
 )
 
 func FlagVar(fs *flag.FlagSet) func(c *http.Client) V3 {
@@ -38,7 +37,7 @@ func NewV3(apiKey, listID string, c *http.Client) V3 {
 	}
 }
 
-func (v3 V3) ListCampaigns(ctx context.Context) (*ListCampaignsResp, error) {
+func (v3 V3) listCampaigns(ctx context.Context) (*ListCampaignsResp, error) {
 	var data ListCampaignsResp
 	if err := v3.listCampaignBuilder.
 		Clone().
@@ -63,16 +62,24 @@ type Campaign struct {
 	} `json:"settings"`
 }
 
-func (v3 V3) ListNewletters(ctx context.Context, kind string) ([]common.Newsletter, error) {
-	resp, err := v3.ListCampaigns(ctx)
+type Newsletter struct {
+	Subject     string    `json:"subject"`
+	Blurb       string    `json:"blurb"`
+	Description string    `json:"description"`
+	ArchiveURL  string    `json:"archive_url"`
+	PublishedAt time.Time `json:"published_at"`
+}
+
+func (v3 V3) ListNewletters(ctx context.Context, kind string) ([]Newsletter, error) {
+	resp, err := v3.listCampaigns(ctx)
 	if err != nil {
 		return nil, err
 	}
-	newsletters := make([]common.Newsletter, 0, len(resp.Campaigns))
+	newsletters := make([]Newsletter, 0, len(resp.Campaigns))
 	for _, camp := range resp.Campaigns {
 		// Hacky but probably the best method?
 		if strings.Contains(camp.Settings.Title, kind) {
-			newsletters = append(newsletters, common.Newsletter{
+			newsletters = append(newsletters, Newsletter{
 				Subject:     camp.Settings.Subject,
 				Blurb:       camp.Settings.PreviewText,
 				Description: camp.Settings.Title,
