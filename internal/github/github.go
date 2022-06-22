@@ -12,7 +12,12 @@ import (
 	"golang.org/x/oauth2"
 )
 
-func FlagVar(fl *flag.FlagSet) func(l common.Logger) (common.ContentStore, error) {
+type ContentStore interface {
+	GetFile(ctx context.Context, path string) (content string, err error)
+	UpdateFile(ctx context.Context, msg, path string, content []byte) error
+}
+
+func FlagVar(fl *flag.FlagSet) func(l common.Logger) (ContentStore, error) {
 	if fl == nil {
 		fl = flag.CommandLine
 	}
@@ -22,7 +27,7 @@ func FlagVar(fl *flag.FlagSet) func(l common.Logger) (common.ContentStore, error
 	repo := fl.String("github-repo", "", "name of Github `repo`")
 	branch := fl.String("github-branch", "", "Github `branch` to use")
 	mock := fl.String("github-mock-path", "", "`path` for mock Github files")
-	return func(l common.Logger) (common.ContentStore, error) {
+	return func(l common.Logger) (ContentStore, error) {
 		if *token == "" || *owner == "" || *repo == "" || *branch == "" {
 			return NewMockClient(*mock, l)
 		}
