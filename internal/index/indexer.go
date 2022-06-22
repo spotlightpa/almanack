@@ -7,9 +7,6 @@ import (
 )
 
 func AddFlags(fl *flag.FlagSet) func(Logger) Indexer {
-	if fl == nil {
-		fl = flag.CommandLine
-	}
 	appID := fl.String("indexer-app-id", "", "`app id` for Algolia")
 	apiKey := fl.String("indexer-api-key", "", "`api key` for Algolia")
 	indexName := fl.String("indexer-index-name", "", "`index` name for Algolia")

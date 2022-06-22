@@ -18,10 +18,6 @@ type ContentStore interface {
 }
 
 func AddFlags(fl *flag.FlagSet) func(l common.Logger) (ContentStore, error) {
-	if fl == nil {
-		fl = flag.CommandLine
-	}
-
 	token := fl.String("github-token", "", "personal access `token` for Github")
 	owner := fl.String("github-owner", "", "owning `organization` for Github repo")
 	repo := fl.String("github-repo", "", "name of Github `repo`")
