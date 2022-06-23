@@ -69,7 +69,6 @@ func (app *appEnv) getProxyImage(w http.ResponseWriter, r *http.Request) {
 		))
 		return
 	}
-	app.Printf("requested %q", u)
 
 	const urlWhitelist = `^https://[^/]*(.inquirer.com|.arcpublishing.com|arc-anglerfish-arc2-prod-pmn.s3.amazonaws.com)/`
 	cl := *app.svc.Client
