@@ -45,9 +45,10 @@ func NewClient(token, owner, repo, branch string) (*Client, error) {
 
 	client := github.NewClient(tc)
 	cl := &Client{client, owner, repo, branch}
-	if err := cl.Ping(ctx); err != nil {
-		return nil, err
-	}
+	/* Omit test ping to keep startup time lower; increase resilience */
+	// if err := cl.Ping(ctx); err != nil {
+	// 	return nil, err
+	// }
 	return cl, nil
 }
 
