@@ -15,7 +15,8 @@ func TestMap(t *testing.T) {
 	if dbURL == "" {
 		t.Skip("ALMANACK_TEST_DATABASE not set")
 	}
-	q, err := db.Open(dbURL)
+	p, err := db.Open(dbURL)
+	q := db.New(p)
 	be.NilErr(t, err)
 	ctx := context.Background()
 	const testpath = "test/hello.md"

@@ -13,10 +13,6 @@ import (
 	"github.com/spotlightpa/almanack/pkg/common"
 )
 
-func Logger(db DBTX) DBTX {
-	return logger{db}
-}
-
 type logger struct {
 	db DBTX
 }

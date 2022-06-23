@@ -48,7 +48,7 @@ func (app *appEnv) parseEnv() error {
 	app.logger.SetPrefix("identity-signup ")
 	fl := flag.NewFlagSet("identity-signup", flag.ContinueOnError)
 	slackHookURL := fl.String("slack-hook-url", "", "Slack hook endpoint `URL`")
-	pg := db.AddFlags(fl, "postgres", "PostgreSQL database `URL`")
+	pg, _ := db.AddFlags(fl, "postgres", "PostgreSQL database `URL`")
 	heroku := herokuapi.AddFlags(fl)
 	sentryDSN := fl.String("sentry-dsn", "", "DSN `pseudo-URL` for Sentry")
 	if err := fl.Parse([]string{}); err != nil {

@@ -22,7 +22,7 @@ func AddFlags(fl *flag.FlagSet) func() (svc Service, err error) {
 	mailchimpSignupURL := fl.String("mc-signup-url", "http://example.com", "`URL` to redirect users to for MailChimp signup")
 
 	cache := fl.Bool("cache", false, "use in-memory cache for http requests")
-	pg := db.AddFlags(fl, "postgres", "PostgreSQL database `URL`")
+	pg, tx := db.AddFlags(fl, "postgres", "PostgreSQL database `URL`")
 	slackURL := fl.String("slack-social-url", "", "Slack hook endpoint `URL` for social")
 	heroku := herokuapi.AddFlags(fl)
 	getS3Store := aws.AddFlags(fl)
@@ -63,6 +63,7 @@ func AddFlags(fl *flag.FlagSet) func() (svc Service, err error) {
 			MailchimpSignupURL: *mailchimpSignupURL,
 			Client:             &client,
 			Queries:            pg,
+			Tx:                 tx,
 			ContentStore:       svc.ContentStore,
 			SlackClient:        slack.New(*slackURL),
 			ImageStore:         is,

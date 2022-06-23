@@ -17,6 +17,7 @@ type Service struct {
 	MailchimpSignupURL string
 	Client             *http.Client
 	Queries            *db.Queries
+	Tx                 *db.Txable
 	github.ContentStore
 	ImageStore       aws.BlobStore
 	FileStore        aws.BlobStore
