@@ -2,7 +2,6 @@ package google
 
 import (
 	"context"
-	"log"
 	"net/http"
 	"os"
 	"testing"
@@ -14,7 +13,6 @@ import (
 
 func TestListDriveFiles(t *testing.T) {
 	svc := Service{}
-	svc.l = log.Default()
 	svc.driveID = stringx.First(os.Getenv("ALMANACK_GOOGLE_TEST_DRIVE"), "1")
 	ctx := context.Background()
 	cl := *http.DefaultClient

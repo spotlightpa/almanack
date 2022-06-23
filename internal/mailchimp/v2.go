@@ -18,19 +18,18 @@ type EmailService interface {
 	SendEmail(ctx context.Context, subject, body string) error
 }
 
-func NewMailService(apiKey, listID string, l common.Logger, c *http.Client) EmailService {
+func NewMailService(apiKey, listID string, c *http.Client) EmailService {
 	if apiKey == "" || listID == "" {
-		l.Printf("using mock mail service")
-		return MockEmailService{l}
+		common.Logger.Printf("using mock mail service")
+		return MockEmailService{}
 	}
-	return V2{apiKey, listID, l, c}
+	return V2{apiKey, listID, c}
 }
 
 // V2 uses MC APIv2 because in v3 they decided REST means
 // not being able to create and send a campign in any efficient way
 type V2 struct {
 	apiKey, listID string
-	l              common.Logger
 	c              *http.Client
 }
 
@@ -67,7 +66,7 @@ func (v2 V2) SendEmail(ctx context.Context, subject, body string) (err error) {
 	if err != nil {
 		return err
 	}
-	v2.l.Printf("created campaign %q", resp.Id)
+	common.Logger.Printf("created campaign %q", resp.Id)
 	type v2CampaignSend struct {
 		APIKey     string `json:"apikey"`
 		CampaignID string `json:"cid"`
@@ -83,16 +82,15 @@ func (v2 V2) SendEmail(ctx context.Context, subject, body string) (err error) {
 		}).
 		ToJSON(&resp2).
 		Fetch(ctx)
-	v2.l.Printf("sent %v", resp2.Complete)
+	common.Logger.Printf("sent %v", resp2.Complete)
 	return err
 }
 
 type MockEmailService struct {
-	l common.Logger
 }
 
 func (mock MockEmailService) SendEmail(ctx context.Context, subject, body string) error {
-	mock.l.Printf("no MailChimp client, debugging output\n")
+	common.Logger.Printf("no MailChimp client, debugging output\n")
 	fmt.Println(subject)
 	fmt.Println("----")
 	fmt.Println(body)

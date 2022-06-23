@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"html"
-	"log"
 	"net/url"
 	"regexp"
 	"strconv"
@@ -13,6 +12,7 @@ import (
 
 	"github.com/spotlightpa/almanack/internal/arc"
 	"github.com/spotlightpa/almanack/internal/stringx"
+	"github.com/spotlightpa/almanack/pkg/common"
 )
 
 func (arcStory *ArcStory) ToArticle(ctx context.Context, svc Service, article *SpotlightPAArticle) (err error) {
@@ -127,7 +127,7 @@ func readContentElements(ctx context.Context, svc Service, rawels []*json.RawMes
 		var _type string
 		wrapper := arc.ContentElementType{Type: &_type}
 		if err := json.Unmarshal(*raw, &wrapper); err != nil {
-			log.Printf("runtime error: %v", err)
+			common.Logger.Printf("runtime error: %v", err)
 		}
 		var graf string
 		switch _type {
@@ -140,7 +140,7 @@ func readContentElements(ctx context.Context, svc Service, rawels []*json.RawMes
 		case "header":
 			var v arc.ContentElementHeading
 			if err := json.Unmarshal(*raw, &v); err != nil {
-				log.Printf("runtime error: %v", err)
+				common.Logger.Printf("runtime error: %v", err)
 			}
 			graf = strings.Repeat("#", v.Level) + " " + v.Content
 		case "oembed_response":

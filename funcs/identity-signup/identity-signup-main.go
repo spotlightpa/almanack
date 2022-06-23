@@ -6,7 +6,6 @@ import (
 	"flag"
 	"fmt"
 	"log"
-	"os"
 	"strings"
 	"time"
 
@@ -20,6 +19,7 @@ import (
 	"github.com/spotlightpa/almanack/internal/netlifyid"
 	"github.com/spotlightpa/almanack/internal/slack"
 	"github.com/spotlightpa/almanack/pkg/almanack"
+	"github.com/spotlightpa/almanack/pkg/common"
 )
 
 func main() {
@@ -44,7 +44,8 @@ type appEnv struct {
 }
 
 func (app *appEnv) parseEnv() error {
-	app.logger = log.New(os.Stdout, "identity-signup ", log.LstdFlags)
+	app.logger = common.Logger
+	app.logger.SetPrefix("identity-signup ")
 	fl := flag.NewFlagSet("identity-signup", flag.ContinueOnError)
 	slackHookURL := fl.String("slack-hook-url", "", "Slack hook endpoint `URL`")
 	pg := db.AddFlags(fl, "postgres", "PostgreSQL database `URL`")
@@ -56,7 +57,7 @@ func (app *appEnv) parseEnv() error {
 	if err := flagx.ParseEnv(fl, "almanack"); err != nil {
 		return err
 	}
-	if err := heroku.Configure(app.logger, map[string]string{
+	if err := heroku.Configure(map[string]string{
 		"postgres": "DATABASE_URL",
 	}); err != nil {
 		return err
@@ -69,7 +70,7 @@ func (app *appEnv) parseEnv() error {
 		return err
 	}
 
-	app.sc = slack.New(*slackHookURL, app.logger)
+	app.sc = slack.New(*slackHookURL)
 	if err := flagx.MustHave(fl, "postgres"); err != nil {
 		return err
 	}

@@ -11,6 +11,7 @@ import (
 	"github.com/spotlightpa/almanack/internal/mailchimp"
 	"github.com/spotlightpa/almanack/internal/stringx"
 	"github.com/spotlightpa/almanack/internal/timex"
+	"github.com/spotlightpa/almanack/pkg/common"
 )
 
 func (svc Service) UpdateNewsletterArchives(ctx context.Context, types []db.NewsletterType) (err error) {
@@ -41,10 +42,10 @@ func (svc Service) UpdateNewsletterArchive(ctx context.Context, campaigns *mailc
 		return err
 	} else if n == 0 {
 		// abort if there's nothing new to update
-		svc.Logger.Printf("%q got no new items", mcType)
+		common.Logger.Printf("%q got no new items", mcType)
 		return nil
 	} else {
-		svc.Logger.Printf("%q got %d new items", mcType, n)
+		common.Logger.Printf("%q got %d new items", mcType, n)
 	}
 
 	return nil
@@ -60,7 +61,7 @@ func (svc Service) ImportNewsletterPages(ctx context.Context, types []db.Newslet
 	if err != nil {
 		return err
 	}
-	svc.Logger.Printf("importing %d newsletter pages", len(nls))
+	common.Logger.Printf("importing %d newsletter pages", len(nls))
 	for _, nl := range nls {
 		body, err := mailchimp.ImportPage(ctx, svc.Client, nl.ArchiveURL)
 		if err != nil {

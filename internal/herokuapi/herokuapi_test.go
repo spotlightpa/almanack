@@ -8,8 +8,10 @@ import (
 	"os"
 	"testing"
 
+	"github.com/carlmjohnson/be"
 	"github.com/carlmjohnson/requests"
 	"github.com/spotlightpa/almanack/internal/herokuapi"
+	"github.com/spotlightpa/almanack/pkg/common"
 )
 
 func TestHerokuAPI(t *testing.T) {
@@ -32,23 +34,14 @@ func TestHerokuAPI(t *testing.T) {
 	err := fs.Parse([]string{
 		"-heroku-api-key", apiKey,
 		"-heroku-app-name", appName})
-	if err != nil {
-		t.Fatal("err", err)
-	}
+	be.NilErr(t, err)
 	var buf bytes.Buffer
-	l := log.New(&buf, "", log.LstdFlags)
-	err = conf.Configure(l, map[string]string{
+	common.Logger = log.New(&buf, "", log.LstdFlags)
+	err = conf.Configure(map[string]string{
 		"db": "TEST_KEY",
 		"xx": "MISSING_VAL",
 	})
-	// t.Log(buf.String())
-	if err != nil {
-		t.Fatal("err", err)
-	}
-	if *dbstr == "" {
-		t.Fatal("no TEST_KEY")
-	}
-	if *xxstr != "initial" {
-		t.Fatalf("overwrote missing value")
-	}
+	be.NilErr(t, err)
+	be.Nonzero(t, *dbstr)
+	be.Equal(t, "initial", *xxstr)
 }

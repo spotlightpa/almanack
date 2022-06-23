@@ -16,25 +16,25 @@ import (
 	"github.com/spotlightpa/almanack/pkg/common"
 )
 
-func AddFlags(fl *flag.FlagSet) func(l common.Logger) (imageStore, fileStore BlobStore) {
+func AddFlags(fl *flag.FlagSet) func() (imageStore, fileStore BlobStore) {
 	accessKeyID := fl.String("aws-access-key", "", "AWS access `key` ID")
 	secretAccessKey := fl.String("aws-secret-key", "", "AWS secret access `key`")
 	region := fl.String("aws-s3-region", "us-east-2", "AWS `region` to use for S3")
 	ibucket := fl.String("image-bucket-url", "mem://", "bucket `URL` for images")
 	fbucket := fl.String("file-bucket-url", "mem://", "bucket `URL` for files")
 
-	return func(l common.Logger) (imageStore, fileStore BlobStore) {
+	return func() (imageStore, fileStore BlobStore) {
 		err := register("s3-cli", *region, *accessKeyID, *secretAccessKey)
 		if err != nil {
-			l.Printf("problem registering gocloud: %v", err)
+			common.Logger.Printf("problem registering gocloud: %v", err)
 		}
-		imageStore = BlobStore{*ibucket, l}
+		imageStore = BlobStore{*ibucket}
 		if *ibucket == "mem://" {
-			l.Printf("using mock AWS image bucket")
+			common.Logger.Printf("using mock AWS image bucket")
 		}
-		fileStore = BlobStore{*fbucket, l}
+		fileStore = BlobStore{*fbucket}
 		if *fbucket == "mem://" {
-			l.Printf("using mock AWS file bucket")
+			common.Logger.Printf("using mock AWS file bucket")
 		}
 		return
 	}
@@ -42,11 +42,10 @@ func AddFlags(fl *flag.FlagSet) func(l common.Logger) (imageStore, fileStore Blo
 
 type BlobStore struct {
 	bucket string
-	l      common.Logger
 }
 
 func (bs BlobStore) GetSignedURL(ctx context.Context, srcPath string, h http.Header) (signedURL string, err error) {
-	bs.l.Printf("creating presigned URL for %q", srcPath)
+	common.Logger.Printf("creating presigned URL for %q", srcPath)
 	b, err := blob.OpenBucket(ctx, bs.bucket)
 	if err != nil {
 		return "", err
@@ -101,12 +100,12 @@ func (bs BlobStore) WriteFile(ctx context.Context, path string, h http.Header, d
 		a := md5.Sum(data)
 		checksum = a[:]
 		if string(checksum) == string(attrs.MD5) {
-			bs.l.Printf("skipping %q %q; already uploaded", bs.bucket, path)
+			common.Logger.Printf("skipping %q %q; already uploaded", bs.bucket, path)
 			return nil
 		}
 	}
 
-	bs.l.Printf("writing to %q %q", bs.bucket, path)
+	common.Logger.Printf("writing to %q %q", bs.bucket, path)
 	return b.WriteAll(ctx, path, data, &blob.WriterOptions{
 		CacheControl:       h.Get("Cache-Control"),
 		ContentType:        h.Get("Content-Type"),

@@ -8,6 +8,7 @@ import (
 
 	"github.com/carlmjohnson/errutil"
 	"github.com/spotlightpa/almanack/internal/db"
+	"github.com/spotlightpa/almanack/pkg/common"
 )
 
 func (svc Service) PopScheduledSiteChanges(ctx context.Context, loc string) (err error) {
@@ -25,10 +26,10 @@ func (svc Service) PopScheduledSiteChanges(ctx context.Context, loc string) (err
 		}
 	}
 	if currentConfig == nil {
-		svc.Printf("site data: no changes to %s", loc)
+		common.Logger.Printf("site data: no changes to %s", loc)
 		return nil
 	}
-	svc.Printf("site data: updating %s", loc)
+	common.Logger.Printf("site data: updating %s", loc)
 
 	// TODO: rollback
 	if err = svc.PublishSiteConfig(ctx, currentConfig); err != nil {
