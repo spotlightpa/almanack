@@ -45,9 +45,9 @@ func listVisitedFlagNames(fl *flag.FlagSet) map[string]bool {
 	return seen
 }
 
-func (conf *Configurator) Configure(l common.Logger, f2c map[string]string) error {
+func (conf *Configurator) Configure(f2c map[string]string) error {
 	if conf.apiKey == "" {
-		l.Printf("no Heroku API key")
+		common.Logger.Printf("no Heroku API key")
 		return nil
 	}
 	seen := listVisitedFlagNames(conf.fl)
@@ -59,7 +59,7 @@ func (conf *Configurator) Configure(l common.Logger, f2c map[string]string) erro
 		}
 	})
 	if len(unseen) == 0 {
-		l.Printf("no missing values for Heroku to enrich")
+		common.Logger.Printf("no missing values for Heroku to enrich")
 		return nil
 	}
 	vals, err := conf.Request()
@@ -71,9 +71,9 @@ func (conf *Configurator) Configure(l common.Logger, f2c map[string]string) erro
 		cname := f2c[ff.Name]
 		val := vals[cname]
 		if val == "" {
-			l.Printf("%s not set as %s in Heroku", ff.Name, cname)
+			common.Logger.Printf("%s not set as %s in Heroku", ff.Name, cname)
 		} else {
-			l.Printf("setting %s from Heroku", ff.Name)
+			common.Logger.Printf("setting %s from Heroku", ff.Name)
 			errs.Push(conf.fl.Set(ff.Name, val))
 		}
 	}

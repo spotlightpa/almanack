@@ -8,6 +8,7 @@ import (
 	"github.com/carlmjohnson/errutil"
 	"github.com/carlmjohnson/resperr"
 	"github.com/spotlightpa/almanack/internal/db"
+	"github.com/spotlightpa/almanack/pkg/common"
 )
 
 func (svc Service) ReplaceImageURL(ctx context.Context, srcURL, description, credit string) (s string, err error) {
@@ -44,7 +45,7 @@ func (svc Service) ReplaceImageURL(ctx context.Context, srcURL, description, cre
 func (svc Service) UpdateMostPopular(ctx context.Context) (err error) {
 	defer errutil.Trace(&err)
 
-	svc.Logger.Printf("updating most popular")
+	common.Logger.Printf("updating most popular")
 	cl, err := svc.gsvc.GAClient(ctx)
 	if err != nil {
 		return err

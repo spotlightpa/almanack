@@ -9,6 +9,7 @@ import (
 	"github.com/spotlightpa/almanack/internal/slack"
 	"github.com/spotlightpa/almanack/internal/stringx"
 	"github.com/spotlightpa/almanack/internal/timex"
+	"github.com/spotlightpa/almanack/pkg/common"
 )
 
 func (svc Service) PublishPage(ctx context.Context, page *db.Page) (err, warning error) {
@@ -115,7 +116,7 @@ func (svc Service) RefreshPageContents(ctx context.Context, id int64) (err error
 		return nil
 	}
 
-	svc.Printf("%s changed", page.FilePath)
+	common.Logger.Printf("%s changed", page.FilePath)
 
 	_, err = svc.Queries.UpdatePage(ctx, db.UpdatePageParams{
 		FilePath:       page.FilePath,

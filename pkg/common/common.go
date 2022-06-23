@@ -1,5 +1,5 @@
 package common
 
-type Logger interface {
-	Printf(format string, v ...any)
-}
+import "log"
+
+var Logger = log.Default()

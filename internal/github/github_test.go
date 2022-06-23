@@ -10,6 +10,7 @@ import (
 
 	"github.com/carlmjohnson/be"
 	"github.com/spotlightpa/almanack/internal/github"
+	"github.com/spotlightpa/almanack/pkg/common"
 )
 
 func TestGithub(t *testing.T) {
@@ -22,8 +23,8 @@ func TestGithub(t *testing.T) {
 		t.Skip("Missing Github ENV vars")
 	}
 	var buf bytes.Buffer
-	l := log.New(&buf, "", 0)
-	client, err := github.NewClient(token, owner, repo, branch, l)
+	common.Logger = log.New(&buf, "", 0)
+	client, err := github.NewClient(token, owner, repo, branch)
 	be.NilErr(t, err)
 	ctx := context.Background()
 	// create

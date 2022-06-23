@@ -17,7 +17,7 @@ import (
 	"github.com/spotlightpa/almanack/pkg/common"
 )
 
-func AddFlags(fl *flag.FlagSet) func(common.Logger) (svc Service, err error) {
+func AddFlags(fl *flag.FlagSet) func() (svc Service, err error) {
 	arcFeedURL := fl.String("src-feed", "", "source `URL` for Arc feed")
 	mailchimpSignupURL := fl.String("mc-signup-url", "http://example.com", "`URL` to redirect users to for MailChimp signup")
 
@@ -33,9 +33,9 @@ func AddFlags(fl *flag.FlagSet) func(common.Logger) (svc Service, err error) {
 	mailServiceAPIKey := fl.String("mc-api-key", "", "API `key` for MailChimp v2")
 	mailServiceListID := fl.String("mc-list-id", "", "List `ID` MailChimp v2 campaign")
 
-	return func(l common.Logger) (svc Service, err error) {
+	return func() (svc Service, err error) {
 		// Get PostgreSQL URL from Heroku if possible, else get it from flag
-		if err = heroku.Configure(l, map[string]string{
+		if err = heroku.Configure(map[string]string{
 			"postgres":    "DATABASE_URL",
 			"google-json": "ALMANACK_GOOGLE_JSON",
 		}); err != nil {
@@ -47,30 +47,29 @@ func AddFlags(fl *flag.FlagSet) func(common.Logger) (svc Service, err error) {
 
 		client := *http.DefaultClient
 		if *cache {
-			httpcache.SetRounderTripper(&client, l)
+			httpcache.SetRounderTripper(&client)
 		}
 
-		if svc.ContentStore, err = getGithub(l); err != nil {
-			l.Printf("could not connect to Github: %v", err)
+		if svc.ContentStore, err = getGithub(); err != nil {
+			common.Logger.Printf("could not connect to Github: %v", err)
 			return
 		}
 
-		is, fs := getS3Store(l)
-		mc := mailchimp.NewMailService(*mailServiceAPIKey, *mailServiceListID, l, &client)
+		is, fs := getS3Store()
+		mc := mailchimp.NewMailService(*mailServiceAPIKey, *mailServiceListID, &client)
 
 		return Service{
 			arcFeedURL:         *arcFeedURL,
 			MailchimpSignupURL: *mailchimpSignupURL,
-			Logger:             l,
 			Client:             &client,
 			Queries:            pg,
 			ContentStore:       svc.ContentStore,
-			SlackClient:        slack.New(*slackURL, l),
+			SlackClient:        slack.New(*slackURL),
 			ImageStore:         is,
 			FileStore:          fs,
-			Indexer:            getIndex(l),
+			Indexer:            getIndex(),
 			NewletterService:   getNewsletter(&client),
-			gsvc:               getGoogle(l),
+			gsvc:               getGoogle(),
 			EmailService:       mc,
 		}, nil
 	}

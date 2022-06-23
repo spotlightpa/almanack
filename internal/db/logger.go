@@ -3,7 +3,6 @@ package db
 import (
 	"context"
 	"fmt"
-	"log"
 	"path/filepath"
 	"runtime"
 	"time"
@@ -11,15 +10,15 @@ import (
 	"github.com/jackc/pgconn"
 	"github.com/jackc/pgx/v4"
 	"github.com/spotlightpa/almanack/internal/stringx"
+	"github.com/spotlightpa/almanack/pkg/common"
 )
 
 func Logger(db DBTX) DBTX {
-	return logger{db, log.Default()}
+	return logger{db}
 }
 
 type logger struct {
 	db DBTX
-	l  *log.Logger
 }
 
 func (l logger) Exec(ctx context.Context, query string, args ...any) (pgconn.CommandTag, error) {
@@ -52,5 +51,5 @@ func (l logger) log(kind string, d time.Duration) {
 		_, name, _ := stringx.LastCut(f.Name(), ".")
 		prefix = fmt.Sprintf("%s(%s:%d)", name, file, line)
 	}
-	l.l.Printf("%s %s in %v", kind, prefix, d)
+	common.Logger.Printf("%s %s in %v", kind, prefix, d)
 }

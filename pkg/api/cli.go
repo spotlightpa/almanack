@@ -41,7 +41,7 @@ func (app *appEnv) parseArgs(args []string) error {
 
 	fl.BoolVar(&app.isLambda, "lambda", false, "use AWS Lambda rather than HTTP")
 	fl.StringVar(&app.port, "port", ":33160", "listen on port (HTTP only)")
-	app.Logger = log.Default()
+	app.Logger = common.Logger
 	app.Logger.SetPrefix(AppName + " ")
 	flagx.BoolFunc(fl, "silent", "don't log debug output", func() error {
 		app.Logger.SetOutput(io.Discard)
@@ -60,12 +60,12 @@ func (app *appEnv) parseArgs(args []string) error {
 	if err := flagx.ParseEnv(fl, "almanack"); err != nil {
 		return err
 	}
-	if err := app.initSentry(*sentryDSN, app.Logger); err != nil {
+	if err := app.initSentry(*sentryDSN); err != nil {
 		return err
 	}
-	app.auth = netlifyid.NewService(app.isLambda, app.Logger)
+	app.auth = netlifyid.NewService(app.isLambda)
 	var err error
-	if app.svc, err = getService(app.Logger); err != nil {
+	if app.svc, err = getService(); err != nil {
 		return err
 	}
 	return nil
@@ -104,10 +104,10 @@ func (app *appEnv) exec() error {
 	return http.ListenAndServe(app.port, routes)
 }
 
-func (app *appEnv) initSentry(dsn string, l common.Logger) error {
+func (app *appEnv) initSentry(dsn string) error {
 	var transport sentry.Transport
 	if app.isLambda {
-		l.Printf("setting sentry sync with timeout")
+		common.Logger.Printf("setting sentry sync with timeout")
 		transport = &sentry.HTTPSyncTransport{Timeout: 5 * time.Second}
 	}
 	return sentry.Init(sentry.ClientOptions{

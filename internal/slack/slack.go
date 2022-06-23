@@ -7,15 +7,11 @@ import (
 	"os"
 
 	"github.com/carlmjohnson/slackhook"
+	"github.com/spotlightpa/almanack/pkg/common"
 )
-
-type Logger interface {
-	Printf(format string, v ...any)
-}
 
 type Client struct {
 	c *slackhook.Client
-	l Logger
 }
 
 type (
@@ -24,8 +20,8 @@ type (
 	Field      = slackhook.Field
 )
 
-func New(hookURL string, l Logger) Client {
-	return Client{slackhook.New(hookURL, nil), l}
+func New(hookURL string) Client {
+	return Client{slackhook.New(hookURL, nil)}
 }
 
 func (sc Client) Post(ctx context.Context, msg Message) error {
@@ -40,7 +36,5 @@ func (sc Client) Post(ctx context.Context, msg Message) error {
 }
 
 func (sc Client) printf(format string, args ...any) {
-	if sc.l != nil {
-		sc.l.Printf(format, args...)
-	}
+	common.Logger.Printf(format, args...)
 }

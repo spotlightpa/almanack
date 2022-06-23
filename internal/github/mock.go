@@ -10,10 +10,9 @@ import (
 
 type MockClient struct {
 	basepath string
-	l        common.Logger
 }
 
-func NewMockClient(dir string, l common.Logger) (*MockClient, error) {
+func NewMockClient(dir string) (*MockClient, error) {
 	if dir == "" {
 		var err error
 		// we don't clean up temp dir:
@@ -23,8 +22,8 @@ func NewMockClient(dir string, l common.Logger) (*MockClient, error) {
 			return nil, err
 		}
 	}
-	l.Printf("mock Github base dir is %s", dir)
-	return &MockClient{dir, l}, nil
+	common.Logger.Printf("mock Github base dir is %s", dir)
+	return &MockClient{dir}, nil
 }
 
 func (mc *MockClient) abspath(path string) string {
@@ -38,14 +37,14 @@ func (mc *MockClient) ensureParent(fn string) {
 
 func (mc *MockClient) CreateFile(ctx context.Context, msg, path string, content []byte) error {
 	tmpfn := mc.abspath(path)
-	mc.l.Printf("creating file %s on mock Github", tmpfn)
+	common.Logger.Printf("creating file %s on mock Github", tmpfn)
 	mc.ensureParent(tmpfn)
 	return os.WriteFile(tmpfn, content, 0644)
 }
 
 func (mc *MockClient) GetFile(ctx context.Context, path string) (contents string, err error) {
 	tmpfn := mc.abspath(path)
-	mc.l.Printf("getting file %s from mock Github", tmpfn)
+	common.Logger.Printf("getting file %s from mock Github", tmpfn)
 	var b []byte
 	b, err = os.ReadFile(tmpfn)
 	return string(b), err
@@ -53,7 +52,7 @@ func (mc *MockClient) GetFile(ctx context.Context, path string) (contents string
 
 func (mc *MockClient) UpdateFile(ctx context.Context, msg, path string, content []byte) error {
 	tmpfn := mc.abspath(path)
-	mc.l.Printf("updating file %s on mock Github", tmpfn)
+	common.Logger.Printf("updating file %s on mock Github", tmpfn)
 	mc.ensureParent(tmpfn)
 	return os.WriteFile(tmpfn, content, 0644)
 }

@@ -10,15 +10,13 @@ import (
 	"github.com/spotlightpa/almanack/internal/index"
 	"github.com/spotlightpa/almanack/internal/mailchimp"
 	"github.com/spotlightpa/almanack/internal/slack"
-	"github.com/spotlightpa/almanack/pkg/common"
 )
 
 type Service struct {
 	arcFeedURL         string
 	MailchimpSignupURL string
-	common.Logger
-	Client  *http.Client
-	Queries *db.Queries
+	Client             *http.Client
+	Queries            *db.Queries
 	github.ContentStore
 	ImageStore       aws.BlobStore
 	FileStore        aws.BlobStore

@@ -14,12 +14,12 @@ import (
 	"github.com/spotlightpa/almanack/pkg/common"
 )
 
-func NewService(isLambda bool, l common.Logger) AuthService {
+func NewService(isLambda bool) AuthService {
 	if isLambda {
-		return NetlifyAuth{l}
+		return NetlifyAuth{}
 	}
-	l.Printf("mocking auth")
-	return MockAuthService{l}
+	common.Logger.Printf("mocking auth")
+	return MockAuthService{}
 }
 
 type AuthService interface {
@@ -28,14 +28,14 @@ type AuthService interface {
 	HasRole(r *http.Request, role string) (err error)
 }
 
-type NetlifyAuth struct{ common.Logger }
+type NetlifyAuth struct{}
 
 var _ AuthService = NetlifyAuth{}
 
 func (as NetlifyAuth) AuthFromHeader(r *http.Request) (*http.Request, error) {
 	netID, err := FromLambdaContext(r.Context())
 	if err != nil {
-		as.Logger.Printf("could not wrap request: %v", err)
+		common.Logger.Printf("could not wrap request: %v", err)
 		return nil, err
 	}
 	return addJWTToRequest(netID, r), nil
@@ -44,7 +44,7 @@ func (as NetlifyAuth) AuthFromHeader(r *http.Request) (*http.Request, error) {
 func (as NetlifyAuth) AuthFromCookie(r *http.Request) (*http.Request, error) {
 	netID, err := FromCookie(r)
 	if err != nil {
-		as.Logger.Printf("could not wrap request: %v", err)
+		common.Logger.Printf("could not wrap request: %v", err)
 		return nil, err
 	}
 	return addJWTToRequest(netID, r), nil
@@ -53,7 +53,7 @@ func (as NetlifyAuth) AuthFromCookie(r *http.Request) (*http.Request, error) {
 func (as NetlifyAuth) HasRole(r *http.Request, role string) error {
 	if jwt := FromContext(r.Context()); jwt != nil {
 		hasRole := jwt.HasRole(role)
-		as.Logger.Printf("permission middleware: %s has role %s == %t",
+		common.Logger.Printf("permission middleware: %s has role %s == %t",
 			jwt.User.Email, role, hasRole)
 		if hasRole {
 			return nil
@@ -66,7 +66,7 @@ func (as NetlifyAuth) HasRole(r *http.Request, role string) error {
 			jwt.User.AppMetadata.Roles,
 		)
 	}
-	as.Logger.Printf("no identity found: running on AWS?")
+	common.Logger.Printf("no identity found: running on AWS?")
 
 	return resperr.WithUserMessage(
 		fmt.Errorf("no user info provided: is this localhost?"),

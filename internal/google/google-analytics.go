@@ -8,13 +8,14 @@ import (
 
 	"github.com/carlmjohnson/errutil"
 	"github.com/carlmjohnson/requests"
+	"github.com/spotlightpa/almanack/pkg/common"
 	"golang.org/x/oauth2"
 	"golang.org/x/oauth2/google"
 )
 
 func (gsvc *Service) GAClient(ctx context.Context) (cl *http.Client, err error) {
 	if len(gsvc.cert) == 0 {
-		gsvc.l.Printf("falling back to default Google credentials")
+		common.Logger.Printf("falling back to default Google credentials")
 		cl, err = google.DefaultClient(ctx, "https://www.googleapis.com/auth/analytics.readonly")
 		return
 	}
@@ -90,7 +91,7 @@ func (gsvc *Service) MostPopularNews(ctx context.Context, cl *http.Client) (page
 			pages = append(pages, page)
 		}
 	}
-	gsvc.l.Printf("got %d most-popular pages", len(pages))
+	common.Logger.Printf("got %d most-popular pages", len(pages))
 	return pages, nil
 }
 

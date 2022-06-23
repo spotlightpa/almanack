@@ -4,16 +4,17 @@ import (
 	"flag"
 
 	"github.com/algolia/algoliasearch-client-go/v3/algolia/search"
+	"github.com/spotlightpa/almanack/pkg/common"
 )
 
-func AddFlags(fl *flag.FlagSet) func(Logger) Indexer {
+func AddFlags(fl *flag.FlagSet) func() Indexer {
 	appID := fl.String("indexer-app-id", "", "`app id` for Algolia")
 	apiKey := fl.String("indexer-api-key", "", "`api key` for Algolia")
 	indexName := fl.String("indexer-index-name", "", "`index` name for Algolia")
-	return func(l Logger) Indexer {
+	return func() Indexer {
 		if *apiKey == "" {
-			l.Printf("using mock indexer")
-			return MockIndexer{l: l}
+			common.Logger.Printf("using mock indexer")
+			return MockIndexer{}
 		}
 
 		client := search.NewClient(*appID, *apiKey)
@@ -22,19 +23,14 @@ func AddFlags(fl *flag.FlagSet) func(Logger) Indexer {
 	}
 }
 
-type Logger interface {
-	Printf(string, ...any)
-}
-
 type Indexer interface {
 	SaveObject(object any, opts ...any) (res search.SaveObjectRes, err error)
 }
 
 type MockIndexer struct {
-	l Logger
 }
 
 func (mi MockIndexer) SaveObject(object any, opts ...any) (res search.SaveObjectRes, err error) {
-	mi.l.Printf("mock indexing")
+	common.Logger.Printf("mock indexing")
 	return
 }

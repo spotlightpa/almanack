@@ -13,17 +13,15 @@ import (
 type requestCache struct {
 	m sync.Map
 	r http.RoundTripper
-	common.Logger
 }
 
-func SetRounderTripper(c *http.Client, l common.Logger) {
+func SetRounderTripper(c *http.Client) {
 	r := c.Transport
 	if r == nil {
 		r = http.DefaultTransport
 	}
 	c.Transport = &requestCache{
-		r:      r,
-		Logger: l,
+		r: r,
 	}
 }
 
@@ -36,7 +34,7 @@ func (rc *requestCache) Get(req *http.Request) (*http.Response, bool) {
 	b := v.([]byte)
 	resp, err := http.ReadResponse(bufio.NewReader(bytes.NewReader(b)), req)
 	if err != nil {
-		rc.Printf("unexpected cache get error: %v", err)
+		common.Logger.Printf("unexpected cache get error: %v", err)
 		return nil, false
 	}
 	return resp, true
@@ -58,10 +56,10 @@ func (rc *requestCache) RoundTrip(req *http.Request) (*http.Response, error) {
 	cacheable := req.Method == http.MethodGet
 	if cacheable {
 		if resp, ok := rc.Get(req); ok {
-			rc.Printf("cache hit for %s", req.URL.String())
+			common.Logger.Printf("cache hit for %s", req.URL.String())
 			return resp, nil
 		}
-		rc.Printf("cache miss for %s", req.URL.String())
+		common.Logger.Printf("cache miss for %s", req.URL.String())
 	}
 	resp, err := rc.r.RoundTrip(req)
 	if err != nil {

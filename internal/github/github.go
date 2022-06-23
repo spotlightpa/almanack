@@ -17,27 +17,26 @@ type ContentStore interface {
 	UpdateFile(ctx context.Context, msg, path string, content []byte) error
 }
 
-func AddFlags(fl *flag.FlagSet) func(l common.Logger) (ContentStore, error) {
+func AddFlags(fl *flag.FlagSet) func() (ContentStore, error) {
 	token := fl.String("github-token", "", "personal access `token` for Github")
 	owner := fl.String("github-owner", "", "owning `organization` for Github repo")
 	repo := fl.String("github-repo", "", "name of Github `repo`")
 	branch := fl.String("github-branch", "", "Github `branch` to use")
 	mock := fl.String("github-mock-path", "", "`path` for mock Github files")
-	return func(l common.Logger) (ContentStore, error) {
+	return func() (ContentStore, error) {
 		if *token == "" || *owner == "" || *repo == "" || *branch == "" {
-			return NewMockClient(*mock, l)
+			return NewMockClient(*mock)
 		}
-		return NewClient(*token, *owner, *repo, *branch, l)
+		return NewClient(*token, *owner, *repo, *branch)
 	}
 }
 
 type Client struct {
 	client              *github.Client
 	owner, repo, branch string
-	l                   common.Logger
 }
 
-func NewClient(token, owner, repo, branch string, l common.Logger) (*Client, error) {
+func NewClient(token, owner, repo, branch string) (*Client, error) {
 	ctx := context.Background()
 	ts := oauth2.StaticTokenSource(
 		&oauth2.Token{AccessToken: token},
@@ -45,7 +44,7 @@ func NewClient(token, owner, repo, branch string, l common.Logger) (*Client, err
 	tc := oauth2.NewClient(ctx, ts)
 
 	client := github.NewClient(tc)
-	cl := &Client{client, owner, repo, branch, l}
+	cl := &Client{client, owner, repo, branch}
 	if err := cl.Ping(ctx); err != nil {
 		return nil, err
 	}
@@ -53,9 +52,7 @@ func NewClient(token, owner, repo, branch string, l common.Logger) (*Client, err
 }
 
 func (cl *Client) printf(format string, v ...any) {
-	if cl.l != nil {
-		cl.l.Printf(format, v...)
-	}
+	common.Logger.Printf(format, v...)
 }
 
 func (cl *Client) CreateFile(ctx context.Context, msg, path string, content []byte) error {

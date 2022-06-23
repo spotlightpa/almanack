@@ -6,11 +6,9 @@ import (
 	"encoding/base64"
 	"flag"
 	"io"
-
-	"github.com/spotlightpa/almanack/pkg/common"
 )
 
-func AddFlags(fl *flag.FlagSet) func(l common.Logger) *Service {
+func AddFlags(fl *flag.FlagSet) func() *Service {
 	var gsvc Service
 	// Using a crazy Base64+GZIP because storing JSON containing \n in
 	//an env var breaks a lot for some reason
@@ -33,15 +31,13 @@ func AddFlags(fl *flag.FlagSet) func(l common.Logger) *Service {
 		})
 	fl.StringVar(&gsvc.viewID, "ga-view-id", "", "view `ID` for Google Analytics")
 	fl.StringVar(&gsvc.driveID, "google-drive-id", "", "`ID` for shared Google Drive")
-	return func(l common.Logger) *Service {
-		gsvc.l = l
+	return func() *Service {
 		return &gsvc
 	}
 }
 
 type Service struct {
 	cert    []byte
-	l       common.Logger
 	viewID  string
 	driveID string
 }
