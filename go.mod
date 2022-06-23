@@ -17,7 +17,7 @@ require (
 	github.com/carlmjohnson/requests v0.22.3
 	github.com/carlmjohnson/resperr v0.22.0
 	github.com/carlmjohnson/slackhook v0.21.2
-	github.com/carlmjohnson/versioninfo v0.22.2
+	github.com/carlmjohnson/versioninfo v0.22.4
 	github.com/gabriel-vasile/mimetype v1.4.0
 	github.com/getsentry/sentry-go v0.13.0
 	github.com/go-chi/chi/v5 v5.0.7
