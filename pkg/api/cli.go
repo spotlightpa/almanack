@@ -12,6 +12,7 @@ import (
 
 	"github.com/carlmjohnson/flagx"
 	"github.com/carlmjohnson/gateway"
+	"github.com/carlmjohnson/versioninfo"
 	"github.com/getsentry/sentry-go"
 	sentryhttp "github.com/getsentry/sentry-go/http"
 
@@ -79,7 +80,7 @@ type appEnv struct {
 }
 
 func (app *appEnv) exec() error {
-	app.Printf("starting %s (%s)", AppName, almanack.BuildVersion)
+	app.Printf("starting %s (%s)", AppName, versioninfo.Short())
 	routes := sentryhttp.
 		New(sentryhttp.Options{
 			WaitForDelivery: true,
