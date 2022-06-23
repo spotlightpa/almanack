@@ -15,8 +15,9 @@ func TestRoles(t *testing.T) {
 	if dbURL == "" {
 		t.Skip("ALMANACK_TEST_DATABASE not set")
 	}
-	q, err := db.Open(dbURL)
+	p, err := db.Open(dbURL)
 	be.NilErr(t, err)
+	q := db.New(p)
 	ctx := context.Background()
 	r, err := q.SetRolesForAddress(ctx, db.SetRolesForAddressParams{
 		EmailAddress: "a@foo.com",

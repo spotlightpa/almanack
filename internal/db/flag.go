@@ -5,23 +5,26 @@ import (
 	"flag"
 	"time"
 
+	"github.com/jackc/pgx/v4"
 	"github.com/jackc/pgx/v4/pgxpool"
 )
 
 // AddFlags adds an option to the specified FlagSet that creates and tests a DB
-func AddFlags(fl *flag.FlagSet, name, usage string) (q *Queries) {
+func AddFlags(fl *flag.FlagSet, name, usage string) (q *Queries, tx *Txable) {
 	q = new(Queries)
+	tx = new(Txable)
 	fl.Func(name, usage, func(dbURL string) error {
-		q2, err := Open(dbURL)
-		if q2 != nil {
-			*q = *q2
+		p, err := Open(dbURL)
+		if p != nil {
+			q.db = logger{p}
+			tx.p = p
 		}
 		return err
 	})
 	return
 }
 
-func Open(dbURL string) (q *Queries, err error) {
+func Open(dbURL string) (p *pgxpool.Pool, err error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 1*time.Second)
 	defer cancel()
 	db, err := pgxpool.Connect(ctx, dbURL)
@@ -33,6 +36,15 @@ func Open(dbURL string) (q *Queries, err error) {
 		return nil, err
 	}
 
-	q = New(Logger(db))
-	return q, nil
+	return db, nil
+}
+
+type Txable struct {
+	p *pgxpool.Pool
+}
+
+func (txable Txable) Begin(ctx context.Context, o pgx.TxOptions, f func(*Queries) error) error {
+	return txable.p.BeginTxFunc(ctx, o, func(tx pgx.Tx) error {
+		return f(New(logger{tx}))
+	})
 }
