@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/carlmjohnson/errutil"
+	"github.com/jackc/pgx/v4"
 	"github.com/spotlightpa/almanack/internal/db"
 	"github.com/spotlightpa/almanack/pkg/common"
 )
@@ -59,34 +60,44 @@ type ScheduledSiteConfig struct {
 	Data        db.Map    `json:"data"`
 }
 
-func (svc Service) UpdateSiteConfig(ctx context.Context, loc string, configs []ScheduledSiteConfig) (dbConfigs []db.SiteDatum, err error) {
-	defer errutil.Trace(&err)
+func (svc Service) UpdateSiteConfig(ctx context.Context, loc string, configs []ScheduledSiteConfig) ([]db.SiteDatum, error) {
+	var dbConfigs []db.SiteDatum
+	err := svc.Tx.Begin(ctx, pgx.TxOptions{}, func(q *db.Queries) (err error) {
+		defer errutil.Trace(&err)
 
-	// TODO: Add transactions
-	// Clear existing future entries before upserting current/future entries
-	if err = svc.Queries.DeleteSiteData(ctx, loc); err != nil {
-		return nil, err
-	}
-	for _, config := range configs {
-		if err = svc.Queries.UpsertSiteData(ctx, db.UpsertSiteDataParams{
-			Key:         loc,
-			Data:        config.Data,
-			ScheduleFor: config.ScheduleFor,
-		}); err != nil {
-			return nil, err
+		// Clear existing future entries before upserting current/future entries
+		if err = q.DeleteSiteData(ctx, loc); err != nil {
+			return err
 		}
-	}
-	dbConfigs, err = svc.Queries.GetSiteData(ctx, loc)
+		for _, config := range configs {
+			if err = q.UpsertSiteData(ctx, db.UpsertSiteDataParams{
+				Key:         loc,
+				Data:        config.Data,
+				ScheduleFor: config.ScheduleFor,
+			}); err != nil {
+				return err
+			}
+		}
+		dbConfigs, err = q.GetSiteData(ctx, loc)
+		if err != nil {
+			return err
+		}
+		if len(dbConfigs) == 0 {
+			return fmt.Errorf("no item is currently scheduled")
+		}
+
+		// GetSiteData must return presorted configs!
+		currentConfig := &dbConfigs[0]
+		if err = svc.PublishSiteConfig(ctx, currentConfig); err != nil {
+			return err
+		}
+
+		return nil
+	})
+
 	if err != nil {
-		return nil, err
+		dbConfigs = nil
 	}
-	if len(dbConfigs) == 0 {
-		return nil, fmt.Errorf("no item is currently scheduled")
-	}
-	// GetSiteData must return presorted configs!
-	currentConfig := &dbConfigs[0]
-	if err = svc.PublishSiteConfig(ctx, currentConfig); err != nil {
-		return nil, err
-	}
-	return dbConfigs, nil
+
+	return
 }
