@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	"github.com/carlmjohnson/errutil"
+	"github.com/jackc/pgx/v4"
 	"github.com/spotlightpa/almanack/internal/db"
 	"github.com/spotlightpa/almanack/internal/slack"
 	"github.com/spotlightpa/almanack/internal/stringx"
@@ -12,7 +13,7 @@ import (
 	"github.com/spotlightpa/almanack/pkg/common"
 )
 
-func (svc Service) PublishPage(ctx context.Context, page *db.Page) (err, warning error) {
+func (svc Service) PublishPage(ctx context.Context, q *db.Queries, page *db.Page) (err, warning error) {
 	defer errutil.Prefix(&err, "Service.PublishPage(%d)", page.ID)
 
 	page.SetURLPath()
@@ -34,7 +35,7 @@ func (svc Service) PublishPage(ctx context.Context, page *db.Page) (err, warning
 		return
 	}
 
-	p2, err := svc.Queries.UpdatePage(ctx, db.UpdatePageParams{
+	p2, err := q.UpdatePage(ctx, db.UpdatePageParams{
 		FilePath:         page.FilePath,
 		URLPath:          page.URLPath.String,
 		SetLastPublished: true,
@@ -67,20 +68,23 @@ func (svc Service) RefreshPageFromContentStore(ctx context.Context, page *db.Pag
 }
 
 func (svc Service) PopScheduledPages(ctx context.Context) (err, warning error) {
-	defer errutil.Trace(&err)
+	var warnings errutil.Slice
+	err = svc.Tx.Begin(ctx, pgx.TxOptions{}, func(q *db.Queries) (txerr error) {
+		defer errutil.Trace(&txerr)
 
-	pages, err := svc.Queries.PopScheduledPages(ctx)
-	if err != nil {
-		return
-	}
-
-	var errs, warnings errutil.Slice
-	for _, page := range pages {
-		err, warning = svc.PublishPage(ctx, &page)
-		errs.Push(err)
-		warnings.Push(warning)
-	}
-	return errs.Merge(), warnings.Merge()
+		pages, txerr := q.PopScheduledPages(ctx)
+		if txerr != nil {
+			return
+		}
+		var errs errutil.Slice
+		for _, page := range pages {
+			txerr, warning = svc.PublishPage(ctx, q, &page)
+			errs.Push(txerr)
+			warnings.Push(warning)
+		}
+		return errs.Merge()
+	})
+	return err, warnings.Merge()
 }
 
 func (svc Service) RefreshPageContents(ctx context.Context, id int64) (err error) {

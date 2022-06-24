@@ -594,7 +594,7 @@ func (app *appEnv) postPage(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 	if shouldPublish {
-		err, warning := app.svc.PublishPage(r.Context(), &res)
+		err, warning := app.svc.PublishPage(r.Context(), app.svc.Queries, &res)
 		if warning != nil {
 			app.logErr(r.Context(), warning)
 		}
