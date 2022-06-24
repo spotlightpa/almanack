@@ -12,31 +12,32 @@ import (
 	"github.com/spotlightpa/almanack/pkg/common"
 )
 
-func (svc Service) PopScheduledSiteChanges(ctx context.Context, loc string) (err error) {
-	defer errutil.Trace(&err)
+func (svc Service) PopScheduledSiteChanges(ctx context.Context, loc string) error {
+	err := svc.Tx.Begin(ctx, pgx.TxOptions{}, func(q *db.Queries) (txerr error) {
+		defer errutil.Trace(&txerr)
 
-	configs, err := svc.Queries.PopScheduledSiteChanges(ctx, loc)
+		configs, txerr := q.PopScheduledSiteChanges(ctx, loc)
+		if txerr != nil {
+			return txerr
+		}
+
+		var currentConfig *db.SiteDatum
+		for _, config := range configs {
+			if currentConfig == nil || config.ScheduleFor.After(currentConfig.ScheduleFor) {
+				currentConfig = &config
+			}
+		}
+		if currentConfig == nil {
+			common.Logger.Printf("site data: no changes to %s", loc)
+			return nil
+		}
+		common.Logger.Printf("site data: updating %s", loc)
+
+		return svc.PublishSiteConfig(ctx, currentConfig)
+	})
 	if err != nil {
 		return err
 	}
-
-	var currentConfig *db.SiteDatum
-	for _, config := range configs {
-		if currentConfig == nil || config.ScheduleFor.After(currentConfig.ScheduleFor) {
-			currentConfig = &config
-		}
-	}
-	if currentConfig == nil {
-		common.Logger.Printf("site data: no changes to %s", loc)
-		return nil
-	}
-	common.Logger.Printf("site data: updating %s", loc)
-
-	// TODO: rollback
-	if err = svc.PublishSiteConfig(ctx, currentConfig); err != nil {
-		return err
-	}
-
 	return svc.Queries.CleanSiteData(ctx, loc)
 }
 
@@ -62,25 +63,25 @@ type ScheduledSiteConfig struct {
 
 func (svc Service) UpdateSiteConfig(ctx context.Context, loc string, configs []ScheduledSiteConfig) ([]db.SiteDatum, error) {
 	var dbConfigs []db.SiteDatum
-	err := svc.Tx.Begin(ctx, pgx.TxOptions{}, func(q *db.Queries) (err error) {
-		defer errutil.Trace(&err)
+	err := svc.Tx.Begin(ctx, pgx.TxOptions{}, func(q *db.Queries) (txerr error) {
+		defer errutil.Trace(&txerr)
 
 		// Clear existing future entries before upserting current/future entries
-		if err = q.DeleteSiteData(ctx, loc); err != nil {
-			return err
+		if txerr = q.DeleteSiteData(ctx, loc); txerr != nil {
+			return txerr
 		}
 		for _, config := range configs {
-			if err = q.UpsertSiteData(ctx, db.UpsertSiteDataParams{
+			if txerr = q.UpsertSiteData(ctx, db.UpsertSiteDataParams{
 				Key:         loc,
 				Data:        config.Data,
 				ScheduleFor: config.ScheduleFor,
-			}); err != nil {
-				return err
+			}); txerr != nil {
+				return txerr
 			}
 		}
-		dbConfigs, err = q.GetSiteData(ctx, loc)
-		if err != nil {
-			return err
+		dbConfigs, txerr = q.GetSiteData(ctx, loc)
+		if txerr != nil {
+			return txerr
 		}
 		if len(dbConfigs) == 0 {
 			return fmt.Errorf("no item is currently scheduled")
@@ -88,16 +89,15 @@ func (svc Service) UpdateSiteConfig(ctx context.Context, loc string, configs []S
 
 		// GetSiteData must return presorted configs!
 		currentConfig := &dbConfigs[0]
-		if err = svc.PublishSiteConfig(ctx, currentConfig); err != nil {
-			return err
+		if txerr = svc.PublishSiteConfig(ctx, currentConfig); txerr != nil {
+			return txerr
 		}
 
 		return nil
 	})
-
 	if err != nil {
-		dbConfigs = nil
+		return nil, err
 	}
 
-	return
+	return dbConfigs, nil
 }
