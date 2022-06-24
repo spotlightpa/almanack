@@ -7,6 +7,7 @@ import (
 
 	"github.com/jackc/pgx/v4"
 	"github.com/jackc/pgx/v4/pgxpool"
+	"github.com/spotlightpa/almanack/pkg/common"
 )
 
 // AddFlags adds an option to the specified FlagSet that creates and tests a DB
@@ -31,10 +32,13 @@ func Open(dbURL string) (p *pgxpool.Pool, err error) {
 	if err != nil {
 		return nil, err
 	}
-
-	if err := db.Ping(ctx); err != nil {
-		return nil, err
-	}
+	go func() {
+		ctx2, cancel := context.WithTimeout(context.Background(), 1*time.Second)
+		defer cancel()
+		if err := db.Ping(ctx2); err != nil {
+			common.Logger.Printf("error in initial ping database: %v", err)
+		}
+	}()
 
 	return db, nil
 }
