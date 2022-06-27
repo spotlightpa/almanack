@@ -90,7 +90,6 @@ export default {
         <button
           class="button is-primary has-text-weight-semibold"
           type="button"
-          :disabled="!isDev"
           @click="convert('statecollege')"
         >
           Convert as a State College article
