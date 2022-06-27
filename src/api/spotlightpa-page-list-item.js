@@ -1,9 +1,9 @@
 import { computed } from "@vue/composition-api";
 
 export default class PageListItem {
-  static from(apiState) {
+  static from(rawData) {
     return computed(() => {
-      let pages = apiState.rawData?.pages;
+      let pages = rawData.value?.pages;
       if (!pages) return [];
       return pages.map((page) => new PageListItem(page));
     });
@@ -39,5 +39,22 @@ export default class PageListItem {
       return "pub";
     }
     return this.scheduleFor ? "sked" : "none";
+  }
+
+  get link() {
+    if (this.filePath.match(/newsletters/)) {
+      return {
+        name: "newsletter-page",
+        params: {
+          id: "" + this.id,
+        },
+      };
+    }
+    return {
+      name: "news-page",
+      params: {
+        id: "" + this.id,
+      },
+    };
   }
 }
