@@ -20,6 +20,12 @@ export default {
     const pageData = usePage(id);
 
     return {
+      parentPage: computed(() => {
+        if (!pageData.page.value) {
+          return { name: "Spotlight PA Pages", to: { name: "news-pages" } };
+        }
+        return pageData.page.value.parentPage;
+      }),
       ...pageData,
       formatDateTime,
       title: computed(() => {
@@ -38,7 +44,7 @@ export default {
     <BulmaBreadcrumbs
       :links="[
         { name: 'Admin', to: { name: 'admin' } },
-        { name: 'Spotlight PA Pages', to: { name: 'news-pages' } },
+        parentPage,
         { name: title, to: { name: 'news-page', params: { id } } },
       ]"
     />
