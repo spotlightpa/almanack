@@ -18,6 +18,7 @@ import ViewNewsletterPage from "./components/ViewNewsletterPage.vue";
 import ViewNewsPage from "./components/ViewNewsPage.vue";
 import ViewNewsPagesList from "./components/ViewNewsPagesList.vue";
 import ViewRedirectArcToNewsPage from "./components/ViewRedirectArcToNewsPage.vue";
+import ViewStateCollegeList from "./components/ViewStateCollegeList.vue";
 import ViewSharedList from "./components/ViewSharedList.vue";
 import ViewSidebarItems from "./components/ViewSidebarItems.vue";
 import ViewSiteParams from "./components/ViewSiteParams.vue";
@@ -133,6 +134,15 @@ let router = new Router({
       path: "/admin/news",
       name: "news-pages",
       component: ViewNewsPagesList,
+      props: (route) => ({ page: route.query.page }),
+      meta: {
+        requiresAuth: isSpotlightPAUser,
+      },
+    },
+    {
+      path: "/admin/statecollege",
+      name: "statecollege-pages",
+      component: ViewStateCollegeList,
       props: (route) => ({ page: route.query.page }),
       meta: {
         requiresAuth: isSpotlightPAUser,
