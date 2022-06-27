@@ -100,6 +100,13 @@ export default {
         :icon="['fa', 'file-upload']"
       />
     </LinkButtons>
+    <LinkButtons label="State College">
+      <LinkButton
+        label="Pages"
+        to="statecollege-pages"
+        :icon="['fas', 'file-signature']"
+      />
+    </LinkButtons>
 
     <details class="content">
       <summary>Tools</summary>
