@@ -34,8 +34,7 @@ const endpoints = {
   // list page points
   listAnyArc: (page = "0") => `/api/list-any-arc/${page}`,
   listAvailableArc: (page = "0") => `/api/list-available/${page}`,
-  listNewsletterPages: (page = "0") => `/api/newsletter-pages/${page}`,
-  listNewsPages: (page = "0") => `/api/news-pages/${page}`,
+
   // GET and POST listed as two endpoints
   listAllPages: `/api/all-pages`,
   listAllSeries: `/api/all-series`,
@@ -57,6 +56,7 @@ const endpoints = {
   getSignupURL: `/api/mailchimp-signup-url`,
   sendMessage: `/api/message`,
   postPage: `/api/page`,
+  listPages: `/api/pages`,
   getPageByFilePath: `/api/page-by-file-path`,
   getPageForArcID: `/api/page-for-arc-id`,
   postPageForArcID: `/api/page-for-arc-id`,
@@ -180,8 +180,6 @@ function makeClient($auth) {
     "getPageWithContent",
     "listAnyArc",
     "listAvailableArc",
-    "listNewsletterPages",
-    "listNewsPages",
   ];
   for (let action of idGetActions) {
     let endpointFn = endpoints[action];
@@ -207,6 +205,7 @@ function makeClient($auth) {
     "listFiles",
     "listImages",
     "listRefreshArc",
+    "listPages",
   ];
   for (let action of simpleGetActions) {
     let endpoint = endpoints[action];

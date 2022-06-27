@@ -480,7 +480,18 @@ func (app *appEnv) postFileUpdate(w http.ResponseWriter, r *http.Request) {
 	app.replyJSON(http.StatusOK, w, &res)
 }
 
-func (app *appEnv) listPages(w http.ResponseWriter, r *http.Request, page int32, prefix string) {
+func (app *appEnv) listPages(w http.ResponseWriter, r *http.Request) {
+	app.Printf("start listPages")
+
+	var page int32
+	_ = intFromQuery(r, "page", &page)
+	if page < 0 {
+		app.replyErr(w, r, resperr.WithUserMessage(nil, "Invalid page"))
+		return
+	}
+
+	prefix := r.URL.Query().Get("path")
+
 	var (
 		resp struct {
 			Pages    []db.ListPagesRow `json:"pages"`
@@ -502,21 +513,6 @@ func (app *appEnv) listPages(w http.ResponseWriter, r *http.Request, page int32,
 		return
 	}
 	app.replyJSON(http.StatusOK, w, &resp)
-}
-
-func (app *appEnv) listNewsPages(w http.ResponseWriter, r *http.Request) {
-	var page int32
-	mustIntParam(r, "page", &page)
-
-	app.Printf("start listNewsPages page %d", page)
-	app.listPages(w, r, page, "content/news/")
-}
-
-func (app *appEnv) listNewsletterPages(w http.ResponseWriter, r *http.Request) {
-	var page int32
-	mustIntParam(r, "page", &page)
-	app.Printf("start listNewsletterPages page %d", page)
-	app.listPages(w, r, page, "content/newsletters/")
 }
 
 func (app *appEnv) getPage(w http.ResponseWriter, r *http.Request) {
