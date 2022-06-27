@@ -54,7 +54,7 @@ export default {
       </table>
     </div>
     <p>
-      <router-link :to="{ name: 'uploader' }" target="_blank">
+      <router-link :to="{ name: 'image-uploader' }" target="_blank">
         Manage photos
       </router-link>
     </p>
