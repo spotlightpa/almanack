@@ -102,7 +102,7 @@ export default {
     </LinkButtons>
     <LinkButtons label="State College">
       <LinkButton
-        label="Pages"
+        label="Articles"
         to="statecollege-pages"
         :icon="['fas', 'file-signature']"
       />

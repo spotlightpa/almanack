@@ -8,7 +8,7 @@ import PageListItem from "@/api/spotlightpa-page-list-item.js";
 export default {
   props: { page: { default: "" } },
   metaInfo: {
-    title: "State College Pages",
+    title: "State College Articles",
   },
   setup(props) {
     let { listPages } = useClient();
@@ -44,7 +44,7 @@ export default {
 
 <template>
   <PageList
-    title="State College Pages"
+    title="State College Articles"
     :page="page"
     :next-page="nextPage"
     :api-state="apiStateRefs"
