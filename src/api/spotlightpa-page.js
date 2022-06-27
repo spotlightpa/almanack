@@ -121,6 +121,16 @@ export class Page {
     return this.topics[0] || "";
   }
 
+  get parentPage() {
+    if (this.filePath.match(/content\/statecollege/)) {
+      return {
+        name: "State College Pages",
+        to: { name: "statecollege-pages" },
+      };
+    }
+    return { name: "Spotlight PA Pages", to: { name: "news-pages" } };
+  }
+
   toJSON() {
     return {
       file_path: this.filePath,
