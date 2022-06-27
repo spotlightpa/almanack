@@ -6,15 +6,20 @@ import { useClient } from "@/api/client.js";
 import PageListItem from "@/api/spotlightpa-page-list-item.js";
 
 export default {
-  props: ["page"],
+  props: { page: { default: "" } },
   metaInfo: {
     title: "Newsletter Pages",
   },
   setup(props) {
-    let { listNewsletterPages } = useClient();
+    let { listPages } = useClient();
     let { apiStateRefs, exec } = makeState();
     const { rawData } = apiStateRefs;
-    const fetch = (page) => exec(() => listNewsletterPages(page));
+    const fetch = () =>
+      exec(() =>
+        listPages({
+          params: { path: "content/newsletters/", page: props.page },
+        })
+      );
     watch(() => props.page, fetch, {
       immediate: true,
     });
