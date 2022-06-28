@@ -128,16 +128,6 @@ export default class ArcArticle {
     return this._almanackStatus >= STATUS_AVAILABLE;
   }
 
-  get pubURL() {
-    let slug = this.pubslug();
-    if (!slug) {
-      return "";
-    }
-    let date = new Date(this.plannedDate);
-    let year = date.getFullYear();
-    let month = (date.getMonth() + 1).toString().padStart(2, "0");
-    return `https://www.spotlightpa.org/news/${year}/${month}/${slug}/`;
-  }
   get arcURL() {
     return `https://pmn.arcpublishing.com/composer/edit/${this.id}/`;
   }
