@@ -219,12 +219,20 @@ func (page *Page) ShouldPublish() bool {
 	return isScheduled && page.ScheduleFor.Time.Before(soon)
 }
 
+func (page *Page) IsNewsyPage() bool {
+	return page.IsNewsPage() || page.IsStateCollegePage()
+}
+
 func (page *Page) IsNewsPage() bool {
 	return strings.HasPrefix(page.FilePath, "content/news/")
 }
 
+func (page *Page) IsStateCollegePage() bool {
+	return strings.HasPrefix(page.FilePath, "content/statecollege/")
+}
+
 func (page *Page) ShouldNotify(oldPage *Page) bool {
-	if !page.IsNewsPage() || !IsPresent(page.ScheduleFor) {
+	if !page.IsNewsyPage() || !IsPresent(page.ScheduleFor) {
 		return false
 	}
 	if page.ShouldPublish() {

@@ -187,6 +187,15 @@ func TestShouldPublishShouldNotify(t *testing.T) {
 			pub:    false,
 			notify: true,
 		},
+		"scheduled-statecollege": {
+			old: db.Page{
+				FilePath: "content/statecollege/whatever.md"},
+			new: db.Page{
+				FilePath:    "content/statecollege/whatever.md",
+				ScheduleFor: future},
+			pub:    false,
+			notify: true,
+		},
 		"rescheduled-news": {
 			old: db.Page{
 				FilePath:    "content/news/whatever.md",
@@ -202,6 +211,15 @@ func TestShouldPublishShouldNotify(t *testing.T) {
 				FilePath: "content/news/whatever.md"},
 			new: db.Page{
 				FilePath:    "content/news/whatever.md",
+				ScheduleFor: past},
+			pub:    true,
+			notify: true,
+		},
+		"pub-statecollege": {
+			old: db.Page{
+				FilePath: "content/statecollege/whatever.md"},
+			new: db.Page{
+				FilePath:    "content/statecollege/whatever.md",
 				ScheduleFor: past},
 			pub:    true,
 			notify: true,
