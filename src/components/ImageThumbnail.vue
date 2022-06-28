@@ -24,8 +24,15 @@ export default {
 
 <template>
   <figure>
-    <div class="image max-256 has-background-grey-lighter has-margin-bottom">
-      <a :href="url" target="_blank" download><img :src="url" /></a>
+    <div class="has-margin-bottom">
+      <a
+        :href="url"
+        class="is-inline-flex max-256 has-background-grey-lighter"
+        target="_blank"
+        download
+      >
+        <img class="max-256" :src="url" />
+      </a>
     </div>
     <figcaption>
       <p class="has-margin-bottom">
@@ -55,6 +62,8 @@ export default {
 
 <style scoped>
 .max-256 {
+  width: auto;
+  height: auto;
   max-height: 256px;
   max-width: 256px;
   min-height: 1rem;
