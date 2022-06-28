@@ -5,7 +5,9 @@ export default {
       type: String,
       required: true,
     },
-    page: {},
+    page: {
+      type: String,
+    },
     nextPage: {
       type: Object,
     },
