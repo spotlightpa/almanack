@@ -21,7 +21,7 @@ func (app *appEnv) listAllArcStories(w http.ResponseWriter, r *http.Request) {
 	var (
 		resp struct {
 			Contents []almanack.ArcStory `json:"contents"`
-			NextPage int32               `json:"next_page,omitempty"`
+			NextPage int32               `json:"next_page,string,omitempty"`
 		}
 		err error
 	)
@@ -37,7 +37,7 @@ func (app *appEnv) listWithArcRefresh(w http.ResponseWriter, r *http.Request) {
 	app.Printf("starting listWithArcRefresh")
 	type response struct {
 		Contents []almanack.ArcStory `json:"contents"`
-		NextPage int32               `json:"next_page,omitempty"`
+		NextPage int32               `json:"next_page,string,omitempty"`
 	}
 	var (
 		feed *arc.API
@@ -352,7 +352,7 @@ func (app *appEnv) listImages(w http.ResponseWriter, r *http.Request) {
 
 	app.replyJSON(http.StatusOK, w, struct {
 		Images   []db.Image `json:"images"`
-		NextPage int32      `json:"next_page,omitempty"`
+		NextPage int32      `json:"next_page,string,omitempty"`
 	}{
 		Images:   images,
 		NextPage: pager.NextPage,
@@ -409,7 +409,7 @@ func (app *appEnv) listFiles(w http.ResponseWriter, r *http.Request) {
 
 	app.replyJSON(http.StatusOK, w, struct {
 		Files    []db.File `json:"files"`
-		NextPage int32     `json:"next_page,omitempty"`
+		NextPage int32     `json:"next_page,string,omitempty"`
 	}{
 		Files:    files,
 		NextPage: pager.NextPage,
@@ -495,7 +495,7 @@ func (app *appEnv) listPages(w http.ResponseWriter, r *http.Request) {
 	var (
 		resp struct {
 			Pages    []db.ListPagesRow `json:"pages"`
-			NextPage int32             `json:"next_page,omitempty"`
+			NextPage int32             `json:"next_page,string,omitempty"`
 		}
 		err error
 	)
