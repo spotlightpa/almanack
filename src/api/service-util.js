@@ -1,4 +1,4 @@
-import { reactive, toRefs } from "@vue/composition-api";
+import { computed, reactive, toRefs, watch } from "@vue/composition-api";
 
 import { useThrottleToggle } from "@/utils/throttle.js";
 
@@ -30,6 +30,21 @@ export function makeState() {
         apiState.rawData = data;
         apiState.didLoad = true;
       }
+    },
+  };
+}
+
+export function watchAPI(watchCb, fetcher) {
+  const { exec, apiStateRefs } = makeState();
+  const fetch = (newVal) => exec(() => fetcher(newVal));
+
+  watch(watchCb, fetch, { immediate: true });
+
+  return {
+    apiState: apiStateRefs,
+    fetch,
+    computer(cb) {
+      return computed(() => cb(apiStateRefs.rawData.value));
     },
   };
 }
