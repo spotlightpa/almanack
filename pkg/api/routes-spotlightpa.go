@@ -3,6 +3,7 @@ package api
 import (
 	"fmt"
 	"net/http"
+	"strings"
 
 	"github.com/carlmjohnson/emailx"
 	"github.com/carlmjohnson/errutil"
@@ -543,6 +544,29 @@ func (app *appEnv) getPageByFilePath(w http.ResponseWriter, r *http.Request) {
 		page.Body = ""
 	}
 	app.replyJSON(http.StatusOK, w, page)
+}
+
+func (app *appEnv) getPageByURLPath(w http.ResponseWriter, r *http.Request) {
+	q := r.URL.Query()
+	path := q.Get("path")
+	app.Printf("starting getPageByURLPath for %q", path)
+	var v resperr.Validator
+	v.AddIf("path", strings.Contains(path, "%"), "Contains forbidden character.")
+	if err := v.Err(); err != nil {
+		app.replyErr(w, r, err)
+		return
+	}
+	page, err := app.svc.Queries.GetPageByURLPath(r.Context(), path)
+	if err != nil {
+		err = db.NoRowsAs404(err, "could not find page %q", path)
+		app.replyErr(w, r, err)
+		return
+	}
+	if slices.Contains(q["select"], "-body") {
+		page.Body = ""
+	}
+	app.replyJSON(http.StatusOK, w, page)
+
 }
 
 func (app *appEnv) getPageWithContent(w http.ResponseWriter, r *http.Request) {
