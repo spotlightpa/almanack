@@ -1,5 +1,5 @@
 <script>
-import { computed, toRefs } from "@vue/composition-api";
+import { computed, watch } from "@vue/composition-api";
 import { useClient, makeState } from "@/api/hooks.js";
 import { Page } from "@/api/spotlightpa-page.js";
 
@@ -9,19 +9,24 @@ export default {
   props: { item: Object, pos: Number, length: Number },
   setup(props) {
     let { getPageByFilePath } = useClient();
-    let { apiState, exec } = makeState();
+    let { apiStateRefs, exec } = makeState();
+    const { rawData } = apiStateRefs;
 
-    async function load() {
-      let params = { path: props.item.page, select: "-body" };
+    async function load(path) {
+      let params = { path, select: "-body" };
       return await exec(() => getPageByFilePath({ params }));
     }
     const page = computed(() =>
-      apiState.rawData ? new Page(apiState.rawData) : null
+      rawData.value ? new Page(rawData.value) : null
     );
-    load();
+    watch(
+      () => props.item,
+      (item) => load(item.page),
+      { immediate: true }
+    );
 
     return {
-      ...toRefs(apiState),
+      ...apiStateRefs,
       page,
 
       ...useData(() => props.item, {
@@ -37,7 +42,9 @@ export default {
 
 <template>
   <div>
-    <h3 class="title is-4">#{{ pos + 1 }} {{ page.internalID || "" }}</h3>
+    <h3 class="title is-4">
+      #{{ pos + 1 }} {{ (page && page.internalID) || "" }}
+    </h3>
     <details open>
       <summary>Settings</summary>
 
