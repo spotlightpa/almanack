@@ -53,7 +53,7 @@ func (gsvc *Service) MostPopularNews(ctx context.Context, cl *http.Client) (page
 				FieldName: "ga:uniquePageviews",
 				SortOrder: "DESCENDING",
 			}},
-			FiltersExpression: `ga:pagePath=~^/news/\d\d\d\d`,
+			FiltersExpression: `ga:pagePath=~^/(news|statecollege)/\d\d\d\d`,
 			PageSize:          20,
 		}},
 	}
