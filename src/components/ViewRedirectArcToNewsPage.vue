@@ -1,5 +1,5 @@
 <script>
-import { ref, toRefs, watch } from "@vue/composition-api";
+import { ref, watch } from "@vue/composition-api";
 import { makeState } from "@/api/service-util.js";
 import { useClient } from "@/api/client.js";
 
@@ -16,13 +16,13 @@ export default {
   setup(props, { root }) {
     const needsCreation = ref(false);
 
-    const isLoading = ref(false);
+    const isLoadingDebounced = ref(false);
     window.setTimeout(() => {
-      isLoading.value = true;
+      isLoadingDebounced.value = true;
     }, 500);
 
     const { getPageForArcID, postPageForArcID } = useClient();
-    const { apiState, exec } = makeState();
+    const { apiStateRefs, exec } = makeState();
 
     const fetch = (id) =>
       exec(() => getPageForArcID({ params: { arc_id: id } }));
@@ -31,31 +31,25 @@ export default {
       immediate: true,
     });
 
-    watch(
-      () => apiState.rawData,
-      (id) => {
-        if (!id) {
-          needsCreation.value = true;
-          return;
-        }
-        root.$router.replace({
-          name: "news-page",
-          params: {
-            id: "" + id,
-          },
-        });
+    watch(apiStateRefs.rawData, (id) => {
+      if (!id) {
+        needsCreation.value = true;
+        return;
       }
-    );
-
-    const { error } = toRefs(apiState);
+      root.$router.replace({
+        name: "news-page",
+        params: {
+          id: "" + id,
+        },
+      });
+    });
 
     return {
+      ...apiStateRefs,
+      isLoadingDebounced,
       isDev: window.location.href.match(/localhost/),
       needsCreation,
-      apiState,
       fetch,
-      error,
-      isLoading,
 
       convert(pagekind) {
         exec(() => postPageForArcID({ arc_id: props.id, page_kind: pagekind }));
@@ -96,7 +90,7 @@ export default {
         </button>
       </div>
     </div>
-    <SpinnerProgress :is-loading="isLoading && apiState.isLoading" />
+    <SpinnerProgress :is-loading="isLoadingDebounced && isLoading" />
     <ErrorReloader :error="error" @reload="fetch(id)" />
   </div>
 </template>
