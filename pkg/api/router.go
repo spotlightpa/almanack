@@ -59,6 +59,7 @@ func (app *appEnv) routes() http.Handler {
 			r.Get(`/page/{id:\d+}`, app.getPage)
 			r.Get(`/pages`, app.listPages)
 			r.Get(`/page-by-file-path`, app.getPageByFilePath)
+			r.Get(`/page-by-url-path`, app.getPageByURLPath)
 			r.Get(`/page-for-arc-id`, app.getPageForArcID)
 			r.Post(`/page-for-arc-id`, app.postPageForArcID)
 			r.Get(`/page-with-content/{id:\d+}`, app.getPageWithContent)

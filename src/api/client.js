@@ -58,6 +58,7 @@ const endpoints = {
   postPage: `/api/page`,
   listPages: `/api/pages`,
   getPageByFilePath: `/api/page-by-file-path`,
+  getPageByURLPath: `/api/page-by-url-path`,
   getPageForArcID: `/api/page-for-arc-id`,
   postPageForArcID: `/api/page-for-arc-id`,
   getSidebar: `/api/sidebar`,
@@ -193,6 +194,7 @@ function makeClient($auth) {
 
   let simpleGetActions = [
     "getEditorsPicks",
+    "getPageByURLPath",
     "getPageByFilePath",
     "getPageForArcID",
     "getSidebar",

@@ -44,6 +44,7 @@ export default {
       {{ title }}
       <template v-if="page">(overflow page {{ page }})</template>
     </h1>
+    <PageLookup />
     <APILoader :is-loading="isLoading" :reload="reload" :error="error">
       <table class="table is-striped is-narrow is-fullwidth">
         <tbody>
