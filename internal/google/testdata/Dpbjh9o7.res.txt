@@ -1,7 +1,8 @@
 HTTP/2.0 200 OK
+Alt-Svc: h3=":443"; ma=2592000,h3-29=":443"; ma=2592000,h3-Q050=":443"; ma=2592000,h3-Q046=":443"; ma=2592000,h3-Q043=":443"; ma=2592000,quic=":443"; ma=2592000; v="46,43"
 Cache-Control: private
 Content-Type: application/json; charset=UTF-8
-Date: Fri, 06 Aug 2021 17:44:12 GMT
+Date: Wed, 29 Jun 2022 00:33:35 GMT
 Server: ESF
 Vary: Origin
 Vary: X-Origin
@@ -30,240 +31,240 @@ X-Xss-Protection: 0
         "rows": [
           {
             "dimensions": [
-              "/news/2021/08/margo-davidson-theft-charges-per-diems-reimbursements/"
+              "/news/2022/06/pa-stimulus-money-budget-spending/"
             ],
             "metrics": [
               {
                 "values": [
-                  "742"
+                  "1429"
                 ]
               }
             ]
           },
           {
             "dimensions": [
-              "/news/2020/03/pa-coronavirus-updates-cases-map-live-tracker/"
+              "/statecollege/2022/06/pfas-chemicals-drinking-water-benner-township-contamination/"
             ],
             "metrics": [
               {
                 "values": [
-                  "637"
+                  "381"
                 ]
               }
             ]
           },
           {
             "dimensions": [
-              "/news/2021/07/pa-2022-senate-race-candidates/"
+              "/news/2022/06/roe-v-wade-supreme-court-overturn-pennsylvania/"
             ],
             "metrics": [
               {
                 "values": [
-                  "263"
+                  "363"
                 ]
               }
             ]
           },
           {
             "dimensions": [
-              "/news/2021/08/pa-eviction-rent-relief-bucks-county-order/"
+              "/news/2022/06/pa-state-police-department-count-discrepancy/"
             ],
             "metrics": [
               {
                 "values": [
-                  "153"
+                  "204"
                 ]
               }
             ]
           },
           {
             "dimensions": [
-              "/news/2021/08/pa-opioid-addiction-medical-marijuana-research/"
+              "/news/2022/06/pennsylvania-doug-mastriano-voter-roll-clean/"
             ],
             "metrics": [
               {
                 "values": [
-                  "122"
+                  "150"
                 ]
               }
             ]
           },
           {
             "dimensions": [
-              "/news/2021/06/pa-2020-governor-race-candidates/"
+              "/news/2021/11/election-results-2021-pennsylvania-supreme-court-candidates/"
             ],
             "metrics": [
               {
                 "values": [
-                  "66"
+                  "131"
                 ]
               }
             ]
           },
           {
             "dimensions": [
-              "/news/2021/08/addiction-treatment-cannabis-pennsylvania-federal-rules-roll-back/"
+              "/news/2022/04/pa-primary-governor-election-2022-candidates-guide/"
             ],
             "metrics": [
               {
                 "values": [
-                  "63"
+                  "95"
                 ]
               }
             ]
           },
           {
             "dimensions": [
-              "/news/2020/08/pa-campaign-dark-money-growth-opportunity-fund-jake-corman-gop/"
+              "/news/2022/06/pa-nursing-home-staffing-proposal-91-million-wolf/"
             ],
             "metrics": [
               {
                 "values": [
-                  "43"
+                  "81"
                 ]
               }
             ]
           },
           {
             "dimensions": [
-              "/news/2021/07/pa-department-of-labor-unemployment-claims-overpayment-interest/"
+              "/news/2022/05/pa-primary-2022-governor-election-results/"
             ],
             "metrics": [
               {
                 "values": [
-                  "43"
+                  "73"
                 ]
               }
             ]
           },
           {
             "dimensions": [
-              "/news/2021/06/pa-medical-marijuana-insurance-drug-treatment-confusion/"
+              "/news/2021/12/pennsylvania-redistricting-house-senate-districts-lookup-tool/"
             ],
             "metrics": [
               {
                 "values": [
-                  "29"
+                  "55"
                 ]
               }
             ]
           },
           {
             "dimensions": [
-              "/news/2021/05/pa-bedford-county-civil-rights-shooting-black-lives-matter-charges/"
+              "/news/2022/06/pennsylvania-delta-8-legal-medical-marijuana-cannabis/"
             ],
             "metrics": [
               {
                 "values": [
-                  "28"
+                  "53"
                 ]
               }
             ]
           },
           {
             "dimensions": [
-              "/news/2021/07/margo-davidson-theft-charges-pa-attorney-general/"
+              "/news/2021/09/pa-psers-teacher-pension-fund-sec-subpoena-wall-street/"
             ],
             "metrics": [
               {
                 "values": [
-                  "24"
+                  "50"
                 ]
               }
             ]
           },
           {
             "dimensions": [
-              "/news/2021/04/pennsylvania-marijuana-legalization-chances-new-york-new-jersey-virginia-legislature/"
+              "/news/2022/01/pennsylvania-mail-voting-unconstitutional-supreme-court-appeal/"
             ],
             "metrics": [
               {
                 "values": [
-                  "23"
+                  "46"
                 ]
               }
             ]
           },
           {
             "dimensions": [
-              "/news/2021/06/pa-coronavirus-disaster-declaration-terminated-legislature/"
+              "/news/2022/05/pa-primary-2022-billionaire-donations-jeff-yass/"
             ],
             "metrics": [
               {
                 "values": [
-                  "10"
+                  "38"
                 ]
               }
             ]
           },
           {
             "dimensions": [
-              "/news/2021/07/eviction-ban-expires-pa-rental-assistance-delayed/"
+              "/news/2022/04/pa-election-day-2022-primary-closed-independent-voters/"
             ],
             "metrics": [
               {
                 "values": [
-                  "10"
+                  "36"
                 ]
               }
             ]
           },
           {
             "dimensions": [
-              "/news/2021/07/pa-emergency-contracts-coronavirus-by-the-numbers/"
+              "/news/2022/06/pennsylvania-police-hiring-misconduct-database/"
             ],
             "metrics": [
               {
                 "values": [
-                  "10"
+                  "34"
                 ]
               }
             ]
           },
           {
             "dimensions": [
-              "/news/2020/11/pa-eviction-cdc-ban-loophole-renters-despair/"
+              "/news/2022/04/pennsylvania-skill-games-what-are-they/"
             ],
             "metrics": [
               {
                 "values": [
-                  "7"
+                  "32"
                 ]
               }
             ]
           },
           {
             "dimensions": [
-              "/news/2020/12/rent-relief-pennsylvania-rrp-cares-act-eviction-mortgage-budget-doc/"
+              "/news/2022/06/uvalde-shooting-pennsylvania-gun-laws/"
             ],
             "metrics": [
               {
                 "values": [
-                  "7"
+                  "32"
                 ]
               }
             ]
           },
           {
             "dimensions": [
-              "/news/2021/06/pa-unemployment-new-system-errors-issues/"
+              "/news/2022/05/pa-primary-2022-last-minute-guide-may-17/"
             ],
             "metrics": [
               {
                 "values": [
-                  "7"
+                  "31"
                 ]
               }
             ]
           },
           {
             "dimensions": [
-              "/news/2021/07/pennsylvania-rental-assistance-questions-answers-live-event/"
+              "/news/2022/05/pa-primary-election-results-budget-impasse/"
             ],
             "metrics": [
               {
                 "values": [
-                  "7"
+                  "31"
                 ]
               }
             ]
@@ -272,11 +273,11 @@ X-Xss-Protection: 0
         "totals": [
           {
             "values": [
-              "2442"
+              "4076"
             ]
           }
         ],
-        "rowCount": 115,
+        "rowCount": 234,
         "minimums": [
           {
             "values": [
@@ -287,7 +288,7 @@ X-Xss-Protection: 0
         "maximums": [
           {
             "values": [
-              "742"
+              "1429"
             ]
           }
         ]
