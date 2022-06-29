@@ -20,6 +20,7 @@ export default {
       error,
     } = useListAnyArc(() => props.page);
     return {
+      showBookmarklet: ref(false),
       showComposer: ref(false),
       didLoad,
       isLoading,
@@ -108,9 +109,30 @@ export default {
       />
     </LinkButtons>
 
-    <details class="content">
-      <summary>Tools</summary>
+    <LinkButtons label="Tools">
+      <button
+        type="button"
+        class="button is-primary is-small has-text-weight-semibold"
+        @click="showComposer = !showComposer"
+      >
+        <span class="icon">
+          <font-awesome-icon :icon="['fas', 'paper-plane']" />
+        </span>
+        <span v-text="!showComposer ? 'Compose Message' : 'Hide Message'" />
+      </button>
+      <LinkAButton label="Embeds" href="https://www.spotlightpa.org/embeds/" />
+      <button
+        type="button"
+        class="button is-light is-small has-text-weight-semibold"
+        @click="showBookmarklet = !showBookmarklet"
+      >
+        Bookmarklet
+      </button>
+    </LinkButtons>
+
+    <template v-if="showBookmarklet">
       <p>
+        Bookmarklet:
         <a
           href="javascript:
 (()=>{
@@ -126,30 +148,14 @@ export default {
         >
           Jump to admin
         </a>
-        bookmarklet
-        <sup
-          ><a
-            title="What's a bookmarklet?"
-            href="https://support.mozilla.org/en-US/kb/bookmarklets-perform-common-web-page-tasks"
-            >?</a
-          ></sup
+      </p>
+      <p>
+        <a
+          href="https://support.mozilla.org/en-US/kb/bookmarklets-perform-common-web-page-tasks"
+          >What's a bookmarklet?</a
         >
       </p>
-    </details>
-
-    <div class="control">
-      <label class="label">Compose a message</label>
-      <button
-        type="button"
-        class="button is-primary has-text-weight-semibold"
-        @click="showComposer = !showComposer"
-      >
-        <span class="icon">
-          <font-awesome-icon :icon="['fas', 'paper-plane']" />
-        </span>
-        <span v-text="!showComposer ? 'Compose Message' : 'Hide Message'" />
-      </button>
-    </div>
+    </template>
 
     <keep-alive>
       <EmailComposer
