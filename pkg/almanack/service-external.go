@@ -54,11 +54,17 @@ func (svc Service) UpdateMostPopular(ctx context.Context) (err error) {
 	if err != nil {
 		return err
 	}
+	if len(pages) < 5 {
+		return fmt.Errorf("expected more popular pages; got %q", pages)
+	}
 	data, err := svc.Queries.ListPagesByURLPaths(ctx, pages)
 	if err != nil {
 		return err
 	}
-
+	if len(data) < 5 {
+		return fmt.Errorf("could not find popular pages; got %q from %q",
+			data, pages)
+	}
 	return UploadJSON(
 		ctx,
 		svc.FileStore,
