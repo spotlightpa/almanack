@@ -36,7 +36,9 @@ func (app *appEnv) backgroundCron(w http.ResponseWriter, r *http.Request) {
 		var errs errutil.Slice
 		// Publish any scheduled pages before pushing new site config
 		poperr, warning := app.svc.PopScheduledPages(r.Context())
-		app.logErr(r.Context(), warning)
+		if warning != nil {
+			app.logErr(r.Context(), warning)
+		}
 		errs.Push(poperr)
 		errs.Push(app.svc.PopScheduledSiteChanges(r.Context(), almanack.EditorsPicksLoc))
 		errs.Push(app.svc.PopScheduledSiteChanges(r.Context(), almanack.SiteParamsLoc))
