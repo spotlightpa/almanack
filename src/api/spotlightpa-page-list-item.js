@@ -1,12 +1,8 @@
-import { computed } from "@vue/composition-api";
-
 export default class PageListItem {
   static from(rawData) {
-    return computed(() => {
-      let pages = rawData.value?.pages;
-      if (!pages) return [];
-      return pages.map((page) => new PageListItem(page));
-    });
+    let pages = rawData.pages;
+    if (!pages) return [];
+    return pages.map((page) => new PageListItem(page));
   }
 
   constructor(data) {

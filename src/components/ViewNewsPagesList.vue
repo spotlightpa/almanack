@@ -1,7 +1,5 @@
 <script>
-import { computed, watch } from "@vue/composition-api";
-
-import { makeState } from "@/api/service-util.js";
+import { watchAPI } from "@/api/service-util.js";
 import { useClient } from "@/api/client.js";
 import PageListItem from "@/api/spotlightpa-page-list-item.js";
 
@@ -12,27 +10,24 @@ export default {
   },
   setup(props) {
     let { listPages } = useClient();
-    let { apiStateRefs, exec } = makeState();
-    const { rawData } = apiStateRefs;
-    const fetch = () =>
-      exec(() =>
-        listPages({ params: { path: "content/news/", page: props.page } })
-      );
-    watch(() => props.page, fetch, {
-      immediate: true,
-    });
+    const { apiState, fetch, computer } = watchAPI(
+      () => props.page,
+      (page) =>
+        listPages({
+          params: { page, path: "content/news/" },
+        })
+    );
+
     return {
-      apiStateRefs,
+      apiState,
       fetch,
-      pages: PageListItem.from(rawData),
-      nextPage: computed(() => {
-        let param = rawData.value?.next_page;
-        if (!param) return null;
+      pages: computer((rawData) => (rawData ? PageListItem.from(rawData) : [])),
+      nextPage: computer((rawData) => {
+        let page = rawData?.next_page;
+        if (!page) return null;
         return {
           name: "news-pages",
-          query: {
-            page: param,
-          },
+          query: { page },
         };
       }),
     };
@@ -45,7 +40,7 @@ export default {
     title="Spotlight PA News Pages"
     :page="page"
     :next-page="nextPage"
-    :api-state="apiStateRefs"
+    :api-state="apiState"
     :reload="fetch"
     :pages="pages"
   />
