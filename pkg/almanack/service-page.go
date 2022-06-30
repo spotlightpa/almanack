@@ -13,7 +13,7 @@ import (
 	"github.com/spotlightpa/almanack/pkg/common"
 )
 
-func (svc Service) PublishPage(ctx context.Context, q *db.Queries, page *db.Page) (err, warning error) {
+func (svc Services) PublishPage(ctx context.Context, q *db.Queries, page *db.Page) (err, warning error) {
 	defer errutil.Prefix(&err, "Service.PublishPage(%d)", page.ID)
 
 	page.SetURLPath()
@@ -51,7 +51,7 @@ func (svc Service) PublishPage(ctx context.Context, q *db.Queries, page *db.Page
 	return
 }
 
-func (svc Service) RefreshPageFromContentStore(ctx context.Context, page *db.Page) (err error) {
+func (svc Services) RefreshPageFromContentStore(ctx context.Context, page *db.Page) (err error) {
 	defer errutil.Prefix(&err, "Service.RefreshPageFromContentStore(%d)", page.ID)
 
 	if db.IsNull(page.LastPublished) {
@@ -67,7 +67,7 @@ func (svc Service) RefreshPageFromContentStore(ctx context.Context, page *db.Pag
 	return nil
 }
 
-func (svc Service) PopScheduledPages(ctx context.Context) (err, warning error) {
+func (svc Services) PopScheduledPages(ctx context.Context) (err, warning error) {
 	var warnings errutil.Slice
 	err = svc.Tx.Begin(ctx, pgx.TxOptions{}, func(q *db.Queries) (txerr error) {
 		defer errutil.Trace(&txerr)
@@ -87,7 +87,7 @@ func (svc Service) PopScheduledPages(ctx context.Context) (err, warning error) {
 	return err, warnings.Merge()
 }
 
-func (svc Service) RefreshPageContents(ctx context.Context, id int64) (err error) {
+func (svc Services) RefreshPageContents(ctx context.Context, id int64) (err error) {
 	defer errutil.Trace(&err)
 
 	page, err := svc.Queries.GetPageByID(ctx, id)
@@ -135,7 +135,7 @@ func (svc Service) RefreshPageContents(ctx context.Context, id int64) (err error
 	return err
 }
 
-func (svc Service) PageFromArcArticle(ctx context.Context, dbArt *db.Article, pagekind string) (page *db.Page, err error) {
+func (svc Services) PageFromArcArticle(ctx context.Context, dbArt *db.Article, pagekind string) (page *db.Page, err error) {
 	defer errutil.Trace(&err)
 
 	story, err := ArcStoryFromDB(dbArt)
@@ -181,7 +181,7 @@ func (svc Service) PageFromArcArticle(ctx context.Context, dbArt *db.Article, pa
 	return &dbPage, nil
 }
 
-func (svc Service) RefreshPageFromArcStory(ctx context.Context, story *ArcStory, page *db.Page) (err error) {
+func (svc Services) RefreshPageFromArcStory(ctx context.Context, story *ArcStory, page *db.Page) (err error) {
 	defer errutil.Trace(&err)
 
 	var splArt SpotlightPAArticle
@@ -193,7 +193,7 @@ func (svc Service) RefreshPageFromArcStory(ctx context.Context, story *ArcStory,
 	return nil
 }
 
-func (svc Service) Notify(ctx context.Context, page *db.Page, publishingNow bool) (err error) {
+func (svc Services) Notify(ctx context.Context, page *db.Page, publishingNow bool) (err error) {
 	defer errutil.Trace(&err)
 
 	const (

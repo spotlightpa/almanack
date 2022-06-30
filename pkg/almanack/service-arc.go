@@ -13,7 +13,7 @@ import (
 	"github.com/spotlightpa/almanack/internal/db"
 )
 
-func (svc Service) FetchArcFeed(ctx context.Context) (*arc.API, error) {
+func (svc Services) FetchArcFeed(ctx context.Context) (*arc.API, error) {
 	var feed arc.API
 	// Timeout needs to leave enough time to report errors to Sentry before
 	// AWS kills the Lambda…
@@ -31,7 +31,7 @@ func (svc Service) FetchArcFeed(ctx context.Context) (*arc.API, error) {
 	return &feed, nil
 }
 
-func (svc Service) GetArcStory(ctx context.Context, articleID string) (story *ArcStory, err error) {
+func (svc Services) GetArcStory(ctx context.Context, articleID string) (story *ArcStory, err error) {
 	defer errutil.Trace(&err)
 
 	dart, err := svc.Queries.GetArticleByArcID(ctx, articleID)
@@ -48,7 +48,7 @@ func (svc Service) GetArcStory(ctx context.Context, articleID string) (story *Ar
 
 }
 
-func (svc Service) ListAvailableArcStories(ctx context.Context, page int32) (stories []ArcStory, nextPage int32, err error) {
+func (svc Services) ListAvailableArcStories(ctx context.Context, page int32) (stories []ArcStory, nextPage int32, err error) {
 	defer errutil.Trace(&err)
 
 	pager := db.PageNumSize(page, 20)
@@ -69,7 +69,7 @@ func (svc Service) ListAvailableArcStories(ctx context.Context, page int32) (sto
 	return
 }
 
-func (svc Service) SaveAlmanackArticle(ctx context.Context, article *ArcStory, setArcData bool) (err error) {
+func (svc Services) SaveAlmanackArticle(ctx context.Context, article *ArcStory, setArcData bool) (err error) {
 	defer errutil.Trace(&err)
 
 	arcData := db.NullJSONB
@@ -95,7 +95,7 @@ func (svc Service) SaveAlmanackArticle(ctx context.Context, article *ArcStory, s
 	return nil
 }
 
-func (svc Service) StoreFeed(ctx context.Context, newfeed *arc.API) (err error) {
+func (svc Services) StoreFeed(ctx context.Context, newfeed *arc.API) (err error) {
 	defer errutil.Trace(&err)
 
 	var arcItems pgtype.JSONB
@@ -105,7 +105,7 @@ func (svc Service) StoreFeed(ctx context.Context, newfeed *arc.API) (err error) 
 	return svc.Queries.UpdateArcArticles(ctx, arcItems)
 }
 
-func (svc Service) ListAllArcStories(ctx context.Context, page int32) (stories []ArcStory, nextPage int32, err error) {
+func (svc Services) ListAllArcStories(ctx context.Context, page int32) (stories []ArcStory, nextPage int32, err error) {
 	defer errutil.Trace(&err)
 
 	pager := db.PageNumSize(page, 50)

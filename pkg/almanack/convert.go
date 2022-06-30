@@ -15,7 +15,7 @@ import (
 	"github.com/spotlightpa/almanack/pkg/common"
 )
 
-func (arcStory *ArcStory) ToArticle(ctx context.Context, svc Service, article *SpotlightPAArticle) (err error) {
+func (arcStory *ArcStory) ToArticle(ctx context.Context, svc Services, article *SpotlightPAArticle) (err error) {
 	var body strings.Builder
 	if article.Warnings, err = readContentElements(ctx, svc, arcStory.ContentElements, &body); err != nil {
 		return
@@ -122,7 +122,7 @@ func slugFromURL(s string) string {
 	return s[start+1 : stop]
 }
 
-func readContentElements(ctx context.Context, svc Service, rawels []*json.RawMessage, body *strings.Builder) (warnings []string, err error) {
+func readContentElements(ctx context.Context, svc Services, rawels []*json.RawMessage, body *strings.Builder) (warnings []string, err error) {
 	for i, raw := range rawels {
 		var _type string
 		wrapper := arc.ContentElementType{Type: &_type}

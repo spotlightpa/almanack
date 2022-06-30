@@ -76,7 +76,7 @@ type appEnv struct {
 	isLambda bool
 	*log.Logger
 	auth netlifyid.AuthService
-	svc  almanack.Service
+	svc  almanack.Services
 }
 
 func (app *appEnv) exec() error {

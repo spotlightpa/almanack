@@ -12,7 +12,7 @@ import (
 	"github.com/spotlightpa/almanack/internal/slack"
 )
 
-type Service struct {
+type Services struct {
 	arcFeedURL         string
 	MailchimpSignupURL string
 	Client             *http.Client
