@@ -10,7 +10,6 @@ import (
 	"github.com/spotlightpa/almanack/internal/github"
 	"github.com/spotlightpa/almanack/internal/google"
 	"github.com/spotlightpa/almanack/internal/herokuapi"
-	"github.com/spotlightpa/almanack/internal/httpcache"
 	"github.com/spotlightpa/almanack/internal/index"
 	"github.com/spotlightpa/almanack/internal/mailchimp"
 	"github.com/spotlightpa/almanack/internal/slack"
@@ -21,7 +20,6 @@ func AddFlags(fl *flag.FlagSet) func() (svc Services, err error) {
 	arcFeedURL := fl.String("src-feed", "", "source `URL` for Arc feed")
 	mailchimpSignupURL := fl.String("mc-signup-url", "http://example.com", "`URL` to redirect users to for MailChimp signup")
 
-	cache := fl.Bool("cache", false, "use in-memory cache for http requests")
 	pg, tx := db.AddFlags(fl, "postgres", "PostgreSQL database `URL`")
 	slackURL := fl.String("slack-social-url", "", "Slack hook endpoint `URL` for social")
 	heroku := herokuapi.AddFlags(fl)
@@ -46,9 +44,6 @@ func AddFlags(fl *flag.FlagSet) func() (svc Services, err error) {
 		}
 
 		client := *http.DefaultClient
-		if *cache {
-			httpcache.SetRounderTripper(&client)
-		}
 
 		if svc.ContentStore, err = getGithub(); err != nil {
 			common.Logger.Printf("could not connect to Github: %v", err)
