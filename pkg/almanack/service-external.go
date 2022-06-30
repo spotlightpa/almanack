@@ -11,7 +11,7 @@ import (
 	"github.com/spotlightpa/almanack/pkg/common"
 )
 
-func (svc Service) ReplaceImageURL(ctx context.Context, srcURL, description, credit string) (s string, err error) {
+func (svc Services) ReplaceImageURL(ctx context.Context, srcURL, description, credit string) (s string, err error) {
 	defer errutil.Trace(&err)
 
 	if srcURL == "" {
@@ -42,7 +42,7 @@ func (svc Service) ReplaceImageURL(ctx context.Context, srcURL, description, cre
 	return path, err
 }
 
-func (svc Service) UpdateMostPopular(ctx context.Context) (err error) {
+func (svc Services) UpdateMostPopular(ctx context.Context) (err error) {
 	defer errutil.Trace(&err)
 
 	common.Logger.Printf("updating most popular")

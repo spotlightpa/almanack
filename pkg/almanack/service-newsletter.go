@@ -14,7 +14,7 @@ import (
 	"github.com/spotlightpa/almanack/pkg/common"
 )
 
-func (svc Service) UpdateNewsletterArchives(ctx context.Context, types []db.NewsletterType) (err error) {
+func (svc Services) UpdateNewsletterArchives(ctx context.Context, types []db.NewsletterType) (err error) {
 	campaigns, err := svc.NewletterService.ListCampaigns(ctx)
 	if err != nil {
 		return err
@@ -26,7 +26,7 @@ func (svc Service) UpdateNewsletterArchives(ctx context.Context, types []db.News
 	return errs.Merge()
 }
 
-func (svc Service) UpdateNewsletterArchive(ctx context.Context, campaigns *mailchimp.ListCampaignsResp, mcType, dbType string) (err error) {
+func (svc Services) UpdateNewsletterArchive(ctx context.Context, campaigns *mailchimp.ListCampaignsResp, mcType, dbType string) (err error) {
 	defer errutil.Trace(&err)
 
 	newItems := campaigns.ToNewsletters(mcType)
@@ -51,7 +51,7 @@ func (svc Service) UpdateNewsletterArchive(ctx context.Context, campaigns *mailc
 	return nil
 }
 
-func (svc Service) ImportNewsletterPages(ctx context.Context, types []db.NewsletterType) (err error) {
+func (svc Services) ImportNewsletterPages(ctx context.Context, types []db.NewsletterType) (err error) {
 	defer errutil.Trace(&err)
 
 	nls, err := svc.Queries.ListNewslettersWithoutPage(ctx, db.ListNewslettersWithoutPageParams{
@@ -74,7 +74,7 @@ func (svc Service) ImportNewsletterPages(ctx context.Context, types []db.Newslet
 	return nil
 }
 
-func (svc Service) SaveNewsletterPage(ctx context.Context, nl *db.Newsletter, body string, types []db.NewsletterType) (err error) {
+func (svc Services) SaveNewsletterPage(ctx context.Context, nl *db.Newsletter, body string, types []db.NewsletterType) (err error) {
 	defer errutil.Trace(&err)
 
 	needsUpdate := false

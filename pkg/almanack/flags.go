@@ -17,7 +17,7 @@ import (
 	"github.com/spotlightpa/almanack/pkg/common"
 )
 
-func AddFlags(fl *flag.FlagSet) func() (svc Service, err error) {
+func AddFlags(fl *flag.FlagSet) func() (svc Services, err error) {
 	arcFeedURL := fl.String("src-feed", "", "source `URL` for Arc feed")
 	mailchimpSignupURL := fl.String("mc-signup-url", "http://example.com", "`URL` to redirect users to for MailChimp signup")
 
@@ -33,7 +33,7 @@ func AddFlags(fl *flag.FlagSet) func() (svc Service, err error) {
 	mailServiceAPIKey := fl.String("mc-api-key", "", "API `key` for MailChimp v2")
 	mailServiceListID := fl.String("mc-list-id", "", "List `ID` MailChimp v2 campaign")
 
-	return func() (svc Service, err error) {
+	return func() (svc Services, err error) {
 		// Get PostgreSQL URL from Heroku if possible, else get it from flag
 		if err = heroku.Configure(map[string]string{
 			"postgres":    "DATABASE_URL",
@@ -58,7 +58,7 @@ func AddFlags(fl *flag.FlagSet) func() (svc Service, err error) {
 		is, fs := getS3Store()
 		mc := mailchimp.NewMailService(*mailServiceAPIKey, *mailServiceListID, &client)
 
-		return Service{
+		return Services{
 			arcFeedURL:         *arcFeedURL,
 			MailchimpSignupURL: *mailchimpSignupURL,
 			Client:             &client,

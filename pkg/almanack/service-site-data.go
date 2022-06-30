@@ -12,7 +12,7 @@ import (
 	"github.com/spotlightpa/almanack/pkg/common"
 )
 
-func (svc Service) PopScheduledSiteChanges(ctx context.Context, loc string) error {
+func (svc Services) PopScheduledSiteChanges(ctx context.Context, loc string) error {
 	err := svc.Tx.Begin(ctx, pgx.TxOptions{}, func(q *db.Queries) (txerr error) {
 		defer errutil.Trace(&txerr)
 
@@ -41,7 +41,7 @@ func (svc Service) PopScheduledSiteChanges(ctx context.Context, loc string) erro
 	return svc.Queries.CleanSiteData(ctx, loc)
 }
 
-func (svc Service) PublishSiteConfig(ctx context.Context, siteConfig *db.SiteDatum) (err error) {
+func (svc Services) PublishSiteConfig(ctx context.Context, siteConfig *db.SiteDatum) (err error) {
 	defer errutil.Trace(&err)
 
 	data, err := json.MarshalIndent(siteConfig.Data, "", "  ")
@@ -61,7 +61,7 @@ type ScheduledSiteConfig struct {
 	Data        db.Map    `json:"data"`
 }
 
-func (svc Service) UpdateSiteConfig(ctx context.Context, loc string, configs []ScheduledSiteConfig) ([]db.SiteDatum, error) {
+func (svc Services) UpdateSiteConfig(ctx context.Context, loc string, configs []ScheduledSiteConfig) ([]db.SiteDatum, error) {
 	var dbConfigs []db.SiteDatum
 	err := svc.Tx.Begin(ctx, pgx.TxOptions{}, func(q *db.Queries) (txerr error) {
 		defer errutil.Trace(&txerr)
