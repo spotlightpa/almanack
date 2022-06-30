@@ -98,16 +98,15 @@ export function useListAnyArc(pageCB) {
 
   watch(
     pageCB,
-    (newVal, oldVal) => {
+    async (newVal, oldVal) => {
       page = newVal;
       if (newVal !== oldVal) {
         articles.value = [];
         apiState.didLoad = false;
       }
+      await actions.load();
       if (!page) {
-        actions.loadAndRefresh();
-      } else {
-        actions.load();
+        await actions.loadAndRefresh();
       }
     },
     {
