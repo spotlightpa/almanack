@@ -3,20 +3,8 @@ import Vue from "vue";
 import { reactive, computed, toRefs, watch } from "@vue/composition-api";
 
 import { useClient, makeState } from "@/api/hooks.js";
+import Page from "@/api/spotlightpa-all-pages-item.js";
 import { formatDateTime } from "@/utils/time-format.js";
-
-class Page {
-  constructor(data) {
-    this.id = data.id;
-    this.filePath = data.file_path ?? "";
-    this.internalID = data.internal_id ?? "";
-    this.hed = data.hed ?? "";
-    this.authors = data.authors ?? [];
-    this.filterableProps = `${this.internalID} ${this.hed} ${this.authors.join(
-      " "
-    )}`;
-  }
-}
 
 class EditorsPicksData {
   constructor(siteConfig, pagesByPath) {
