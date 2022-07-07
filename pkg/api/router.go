@@ -68,6 +68,8 @@ func (app *appEnv) routes() http.Handler {
 			r.Post(`/sidebar`, app.setSiteData((almanack.SidebarLoc)))
 			r.Get(`/site-params`, app.getSiteData(almanack.SiteParamsLoc))
 			r.Post(`/site-params`, app.setSiteData((almanack.SiteParamsLoc)))
+			r.Get(`/state-college-editor`, app.getSiteData(almanack.StateCollegeLoc))
+			r.Post(`/state-college-editor`, app.setSiteData((almanack.StateCollegeLoc)))
 		})
 	})
 	r.Route("/ssr", func(r chi.Router) {
