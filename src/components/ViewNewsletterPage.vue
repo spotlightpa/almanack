@@ -5,7 +5,6 @@ import { usePage } from "../api/spotlightpa-page.js";
 import { formatDateTime } from "@/utils/time-format.js";
 
 export default {
-  name: "ViewNewsletterPage",
   props: {
     id: String,
   },
@@ -166,11 +165,17 @@ export default {
         help="Series are limited-time collections, e.g. “Legislative privilege 2020”"
       />
 
-      <BulmaFieldInput
-        v-model="page.image"
+      <BulmaField
         label="Photo ID"
         help="Image is shown in article rivers and on social media"
-      />
+        v-slot="{ idForLabel }"
+      >
+        <div class="is-flex">
+          <input :id="idForLabel" v-model="page.image" class="input" />
+          <BulmaPaste @paste="page.image = $event" />
+        </div>
+      </BulmaField>
+
       <picture v-if="page.imagePreviewURL" class="has-ratio">
         <img :src="page.imagePreviewURL" class="is-3x4" width="200" />
       </picture>
