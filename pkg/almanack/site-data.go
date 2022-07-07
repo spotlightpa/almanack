@@ -3,15 +3,17 @@ package almanack
 import "fmt"
 
 const (
-	EditorsPicksLoc = "data/editorsPicks.json"
+	HomepageLoc     = "data/editorsPicks.json"
 	SidebarLoc      = "data/sidebar.json"
 	SiteParamsLoc   = "config/_default/params.json"
+	StateCollegeLoc = "data/stateCollege.json"
 )
 
 var messageForLoc = map[string]string{
-	EditorsPicksLoc: "Setting homepage configuration",
+	HomepageLoc:     "Setting homepage configuration",
 	SidebarLoc:      "Setting sidebar configuration",
 	SiteParamsLoc:   "Setting site parameters",
+	StateCollegeLoc: "Setting State College frontpage configuration",
 }
 
 func MessageForLoc(loc string) string {

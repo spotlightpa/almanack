@@ -40,7 +40,7 @@ func (app *appEnv) backgroundCron(w http.ResponseWriter, r *http.Request) {
 			app.logErr(r.Context(), warning)
 		}
 		errs.Push(poperr)
-		errs.Push(app.svc.PopScheduledSiteChanges(r.Context(), almanack.EditorsPicksLoc))
+		errs.Push(app.svc.PopScheduledSiteChanges(r.Context(), almanack.HomepageLoc))
 		errs.Push(app.svc.PopScheduledSiteChanges(r.Context(), almanack.SiteParamsLoc))
 		return errs.Merge()
 	}, func() error {
