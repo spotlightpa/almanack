@@ -186,8 +186,8 @@ github.com/aymerick/douceur v0.2.0/go.mod h1:wlT5vV2O3h55X9m7iVYN0TBM0NH/MmbLnd3
 github.com/benbjohnson/clock v1.1.0/go.mod h1:J11/hYXuz8f4ySSvYwY0FKfm+ezbsZBKZxNJlLklBHA=
 github.com/carlmjohnson/be v0.22.4 h1:CEYQrjQu8ABgEryNXibdk9gvJb7I0yg3iTAK7L4c2bk=
 github.com/carlmjohnson/be v0.22.4/go.mod h1:KAgPUh0HpzWYZZI+IABdo80wTgY43YhbdsiLYAaSI/Q=
-github.com/carlmjohnson/crockford v0.22.1 h1:hd6hTYSTu1ZvTIfaOo8gOCpE8HDSN4h2GxkacpjKvH4=
-github.com/carlmjohnson/crockford v0.22.1/go.mod h1:Ry0l3g9KMB919ee2CjzhPH8FccE9xZNgcPBi8TQm6LM=
+github.com/carlmjohnson/crockford v0.22.2 h1:xvJJfTQBHmD6sbkGKVsVa3kL3+1oxXmyhiv874U1DX8=
+github.com/carlmjohnson/crockford v0.22.2/go.mod h1:+uz/aAJerF/noKb/fS4l9vl4bFexgpDjdVoL9XeKn/0=
 github.com/carlmjohnson/emailx v0.20.2 h1:0euWTGWnz5zwxXaDwLjP/egV7kACYGUvO5Wqu/5RqL0=
 github.com/carlmjohnson/emailx v0.20.2/go.mod h1:Lngztj3awUX1Zu5b0Jv9ety36JBRKYvwlkFgem+0K+Q=
 github.com/carlmjohnson/errutil v0.21.5 h1:4WpeYOqUXCg1LVrc3qp7Tzr0SJgpipupdVIpNmmwd/U=
