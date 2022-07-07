@@ -61,7 +61,7 @@ export default {
     <LinkButtons label="Spotlight PA promotions">
       <LinkButton
         label="Homepage Editor"
-        to="editors-picks"
+        to="homepage-editor"
         :icon="['fas', 'newspaper']"
       />
       <LinkButton

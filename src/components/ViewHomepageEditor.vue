@@ -52,7 +52,6 @@ class EditorsPicksData {
 }
 
 export default {
-  name: "ViewHomepageEditor",
   metaInfo: {
     title: "Homepage Editor",
   },
@@ -132,7 +131,7 @@ export default {
     <BulmaBreadcrumbs
       :links="[
         { name: 'Admin', to: { name: 'admin' } },
-        { name: 'Homepage Editor', to: { name: 'editors-picks' } },
+        { name: 'Homepage Editor', to: { name: 'homepage-editor' } },
       ]"
     />
 
