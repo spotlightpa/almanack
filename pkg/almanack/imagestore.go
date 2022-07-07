@@ -24,15 +24,16 @@ func GetSignedImageUpload(ctx context.Context, is aws.BlobStore, ct string) (sig
 }
 
 func makeImageName(ct string) string {
+	now := time.Now().UTC()
 	ext := "bin"
 	if _, tempext, ok := strings.Cut(ct, "/"); ok && len(tempext) >= 3 {
 		ext = tempext
 	}
 	var sb strings.Builder
 	sb.Grow(len("2006/01/1234-5678-9abc-defg.") + len(ext))
-	sb.WriteString(time.Now().Format("2006/01/"))
+	sb.WriteString(now.Format("2006/01/"))
 	buf := make([]byte, 0, len("1234-5678-9abc-defg"))
-	buf = crockford.AppendTime(crockford.Lower, time.Now(), buf)
+	buf = crockford.AppendTime(crockford.Lower, now, buf)
 	buf = crockford.AppendRandom(crockford.Lower, buf)
 	buf = crockford.AppendPartition(buf[:0], buf, 4)
 	sb.Write(buf)
