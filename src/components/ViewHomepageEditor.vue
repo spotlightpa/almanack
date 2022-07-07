@@ -26,13 +26,7 @@ class EditorsPicksData {
   }
 
   reset(siteConfig) {
-    for (let prop of [
-      "featuredStories",
-      "subfeatures",
-      "topSlots",
-      "sidebarPicks",
-      "topper",
-    ]) {
+    for (let prop of ["featuredStories", "subfeatures", "topSlots", "topper"]) {
       let a = siteConfig.data?.[prop] ?? [];
       this[prop] = a.map((s) => this.pagesByPath.get(s)).filter((a) => !!a);
     }
@@ -63,7 +57,6 @@ class EditorsPicksData {
         featuredStories: this.featuredStories.map(getPath),
         subfeatures: this.subfeatures.map(getPath),
         topSlots: this.topSlots.map(getPath),
-        sidebarPicks: this.sidebarPicks.map(getPath),
         topper: this.topper.map(getPath),
       },
     };
