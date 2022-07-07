@@ -98,7 +98,7 @@ let router = new Router({
     },
     {
       path: "/admin/editors-picks",
-      name: "editors-picks",
+      name: "homepage-editor",
       component: ViewHomepageEditor,
       meta: {
         requiresAuth: isSpotlightPAUser,
