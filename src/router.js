@@ -22,6 +22,7 @@ import ViewStateCollegeList from "./components/ViewStateCollegeList.vue";
 import ViewSharedList from "./components/ViewSharedList.vue";
 import ViewSidebarItems from "./components/ViewSidebarItems.vue";
 import ViewSiteParams from "./components/ViewSiteParams.vue";
+import ViewStateCollegeEditor from "./components/ViewStateCollegeEditor.vue";
 import ViewUnauthorized from "./components/ViewUnauthorized.vue";
 
 Vue.use(Router);
@@ -100,6 +101,14 @@ let router = new Router({
       path: "/admin/editors-picks",
       name: "homepage-editor",
       component: ViewHomepageEditor,
+      meta: {
+        requiresAuth: isSpotlightPAUser,
+      },
+    },
+    {
+      path: "/admin/state-college-editor",
+      name: "state-college-editor",
+      component: ViewStateCollegeEditor,
       meta: {
         requiresAuth: isSpotlightPAUser,
       },

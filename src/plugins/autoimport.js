@@ -74,6 +74,7 @@ import ViewRedirectArcToNewsPage from "@/components/ViewRedirectArcToNewsPage.vu
 import ViewSharedList from "@/components/ViewSharedList.vue";
 import ViewSidebarItems from "@/components/ViewSidebarItems.vue";
 import ViewSiteParams from "@/components/ViewSiteParams.vue";
+import ViewStateCollegeEditor from "@/components/ViewStateCollegeEditor.vue";
 import ViewUnauthorized from "@/components/ViewUnauthorized.vue";
 
 Vue.component("AdminList", AdminList);
@@ -150,4 +151,5 @@ Vue.component("ViewRedirectArcToNewsPage", ViewRedirectArcToNewsPage);
 Vue.component("ViewSharedList", ViewSharedList);
 Vue.component("ViewSidebarItems", ViewSidebarItems);
 Vue.component("ViewSiteParams", ViewSiteParams);
+Vue.component("ViewStateCollegeEditor", ViewStateCollegeEditor);
 Vue.component("ViewUnauthorized", ViewUnauthorized);

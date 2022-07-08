@@ -107,6 +107,11 @@ export default {
         to="statecollege-pages"
         :icon="['fas', 'file-signature']"
       />
+      <LinkButton
+        label="Frontpage Editor"
+        to="state-college-editor"
+        :icon="['fas', 'newspaper']"
+      />
     </LinkButtons>
 
     <LinkButtons label="Tools">
