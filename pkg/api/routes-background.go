@@ -42,6 +42,7 @@ func (app *appEnv) backgroundCron(w http.ResponseWriter, r *http.Request) {
 		errs.Push(poperr)
 		errs.Push(app.svc.PopScheduledSiteChanges(r.Context(), almanack.HomepageLoc))
 		errs.Push(app.svc.PopScheduledSiteChanges(r.Context(), almanack.SiteParamsLoc))
+		errs.Push(app.svc.PopScheduledSiteChanges(r.Context(), almanack.SidebarLoc))
 		errs.Push(app.svc.PopScheduledSiteChanges(r.Context(), almanack.StateCollegeLoc))
 		return errs.Merge()
 	}, func() error {
