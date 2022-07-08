@@ -65,6 +65,8 @@ const endpoints = {
   saveSidebar: `/api/sidebar`,
   getSiteParams: `/api/site-params`,
   postSiteParams: `/api/site-params`,
+  getStateCollegeEditor: `/api/state-college-editor`,
+  saveStateCollegeEditor: `/api/state-college-editor`,
 };
 
 function makeClient($auth) {
@@ -199,6 +201,7 @@ function makeClient($auth) {
     "getPageForArcID",
     "getSidebar",
     "getSiteParams",
+    "getStateCollegeEditor",
     "listAllPages",
     "listAllSeries",
     "listAllTopics",
@@ -223,6 +226,7 @@ function makeClient($auth) {
     "saveArticle",
     "saveEditorsPicks",
     "saveSidebar",
+    "saveStateCollegeEditor",
     "sendMessage",
   ];
   for (let action of simplePostActions) {
