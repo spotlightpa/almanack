@@ -200,6 +200,7 @@ function makeClient($auth) {
     "getPageByFilePath",
     "getPageForArcID",
     "getSidebar",
+    "getSignupURL",
     "getSiteParams",
     "getStateCollegeEditor",
     "listAllPages",
