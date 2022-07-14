@@ -126,6 +126,10 @@ export default {
         <span v-text="!showComposer ? 'Compose Message' : 'Hide Message'" />
       </button>
       <LinkAButton label="Embeds" href="https://www.spotlightpa.org/embeds/" />
+      <LinkAButton
+        label="Legacy admin"
+        href="https://www.spotlightpa.org/admin/"
+      />
       <button
         type="button"
         class="button is-light is-small has-text-weight-semibold"
