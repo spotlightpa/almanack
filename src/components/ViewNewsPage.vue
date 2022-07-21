@@ -246,19 +246,23 @@ export default {
       <BulmaFieldInput v-model="page.imageCredit" label="Image credit" />
 
       <b-field label="Image size">
-        <b-select v-model="page.imageSize" expanded>
-          <option
-            v-for="[val, desc] in [
-              ['inline', 'Normal'],
-              ['hidden', 'Hidden'],
-              ['wide', 'Suppress Right Rail'],
-            ]"
-            :key="val"
-            :value="val"
-          >
-            {{ desc }}
-          </option>
-        </b-select>
+        <div class="control is-expanded">
+          <span class="select is-fullwidth">
+            <select v-model="page.imageSize">
+              <option
+                v-for="[val, desc] in [
+                  ['inline', 'Normal'],
+                  ['hidden', 'Hidden'],
+                  ['wide', 'Suppress Right Rail'],
+                ]"
+                :key="val"
+                :value="val"
+              >
+                {{ desc }}
+              </option>
+            </select>
+          </span>
+        </div>
       </b-field>
 
       <BulmaFieldInput
