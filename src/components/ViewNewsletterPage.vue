@@ -16,7 +16,6 @@ export default {
   setup(props) {
     const { id } = toRefs(props);
     const pageData = usePage(id);
-
     return {
       ...pageData,
       formatDateTime,
@@ -189,7 +188,7 @@ export default {
       <BulmaFieldInput v-model="page.imageCredit" label="Image credit" />
 
       <b-field label="URL keywords slug">
-        <b-input
+        <BulmaFieldInput
           v-model="page.slug"
           :disabled="page.isPublished"
           :readonly="page.isPublished"
