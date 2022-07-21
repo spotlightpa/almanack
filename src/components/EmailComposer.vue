@@ -1,5 +1,5 @@
 <script>
-import { computed, reactive, toRefs } from "@vue/composition-api";
+import { computed, reactive, toRefs } from "vue";
 import { useClient } from "@/api/hooks.js";
 
 export default {

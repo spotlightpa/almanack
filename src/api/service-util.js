@@ -1,4 +1,4 @@
-import { computed, reactive, toRefs, watch } from "@vue/composition-api";
+import { computed, reactive, toRefs, watch } from "vue";
 
 import { useThrottleToggle } from "@/utils/throttle.js";
 

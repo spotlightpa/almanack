@@ -1,5 +1,5 @@
 <script>
-import { computed, watch } from "@vue/composition-api";
+import { computed, watch } from "vue";
 import { useClient, makeState } from "@/api/hooks.js";
 import { Page } from "@/api/spotlightpa-page.js";
 

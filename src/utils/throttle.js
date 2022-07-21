@@ -1,4 +1,4 @@
-import { computed, ref, toRef, watch } from "@vue/composition-api";
+import { computed, ref, toRef, watch } from "vue";
 
 export function useThrottleToggle(
   watchedRef,

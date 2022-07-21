@@ -1,6 +1,5 @@
 <script>
-import Vue from "vue";
-import { reactive, computed, toRefs, watch } from "@vue/composition-api";
+import Vue, { reactive, computed, toRefs, watch } from "vue";
 
 import { useClient, makeState } from "@/api/hooks.js";
 import Page from "@/api/spotlightpa-all-pages-item.js";

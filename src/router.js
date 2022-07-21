@@ -1,6 +1,5 @@
-import Vue from "vue";
+import Vue, { watch } from "vue";
 import Router from "vue-router";
-import { watch } from "@vue/composition-api";
 
 import { useAuth } from "@/api/hooks.js";
 import { setDimensions, sendGAPageview } from "@/utils/google-analytics.js";

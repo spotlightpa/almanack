@@ -1,6 +1,5 @@
 <script>
-import Vue from "vue";
-import { reactive, toRefs, watch } from "@vue/composition-api";
+import Vue, { reactive, toRefs, watch } from "vue";
 
 import { useClient, makeState } from "@/api/hooks.js";
 import { useFileList } from "@/api/file-list.js";
