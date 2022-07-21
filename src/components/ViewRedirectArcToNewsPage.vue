@@ -1,5 +1,5 @@
 <script>
-import { ref, watch } from "vue";
+import { inject, ref, watch } from "vue";
 import { makeState } from "@/api/service-util.js";
 import { useClient } from "@/api/client.js";
 
@@ -13,7 +13,8 @@ export default {
       title: "Loading…",
     };
   },
-  setup(props, { root }) {
+  setup(props) {
+    const router = inject("router");
     const needsCreation = ref(false);
 
     const isLoadingDebounced = ref(false);
@@ -36,7 +37,7 @@ export default {
         needsCreation.value = true;
         return;
       }
-      root.$router.replace({
+      router.replace({
         name: "news-page",
         params: {
           id: "" + id,
