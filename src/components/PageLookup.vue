@@ -1,11 +1,12 @@
 <script>
-import { defineComponent, ref, watch } from "vue";
+import { inject, defineComponent, ref, watch } from "vue";
 
 import { makeState } from "@/api/service-util.js";
 import { useClient } from "@/api/client.js";
 
 export default defineComponent({
-  setup(_, { root }) {
+  setup() {
+    const router = inject("router");
     const url = ref("");
     const { getPageByURLPath } = useClient();
     const { apiStateRefs, exec } = makeState();
@@ -19,6 +20,7 @@ export default defineComponent({
       } catch (e) {}
       await exec(() => getPageByURLPath({ params: { path, select } }));
     }
+
     watch(apiStateRefs.rawData, (page) => {
       if (!page) {
         return;
@@ -32,7 +34,8 @@ export default defineComponent({
         apiStateRefs.error.value = { name: "No admin associate with page." };
         return;
       }
-      root.$router.push({
+
+      router.push({
         name,
         params: {
           id: "" + page.id,

@@ -5,6 +5,11 @@ export default {
   metaInfo: {
     titleTemplate: "%s • Spotlight PA Almanack",
   },
+  provide() {
+    return {
+      router: this.$router,
+    };
+  },
 };
 </script>
 
