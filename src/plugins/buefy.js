@@ -6,9 +6,7 @@ import {
   Datetimepicker,
   Field,
   Input,
-  Numberinput,
   Select,
-  Taginput,
 } from "buefy/src/components";
 
 const MyBuefy = {
@@ -18,15 +16,7 @@ const MyBuefy = {
       defaultIconPack: "fas",
     });
 
-    let comps = [
-      Autocomplete,
-      Datetimepicker,
-      Field,
-      Input,
-      Numberinput,
-      Select,
-      Taginput,
-    ];
+    let comps = [Autocomplete, Datetimepicker, Field, Input, Select];
 
     for (let comp of comps) {
       v.use(comp);
