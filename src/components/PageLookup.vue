@@ -1,5 +1,5 @@
 <script>
-import { defineComponent, ref, watch } from "@vue/composition-api";
+import { defineComponent, ref, watch } from "vue";
 
 import { makeState } from "@/api/service-util.js";
 import { useClient } from "@/api/client.js";

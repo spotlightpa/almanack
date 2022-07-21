@@ -1,4 +1,4 @@
-import { reactive, computed, toRefs } from "@vue/composition-api";
+import { reactive, computed, toRefs } from "vue";
 
 import netlifyIdentity from "netlify-identity-widget";
 

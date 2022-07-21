@@ -1,5 +1,5 @@
 <script>
-import { computed, toRefs } from "@vue/composition-api";
+import { computed, toRefs } from "vue";
 
 import { usePage } from "@/api/spotlightpa-page.js";
 

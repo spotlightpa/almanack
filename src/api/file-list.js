@@ -1,4 +1,4 @@
-import { reactive, computed, toRefs } from "@vue/composition-api";
+import { reactive, computed, toRefs } from "vue";
 
 import { useClient } from "./client.js";
 import { makeState } from "./service-util.js";
