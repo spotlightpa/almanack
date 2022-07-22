@@ -3,7 +3,7 @@ import Vue, { reactive, computed, toRefs, watch } from "vue";
 
 import { useClient, makeState } from "@/api/hooks.js";
 import Page from "@/api/spotlightpa-all-pages-item.js";
-import { formatDateTime } from "@/utils/time-format.js";
+import { formatDateTime, today, tomorrow } from "@/utils/time-format.js";
 import useScrollTo from "@/utils/use-scroll-to.js";
 
 class EditorsPicksData {
@@ -118,6 +118,8 @@ export default {
       removeScheduledPick(i) {
         state.allEdPicks.splice(i, 1);
       },
+      today,
+      tomorrow,
     };
   },
 };
@@ -153,31 +155,43 @@ export default {
           Remove {{ formatDateTime(edpick.scheduleFor) }}
         </button>
       </div>
-      <h2 class="mt-2 title">Add a scheduled change</h2>
-      <BulmaField v-slot="{ idForLabel }" label="Schedule for">
-        <b-datetimepicker
-          :id="idForLabel"
-          v-model="nextSchedule"
-          icon="user-clock"
-          :datetime-formatter="formatDateTime"
-          :inline="true"
-          locale="en-US"
-        />
-        <button
-          type="button"
-          :disabled="!nextSchedule || nextSchedule < new Date()"
-          class="mt-3 button is-success has-text-weight-semibold"
-          @click="addScheduledPicks"
-        >
-          <span class="icon is-size-6">
-            <font-awesome-icon :icon="['fas', 'plus']" />
-          </span>
-          <span>Add</span>
-        </button>
-      </BulmaField>
+      <h2 class="mt-2 mb-0 title is-size-3">Add a scheduled change</h2>
+      <BulmaDateTime
+        v-model="nextSchedule"
+        label="Schedule for"
+        icon="user-clock"
+      >
+        <p class="mt-2 buttons">
+          <button
+            type="button"
+            :disabled="!nextSchedule || nextSchedule < new Date()"
+            class="button is-small is-success has-text-weight-semibold"
+            @click="addScheduledPicks"
+          >
+            <span class="icon is-size-6">
+              <font-awesome-icon :icon="['fas', 'plus']" />
+            </span>
+            <span>Add</span>
+          </button>
+          <button
+            class="button is-small is-light has-text-weight-semibold"
+            type="button"
+            @click="nextSchedule = today()"
+          >
+            Today
+          </button>
+          <button
+            type="button"
+            class="button is-small is-light has-text-weight-semibold"
+            @click="nextSchedule = tomorrow()"
+          >
+            Tomorrow
+          </button>
+        </p>
+      </BulmaDateTime>
     </div>
 
-    <div class="my-2 buttons">
+    <div class="mt-5 buttons">
       <button
         type="button"
         class="button is-primary has-text-weight-semibold"

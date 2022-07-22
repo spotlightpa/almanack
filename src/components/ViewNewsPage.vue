@@ -89,19 +89,12 @@ export default {
     </h2>
 
     <form v-if="page" ref="form">
-      <BulmaField
-        v-slot="{ idForLabel }"
+      <BulmaDateTime
+        v-model="page.publishedAt"
         label="Publication Date"
+        :icon="['fas', 'user-clock']"
         help="Page will be listed on the site under this date"
       >
-        <b-datetimepicker
-          :id="idForLabel"
-          v-model="page.publishedAt"
-          icon="user-clock"
-          :datetime-formatter="formatDateTime"
-          locale="en-US"
-          :datepicker="{ required: false }"
-        />
         <p class="content is-small">
           <a
             href="#"
@@ -111,7 +104,8 @@ export default {
             Set to now
           </a>
         </p>
-      </BulmaField>
+      </BulmaDateTime>
+
       <p v-if="page.isFutureDated" class="content has-text-warning is-small">
         Article publication date is in the future.
       </p>
@@ -123,20 +117,13 @@ export default {
         help="Topics are open-ended collections, e.g. “Events”, “Coronavirus”"
       />
 
-      <BulmaField
+      <BulmaDateTime
         v-if="page.topics.includes('Events')"
-        v-slot="{ idForLabel }"
+        v-model="page.eventDate"
         label="Event Date"
         help="If present, the events landing page will show this date for the event"
-      >
-        <b-datetimepicker
-          :id="idForLabel"
-          v-model="page.eventDate"
-          icon="user-clock"
-          :datetime-formatter="formatDateTime"
-          locale="en-US"
-        />
-      </BulmaField>
+        icon="user-clock"
+      />
 
       <BulmaAutocompleteArray
         v-model="page.series"
@@ -381,22 +368,15 @@ export default {
       </p>
 
       <div v-if="page.status !== 'pub'" class="field mb-5">
-        <BulmaField
-          v-slot="{ idForLabel }"
+        <BulmaDateTime
+          v-model="page.scheduleFor"
           :label="
             page.status === 'sked'
               ? `Scheduled for ${formatDateTime(page.scheduleFor)}`
               : `Schedule for`
           "
+          icon="user-clock"
         >
-          <b-datetimepicker
-            :id="idForLabel"
-            v-model="page.scheduleFor"
-            icon="user-clock"
-            :datetime-formatter="formatDateTime"
-            :inline="true"
-            locale="en-US"
-          />
           <p v-if="page.isFutureDated" class="mt-2 content is-small">
             <a
               href="#"
@@ -406,7 +386,7 @@ export default {
               Schedule for publication date
             </a>
           </p>
-        </BulmaField>
+        </BulmaDateTime>
       </div>
       <div class="field">
         <div class="buttons">
