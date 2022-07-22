@@ -1,10 +1,9 @@
 <script>
-import { reactive, computed, toRefs, watch } from "vue";
+import { computed, watch } from "vue";
 
 import { useClient, makeState } from "@/api/hooks.js";
 import imgproxyURL from "@/api/imgproxy-url.js";
 
-import fuzzyMatch from "@/utils/fuzzy-match.js";
 import { formatDate } from "@/utils/time-format.js";
 
 const toImageObj = (rawImage) => ({
@@ -20,7 +19,6 @@ const toImageObj = (rawImage) => ({
   srcURL: rawImage.src_url,
   date: new Date(rawImage.created_at),
 });
-const imageProps = (image) => [image.description, image.credit];
 
 export default {
   props: { page: { type: String, default: "0" } },
@@ -32,41 +30,22 @@ export default {
     const { apiStateRefs, exec } = makeState();
     const { rawData } = apiStateRefs;
 
-    let state = reactive({
-      images: computed(() => {
-        if (!rawData.value?.images) {
-          return [];
-        }
-        return rawData.value.images.map((obj) => toImageObj(obj));
-      }),
-      rawFilter: "",
-      imageProps: computed(() =>
-        Array.from(
-          new Set(state.images.flatMap((article) => imageProps(article)))
-        ).sort()
-      ),
-      filteredImages: computed(() => {
-        if (!state.rawFilter) {
-          return state.images;
-        }
-        return state.images.filter((article) =>
-          imageProps(article).some((prop) => fuzzyMatch(prop, state.rawFilter))
-        );
-      }),
-      filterOptions: computed(() =>
-        state.imageProps.filter((prop) => fuzzyMatch(prop, state.rawFilter))
-      ),
-      nextPage: computed(() => {
-        if (!rawData.value?.next_page) {
-          return null;
-        }
-        return {
-          name: "image-uploader",
-          query: {
-            page: "" + rawData.value.next_page,
-          },
-        };
-      }),
+    const images = computed(() => {
+      if (!rawData.value?.images) {
+        return [];
+      }
+      return rawData.value.images.map((obj) => toImageObj(obj));
+    });
+    const nextPage = computed(() => {
+      if (!rawData.value?.next_page) {
+        return null;
+      }
+      return {
+        name: "image-uploader",
+        query: {
+          page: "" + rawData.value.next_page,
+        },
+      };
     });
 
     let actions = {
@@ -104,7 +83,8 @@ export default {
 
     return {
       ...apiStateRefs,
-      ...toRefs(state),
+      images,
+      nextPage,
       ...actions,
       formatDate,
     };
@@ -123,20 +103,9 @@ export default {
 
     <h2 class="title has-margin-top">Existing Images</h2>
     <APILoader :is-loading="isLoading" :reload="fetch" :error="error">
-      <BulmaField label="">
-        <b-autocomplete
-          v-model="rawFilter"
-          :data="filterOptions"
-          placeholder="Filter images"
-          clearable
-        >
-          <template v-slot:empty>No results found</template>
-        </b-autocomplete>
-      </BulmaField>
-
       <table class="table is-striped is-fullwidth">
         <tbody>
-          <tr v-for="image of filteredImages" :key="image.id">
+          <tr v-for="image of images" :key="image.id">
             <td>
               <div class="max-128">
                 <picture

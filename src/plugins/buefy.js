@@ -1,7 +1,7 @@
 import Vue from "vue";
 
 import config from "buefy/src/utils/config";
-import { Autocomplete, Datetimepicker } from "buefy/src/components";
+import { Datetimepicker } from "buefy/src/components";
 
 const MyBuefy = {
   install(v, options = {}) {
@@ -10,7 +10,7 @@ const MyBuefy = {
       defaultIconPack: "fas",
     });
 
-    let comps = [Autocomplete, Datetimepicker];
+    let comps = [Datetimepicker];
 
     for (let comp of comps) {
       v.use(comp);
