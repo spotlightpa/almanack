@@ -1,10 +1,11 @@
 <script>
-import Vue, { ref, nextTick, reactive, toRefs, watch } from "vue";
+import Vue, { reactive, toRefs, watch } from "vue";
 
 import { useClient, makeState } from "@/api/hooks.js";
 import { useFileList } from "@/api/file-list.js";
 
 import { formatDateTime } from "@/utils/time-format.js";
+import useScrollTo from "@/utils/use-scroll-to.js";
 
 class SiteParams {
   constructor(config) {
@@ -30,7 +31,7 @@ export default {
     title: "Sitewide Settings",
   },
   setup() {
-    const container = ref();
+    const [container, scrollTo] = useScrollTo();
 
     let { getSiteParams, postSiteParams } = useClient();
     const { apiState, exec } = makeState();
@@ -69,15 +70,7 @@ export default {
           })
         );
         state.nextSchedule = null;
-        await nextTick();
-
-        let el = container.value;
-        let headings = el.querySelectorAll("[data-heading]");
-        let newPick = Array.from(headings).at(-1);
-        newPick.scrollIntoView({
-          behavior: "smooth",
-          block: "start",
-        });
+        await scrollTo();
       },
       removeScheduledConfig(i) {
         state.configs.splice(i, 1);
@@ -117,7 +110,7 @@ export default {
 
     <div v-if="configs.length" ref="container">
       <div v-for="(params, i) of configs" :key="i" class="px-2 py-4 zebra-row">
-        <h2 data-heading class="title is-3">
+        <h2 data-scroll-to class="title is-3">
           {{
             params.isCurrent
               ? "Current Settings"

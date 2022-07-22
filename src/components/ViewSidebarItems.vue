@@ -1,9 +1,10 @@
 <script>
-import Vue, { nextTick, ref, reactive, computed, toRefs, watch } from "vue";
+import Vue, { reactive, computed, toRefs, watch } from "vue";
 
 import Page from "@/api/spotlightpa-all-pages-item.js";
 import { useClient, makeState } from "@/api/hooks.js";
 import { formatDateTime } from "@/utils/time-format.js";
+import useScrollTo from "@/utils/use-scroll-to.js";
 
 let itemIds = 0;
 
@@ -82,7 +83,8 @@ export default {
     title: "Sidebar Editor",
   },
   setup() {
-    const container = ref();
+    const [container, scrollTo] = useScrollTo();
+
     let { listAllPages, getSidebar, saveSidebar } = useClient();
     let { apiState: pagesState, exec: pagesExec } = makeState();
     let { apiState: sidebarState, exec: sidebarExec } = makeState();
@@ -136,15 +138,7 @@ export default {
         let lastPick = state.allSidebars[state.allSidebars.length - 1];
         state.allSidebars.push(lastPick.clone(state.nextSchedule));
         state.nextSchedule = null;
-        await nextTick();
-
-        let el = container.value;
-        let headings = el.querySelectorAll("[data-heading]");
-        let newPick = Array.from(headings).at(-1);
-        newPick.scrollIntoView({
-          behavior: "smooth",
-          block: "start",
-        });
+        await scrollTo();
       },
       removeScheduledPick(i) {
         state.allSidebars.splice(i, 1);
@@ -167,7 +161,7 @@ export default {
 
     <div v-if="allSidebars.length" ref="container">
       <div v-for="(sidebar, i) of allSidebars" :key="i" class="p-4 zebra-row">
-        <h2 data-heading class="title">
+        <h2 data-scroll-to class="title">
           {{
             sidebar.isCurrent
               ? "Current Sidebar"
