@@ -245,7 +245,7 @@ export default {
       />
       <BulmaFieldInput v-model="page.imageCredit" label="Image credit" />
 
-      <b-field label="Image size">
+      <BulmaField label="Image size">
         <div class="control is-expanded">
           <span class="select is-fullwidth">
             <select v-model="page.imageSize">
@@ -263,7 +263,7 @@ export default {
             </select>
           </span>
         </div>
-      </b-field>
+      </BulmaField>
 
       <BulmaFieldInput
         v-model="page.slug"

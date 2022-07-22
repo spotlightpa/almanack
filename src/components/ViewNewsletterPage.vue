@@ -187,13 +187,13 @@ export default {
       />
       <BulmaFieldInput v-model="page.imageCredit" label="Image credit" />
 
-      <b-field label="URL keywords slug">
+      <BulmaField label="URL keywords slug">
         <BulmaFieldInput
           v-model="page.slug"
           :disabled="page.isPublished"
           :readonly="page.isPublished"
         />
-      </b-field>
+      </BulmaField>
       <button
         class="block button is-small is-light has-text-weight-semibold"
         type="button"

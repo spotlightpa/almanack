@@ -19,24 +19,24 @@ export default {
       <PageSelector :pages="pages" @select="push($event)" />
     </div>
     <div class="column is-half">
-      <b-field label="Homepage featured article">
+      <BulmaField label="Homepage featured article">
         <HomepageEditorDraggable v-model="editorsPicks.featuredStories" />
         Pin top story on homepage
-      </b-field>
-      <b-field label="Subfeatures stories">
+      </BulmaField>
+      <BulmaField label="Subfeatures stories">
         <HomepageEditorDraggable v-model="editorsPicks.subfeatures" />
 
         Bulleted items under the top story
-      </b-field>
-      <b-field label="Pinned stories">
+      </BulmaField>
+      <BulmaField label="Pinned stories">
         <HomepageEditorDraggable v-model="editorsPicks.topSlots" />
         Pin stories at the top of homepage
-      </b-field>
-      <b-field label="Homepage topper">
+      </BulmaField>
+      <BulmaField label="Homepage topper">
         <HomepageEditorDraggable v-model="editorsPicks.topper" />
         If populated, a topper will appear on the homepage with the first story
         as its featured item and the other stories as bulleted items underneath
-      </b-field>
+      </BulmaField>
     </div>
   </div>
 </template>
