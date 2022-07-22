@@ -1,9 +1,10 @@
 <script>
-import Vue, { nextTick, reactive, computed, ref, toRefs, watch } from "vue";
+import Vue, { reactive, computed, toRefs, watch } from "vue";
 
 import { useClient, makeState } from "@/api/hooks.js";
 import Page from "@/api/spotlightpa-all-pages-item.js";
 import { formatDateTime } from "@/utils/time-format.js";
+import useScrollTo from "@/utils/use-scroll-to.js";
 
 class EditorsPicksData {
   constructor(siteConfig, pagesByPath) {
@@ -55,7 +56,7 @@ export default {
     title: "Homepage Editor",
   },
   setup() {
-    const container = ref();
+    const [container, scrollTo] = useScrollTo();
 
     let { listAllPages, getEditorsPicks, saveEditorsPicks } = useClient();
     let { apiState: listState, exec: listExec } = makeState();
@@ -112,14 +113,7 @@ export default {
         let lastPick = state.allEdPicks[state.allEdPicks.length - 1];
         state.allEdPicks.push(lastPick.clone(state.nextSchedule));
         state.nextSchedule = null;
-        await nextTick();
-        let el = container.value;
-        let headings = el.querySelectorAll("h2");
-        let newPick = Array.from(headings).at(-2);
-        newPick.scrollIntoView({
-          behavior: "smooth",
-          block: "start",
-        });
+        await scrollTo();
       },
       removeScheduledPick(i) {
         state.allEdPicks.splice(i, 1);
@@ -142,7 +136,7 @@ export default {
 
     <div v-if="allEdPicks.length" ref="container">
       <div v-for="(edpick, i) of allEdPicks" :key="i" class="p-4 zebra-row">
-        <h2 class="title">
+        <h2 class="title" data-scroll-to>
           {{
             edpick.isCurrent
               ? "Current Homepage"
@@ -183,7 +177,7 @@ export default {
       </BulmaField>
     </div>
 
-    <div class="mt-2 buttons">
+    <div class="my-2 buttons">
       <button
         type="button"
         class="button is-primary has-text-weight-semibold"

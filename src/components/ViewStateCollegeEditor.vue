@@ -1,9 +1,11 @@
 <script>
-import Vue, { ref, nextTick, reactive, computed, toRefs, watch } from "vue";
+import Vue, { reactive, computed, toRefs, watch } from "vue";
 
 import { useClient, makeState } from "@/api/hooks.js";
 import Page from "@/api/spotlightpa-all-pages-item.js";
+
 import { formatDateTime } from "@/utils/time-format.js";
+import useScrollTo from "@/utils/use-scroll-to.js";
 
 class EditorsPicksData {
   constructor(siteConfig, pagesByPath) {
@@ -55,7 +57,7 @@ export default {
     title: "State College Frontpage Editor",
   },
   setup() {
-    const container = ref();
+    const [container, scrollTo] = useScrollTo();
 
     let { listAllPages, getStateCollegeEditor, saveStateCollegeEditor } =
       useClient();
@@ -113,14 +115,7 @@ export default {
         let lastPick = state.allEdPicks[state.allEdPicks.length - 1];
         state.allEdPicks.push(lastPick.clone(state.nextSchedule));
         state.nextSchedule = null;
-        await nextTick();
-        let el = container.value;
-        let headings = el.querySelectorAll("[data-heading]");
-        let newPick = Array.from(headings).at(-1);
-        newPick.scrollIntoView({
-          behavior: "smooth",
-          block: "start",
-        });
+        await scrollTo();
       },
       removeScheduledPick(i) {
         state.allEdPicks.splice(i, 1);
@@ -146,7 +141,7 @@ export default {
 
     <div v-if="allEdPicks.length" ref="container" class="my-1">
       <div v-for="(edpick, i) of allEdPicks" :key="i" class="p-4 zebra-row">
-        <h2 data-heading class="title">
+        <h2 data-scroll-to class="title">
           {{
             edpick.isCurrent
               ? "Current Frontpage"
