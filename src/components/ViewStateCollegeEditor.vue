@@ -1,5 +1,5 @@
 <script>
-import Vue, { reactive, computed, toRefs, watch } from "vue";
+import Vue, { ref, nextTick, reactive, computed, toRefs, watch } from "vue";
 
 import { useClient, makeState } from "@/api/hooks.js";
 import Page from "@/api/spotlightpa-all-pages-item.js";
@@ -55,6 +55,8 @@ export default {
     title: "State College Frontpage Editor",
   },
   setup() {
+    const container = ref();
+
     let { listAllPages, getStateCollegeEditor, saveStateCollegeEditor } =
       useClient();
     let { apiState: listState, exec: listExec } = makeState();
@@ -102,6 +104,8 @@ export default {
     );
     actions.reload();
     return {
+      container,
+
       ...toRefs(state),
       ...actions,
       formatDateTime,
@@ -109,10 +113,11 @@ export default {
         let lastPick = state.allEdPicks[state.allEdPicks.length - 1];
         state.allEdPicks.push(lastPick.clone(state.nextSchedule));
         state.nextSchedule = null;
-        await this.$nextTick();
-        // TODO: Fix this array if we ever upgrade to Vue 3
-        // https://vueuse.org/core/useTemplateRefsList/
-        this.$refs.edPicksEls[this.$refs.edPicksEls.length - 1].scrollIntoView({
+        await nextTick();
+        let el = container.value;
+        let headings = el.querySelectorAll("[data-heading]");
+        let newPick = Array.from(headings).at(-1);
+        newPick.scrollIntoView({
           behavior: "smooth",
           block: "start",
         });
@@ -139,9 +144,9 @@ export default {
 
     <h1 class="title">State College Frontpage Editor</h1>
 
-    <template v-if="allEdPicks.length">
+    <div v-if="allEdPicks.length" ref="container" class="my-1">
       <div v-for="(edpick, i) of allEdPicks" :key="i" class="p-4 zebra-row">
-        <h2 ref="edPicksEls" class="title">
+        <h2 data-heading class="title">
           {{
             edpick.isCurrent
               ? "Current Frontpage"
@@ -180,7 +185,7 @@ export default {
           <span>Add</span>
         </button>
       </BulmaField>
-    </template>
+    </div>
 
     <div class="buttons">
       <button

@@ -1,5 +1,5 @@
 <script>
-import Vue, { reactive, computed, toRefs, watch } from "vue";
+import Vue, { nextTick, ref, reactive, computed, toRefs, watch } from "vue";
 
 import Page from "@/api/spotlightpa-all-pages-item.js";
 import { useClient, makeState } from "@/api/hooks.js";
@@ -82,6 +82,7 @@ export default {
     title: "Sidebar Editor",
   },
   setup() {
+    const container = ref();
     let { listAllPages, getSidebar, saveSidebar } = useClient();
     let { apiState: pagesState, exec: pagesExec } = makeState();
     let { apiState: sidebarState, exec: sidebarExec } = makeState();
@@ -125,6 +126,7 @@ export default {
     actions.reloadSidebars();
     actions.reloadPages();
     return {
+      container,
       sidebarState,
       pagesState,
       ...toRefs(state),
@@ -134,10 +136,12 @@ export default {
         let lastPick = state.allSidebars[state.allSidebars.length - 1];
         state.allSidebars.push(lastPick.clone(state.nextSchedule));
         state.nextSchedule = null;
-        await this.$nextTick();
-        // TODO: Fix this array if we ever upgrade to Vue 3
-        // https://vueuse.org/core/useTemplateRefsList/
-        this.$refs.sidebarEls[this.$refs.sidebarEls.length - 1].scrollIntoView({
+        await nextTick();
+
+        let el = container.value;
+        let headings = el.querySelectorAll("[data-heading]");
+        let newPick = Array.from(headings).at(-1);
+        newPick.scrollIntoView({
           behavior: "smooth",
           block: "start",
         });
@@ -161,9 +165,9 @@ export default {
 
     <h1 class="title">Sidebar Items</h1>
 
-    <template v-if="allSidebars.length">
+    <div v-if="allSidebars.length" ref="container">
       <div v-for="(sidebar, i) of allSidebars" :key="i" class="p-4 zebra-row">
-        <h2 ref="sidebarEls" class="title">
+        <h2 data-heading class="title">
           {{
             sidebar.isCurrent
               ? "Current Sidebar"
@@ -199,7 +203,7 @@ export default {
           Remove {{ formatDateTime(sidebar.scheduleFor) }}
         </button>
       </div>
-    </template>
+    </div>
     <template v-if="!sidebarState.isLoading">
       <h2 class="mt-2 title">Add a scheduled change</h2>
       <BulmaField v-slot="{ idForLabel }" label="Schedule for">
