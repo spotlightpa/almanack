@@ -1,5 +1,5 @@
 <script>
-import Vue, { reactive, toRefs, watch } from "vue";
+import Vue, { ref, nextTick, reactive, toRefs, watch } from "vue";
 
 import { useClient, makeState } from "@/api/hooks.js";
 import { useFileList } from "@/api/file-list.js";
@@ -30,6 +30,8 @@ export default {
     title: "Sitewide Settings",
   },
   setup() {
+    const container = ref();
+
     let { getSiteParams, postSiteParams } = useClient();
     const { apiState, exec } = makeState();
 
@@ -67,10 +69,12 @@ export default {
           })
         );
         state.nextSchedule = null;
-        await this.$nextTick();
-        // TODO: Fix this array if we ever upgrade to Vue 3
-        // https://vueuse.org/core/useTemplateRefsList/
-        this.$refs.configEls[this.$refs.configEls.length - 1].scrollIntoView({
+        await nextTick();
+
+        let el = container.value;
+        let headings = el.querySelectorAll("[data-heading]");
+        let newPick = Array.from(headings).at(-1);
+        newPick.scrollIntoView({
           behavior: "smooth",
           block: "start",
         });
@@ -88,6 +92,7 @@ export default {
     actions.fetch();
 
     return {
+      container,
       ...toRefs(state),
       ...actions,
 
@@ -110,9 +115,9 @@ export default {
       <h1 class="title">Sitewide Settings</h1>
     </div>
 
-    <template v-if="configs.length">
+    <div v-if="configs.length" ref="container">
       <div v-for="(params, i) of configs" :key="i" class="px-2 py-4 zebra-row">
-        <h2 ref="configEls" class="title is-3">
+        <h2 data-heading class="title is-3">
           {{
             params.isCurrent
               ? "Current Settings"
@@ -151,9 +156,9 @@ export default {
           <span>Add</span>
         </button>
       </BulmaField>
-    </template>
+    </div>
 
-    <div class="buttons">
+    <div class="mt-1 buttons">
       <button
         type="button"
         class="button is-primary has-text-weight-semibold"

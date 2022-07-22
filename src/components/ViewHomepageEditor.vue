@@ -1,6 +1,5 @@
 <script>
-import Vue from "vue";
-import { reactive, computed, toRefs, watch } from "vue";
+import Vue, { nextTick, reactive, computed, ref, toRefs, watch } from "vue";
 
 import { useClient, makeState } from "@/api/hooks.js";
 import Page from "@/api/spotlightpa-all-pages-item.js";
@@ -56,6 +55,8 @@ export default {
     title: "Homepage Editor",
   },
   setup() {
+    const container = ref();
+
     let { listAllPages, getEditorsPicks, saveEditorsPicks } = useClient();
     let { apiState: listState, exec: listExec } = makeState();
     let { apiState: edPicksState, exec: edPickExec } = makeState();
@@ -103,6 +104,7 @@ export default {
     );
     actions.reload();
     return {
+      container,
       ...toRefs(state),
       ...actions,
       formatDateTime,
@@ -110,10 +112,11 @@ export default {
         let lastPick = state.allEdPicks[state.allEdPicks.length - 1];
         state.allEdPicks.push(lastPick.clone(state.nextSchedule));
         state.nextSchedule = null;
-        await this.$nextTick();
-        // TODO: Fix this array if we ever upgrade to Vue 3
-        // https://vueuse.org/core/useTemplateRefsList/
-        this.$refs.edPicksEls[this.$refs.edPicksEls.length - 1].scrollIntoView({
+        await nextTick();
+        let el = container.value;
+        let headings = el.querySelectorAll("h2");
+        let newPick = Array.from(headings).at(-2);
+        newPick.scrollIntoView({
           behavior: "smooth",
           block: "start",
         });
@@ -137,9 +140,9 @@ export default {
 
     <h1 class="title">Homepage Editor</h1>
 
-    <template v-if="allEdPicks.length">
+    <div v-if="allEdPicks.length" ref="container">
       <div v-for="(edpick, i) of allEdPicks" :key="i" class="p-4 zebra-row">
-        <h2 ref="edPicksEls" class="title">
+        <h2 class="title">
           {{
             edpick.isCurrent
               ? "Current Homepage"
@@ -178,9 +181,9 @@ export default {
           <span>Add</span>
         </button>
       </BulmaField>
-    </template>
+    </div>
 
-    <div class="buttons">
+    <div class="mt-2 buttons">
       <button
         type="button"
         class="button is-primary has-text-weight-semibold"
