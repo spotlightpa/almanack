@@ -123,7 +123,7 @@ export default {
 
     <h2 class="title has-margin-top">Existing Images</h2>
     <APILoader :is-loading="isLoading" :reload="fetch" :error="error">
-      <b-field label="">
+      <BulmaField label="">
         <b-autocomplete
           v-model="rawFilter"
           :data="filterOptions"
@@ -132,7 +132,7 @@ export default {
         >
           <template v-slot:empty>No results found</template>
         </b-autocomplete>
-      </b-field>
+      </BulmaField>
 
       <table class="table is-striped is-fullwidth">
         <tbody>

@@ -31,9 +31,9 @@ export default {
 
 <template>
   <div>
-    <b-field label="Spotlight PA Pages">
+    <BulmaField label="Spotlight PA Pages">
       <input v-model="filterText" class="input" placeholder="Filter pages" />
-    </b-field>
+    </BulmaField>
 
     <draggable
       class="dropdown-content"
