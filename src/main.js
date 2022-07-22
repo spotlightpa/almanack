@@ -10,7 +10,6 @@ Sentry.init({ dsn });
 import Vue from "vue";
 import router from "./router.js";
 import "./plugins/font-awesome.js";
-import "./plugins/buefy.js";
 
 import VueMeta from "vue-meta";
 Vue.use(VueMeta);
