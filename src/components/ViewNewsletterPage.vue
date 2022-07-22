@@ -57,18 +57,12 @@ export default {
     </h1>
 
     <form v-if="page" ref="form">
-      <BulmaField
-        v-slot="{ idForLabel }"
+      <BulmaDateTime
+        v-model="page.publishedAt"
         label="Publication Date"
+        icon="user-clock"
         help="Page will be listed on the site under this date"
       >
-        <b-datetimepicker
-          :id="idForLabel"
-          v-model="page.publishedAt"
-          icon="user-clock"
-          :datetime-formatter="formatDateTime"
-          locale="en-US"
-        />
         <p class="content is-small">
           <a
             href="#"
@@ -78,7 +72,8 @@ export default {
             Set to now
           </a>
         </p>
-      </BulmaField>
+      </BulmaDateTime>
+
       <p
         v-if="page.publishedAt - new Date() > 0"
         class="content has-text-primary is-small"
@@ -276,20 +271,17 @@ export default {
                 : "Schedule for"
             }}
           </summary>
-
-          <BulmaField
-            v-slot="{ idForLabel }"
-            help="Page will be automatically published at this time if set"
-          >
-            <b-datetimepicker
-              :id="idForLabel"
-              v-model="page.scheduleFor"
-              icon="user-clock"
-              :datetime-formatter="formatDateTime"
-              :inline="true"
-              locale="en-US"
-            />
-          </BulmaField>
+          <BulmaDateTime v-model="page.scheduleFor" icon="user-clock">
+            <p v-if="page.isFutureDated" class="mt-2 content is-small">
+              <a
+                href="#"
+                class="has-text-info"
+                @click.prevent="page.scheduleFor = page.publishedAt"
+              >
+                Schedule for publication date
+              </a>
+            </p>
+          </BulmaDateTime>
         </details>
       </div>
       <div class="field">

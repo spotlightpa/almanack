@@ -3,7 +3,7 @@ import Vue, { reactive, computed, toRefs, watch } from "vue";
 
 import Page from "@/api/spotlightpa-all-pages-item.js";
 import { useClient, makeState } from "@/api/hooks.js";
-import { formatDateTime } from "@/utils/time-format.js";
+import { formatDateTime, today, tomorrow } from "@/utils/time-format.js";
 import useScrollTo from "@/utils/use-scroll-to.js";
 
 let itemIds = 0;
@@ -129,6 +129,8 @@ export default {
     actions.reloadPages();
     return {
       container,
+      today,
+      tomorrow,
       sidebarState,
       pagesState,
       ...toRefs(state),
@@ -182,7 +184,7 @@ export default {
             />
           </div>
           <div class="column is-full">
-            <h2 class="title">Add new item</h2>
+            <h2 class="mb-1 title is-size-3">Add new item</h2>
             <PageSelector :pages="pages" @select="sidebar.add($event)" />
             <SpinnerProgress :is-loading="pagesState.isLoading" />
             <ErrorReloader :error="pagesState.error" @reload="reloadPages" />
@@ -199,31 +201,43 @@ export default {
       </div>
     </div>
     <template v-if="!sidebarState.isLoading">
-      <h2 class="mt-2 title">Add a scheduled change</h2>
-      <BulmaField v-slot="{ idForLabel }" label="Schedule for">
-        <b-datetimepicker
-          :id="idForLabel"
-          v-model="nextSchedule"
-          icon="user-clock"
-          :datetime-formatter="formatDateTime"
-          :inline="true"
-          locale="en-US"
-        />
-        <button
-          type="button"
-          :disabled="!nextSchedule || nextSchedule < new Date()"
-          class="mt-3 button is-success has-text-weight-semibold"
-          @click="addScheduledPicks"
-        >
-          <span class="icon is-size-6">
-            <font-awesome-icon :icon="['fas', 'plus']" />
-          </span>
-          <span>Add</span>
-        </button>
-      </BulmaField>
+      <h2 class="mt-2 mb-0 title is-size-3">Add a scheduled change</h2>
+      <BulmaDateTime
+        v-model="nextSchedule"
+        label="Schedule for"
+        icon="user-clock"
+      >
+        <p class="mt-2 buttons">
+          <button
+            type="button"
+            :disabled="!nextSchedule || nextSchedule < new Date()"
+            class="button is-small is-success has-text-weight-semibold"
+            @click="addScheduledPicks"
+          >
+            <span class="icon is-size-6">
+              <font-awesome-icon :icon="['fas', 'plus']" />
+            </span>
+            <span>Add</span>
+          </button>
+          <button
+            class="button is-small is-light has-text-weight-semibold"
+            type="button"
+            @click="nextSchedule = today()"
+          >
+            Today
+          </button>
+          <button
+            type="button"
+            class="button is-small is-light has-text-weight-semibold"
+            @click="nextSchedule = tomorrow()"
+          >
+            Tomorrow
+          </button>
+        </p>
+      </BulmaDateTime>
     </template>
 
-    <div class="buttons">
+    <div class="mt-5 buttons">
       <button
         type="button"
         class="button is-primary has-text-weight-semibold"

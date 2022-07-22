@@ -51,3 +51,20 @@ export function formatDateTime(d) {
   tz = tz && " " + tz;
   return aptime(d) + " " + toShortWeekday.format(d) + "., " + apdate(d) + tz;
 }
+
+export function today() {
+  let d = new Date();
+  d.setHours(d.getHours() + 1);
+  d.setMinutes(0);
+  d.setSeconds(0);
+  return d;
+}
+
+export function tomorrow() {
+  let d = new Date();
+  d.setDate(d.getDate() + 1);
+  d.setHours(5);
+  d.setMinutes(0);
+  d.setSeconds(0);
+  return d;
+}
