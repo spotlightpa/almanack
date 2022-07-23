@@ -37,15 +37,15 @@ export default {
     <ArticleWordCount :article="article" />
 
     <h2 class="title">Working Hed</h2>
-    <NoCopyTextArea v-text="article.headline" />
+    <NoCopyTextArea>{{ article.headline }}</NoCopyTextArea>
 
     <template v-if="article.description">
       <h2 class="title">Working Description</h2>
-      <NoCopyTextArea v-text="article.description" />
+      <NoCopyTextArea>{{ article.description }}</NoCopyTextArea>
     </template>
 
     <h2 class="title">Byline</h2>
-    <NoCopyTextArea v-text="article.byline" />
+    <NoCopyTextArea>{{ article.byline }}</NoCopyTextArea>
 
     <template v-if="article.featuredImage">
       <h2 class="title">Working Image</h2>

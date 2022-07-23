@@ -12,7 +12,9 @@ export default {
         :key="i"
         :class="{ 'is-active': i === links.length - 1 }"
       >
-        <router-link exact :to="link.to" v-text="link.name" />
+        <router-link exact :to="link.to">
+          {{ link.name }}
+        </router-link>
       </li>
     </ul>
   </nav>

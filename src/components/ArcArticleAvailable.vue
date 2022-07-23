@@ -192,8 +192,8 @@ export default {
       v-show="viewHTML"
       ref="copyHTML"
       size="is-small height-50vh"
-      v-text="articleHTML"
-    />
+      >{{ articleHTML }}</CopyTextarea
+    >
 
     <details class="block">
       <summary class="title">Budget details</summary>
