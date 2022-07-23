@@ -24,12 +24,9 @@ export default {
   <div class="has-margin-bottom">
     <div class="field">
       <div class="control">
-        <CopyTextarea
-          ref="copier"
-          :size="size"
-          @copied="copied = $event"
-          v-text="value"
-        />
+        <CopyTextarea ref="copier" :size="size" @copied="copied = $event">{{
+          value
+        }}</CopyTextarea>
       </div>
     </div>
     <div class="field">

@@ -34,7 +34,7 @@ module.exports = {
       },
     ],
     "vue/mustache-interpolation-spacing": ["warn", "always"],
-    "vue/name-property-casing": ["warn", "PascalCase"],
+    "vue/component-definition-name-casing": ["warn", "PascalCase"],
     "vue/order-in-components": [
       "warn",
       {
