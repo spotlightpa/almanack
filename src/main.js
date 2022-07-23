@@ -16,11 +16,11 @@ Vue.use(VueMeta);
 
 import "./plugins/autoimport.js";
 
-import App from "./components/TheApp.vue";
+import TheApp from "./components/TheApp.vue";
 
 Vue.config.ignoredElements = ["raw-html"];
 
 new Vue({
   router,
-  render: (h) => h(App),
+  render: (h) => h(TheApp),
 }).$mount("#app");
