@@ -88,6 +88,7 @@ function emitTime(value) {
           class="input"
           type="time"
           :value="time"
+          step="1"
           @input="emitTime($event.target.value)"
         />
       </p>
