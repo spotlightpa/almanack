@@ -1,3 +1,5 @@
+import { h } from "vue";
+
 import { intcomma } from "journalize";
 
 import getProp from "@/utils/getter.js";
@@ -281,7 +283,8 @@ export default class ArcArticle {
       if (renderer) {
         return {
           component: {
-            render(h) {
+            compatConfig: { RENDER_FUNCTION: false },
+            render() {
               return h("raw-html");
             },
           },
