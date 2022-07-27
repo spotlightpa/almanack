@@ -40,7 +40,6 @@ export default {
         help: this.help,
         labelClass: this.labelClass,
         required: this.required,
-        validationMessage: this.validationMessage,
       };
     },
   },
@@ -110,7 +109,7 @@ export default {
       <div v-for="(v, i) of value" :key="i" class="control">
         <div
           class="tags has-addons"
-          draggable="true"
+          :draggable="true"
           @dragstart="dragoverFrom = i"
           @dragover.prevent.stop="dragover(i)"
           @dragleave="dragleave()"
