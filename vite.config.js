@@ -1,17 +1,30 @@
 import { defineConfig } from "vite";
 
 import eslint from "vite-plugin-eslint";
-import vue from "@vitejs/plugin-vue2";
+import vue from "@vitejs/plugin-vue";
 
 import path from "path";
 
 export default defineConfig({
-  plugins: [vue(), eslint({ fix: true })],
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),
+      vue: "@vue/compat",
     },
   },
+  plugins: [
+    vue({
+      template: {
+        compilerOptions: {
+          isCustomElement: (tag) => tag === "raw-html",
+          compatConfig: {
+            MODE: 2,
+          },
+        },
+      },
+    }),
+    eslint({ fix: true }),
+  ],
   server: {
     port: 33159,
     strictPort: true,

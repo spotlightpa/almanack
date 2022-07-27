@@ -1,5 +1,5 @@
 import { watch } from "vue";
-import Router from "vue-router";
+import { createRouter, createWebHistory } from "vue-router";
 
 import { useAuth } from "@/api/hooks.js";
 import { setDimensions, sendGAPageview } from "@/utils/google-analytics.js";
@@ -27,9 +27,8 @@ import ViewUnauthorized from "@/components/ViewUnauthorized.vue";
 let { roles, fullName, email, isEditor, isSpotlightPAUser, isSignedIn } =
   useAuth();
 
-let router = new Router({
-  mode: "history",
-  base: import.meta.env.BASE_URL,
+let router = createRouter({
+  history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
     {
       path: "/",
