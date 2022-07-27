@@ -1,30 +1,28 @@
-import Vue, { watch } from "vue";
+import { watch } from "vue";
 import Router from "vue-router";
 
 import { useAuth } from "@/api/hooks.js";
 import { setDimensions, sendGAPageview } from "@/utils/google-analytics.js";
 
-import ViewAdmin from "./components/ViewAdmin.vue";
-import ViewArcArticle from "./components/ViewArcArticle.vue";
-import ViewAuthorizedDomains from "./components/ViewAuthorizedDomains.vue";
-import ViewError from "./components/ViewError.vue";
-import ViewFileUploader from "./components/ViewFileUploader.vue";
-import ViewHomepageEditor from "./components/ViewHomepageEditor.vue";
-import ViewImageUploader from "./components/ViewImageUploader.vue";
-import ViewLogin from "./components/ViewLogin.vue";
-import ViewNewsletterList from "./components/ViewNewsletterList.vue";
-import ViewNewsletterPage from "./components/ViewNewsletterPage.vue";
-import ViewNewsPage from "./components/ViewNewsPage.vue";
-import ViewNewsPagesList from "./components/ViewNewsPagesList.vue";
-import ViewRedirectArcToNewsPage from "./components/ViewRedirectArcToNewsPage.vue";
-import ViewStateCollegeList from "./components/ViewStateCollegeList.vue";
-import ViewSharedList from "./components/ViewSharedList.vue";
-import ViewSidebarItems from "./components/ViewSidebarItems.vue";
-import ViewSiteParams from "./components/ViewSiteParams.vue";
-import ViewStateCollegeEditor from "./components/ViewStateCollegeEditor.vue";
-import ViewUnauthorized from "./components/ViewUnauthorized.vue";
-
-Vue.use(Router);
+import ViewAdmin from "@/components/ViewAdmin.vue";
+import ViewArcArticle from "@/components/ViewArcArticle.vue";
+import ViewAuthorizedDomains from "@/components/ViewAuthorizedDomains.vue";
+import ViewError from "@/components/ViewError.vue";
+import ViewFileUploader from "@/components/ViewFileUploader.vue";
+import ViewHomepageEditor from "@/components/ViewHomepageEditor.vue";
+import ViewImageUploader from "@/components/ViewImageUploader.vue";
+import ViewLogin from "@/components/ViewLogin.vue";
+import ViewNewsletterList from "@/components/ViewNewsletterList.vue";
+import ViewNewsletterPage from "@/components/ViewNewsletterPage.vue";
+import ViewNewsPage from "@/components/ViewNewsPage.vue";
+import ViewNewsPagesList from "@/components/ViewNewsPagesList.vue";
+import ViewRedirectArcToNewsPage from "@/components/ViewRedirectArcToNewsPage.vue";
+import ViewStateCollegeList from "@/components/ViewStateCollegeList.vue";
+import ViewSharedList from "@/components/ViewSharedList.vue";
+import ViewSidebarItems from "@/components/ViewSidebarItems.vue";
+import ViewSiteParams from "@/components/ViewSiteParams.vue";
+import ViewStateCollegeEditor from "@/components/ViewStateCollegeEditor.vue";
+import ViewUnauthorized from "@/components/ViewUnauthorized.vue";
 
 let { roles, fullName, email, isEditor, isSpotlightPAUser, isSignedIn } =
   useAuth();
