@@ -255,14 +255,14 @@ export default {
       <BulmaFieldInput
         v-model="page.slug"
         label="URL keywords slug"
-        :disabled="page.isPublished"
-        :readonly="page.isPublished"
+        :disabled="page.isPublished || null"
+        :readonly="page.isPublished || null"
         :required="true"
       />
       <button
         class="block button is-small is-light has-text-weight-semibold"
         type="button"
-        :disabled="page.isPublished"
+        :disabled="page.isPublished || null"
         @click.prevent="deriveSlug"
       >
         Derive keywords from title
@@ -392,7 +392,7 @@ export default {
         <div class="buttons">
           <button
             class="button is-success has-text-weight-semibold"
-            :disabled="isLoading"
+            :disabled="isLoading || null"
             type="button"
             @click="publishNow($refs.form)"
           >
@@ -402,7 +402,10 @@ export default {
             v-if="page.status !== 'pub'"
             class="button is-warning has-text-weight-semibold"
             :disabled="
-              isLoading || !page.scheduleFor || page.scheduleFor < new Date()
+              isLoading ||
+              !page.scheduleFor ||
+              page.scheduleFor < new Date() ||
+              null
             "
             type="button"
             @click="updateSchedule($refs.form)"
@@ -414,7 +417,7 @@ export default {
           <button
             v-if="page.status === 'sked'"
             class="button is-danger has-text-weight-semibold"
-            :disabled="isLoading"
+            :disabled="isLoading || null"
             type="button"
             @click="updateOnly"
           >
@@ -423,7 +426,7 @@ export default {
           <button
             v-if="page.status === 'none'"
             class="button is-light has-text-weight-semibold"
-            :disabled="isLoading"
+            :disabled="isLoading || null"
             type="button"
             @click="updateOnly"
           >
@@ -432,7 +435,7 @@ export default {
 
           <button
             class="button is-light has-text-weight-semibold"
-            :disabled="isLoading"
+            :disabled="isLoading || null"
             type="button"
             @click="discardChanges"
           >
