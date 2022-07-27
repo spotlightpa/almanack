@@ -18,11 +18,11 @@ export default {
   computed: {
     filteredPages() {
       if (!this.filterText) {
-        return this.pages;
+        return this.pages.slice(0, 10);
       }
-      return this.pages.filter((p) =>
-        fuzzyMatch(p.filterableProps, this.filterText)
-      );
+      return this.pages
+        .filter((p) => fuzzyMatch(p.filterableProps, this.filterText))
+        .slice(0, 10);
     },
   },
   methods: {},
@@ -38,22 +38,20 @@ export default {
     <draggable
       class="dropdown-content"
       :model-value="filteredPages"
+      item-key="id"
       :sort="false"
       :group="{ name: 'articles', pull: 'clone', put: false }"
       ghost-class="is-info"
       chosen-class="is-active"
     >
-      <a
-        v-for="(article, i) of filteredPages.slice(0, 10)"
-        :key="i"
-        class="dropdown-item select-none"
-        @click="$emit('select', article)"
-      >
-        <span class="overflow">
-          <b>{{ article.internalID }}</b
-          >: {{ article.hed }}
-        </span>
-      </a>
+      <template #item="{ element: article }">
+        <a class="dropdown-item select-none" @click="$emit('select', article)">
+          <span class="overflow">
+            <b>{{ article.internalID }}</b
+            >: {{ article.hed }}
+          </span>
+        </a>
+      </template>
       <template v-slot:footer>
         <div v-if="pages.length === 0" class="dropdown-item">Loading…</div>
         <div v-else-if="filteredPages.length > 10" class="dropdown-item">
