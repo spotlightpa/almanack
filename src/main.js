@@ -8,15 +8,21 @@ let dsn =
 Sentry.init({ dsn });
 
 import Vue from "vue";
-import router from "./router.js";
-import "./plugins/font-awesome.js";
 
 import VueMeta from "vue-meta";
 Vue.use(VueMeta);
 
-import "./plugins/autoimport.js";
+import fontAwesome from "./plugins/font-awesome.js";
+Vue.use(fontAwesome);
+
+import project from "./plugins/autoimport.js";
+Vue.use(project);
+
+import Router from "vue-router";
+Vue.use(Router);
 
 import TheApp from "./components/TheApp.vue";
+import router from "./plugins/router.js";
 
 Vue.config.ignoredElements = ["raw-html"];
 

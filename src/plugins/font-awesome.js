@@ -1,4 +1,3 @@
-import Vue from "vue";
 import { library } from "@fortawesome/fontawesome-svg-core";
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 import {
@@ -57,4 +56,8 @@ library.add(
   faUserClock
 );
 
-Vue.component("FontAwesomeIcon", FontAwesomeIcon);
+export default {
+  install: (Vue) => {
+    Vue.component("FontAwesomeIcon", FontAwesomeIcon);
+  },
+};
