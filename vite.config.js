@@ -6,10 +6,6 @@ import vue from "@vitejs/plugin-vue2";
 import path from "path";
 
 export default defineConfig({
-  define: {
-    "process.env.NODE_ENV": JSON.stringify(process.env.NODE_ENV),
-    "process.env.BASE_URL": JSON.stringify(process.env.BASE_URL),
-  },
   plugins: [vue(), eslint({ fix: true })],
   resolve: {
     alias: {
