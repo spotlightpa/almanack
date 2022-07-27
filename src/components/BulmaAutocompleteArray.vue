@@ -2,14 +2,14 @@
 let labelIDCounter = 0;
 
 export default {
-  name: "BulmaAutocompleteArray",
+  emits: ["update:modelValue"],
   props: {
     label: String,
     labelClass: {
       type: String,
       default: "label",
     },
-    value: Array,
+    modelValue: Array,
     options: Array,
     placeholder: String,
     help: String,
@@ -58,18 +58,18 @@ export default {
       if (!input) {
         return;
       }
-      let vals = [...this.value];
+      let vals = [...this.modelValue];
       vals.push(input);
-      this.$emit("input", vals);
+      this.$emit("update:modelValue", vals);
       this.currentInput = "";
     },
     paste(event) {
       this.currentInput = event?.clipboardData?.getData?.("text") ?? "";
     },
     remove(i) {
-      let vals = [...this.value];
+      let vals = [...this.modelValue];
       vals.splice(i, 1);
-      this.$emit("input", vals);
+      this.$emit("update:modelValue", vals);
     },
     dragover(i) {
       if (
@@ -94,10 +94,10 @@ export default {
       if (from === null || from === to) {
         return;
       }
-      let vals = [...this.value];
-      vals[from] = this.value[to];
-      vals[to] = this.value[from];
-      this.$emit("input", vals);
+      let vals = [...this.modelValue];
+      vals[from] = this.modelValue[to];
+      vals[to] = this.modelValue[from];
+      this.$emit("update:modelValue", vals);
     },
   },
 };
@@ -106,7 +106,7 @@ export default {
 <template>
   <BulmaField ref="field" v-slot="{ idForLabel }" v-bind="fieldProps">
     <div class="field is-grouped is-grouped-multiline">
-      <div v-for="(v, i) of value" :key="i" class="control">
+      <div v-for="(v, i) of modelValue" :key="i" class="control">
         <div
           class="tags has-addons"
           :draggable="true"

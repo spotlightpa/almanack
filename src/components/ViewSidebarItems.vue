@@ -1,5 +1,5 @@
 <script>
-import Vue, { reactive, computed, toRefs, watch } from "vue";
+import { reactive, computed, toRefs, watch } from "vue";
 
 import Page from "@/api/spotlightpa-all-pages-item.js";
 import { useClient, makeState } from "@/api/hooks.js";
@@ -11,7 +11,6 @@ let itemIds = 0;
 class SidebarData {
   constructor(siteConfig) {
     this.reset(siteConfig);
-    Vue.observable(this);
   }
 
   reset(siteConfig) {
@@ -60,11 +59,13 @@ class SidebarData {
 
   clone(scheduleFor) {
     let { data } = JSON.parse(JSON.stringify(this));
-    let newPicks = new SidebarData({
-      schedule_for: scheduleFor,
-      data,
-      published_at: null,
-    });
+    let newPicks = reactive(
+      new SidebarData({
+        schedule_for: scheduleFor,
+        data,
+        published_at: null,
+      })
+    );
     return newPicks;
   }
 
@@ -90,7 +91,7 @@ export default {
     let { apiState: sidebarState, exec: sidebarExec } = makeState();
     let state = reactive({
       pages: computed(
-        () => pagesState.rawData?.pages.map((p) => new Page(p)) ?? []
+        () => pagesState.rawData?.pages.map((p) => reactive(new Page(p))) ?? []
       ),
       pagesByPath: computed(
         () => new Map(state.pages.map((p) => [p.filePath, p]))
@@ -118,7 +119,9 @@ export default {
         if (!rawSidebars.length) {
           return;
         }
-        state.allSidebars = rawSidebars.map((data) => new SidebarData(data));
+        state.allSidebars = rawSidebars.map((data) =>
+          reactive(new SidebarData(data))
+        );
       },
     };
     watch(
