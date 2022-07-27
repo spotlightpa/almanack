@@ -1,5 +1,5 @@
 <script>
-import { computed, watch } from "vue";
+import { computed, reactive, watch } from "vue";
 import { useClient, makeState } from "@/api/hooks.js";
 import { Page } from "@/api/spotlightpa-page.js";
 
@@ -17,7 +17,7 @@ export default {
       return await exec(() => getPageByFilePath({ params }));
     }
     const page = computed(() =>
-      rawData.value ? new Page(rawData.value) : null
+      rawData.value ? reactive(new Page(rawData.value)) : null
     );
     watch(
       () => props.item,

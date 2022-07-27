@@ -12,7 +12,7 @@ export default {
 </script>
 
 <template>
-  <component :is="hlevel">
-    <template v-html="block.content" />
-  </component>
+  <!-- eslint-disable  vue/no-v-text-v-html-on-component-->
+  <component :is="hlevel" v-html="block.content" />
+  <!-- eslint-enable -->
 </template>

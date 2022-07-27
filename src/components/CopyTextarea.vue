@@ -46,7 +46,7 @@ export default {
     class="textarea pre-wrap"
     rows="bulmaoverride"
     :class="size"
-    contenteditable
+    :contenteditable="true"
     @click="click"
     @blur="isFocused = false"
     @focus="select"

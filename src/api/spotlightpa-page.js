@@ -1,4 +1,4 @@
-import Vue, { computed, reactive, ref, toRefs, watch } from "vue";
+import { computed, reactive, ref, toRefs, watch } from "vue";
 
 import { makeState } from "@/api/service-util.js";
 import { useClient } from "@/api/client.js";
@@ -48,8 +48,6 @@ export class Page {
     if (!this.lastPublished) {
       this.status = this.scheduleFor ? "sked" : "none";
     }
-
-    Vue.observable(this);
   }
 
   static getDate(data, prop) {
