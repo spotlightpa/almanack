@@ -126,7 +126,8 @@ export default {
     };
     watch(
       () => [state.rawSidebars],
-      () => actions.initSidebars()
+      () => actions.initSidebars(),
+      { deep: true }
     );
     actions.reloadSidebars();
     actions.reloadPages();
