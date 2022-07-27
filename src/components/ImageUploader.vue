@@ -70,7 +70,7 @@ export default {
               :class="
                 isUploading ? 'is-warning' : isDragging ? 'is-success' : ''
               "
-              :disabled="isUploading"
+              :disabled="isUploading || null"
               @dragover.prevent="isDragging = true"
               @dragleave.prevent="isDragging = false"
               @drop.prevent="dropFile"
@@ -84,7 +84,7 @@ export default {
                   @change="uploadFileInput"
                 />
 
-                <span class="file-cta" :disabled="isUploading">
+                <span class="file-cta" :disabled="isUploading || null">
                   <span class="file-icon">
                     <font-awesome-icon
                       :icon="['fas', 'sync-alt']"

@@ -210,7 +210,7 @@ export default {
         <p class="mt-2 buttons">
           <button
             type="button"
-            :disabled="!nextSchedule || nextSchedule < new Date()"
+            :disabled="!nextSchedule || nextSchedule < new Date() || null"
             class="button is-small is-success has-text-weight-semibold"
             @click="addScheduledPicks"
           >
@@ -241,7 +241,7 @@ export default {
       <button
         type="button"
         class="button is-primary has-text-weight-semibold"
-        :disabled="sidebarState.isLoading"
+        :disabled="sidebarState.isLoading || null"
         :class="{ 'is-loading': sidebarState.isLoading }"
         @click="save"
       >
@@ -250,7 +250,7 @@ export default {
       <button
         type="button"
         class="button is-light has-text-weight-semibold"
-        :disabled="sidebarState.isLoading"
+        :disabled="sidebarState.isLoading || null"
         :class="{ 'is-loading': sidebarState.isLoading }"
         @click="reloadSidebars"
       >

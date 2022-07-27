@@ -84,7 +84,7 @@ export default {
       </button>
       <button
         class="button has-text-weight-semibold is-danger"
-        :disabled="isSending || !hasChanged"
+        :disabled="isSending || !hasChanged || null"
         @click="discard"
       >
         <span class="icon">

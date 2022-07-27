@@ -67,7 +67,7 @@ export default defineComponent({
         <button
           class="button is-primary has-text-weight-semibold"
           :class="{ 'is-loading': isLoadingThrottled }"
-          :disabled="isLoadingThrottled"
+          :disabled="isLoadingThrottled || null"
         >
           Search
         </button>
