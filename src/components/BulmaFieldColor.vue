@@ -7,7 +7,7 @@ export default {
       type: String,
       default: "label",
     },
-    value: String,
+    modelValue: String,
     placeholder: String,
     help: String,
     validator: Function,
@@ -43,24 +43,24 @@ export default {
     <div class="is-flex is-align-items-center">
       <input
         :id="idForLabel"
-        :value="value"
+        :value="modelValue"
         type="color"
-        @input="$emit('input', $event.target.value)"
+        @input="$emit('update:modelValue', $event.target.value)"
       />
       <span class="ml-4 is-flex-grow-0">
         <input
-          :value="value"
+          :value="modelValue"
           :required="required"
           :name="name"
           :placeholder="placeholder"
           type="text"
           class="input is-small"
-          @input="$emit('input', $event.target.value)"
+          @input="$emit('update:modelValue', $event.target.value)"
         />
       </span>
       <BulmaPaste
         button-class="ml-2 button is-primary is-small has-text-weight-semibold"
-        @paste="$emit('input', $event)"
+        @paste="$emit('update:modelValue', $event)"
       />
     </div>
   </BulmaField>

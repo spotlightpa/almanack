@@ -208,7 +208,7 @@ export function usePage(id) {
   const post = (page) => exec(() => postPage(page));
 
   const page = computed(() =>
-    apiState.rawData ? new Page(apiState.rawData) : null
+    apiState.rawData ? reactive(new Page(apiState.rawData)) : null
   );
 
   watch(() => id.value, fetch, {

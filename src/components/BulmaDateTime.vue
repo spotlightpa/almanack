@@ -5,12 +5,12 @@ import { formatDateTime } from "@/utils/time-format.js";
 const props = defineProps({
   label: String,
   help: String,
-  value: Date,
+  modelValue: Date,
   icon: [Array, String],
   required: Boolean,
 });
 
-const emit = defineEmits(["input"]);
+const emit = defineEmits(["update:modelValue"]);
 
 const leftPad = (n) => String(n).padStart(2, "0");
 
@@ -24,10 +24,10 @@ const localDay = (d) => {
   return `${y}-${m}-${dd}`;
 };
 
-const day = computed(() => localDay(props.value));
+const day = computed(() => localDay(props.modelValue));
 
 const time = computed(() => {
-  let d = props.value;
+  let d = props.modelValue;
   if (!d) {
     return "";
   }
@@ -40,26 +40,26 @@ const time = computed(() => {
 
 function emitDay(value) {
   if (!value) {
-    emit("input", null);
+    emit("update:modelValue", null);
     return;
   }
   let t = time.value || "00:00:00";
-  emit("input", new Date(`${value}T${t}`));
+  emit("update:modelValue", new Date(`${value}T${t}`));
 }
 
 function emitTime(value) {
   if (!day.value && !value) {
-    emit("input", null);
+    emit("update:modelValue", null);
     return;
   } else if (!day.value) {
     let today = localDay(new Date());
-    emit("input", new Date(`${today}T${value}`));
+    emit("update:modelValue", new Date(`${today}T${value}`));
     return;
   }
   if (!value) {
     value = "00:00:00";
   }
-  emit("input", new Date(`${day.value}T${value}`));
+  emit("update:modelValue", new Date(`${day.value}T${value}`));
 }
 </script>
 
@@ -94,7 +94,7 @@ function emitTime(value) {
       </p>
       <p class="control">
         <span class="button is-static">
-          {{ formatDateTime(value) || "Unset" }}
+          {{ formatDateTime(modelValue) || "Unset" }}
         </span>
       </p>
     </div>

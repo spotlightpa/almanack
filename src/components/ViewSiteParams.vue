@@ -1,5 +1,5 @@
 <script>
-import Vue, { reactive, toRefs, watch } from "vue";
+import { reactive, toRefs, watch } from "vue";
 
 import { useClient, makeState } from "@/api/hooks.js";
 import { useFileList } from "@/api/file-list.js";
@@ -15,7 +15,6 @@ class SiteParams {
     this.publishedAt = pub ? new Date(pub) : null;
     this.isCurrent = !!this.publishedAt;
     this.data = config.data;
-    Vue.observable(this);
   }
 
   toJSON() {
@@ -57,17 +56,19 @@ export default {
         if (!apiState.rawData) {
           return;
         }
-        state.configs = apiState.rawData.configs.map(
-          (data) => new SiteParams(data)
+        state.configs = apiState.rawData.configs.map((data) =>
+          reactive(new SiteParams(data))
         );
       },
       async addScheduledConfig() {
         let lastParams = state.configs[state.configs.length - 1];
         state.configs.push(
-          new SiteParams({
-            ...JSON.parse(JSON.stringify(lastParams)),
-            schedule_for: state.nextSchedule,
-          })
+          reactive(
+            new SiteParams({
+              ...JSON.parse(JSON.stringify(lastParams)),
+              schedule_for: state.nextSchedule,
+            })
+          )
         );
         state.nextSchedule = null;
         await scrollTo();

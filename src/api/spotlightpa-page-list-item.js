@@ -1,8 +1,10 @@
+import { reactive } from "vue";
+
 export default class PageListItem {
   static from(rawData) {
     let pages = rawData.pages;
     if (!pages) return [];
-    return pages.map((page) => new PageListItem(page));
+    return pages.map((page) => reactive(new PageListItem(page)));
   }
 
   constructor(data) {

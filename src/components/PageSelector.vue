@@ -37,7 +37,7 @@ export default {
 
     <draggable
       class="dropdown-content"
-      :value="filteredPages"
+      :model-value="filteredPages"
       :sort="false"
       :group="{ name: 'articles', pull: 'clone', put: false }"
       ghost-class="is-info"

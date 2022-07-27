@@ -1,4 +1,4 @@
-import { h } from "vue";
+import { h, reactive } from "vue";
 
 import { intcomma } from "journalize";
 
@@ -48,7 +48,7 @@ const STATUS_AVAILABLE = 2;
 export default class ArcArticle {
   static from(data) {
     return data.contents
-      .map((a) => new ArcArticle(a))
+      .map((a) => reactive(new ArcArticle(a)))
       .sort((a, b) => cmp(b.plannedDate, a.plannedDate));
   }
 

@@ -1,5 +1,5 @@
 <script>
-import Vue, { reactive, computed, toRefs, watch } from "vue";
+import { reactive, computed, toRefs, watch } from "vue";
 
 import { useClient, makeState } from "@/api/hooks.js";
 import Page from "@/api/spotlightpa-all-pages-item.js";
@@ -11,7 +11,6 @@ class EditorsPicksData {
   constructor(siteConfig, pagesByPath) {
     this.pagesByPath = pagesByPath;
     this.reset(siteConfig);
-    Vue.observable(this);
   }
 
   reset(siteConfig) {
@@ -27,13 +26,15 @@ class EditorsPicksData {
 
   clone(scheduleFor) {
     let { data } = JSON.parse(JSON.stringify(this));
-    let newPick = new EditorsPicksData(
-      {
-        schedule_for: scheduleFor,
-        data,
-        published_at: null,
-      },
-      this.pagesByPath
+    let newPick = reactive(
+      new EditorsPicksData(
+        {
+          schedule_for: scheduleFor,
+          data,
+          published_at: null,
+        },
+        this.pagesByPath
+      )
     );
     return newPick;
   }
@@ -67,7 +68,7 @@ export default {
       isLoading: computed(() => listState.isLoading || edPicksState.isLoading),
       error: computed(() => listState.error ?? edPicksState.error),
       pages: computed(
-        () => listState.rawData?.pages.map((p) => new Page(p)) ?? []
+        () => listState.rawData?.pages.map((p) => reactive(new Page(p))) ?? []
       ),
       pagesByPath: computed(
         () => new Map(state.pages.map((p) => [p.filePath, p]))
@@ -95,8 +96,8 @@ export default {
         if (!pages.length || !rawPicks.length) {
           return;
         }
-        state.allEdPicks = rawPicks.map(
-          (data) => new EditorsPicksData(data, state.pagesByPath)
+        state.allEdPicks = rawPicks.map((data) =>
+          reactive(new EditorsPicksData(data, state.pagesByPath))
         );
       },
     };

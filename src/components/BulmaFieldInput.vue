@@ -7,7 +7,7 @@ export default {
       type: String,
       default: "label",
     },
-    value: String,
+    modelValue: String,
     placeholder: String,
     help: String,
     validator: Function,
@@ -59,7 +59,7 @@ export default {
     },
   },
   watch: {
-    value(newVal) {
+    modelValue(newVal) {
       if (this.validator) {
         let message = this.validator(newVal);
         this.$refs.input.setCustomValidity(message);
@@ -77,7 +77,7 @@ export default {
         newVal = newVal.slice(0, this.maxLength);
       }
       this.updateValidationMessage(ev);
-      this.$emit("input", newVal);
+      this.$emit("update:modelValue", newVal);
     },
   },
 };
@@ -98,7 +98,7 @@ export default {
       :placeholder="placeholder"
       :required="required"
       :type="type"
-      :value="value"
+      :value="modelValue"
       :readonly="readonly"
       @blur="updateValidationMessage"
       @invalid="updateValidationMessage"
