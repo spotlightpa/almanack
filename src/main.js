@@ -8,25 +8,24 @@ let dsn =
 Sentry.init({ dsn });
 
 import Vue from "vue";
+import TheApp from "./components/TheApp.vue";
 
-import VueMeta from "vue-meta";
-Vue.use(VueMeta);
+const app = Vue.createApp(TheApp);
+
+import { createMetaManager } from "vue-meta";
+
+app.use(createMetaManager());
+// app.use(metaPlugin);
 
 import fontAwesome from "./plugins/font-awesome.js";
-Vue.use(fontAwesome);
+app.use(fontAwesome);
 
 import project from "./plugins/autoimport.js";
-Vue.use(project);
+app.use(project);
 
-import Router from "vue-router";
-Vue.use(Router);
-
-import TheApp from "./components/TheApp.vue";
 import router from "./plugins/router.js";
 
-Vue.config.ignoredElements = ["raw-html"];
+app.use(router);
+// app.config.compilerOptions.isCustomElement = (tag) => tag === "raw-html";
 
-new Vue({
-  router,
-  render: (h) => h(TheApp),
-}).$mount("#app");
+app.mount("#app");
