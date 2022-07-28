@@ -54,9 +54,6 @@ class EditorsPicksData {
 }
 
 export default {
-  metaInfo: {
-    title: "State College Frontpage Editor",
-  },
   setup() {
     const [container, scrollTo] = useScrollTo();
 
@@ -130,6 +127,9 @@ export default {
 </script>
 
 <template>
+  <MetaHead>
+    <title>State College Frontpage Editor • Spotlight PA Almanack</title>
+  </MetaHead>
   <div>
     <BulmaBreadcrumbs
       :links="[

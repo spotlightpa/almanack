@@ -53,9 +53,6 @@ class EditorsPicksData {
 }
 
 export default {
-  metaInfo: {
-    title: "Homepage Editor",
-  },
   setup() {
     const [container, scrollTo] = useScrollTo();
 
@@ -128,6 +125,9 @@ export default {
 </script>
 
 <template>
+  <MetaHead>
+    <title>Homepage Editor • Spotlight PA</title>
+  </MetaHead>
   <div>
     <BulmaBreadcrumbs
       :links="[

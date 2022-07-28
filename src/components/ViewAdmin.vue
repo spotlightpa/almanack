@@ -6,9 +6,6 @@ import { useListAnyArc } from "@/api/hooks.js";
 export default {
   name: "ViewAdmin",
   props: ["page"],
-  metaInfo: {
-    title: "Admin",
-  },
   setup(props) {
     let {
       articles,
@@ -39,6 +36,9 @@ export default {
 </script>
 
 <template>
+  <MetaHead>
+    <title>Admin • Spotlight PA</title>
+  </MetaHead>
   <div>
     <h1 class="title is-flex">
       Spotlight Administrator

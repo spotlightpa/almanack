@@ -8,11 +8,6 @@ export default {
   props: {
     id: String,
   },
-  metaInfo() {
-    return {
-      title: this.title,
-    };
-  },
   setup(props) {
     const { id } = toRefs(props);
     const pageData = usePage(id);
@@ -31,6 +26,9 @@ export default {
 </script>
 
 <template>
+  <MetaHead>
+    <title>{{ title }} • Spotlight PA</title>
+  </MetaHead>
   <div>
     <BulmaBreadcrumbs
       :links="[

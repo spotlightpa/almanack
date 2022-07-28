@@ -7,9 +7,6 @@ import { formatDate } from "@/utils/time-format.js";
 
 export default {
   props: { page: { type: String, default: "0" } },
-  metaInfo: {
-    title: "File Uploads",
-  },
   setup(props) {
     let { listFiles, updateFile, uploadFile } = useClient();
     let { apiStateRefs, exec } = makeState();
@@ -89,6 +86,9 @@ export default {
 </script>
 
 <template>
+  <MetaHead>
+    <title>File Uploads • Spotlight PA</title>
+  </MetaHead>
   <div>
     <h1 class="title">
       Upload a file

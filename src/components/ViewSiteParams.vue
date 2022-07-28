@@ -26,9 +26,6 @@ class SiteParams {
 }
 
 export default {
-  metaInfo: {
-    title: "Sitewide Settings",
-  },
   setup() {
     const [container, scrollTo] = useScrollTo();
 
@@ -100,6 +97,9 @@ export default {
 </script>
 
 <template>
+  <MetaHead>
+    <title>Sitewide Settings • Spotlight PA Almanack</title>
+  </MetaHead>
   <div>
     <div class="px-2">
       <BulmaBreadcrumbs

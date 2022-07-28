@@ -2,12 +2,6 @@
 import { useAvailableArc } from "@/api/hooks.js";
 
 export default {
-  name: "ViewArcArticle",
-  metaInfo() {
-    return {
-      title: this.article ? this.article.slug : "Article",
-    };
-  },
   props: {
     id: String,
   },
@@ -25,8 +19,15 @@ export default {
 </script>
 
 <template>
+  <MetaHead>
+    <title>Article • Spotlight PA</title>
+  </MetaHead>
   <APILoader :is-loading="isLoading" :reload="load" :error="error">
     <template v-if="article">
+      <MetaHead>
+        <title>{{ article.slug }} • Spotlight PA</title>
+      </MetaHead>
+
       <ArcArticleAvailable v-if="article.isAvailable" :article="article" />
       <ArcArticlePlanned v-else :article="article" />
     </template>

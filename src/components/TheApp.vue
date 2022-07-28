@@ -2,9 +2,6 @@
 import "@/css/main.scss";
 
 export default {
-  metaInfo: {
-    titleTemplate: "%s • Spotlight PA Almanack",
-  },
   provide() {
     return {
       router: this.$router,

@@ -22,9 +22,6 @@ const toImageObj = (rawImage) => ({
 
 export default {
   props: { page: { type: String, default: "0" } },
-  metaInfo: {
-    title: "Photos",
-  },
   setup(props) {
     let { listImages, updateImage } = useClient();
     const { apiStateRefs, exec } = makeState();
@@ -93,6 +90,9 @@ export default {
 </script>
 
 <template>
+  <MetaHead>
+    <title>Photo Uploads • Spotlight PA</title>
+  </MetaHead>
   <div>
     <h1 class="title">
       Upload an image
