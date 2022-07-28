@@ -32,7 +32,7 @@ export default {
 
 <template>
   <span>
-    <router-link :to="article.detailsRoute" class="middle">
+    <router-link :to="article.detailsRoute" class="mr-2 middle">
       <font-awesome-icon :icon="['far', 'newspaper']" />
       {{ article.slug }}
     </router-link>
