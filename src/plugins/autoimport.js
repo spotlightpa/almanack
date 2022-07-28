@@ -1,159 +1,92 @@
-import AdminList from "@/components/AdminList.vue";
-import AdminListPanel from "@/components/AdminListPanel.vue";
-import APILoader from "@/components/APILoader.vue";
-import AppNav from "@/components/AppNav.vue";
-import ArcArticleAvailable from "@/components/ArcArticleAvailable.vue";
-import ArcArticleDivider from "@/components/ArcArticleDivider.vue";
-import ArcArticleHeader from "@/components/ArcArticleHeader.vue";
-import ArcArticleHTML from "@/components/ArcArticleHTML.vue";
-import ArcArticleImage from "@/components/ArcArticleImage.vue";
-import ArcArticleList from "@/components/ArcArticleList.vue";
-import ArcArticleOEmbed from "@/components/ArcArticleOEmbed.vue";
-import ArcArticlePlaceholder from "@/components/ArcArticlePlaceholder.vue";
-import ArcArticlePlanned from "@/components/ArcArticlePlanned.vue";
-import ArcArticleText from "@/components/ArcArticleText.vue";
-import ArticleList from "@/components/ArticleList.vue";
-import ArticleSlugLine from "@/components/ArticleSlugLine.vue";
-import ArticleWordCount from "@/components/ArticleWordCount.vue";
-import BulmaAutocompleteArray from "@/components/BulmaAutocompleteArray.vue";
-import BulmaBreadcrumbs from "@/components/BulmaBreadcrumbs.vue";
-import BulmaDateTime from "@/components/BulmaDateTime.vue";
-import BulmaField from "@/components/BulmaField.vue";
-import BulmaFieldColor from "@/components/BulmaFieldColor.vue";
-import BulmaFieldInput from "@/components/BulmaFieldInput.vue";
-import BulmaPaste from "@/components/BulmaPaste.vue";
-import CopyTextarea from "@/components/CopyTextarea.vue";
-import CopyWithButton from "@/components/CopyWithButton.vue";
-import DOMInnerHTML from "@/components/DOMInnerHTML.vue";
-import EmailComposer from "@/components/EmailComposer.vue";
-import ErrorReloader from "@/components/ErrorReloader.vue";
-import ErrorSimple from "@/components/ErrorSimple.vue";
-import HomepageEditor from "@/components/HomepageEditor.vue";
-import HomepageEditorDraggable from "@/components/HomepageEditorDraggable.vue";
-import ImageThumbnail from "@/components/ImageThumbnail.vue";
-import ImageUploader from "@/components/ImageUploader.vue";
-import LinkAButton from "@/components/LinkAButton.vue";
-import LinkButton from "@/components/LinkButton.vue";
-import LinkButtons from "@/components/LinkButtons.vue";
-import NoCopyTextArea from "@/components/NoCopyTextArea.vue";
-import PageList from "@/components/PageList.vue";
-import PageListRow from "@/components/PageListRow.vue";
-import PageLookup from "@/components/PageLookup.vue";
-import PageSelector from "@/components/PageSelector.vue";
-import PickerFiles from "@/components/PickerFiles.vue";
-import PickerImages from "@/components/PickerImages.vue";
-import SidebarItem from "@/components/SidebarItem.vue";
-import SiteParams from "@/components/SiteParams.vue";
-import SiteParamsBanner from "@/components/SiteParamsBanner.vue";
-import SiteParamsFiles from "@/components/SiteParamsFiles.vue";
-import SiteParamsFooter from "@/components/SiteParamsFooter.vue";
-import SiteParamsRiver from "@/components/SiteParamsRiver.vue";
-import SiteParamsSidebar from "@/components/SiteParamsSidebar.vue";
-import SiteParamsSticky from "@/components/SiteParamsSticky.vue";
-import SiteParamsSupport from "@/components/SiteParamsSupport.vue";
-import SiteParamsTop from "@/components/SiteParamsTop.vue";
-import SiteParamsTopper from "@/components/SiteParamsTopper.vue";
-import SpinnerProgress from "@/components/SpinnerProgress.vue";
-import TagDate from "@/components/TagDate.vue";
-import TagStatus from "@/components/TagStatus.vue";
-import TheApp from "@/components/TheApp.vue";
-import ViewAdmin from "@/components/ViewAdmin.vue";
-import ViewArcArticle from "@/components/ViewArcArticle.vue";
-import ViewAuthorizedDomains from "@/components/ViewAuthorizedDomains.vue";
-import ViewError from "@/components/ViewError.vue";
-import ViewFileUploader from "@/components/ViewFileUploader.vue";
-import ViewHomepageEditor from "@/components/ViewHomepageEditor.vue";
-import ViewImageUploader from "@/components/ViewImageUploader.vue";
-import ViewLogin from "@/components/ViewLogin.vue";
-import ViewNewsletterList from "@/components/ViewNewsletterList.vue";
-import ViewNewsletterPage from "@/components/ViewNewsletterPage.vue";
-import ViewNewsPage from "@/components/ViewNewsPage.vue";
-import ViewNewsPagesList from "@/components/ViewNewsPagesList.vue";
-import ViewRedirectArcToNewsPage from "@/components/ViewRedirectArcToNewsPage.vue";
-import ViewSharedList from "@/components/ViewSharedList.vue";
-import ViewSidebarItems from "@/components/ViewSidebarItems.vue";
-import ViewSiteParams from "@/components/ViewSiteParams.vue";
-import ViewStateCollegeEditor from "@/components/ViewStateCollegeEditor.vue";
-import ViewUnauthorized from "@/components/ViewUnauthorized.vue";
+import { defineAsyncComponent } from "vue";
+
+let components = [
+  "AdminList",
+  "AdminListPanel",
+  "APILoader",
+  "AppNav",
+  "ArcArticleAvailable",
+  "ArcArticleDivider",
+  "ArcArticleHeader",
+  "ArcArticleHTML",
+  "ArcArticleImage",
+  "ArcArticleList",
+  "ArcArticleOEmbed",
+  "ArcArticlePlaceholder",
+  "ArcArticlePlanned",
+  "ArcArticleText",
+  "ArticleList",
+  "ArticleSlugLine",
+  "ArticleWordCount",
+  "BulmaAutocompleteArray",
+  "BulmaBreadcrumbs",
+  "BulmaDateTime",
+  "BulmaField",
+  "BulmaFieldColor",
+  "BulmaFieldInput",
+  "BulmaPaste",
+  "CopyTextarea",
+  "CopyWithButton",
+  "DOMInnerHTML",
+  "EmailComposer",
+  "ErrorReloader",
+  "ErrorSimple",
+  "HomepageEditor",
+  "HomepageEditorDraggable",
+  "ImageThumbnail",
+  "ImageUploader",
+  "LinkAButton",
+  "LinkButton",
+  "LinkButtons",
+  "NoCopyTextArea",
+  "PageList",
+  "PageListRow",
+  "PageLookup",
+  "PageSelector",
+  "PickerFiles",
+  "PickerImages",
+  "SidebarItem",
+  "SiteParams",
+  "SiteParamsBanner",
+  "SiteParamsFiles",
+  "SiteParamsFooter",
+  "SiteParamsRiver",
+  "SiteParamsSidebar",
+  "SiteParamsSticky",
+  "SiteParamsSupport",
+  "SiteParamsTop",
+  "SiteParamsTopper",
+  "SpinnerProgress",
+  "TagDate",
+  "TagStatus",
+  "TheApp",
+  "ViewAdmin",
+  "ViewArcArticle",
+  "ViewAuthorizedDomains",
+  "ViewError",
+  "ViewFileUploader",
+  "ViewHomepageEditor",
+  "ViewImageUploader",
+  "ViewLogin",
+  "ViewNewsletterList",
+  "ViewNewsletterPage",
+  "ViewNewsPage",
+  "ViewNewsPagesList",
+  "ViewRedirectArcToNewsPage",
+  "ViewSharedList",
+  "ViewSidebarItems",
+  "ViewSiteParams",
+  "ViewStateCollegeEditor",
+  "ViewUnauthorized",
+];
 
 export default {
-  install: (Vue) => {
-    Vue.component("AdminList", AdminList);
-    Vue.component("AdminListPanel", AdminListPanel);
-    Vue.component("APILoader", APILoader);
-    Vue.component("AppNav", AppNav);
-    Vue.component("ArcArticleAvailable", ArcArticleAvailable);
-    Vue.component("ArcArticleDivider", ArcArticleDivider);
-    Vue.component("ArcArticleHeader", ArcArticleHeader);
-    Vue.component("ArcArticleHTML", ArcArticleHTML);
-    Vue.component("ArcArticleImage", ArcArticleImage);
-    Vue.component("ArcArticleList", ArcArticleList);
-    Vue.component("ArcArticleOEmbed", ArcArticleOEmbed);
-    Vue.component("ArcArticlePlaceholder", ArcArticlePlaceholder);
-    Vue.component("ArcArticlePlanned", ArcArticlePlanned);
-    Vue.component("ArcArticleText", ArcArticleText);
-    Vue.component("ArticleList", ArticleList);
-    Vue.component("ArticleSlugLine", ArticleSlugLine);
-    Vue.component("ArticleWordCount", ArticleWordCount);
-    Vue.component("BulmaAutocompleteArray", BulmaAutocompleteArray);
-    Vue.component("BulmaBreadcrumbs", BulmaBreadcrumbs);
-    Vue.component("BulmaDateTime", BulmaDateTime);
-    Vue.component("BulmaField", BulmaField);
-    Vue.component("BulmaFieldColor", BulmaFieldColor);
-    Vue.component("BulmaFieldInput", BulmaFieldInput);
-    Vue.component("BulmaPaste", BulmaPaste);
-    Vue.component("CopyTextarea", CopyTextarea);
-    Vue.component("CopyWithButton", CopyWithButton);
-    Vue.component("DOMInnerHTML", DOMInnerHTML);
-    Vue.component("EmailComposer", EmailComposer);
-    Vue.component("ErrorReloader", ErrorReloader);
-    Vue.component("ErrorSimple", ErrorSimple);
-    Vue.component("HomepageEditor", HomepageEditor);
-    Vue.component("HomepageEditorDraggable", HomepageEditorDraggable);
-    Vue.component("ImageThumbnail", ImageThumbnail);
-    Vue.component("ImageUploader", ImageUploader);
-    Vue.component("LinkAButton", LinkAButton);
-    Vue.component("LinkButton", LinkButton);
-    Vue.component("LinkButtons", LinkButtons);
-    Vue.component("NoCopyTextArea", NoCopyTextArea);
-    Vue.component("PageList", PageList);
-    Vue.component("PageListRow", PageListRow);
-    Vue.component("PageLookup", PageLookup);
-    Vue.component("PageSelector", PageSelector);
-    Vue.component("PickerFiles", PickerFiles);
-    Vue.component("PickerImages", PickerImages);
-    Vue.component("SidebarItem", SidebarItem);
-    Vue.component("SiteParams", SiteParams);
-    Vue.component("SiteParamsBanner", SiteParamsBanner);
-    Vue.component("SiteParamsFiles", SiteParamsFiles);
-    Vue.component("SiteParamsFooter", SiteParamsFooter);
-    Vue.component("SiteParamsRiver", SiteParamsRiver);
-    Vue.component("SiteParamsSidebar", SiteParamsSidebar);
-    Vue.component("SiteParamsSticky", SiteParamsSticky);
-    Vue.component("SiteParamsSupport", SiteParamsSupport);
-    Vue.component("SiteParamsTop", SiteParamsTop);
-    Vue.component("SiteParamsTopper", SiteParamsTopper);
-    Vue.component("SpinnerProgress", SpinnerProgress);
-    Vue.component("TagDate", TagDate);
-    Vue.component("TagStatus", TagStatus);
-    Vue.component("TheApp", TheApp);
-    Vue.component("ViewAdmin", ViewAdmin);
-    Vue.component("ViewArcArticle", ViewArcArticle);
-    Vue.component("ViewAuthorizedDomains", ViewAuthorizedDomains);
-    Vue.component("ViewError", ViewError);
-    Vue.component("ViewFileUploader", ViewFileUploader);
-    Vue.component("ViewHomepageEditor", ViewHomepageEditor);
-    Vue.component("ViewImageUploader", ViewImageUploader);
-    Vue.component("ViewLogin", ViewLogin);
-    Vue.component("ViewNewsletterList", ViewNewsletterList);
-    Vue.component("ViewNewsletterPage", ViewNewsletterPage);
-    Vue.component("ViewNewsPage", ViewNewsPage);
-    Vue.component("ViewNewsPagesList", ViewNewsPagesList);
-    Vue.component("ViewRedirectArcToNewsPage", ViewRedirectArcToNewsPage);
-    Vue.component("ViewSharedList", ViewSharedList);
-    Vue.component("ViewSidebarItems", ViewSidebarItems);
-    Vue.component("ViewSiteParams", ViewSiteParams);
-    Vue.component("ViewStateCollegeEditor", ViewStateCollegeEditor);
-    Vue.component("ViewUnauthorized", ViewUnauthorized);
+  install: (app) => {
+    for (let name of components) {
+      app.component(
+        name,
+        defineAsyncComponent(() => import(`@/components/${name}.vue`))
+      );
+    }
   },
 };
