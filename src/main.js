@@ -9,12 +9,7 @@ Sentry.init({ dsn });
 
 import { createApp } from "vue";
 import TheApp from "./components/TheApp.vue";
-import { configureCompat } from "vue";
 
-// disable compat for certain features
-configureCompat({
-  MODE: 3,
-});
 const app = createApp(TheApp);
 
 import { createMetaManager } from "vue-meta";

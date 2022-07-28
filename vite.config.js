@@ -9,7 +9,6 @@ export default defineConfig({
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),
-      vue: "@vue/compat",
     },
   },
   plugins: [
@@ -17,9 +16,6 @@ export default defineConfig({
       template: {
         compilerOptions: {
           isCustomElement: (tag) => tag === "raw-html",
-          compatConfig: {
-            MODE: 2,
-          },
         },
       },
     }),
