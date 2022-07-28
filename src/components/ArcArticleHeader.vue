@@ -1,18 +1,13 @@
 <script>
-export default {
-  props: {
-    block: Object,
-  },
-  computed: {
-    hlevel() {
-      return `h${this.block.level}`;
-    },
-  },
-};
-</script>
+import { h } from "vue";
 
-<template>
-  <!-- eslint-disable  vue/no-v-text-v-html-on-component-->
-  <component :is="hlevel" v-html="block.content" />
-  <!-- eslint-enable -->
-</template>
+function ArcArticleHeader(props) {
+  return h(`h${props.block.level}`, { innerHTML: props.block.content });
+}
+
+ArcArticleHeader.props = {
+  block: Object,
+};
+
+export default ArcArticleHeader;
+</script>
