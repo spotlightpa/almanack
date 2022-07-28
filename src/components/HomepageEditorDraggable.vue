@@ -11,7 +11,7 @@ export default {
   methods: {
     remove(i) {
       let old = this.modelValue;
-      let newArray = old.slice(0, i).concat(old.slice(i + 1));
+      let newArray = [...old.slice(0, i), ...old.slice(i + 1)];
       this.$emit("update:modelValue", newArray);
     },
     getComponentData() {
@@ -26,26 +26,25 @@ export default {
 </script>
 <template>
   <draggable
+    v-model="modelValue"
     class="textarea"
-    :list="modelValue"
+    item-key="id"
     :group="{ name: 'articles', pull: 'clone', put: true }"
     ghost-class="is-info"
     chosen-class="is-primary"
     :component-data="getComponentData()"
   >
-    <span
-      v-for="(page, i) of modelValue"
-      :key="i"
-      class="tag is-medium spacer select-none"
-    >
-      {{ page.internalID }}
-      <button class="delete" @click="remove(i)"></button>
-    </span>
-    <template v-slot:header>
+    <template #item="{ element: page, index }">
+      <span class="tag is-medium spacer select-none">
+        {{ page.internalID }}
+        <button class="delete" @click="remove(index)"></button>
+      </span>
+    </template>
+    <template #header>
       <span v-if="!modelValue.length" class="has-text-grey-lighter">
         Drag articles here
-      </span></template
-    >
+      </span>
+    </template>
   </draggable>
 </template>
 

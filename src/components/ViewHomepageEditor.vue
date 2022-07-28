@@ -102,7 +102,8 @@ export default {
     };
     watch(
       () => [state.pages, state.rawPicks],
-      () => actions.reset()
+      () => actions.reset(),
+      { deep: true }
     );
     actions.reload();
     return {
