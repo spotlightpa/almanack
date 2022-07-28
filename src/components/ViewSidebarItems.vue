@@ -16,7 +16,7 @@ class SidebarData {
   reset(siteConfig) {
     let items = siteConfig?.data.items ?? [];
     this.items = items.map((item) => ({
-      item,
+      item: { ...item },
       id: itemIds++,
     }));
     this.scheduleFor = siteConfig.schedule_for;
