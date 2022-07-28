@@ -283,7 +283,6 @@ export default class ArcArticle {
       if (renderer) {
         return {
           component: {
-            compatConfig: { RENDER_FUNCTION: false },
             render() {
               return h("raw-html");
             },
