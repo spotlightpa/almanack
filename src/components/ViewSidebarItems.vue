@@ -80,9 +80,6 @@ class SidebarData {
 }
 
 export default {
-  metaInfo: {
-    title: "Sidebar Editor",
-  },
   setup() {
     const [container, scrollTo] = useScrollTo();
 
@@ -155,6 +152,9 @@ export default {
 </script>
 
 <template>
+  <MetaHead>
+    <title>Sidebar Editor • Spotlight PA Almanack</title>
+  </MetaHead>
   <div>
     <BulmaBreadcrumbs
       :links="[

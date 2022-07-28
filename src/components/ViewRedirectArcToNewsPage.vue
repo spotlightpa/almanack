@@ -8,11 +8,6 @@ export default {
   props: {
     id: String,
   },
-  metaInfo() {
-    return {
-      title: "Loading…",
-    };
-  },
   setup(props) {
     const router = inject("router");
     const needsCreation = ref(false);
@@ -62,7 +57,14 @@ export default {
 
 <template>
   <div>
+    <MetaHead>
+      <title>Loading…</title>
+    </MetaHead>
     <div v-if="needsCreation">
+      <MetaHead>
+        <title>Convert Page • Spotlight PA Almanack</title>
+      </MetaHead>
+
       <h1 class="title">Convert article?</h1>
       <p>
         The article has not been converted from an Arc article to a Spotlight PA

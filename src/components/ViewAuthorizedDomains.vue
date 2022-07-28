@@ -89,10 +89,6 @@ function addressState() {
 }
 
 export default {
-  name: "ViewAuthorizedDomains",
-  metaInfo: {
-    title: "Preauthorized Domains and Addresses",
-  },
   setup() {
     return {
       newDomainName: ref(""),
@@ -105,6 +101,9 @@ export default {
 </script>
 
 <template>
+  <MetaHead>
+    <title>Preauthorized Domains and Addresses • Spotlight PA</title>
+  </MetaHead>
   <div>
     <div>
       <h2 class="title">Preauthorized domains</h2>

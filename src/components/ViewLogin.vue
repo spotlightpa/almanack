@@ -2,10 +2,6 @@
 import { useAuth } from "@/api/hooks.js";
 
 export default {
-  name: "ViewLogin",
-  metaInfo: {
-    title: "Log In",
-  },
   setup() {
     let { login, signup, isSignedIn } = useAuth();
     return {
@@ -25,6 +21,9 @@ export default {
 </script>
 
 <template>
+  <MetaHead>
+    <title>Log In • Spotlight PA</title>
+  </MetaHead>
   <div class="content">
     <h2>Predicting future sports scores.</h2>
     <p class="has-text-centered">

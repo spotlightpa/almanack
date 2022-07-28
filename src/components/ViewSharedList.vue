@@ -2,11 +2,7 @@
 import { useAuth, useListAvailableArc, useClient } from "@/api/hooks.js";
 
 export default {
-  name: "ViewSharedList",
   props: ["page"],
-  metaInfo: {
-    title: "Available Articles",
-  },
   setup(props) {
     let { fullName, roles } = useAuth();
     let { articles, nextPage, didLoad, isLoading, load, error } =
@@ -37,6 +33,10 @@ export default {
 </script>
 
 <template>
+  <MetaHead>
+    <title>Shared Articles • Spotlight PA Almanack</title>
+  </MetaHead>
+
   <div>
     <h2 class="title">Welcome, {{ fullName }}</h2>
     <p class="content">

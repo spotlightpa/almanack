@@ -5,9 +5,6 @@ import PageListItem from "@/api/spotlightpa-page-list-item.js";
 
 export default {
   props: { page: { default: "" } },
-  metaInfo: {
-    title: "Spotlight PA News Pages",
-  },
   setup(props) {
     let { listPages } = useClient();
     const { apiState, fetch, computer } = watchAPI(
@@ -36,6 +33,10 @@ export default {
 </script>
 
 <template>
+  <MetaHead>
+    <title>Spotlight PA News Pages • Spotlight PA Almanack</title>
+  </MetaHead>
+
   <PageList
     title="Spotlight PA News Pages"
     :page="page"
