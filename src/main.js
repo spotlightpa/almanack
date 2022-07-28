@@ -7,10 +7,15 @@ let dsn =
 
 Sentry.init({ dsn });
 
-import Vue from "vue";
+import { createApp } from "vue";
 import TheApp from "./components/TheApp.vue";
+import { configureCompat } from "vue";
 
-const app = Vue.createApp(TheApp);
+// disable compat for certain features
+configureCompat({
+  MODE: 3,
+});
+const app = createApp(TheApp);
 
 import { createMetaManager } from "vue-meta";
 
@@ -26,6 +31,5 @@ app.use(project);
 import router from "./plugins/router.js";
 
 app.use(router);
-// app.config.compilerOptions.isCustomElement = (tag) => tag === "raw-html";
 
 app.mount("#app");
