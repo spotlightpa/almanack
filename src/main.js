@@ -9,13 +9,12 @@ Sentry.init({ dsn });
 
 import { createApp } from "vue";
 import TheApp from "./components/TheApp.vue";
-
 const app = createApp(TheApp);
 
-import { createMetaManager } from "vue-meta";
-
-app.use(createMetaManager());
-// app.use(metaPlugin);
+import { Head, createHead } from "@vueuse/head";
+const head = createHead();
+app.use(head);
+app.component("MetaHead", Head);
 
 import fontAwesome from "./plugins/font-awesome.js";
 app.use(fontAwesome);
