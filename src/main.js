@@ -23,7 +23,7 @@ import project from "./plugins/autoimport.js";
 app.use(project);
 
 import router from "./plugins/router.js";
-
 app.use(router);
+router.app = app;
 
 app.mount("#app");
