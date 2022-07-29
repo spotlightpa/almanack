@@ -1,5 +1,5 @@
 <script>
-import { reactive, toRefs } from "vue";
+import { reactive, ref, toRefs } from "vue";
 import { sendGAEvent } from "@/utils/google-analytics.js";
 import { formatDate } from "@/utils/time-format.js";
 
@@ -7,14 +7,20 @@ export default {
   props: {
     article: { type: Object, required: true },
   },
-  setup(props, { refs }) {
-    let data = reactive({
+  setup(props) {
+    const htmlArea = ref();
+    const richTextArea = ref();
+
+    const data = reactive({
       copied: false,
       viewHTML: false,
       articleHTML: "",
     });
 
     return {
+      htmlArea,
+      richTextArea,
+
       ...toRefs(data),
 
       embeds: props.article.embedComponents,
@@ -28,7 +34,7 @@ export default {
       },
       copyRichText() {
         data.viewHTML = false;
-        refs.copyRichText.copy();
+        richTextArea.value.copy();
         sendGAEvent({
           eventCategory: "ArticleDetails interaction",
           eventAction: "Copy Rich Text",
@@ -43,7 +49,7 @@ export default {
       },
       copyHTML() {
         data.viewHTML = true;
-        refs.copyHTML.copy();
+        htmlArea.value.copy();
         sendGAEvent({
           eventCategory: "ArticleDetails interaction",
           eventAction: "Copy HTML",
@@ -167,7 +173,7 @@ export default {
 
     <CopyTextarea
       v-show="!viewHTML"
-      ref="copyRichText"
+      ref="richTextArea"
       size="content height-50vh"
     >
       <component
@@ -190,7 +196,7 @@ export default {
 
     <CopyTextarea
       v-show="viewHTML"
-      ref="copyHTML"
+      ref="htmlArea"
       size="is-small height-50vh"
       >{{ articleHTML }}</CopyTextarea
     >
