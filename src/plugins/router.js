@@ -1,4 +1,4 @@
-import { watch } from "vue";
+import { nextTick, watch } from "vue";
 import { createRouter, createWebHistory } from "vue-router";
 
 import { useAuth } from "@/api/hooks.js";
@@ -242,22 +242,23 @@ router.afterEach((to) => {
 
 watch(
   () => isSignedIn.value,
-  (newStatus, oldStatus) => {
+  async (newStatus, oldStatus) => {
     if (oldStatus === undefined || newStatus === oldStatus) {
       return;
     }
     let destination = { name: "home" };
-    if (newStatus && router.app.$route.query?.redirect) {
-      let path = router.app.$route.query.redirect;
-      let { route } = router.resolve({ path });
+    if (newStatus && router.currentRoute.value.query?.redirect) {
+      let path = router.currentRoute.value.query.redirect;
+      let { matched } = router.resolve({ path });
+      let [route = null] = matched;
       if (route) {
         if (!route.meta.requiresAuth || route.meta.requiresAuth.value) {
           destination = { path };
         }
       }
     }
-    // Use a timeout because isSpotlight, etc won't be updated yet when push runs
-    window.setTimeout(() => router.push(destination), 0);
+    await nextTick();
+    router.push(destination);
   },
   {
     immediate: true,
