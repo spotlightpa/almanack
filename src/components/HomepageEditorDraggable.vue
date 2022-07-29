@@ -26,7 +26,7 @@ export default {
 </script>
 <template>
   <draggable
-    v-model="modelValue"
+    :list="modelValue"
     class="textarea"
     item-key="id"
     :group="{ name: 'articles', pull: 'clone', put: true }"
