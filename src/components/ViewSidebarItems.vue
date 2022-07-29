@@ -189,7 +189,7 @@ export default {
           </div>
           <div class="column is-full">
             <h2 class="mb-1 title is-size-3">Add new item</h2>
-            <PageSelector :pages="pages" @select="sidebar.add($event)" />
+            <PageSelector :pages="pages" @select-page="sidebar.add($event)" />
             <SpinnerProgress :is-loading="pagesState.isLoading" />
             <ErrorReloader :error="pagesState.error" @reload="reloadPages" />
           </div>

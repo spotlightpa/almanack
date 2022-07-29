@@ -16,7 +16,7 @@ export default {
 <template>
   <div class="columns">
     <div class="column is-half">
-      <PageSelector :pages="pages" @select="push($event)" />
+      <PageSelector :pages="pages" @select-page="push($event)" />
     </div>
     <div class="column is-half">
       <BulmaField label="Homepage featured article">
