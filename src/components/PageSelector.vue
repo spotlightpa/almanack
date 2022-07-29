@@ -17,15 +17,15 @@ export default {
   },
   computed: {
     filteredPages() {
-      if (!this.filterText) {
-        return this.pages.slice(0, 10);
+      let pages = this.pages;
+      if (this.filterText) {
+        pages = pages.filter((p) =>
+          fuzzyMatch(p.filterableProps, this.filterText)
+        );
       }
-      return this.pages
-        .filter((p) => fuzzyMatch(p.filterableProps, this.filterText))
-        .slice(0, 10);
+      return pages.slice(0, 20);
     },
   },
-  methods: {},
 };
 </script>
 
@@ -45,7 +45,10 @@ export default {
       chosen-class="is-active"
     >
       <template #item="{ element: article }">
-        <a class="dropdown-item select-none" @click="$emit('select', article)">
+        <a
+          class="dropdown-item select-none"
+          @click="$emit('select-page', article)"
+        >
           <span class="overflow">
             <b>{{ article.internalID }}</b
             >: {{ article.hed }}
