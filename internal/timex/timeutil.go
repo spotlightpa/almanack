@@ -38,19 +38,9 @@ func Equalish(old, new pgtype.Timestamptz) bool {
 	if old.Status != new.Status {
 		return false
 	}
-	if old.Status != pgtype.Present || new.Status != pgtype.Present {
+	if old.Status != pgtype.Present {
 		return true
 	}
-	// If the dates are more than 290 years apart
-	// (e.g. because one is zero time)
-	// the duration is the max that fits into an int64, but
-	// math.MinInt64 can't be converted to a positive number.
-	// To workaround this, just pre-sort them
-	// so the diff will always be zero or positive.
-	older, newer := old.Time, new.Time
-	if newer.Before(older) {
-		older, newer = new.Time, old.Time
-	}
-	diff := newer.Sub(older)
+	diff := old.Time.Sub(new.Time).Abs()
 	return diff < timeWindow
 }
