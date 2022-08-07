@@ -83,8 +83,11 @@ func (app *appEnv) tryReadJSON(w http.ResponseWriter, r *http.Request, dst any) 
 
 	err := dec.Decode(&dst)
 	if err != nil {
-		var syntaxError *json.SyntaxError
-		var unmarshalTypeError *json.UnmarshalTypeError
+		var (
+			syntaxError        *json.SyntaxError
+			unmarshalTypeError *json.UnmarshalTypeError
+			maxBytesError      *http.MaxBytesError
+		)
 
 		switch {
 		case errors.As(err, &syntaxError):
@@ -110,9 +113,10 @@ func (app *appEnv) tryReadJSON(w http.ResponseWriter, r *http.Request, dst any) 
 			return resperr.WithUserMessage(nil,
 				"Request body must not be empty")
 
-		case err.Error() == "http: request body too large":
+		case errors.As(err, &maxBytesError):
 			return resperr.New(http.StatusRequestEntityTooLarge,
-				"request body too large: %w", err)
+				"request body exceeds max size %d: %w",
+				maxBytesError.Limit, err)
 
 		default:
 			return resperr.New(http.StatusBadRequest, "tryReadJSON: %w", err)
