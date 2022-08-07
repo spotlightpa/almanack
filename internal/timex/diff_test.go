@@ -11,6 +11,9 @@ import (
 
 func TestEqualish(t *testing.T) {
 	parseTime := func(s string) pgtype.Timestamptz {
+		if s == "0" {
+			return pgtype.Timestamptz{Status: pgtype.Present}
+		}
 		t, err := time.Parse("15:04:05", s)
 		status := pgtype.Present
 		if err != nil {
@@ -30,6 +33,8 @@ func TestEqualish(t *testing.T) {
 		"second later":       {"1:00:00", "1:01:00", true},
 		"first much later":   {"1:10:00", "1:00:00", false},
 		"second much later":  {"1:00:00", "1:10:00", false},
+		"first zero":         {"0", "1:00:00", false},
+		"second zero":        {"1:00:00", "0", false},
 	}
 	for name, tc := range cases {
 		t.Run(name, func(t *testing.T) {
