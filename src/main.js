@@ -19,9 +19,6 @@ app.component("MetaHead", Head);
 import fontAwesome from "./plugins/font-awesome.js";
 app.use(fontAwesome);
 
-import project from "./plugins/autoimport.js";
-app.use(project);
-
 import router from "./plugins/router.js";
 app.use(router);
 router.app = app;

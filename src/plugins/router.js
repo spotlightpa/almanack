@@ -1,28 +1,36 @@
-import { nextTick, watch } from "vue";
+import { defineAsyncComponent, nextTick, watch } from "vue";
 import { createRouter, createWebHistory } from "vue-router";
 
 import { useAuth } from "@/api/hooks.js";
 import { setDimensions, sendGAPageview } from "@/utils/google-analytics.js";
 
-import ViewAdmin from "@/components/ViewAdmin.vue";
-import ViewArcArticle from "@/components/ViewArcArticle.vue";
-import ViewAuthorizedDomains from "@/components/ViewAuthorizedDomains.vue";
 import ViewError from "@/components/ViewError.vue";
-import ViewFileUploader from "@/components/ViewFileUploader.vue";
-import ViewHomepageEditor from "@/components/ViewHomepageEditor.vue";
-import ViewImageUploader from "@/components/ViewImageUploader.vue";
-import ViewLogin from "@/components/ViewLogin.vue";
-import ViewNewsletterList from "@/components/ViewNewsletterList.vue";
-import ViewNewsletterPage from "@/components/ViewNewsletterPage.vue";
-import ViewNewsPage from "@/components/ViewNewsPage.vue";
-import ViewNewsPagesList from "@/components/ViewNewsPagesList.vue";
-import ViewRedirectArcToNewsPage from "@/components/ViewRedirectArcToNewsPage.vue";
-import ViewStateCollegeList from "@/components/ViewStateCollegeList.vue";
-import ViewSharedList from "@/components/ViewSharedList.vue";
-import ViewSidebarItems from "@/components/ViewSidebarItems.vue";
-import ViewSiteParams from "@/components/ViewSiteParams.vue";
-import ViewStateCollegeEditor from "@/components/ViewStateCollegeEditor.vue";
-import ViewUnauthorized from "@/components/ViewUnauthorized.vue";
+
+let viewNames = [
+  "ViewAdmin",
+  "ViewArcArticle",
+  "ViewAuthorizedDomains",
+  "ViewFileUploader",
+  "ViewHomepageEditor",
+  "ViewImageUploader",
+  "ViewLogin",
+  "ViewNewsletterList",
+  "ViewNewsletterPage",
+  "ViewNewsPage",
+  "ViewNewsPagesList",
+  "ViewRedirectArcToNewsPage",
+  "ViewSharedList",
+  "ViewSidebarItems",
+  "ViewSiteParams",
+  "ViewStateCollegeEditor",
+  "ViewUnauthorized",
+];
+let viewComponents = {};
+for (let name of viewNames) {
+  viewComponents[name] = defineAsyncComponent(() =>
+    import(`@/components/${name}.vue`)
+  );
+}
 
 let { roles, fullName, email, isEditor, isSpotlightPAUser, isSignedIn } =
   useAuth();
@@ -49,13 +57,13 @@ let router = createRouter({
     {
       path: "/login",
       name: "login",
-      component: ViewLogin,
+      component: viewComponents.ViewLogin,
       meta: {},
     },
     {
       path: "/unauthorized",
       name: "unauthorized",
-      component: ViewUnauthorized,
+      component: viewComponents.ViewUnauthorized,
       meta: {
         requiresAuth: isSignedIn,
       },
@@ -63,7 +71,7 @@ let router = createRouter({
     {
       path: "/articles",
       name: "articles",
-      component: ViewSharedList,
+      component: viewComponents.ViewSharedList,
       props: (route) => ({ page: route.query.page }),
       meta: {
         requiresAuth: isEditor,
@@ -72,14 +80,14 @@ let router = createRouter({
     {
       path: "/articles/:id",
       name: "article",
-      component: ViewArcArticle,
+      component: viewComponents.ViewArcArticle,
       props: true,
       meta: { requiresAuth: isEditor },
     },
     {
       path: "/admin",
       name: "admin",
-      component: ViewAdmin,
+      component: viewComponents.ViewAdmin,
       props: (route) => ({ page: route.query.page }),
       meta: {
         requiresAuth: isSpotlightPAUser,
@@ -88,7 +96,7 @@ let router = createRouter({
     {
       path: "/admin/site-params",
       name: "site-params",
-      component: ViewSiteParams,
+      component: viewComponents.ViewSiteParams,
       meta: {
         requiresAuth: isSpotlightPAUser,
       },
@@ -96,7 +104,7 @@ let router = createRouter({
     {
       path: "/admin/editors-picks",
       name: "homepage-editor",
-      component: ViewHomepageEditor,
+      component: viewComponents.ViewHomepageEditor,
       meta: {
         requiresAuth: isSpotlightPAUser,
       },
@@ -104,7 +112,7 @@ let router = createRouter({
     {
       path: "/admin/state-college-editor",
       name: "state-college-editor",
-      component: ViewStateCollegeEditor,
+      component: viewComponents.ViewStateCollegeEditor,
       meta: {
         requiresAuth: isSpotlightPAUser,
       },
@@ -112,7 +120,7 @@ let router = createRouter({
     {
       path: "/admin/sidebar-items",
       name: "sidebar-items",
-      component: ViewSidebarItems,
+      component: viewComponents.ViewSidebarItems,
       meta: {
         requiresAuth: isSpotlightPAUser,
       },
@@ -120,7 +128,7 @@ let router = createRouter({
     {
       path: "/admin/uploader",
       name: "image-uploader",
-      component: ViewImageUploader,
+      component: viewComponents.ViewImageUploader,
       props: (route) => ({ page: route.query.page }),
       meta: {
         requiresAuth: isSpotlightPAUser,
@@ -129,7 +137,7 @@ let router = createRouter({
     {
       path: "/admin/file-uploader",
       name: "file-uploader",
-      component: ViewFileUploader,
+      component: viewComponents.ViewFileUploader,
       props: (route) => ({ page: route.query.page }),
       meta: {
         requiresAuth: isSpotlightPAUser,
@@ -138,7 +146,7 @@ let router = createRouter({
     {
       path: "/admin/news",
       name: "news-pages",
-      component: ViewNewsPagesList,
+      component: viewComponents.ViewNewsPagesList,
       props: (route) => ({ page: route.query.page }),
       meta: {
         requiresAuth: isSpotlightPAUser,
@@ -147,7 +155,7 @@ let router = createRouter({
     {
       path: "/admin/statecollege",
       name: "statecollege-pages",
-      component: ViewStateCollegeList,
+      component: viewComponents.ViewStateCollegeList,
       props: (route) => ({ page: route.query.page }),
       meta: {
         requiresAuth: isSpotlightPAUser,
@@ -156,7 +164,7 @@ let router = createRouter({
     {
       path: "/admin/redirect/arc-to-news/:id",
       name: "redirect-arc-news-page",
-      component: ViewRedirectArcToNewsPage,
+      component: viewComponents.ViewRedirectArcToNewsPage,
       props: true,
       meta: {
         requiresAuth: isSpotlightPAUser,
@@ -165,7 +173,7 @@ let router = createRouter({
     {
       path: "/admin/news/:id",
       name: "news-page",
-      component: ViewNewsPage,
+      component: viewComponents.ViewNewsPage,
       props: true,
       meta: {
         requiresAuth: isSpotlightPAUser,
@@ -174,7 +182,7 @@ let router = createRouter({
     {
       path: "/admin/domains",
       name: "domains",
-      component: ViewAuthorizedDomains,
+      component: viewComponents.ViewAuthorizedDomains,
       meta: {
         requiresAuth: isSpotlightPAUser,
       },
@@ -182,7 +190,7 @@ let router = createRouter({
     {
       path: "/admin/newsletters",
       name: "newsletters",
-      component: ViewNewsletterList,
+      component: viewComponents.ViewNewsletterList,
       props: (route) => ({ page: route.query.page }),
       meta: {
         requiresAuth: isSpotlightPAUser,
@@ -191,7 +199,7 @@ let router = createRouter({
     {
       path: "/admin/newsletters/:id",
       name: "newsletter-page",
-      component: ViewNewsletterPage,
+      component: viewComponents.ViewNewsletterPage,
       props: true,
       meta: { requiresAuth: isSpotlightPAUser },
     },
