@@ -1,4 +1,4 @@
-import { defineAsyncComponent, nextTick, watch } from "vue";
+import { nextTick, watch } from "vue";
 import { createRouter, createWebHistory } from "vue-router";
 
 import { useAuth } from "@/api/hooks.js";
@@ -27,9 +27,7 @@ let viewNames = [
 ];
 let viewComponents = {};
 for (let name of viewNames) {
-  viewComponents[name] = defineAsyncComponent(() =>
-    import(`@/components/${name}.vue`)
-  );
+  viewComponents[name] = () => import(`@/components/${name}.vue`);
 }
 
 let { roles, fullName, email, isEditor, isSpotlightPAUser, isSignedIn } =
