@@ -1,15 +1,15 @@
-import * as Sentry from "@sentry/browser";
+import { createApp } from "vue";
+import TheApp from "./components/TheApp.vue";
+const app = createApp(TheApp);
+
+import * as Sentry from "@sentry/vue";
 
 let dsn =
   import.meta.env.MODE === "production"
     ? "https://cf41d56053f841ae9625673c3ab8d53f@o361657.ingest.sentry.io/3944373"
     : "";
 
-Sentry.init({ dsn });
-
-import { createApp } from "vue";
-import TheApp from "./components/TheApp.vue";
-const app = createApp(TheApp);
+Sentry.init({ app, dsn });
 
 import { Head, createHead } from "@vueuse/head";
 const head = createHead();
