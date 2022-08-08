@@ -179,7 +179,6 @@ export default {
       <component
         :is="block.component"
         v-for="(block, i) of article.contentComponents"
-        ref="contentsEls"
         :key="i"
         :block="block.block"
       ></component>

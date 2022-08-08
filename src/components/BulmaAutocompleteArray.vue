@@ -104,7 +104,7 @@ export default {
 </script>
 
 <template>
-  <BulmaField ref="field" v-slot="{ idForLabel }" v-bind="fieldProps">
+  <BulmaField v-slot="{ idForLabel }" v-bind="fieldProps">
     <div class="field is-grouped is-grouped-multiline">
       <div v-for="(v, i) of modelValue" :key="i" class="control">
         <div
@@ -139,7 +139,6 @@ export default {
 
     <input
       :id="idForLabel"
-      ref="input"
       :value="currentInput"
       class="input"
       :placeholder="placeholder"

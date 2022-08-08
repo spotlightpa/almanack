@@ -58,15 +58,6 @@ export default {
       };
     },
   },
-  watch: {
-    modelValue(newVal) {
-      if (this.validator) {
-        let message = this.validator(newVal);
-        this.$refs.input.setCustomValidity(message);
-        this.validationMessage = message;
-      }
-    },
-  },
   methods: {
     updateValidationMessage(ev) {
       this.validationMessage = ev.target.validationMessage;
@@ -84,10 +75,9 @@ export default {
 </script>
 
 <template>
-  <BulmaField ref="field" v-slot="{ idForLabel }" v-bind="fieldProps">
+  <BulmaField v-slot="{ idForLabel }" v-bind="fieldProps">
     <input
       :id="idForLabel"
-      ref="input"
       class="input"
       :autocomplete="autocomplete"
       :autofocus="autofocus"

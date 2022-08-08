@@ -39,7 +39,7 @@ export default {
 </script>
 
 <template>
-  <BulmaField ref="field" v-slot="{ idForLabel }" v-bind="fieldProps">
+  <BulmaField v-slot="{ idForLabel }" v-bind="fieldProps">
     <div class="is-flex is-align-items-center">
       <input
         :id="idForLabel"
