@@ -1,12 +1,13 @@
 <script>
-import { inject, defineComponent, ref, watch } from "vue";
+import { defineComponent, ref, watch } from "vue";
+import { useRouter } from "vue-router";
 
 import { makeState } from "@/api/service-util.js";
 import { useClient } from "@/api/client.js";
 
 export default defineComponent({
   setup() {
-    const router = inject("router");
+    const router = useRouter();
     const url = ref("");
     const { getPageByURLPath } = useClient();
     const { apiStateRefs, exec } = makeState();

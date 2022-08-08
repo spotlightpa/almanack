@@ -1,15 +1,3 @@
-<script>
-import "@/css/main.scss";
-
-export default {
-  provide() {
-    return {
-      router: this.$router,
-    };
-  },
-};
-</script>
-
 <template>
   <div class="body">
     <AppNav id="top-nav" />
@@ -44,6 +32,10 @@ export default {
     </footer>
   </div>
 </template>
+
+<style lang="scss">
+@import "@/css/main.scss";
+</style>
 
 <style scoped>
 .content-width {
