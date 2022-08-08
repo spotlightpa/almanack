@@ -1,5 +1,6 @@
 <script>
-import { inject, ref, watch } from "vue";
+import { ref, watch } from "vue";
+import { useRouter } from "vue-router";
 import { makeState } from "@/api/service-util.js";
 import { useClient } from "@/api/client.js";
 
@@ -9,7 +10,7 @@ export default {
     id: String,
   },
   setup(props) {
-    const router = inject("router");
+    const router = useRouter();
     const needsCreation = ref(false);
 
     const isLoadingDebounced = ref(false);
