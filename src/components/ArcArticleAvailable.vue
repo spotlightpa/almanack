@@ -200,7 +200,7 @@ export default {
       >{{ articleHTML }}</CopyTextarea
     >
 
-    <details class="block">
+    <details class="mt-5 block">
       <summary class="title">Budget details</summary>
       <p class="content">
         {{ article.budgetLine }}
