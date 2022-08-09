@@ -13,6 +13,7 @@ import (
 	"github.com/carlmjohnson/errutil"
 	"gocloud.dev/blob"
 
+	"github.com/spotlightpa/almanack/internal/try"
 	"github.com/spotlightpa/almanack/pkg/common"
 )
 
@@ -72,10 +73,7 @@ func (bs BlobStore) GetSignedURL(ctx context.Context, srcPath string, h http.Hea
 }
 
 func (bs BlobStore) BuildURL(srcPath string) string {
-	u, err := url.Parse(bs.bucket)
-	if err != nil {
-		panic(err)
-	}
+	u := try.To(url.Parse(bs.bucket))
 
 	// Just assuming bucket name is valid DNS…
 	return fmt.Sprintf("https://%s/%s", u.Hostname(), srcPath)

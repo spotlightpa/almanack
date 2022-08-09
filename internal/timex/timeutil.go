@@ -5,14 +5,11 @@ import (
 
 	"github.com/jackc/pgtype"
 	"github.com/spotlightpa/almanack/internal/syncx"
+	"github.com/spotlightpa/almanack/internal/try"
 )
 
 var getNewYork = syncx.Once(func() *time.Location {
-	newYork, err := time.LoadLocation("America/New_York")
-	if err != nil {
-		panic("timezone db not available")
-	}
-	return newYork
+	return try.To(time.LoadLocation("America/New_York"))
 })
 
 func ToEST(t time.Time) time.Time {
