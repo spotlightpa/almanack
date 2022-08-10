@@ -19,9 +19,9 @@ import (
 	"github.com/getsentry/sentry-go"
 	"github.com/go-chi/chi/v5"
 
+	"github.com/spotlightpa/almanack/internal/must"
 	"github.com/spotlightpa/almanack/internal/netlifyid"
 	"github.com/spotlightpa/almanack/internal/stringx"
-	"github.com/spotlightpa/almanack/internal/try"
 	"github.com/spotlightpa/almanack/layouts"
 	"github.com/spotlightpa/almanack/pkg/almanack"
 )
@@ -195,7 +195,7 @@ func (app *appEnv) maxSizeMiddleware(next http.Handler) http.Handler {
 }
 
 func mustIntParam[Int int | int32 | int64](r *http.Request, param string, p *Int) {
-	try.Must(intParam(r, param, p))
+	must.Do(intParam(r, param, p))
 }
 
 func intParam[Int int | int32 | int64](r *http.Request, param string, p *Int) error {
