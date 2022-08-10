@@ -13,7 +13,7 @@ import (
 	"github.com/carlmjohnson/resperr"
 	"github.com/go-chi/chi/v5"
 	"github.com/spotlightpa/almanack/internal/db"
-	"github.com/spotlightpa/almanack/internal/try"
+	"github.com/spotlightpa/almanack/internal/must"
 	"github.com/spotlightpa/almanack/pkg/almanack"
 )
 
@@ -44,7 +44,7 @@ func (app *appEnv) pingErr(w http.ResponseWriter, r *http.Request) {
 	))
 }
 
-var inkyURL = try.To(url.Parse("https://www.inquirer.com"))
+var inkyURL = must.Get(url.Parse("https://www.inquirer.com"))
 
 func (app *appEnv) getProxyImage(w http.ResponseWriter, r *http.Request) {
 	app.Println("start getProxyImage")

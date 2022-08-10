@@ -4,12 +4,12 @@ import (
 	"time"
 
 	"github.com/jackc/pgtype"
+	"github.com/spotlightpa/almanack/internal/must"
 	"github.com/spotlightpa/almanack/internal/syncx"
-	"github.com/spotlightpa/almanack/internal/try"
 )
 
 var getNewYork = syncx.Once(func() *time.Location {
-	return try.To(time.LoadLocation("America/New_York"))
+	return must.Get(time.LoadLocation("America/New_York"))
 })
 
 func ToEST(t time.Time) time.Time {

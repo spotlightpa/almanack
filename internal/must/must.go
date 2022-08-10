@@ -1,12 +1,12 @@
-package try
+package must
 
-func Must(err error) {
+func Do(err error) {
 	if err != nil {
 		panic(err)
 	}
 }
 
-func To[T any](v T, err error) T {
+func Get[T any](v T, err error) T {
 	if err != nil {
 		panic(err)
 	}

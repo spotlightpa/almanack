@@ -11,8 +11,8 @@ import (
 	"strings"
 
 	"github.com/spotlightpa/almanack/internal/arc"
+	"github.com/spotlightpa/almanack/internal/must"
 	"github.com/spotlightpa/almanack/internal/stringx"
-	"github.com/spotlightpa/almanack/internal/try"
 	"github.com/spotlightpa/almanack/pkg/common"
 )
 
@@ -245,7 +245,7 @@ func readContentElements(ctx context.Context, svc Services, rawels []*json.RawMe
 	return
 }
 
-var inkyURL = try.To(url.Parse("https://www.inquirer.com"))
+var inkyURL = must.Get(url.Parse("https://www.inquirer.com"))
 
 func resolveFromInky(s string) string {
 	if s == "" {
