@@ -13,11 +13,12 @@ import (
 )
 
 type Services struct {
-	arcFeedURL         string
-	MailchimpSignupURL string
-	Client             *http.Client
-	Queries            *db.Queries
-	Tx                 *db.Txable
+	arcFeedURL           string
+	MailchimpSignupURL   string
+	NetlifyWebhookSecret string
+	Client               *http.Client
+	Queries              *db.Queries
+	Tx                   *db.Txable
 	github.ContentStore
 	ImageStore       aws.BlobStore
 	FileStore        aws.BlobStore
