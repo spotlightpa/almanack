@@ -1,6 +1,7 @@
 package api
 
 import (
+	"context"
 	"encoding/base64"
 	"fmt"
 	"net/http"
@@ -17,6 +18,7 @@ import (
 	"github.com/spotlightpa/almanack/internal/jwthook"
 	"github.com/spotlightpa/almanack/internal/must"
 	"github.com/spotlightpa/almanack/internal/netlifyid"
+	"github.com/spotlightpa/almanack/internal/slack"
 	"github.com/spotlightpa/almanack/pkg/almanack"
 )
 
@@ -111,13 +113,47 @@ func (app *appEnv) postIdentityHook(w http.ResponseWriter, r *http.Request) {
 		EventType string         `json:"event"`
 		User      netlifyid.User `json:"user"`
 	}
-
-	err := jwthook.VerifyRequest(r, "abc", "d4cce6f2-6b46-4bba-b126-cfb8f469e3c5", "gotrue", time.Now(), &req)
-
+	err := jwthook.VerifyRequest(r,
+		app.svc.NetlifyWebhookSecret, "d4cce6f2-6b46-4bba-b126-cfb8f469e3c5", "gotrue",
+		time.Now(),
+		&req)
 	if err != nil {
 		app.replyErr(w, r, err)
 		return
 	}
-	req.User.AppMetadata.Roles = append(req.User.AppMetadata.Roles, "testrole")
+	roles, err := db.GetRolesForEmail(r.Context(), app.svc.Queries, req.User.Email)
+	if err != nil {
+		app.replyErr(w, r, err)
+		return
+	}
+	req.User.AppMetadata.Roles = append(req.User.AppMetadata.Roles, roles...)
+
+	const (
+		colorGreen = "#78bc20"
+		colorRed   = "#da291c"
+	)
+
+	msg := fmt.Sprintf("%s <%s> with %d role(s)",
+		req.User.UserMetadata.FullName,
+		req.User.Email,
+		len(req.User.AppMetadata.Roles))
+	color := colorGreen
+	if len(req.User.AppMetadata.Roles) < 1 {
+		color = colorRed
+	}
+	app.svc.SlackClient.Post(context.Background(),
+		slack.Message{
+			Attachments: []slack.Attachment{
+				{
+					Title: "New Almanack Registration",
+					Text:  msg,
+					Color: color,
+					Fields: []slack.Field{
+						{
+							Title: "Roles",
+							Value: strings.Join(req.User.AppMetadata.Roles, ", "),
+							Short: true,
+						}}}}},
+	)
 	app.replyJSON(http.StatusOK, w, req.User)
 }

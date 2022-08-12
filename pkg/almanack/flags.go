@@ -19,6 +19,7 @@ import (
 func AddFlags(fl *flag.FlagSet) func() (svc Services, err error) {
 	arcFeedURL := fl.String("src-feed", "", "source `URL` for Arc feed")
 	mailchimpSignupURL := fl.String("mc-signup-url", "http://example.com", "`URL` to redirect users to for MailChimp signup")
+	netlifyHookSecret := fl.String("netlify-webhook-secret", "", "`shared secret` to authorize Netlify identity webhook")
 
 	pg, tx := db.AddFlags(fl, "postgres", "PostgreSQL database `URL`")
 	slackURL := fl.String("slack-social-url", "", "Slack hook endpoint `URL` for social")
@@ -54,19 +55,20 @@ func AddFlags(fl *flag.FlagSet) func() (svc Services, err error) {
 		mc := mailchimp.NewMailService(*mailServiceAPIKey, *mailServiceListID, &client)
 
 		return Services{
-			arcFeedURL:         *arcFeedURL,
-			MailchimpSignupURL: *mailchimpSignupURL,
-			Client:             &client,
-			Queries:            pg,
-			Tx:                 tx,
-			ContentStore:       svc.ContentStore,
-			SlackClient:        slack.New(*slackURL),
-			ImageStore:         is,
-			FileStore:          fs,
-			Indexer:            getIndex(),
-			NewletterService:   getNewsletter(&client),
-			gsvc:               getGoogle(),
-			EmailService:       mc,
+			arcFeedURL:           *arcFeedURL,
+			MailchimpSignupURL:   *mailchimpSignupURL,
+			NetlifyWebhookSecret: *netlifyHookSecret,
+			Client:               &client,
+			Queries:              pg,
+			Tx:                   tx,
+			ContentStore:         svc.ContentStore,
+			SlackClient:          slack.New(*slackURL),
+			ImageStore:           is,
+			FileStore:            fs,
+			Indexer:              getIndex(),
+			NewletterService:     getNewsletter(&client),
+			gsvc:                 getGoogle(),
+			EmailService:         mc,
 		}, nil
 	}
 }
