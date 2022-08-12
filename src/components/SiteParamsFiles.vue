@@ -3,14 +3,14 @@ import { ref } from "vue";
 
 export default {
   props: { files: Array, fileProps: Object },
-  setup() {
+  setup(_, { emit }) {
     const inputText = ref("");
     return {
       inputText,
       addText() {
         let text = inputText.value;
         inputText.value = "";
-        this.$emit("add", text);
+        emit("add", text);
       },
     };
   },
