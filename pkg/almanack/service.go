@@ -22,7 +22,8 @@ type Services struct {
 	github.ContentStore
 	ImageStore       aws.BlobStore
 	FileStore        aws.BlobStore
-	SlackClient      slack.Client
+	SlackSocial      slack.Client
+	SlackTech        slack.Client
 	Indexer          index.Indexer
 	NewletterService mailchimp.V3
 	gsvc             *google.Service
