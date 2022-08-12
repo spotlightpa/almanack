@@ -22,7 +22,8 @@ func AddFlags(fl *flag.FlagSet) func() (svc Services, err error) {
 	netlifyHookSecret := fl.String("netlify-webhook-secret", "", "`shared secret` to authorize Netlify identity webhook")
 
 	pg, tx := db.AddFlags(fl, "postgres", "PostgreSQL database `URL`")
-	slackURL := fl.String("slack-social-url", "", "Slack hook endpoint `URL` for social")
+	slackSocialURL := fl.String("slack-social-url", "", "Slack hook endpoint `URL` for social")
+	slackTechURL := fl.String("slack-hook-url", "", "Slack tech channel endpoint `URL`")
 	heroku := herokuapi.AddFlags(fl)
 	getS3Store := aws.AddFlags(fl)
 	getGithub := github.AddFlags(fl)
@@ -62,7 +63,8 @@ func AddFlags(fl *flag.FlagSet) func() (svc Services, err error) {
 			Queries:              pg,
 			Tx:                   tx,
 			ContentStore:         svc.ContentStore,
-			SlackClient:          slack.New(*slackURL),
+			SlackSocial:          slack.New(*slackSocialURL),
+			SlackTech:            slack.New(*slackTechURL),
 			ImageStore:           is,
 			FileStore:            fs,
 			Indexer:              getIndex(),

@@ -113,6 +113,10 @@ func (app *appEnv) postIdentityHook(w http.ResponseWriter, r *http.Request) {
 		EventType string         `json:"event"`
 		User      netlifyid.User `json:"user"`
 	}
+	if req.EventType != "signup" {
+		w.WriteHeader(http.StatusAccepted)
+		return
+	}
 	err := jwthook.VerifyRequest(r,
 		app.svc.NetlifyWebhookSecret, "d4cce6f2-6b46-4bba-b126-cfb8f469e3c5", "gotrue",
 		time.Now(),
@@ -141,7 +145,7 @@ func (app *appEnv) postIdentityHook(w http.ResponseWriter, r *http.Request) {
 	if len(req.User.AppMetadata.Roles) < 1 {
 		color = colorRed
 	}
-	app.svc.SlackClient.Post(context.Background(),
+	app.svc.SlackTech.Post(context.Background(),
 		slack.Message{
 			Attachments: []slack.Attachment{
 				{
