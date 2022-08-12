@@ -8,12 +8,15 @@ import (
 	"net/url"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/carlmjohnson/requests"
 	"github.com/carlmjohnson/resperr"
 	"github.com/go-chi/chi/v5"
 	"github.com/spotlightpa/almanack/internal/db"
+	"github.com/spotlightpa/almanack/internal/jwthook"
 	"github.com/spotlightpa/almanack/internal/must"
+	"github.com/spotlightpa/almanack/internal/netlifyid"
 	"github.com/spotlightpa/almanack/pkg/almanack"
 )
 
@@ -100,4 +103,21 @@ func (app *appEnv) getBookmarklet(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r,
 		fmt.Sprintf("/admin/news/%d", page.ID),
 		http.StatusTemporaryRedirect)
+}
+
+func (app *appEnv) postIdentityHook(w http.ResponseWriter, r *http.Request) {
+	app.Println("start postIdentityHook")
+	var req struct {
+		EventType string         `json:"event"`
+		User      netlifyid.User `json:"user"`
+	}
+
+	err := jwthook.VerifyRequest(r, "abc", "d4cce6f2-6b46-4bba-b126-cfb8f469e3c5", "gotrue", time.Now(), &req)
+
+	if err != nil {
+		app.replyErr(w, r, err)
+		return
+	}
+	req.User.AppMetadata.Roles = append(req.User.AppMetadata.Roles, "testrole")
+	app.replyJSON(http.StatusOK, w, req.User)
 }

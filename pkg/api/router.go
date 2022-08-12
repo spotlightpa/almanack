@@ -23,6 +23,7 @@ func (app *appEnv) routes() http.Handler {
 	r.Get(`/api/healthcheck`, app.ping)
 	r.Get(`/api/healthcheck/{code:\d{3}}`, app.pingErr)
 	r.Get(`/api/proxy-image/{encURL}`, app.getProxyImage)
+	r.Post(`/api/identity-hook`, app.postIdentityHook)
 	r.Route("/api", func(r chi.Router) {
 		r.Use(app.authHeaderMiddleware)
 		r.Get(`/user-info`, app.userInfo)
