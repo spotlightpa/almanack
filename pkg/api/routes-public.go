@@ -113,16 +113,17 @@ func (app *appEnv) postIdentityHook(w http.ResponseWriter, r *http.Request) {
 		EventType string         `json:"event"`
 		User      netlifyid.User `json:"user"`
 	}
-	if req.EventType != "signup" {
-		w.WriteHeader(http.StatusAccepted)
-		return
-	}
 	err := jwthook.VerifyRequest(r,
 		app.svc.NetlifyWebhookSecret, "d4cce6f2-6b46-4bba-b126-cfb8f469e3c5", "gotrue",
 		time.Now(),
 		&req)
 	if err != nil {
 		app.replyErr(w, r, err)
+		return
+	}
+	if req.EventType != "signup" {
+		app.replyErr(w, r, resperr.New(
+			http.StatusBadRequest, "unexpect event type: %q", req.EventType))
 		return
 	}
 	roles, err := db.GetRolesForEmail(r.Context(), app.svc.Queries, req.User.Email)
