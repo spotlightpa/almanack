@@ -51,6 +51,10 @@ func (app *appEnv) replyErr(w http.ResponseWriter, r *http.Request, err error) {
 	})
 }
 
+func (app *appEnv) replyNewErr(code int, w http.ResponseWriter, r *http.Request, format string, v ...any) {
+	app.replyErr(w, r, resperr.New(code, format, v...))
+}
+
 func (app *appEnv) logErr(ctx context.Context, err error) {
 	if hub := sentry.GetHubFromContext(ctx); hub != nil {
 		hub.WithScope(func(scope *sentry.Scope) {
