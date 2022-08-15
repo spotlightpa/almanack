@@ -44,9 +44,7 @@ func (app *appEnv) pingErr(w http.ResponseWriter, r *http.Request) {
 	statusCode, _ := strconv.Atoi(code)
 	app.Printf("start pingErr %q", code)
 
-	app.replyErr(w, r, resperr.New(
-		statusCode, "got test ping %q", code,
-	))
+	app.replyNewErr(statusCode, w, r, "got test ping %q", code)
 }
 
 var inkyURL = must.Get(url.Parse("https://www.inquirer.com"))
@@ -122,8 +120,8 @@ func (app *appEnv) postIdentityHook(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if req.EventType != "signup" {
-		app.replyErr(w, r, resperr.New(
-			http.StatusBadRequest, "unexpect event type: %q", req.EventType))
+		app.replyNewErr(http.StatusBadRequest, w, r,
+			"unexpect event type: %q", req.EventType)
 		return
 	}
 	roles, err := db.GetRolesForEmail(r.Context(), app.svc.Queries, req.User.Email)

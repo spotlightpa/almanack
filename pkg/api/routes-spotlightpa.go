@@ -711,8 +711,7 @@ func (app *appEnv) postRefreshPageFromArc(w http.ResponseWriter, r *http.Request
 
 	arcID, _ := page.Frontmatter["arc-id"].(string)
 	if arcID == "" {
-		app.replyErr(w, r, resperr.New(http.StatusConflict,
-			"no arc-id on page %d", id))
+		app.replyNewErr(http.StatusConflict, w, r, "no arc-id on page %d", id)
 		return
 	}
 	var story *almanack.ArcStory

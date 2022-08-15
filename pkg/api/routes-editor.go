@@ -3,7 +3,6 @@ package api
 import (
 	"net/http"
 
-	"github.com/carlmjohnson/resperr"
 	"github.com/go-chi/chi/v5"
 	"github.com/spotlightpa/almanack/internal/netlifyid"
 	"github.com/spotlightpa/almanack/pkg/almanack"
@@ -52,9 +51,8 @@ func (app *appEnv) getArcStory(w http.ResponseWriter, r *http.Request) {
 		article.Status != almanack.StatusPlanned {
 		// Let Spotlight PA users get article regardless of its status
 		if err := app.auth.HasRole(r, "Spotlight PA"); err != nil {
-			app.replyErr(w, r, resperr.New(
-				http.StatusNotFound, "user unauthorized to view article: %w", err,
-			))
+			app.replyNewErr(http.StatusNotFound, w, r,
+				"user unauthorized to view article: %w", err)
 			return
 		}
 	}
