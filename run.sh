@@ -8,7 +8,7 @@ THIS_DIR=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
 cd "$THIS_DIR"
 
 function _default() {
-	api -src-feed "$ARC_FEED" -cache
+	api
 }
 
 function _die() {
