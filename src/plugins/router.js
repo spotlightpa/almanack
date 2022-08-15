@@ -202,7 +202,7 @@ let router = createRouter({
       meta: { requiresAuth: isSpotlightPAUser },
     },
     {
-      path: "/*",
+      path: "/:pathMatch(.*)*",
       name: "error",
       component: ViewError,
     },
