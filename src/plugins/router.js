@@ -23,6 +23,7 @@ let viewNames = [
   "ViewSidebarItems",
   "ViewSiteParams",
   "ViewStateCollegeEditor",
+  "ViewStateCollegeList",
   "ViewUnauthorized",
 ];
 let viewComponents = {};
