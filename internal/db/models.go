@@ -101,6 +101,8 @@ type Page struct {
 	CreatedAt     time.Time          `json:"created_at"`
 	UpdatedAt     time.Time          `json:"updated_at"`
 	URLPath       pgtype.Text        `json:"url_path"`
+	SourceType    string             `json:"source_type"`
+	SourceID      string             `json:"source_id"`
 }
 
 type SiteDatum struct {

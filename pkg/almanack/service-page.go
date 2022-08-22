@@ -158,7 +158,12 @@ func (svc Services) PageFromArcArticle(ctx context.Context, dbArt *db.Article, p
 	if err = dbPage.FromTOML(content); err != nil {
 		return nil, err
 	}
-	if err = svc.Queries.EnsurePage(ctx, splArt.ContentFilepath()); err != nil {
+
+	if err = svc.Queries.EnsurePage(ctx, db.EnsurePageParams{
+		FilePath:   splArt.ContentFilepath(),
+		SourceType: "arc",
+		SourceID:   dbArt.ArcID.String,
+	}); err != nil {
 		return nil, err
 	}
 	if dbPage, err = svc.Queries.UpdatePage(ctx, db.UpdatePageParams{

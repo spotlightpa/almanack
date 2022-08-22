@@ -13,20 +13,26 @@ import (
 )
 
 const ensurePage = `-- name: EnsurePage :exec
-INSERT INTO page ("file_path")
-  VALUES ($1)
+INSERT INTO page ("file_path", "source_type", "source_id")
+  VALUES ($1, $2, $3)
 ON CONFLICT (file_path)
   DO NOTHING
 `
 
-func (q *Queries) EnsurePage(ctx context.Context, filePath string) error {
-	_, err := q.db.Exec(ctx, ensurePage, filePath)
+type EnsurePageParams struct {
+	FilePath   string `json:"file_path"`
+	SourceType string `json:"source_type"`
+	SourceID   string `json:"source_id"`
+}
+
+func (q *Queries) EnsurePage(ctx context.Context, arg EnsurePageParams) error {
+	_, err := q.db.Exec(ctx, ensurePage, arg.FilePath, arg.SourceType, arg.SourceID)
 	return err
 }
 
 const getPageByFilePath = `-- name: GetPageByFilePath :one
 SELECT
-  id, file_path, frontmatter, body, schedule_for, last_published, created_at, updated_at, url_path
+  id, file_path, frontmatter, body, schedule_for, last_published, created_at, updated_at, url_path, source_type, source_id
 FROM
   "page"
 WHERE
@@ -46,13 +52,15 @@ func (q *Queries) GetPageByFilePath(ctx context.Context, filePath string) (Page,
 		&i.CreatedAt,
 		&i.UpdatedAt,
 		&i.URLPath,
+		&i.SourceType,
+		&i.SourceID,
 	)
 	return i, err
 }
 
 const getPageByID = `-- name: GetPageByID :one
 SELECT
-  id, file_path, frontmatter, body, schedule_for, last_published, created_at, updated_at, url_path
+  id, file_path, frontmatter, body, schedule_for, last_published, created_at, updated_at, url_path, source_type, source_id
 FROM
   "page"
 WHERE
@@ -72,13 +80,15 @@ func (q *Queries) GetPageByID(ctx context.Context, id int64) (Page, error) {
 		&i.CreatedAt,
 		&i.UpdatedAt,
 		&i.URLPath,
+		&i.SourceType,
+		&i.SourceID,
 	)
 	return i, err
 }
 
 const getPageByURLPath = `-- name: GetPageByURLPath :one
 SELECT
-  id, file_path, frontmatter, body, schedule_for, last_published, created_at, updated_at, url_path
+  id, file_path, frontmatter, body, schedule_for, last_published, created_at, updated_at, url_path, source_type, source_id
 FROM
   page
 WHERE
@@ -98,6 +108,8 @@ func (q *Queries) GetPageByURLPath(ctx context.Context, urlPath string) (Page, e
 		&i.CreatedAt,
 		&i.UpdatedAt,
 		&i.URLPath,
+		&i.SourceType,
+		&i.SourceID,
 	)
 	return i, err
 }
@@ -301,7 +313,7 @@ func (q *Queries) ListPageIDs(ctx context.Context, arg ListPageIDsParams) ([]int
 const listPages = `-- name: ListPages :many
 WITH paths AS (
   SELECT
-    id, file_path, frontmatter, body, schedule_for, last_published, created_at, updated_at, url_path
+    id, file_path, frontmatter, body, schedule_for, last_published, created_at, updated_at, url_path, source_type, source_id
   FROM
     page
   WHERE
@@ -309,7 +321,7 @@ WITH paths AS (
 ),
 ordered AS (
   SELECT
-    id, file_path, frontmatter, body, schedule_for, last_published, created_at, updated_at, url_path
+    id, file_path, frontmatter, body, schedule_for, last_published, created_at, updated_at, url_path, source_type, source_id
   FROM
     paths
   ORDER BY
@@ -399,7 +411,7 @@ WITH query_paths AS (
 ),
 page_paths AS (
   SELECT
-    id, file_path, frontmatter, body, schedule_for, last_published, created_at, updated_at, url_path
+    id, file_path, frontmatter, body, schedule_for, last_published, created_at, updated_at, url_path, source_type, source_id
   FROM
     page
   WHERE
@@ -476,7 +488,7 @@ WHERE
   last_published IS NULL
   AND schedule_for < (CURRENT_TIMESTAMP + '5 minutes'::interval)
 RETURNING
-  id, file_path, frontmatter, body, schedule_for, last_published, created_at, updated_at, url_path
+  id, file_path, frontmatter, body, schedule_for, last_published, created_at, updated_at, url_path, source_type, source_id
 `
 
 func (q *Queries) PopScheduledPages(ctx context.Context) ([]Page, error) {
@@ -498,6 +510,8 @@ func (q *Queries) PopScheduledPages(ctx context.Context) ([]Page, error) {
 			&i.CreatedAt,
 			&i.UpdatedAt,
 			&i.URLPath,
+			&i.SourceType,
+			&i.SourceID,
 		); err != nil {
 			return nil, err
 		}
@@ -541,7 +555,7 @@ SET
 WHERE
   file_path = $9
 RETURNING
-  id, file_path, frontmatter, body, schedule_for, last_published, created_at, updated_at, url_path
+  id, file_path, frontmatter, body, schedule_for, last_published, created_at, updated_at, url_path, source_type, source_id
 `
 
 type UpdatePageParams struct {
@@ -579,6 +593,8 @@ func (q *Queries) UpdatePage(ctx context.Context, arg UpdatePageParams) (Page, e
 		&i.CreatedAt,
 		&i.UpdatedAt,
 		&i.URLPath,
+		&i.SourceType,
+		&i.SourceID,
 	)
 	return i, err
 }
