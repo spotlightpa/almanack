@@ -20,10 +20,16 @@ func TestMap(t *testing.T) {
 	be.NilErr(t, err)
 	ctx := context.Background()
 	const testpath = "test/hello.md"
-	err = q.EnsurePage(ctx, testpath)
+	err = q.EnsurePage(ctx, db.EnsurePageParams{
+		FilePath:   testpath,
+		SourceType: "testing",
+	})
 	be.NilErr(t, err)
 	// create again
-	err = q.EnsurePage(ctx, testpath)
+	err = q.EnsurePage(ctx, db.EnsurePageParams{
+		FilePath:   testpath,
+		SourceType: "testing",
+	})
 	be.NilErr(t, err)
 	p1, err := q.GetPageByFilePath(ctx, testpath)
 	be.NilErr(t, err)

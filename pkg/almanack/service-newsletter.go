@@ -3,6 +3,7 @@ package almanack
 import (
 	"context"
 	"fmt"
+	"strconv"
 	"strings"
 
 	"github.com/carlmjohnson/errutil"
@@ -92,7 +93,11 @@ func (svc Services) SaveNewsletterPage(ctx context.Context, nl *db.Newsletter, b
 		return nil
 	}
 	path := nl.SpotlightPAPath.String
-	if err := svc.Queries.EnsurePage(ctx, path); err != nil {
+	if err := svc.Queries.EnsurePage(ctx, db.EnsurePageParams{
+		FilePath:   path,
+		SourceType: "newsletter",
+		SourceID:   strconv.FormatInt(nl.ID, 10),
+	}); err != nil {
 		return err
 	}
 	slug := stringx.Slugify(
