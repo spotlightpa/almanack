@@ -10,6 +10,7 @@ import (
 	"github.com/carlmjohnson/resperr"
 	"github.com/spotlightpa/almanack/internal/arc"
 	"github.com/spotlightpa/almanack/internal/db"
+	"github.com/spotlightpa/almanack/internal/mailchimp"
 	"github.com/spotlightpa/almanack/pkg/almanack"
 	"golang.org/x/exp/slices"
 )
@@ -823,4 +824,33 @@ func (app *appEnv) setSiteData(loc string) http.HandlerFunc {
 
 		app.replyJSON(http.StatusOK, w, res)
 	}
+}
+
+func (app *appEnv) postRefreshPageFromNewsletterArchive(w http.ResponseWriter, r *http.Request) {
+	var id int64
+	mustIntParam(r, "id", &id)
+	app.Printf("start postRefreshPageFromNewsletterArchive for %d", id)
+
+	archiveURL, err := app.svc.Queries.GetArchiveURLForPageID(r.Context(), id)
+	if err != nil {
+		app.replyErr(w, r, err)
+		return
+	}
+	if archiveURL == "" {
+		app.replyNewErr(http.StatusConflict, w, r, "no archiveURL for page %d", id)
+	}
+	body, err := mailchimp.ImportPage(r.Context(), app.svc.Client, archiveURL)
+	if err != nil {
+		app.replyErr(w, r, err)
+		return
+	}
+	page, err := app.svc.Queries.UpdatePageRawContent(r.Context(), db.UpdatePageRawContentParams{
+		ID:         id,
+		RawContent: body,
+	})
+	if err != nil {
+		app.replyErr(w, r, err)
+		return
+	}
+	app.replyJSON(http.StatusOK, w, &page)
 }

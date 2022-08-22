@@ -200,8 +200,13 @@ function useAutocompletions() {
 }
 
 export function usePage(id) {
-  const { getPageWithContent, postPage, listImages, postRefreshPageFromArc } =
-    useClient();
+  const {
+    getPageWithContent,
+    postPage,
+    listImages,
+    postRefreshPageFromArc,
+    postRefreshPageFromNewsletterArchive,
+  } = useClient();
   const { apiState, exec } = makeState();
 
   const fetch = (id) => exec(() => getPageWithContent(id));
@@ -269,6 +274,9 @@ export function usePage(id) {
     },
     arcRefresh() {
       return exec(() => postRefreshPageFromArc(id.value));
+    },
+    mailchimpRefresh() {
+      return exec(() => postRefreshPageFromNewsletterArchive(id.value));
     },
     imageState,
     images: computed(() =>

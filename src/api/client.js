@@ -31,6 +31,8 @@ const endpoints = {
   getPageWithContent: (id) => `/api/page-with-content/${id}`,
   // post id endpoints
   postRefreshPageFromArc: (id) => `/api/refresh-page-from-arc/${id}`,
+  postRefreshPageFromNewsletterArchive: (id) =>
+    `/api/refresh-page-from-newsletter-archive/${id}`,
   // list page points
   listAnyArc: (page = "0") => `/api/list-any-arc/${page}`,
   listAvailableArc: (page = "0") => `/api/list-available/${page}`,
@@ -188,7 +190,10 @@ function makeClient($auth) {
     let endpointFn = endpoints[action];
     actions[action] = (id) => tryTo(request(endpointFn(id)));
   }
-  let idPostActions = ["postRefreshPageFromArc"];
+  let idPostActions = [
+    "postRefreshPageFromArc",
+    "postRefreshPageFromNewsletterArchive",
+  ];
   for (let action of idPostActions) {
     let endpointFn = endpoints[action];
     actions[action] = (id) => tryTo(post(endpointFn(id)));
