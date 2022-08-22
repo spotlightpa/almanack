@@ -221,7 +221,7 @@ export default {
           class="textarea preview-frame"
         />
         <button
-          v-if="page.sourceType === 'newsletter' && page.sourceID"
+          v-if="page.sourceType === 'mailchimp' && page.sourceID"
           class="mt-2 block button is-warning has-text-weight-semibold"
           :class="{ 'is-loading': isLoadingThrottled }"
           type="button"

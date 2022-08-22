@@ -65,7 +65,7 @@ func (app *appEnv) routes() http.Handler {
 			r.Post(`/page-for-arc-id`, app.postPageForArcID)
 			r.Get(`/page-with-content/{id:\d+}`, app.getPageWithContent)
 			r.Post(`/refresh-page-from-arc/{id:\d+}`, app.postRefreshPageFromArc)
-			r.Post(`/refresh-page-from-newsletter-archive/{id:\d+}`, app.postRefreshPageFromNewsletterArchive)
+			r.Post(`/refresh-page-from-mailchimp/{id:\d+}`, app.postRefreshPageFromMailchimp)
 			r.Get(`/sidebar`, app.getSiteData(almanack.SidebarLoc))
 			r.Post(`/sidebar`, app.setSiteData((almanack.SidebarLoc)))
 			r.Get(`/site-params`, app.getSiteData(almanack.SiteParamsLoc))

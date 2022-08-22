@@ -826,10 +826,10 @@ func (app *appEnv) setSiteData(loc string) http.HandlerFunc {
 	}
 }
 
-func (app *appEnv) postRefreshPageFromNewsletterArchive(w http.ResponseWriter, r *http.Request) {
+func (app *appEnv) postRefreshPageFromMailchimp(w http.ResponseWriter, r *http.Request) {
 	var id int64
 	mustIntParam(r, "id", &id)
-	app.Printf("start postRefreshPageFromNewsletterArchive for %d", id)
+	app.Printf("start postRefreshPageFromMailchimp for %d", id)
 
 	archiveURL, err := app.svc.Queries.GetArchiveURLForPageID(r.Context(), id)
 	if err != nil {
