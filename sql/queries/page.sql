@@ -231,3 +231,23 @@ FROM
   CROSS JOIN query_paths
 ORDER BY
   array_position(query_paths.paths, url_path::text);
+
+-- name: GetArchiveURLForPageID :one
+SELECT
+  coalesce(archive_url, '')
+FROM
+  page
+  LEFT JOIN newsletter ON page.source_id = newsletter.id::text
+    AND page.source_type = 'newsletter'
+WHERE
+  page.id = $1;
+
+-- name: UpdatePageRawContent :one
+UPDATE
+  page
+SET
+  frontmatter = frontmatter || jsonb_build_object('raw-content', @raw_content::text)
+WHERE
+  id = @id
+RETURNING
+  *;

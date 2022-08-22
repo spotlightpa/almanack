@@ -211,8 +211,28 @@ export default {
         </a>
       </div>
 
-      <BulmaField label="Content">
-        <iframe :src="`/ssr/page/${page.id}`" class="textarea preview-frame" />
+      <BulmaField
+        label="Content"
+        help="If content did not load correctly, try refreshing then save"
+      >
+        <iframe
+          ref="iframe"
+          :src="`/ssr/page/${page.id}`"
+          class="textarea preview-frame"
+        />
+        <button
+          class="mt-2 block button is-warning has-text-weight-semibold"
+          :class="{ 'is-loading': isLoadingThrottled }"
+          type="button"
+          title="Remember to update published pages after refreshing"
+          @click.prevent="
+            mailchimpRefresh().then(() =>
+              $refs.iframe.contentDocument.location.reload(true)
+            )
+          "
+        >
+          Refresh content from Mailchimp
+        </button>
       </BulmaField>
 
       <details class="field">
