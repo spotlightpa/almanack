@@ -50,7 +50,10 @@ func (arcStory *ArcStory) ToArticle(ctx context.Context, svc Services, article *
 	{
 		filteredAuthors := article.Authors[:0]
 		for _, author := range article.Authors {
-			if !strings.EqualFold(author, "Spotlight PA Staff") {
+			switch {
+			case strings.EqualFold(author, "Spotlight PA Staff"):
+			case strings.EqualFold(author, "Spotlight PA State College Staff"):
+			default:
 				filteredAuthors = append(filteredAuthors, author)
 			}
 		}
