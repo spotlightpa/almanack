@@ -207,7 +207,7 @@ export function usePage(id) {
     postPage,
     listImages,
     postRefreshPageFromArc,
-    postRefreshPageFromNewsletterArchive,
+    postRefreshPageFromMailchimp,
   } = useClient();
   const { apiState, exec } = makeState();
 
@@ -278,7 +278,7 @@ export function usePage(id) {
       return exec(() => postRefreshPageFromArc(id.value));
     },
     mailchimpRefresh() {
-      return exec(() => postRefreshPageFromNewsletterArchive(id.value));
+      return exec(() => postRefreshPageFromMailchimp(id.value));
     },
     imageState,
     images: computed(() =>

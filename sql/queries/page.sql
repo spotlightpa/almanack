@@ -238,7 +238,7 @@ SELECT
 FROM
   page
   LEFT JOIN newsletter ON page.source_id = newsletter.id::text
-    AND page.source_type = 'newsletter'
+    AND page.source_type = 'mailchimp'
 WHERE
   page.id = $1;
 

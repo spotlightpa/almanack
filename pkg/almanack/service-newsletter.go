@@ -95,7 +95,7 @@ func (svc Services) SaveNewsletterPage(ctx context.Context, nl *db.Newsletter, b
 	path := nl.SpotlightPAPath.String
 	if err := svc.Queries.EnsurePage(ctx, db.EnsurePageParams{
 		FilePath:   path,
-		SourceType: "newsletter",
+		SourceType: "mailchimp",
 		SourceID:   strconv.FormatInt(nl.ID, 10),
 	}); err != nil {
 		return err

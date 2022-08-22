@@ -22,7 +22,7 @@ WITH nl_to_page AS (
 UPDATE
   page
 SET
-  source_type = 'newsletter',
+  source_type = 'mailchimp',
   source_id = nl_id
 FROM
   nl_to_page

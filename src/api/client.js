@@ -31,8 +31,8 @@ const endpoints = {
   getPageWithContent: (id) => `/api/page-with-content/${id}`,
   // post id endpoints
   postRefreshPageFromArc: (id) => `/api/refresh-page-from-arc/${id}`,
-  postRefreshPageFromNewsletterArchive: (id) =>
-    `/api/refresh-page-from-newsletter-archive/${id}`,
+  postRefreshPageFromMailchimp: (id) =>
+    `/api/refresh-page-from-mailchimp/${id}`,
   // list page points
   listAnyArc: (page = "0") => `/api/list-any-arc/${page}`,
   listAvailableArc: (page = "0") => `/api/list-available/${page}`,
@@ -192,7 +192,7 @@ function makeClient($auth) {
   }
   let idPostActions = [
     "postRefreshPageFromArc",
-    "postRefreshPageFromNewsletterArchive",
+    "postRefreshPageFromMailchimp",
   ];
   for (let action of idPostActions) {
     let endpointFn = endpoints[action];
