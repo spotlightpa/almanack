@@ -11,6 +11,8 @@ export class Page {
     this.frontmatter = data["frontmatter"] ?? {};
     this.filePath = data["file_path"] ?? "";
     this.urlPath = data["url_path"] ?? "";
+    this.sourceType = data["source_type"] ?? "";
+    this.sourceID = data["source_id"] ?? "";
     this.createdAt = data["created_at"] ?? "";
     this.publishedAt = Page.getDate(this.frontmatter, "published");
     this.updatedAt = Page.getDate(data, "updated_at");
