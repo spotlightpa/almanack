@@ -17,8 +17,12 @@ const (
 )
 
 type API struct {
-	Version  string     `json:"apiVersion"`
-	Contents []FeedItem `json:"contents"`
+	Contents             []FeedItem     `json:"content_elements"`
+	Type                 string         `json:"type"`
+	Version              string         `json:"version"`
+	AdditionalProperties map[string]any `json:"additional_properties"`
+	Count                int            `json:"count"`
+	Next                 int            `json:"next"`
 }
 
 type FeedItem struct {
