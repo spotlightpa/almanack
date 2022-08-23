@@ -8,7 +8,7 @@ export default {
       default: "ml-2 button is-primary has-text-weight-semibold",
     },
   },
-  setup() {
+  setup(_, { emit }) {
     return {
       canPaste,
       async pasteText() {
@@ -17,7 +17,7 @@ export default {
           alert("Could not paste");
           return;
         }
-        this.$emit("paste", text);
+        emit("paste", text);
       },
     };
   },
