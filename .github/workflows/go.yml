@@ -19,3 +19,6 @@ jobs:
 
       - name: Test
         run: ./run.sh test:backend
+
+      - name: govulncheck
+        uses: elgohr/go-vulncheck-action@v1
