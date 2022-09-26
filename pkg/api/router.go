@@ -82,6 +82,7 @@ func (app *appEnv) routes() http.Handler {
 		r.Use(app.hasRoleMiddleware("Spotlight PA"))
 		r.Get(`/page/{id:\d+}`, app.renderPage)
 		r.Get(`/user-info`, app.userInfo)
+		r.Get(`/download-image`, app.redirectImageURL)
 		r.NotFound(app.renderNotFound)
 	})
 

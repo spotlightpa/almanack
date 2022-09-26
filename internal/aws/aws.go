@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
+	"path"
 	"time"
 
 	"github.com/aws/aws-sdk-go/service/s3"
@@ -45,8 +46,8 @@ type BlobStore struct {
 	bucket string
 }
 
-func (bs BlobStore) GetSignedURL(ctx context.Context, srcPath string, h http.Header) (signedURL string, err error) {
-	common.Logger.Printf("creating presigned URL for %q", srcPath)
+func (bs BlobStore) SignPutURL(ctx context.Context, srcPath string, h http.Header) (signedURL string, err error) {
+	common.Logger.Printf("creating presigned put URL for %q", srcPath)
 	b, err := blob.OpenBucket(ctx, bs.bucket)
 	if err != nil {
 		return "", err
@@ -66,6 +67,30 @@ func (bs BlobStore) GetSignedURL(ctx context.Context, srcPath string, h http.Hea
 				if cc := h.Get("Cache-Control"); cc != "" {
 					opts.CacheControl = &cc
 				}
+			}
+			return nil
+		},
+	})
+}
+
+func (bs BlobStore) SignGetURL(ctx context.Context, srcPath string) (signedURL string, err error) {
+	common.Logger.Printf("creating presigned get URL for %q", srcPath)
+	b, err := blob.OpenBucket(ctx, bs.bucket)
+	if err != nil {
+		return "", err
+	}
+	defer b.Close()
+	return b.SignedURL(ctx, srcPath, &blob.SignedURLOptions{
+		Expiry: 24 * time.Hour,
+		Method: http.MethodGet,
+		BeforeSign: func(as func(any) bool) error {
+			var opts *s3.GetObjectInput
+			if as(&opts) {
+				filename := path.Base(srcPath)
+				download := fmt.Sprintf(
+					"attachment; filename*=UTF-8''%s",
+					url.PathEscape(filename))
+				opts.ResponseContentDisposition = &download
 			}
 			return nil
 		},

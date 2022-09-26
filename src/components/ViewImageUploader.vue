@@ -11,13 +11,14 @@ const toImageObj = (rawImage) => ({
   path: rawImage.path,
   url: imgproxyURL(rawImage.path, {
     width: 256,
-    height: 192,
+    height: (256 * 9) / 16,
     extension: "webp",
   }),
   description: rawImage.description,
   credit: rawImage.credit,
   srcURL: rawImage.src_url,
   date: new Date(rawImage.created_at),
+  downloadURL: "/ssr/download-image?src=" + encodeURIComponent(rawImage.path),
 });
 
 export default {
@@ -108,16 +109,27 @@ export default {
           <tr v-for="image of images" :key="image.id">
             <td>
               <div class="max-128">
-                <picture
-                  class="image is-3x4 has-background-grey-lighter has-margin-bottom"
-                >
-                  <img
-                    :src="image.url"
-                    width="256"
-                    height="192"
-                    loading="lazy"
-                  />
-                </picture>
+                <a :href="image.downloadURL" class="is-flex">
+                  <picture
+                    class="image is-3x4 has-background-grey-lighter has-margin-bottom"
+                  >
+                    <img
+                      :src="image.url"
+                      class="border-thick"
+                      width="256"
+                      height="192"
+                      loading="lazy"
+                    />
+                  </picture>
+                </a>
+              </div>
+              <div class="mt-4">
+                <LinkAButton
+                  label="Original"
+                  color="is-success"
+                  :icon="['fas', 'file-download']"
+                  :href="image.downloadURL"
+                />
               </div>
             </td>
             <td>
@@ -171,9 +183,12 @@ export default {
 
 <style scoped>
 .max-128 {
-  height: 128px;
+  height: 72px;
   width: 128px;
   min-height: 1rem;
   min-width: 1rem;
+}
+.border-thick {
+  border: 2px solid #ccc;
 }
 </style>
