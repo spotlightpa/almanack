@@ -19,7 +19,7 @@ func GetSignedImageUpload(ctx context.Context, is aws.BlobStore, ct string) (sig
 	filename = makeImageName(ct)
 	h := make(http.Header, 1)
 	h.Set("Content-Type", ct)
-	signedURL, err = is.GetSignedURL(ctx, filename, h)
+	signedURL, err = is.SignPutURL(ctx, filename, h)
 	return
 }
 

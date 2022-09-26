@@ -23,7 +23,7 @@ func GetSignedFileUpload(ctx context.Context, is aws.BlobStore, filename, mimety
 	h.Set("Content-Type", mimetype)
 	cachecontrol = "public,max-age=365000000,immutable"
 	h.Set("Cache-Control", cachecontrol)
-	signedURL, err = is.GetSignedURL(ctx, filepath, h)
+	signedURL, err = is.SignPutURL(ctx, filepath, h)
 	return
 }
 

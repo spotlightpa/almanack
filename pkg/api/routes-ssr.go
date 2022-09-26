@@ -34,3 +34,18 @@ func (app *appEnv) renderPage(w http.ResponseWriter, r *http.Request) {
 		Body:  template.HTML(body),
 	})
 }
+
+func (app *appEnv) redirectImageURL(w http.ResponseWriter, r *http.Request) {
+	src := r.URL.Query().Get("src")
+	if src == "" {
+		http.Error(w, "Missing required parameter src", http.StatusBadRequest)
+		return
+	}
+	redirect, err := app.svc.ImageStore.SignGetURL(r.Context(), src)
+	if err != nil {
+		app.logErr(r.Context(), err)
+		app.replyHTMLErr(w, r, err)
+		return
+	}
+	http.Redirect(w, r, redirect, http.StatusFound)
+}
