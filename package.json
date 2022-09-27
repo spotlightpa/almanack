@@ -39,7 +39,7 @@
     "eslint-plugin-vue": "^9.3.0",
     "prettier": "^2.4.1",
     "sass": "^1.54.3",
-    "unplugin-vue-components": "0.22.4",
+    "unplugin-vue-components": "0.22.7",
     "vite": "^3.0.5",
     "vite-plugin-eslint": "^1.7.0"
   },
