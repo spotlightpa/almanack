@@ -4,12 +4,11 @@ export function useThrottleToggle(
   watchedRef,
   { prop = "", timeout = 1000 } = {}
 ) {
-  if (prop) {
-    watchedRef = toRef(watchedRef, prop);
-  }
+  const watched = prop ? toRef(watchedRef, prop) : watchedRef;
+
   const recentlyChanged = ref(false);
   watch(
-    watchedRef,
+    watched,
     (val) => {
       if (val) {
         recentlyChanged.value = true;
