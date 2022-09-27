@@ -4,8 +4,9 @@ CREATE TABLE article_status (
 );
 
 INSERT INTO article_status ("status_id", "description")
-  VALUES ('U', 'Unset'), ('P', 'Planned'),
-    ('A', 'Available');
+  VALUES ('U', 'Unset'),
+  ('P', 'Planned'),
+  ('A', 'Available');
 
 CREATE TABLE article (
   id serial PRIMARY KEY,
