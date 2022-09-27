@@ -32,6 +32,7 @@ export class Page {
     this.topics = this.frontmatter["topics"] ?? [];
     this.series = this.frontmatter["series"] ?? [];
     this.image = this.frontmatter["image"] ?? "";
+    this.imageGravity = this.frontmatter["image-gravity"] ?? "";
     this.imageDescription = this.frontmatter["image-description"] ?? "";
     this.imageCredit = this.frontmatter["image-credit"] ?? "";
     this.imageSize = this.frontmatter["image-size"] ?? "";
@@ -152,6 +153,7 @@ export class Page {
         topics: this.topics,
         series: this.series,
         image: this.image,
+        "image-gravity": this.imageGravity,
         "image-description": this.imageDescription,
         "image-credit": this.imageCredit,
         "image-size": this.imageSize,
@@ -288,6 +290,7 @@ export function usePage(id) {
       page.value.image = image.path;
       page.value.imageDescription = image.description;
       page.value.imageCredit = image.credit;
+      page.value.imageGravity = "";
     },
   };
 }

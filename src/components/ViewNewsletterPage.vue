@@ -157,6 +157,8 @@ export default {
         help="Series are limited-time collections, e.g. “Legislative privilege 2020”"
       />
 
+      <PickerImages :images="images" @select-image="setImageProps($event)" />
+
       <BulmaField
         label="Photo ID"
         help="Image is shown in article rivers and on social media"
@@ -168,11 +170,63 @@ export default {
         </div>
       </BulmaField>
 
-      <picture v-if="page.imagePreviewURL" class="has-ratio">
-        <img :src="page.imagePreviewURL" class="is-3x4" width="200" />
-      </picture>
+      <div v-if="page.imagePreviewURL" class="is-flex">
+        <div>
+          <picture class="has-ratio">
+            <img
+              :src="
+                page.getImagePreviewURL({
+                  width: 400,
+                  height: 267,
+                  gravity: page.imageGravity,
+                })
+              "
+              class="is-3x2 border-thick"
+              width="200"
+            />
+          </picture>
+          <p class="has-text-centered">3 x 2</p>
+        </div>
+        <div class="ml-5">
+          <picture class="has-ratio">
+            <img
+              :src="
+                page.getImagePreviewURL({
+                  width: 400,
+                  height: (400 * 9) / 16,
+                  gravity: page.imageGravity,
+                })
+              "
+              class="is-16x9 border-thick"
+              width="200"
+            />
+          </picture>
+          <p class="has-text-centered">16 x 9</p>
+        </div>
+      </div>
 
-      <PickerImages :images="images" @select-image="setImageProps($event)" />
+      <BulmaField label="Image focus">
+        <div class="control is-expanded">
+          <span class="select is-fullwidth">
+            <select v-model="page.imageGravity">
+              <option
+                v-for="[val, desc] in [
+                  ['', 'Auto'],
+                  ['we', 'Left'],
+                  ['no', 'Top'],
+                  ['ea', 'Right'],
+                  ['so', 'Bottom'],
+                  ['ce', 'Center'],
+                ]"
+                :key="val"
+                :value="val"
+              >
+                {{ desc }}
+              </option>
+            </select>
+          </span>
+        </div>
+      </BulmaField>
 
       <BulmaFieldInput
         v-model="page.imageDescription"
@@ -363,6 +417,9 @@ export default {
 </template>
 
 <style scoped>
+.border-thick {
+  border: 2px solid #ccc;
+}
 .preview-frame {
   height: 300px;
   overflow-y: auto;
