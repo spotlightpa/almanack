@@ -4,8 +4,8 @@ export default function imageURL(
     width = 400,
     height = 300,
     extension = "jpeg",
-    gravity = "sm",
-    quality = "75",
+    gravity = "",
+    quality = 75,
   } = {}
 ) {
   if (!filepath) {
@@ -16,7 +16,11 @@ export default function imageURL(
   let resizing_type = "fill";
   let enlarge = "1";
   let encoded_source_url = btoa(filepath);
-  return `${baseURL}/${signature}/rt:${resizing_type}/w:${width}/h:${height}/g:${
-    gravity || "sm"
-  }/el:${enlarge}/q:${quality}/${encoded_source_url}.${extension}`;
+
+  gravity = gravity || "sm";
+  width = Math.round(width);
+  height = Math.round(height);
+  quality = Math.round(quality);
+
+  return `${baseURL}/${signature}/rt:${resizing_type}/w:${width}/h:${height}/g:${gravity}/el:${enlarge}/q:${quality}/${encoded_source_url}.${extension}`;
 }
