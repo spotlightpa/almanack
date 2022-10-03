@@ -148,6 +148,7 @@ export default {
           }
         "
       />
+      <BulmaCharLimit :value="page.kicker" class="mt-1 mb-4" />
 
       <BulmaFieldInput
         v-model="page.title"
