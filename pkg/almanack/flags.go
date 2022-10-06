@@ -34,9 +34,8 @@ func AddFlags(fl *flag.FlagSet) func() (svc Services, err error) {
 	mailServiceListID := fl.String("mc-list-id", "", "List `ID` MailChimp v2 campaign")
 
 	return func() (svc Services, err error) {
-		// Get PostgreSQL URL from Heroku if possible, else get it from flag
+		// Get google-json URL from Heroku if possible, else get it from flag
 		if err = heroku.Configure(map[string]string{
-			"postgres":    "DATABASE_URL",
 			"google-json": "ALMANACK_GOOGLE_JSON",
 		}); err != nil {
 			return
