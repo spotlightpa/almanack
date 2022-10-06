@@ -135,7 +135,7 @@ function db:copy-prod() {
 	echo "Using $PG_BIN"
 	set -x
 	DATE_NAME=$(date -u +"%Y-%m-%dT%H:%M:%S")
-	DUMP_FILE="$(mktemp -d)/dump-$DATE_NAME.sql"
+	DUMP_FILE="$(mktemp -d)/dump-$DATE_NAME.sql.tar"
 	db:dump-prod "$DUMP_FILE"
 	db:load-dump "$DUMP_FILE"
 	set +x
@@ -143,14 +143,19 @@ function db:copy-prod() {
 
 function db:dump-prod() {
 	local DUMP_FILE=$1
-	heroku pg:backups:capture
-	heroku pg:backups:download --output "$DUMP_FILE"
+	"${PG_BIN}pg_dump" \
+		-d "$PG_PROD_URL" \
+		--verbose \
+		--no-owner \
+		--format=tar \
+		--file="$DUMP_FILE"
 }
 
 function db:load-dump() {
 	local DUMP_FILE=$1
-	"$PG_BIN"/pg_restore \
+	"${PG_BIN}pg_restore" \
 		-d 'postgres://localhost/almanack?sslmode=disable' \
+		--verbose \
 		--clean \
 		--no-owner \
 		"$DUMP_FILE"
