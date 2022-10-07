@@ -65,5 +65,3 @@ dist/
 .netlify
 functions/
 
-# Tern
-prod.conf
