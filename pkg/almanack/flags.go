@@ -9,7 +9,6 @@ import (
 	"github.com/spotlightpa/almanack/internal/db"
 	"github.com/spotlightpa/almanack/internal/github"
 	"github.com/spotlightpa/almanack/internal/google"
-	"github.com/spotlightpa/almanack/internal/herokuapi"
 	"github.com/spotlightpa/almanack/internal/index"
 	"github.com/spotlightpa/almanack/internal/mailchimp"
 	"github.com/spotlightpa/almanack/internal/slack"
@@ -24,7 +23,6 @@ func AddFlags(fl *flag.FlagSet) func() (svc Services, err error) {
 	pg, tx := db.AddFlags(fl, "postgres", "PostgreSQL database `URL`")
 	slackSocialURL := fl.String("slack-social-url", "", "Slack hook endpoint `URL` for social")
 	slackTechURL := fl.String("slack-hook-url", "", "Slack tech channel endpoint `URL`")
-	heroku := herokuapi.AddFlags(fl)
 	getS3Store := aws.AddFlags(fl)
 	getGithub := github.AddFlags(fl)
 	getIndex := index.AddFlags(fl)
@@ -34,12 +32,6 @@ func AddFlags(fl *flag.FlagSet) func() (svc Services, err error) {
 	mailServiceListID := fl.String("mc-list-id", "", "List `ID` MailChimp v2 campaign")
 
 	return func() (svc Services, err error) {
-		// Get google-json URL from Heroku if possible, else get it from flag
-		if err = heroku.Configure(map[string]string{
-			"google-json": "ALMANACK_GOOGLE_JSON",
-		}); err != nil {
-			return
-		}
 		if err = flagx.MustHave(fl, "postgres"); err != nil {
 			return
 		}
