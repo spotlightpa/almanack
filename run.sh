@@ -155,7 +155,7 @@ function db:dump-prod() {
 function db:load-dump() {
 	local DUMP_FILE=$1
 	"${PG_BIN}pg_restore" \
-		-d 'postgres://localhost/almanack?sslmode=disable' \
+		-d "$PG_LOCAL_URL" \
 		--verbose \
 		--clean \
 		--no-owner \
