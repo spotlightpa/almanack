@@ -91,6 +91,12 @@ type NewsletterType struct {
 	Description string `json:"description"`
 }
 
+type Option struct {
+	ID    int64  `json:"id"`
+	Key   string `json:"key"`
+	Value string `json:"value"`
+}
+
 type Page struct {
 	ID            int64              `json:"id"`
 	FilePath      string             `json:"file_path"`
