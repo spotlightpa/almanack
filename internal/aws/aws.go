@@ -14,6 +14,7 @@ import (
 	"github.com/carlmjohnson/errutil"
 	"gocloud.dev/blob"
 
+	"github.com/spotlightpa/almanack/internal/httpx"
 	"github.com/spotlightpa/almanack/internal/must"
 	"github.com/spotlightpa/almanack/pkg/common"
 )
@@ -87,9 +88,7 @@ func (bs BlobStore) SignGetURL(ctx context.Context, srcPath string) (signedURL s
 			var opts *s3.GetObjectInput
 			if as(&opts) {
 				filename := path.Base(srcPath)
-				download := fmt.Sprintf(
-					"attachment; filename*=UTF-8''%s",
-					url.PathEscape(filename))
+				download := httpx.AttachmentName(filename)
 				opts.ResponseContentDisposition = &download
 			}
 			return nil

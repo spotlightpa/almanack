@@ -15,6 +15,7 @@ import (
 	"github.com/carlmjohnson/resperr"
 	"github.com/go-chi/chi/v5"
 	"github.com/spotlightpa/almanack/internal/db"
+	"github.com/spotlightpa/almanack/internal/httpx"
 	"github.com/spotlightpa/almanack/internal/jwthook"
 	"github.com/spotlightpa/almanack/internal/must"
 	"github.com/spotlightpa/almanack/internal/netlifyid"
@@ -78,8 +79,7 @@ func (app *appEnv) getProxyImage(w http.ResponseWriter, r *http.Request) {
 	}
 	w.Header().Set("Content-Type", ctype)
 	ext := strings.TrimPrefix(ctype, "image/")
-	disposition := fmt.Sprintf(`attachment; filename="image.%s"`, ext)
-	w.Header().Set("Content-Disposition", disposition)
+	httpx.SetAttachmentName(w.Header(), "image."+ext)
 	w.Header().Set("Cache-Control", "public, max-age=900")
 	if _, err = w.Write(body); err != nil {
 		app.logErr(r.Context(), err)
