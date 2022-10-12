@@ -3,22 +3,20 @@ package almanack
 import (
 	"context"
 	"encoding/json"
-	"fmt"
 	"net/http"
-	"net/url"
 	"strings"
 	"time"
 
 	"github.com/carlmjohnson/crockford"
 	"github.com/spotlightpa/almanack/internal/aws"
+	"github.com/spotlightpa/almanack/internal/httpx"
 )
 
 func GetSignedFileUpload(ctx context.Context, is aws.BlobStore, filename, mimetype string) (signedURL, fileURL, disposition, cachecontrol string, err error) {
 	filepath := makeFilePath(filename)
 	fileURL = is.BuildURL(filepath)
 	h := http.Header{}
-	disposition = fmt.Sprintf("attachment; filename*=UTF-8''%s",
-		url.PathEscape(filename))
+	disposition = httpx.AttachmentName(filename)
 	h.Set("Content-Disposition", disposition)
 	h.Set("Content-Type", mimetype)
 	cachecontrol = "public,max-age=365000000,immutable"
