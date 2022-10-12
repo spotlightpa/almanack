@@ -130,6 +130,7 @@ export default {
                   :icon="['fas', 'file-download']"
                   :href="image.downloadURL"
                 />
+                <ImageSize class="mt-1" :path="image.path" />
               </div>
             </td>
             <td>
