@@ -68,6 +68,8 @@ func (app *appEnv) routes() http.Handler {
 			r.Post(`/refresh-page-from-mailchimp/{id:\d+}`, app.postRefreshPageFromMailchimp)
 			r.Get(`/sidebar`, app.getSiteData(almanack.SidebarLoc))
 			r.Post(`/sidebar`, app.setSiteData((almanack.SidebarLoc)))
+			r.Get(`/election-feature`, app.getSiteData(almanack.ElectionFeatLoc))
+			r.Post(`/election-feature`, app.setSiteData((almanack.ElectionFeatLoc)))
 			r.Get(`/site-params`, app.getSiteData(almanack.SiteParamsLoc))
 			r.Post(`/site-params`, app.setSiteData((almanack.SiteParamsLoc)))
 			r.Get(`/state-college-editor`, app.getSiteData(almanack.StateCollegeLoc))

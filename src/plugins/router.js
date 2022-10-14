@@ -178,6 +178,14 @@ let router = createRouter({
       meta: { requiresAuth: isSpotlightPAUser },
     },
     {
+      path: "/admin/election-features",
+      name: "election-features",
+      component: () => import("@/components/ViewElectionFeatures.vue"),
+      meta: {
+        requiresAuth: isSpotlightPAUser,
+      },
+    },
+    {
       path: "/:pathMatch(.*)*",
       name: "error",
       component: ViewError,
