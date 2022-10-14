@@ -49,6 +49,8 @@ const endpoints = {
   createSignedUpload: `/api/create-signed-upload`,
   getEditorsPicks: `/api/editors-picks`,
   saveEditorsPicks: `/api/editors-picks`,
+  getElectionFeature: `/api/election-feature`,
+  saveElectionFeature: `/api/election-feature`,
   createFile: `/api/files-create`,
   listFiles: `/api/files-list`,
   updateFile: `/api/files-update`,
@@ -201,8 +203,9 @@ function makeClient($auth) {
 
   let simpleGetActions = [
     "getEditorsPicks",
-    "getPageByURLPath",
+    "getElectionFeature",
     "getPageByFilePath",
+    "getPageByURLPath",
     "getPageForArcID",
     "getSidebar",
     "getSignupURL",
@@ -215,8 +218,8 @@ function makeClient($auth) {
     "listAuthorizedEmailAddresses",
     "listFiles",
     "listImages",
-    "listRefreshArc",
     "listPages",
+    "listRefreshArc",
   ];
   for (let action of simpleGetActions) {
     let endpoint = endpoints[action];
@@ -231,6 +234,7 @@ function makeClient($auth) {
     "saveArcArticle",
     "saveArticle",
     "saveEditorsPicks",
+    "saveElectionFeature",
     "saveSidebar",
     "saveStateCollegeEditor",
     "sendMessage",

@@ -87,6 +87,11 @@ export default {
         to="newsletters"
         :icon="['fas', 'mail-bulk']"
       />
+      <LinkButton
+        label="Election Features"
+        to="election-features"
+        :icon="['fas', 'check-circle']"
+      />
     </LinkButtons>
 
     <LinkButtons label="Uploads">
