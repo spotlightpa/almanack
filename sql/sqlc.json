@@ -7,7 +7,10 @@
       "name": "db",
       "path": "../internal/db",
       "queries": "queries/",
-      "schema": "schema/",
+      "schema": [
+        "schema/",
+        "schema-overrides/"
+      ],
       "sql_package": "pgx/v4"
     }
   ],
