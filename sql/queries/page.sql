@@ -251,3 +251,27 @@ WHERE
   id = @id
 RETURNING
   *;
+
+-- name: PageFTS :many
+WITH query AS (
+  SELECT
+    id,
+    ts_rank(fts_doc_en, tsq) AS rank
+  FROM
+    page,
+    websearch_to_tsquery('english', @query::text) tsq,
+    tsquery ('''' || @query::text || ''':*') id_tsq
+  WHERE
+    fts_doc_en @@ tsq
+    OR internal_id_fts @@ id_tsq
+  ORDER BY
+    rank DESC
+  LIMIT 20
+)
+SELECT
+  page.*
+FROM
+  page
+  JOIN query USING (id)
+ORDER BY
+  frontmatter -> 'published' DESC;
