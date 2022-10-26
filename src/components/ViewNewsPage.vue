@@ -148,13 +148,24 @@ export default {
           }
         "
       />
-      <BulmaCharLimit :value="page.kicker" class="mt-1 mb-4" />
+      <BulmaCharLimit
+        :warn="15"
+        :max="20"
+        :value="page.kicker"
+        class="mt-1 mb-4"
+      />
 
       <BulmaFieldInput
         v-model="page.title"
-        label="Title"
+        label="Hed"
         help="Default value for title tag, link title, and share title"
         :required="true"
+      />
+      <BulmaCharLimit
+        :warn="90"
+        :max="100"
+        :value="page.title"
+        class="mt-1 mb-4"
       />
 
       <BulmaFieldInput
@@ -207,6 +218,12 @@ export default {
           rows="2"
         ></textarea>
       </BulmaField>
+      <BulmaCharLimit
+        :warn="190"
+        :max="200"
+        :value="page.blurb"
+        class="mt-1 mb-4"
+      />
 
       <PickerImages :images="images" @select-image="setImageProps($event)" />
 
