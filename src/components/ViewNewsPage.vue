@@ -109,6 +109,7 @@ export default {
       </p>
 
       <BulmaAutocompleteArray
+        id="topics"
         v-model="page.topics"
         label="Topics"
         :options="topics"
@@ -122,6 +123,7 @@ export default {
         help="If present, the events landing page will show this date for the event"
         icon="user-clock"
       />
+      <!-- todo: date stuff -->
 
       <BulmaAutocompleteArray
         v-model="page.series"
@@ -137,6 +139,7 @@ export default {
       />
 
       <BulmaFieldInput
+        id="eyebrow"
         v-model="page.kicker"
         label="Eyebrow"
         help="Small text appearing above the page hed"
@@ -156,9 +159,10 @@ export default {
       />
 
       <BulmaFieldInput
+        id="hed"
         v-model="page.title"
         label="Hed"
-        help="Default value for title tag, link title, and share title"
+        help="Hed on the page and the default value for link title, SEO title, and share titles"
         :required="true"
       />
       <BulmaCharLimit
@@ -175,10 +179,18 @@ export default {
       />
 
       <BulmaFieldInput
+        id="seo"
         v-model="page.titleTag"
-        label="Title tag"
-        help="Use this in the page title bar rather than the regular title"
+        label="SEO Title"
+        help="This is the title seen by search engines"
       />
+      <BulmaCharLimit
+        :warn="40"
+        :max="55"
+        :value="page.titleTag"
+        class="mt-1 mb-4"
+      />
+      <!-- todo: og, twitter -->
 
       <BulmaAutocompleteArray
         v-model="page.authors"
@@ -194,8 +206,9 @@ export default {
       />
 
       <BulmaField
+        id="description"
         v-slot="{ idForLabel }"
-        label="Summary"
+        label="SEO Description"
         help="Shown in social share previews and search results"
       >
         <textarea
@@ -205,8 +218,15 @@ export default {
           rows="2"
         ></textarea>
       </BulmaField>
+      <BulmaCharLimit
+        :warn="135"
+        :max="150"
+        :value="page.summary"
+        class="mt-1 mb-4"
+      />
 
       <BulmaField
+        id="blurb"
         v-slot="{ idForLabel }"
         label="Blurb"
         help="Short summary to appear in article rivers"
@@ -297,9 +317,17 @@ export default {
       </BulmaField>
 
       <BulmaFieldInput
+        id="alt"
         v-model="page.imageDescription"
         label="Image description"
       />
+      <BulmaCharLimit
+        :warn="90"
+        :max="100"
+        :value="page.imageDescription"
+        class="mt-1 mb-4"
+      />
+
       <BulmaFieldInput v-model="page.imageCredit" label="Image credit" />
 
       <BulmaField label="Image size">
@@ -458,6 +486,38 @@ export default {
           </p>
         </BulmaDateTime>
       </div>
+      <BulmaWarnings
+        :values="[
+          [page.topics.length < 1, '#topics', 'Has page topic been set?'],
+          [page.kicker.length < 1, '#eyebrow', 'Has the eyebrow been set?'],
+          [page.kicker.length > 20, '#eyebrow', 'Is the eyebrow too long?'],
+          [page.title.length < 1, '#hed', 'Has the hed been set?'],
+          [page.title.length > 100, '#hed', 'Is the hed too long?'],
+          [page.titleTag.length < 1, '#seo', 'Has the SEO title been set?'],
+          [page.titleTag.length > 55, '#seo', 'Is the SEO title too long?'],
+          [
+            page.summary.length < 1,
+            '#description',
+            'Has the SEO description been set?',
+          ],
+          [
+            page.summary.length > 150,
+            '#description',
+            'Is the SEO description too long?',
+          ],
+          [
+            page.imageDescription.length < 1,
+            '#alt',
+            'Has the image description been set?',
+          ],
+          [
+            page.imageDescription.length > 100,
+            '#alt',
+            'Is the image description too long?',
+          ],
+        ]"
+      />
+
       <div class="field">
         <div class="buttons">
           <button
