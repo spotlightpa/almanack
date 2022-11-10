@@ -25,6 +25,8 @@ export class Page {
     this.internalID = this.frontmatter["internal-id"] ?? "";
     this.linkTitle = this.frontmatter["linktitle"] ?? "";
     this.titleTag = this.frontmatter["title-tag"] ?? "";
+    this.ogTitle = this.frontmatter["og-title"] ?? "";
+    this.twitterTitle = this.frontmatter["twitter-title"] ?? "";
     this.authors = this.frontmatter["authors"] ?? [];
     this.byline = this.frontmatter["byline"] ?? "";
     this.summary = this.frontmatter["description"] ?? "";
@@ -146,6 +148,8 @@ export class Page {
         "internal-id": this.internalID,
         linktitle: this.linkTitle,
         "title-tag": this.titleTag,
+        "og-title": this.ogTitle,
+        "twitter-title": this.twitterTitle,
         authors: this.authors,
         byline: this.byline,
         description: this.summary,

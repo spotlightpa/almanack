@@ -190,7 +190,22 @@ export default {
         :value="page.titleTag"
         class="mt-1 mb-4"
       />
-      <!-- todo: og, twitter -->
+
+      <BulmaFieldInput v-model="page.ogTitle" label="FaceBook Title" />
+      <BulmaCharLimit
+        :warn="60"
+        :max="80"
+        :value="page.titleTag"
+        class="mt-1 mb-4"
+      />
+
+      <BulmaFieldInput v-model="page.twitterTitle" label="Twitter Title" />
+      <BulmaCharLimit
+        :warn="60"
+        :max="80"
+        :value="page.titleTag"
+        class="mt-1 mb-4"
+      />
 
       <BulmaAutocompleteArray
         v-model="page.authors"
