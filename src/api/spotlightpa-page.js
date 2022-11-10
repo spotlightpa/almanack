@@ -19,6 +19,8 @@ export class Page {
     this.lastPublished = Page.getDate(data, "last_published");
     this.scheduleFor = Page.getDate(data, "schedule_for");
     this.eventDate = Page.getDate(this.frontmatter, "event-date");
+    this.eventTitle = this.frontmatter["event-title"] ?? "";
+    this.eventURL = this.frontmatter["event-url"] ?? "";
     this.arcID = this.frontmatter["arc-id"] ?? "";
     this.kicker = this.frontmatter["kicker"] ?? "";
     this.title = this.frontmatter["title"] ?? "";
@@ -143,6 +145,8 @@ export class Page {
         // copy others
         published: this.publishedAt,
         "event-date": this.eventDate,
+        "event-title": this.eventTitle,
+        "event-url": this.eventURL,
         kicker: this.kicker || this.mainTopic,
         title: this.title,
         "internal-id": this.internalID,
