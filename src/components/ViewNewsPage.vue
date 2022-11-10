@@ -514,32 +514,28 @@ export default {
       </div>
       <BulmaWarnings
         :values="[
-          [page.topics.length < 1, '#topics', 'Has page topic been set?'],
-          [page.kicker.length < 1, '#eyebrow', 'Has the eyebrow been set?'],
-          [page.kicker.length > 20, '#eyebrow', 'Is the eyebrow too long?'],
-          [page.title.length < 1, '#hed', 'Has the hed been set?'],
-          [page.title.length > 100, '#hed', 'Is the hed too long?'],
-          [page.titleTag.length < 1, '#seo', 'Has the SEO title been set?'],
-          [page.titleTag.length > 55, '#seo', 'Is the SEO title too long?'],
-          [
-            page.summary.length < 1,
-            '#description',
-            'Has the SEO description been set?',
-          ],
+          [page.topics.length < 1, '#topics', 'Page topic is unset'],
+          [page.kicker.length < 1, '#eyebrow', 'Eyebrow is unset'],
+          [page.kicker.length > 20, '#eyebrow', 'Eyebrow is long'],
+          [page.title.length < 1, '#hed', 'Hed is unset'],
+          [page.title.length > 100, '#hed', 'Hed is long'],
+          [page.titleTag.length < 1, '#seo', 'SEO title is unset'],
+          [page.titleTag.length > 55, '#seo', 'SEO title is long'],
+          [page.summary.length < 1, '#description', 'SEO description is unset'],
           [
             page.summary.length > 150,
             '#description',
-            'Is the SEO description too long?',
+            'SEO description is long',
           ],
           [
             page.imageDescription.length < 1,
             '#alt',
-            'Has the image description been set?',
+            'Image description is unset',
           ],
           [
             page.imageDescription.length > 100,
             '#alt',
-            'Is the image description too long?',
+            'Image description is long',
           ],
         ]"
       />
