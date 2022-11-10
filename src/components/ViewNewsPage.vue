@@ -116,14 +116,25 @@ export default {
         help="Topics are open-ended collections, e.g. “Events”, “Coronavirus”"
       />
 
-      <BulmaDateTime
-        v-if="page.topics.includes('Events')"
-        v-model="page.eventDate"
-        label="Event Date"
-        help="If present, the events landing page will show this date for the event"
-        icon="user-clock"
-      />
-      <!-- todo: date stuff -->
+      <div v-show="page.topics.includes('Events')">
+        <BulmaDateTime
+          v-model="page.eventDate"
+          label="Event Date"
+          help="If present, the events landing page will show this date for the event"
+          icon="user-clock"
+        />
+        <BulmaFieldInput
+          v-model="page.eventTitle"
+          label="Name of Event"
+          help="Shown in search results"
+        />
+        <BulmaFieldInput
+          v-model="page.eventURL"
+          label="Registration link"
+          type="url"
+          help="Shown in search results"
+        />
+      </div>
 
       <BulmaAutocompleteArray
         v-model="page.series"
