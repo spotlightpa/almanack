@@ -124,14 +124,14 @@ export default {
       <BulmaFieldInput
         v-model="page.linkTitle"
         label="Link to as"
-        help="When linking to this page from another page, use this as the link title instead of regular title"
+        help="When linking to this page from the homepage or an article list, use this as the link title instead of the hed"
       />
 
       <BulmaFieldInput
         id="seo"
         v-model="page.titleTag"
-        label="SEO Title"
-        help="This is the title seen by search engines"
+        label="SEO Hed"
+        help="If set, this is the title seen by search engines"
       />
       <BulmaCharLimit
         :warn="40"
@@ -140,19 +140,27 @@ export default {
         class="mt-1 mb-4"
       />
 
-      <BulmaFieldInput v-model="page.ogTitle" label="FaceBook Title" />
+      <BulmaFieldInput
+        v-model="page.ogTitle"
+        label="FaceBook Hed"
+        help="If set, this overrides the SEO hed on Facebook"
+      />
       <BulmaCharLimit
         :warn="60"
         :max="80"
-        :value="page.titleTag"
+        :value="page.ogTitle"
         class="mt-1 mb-4"
       />
 
-      <BulmaFieldInput v-model="page.twitterTitle" label="Twitter Title" />
+      <BulmaFieldInput
+        v-model="page.twitterTitle"
+        label="Twitter Hed"
+        help="If set, this overrides the SEO hed on Twitter"
+      />
       <BulmaCharLimit
         :warn="60"
         :max="80"
-        :value="page.titleTag"
+        :value="page.twitterTitle"
         class="mt-1 mb-4"
       />
 
@@ -283,7 +291,7 @@ export default {
       <BulmaFieldInput
         id="alt"
         v-model="page.imageDescription"
-        label="Image description"
+        label="SEO Image Alt Text"
       />
       <BulmaCharLimit
         :warn="90"
