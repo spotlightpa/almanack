@@ -45,7 +45,7 @@ export default {
       ]"
     />
 
-    <h1 class="mb-2 is-spaced title is-flex-desktop">
+    <h1 class="mb-2 is-spaced title">
       {{ title }}
     </h1>
     <h2 class="subtitle">
@@ -484,34 +484,6 @@ export default {
         </BulmaField>
       </details>
 
-      <p class="my-4 has-text-weight-semibold">
-        Page is {{ page.statusVerbose
-        }}<template v-if="page.status == 'sked'">
-          at {{ formatDateTime(page.scheduleFor) }}</template
-        >.
-      </p>
-
-      <div v-if="page.status !== 'pub'" class="field mb-5">
-        <BulmaDateTime
-          v-model="page.scheduleFor"
-          :label="
-            page.status === 'sked'
-              ? `Scheduled for ${formatDateTime(page.scheduleFor)}`
-              : `Schedule for`
-          "
-          icon="user-clock"
-        >
-          <p v-if="page.isFutureDated" class="mt-2 content is-small">
-            <a
-              href="#"
-              class="has-text-info"
-              @click.prevent="page.scheduleFor = page.publishedAt"
-            >
-              Schedule for publication date
-            </a>
-          </p>
-        </BulmaDateTime>
-      </div>
       <BulmaWarnings
         :values="[
           [page.topics.length < 1, '#topics', 'Page topic is unset'],
@@ -540,6 +512,34 @@ export default {
         ]"
       />
 
+      <p class="my-4 has-text-weight-semibold">
+        Page is {{ page.statusVerbose
+        }}<template v-if="page.status == 'sked'">
+          at {{ formatDateTime(page.scheduleFor) }}</template
+        >.
+      </p>
+
+      <div v-if="page.status !== 'pub'" class="field mb-5">
+        <BulmaDateTime
+          v-model="page.scheduleFor"
+          :label="
+            page.status === 'sked'
+              ? `Scheduled for ${formatDateTime(page.scheduleFor)}`
+              : `Schedule for`
+          "
+          icon="user-clock"
+        >
+          <p v-if="page.isFutureDated" class="mt-2 content is-small">
+            <a
+              href="#"
+              class="has-text-info"
+              @click.prevent="page.scheduleFor = page.publishedAt"
+            >
+              Schedule for publication date
+            </a>
+          </p>
+        </BulmaDateTime>
+      </div>
       <div class="field">
         <div class="buttons">
           <button
