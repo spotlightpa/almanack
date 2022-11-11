@@ -141,6 +141,7 @@ export default {
       />
 
       <BulmaFieldInput
+        id="facebook"
         v-model="page.ogTitle"
         label="FaceBook Hed"
         help="If set, this overrides the SEO hed on Facebook"
@@ -153,13 +154,14 @@ export default {
       />
 
       <BulmaFieldInput
+        id="twitter"
         v-model="page.twitterTitle"
         label="Twitter Hed"
         help="If set, this overrides the SEO hed on Twitter"
       />
       <BulmaCharLimit
         :warn="60"
-        :max="80"
+        :max="70"
         :value="page.twitterTitle"
         class="mt-1 mb-4"
       />
@@ -450,8 +452,10 @@ export default {
           [page.kicker.length > 20, '#eyebrow', 'Eyebrow is long'],
           [page.title.length < 1, '#hed', 'Hed is unset'],
           [page.title.length > 100, '#hed', 'Hed is long'],
-          [page.titleTag.length < 1, '#seo', 'SEO title is unset'],
-          [page.titleTag.length > 55, '#seo', 'SEO title is long'],
+          [page.titleTag.length < 1, '#seo', 'SEO hed is unset'],
+          [page.titleTag.length > 55, '#seo', 'SEO hed is long'],
+          [page.ogTitle.length > 80, '#facebook', 'Facebook hed is long'],
+          [page.twitterTitle.length > 70, '#twitter', 'Twitter hed is long'],
           [page.summary.length < 1, '#description', 'SEO description is unset'],
           [
             page.summary.length > 150,
