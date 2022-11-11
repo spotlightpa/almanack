@@ -25,7 +25,7 @@ export default {
       class="mt-1 ml-3 progress max-w"
       :value="value.length"
       :max="max"
-      :class="value.length < max ? 'is-warning' : 'is-danger'"
+      :class="value.length <= max ? 'is-warning' : 'is-danger'"
     ></progress>
   </div>
 </template>
