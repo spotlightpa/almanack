@@ -1,15 +1,10 @@
 <script>
-import { useRouter } from "vue-router";
-
 export default {
   props: {
     values: {
       type: Array,
       required: true,
     },
-  },
-  setup() {
-    return { router: useRouter() };
   },
   computed: {
     active() {
@@ -19,9 +14,8 @@ export default {
     },
   },
   methods: {
-    async scrollTo(link) {
-      let el = document.querySelector(link);
-      el.scrollIntoView({
+    scrollTo(link) {
+      document.querySelector(link)?.scrollIntoView({
         behavior: "smooth",
         block: "start",
       });
