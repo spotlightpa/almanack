@@ -38,6 +38,7 @@ export class Page {
     this.image = this.frontmatter["image"] ?? "";
     this.imageGravity = this.frontmatter["image-gravity"] ?? "";
     this.imageDescription = this.frontmatter["image-description"] ?? "";
+    this.imageCaption = this.frontmatter["image-caption"] ?? "";
     this.imageCredit = this.frontmatter["image-credit"] ?? "";
     this.imageSize = this.frontmatter["image-size"] ?? "";
     this.languageCode = this.frontmatter["language-code"] ?? "";
@@ -163,6 +164,7 @@ export class Page {
         image: this.image,
         "image-gravity": this.imageGravity,
         "image-description": this.imageDescription,
+        "image-caption": this.imageCaption,
         "image-credit": this.imageCredit,
         "image-size": this.imageSize,
         "language-code": this.languageCode,

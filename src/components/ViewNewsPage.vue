@@ -366,6 +366,20 @@ export default {
 
       <BulmaFieldInput v-model="page.imageCredit" label="Image credit" />
 
+      <BulmaField
+        v-slot="{ idForLabel }"
+        id="caption"
+        label="Image Caption"
+        help="If set, captions appear as an overlay on top of the image on the article page"
+      >
+        <textarea
+          :id="idForLabel"
+          v-model="page.imageCaption"
+          class="textarea"
+          rows="2"
+        ></textarea>
+      </BulmaField>
+
       <BulmaField label="Image size">
         <div class="control is-expanded">
           <span class="select is-fullwidth">
