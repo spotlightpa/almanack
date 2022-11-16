@@ -46,12 +46,12 @@ export default {
     </h1>
 
     <LinkButtons label="News Partners">
-      <LinkButton
+      <LinkRoute
         label="External Editor View"
         to="articles"
         :icon="['fas', 'file-invoice']"
       />
-      <LinkButton
+      <LinkRoute
         label="Preauthorization"
         to="domains"
         :icon="['fas', 'user-circle']"
@@ -59,17 +59,17 @@ export default {
     </LinkButtons>
 
     <LinkButtons label="Spotlight PA promotions">
-      <LinkButton
+      <LinkRoute
         label="Homepage Editor"
         to="homepage-editor"
         :icon="['fas', 'newspaper']"
       />
-      <LinkButton
+      <LinkRoute
         label="Sidebar Items"
         to="sidebar-items"
         :icon="['fas', 'check-circle']"
       />
-      <LinkButton
+      <LinkRoute
         label="Sitewide Settings"
         to="site-params"
         :icon="['fas', 'sliders-h']"
@@ -77,17 +77,17 @@ export default {
     </LinkButtons>
 
     <LinkButtons label="Spotlight PA pages">
-      <LinkButton
+      <LinkRoute
         label="Spotlight PA Articles"
         to="news-pages"
         :icon="['fas', 'file-signature']"
       />
-      <LinkButton
+      <LinkRoute
         label="Newsletter pages"
         to="newsletters"
         :icon="['fas', 'mail-bulk']"
       />
-      <LinkButton
+      <LinkRoute
         label="Election Features"
         to="election-features"
         :icon="['fas', 'check-circle']"
@@ -95,24 +95,24 @@ export default {
     </LinkButtons>
 
     <LinkButtons label="Uploads">
-      <LinkButton
+      <LinkRoute
         label="Photo manager"
         to="image-uploader"
         :icon="['fa', 'file-image']"
       />
-      <LinkButton
+      <LinkRoute
         label="File manager"
         to="file-uploader"
         :icon="['fa', 'file-upload']"
       />
     </LinkButtons>
     <LinkButtons label="State College">
-      <LinkButton
+      <LinkRoute
         label="Articles"
         to="statecollege-pages"
         :icon="['fas', 'file-signature']"
       />
-      <LinkButton
+      <LinkRoute
         label="Frontpage Editor"
         to="state-college-editor"
         :icon="['fas', 'newspaper']"
@@ -130,8 +130,8 @@ export default {
         </span>
         <span v-text="!showComposer ? 'Compose Message' : 'Hide Message'" />
       </button>
-      <LinkAButton label="Embeds" href="https://www.spotlightpa.org/embeds/" />
-      <LinkAButton
+      <LinkHref label="Embeds" href="https://www.spotlightpa.org/embeds/" />
+      <LinkHref
         label="Legacy admin"
         href="https://www.spotlightpa.org/admin/"
       />
