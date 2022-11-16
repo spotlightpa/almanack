@@ -1,6 +1,7 @@
 <script>
 export default {
   props: {
+    to: String,
     label: String,
     icon: Array,
     size: {
@@ -16,8 +17,8 @@ export default {
 </script>
 
 <template>
-  <button
-    type="button"
+  <router-link
+    :to="{ name: to }"
     class="button has-text-weight-semibold"
     :class="[size, color]"
   >
@@ -25,5 +26,5 @@ export default {
       <font-awesome-icon :icon="icon" />
     </span>
     <span v-text="label" />
-  </button>
+  </router-link>
 </template>

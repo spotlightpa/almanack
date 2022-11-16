@@ -124,7 +124,7 @@ export default {
                 </a>
               </div>
               <div class="mt-4">
-                <LinkAButton
+                <LinkHref
                   label="Original"
                   color="is-success"
                   :icon="['fas', 'file-download']"

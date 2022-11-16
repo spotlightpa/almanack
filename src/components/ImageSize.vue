@@ -37,7 +37,7 @@ async function onclick() {
       :class="{ 'is-loading': isLoading }"
       color="is-success"
       :icon="['fas', 'file-image']"
-      @click="onclick"
+      @click.prevent="onclick"
     />
     <Teleport to="body">
       <div v-if="open" class="modal is-active">
