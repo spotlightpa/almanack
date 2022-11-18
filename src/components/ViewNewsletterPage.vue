@@ -296,8 +296,8 @@ export default {
         label="SEO Image Alt Text"
       />
       <BulmaCharLimit
-        :warn="90"
-        :max="100"
+        :warn="100"
+        :max="120"
         :value="page.imageDescription"
         class="mt-1 mb-4"
       />
@@ -468,7 +468,7 @@ export default {
             'Image description is unset',
           ],
           [
-            page.imageDescription.length > 100,
+            page.imageDescription.length > 120,
             '#alt',
             'Image description is long',
           ],
