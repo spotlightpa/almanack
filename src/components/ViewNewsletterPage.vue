@@ -179,19 +179,12 @@ export default {
         help="If present, overrides the byline created from authors list"
       />
 
-      <BulmaField
+      <BulmaTextarea
         id="description"
-        v-slot="{ idForLabel }"
+        v-model="page.summary"
         label="SEO Description"
         help="Shown in social share previews and search results"
-      >
-        <textarea
-          :id="idForLabel"
-          v-model="page.summary"
-          class="textarea"
-          rows="2"
-        ></textarea>
-      </BulmaField>
+      />
       <BulmaCharLimit
         :warn="135"
         :max="150"
@@ -199,19 +192,12 @@ export default {
         class="mt-1 mb-4"
       />
 
-      <BulmaField
+      <BulmaTextarea
         id="blurb"
-        v-slot="{ idForLabel }"
+        v-model="page.blurb"
         label="Blurb"
         help="Short summary to appear in article rivers"
-      >
-        <textarea
-          :id="idForLabel"
-          v-model="page.blurb"
-          class="textarea"
-          rows="2"
-        ></textarea>
-      </BulmaField>
+      />
       <BulmaCharLimit
         :warn="190"
         :max="200"
@@ -290,7 +276,7 @@ export default {
         </div>
       </BulmaField>
 
-      <BulmaFieldInput
+      <BulmaTextarea
         id="alt"
         v-model="page.imageDescription"
         label="SEO Image Alt Text"

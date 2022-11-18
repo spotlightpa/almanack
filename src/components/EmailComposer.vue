@@ -63,12 +63,8 @@ export default {
 <template>
   <div class="box">
     <div class="field">
-      <label class="label">Subject</label>
-      <div class="control">
-        <input v-model="subject" class="input" />
-      </div>
-      <label class="label">Body</label>
-      <textarea v-model="body" class="textarea" :rows="rows"></textarea>
+      <BulmaFieldInput v-model="subject" label="Subject" />
+      <BulmaTextarea v-model="body" label="Body" :rows="rows" />
     </div>
     <ErrorSimple :error="error" />
     <div class="buttons">

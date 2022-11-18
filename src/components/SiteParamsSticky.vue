@@ -32,18 +32,11 @@ export default {
       </BulmaField>
       <template v-if="stickyActive">
         <BulmaFieldInput v-model="stickyLink" label="Sticky link" type="url" />
-        <BulmaField
-          v-slot="{ idForLabel }"
+        <BulmaTextarea
+          v-model="stickyImageDescription"
           label="Sticky image description"
           help="For blind readers and search engines"
-        >
-          <textarea
-            :id="idForLabel"
-            v-model="stickyImageDescription"
-            class="textarea"
-            rows="2"
-          ></textarea>
-        </BulmaField>
+        />
         <BulmaField
           label="Sticky images"
           help="If multiple images are provided, each page load will select one randomly"

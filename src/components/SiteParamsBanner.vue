@@ -32,18 +32,11 @@ export default {
         </div>
       </BulmaField>
       <template v-if="bannerActive">
-        <BulmaField
-          v-slot="{ idForLabel }"
+        <BulmaTextarea
+          v-model="bannerText"
           label="Banner Text"
           help="Supports bold and italics tags"
-        >
-          <textarea
-            :id="idForLabel"
-            v-model="bannerText"
-            class="textarea"
-            rows="2"
-          ></textarea>
-        </BulmaField>
+        />
 
         <BulmaFieldInput v-model="bannerLink" label="Banner link" type="url" />
         <BulmaFieldColor v-model="bannerTextColor" label="Banner Text Color" />

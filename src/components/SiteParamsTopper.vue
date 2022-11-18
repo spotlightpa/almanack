@@ -53,18 +53,11 @@ export default {
           help="If banner is turned off, this will separate the topper from the navbar. Our orange is #ff6c36. Our yellow is #ffcb05. Our dark blue is #009edb. Our light blue is #99d9f1."
         />
 
-        <BulmaField
-          v-slot="{ idForLabel }"
+        <BulmaTextarea
+          v-model="topperImageDescription"
           label="Topper image description"
           help="For blind readers and search engines"
-        >
-          <textarea
-            :id="idForLabel"
-            v-model="topperImageDescription"
-            class="textarea"
-            rows="2"
-          ></textarea>
-        </BulmaField>
+        />
         <div class="is-flex mb-2">
           <BulmaField v-slot="{ idForLabel }" label="Desktop Image Width">
             <input
