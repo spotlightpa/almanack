@@ -51,33 +51,19 @@ export default {
           </div>
         </BulmaField>
 
-        <BulmaField
+        <BulmaTextarea
           v-if="promoType === 'text'"
-          v-slot="{ idForLabel }"
+          v-model="promoText"
           label="Top promo text"
           help="Text will appear between navbar and page content"
-        >
-          <textarea
-            :id="idForLabel"
-            v-model="promoText"
-            class="textarea"
-            rows="2"
-          ></textarea>
-        </BulmaField>
+        />
 
         <template v-if="promoType === 'image'">
-          <BulmaField
-            v-slot="{ idForLabel }"
+          <BulmaTextarea
+            v-model="promoImageDescription"
             label="Top promo image description"
             help="For blind readers and search engines"
-          >
-            <textarea
-              :id="idForLabel"
-              v-model="promoImageDescription"
-              class="textarea"
-              rows="2"
-            ></textarea>
-          </BulmaField>
+          />
           <div class="is-flex mb-2">
             <BulmaField v-slot="{ idForLabel }" label="Desktop Image Width">
               <input

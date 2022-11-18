@@ -33,18 +33,11 @@ export default {
         label="Sidebar top promo link"
         type="url"
       />
-      <BulmaField
-        v-slot="{ idForLabel }"
+      <BulmaTextarea
+        v-model="sidebarTopDescription"
         label="Sidebar top promo image description"
         help="For blind readers and search engines"
-      >
-        <textarea
-          :id="idForLabel"
-          v-model="sidebarTopDescription"
-          class="textarea"
-          rows="2"
-        ></textarea>
-      </BulmaField>
+      />
       <div class="is-flex mb-2">
         <BulmaField v-slot="{ idForLabel }" label="Image Width">
           <input
@@ -82,18 +75,11 @@ export default {
         label="Sidebar sticky bottom promo link"
         type="url"
       />
-      <BulmaField
-        v-slot="{ idForLabel }"
+      <BulmaTextarea
+        v-model="sidebarStickyDescription"
         label="Sidebar sticky bottom promo image description"
         help="For blind readers and search engines"
-      >
-        <textarea
-          :id="idForLabel"
-          v-model="sidebarStickyDescription"
-          class="textarea"
-          rows="2"
-        ></textarea>
-      </BulmaField>
+      />
       <div class="is-flex mb-2">
         <BulmaField v-slot="{ idForLabel }" label="Image Width">
           <input

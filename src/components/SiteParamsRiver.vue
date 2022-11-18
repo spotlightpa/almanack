@@ -30,18 +30,11 @@ export default {
         label="Homepage river promo link"
         type="url"
       />
-      <BulmaField
-        v-slot="{ idForLabel }"
+      <BulmaTextarea
+        v-model="riverDescription"
         label="Homepage river promo image description"
         help="For blind readers and search engines"
-      >
-        <textarea
-          :id="idForLabel"
-          v-model="riverDescription"
-          class="textarea"
-          rows="2"
-        ></textarea>
-      </BulmaField>
+      />
       <div class="is-flex mb-2">
         <BulmaField v-slot="{ idForLabel }" label="Desktop Image Width">
           <input

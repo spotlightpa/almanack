@@ -50,18 +50,11 @@ export default {
           type="url"
         />
         <BulmaFieldInput v-model="supportHed" label="Support Us Box hed" />
-        <BulmaField
-          v-slot="{ idForLabel }"
+        <BulmaTextarea
+          v-model="supportText"
           label="Support Us Box text"
           help="Supports bold and italics tags"
-        >
-          <textarea
-            :id="idForLabel"
-            v-model="supportText"
-            class="textarea"
-            rows="5"
-          ></textarea>
-        </BulmaField>
+        />
         <BulmaFieldInput
           v-model="supportCTA"
           label="Support Us Box call to action"
