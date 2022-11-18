@@ -231,7 +231,7 @@ export default {
       <BulmaAutocompleteArray
         v-model="page.authors"
         label="Authors"
-        help="Full name as listed in data profile"
+        help="Adds links to and from each listed author page"
         :options="[]"
       />
 
