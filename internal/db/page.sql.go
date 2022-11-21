@@ -422,6 +422,63 @@ func (q *Queries) ListPages(ctx context.Context, arg ListPagesParams) ([]ListPag
 	return items, nil
 }
 
+const listPagesByFTS = `-- name: ListPagesByFTS :many
+WITH query AS (
+  SELECT
+    id,
+    ts_rank(fts_doc_en, tsq) AS rank
+  FROM
+    page,
+    websearch_to_tsquery('english', $1::text) tsq,
+    tsquery ('''' || $1::text || ''':*') id_tsq
+  WHERE
+    fts_doc_en @@ tsq
+    OR internal_id_fts @@ id_tsq
+  ORDER BY
+    rank DESC
+  LIMIT 20
+)
+SELECT
+  page.id, page.file_path, page.frontmatter, page.body, page.schedule_for, page.last_published, page.created_at, page.updated_at, page.url_path, page.source_type, page.source_id
+FROM
+  page
+  JOIN query USING (id)
+ORDER BY
+  frontmatter -> 'published' DESC
+`
+
+func (q *Queries) ListPagesByFTS(ctx context.Context, query string) ([]Page, error) {
+	rows, err := q.db.Query(ctx, listPagesByFTS, query)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []Page
+	for rows.Next() {
+		var i Page
+		if err := rows.Scan(
+			&i.ID,
+			&i.FilePath,
+			&i.Frontmatter,
+			&i.Body,
+			&i.ScheduleFor,
+			&i.LastPublished,
+			&i.CreatedAt,
+			&i.UpdatedAt,
+			&i.URLPath,
+			&i.SourceType,
+			&i.SourceID,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const listPagesByURLPaths = `-- name: ListPagesByURLPaths :many
 WITH query_paths AS (
   SELECT
@@ -486,63 +543,6 @@ func (q *Queries) ListPagesByURLPaths(ctx context.Context, paths []string) ([]Li
 			&i.Image,
 			&i.URLPath,
 			&i.PublishedAt,
-		); err != nil {
-			return nil, err
-		}
-		items = append(items, i)
-	}
-	if err := rows.Err(); err != nil {
-		return nil, err
-	}
-	return items, nil
-}
-
-const pageFTS = `-- name: PageFTS :many
-WITH query AS (
-  SELECT
-    id,
-    ts_rank(fts_doc_en, tsq) AS rank
-  FROM
-    page,
-    websearch_to_tsquery('english', $1::text) tsq,
-    tsquery ('''' || $1::text || ''':*') id_tsq
-  WHERE
-    fts_doc_en @@ tsq
-    OR internal_id_fts @@ id_tsq
-  ORDER BY
-    rank DESC
-  LIMIT 20
-)
-SELECT
-  page.id, page.file_path, page.frontmatter, page.body, page.schedule_for, page.last_published, page.created_at, page.updated_at, page.url_path, page.source_type, page.source_id
-FROM
-  page
-  JOIN query USING (id)
-ORDER BY
-  frontmatter -> 'published' DESC
-`
-
-func (q *Queries) PageFTS(ctx context.Context, query string) ([]Page, error) {
-	rows, err := q.db.Query(ctx, pageFTS, query)
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-	var items []Page
-	for rows.Next() {
-		var i Page
-		if err := rows.Scan(
-			&i.ID,
-			&i.FilePath,
-			&i.Frontmatter,
-			&i.Body,
-			&i.ScheduleFor,
-			&i.LastPublished,
-			&i.CreatedAt,
-			&i.UpdatedAt,
-			&i.URLPath,
-			&i.SourceType,
-			&i.SourceID,
 		); err != nil {
 			return nil, err
 		}
