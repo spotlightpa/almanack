@@ -5,6 +5,12 @@ ALTER TABLE page
   || setweight(to_tsvector('english', --
   coalesce(frontmatter ->> 'linktitle', '')), 'A') --
   || setweight(to_tsvector('english', --
+  coalesce(frontmatter ->> 'title-tag', '')), 'A') --
+  || setweight(to_tsvector('english', --
+  coalesce(frontmatter ->> 'og-title', '')), 'A') --
+  || setweight(to_tsvector('english', --
+  coalesce(frontmatter ->> 'twitter-title', '')), 'A') --
+  || setweight(to_tsvector('english', --
   coalesce(frontmatter ->> 'description', '')), 'B') --
   || setweight(to_tsvector('english', --
   coalesce(frontmatter ->> 'blurb', '')), 'B') --
