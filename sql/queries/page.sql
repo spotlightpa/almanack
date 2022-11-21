@@ -252,7 +252,7 @@ WHERE
 RETURNING
   *;
 
--- name: PageFTS :many
+-- name: ListPagesByFTS :many
 WITH query AS (
   SELECT
     id,

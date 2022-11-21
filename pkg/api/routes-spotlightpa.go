@@ -854,3 +854,23 @@ func (app *appEnv) postRefreshPageFromMailchimp(w http.ResponseWriter, r *http.R
 	}
 	app.replyJSON(http.StatusOK, w, &page)
 }
+
+func (app *appEnv) listPagesByFTS(w http.ResponseWriter, r *http.Request) {
+	q := r.URL.Query()
+	query := q.Get("q")
+	app.Printf("start getPageByFTS for %q", query)
+
+	pages, err := app.svc.Queries.ListPagesByFTS(r.Context(), query)
+	if err != nil {
+		err = db.NoRowsAs404(err, "could not find page %q", query)
+		app.replyErr(w, r, err)
+		return
+	}
+	if slices.Contains(q["select"], "-body") {
+		for i := range pages {
+			page := &pages[i]
+			page.Body = ""
+		}
+	}
+	app.replyJSON(http.StatusOK, w, pages)
+}
