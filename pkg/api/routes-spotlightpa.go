@@ -543,6 +543,7 @@ func (app *appEnv) getPageByFilePath(w http.ResponseWriter, r *http.Request) {
 	}
 	if slices.Contains(q["select"], "-body") {
 		page.Body = ""
+		delete(page.Frontmatter, "raw-content")
 	}
 	app.replyJSON(http.StatusOK, w, page)
 }
@@ -565,6 +566,7 @@ func (app *appEnv) getPageByURLPath(w http.ResponseWriter, r *http.Request) {
 	}
 	if slices.Contains(q["select"], "-body") {
 		page.Body = ""
+		delete(page.Frontmatter, "raw-content")
 	}
 	app.replyJSON(http.StatusOK, w, page)
 
@@ -857,7 +859,7 @@ func (app *appEnv) postRefreshPageFromMailchimp(w http.ResponseWriter, r *http.R
 
 func (app *appEnv) listPagesByFTS(w http.ResponseWriter, r *http.Request) {
 	q := r.URL.Query()
-	query := q.Get("q")
+	query := q.Get("query")
 	app.Printf("start getPageByFTS for %q", query)
 
 	var (
@@ -902,6 +904,7 @@ func (app *appEnv) listPagesByFTS(w http.ResponseWriter, r *http.Request) {
 		for i := range pages {
 			page := &pages[i]
 			page.Body = ""
+			delete(page.Frontmatter, "raw-content")
 		}
 	}
 	app.replyJSON(http.StatusOK, w, pages)
