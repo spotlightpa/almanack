@@ -60,11 +60,12 @@ const endpoints = {
   getSignupURL: `/api/mailchimp-signup-url`,
   sendMessage: `/api/message`,
   postPage: `/api/page`,
-  listPages: `/api/pages`,
   getPageByFilePath: `/api/page-by-file-path`,
   getPageByURLPath: `/api/page-by-url-path`,
   getPageForArcID: `/api/page-for-arc-id`,
   postPageForArcID: `/api/page-for-arc-id`,
+  listPages: `/api/pages`,
+  listPagesByFTS: `/api/pages-by-fts`,
   getSidebar: `/api/sidebar`,
   saveSidebar: `/api/sidebar`,
   getSiteParams: `/api/site-params`,
@@ -219,6 +220,7 @@ function makeClient($auth) {
     "listFiles",
     "listImages",
     "listPages",
+    "listPagesByFTS",
     "listRefreshArc",
   ];
   for (let action of simpleGetActions) {
