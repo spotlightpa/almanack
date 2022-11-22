@@ -16,14 +16,17 @@ export default {
     };
   },
   computed: {
-    filteredPages() {
+    allFilteredPages() {
       let pages = this.pages;
       if (this.filterText) {
         pages = pages.filter((p) =>
           fuzzyMatch(p.filterableProps, this.filterText)
         );
       }
-      return pages.slice(0, 20);
+      return pages;
+    },
+    filteredPages() {
+      return this.allFilteredPages.slice(0, 20);
     },
   },
 };
@@ -57,7 +60,7 @@ export default {
       </template>
       <template v-slot:footer>
         <div v-if="pages.length === 0" class="dropdown-item">Loading…</div>
-        <div v-else-if="filteredPages.length > 10" class="dropdown-item">
+        <div v-else-if="allFilteredPages.length > 20" class="dropdown-item">
           More results hidden…
         </div>
         <div v-else-if="filteredPages.length === 0" class="dropdown-item">
