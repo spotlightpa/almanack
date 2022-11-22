@@ -1,7 +1,6 @@
 <script>
 import { reactive, computed, toRefs, watch } from "vue";
 
-import Page from "@/api/spotlightpa-all-pages-item.js";
 import { useClient, makeState } from "@/api/hooks.js";
 import { formatDateTime, today, tomorrow } from "@/utils/time-format.js";
 import useScrollTo from "@/utils/use-scroll-to.js";
@@ -83,16 +82,9 @@ export default {
   setup() {
     const [container, scrollTo] = useScrollTo();
 
-    let { listAllPages, getSidebar, saveSidebar } = useClient();
-    let { apiState: pagesState, exec: pagesExec } = makeState();
+    let { getSidebar, saveSidebar } = useClient();
     let { apiState: sidebarState, exec: sidebarExec } = makeState();
     let state = reactive({
-      pages: computed(
-        () => pagesState.rawData?.pages.map((p) => reactive(new Page(p))) ?? []
-      ),
-      pagesByPath: computed(
-        () => new Map(state.pages.map((p) => [p.filePath, p]))
-      ),
       rawSidebars: computed(() => sidebarState.rawData?.configs ?? []),
       allSidebars: [],
       nextSchedule: null,
@@ -100,9 +92,6 @@ export default {
     let actions = {
       reloadSidebars() {
         return sidebarExec(getSidebar);
-      },
-      reloadPages() {
-        return pagesExec(listAllPages);
       },
       save() {
         return sidebarExec(() =>
@@ -127,13 +116,11 @@ export default {
       { deep: true }
     );
     actions.reloadSidebars();
-    actions.reloadPages();
     return {
       container,
       today,
       tomorrow,
       sidebarState,
-      pagesState,
       ...toRefs(state),
       ...actions,
       formatDateTime,
@@ -189,9 +176,7 @@ export default {
           </div>
           <div class="column is-full">
             <h2 class="mb-1 title is-size-3">Add new item</h2>
-            <PageSelector :pages="pages" @select-page="sidebar.add($event)" />
-            <SpinnerProgress :is-loading="pagesState.isLoading" />
-            <ErrorReloader :error="pagesState.error" @reload="reloadPages" />
+            <PageFinder @select-page="sidebar.add($event)" />
           </div>
         </div>
         <button
