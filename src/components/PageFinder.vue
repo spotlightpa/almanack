@@ -53,6 +53,7 @@ export default {
       if (err) {
         this.error = err;
       } else {
+        this.error = null;
         this.rawPages = data ?? [];
       }
     },
@@ -97,6 +98,7 @@ export default {
         </div>
       </template>
     </draggable>
+    <ErrorSimple class="mt-4" :error="error" />
   </div>
 </template>
 
