@@ -150,7 +150,7 @@ export default {
               : `Scheduled for ${formatDateTime(edpick.scheduleFor)}`
           }}
         </h2>
-        <HomepageEditor :pages="pages" :editors-picks="edpick" />
+        <HomepageEditor :editors-picks="edpick" />
         <button
           v-if="!edpick.isCurrent"
           type="button"
