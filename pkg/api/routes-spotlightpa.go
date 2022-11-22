@@ -860,12 +860,44 @@ func (app *appEnv) listPagesByFTS(w http.ResponseWriter, r *http.Request) {
 	query := q.Get("q")
 	app.Printf("start getPageByFTS for %q", query)
 
-	pages, err := app.svc.Queries.ListPagesByFTS(r.Context(), query)
-	if err != nil {
-		err = db.NoRowsAs404(err, "could not find page %q", query)
-		app.replyErr(w, r, err)
-		return
+	var (
+		pages []db.Page
+		err   error
+	)
+	if query == "" {
+		pages, err = app.svc.Queries.ListPagesByPublished(r.Context(), db.ListPagesByPublishedParams{
+			Limit:  20,
+			Offset: 0,
+		})
+		if err != nil {
+			app.replyErr(w, r, err)
+			return
+		}
+	} else {
+		pages, err = app.svc.Queries.ListPagesByFTS(r.Context(), db.ListPagesByFTSParams{
+			Query: query,
+			Limit: 20,
+		})
+		if err != nil {
+			app.replyErr(w, r, err)
+			return
+		}
+		if !strings.Contains(query, " ") {
+			idpages, err := app.svc.Queries.ListPagesByInternalID(r.Context(), db.ListPagesByInternalIDParams{
+				Query: fmt.Sprintf("%s:*", query),
+				Limit: 5,
+			})
+			if err != nil {
+				app.replyErr(w, r, err)
+				return
+			}
+			pages = append(idpages, pages...)
+			if len(pages) > 20 {
+				pages = pages[:20]
+			}
+		}
 	}
+
 	if slices.Contains(q["select"], "-body") {
 		for i := range pages {
 			page := &pages[i]

@@ -82,7 +82,7 @@ ordered AS (
   FROM
     paths
   ORDER BY
-    frontmatter ->> 'published' DESC
+    published_at DESC
 )
 SELECT
   id,
@@ -97,7 +97,7 @@ SELECT
   created_at,
   updated_at,
   schedule_for,
-  coalesce(frontmatter ->> 'published', '')::text AS "published_at"
+  published_at
 FROM
   ordered
 LIMIT $2 OFFSET $3;
@@ -142,13 +142,13 @@ ORDER BY
 WITH series_dates AS (
   SELECT
     jsonb_array_elements_text(frontmatter -> 'series') AS series,
-    frontmatter ->> 'published' AS pub_date
+    published_at
   FROM
     page
   WHERE
     frontmatter ->> 'series' IS NOT NULL
   ORDER BY
-    pub_date DESC,
+    published_at DESC,
     series DESC
 ),
 distinct_series_dates AS (
@@ -158,47 +158,36 @@ distinct_series_dates AS (
     series_dates
   ORDER BY
     series DESC,
-    pub_date DESC
+    published_at DESC
 )
 SELECT
   series::text
 FROM
   distinct_series_dates
 ORDER BY
-  pub_date DESC;
+  published_at DESC;
 
 -- name: ListAllPages :many
-WITH ROWS AS (
-  SELECT
-    id,
-    file_path,
-    coalesce(frontmatter ->> 'internal-id', '') AS internal_id,
-    coalesce(frontmatter ->> 'title', '') AS hed,
-    ARRAY (
-      SELECT
-        jsonb_array_elements_text(
-          CASE WHEN frontmatter ->> 'authors' IS NOT NULL THEN
-            frontmatter -> 'authors'
-          ELSE
-            '[]'::jsonb
-          END)) AS authors,
-      iso_to_timestamptz (frontmatter ->> 'published') AS pub_date
-    FROM
-      page
-    ORDER BY
-      pub_date DESC
-)
 SELECT
   id,
   file_path,
-  internal_id::text AS internal_id,
-  hed::text AS hed,
-  authors::text[] AS authors,
-  pub_date::timestamptz AS pub_date
+  coalesce(frontmatter ->> 'internal-id', '')::text AS internal_id,
+  coalesce(frontmatter ->> 'title', '')::text AS hed,
+  ARRAY (
+    SELECT
+      jsonb_array_elements_text(
+        CASE WHEN frontmatter ->> 'authors' IS NOT NULL THEN
+          frontmatter -> 'authors'
+        ELSE
+          '[]'::jsonb
+        END))::text[] AS authors,
+  published_at::timestamptz AS pub_date
 FROM
-  ROWS
+  page
 WHERE
-  pub_date IS NOT NULL;
+  published_at IS NOT NULL
+ORDER BY
+  published_at DESC;
 
 -- name: ListPagesByURLPaths :many
 WITH query_paths AS (
@@ -225,7 +214,7 @@ SELECT
   coalesce(frontmatter ->> 'blurb', '')::text AS "blurb",
   coalesce(frontmatter ->> 'image', '')::text AS "image",
   coalesce(url_path, '')::text AS "url_path",
-  coalesce(frontmatter ->> 'published', '')::text AS "published_at"
+  published_at::timestamptz
 FROM
   page_paths
   CROSS JOIN query_paths
@@ -259,14 +248,12 @@ WITH query AS (
     ts_rank(fts_doc_en, tsq) AS rank
   FROM
     page,
-    websearch_to_tsquery('english', @query::text) tsq,
-    tsquery ('''' || @query::text || ''':*') id_tsq
+    websearch_to_tsquery('english', @query::text) tsq
   WHERE
     fts_doc_en @@ tsq
-    OR internal_id_fts @@ id_tsq
   ORDER BY
     rank DESC
-  LIMIT 20
+  LIMIT $1
 )
 SELECT
   page.*
@@ -274,4 +261,35 @@ FROM
   page
   JOIN query USING (id)
 ORDER BY
-  frontmatter -> 'published' DESC;
+  published_at DESC;
+
+-- name: ListPagesByPublished :many
+SELECT
+  *
+FROM
+  page
+ORDER BY
+  published_at DESC
+LIMIT $1 OFFSET $2;
+
+-- name: ListPagesByInternalID :many
+WITH query AS (
+  SELECT
+    id,
+    ts_rank(fts_doc_en, id_tsq) AS rank
+  FROM
+    page,
+    tsquery (@query::text) id_tsq
+  WHERE
+    internal_id_fts @@ id_tsq
+  ORDER BY
+    rank DESC
+  LIMIT $1
+)
+SELECT
+  page.*
+FROM
+  page
+  JOIN query USING (id)
+ORDER BY
+  published_at DESC;

@@ -50,7 +50,7 @@ func (q *Queries) GetArchiveURLForPageID(ctx context.Context, id int64) (string,
 
 const getPageByFilePath = `-- name: GetPageByFilePath :one
 SELECT
-  id, file_path, frontmatter, body, schedule_for, last_published, created_at, updated_at, url_path, source_type, source_id
+  id, file_path, frontmatter, body, schedule_for, last_published, created_at, updated_at, url_path, source_type, source_id, published_at
 FROM
   "page"
 WHERE
@@ -72,13 +72,14 @@ func (q *Queries) GetPageByFilePath(ctx context.Context, filePath string) (Page,
 		&i.URLPath,
 		&i.SourceType,
 		&i.SourceID,
+		&i.PublishedAt,
 	)
 	return i, err
 }
 
 const getPageByID = `-- name: GetPageByID :one
 SELECT
-  id, file_path, frontmatter, body, schedule_for, last_published, created_at, updated_at, url_path, source_type, source_id
+  id, file_path, frontmatter, body, schedule_for, last_published, created_at, updated_at, url_path, source_type, source_id, published_at
 FROM
   "page"
 WHERE
@@ -100,13 +101,14 @@ func (q *Queries) GetPageByID(ctx context.Context, id int64) (Page, error) {
 		&i.URLPath,
 		&i.SourceType,
 		&i.SourceID,
+		&i.PublishedAt,
 	)
 	return i, err
 }
 
 const getPageByURLPath = `-- name: GetPageByURLPath :one
 SELECT
-  id, file_path, frontmatter, body, schedule_for, last_published, created_at, updated_at, url_path, source_type, source_id
+  id, file_path, frontmatter, body, schedule_for, last_published, created_at, updated_at, url_path, source_type, source_id, published_at
 FROM
   page
 WHERE
@@ -128,42 +130,32 @@ func (q *Queries) GetPageByURLPath(ctx context.Context, urlPath string) (Page, e
 		&i.URLPath,
 		&i.SourceType,
 		&i.SourceID,
+		&i.PublishedAt,
 	)
 	return i, err
 }
 
 const listAllPages = `-- name: ListAllPages :many
-WITH ROWS AS (
-  SELECT
-    id,
-    file_path,
-    coalesce(frontmatter ->> 'internal-id', '') AS internal_id,
-    coalesce(frontmatter ->> 'title', '') AS hed,
-    ARRAY (
-      SELECT
-        jsonb_array_elements_text(
-          CASE WHEN frontmatter ->> 'authors' IS NOT NULL THEN
-            frontmatter -> 'authors'
-          ELSE
-            '[]'::jsonb
-          END)) AS authors,
-      iso_to_timestamptz (frontmatter ->> 'published') AS pub_date
-    FROM
-      page
-    ORDER BY
-      pub_date DESC
-)
 SELECT
   id,
   file_path,
-  internal_id::text AS internal_id,
-  hed::text AS hed,
-  authors::text[] AS authors,
-  pub_date::timestamptz AS pub_date
+  coalesce(frontmatter ->> 'internal-id', '')::text AS internal_id,
+  coalesce(frontmatter ->> 'title', '')::text AS hed,
+  ARRAY (
+    SELECT
+      jsonb_array_elements_text(
+        CASE WHEN frontmatter ->> 'authors' IS NOT NULL THEN
+          frontmatter -> 'authors'
+        ELSE
+          '[]'::jsonb
+        END))::text[] AS authors,
+  published_at::timestamptz AS pub_date
 FROM
-  ROWS
+  page
 WHERE
-  pub_date IS NOT NULL
+  published_at IS NOT NULL
+ORDER BY
+  published_at DESC
 `
 
 type ListAllPagesRow struct {
@@ -206,30 +198,30 @@ const listAllSeries = `-- name: ListAllSeries :many
 WITH series_dates AS (
   SELECT
     jsonb_array_elements_text(frontmatter -> 'series') AS series,
-    frontmatter ->> 'published' AS pub_date
+    published_at
   FROM
     page
   WHERE
     frontmatter ->> 'series' IS NOT NULL
   ORDER BY
-    pub_date DESC,
+    published_at DESC,
     series DESC
 ),
 distinct_series_dates AS (
   SELECT DISTINCT ON (series)
-    series, pub_date
+    series, published_at
   FROM
     series_dates
   ORDER BY
     series DESC,
-    pub_date DESC
+    published_at DESC
 )
 SELECT
   series::text
 FROM
   distinct_series_dates
 ORDER BY
-  pub_date DESC
+  published_at DESC
 `
 
 func (q *Queries) ListAllSeries(ctx context.Context) ([]string, error) {
@@ -331,7 +323,7 @@ func (q *Queries) ListPageIDs(ctx context.Context, arg ListPageIDsParams) ([]int
 const listPages = `-- name: ListPages :many
 WITH paths AS (
   SELECT
-    id, file_path, frontmatter, body, schedule_for, last_published, created_at, updated_at, url_path, source_type, source_id
+    id, file_path, frontmatter, body, schedule_for, last_published, created_at, updated_at, url_path, source_type, source_id, published_at
   FROM
     page
   WHERE
@@ -339,11 +331,11 @@ WITH paths AS (
 ),
 ordered AS (
   SELECT
-    id, file_path, frontmatter, body, schedule_for, last_published, created_at, updated_at, url_path, source_type, source_id
+    id, file_path, frontmatter, body, schedule_for, last_published, created_at, updated_at, url_path, source_type, source_id, published_at
   FROM
     paths
   ORDER BY
-    frontmatter ->> 'published' DESC
+    published_at DESC
 )
 SELECT
   id,
@@ -358,7 +350,7 @@ SELECT
   created_at,
   updated_at,
   schedule_for,
-  coalesce(frontmatter ->> 'published', '')::text AS "published_at"
+  published_at
 FROM
   ordered
 LIMIT $2 OFFSET $3
@@ -383,7 +375,7 @@ type ListPagesRow struct {
 	CreatedAt     time.Time          `json:"created_at"`
 	UpdatedAt     time.Time          `json:"updated_at"`
 	ScheduleFor   pgtype.Timestamptz `json:"schedule_for"`
-	PublishedAt   string             `json:"published_at"`
+	PublishedAt   pgtype.Timestamptz `json:"published_at"`
 }
 
 // Treating published_at as text because it sorts faster and we don't do
@@ -429,26 +421,29 @@ WITH query AS (
     ts_rank(fts_doc_en, tsq) AS rank
   FROM
     page,
-    websearch_to_tsquery('english', $1::text) tsq,
-    tsquery ('''' || $1::text || ''':*') id_tsq
+    websearch_to_tsquery('english', $2::text) tsq
   WHERE
     fts_doc_en @@ tsq
-    OR internal_id_fts @@ id_tsq
   ORDER BY
     rank DESC
-  LIMIT 20
+  LIMIT $1
 )
 SELECT
-  page.id, page.file_path, page.frontmatter, page.body, page.schedule_for, page.last_published, page.created_at, page.updated_at, page.url_path, page.source_type, page.source_id
+  page.id, page.file_path, page.frontmatter, page.body, page.schedule_for, page.last_published, page.created_at, page.updated_at, page.url_path, page.source_type, page.source_id, page.published_at
 FROM
   page
   JOIN query USING (id)
 ORDER BY
-  frontmatter -> 'published' DESC
+  published_at DESC
 `
 
-func (q *Queries) ListPagesByFTS(ctx context.Context, query string) ([]Page, error) {
-	rows, err := q.db.Query(ctx, listPagesByFTS, query)
+type ListPagesByFTSParams struct {
+	Limit int32  `json:"limit"`
+	Query string `json:"query"`
+}
+
+func (q *Queries) ListPagesByFTS(ctx context.Context, arg ListPagesByFTSParams) ([]Page, error) {
+	rows, err := q.db.Query(ctx, listPagesByFTS, arg.Limit, arg.Query)
 	if err != nil {
 		return nil, err
 	}
@@ -468,6 +463,116 @@ func (q *Queries) ListPagesByFTS(ctx context.Context, query string) ([]Page, err
 			&i.URLPath,
 			&i.SourceType,
 			&i.SourceID,
+			&i.PublishedAt,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const listPagesByInternalID = `-- name: ListPagesByInternalID :many
+WITH query AS (
+  SELECT
+    id,
+    ts_rank(fts_doc_en, id_tsq) AS rank
+  FROM
+    page,
+    tsquery ($2::text) id_tsq
+  WHERE
+    internal_id_fts @@ id_tsq
+  ORDER BY
+    rank DESC
+  LIMIT $1
+)
+SELECT
+  page.id, page.file_path, page.frontmatter, page.body, page.schedule_for, page.last_published, page.created_at, page.updated_at, page.url_path, page.source_type, page.source_id, page.published_at
+FROM
+  page
+  JOIN query USING (id)
+ORDER BY
+  published_at DESC
+`
+
+type ListPagesByInternalIDParams struct {
+	Limit int32  `json:"limit"`
+	Query string `json:"query"`
+}
+
+func (q *Queries) ListPagesByInternalID(ctx context.Context, arg ListPagesByInternalIDParams) ([]Page, error) {
+	rows, err := q.db.Query(ctx, listPagesByInternalID, arg.Limit, arg.Query)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []Page
+	for rows.Next() {
+		var i Page
+		if err := rows.Scan(
+			&i.ID,
+			&i.FilePath,
+			&i.Frontmatter,
+			&i.Body,
+			&i.ScheduleFor,
+			&i.LastPublished,
+			&i.CreatedAt,
+			&i.UpdatedAt,
+			&i.URLPath,
+			&i.SourceType,
+			&i.SourceID,
+			&i.PublishedAt,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const listPagesByPublished = `-- name: ListPagesByPublished :many
+SELECT
+  id, file_path, frontmatter, body, schedule_for, last_published, created_at, updated_at, url_path, source_type, source_id, published_at
+FROM
+  page
+ORDER BY
+  published_at DESC
+LIMIT $1 OFFSET $2
+`
+
+type ListPagesByPublishedParams struct {
+	Limit  int32 `json:"limit"`
+	Offset int32 `json:"offset"`
+}
+
+func (q *Queries) ListPagesByPublished(ctx context.Context, arg ListPagesByPublishedParams) ([]Page, error) {
+	rows, err := q.db.Query(ctx, listPagesByPublished, arg.Limit, arg.Offset)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []Page
+	for rows.Next() {
+		var i Page
+		if err := rows.Scan(
+			&i.ID,
+			&i.FilePath,
+			&i.Frontmatter,
+			&i.Body,
+			&i.ScheduleFor,
+			&i.LastPublished,
+			&i.CreatedAt,
+			&i.UpdatedAt,
+			&i.URLPath,
+			&i.SourceType,
+			&i.SourceID,
+			&i.PublishedAt,
 		); err != nil {
 			return nil, err
 		}
@@ -486,7 +591,7 @@ WITH query_paths AS (
 ),
 page_paths AS (
   SELECT
-    id, file_path, frontmatter, body, schedule_for, last_published, created_at, updated_at, url_path, source_type, source_id
+    id, file_path, frontmatter, body, schedule_for, last_published, created_at, updated_at, url_path, source_type, source_id, published_at
   FROM
     page
   WHERE
@@ -504,7 +609,7 @@ SELECT
   coalesce(frontmatter ->> 'blurb', '')::text AS "blurb",
   coalesce(frontmatter ->> 'image', '')::text AS "image",
   coalesce(url_path, '')::text AS "url_path",
-  coalesce(frontmatter ->> 'published', '')::text AS "published_at"
+  published_at::timestamptz
 FROM
   page_paths
   CROSS JOIN query_paths
@@ -513,15 +618,15 @@ ORDER BY
 `
 
 type ListPagesByURLPathsRow struct {
-	FilePath    string `json:"file_path"`
-	InternalID  string `json:"internal_id"`
-	Title       string `json:"title"`
-	LinkTitle   string `json:"link_title"`
-	Description string `json:"description"`
-	Blurb       string `json:"blurb"`
-	Image       string `json:"image"`
-	URLPath     string `json:"url_path"`
-	PublishedAt string `json:"published_at"`
+	FilePath    string    `json:"file_path"`
+	InternalID  string    `json:"internal_id"`
+	Title       string    `json:"title"`
+	LinkTitle   string    `json:"link_title"`
+	Description string    `json:"description"`
+	Blurb       string    `json:"blurb"`
+	Image       string    `json:"image"`
+	URLPath     string    `json:"url_path"`
+	PublishedAt time.Time `json:"published_at"`
 }
 
 func (q *Queries) ListPagesByURLPaths(ctx context.Context, paths []string) ([]ListPagesByURLPathsRow, error) {
@@ -563,7 +668,7 @@ WHERE
   last_published IS NULL
   AND schedule_for < (CURRENT_TIMESTAMP + '5 minutes'::interval)
 RETURNING
-  id, file_path, frontmatter, body, schedule_for, last_published, created_at, updated_at, url_path, source_type, source_id
+  id, file_path, frontmatter, body, schedule_for, last_published, created_at, updated_at, url_path, source_type, source_id, published_at
 `
 
 func (q *Queries) PopScheduledPages(ctx context.Context) ([]Page, error) {
@@ -587,6 +692,7 @@ func (q *Queries) PopScheduledPages(ctx context.Context) ([]Page, error) {
 			&i.URLPath,
 			&i.SourceType,
 			&i.SourceID,
+			&i.PublishedAt,
 		); err != nil {
 			return nil, err
 		}
@@ -630,7 +736,7 @@ SET
 WHERE
   file_path = $9
 RETURNING
-  id, file_path, frontmatter, body, schedule_for, last_published, created_at, updated_at, url_path, source_type, source_id
+  id, file_path, frontmatter, body, schedule_for, last_published, created_at, updated_at, url_path, source_type, source_id, published_at
 `
 
 type UpdatePageParams struct {
@@ -670,6 +776,7 @@ func (q *Queries) UpdatePage(ctx context.Context, arg UpdatePageParams) (Page, e
 		&i.URLPath,
 		&i.SourceType,
 		&i.SourceID,
+		&i.PublishedAt,
 	)
 	return i, err
 }
@@ -682,7 +789,7 @@ SET
 WHERE
   id = $2
 RETURNING
-  id, file_path, frontmatter, body, schedule_for, last_published, created_at, updated_at, url_path, source_type, source_id
+  id, file_path, frontmatter, body, schedule_for, last_published, created_at, updated_at, url_path, source_type, source_id, published_at
 `
 
 type UpdatePageRawContentParams struct {
@@ -705,6 +812,7 @@ func (q *Queries) UpdatePageRawContent(ctx context.Context, arg UpdatePageRawCon
 		&i.URLPath,
 		&i.SourceType,
 		&i.SourceID,
+		&i.PublishedAt,
 	)
 	return i, err
 }
