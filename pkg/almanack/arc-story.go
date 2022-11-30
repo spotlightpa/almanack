@@ -22,11 +22,11 @@ func ArcStoryFromDB(dart *db.Article) (story *ArcStory, err error) {
 	return
 }
 
-func (story *ArcStory) fromDB(dart *db.Article) error {
-	story.FeedItem = dart.ArcData
-	story.Note = dart.Note
+func (arcStory *ArcStory) fromDB(dart *db.Article) error {
+	arcStory.FeedItem = dart.ArcData
+	arcStory.Note = dart.Note
 	var ok bool
-	if story.Status, ok = dbStatusToStatus[dart.Status]; !ok {
+	if arcStory.Status, ok = dbStatusToStatus[dart.Status]; !ok {
 		return errors.New("bad status flag in database")
 	}
 	return nil
