@@ -104,7 +104,7 @@ func (svc Services) StoreFeed(ctx context.Context, newfeed *arc.API) (err error)
 	if err := arcItems.Set(&newfeed.Contents); err != nil {
 		return err
 	}
-	return svc.Queries.UpdateArcArticles(ctx, arcItems)
+	return svc.Queries.UpdateArc(ctx, arcItems)
 }
 
 func (svc Services) ListAllArcStories(ctx context.Context, page int32) (stories []ArcStory, nextPage int32, err error) {
