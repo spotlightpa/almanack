@@ -5,6 +5,7 @@
 package db
 
 import (
+	"database/sql"
 	"time"
 
 	"github.com/jackc/pgtype"
@@ -17,6 +18,15 @@ type AddressRole struct {
 	Roles        []string  `json:"roles"`
 	CreatedAt    time.Time `json:"created_at"`
 	UpdatedAt    time.Time `json:"updated_at"`
+}
+
+type Arc struct {
+	ID          int64              `json:"id"`
+	ArcID       string             `json:"arc_id"`
+	RawData     pgtype.JSONB       `json:"raw_data"`
+	LastUpdated pgtype.Timestamptz `json:"last_updated"`
+	CreatedAt   time.Time          `json:"created_at"`
+	UpdatedAt   time.Time          `json:"updated_at"`
 }
 
 type Article struct {
@@ -110,6 +120,24 @@ type Page struct {
 	SourceType    string             `json:"source_type"`
 	SourceID      string             `json:"source_id"`
 	PublishedAt   pgtype.Timestamptz `json:"published_at"`
+}
+
+type SharedArticle struct {
+	ID           int64              `json:"id"`
+	Status       string             `json:"status"`
+	EmbargoUntil pgtype.Timestamptz `json:"embargo_until"`
+	Note         string             `json:"note"`
+	SourceType   string             `json:"source_type"`
+	SourceID     string             `json:"source_id"`
+	RawData      pgtype.JSONB       `json:"raw_data"`
+	PageID       sql.NullInt64      `json:"page_id"`
+	CreatedAt    time.Time          `json:"created_at"`
+	UpdatedAt    time.Time          `json:"updated_at"`
+}
+
+type SharedStatus struct {
+	ID          string `json:"id"`
+	Description string `json:"description"`
 }
 
 type SiteDatum struct {
