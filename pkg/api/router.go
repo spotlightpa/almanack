@@ -32,6 +32,8 @@ func (app *appEnv) routes() http.Handler {
 		).Group(func(r chi.Router) {
 			r.Get(`/available-articles/{id}`, app.getArcStory)
 			r.Get(`/list-available/{page:\d+}`, app.listAvailableArcStories)
+			r.Get(`/shared-article`, app.getSharedArticle)
+			r.Get(`/shared-articles`, app.listSharedArticles)
 			r.Get(`/mailchimp-signup-url`, app.getSignupURL)
 		})
 		r.With(
