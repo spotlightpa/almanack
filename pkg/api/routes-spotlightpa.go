@@ -11,6 +11,7 @@ import (
 	"github.com/spotlightpa/almanack/internal/arc"
 	"github.com/spotlightpa/almanack/internal/db"
 	"github.com/spotlightpa/almanack/internal/mailchimp"
+	"github.com/spotlightpa/almanack/internal/paginate"
 	"github.com/spotlightpa/almanack/pkg/almanack"
 	"golang.org/x/exp/slices"
 )
@@ -338,8 +339,9 @@ func (app *appEnv) listImages(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	pager := db.PageNumSize(page, 100)
-	images, err := db.Paginate(
+	pager := paginate.PageNumber(page)
+	pager.PageSize = 100
+	images, err := paginate.List(
 		pager,
 		r.Context(),
 		app.svc.Queries.ListImages,
@@ -395,8 +397,9 @@ func (app *appEnv) listFiles(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	pager := db.PageNumSize(page, 100)
-	files, err := db.Paginate(
+	pager := paginate.PageNumber(page)
+	pager.PageSize = 100
+	files, err := paginate.List(
 		pager,
 		r.Context(),
 		app.svc.Queries.ListFiles,
@@ -501,8 +504,9 @@ func (app *appEnv) listPages(w http.ResponseWriter, r *http.Request) {
 		}
 		err error
 	)
-	pager := db.PageNumSize(page, 100)
-	resp.Pages, err = db.Paginate(pager, r.Context(),
+	pager := paginate.PageNumber(page)
+	pager.PageSize = 100
+	resp.Pages, err = paginate.List(pager, r.Context(),
 		app.svc.Queries.ListPages,
 		db.ListPagesParams{
 			FilePath: prefix + "%",

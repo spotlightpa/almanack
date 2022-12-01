@@ -7,6 +7,7 @@ import (
 	"github.com/carlmjohnson/errutil"
 	"github.com/go-chi/chi/v5"
 	"github.com/spotlightpa/almanack/internal/db"
+	"github.com/spotlightpa/almanack/internal/paginate"
 	"github.com/spotlightpa/almanack/pkg/almanack"
 )
 
@@ -73,8 +74,9 @@ func (app *appEnv) backgroundRefreshPages(w http.ResponseWriter, r *http.Request
 
 	hasMore := true
 	for queryPage := int32(0); hasMore; queryPage++ {
-		pager := db.PageNumSize(queryPage, 10)
-		pageIDs, err := db.Paginate(
+		pager := paginate.PageNumber(queryPage)
+		pager.PageSize = 10
+		pageIDs, err := paginate.List(
 			pager, r.Context(),
 			app.svc.Queries.ListPageIDs,
 			db.ListPageIDsParams{
