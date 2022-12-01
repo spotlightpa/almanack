@@ -11,6 +11,7 @@ import (
 	"github.com/jackc/pgtype"
 	"github.com/spotlightpa/almanack/internal/arc"
 	"github.com/spotlightpa/almanack/internal/db"
+	"github.com/spotlightpa/almanack/internal/paginate"
 )
 
 func (svc Services) FetchArcFeed(ctx context.Context) (*arc.API, error) {
@@ -51,8 +52,9 @@ func (svc Services) GetArcStory(ctx context.Context, articleID string) (story *A
 func (svc Services) ListAvailableArcStories(ctx context.Context, page int32) (stories []ArcStory, nextPage int32, err error) {
 	defer errutil.Trace(&err)
 
-	pager := db.PageNumSize(page, 20)
-	dbArts, err := db.Paginate(
+	pager := paginate.PageNumber(page)
+	pager.PageSize = 20
+	dbArts, err := paginate.List(
 		pager, ctx,
 		svc.Queries.ListAvailableArticles,
 		db.ListAvailableArticlesParams{
@@ -108,8 +110,9 @@ func (svc Services) StoreFeed(ctx context.Context, newfeed *arc.API) (err error)
 func (svc Services) ListAllArcStories(ctx context.Context, page int32) (stories []ArcStory, nextPage int32, err error) {
 	defer errutil.Trace(&err)
 
-	pager := db.PageNumSize(page, 50)
-	dbArts, err := db.Paginate(
+	pager := paginate.PageNumber(page)
+	pager.PageSize = 50
+	dbArts, err := paginate.List(
 		pager, ctx,
 		svc.Queries.ListAllArcArticles,
 		db.ListAllArcArticlesParams{
