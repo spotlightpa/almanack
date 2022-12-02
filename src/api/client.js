@@ -66,6 +66,7 @@ const endpoints = {
   postPageForArcID: `/api/page-for-arc-id`,
   listPages: `/api/pages`,
   listPagesByFTS: `/api/pages-by-fts`,
+  listSharedArticles: `/api/shared-articles`,
   getSidebar: `/api/sidebar`,
   saveSidebar: `/api/sidebar`,
   getSiteParams: `/api/site-params`,
@@ -222,6 +223,7 @@ function makeClient($auth) {
     "listPages",
     "listPagesByFTS",
     "listRefreshArc",
+    "listSharedArticles",
   ];
   for (let action of simpleGetActions) {
     let endpoint = endpoints[action];
