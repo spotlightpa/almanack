@@ -1,26 +1,42 @@
 <script>
-import { useAuth, useListAvailableArc, useClient } from "@/api/hooks.js";
+import { useAuth, useClient } from "@/api/hooks.js";
+import { watchAPI } from "@/api/service-util.js";
+import SharedArticle from "@/api/shared-article.js";
 
 export default {
   props: ["page"],
   setup(props) {
     let { fullName, roles } = useAuth();
-    let { articles, nextPage, didLoad, isLoading, load, error } =
-      useListAvailableArc(() => props.page);
-    let client = useClient();
+
+    let { listSharedArticles } = useClient();
+    const { apiState, fetch, computer } = watchAPI(
+      () => props.page || 0,
+      (page) =>
+        listSharedArticles({
+          params: { page },
+        })
+    );
 
     return {
-      articles,
-      nextPage,
-      didLoad,
-      isLoading,
-      load,
-      error,
+      apiState,
+      fetch,
+      articles: computer((rawData) =>
+        (rawData?.stories ?? []).map((a) => new SharedArticle(a))
+      ),
+      nextPage: computer((rawData) => {
+        let page = rawData?.next_page;
+        if (!page) return null;
+        return {
+          name: "articles",
+          query: { page },
+        };
+      }),
+
       fullName,
       roles,
 
       async redirectToSignup() {
-        let [url, err] = await client.getSignupURL();
+        let [url, err] = await useClient().getSignupURL();
         if (err) {
           alert(`Something went wrong: ${err}`);
           return;
@@ -58,8 +74,8 @@ export default {
       <a href="#" @click.prevent="redirectToSignup">resubscribe here</a>.
     </p>
 
-    <SpinnerProgress :is-loading="!didLoad && isLoading" />
-    <ErrorReloader :error="error" @reload="load" />
+    <SpinnerProgress :is-loading="apiState.isLoading.value" />
+    <ErrorReloader :error="apiState.error.value" @reload="fetch" />
 
     <ArticleList
       v-if="articles.length"
