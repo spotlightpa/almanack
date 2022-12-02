@@ -74,7 +74,7 @@ function makeAuth() {
     },
   };
 
-  let APIUrl = window.location.hostname.match(/localhost/)
+  let APIUrl = window.location.hostname.match(/localhost|\.ts\.net/)
     ? "https://almanack.data.spotlightpa.org/.netlify/identity"
     : null;
   netlifyIdentity.init({ logo: false, APIUrl });
