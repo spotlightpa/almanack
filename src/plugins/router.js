@@ -1,10 +1,21 @@
-import { nextTick, watch } from "vue";
+import { defineAsyncComponent, nextTick, watch } from "vue";
+
 import { createRouter, createWebHistory } from "vue-router";
 
 import { useAuth } from "@/api/hooks.js";
 import { setDimensions, sendGAPageview } from "@/utils/google-analytics.js";
 
+import AsyncSpinner from "@/components/AsyncSpinner.vue";
 import ViewError from "@/components/ViewError.vue";
+
+function load(loader) {
+  return defineAsyncComponent({
+    loader,
+    loadingComponent: AsyncSpinner,
+    errorComponent: ViewError,
+    timeout: 3000,
+  });
+}
 
 let { roles, fullName, email, isEditor, isSpotlightPAUser, isSignedIn } =
   useAuth();
@@ -31,13 +42,13 @@ let router = createRouter({
     {
       path: "/login",
       name: "login",
-      component: () => import("@/components/ViewLogin.vue"),
+      component: load(() => import("@/components/ViewLogin.vue")),
       meta: {},
     },
     {
       path: "/unauthorized",
       name: "unauthorized",
-      component: () => import("@/components/ViewUnauthorized.vue"),
+      component: load(() => import("@/components/ViewUnauthorized.vue")),
       meta: {
         requiresAuth: isSignedIn,
       },
@@ -45,7 +56,7 @@ let router = createRouter({
     {
       path: "/articles",
       name: "articles",
-      component: () => import("@/components/ViewSharedList.vue"),
+      component: load(() => import("@/components/ViewSharedList.vue")),
       props: (route) => ({ page: route.query.page }),
       meta: {
         requiresAuth: isEditor,
@@ -54,14 +65,14 @@ let router = createRouter({
     {
       path: "/articles/:id",
       name: "article",
-      component: () => import("@/components/ViewArcArticle.vue"),
+      component: load(() => import("@/components/ViewArcArticle.vue")),
       props: true,
       meta: { requiresAuth: isEditor },
     },
     {
       path: "/admin",
       name: "admin",
-      component: () => import("@/components/ViewAdmin.vue"),
+      component: load(() => import("@/components/ViewAdmin.vue")),
       props: (route) => ({ page: route.query.page }),
       meta: {
         requiresAuth: isSpotlightPAUser,
@@ -70,7 +81,7 @@ let router = createRouter({
     {
       path: "/admin/site-params",
       name: "site-params",
-      component: () => import("@/components/ViewSiteParams.vue"),
+      component: load(() => import("@/components/ViewSiteParams.vue")),
       meta: {
         requiresAuth: isSpotlightPAUser,
       },
@@ -78,7 +89,7 @@ let router = createRouter({
     {
       path: "/admin/editors-picks",
       name: "homepage-editor",
-      component: () => import("@/components/ViewHomepageEditor.vue"),
+      component: load(() => import("@/components/ViewHomepageEditor.vue")),
       meta: {
         requiresAuth: isSpotlightPAUser,
       },
@@ -86,7 +97,7 @@ let router = createRouter({
     {
       path: "/admin/state-college-editor",
       name: "state-college-editor",
-      component: () => import("@/components/ViewStateCollegeEditor.vue"),
+      component: load(() => import("@/components/ViewStateCollegeEditor.vue")),
       meta: {
         requiresAuth: isSpotlightPAUser,
       },
@@ -94,7 +105,7 @@ let router = createRouter({
     {
       path: "/admin/sidebar-items",
       name: "sidebar-items",
-      component: () => import("@/components/ViewSidebarItems.vue"),
+      component: load(() => import("@/components/ViewSidebarItems.vue")),
       meta: {
         requiresAuth: isSpotlightPAUser,
       },
@@ -102,7 +113,7 @@ let router = createRouter({
     {
       path: "/admin/uploader",
       name: "image-uploader",
-      component: () => import("@/components/ViewImageUploader.vue"),
+      component: load(() => import("@/components/ViewImageUploader.vue")),
       props: (route) => ({ page: route.query.page }),
       meta: {
         requiresAuth: isSpotlightPAUser,
@@ -111,7 +122,7 @@ let router = createRouter({
     {
       path: "/admin/file-uploader",
       name: "file-uploader",
-      component: () => import("@/components/ViewFileUploader.vue"),
+      component: load(() => import("@/components/ViewFileUploader.vue")),
       props: (route) => ({ page: route.query.page }),
       meta: {
         requiresAuth: isSpotlightPAUser,
@@ -120,7 +131,7 @@ let router = createRouter({
     {
       path: "/admin/news",
       name: "news-pages",
-      component: () => import("@/components/ViewNewsPagesList.vue"),
+      component: load(() => import("@/components/ViewNewsPagesList.vue")),
       props: (route) => ({ page: route.query.page }),
       meta: {
         requiresAuth: isSpotlightPAUser,
@@ -129,7 +140,7 @@ let router = createRouter({
     {
       path: "/admin/statecollege",
       name: "statecollege-pages",
-      component: () => import("@/components/ViewStateCollegeList.vue"),
+      component: load(() => import("@/components/ViewStateCollegeList.vue")),
       props: (route) => ({ page: route.query.page }),
       meta: {
         requiresAuth: isSpotlightPAUser,
@@ -138,7 +149,9 @@ let router = createRouter({
     {
       path: "/admin/redirect/arc-to-news/:id",
       name: "redirect-arc-news-page",
-      component: () => import("@/components/ViewRedirectArcToNewsPage.vue"),
+      component: load(() =>
+        import("@/components/ViewRedirectArcToNewsPage.vue")
+      ),
       props: true,
       meta: {
         requiresAuth: isSpotlightPAUser,
@@ -147,7 +160,7 @@ let router = createRouter({
     {
       path: "/admin/news/:id",
       name: "news-page",
-      component: () => import("@/components/ViewNewsPage.vue"),
+      component: load(() => import("@/components/ViewNewsPage.vue")),
       props: true,
       meta: {
         requiresAuth: isSpotlightPAUser,
@@ -156,7 +169,7 @@ let router = createRouter({
     {
       path: "/admin/domains",
       name: "domains",
-      component: () => import("@/components/ViewAuthorizedDomains.vue"),
+      component: load(() => import("@/components/ViewAuthorizedDomains.vue")),
       meta: {
         requiresAuth: isSpotlightPAUser,
       },
@@ -164,7 +177,7 @@ let router = createRouter({
     {
       path: "/admin/newsletters",
       name: "newsletters",
-      component: () => import("@/components/ViewNewsletterList.vue"),
+      component: load(() => import("@/components/ViewNewsletterList.vue")),
       props: (route) => ({ page: route.query.page }),
       meta: {
         requiresAuth: isSpotlightPAUser,
@@ -173,14 +186,14 @@ let router = createRouter({
     {
       path: "/admin/newsletters/:id",
       name: "newsletter-page",
-      component: () => import("@/components/ViewNewsletterPage.vue"),
+      component: load(() => import("@/components/ViewNewsletterPage.vue")),
       props: true,
       meta: { requiresAuth: isSpotlightPAUser },
     },
     {
       path: "/admin/election-features",
       name: "election-features",
-      component: () => import("@/components/ViewElectionFeatures.vue"),
+      component: load(() => import("@/components/ViewElectionFeatures.vue")),
       meta: {
         requiresAuth: isSpotlightPAUser,
       },
