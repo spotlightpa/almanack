@@ -21,7 +21,7 @@ require (
 	github.com/gabriel-vasile/mimetype v1.4.1
 	github.com/getsentry/sentry-go v0.15.0
 	github.com/go-chi/chi/v5 v5.0.7
-	github.com/google/go-github/v39 v39.2.0
+	github.com/google/go-github/v48 v48.1.0
 	github.com/jackc/pgconn v1.13.0
 	github.com/jackc/pgtype v1.12.0
 	github.com/jackc/pgx/v4 v4.17.2
