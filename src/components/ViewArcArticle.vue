@@ -1,18 +1,29 @@
 <script>
-import { useAvailableArc } from "@/api/hooks.js";
+import { useClient } from "@/api/hooks.js";
+import { watchAPI } from "@/api/service-util.js";
+import SharedArticle from "@/api/shared-article.js";
 
 export default {
   props: {
     id: String,
   },
+
   setup(props) {
-    let { article, isLoading, load, error } = useAvailableArc(props.id);
+    let { getSharedArticle } = useClient();
+    const { apiState, fetch, computer } = watchAPI(
+      () => props.id,
+      (id) =>
+        getSharedArticle({
+          params: { id },
+        })
+    );
 
     return {
-      isLoading,
-      load,
-      error,
-      article,
+      apiState,
+      fetch,
+      article: computer((rawData) =>
+        rawData ? new SharedArticle(rawData) : null
+      ),
     };
   },
 };
@@ -22,7 +33,11 @@ export default {
   <MetaHead>
     <title>Article • Spotlight PA</title>
   </MetaHead>
-  <APILoader :is-loading="isLoading" :reload="load" :error="error">
+  <APILoader
+    :is-loading="apiState.isLoading.value"
+    :reload="fetch"
+    :error="apiState.error.value"
+  >
     <template v-if="article">
       <MetaHead>
         <title>{{ article.slug }} • Spotlight PA</title>
