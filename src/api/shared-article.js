@@ -61,7 +61,7 @@ export default class SharedArticle {
       budgetLine: "raw_data.planning.budget_line",
       description: "raw_data.description.basic",
       headline: "raw_data.headlines.basic",
-      id: "source_id",
+      id: "id",
       note: "note",
       plannedDate: "raw_data.planning.scheduling.planned_publish_date",
       plannedWordCount: "raw_data.planning.story_length.word_count_planned",
@@ -197,7 +197,7 @@ export default class SharedArticle {
   get contentComponents() {
     let embedcount = 0;
 
-    return this.rawData.content_elements.flatMap((block) => {
+    return this.rawData.raw_data.content_elements.flatMap((block) => {
       let component = contentComponentsTypes[block.type];
       if (component) {
         return {
@@ -225,7 +225,7 @@ export default class SharedArticle {
   get embedComponents() {
     let embedcount = 0;
 
-    return this.rawData.content_elements.flatMap((block) => {
+    return this.rawData.raw_data.content_elements.flatMap((block) => {
       let component = embedComponentsTypes[block.type];
       if (!component) {
         return [];
@@ -243,7 +243,7 @@ export default class SharedArticle {
   get htmlComponents() {
     let embedcount = 0;
 
-    return this.rawData.content_elements.flatMap((block) => {
+    return this.rawData.raw_data.content_elements.flatMap((block) => {
       // Render code blocks but not use placeholder for images
       if (embedComponentsTypes[block.type]) {
         embedcount++;
