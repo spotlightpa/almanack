@@ -1,5 +1,5 @@
 <script>
-import { useClient } from "@/api/hooks.js";
+import { get, getSharedArticle } from "@/api/client-v2.js";
 import { watchAPI } from "@/api/service-util.js";
 import SharedArticle from "@/api/shared-article.js";
 
@@ -9,13 +9,9 @@ export default {
   },
 
   setup(props) {
-    let { getSharedArticle } = useClient();
     const { apiState, fetch, computer } = watchAPI(
       () => props.id,
-      (id) =>
-        getSharedArticle({
-          params: { id },
-        })
+      (id) => get(getSharedArticle, { id })
     );
 
     return {
