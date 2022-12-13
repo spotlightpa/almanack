@@ -4,6 +4,15 @@ import { reactive, toRefs, computed } from "vue";
 import { useClient } from "@/api/hooks.js";
 import imgproxyURL from "@/api/imgproxy-url.js";
 
+let acceptedTypes = [
+  "image/jpeg",
+  "image/png",
+  "image/tiff",
+  "image/webp",
+  "image/avif",
+  "image/heic",
+];
+
 export default {
   name: "ImageUploader",
   setup(props, { emit }) {
@@ -26,16 +35,7 @@ export default {
         let { files } = ev.target;
 
         for (let body of files) {
-          if (
-            ![
-              "image/jpeg",
-              "image/png",
-              "image/tiff",
-              "image/webp",
-              "image/avif",
-              "image/heic",
-            ].includes(body.type)
-          ) {
+          if (!acceptedTypes.includes(body.type)) {
             state.error = new Error(
               "Only JPEG, PNG, WEBP, AVIF, HEIC, and TIFF are supported"
             );
@@ -63,6 +63,7 @@ export default {
     };
 
     return {
+      acceptedTypes,
       ...toRefs(state),
       ...actions,
     };
@@ -89,7 +90,7 @@ export default {
               <label class="file-label">
                 <input
                   type="file"
-                  accept="image/jpeg,image/png,image/tiff,image/webp,image/avif,image/heic"
+                  :accept="acceptedTypes.join(',')"
                   class="file-input"
                   multiple
                   @change="uploadFileInput"
