@@ -137,6 +137,8 @@ var supportedContentTypes = map[string]string{
 	"image/png":  "png",
 	"image/tiff": "tiff",
 	"image/webp": "webp",
+	"image/avif": "avif",
+	"image/heic": "heic",
 }
 
 func (app *appEnv) postSignedUpload(w http.ResponseWriter, r *http.Request) {

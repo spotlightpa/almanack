@@ -80,7 +80,9 @@ func FetchImageURL(ctx context.Context, c *http.Client, srcurl string) (body []b
 			if ct.Is("image/jpeg") ||
 				ct.Is("image/png") ||
 				ct.Is("image/tiff") ||
-				ct.Is("image/webp") {
+				ct.Is("image/webp") ||
+				ct.Is("image/avif") ||
+				ct.Is("image/heic") {
 				ctype = ct.String()
 				return nil
 			}

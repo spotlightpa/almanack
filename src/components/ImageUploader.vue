@@ -27,12 +27,17 @@ export default {
 
         for (let body of files) {
           if (
-            !["image/jpeg", "image/png", "image/tiff", "image/webp"].includes(
-              body.type
-            )
+            ![
+              "image/jpeg",
+              "image/png",
+              "image/tiff",
+              "image/webp",
+              "image/avif",
+              "image/heic",
+            ].includes(body.type)
           ) {
             state.error = new Error(
-              "Only JPEG, PNG, WEBP, and TIFF are supported"
+              "Only JPEG, PNG, WEBP, AVIF, HEIC, and TIFF are supported"
             );
             return;
           }
@@ -84,7 +89,7 @@ export default {
               <label class="file-label">
                 <input
                   type="file"
-                  accept="image/jpeg,image/png,image/tiff,image/webp"
+                  accept="image/jpeg,image/png,image/tiff,image/webp,image/avif,image/heic"
                   class="file-input"
                   multiple
                   @change="uploadFileInput"
