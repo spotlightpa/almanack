@@ -77,7 +77,10 @@ func FetchImageURL(ctx context.Context, c *http.Client, srcurl string) (body []b
 		CheckStatus(http.StatusOK).
 		CheckPeek(512, func(peek []byte) error {
 			ct := mimetype.Detect(peek)
-			if ct.Is("image/jpeg") || ct.Is("image/png") || ct.Is("image/tiff") {
+			if ct.Is("image/jpeg") ||
+				ct.Is("image/png") ||
+				ct.Is("image/tiff") ||
+				ct.Is("image/webp") {
 				ctype = ct.String()
 				return nil
 			}
