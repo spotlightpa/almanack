@@ -17,6 +17,10 @@ import (
 )
 
 func (arcStory *ArcStory) ToArticle(ctx context.Context, svc Services, article *SpotlightPAArticle) (err error) {
+	return ArcFeedItemToPage(ctx, svc, &arcStory.FeedItem, article)
+}
+
+func ArcFeedItemToPage(ctx context.Context, svc Services, arcStory *arc.FeedItem, article *SpotlightPAArticle) (err error) {
 	var body strings.Builder
 	if article.Warnings, err = readContentElements(ctx, svc, arcStory.ContentElements, &body); err != nil {
 		return

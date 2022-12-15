@@ -20,3 +20,11 @@ FROM
 ORDER BY
   last_updated DESC
 LIMIT $1 OFFSET $2;
+
+-- name: GetArcByArcID :one
+SELECT
+  *
+FROM
+  arc
+WHERE
+  arc_id = $1;

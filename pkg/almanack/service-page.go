@@ -6,6 +6,7 @@ import (
 
 	"github.com/carlmjohnson/errutil"
 	"github.com/jackc/pgx/v4"
+	"github.com/spotlightpa/almanack/internal/arc"
 	"github.com/spotlightpa/almanack/internal/db"
 	"github.com/spotlightpa/almanack/internal/slack"
 	"github.com/spotlightpa/almanack/internal/stringx"
@@ -186,11 +187,15 @@ func (svc Services) PageFromArcArticle(ctx context.Context, dbArt *db.Article, p
 	return &dbPage, nil
 }
 
-func (svc Services) RefreshPageFromArcStory(ctx context.Context, story *ArcStory, page *db.Page) (err error) {
+func (svc Services) RefreshPageFromArcStory(ctx context.Context, page *db.Page, story *db.Arc) (err error) {
 	defer errutil.Trace(&err)
 
 	var splArt SpotlightPAArticle
-	if err = story.ToArticle(ctx, svc, &splArt); err != nil {
+	var feedItem arc.FeedItem
+	if err = story.RawData.AssignTo(&feedItem); err != nil {
+		return err
+	}
+	if err = ArcFeedItemToPage(ctx, svc, &feedItem, &splArt); err != nil {
 		return err
 	}
 
