@@ -98,6 +98,7 @@ export const getPageByFilePath = `/api/page-by-file-path`;
 export const getPageByURLPath = `/api/page-by-url-path`;
 export const getPageForArcID = `/api/page-for-arc-id`;
 export const postPageForArcID = `/api/page-for-arc-id`;
+export const postPageRefresh = `/api/page-refresh`;
 export const listPages = `/api/pages`;
 export const listPagesByFTS = `/api/pages-by-fts`;
 export const getSharedArticle = `/api/shared-article`;

@@ -2,6 +2,7 @@ import { computed, reactive, ref, toRefs, watch } from "vue";
 
 import { makeState } from "@/api/service-util.js";
 import { useClient } from "@/api/client.js";
+import { post as clientPost, postPageRefresh } from "@/api/client-v2.js";
 import imgproxyURL from "@/api/imgproxy-url.js";
 
 export class Page {
@@ -218,7 +219,6 @@ export function usePage(id) {
     getPageWithContent,
     postPage,
     listImages,
-    postRefreshPageFromArc,
     postRefreshPageFromMailchimp,
   } = useClient();
   const { apiState, exec } = makeState();
@@ -287,7 +287,7 @@ export function usePage(id) {
       return post(page.value);
     },
     arcRefresh() {
-      return exec(() => postRefreshPageFromArc(id.value));
+      return exec(() => clientPost(postPageRefresh, { id: id.value }));
     },
     mailchimpRefresh() {
       return exec(() => postRefreshPageFromMailchimp(id.value));

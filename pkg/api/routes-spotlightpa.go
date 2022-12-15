@@ -705,10 +705,16 @@ func (app *appEnv) postPageForArcID(w http.ResponseWriter, r *http.Request) {
 	app.replyJSON(http.StatusOK, w, page.ID)
 }
 
-func (app *appEnv) postRefreshPageFromArc(w http.ResponseWriter, r *http.Request) {
-	var id int64
-	mustIntParam(r, "id", &id)
-	app.Printf("start postRefreshPageFromArc for %d", id)
+func (app *appEnv) postPageRefresh(w http.ResponseWriter, r *http.Request) {
+	app.Print("start postPageRefresh")
+	var req struct {
+		ID int64 `json:"id,string"`
+	}
+	if !app.readJSON(w, r, &req) {
+		return
+	}
+
+	id := req.ID
 
 	page, err := app.svc.Queries.GetPageByID(r.Context(), id)
 	if err != nil {
@@ -717,12 +723,13 @@ func (app *appEnv) postRefreshPageFromArc(w http.ResponseWriter, r *http.Request
 		return
 	}
 
+	// TODO: test if it's a MailChimp page
 	arcID, _ := page.Frontmatter["arc-id"].(string)
 	if arcID == "" {
 		app.replyNewErr(http.StatusConflict, w, r, "no arc-id on page %d", id)
 		return
 	}
-	var story *almanack.ArcStory
+
 	feed, feedErr := app.svc.FetchArcFeed(r.Context())
 	if feedErr != nil {
 		// Keep trucking even if you can't load feed
@@ -733,30 +740,18 @@ func (app *appEnv) postRefreshPageFromArc(w http.ResponseWriter, r *http.Request
 			app.replyErr(w, r, err)
 			return
 		}
-		for _, rawStory := range feed.Contents {
-			if rawStory.ID == arcID {
-				app.Printf("Arc ID %q found in feed", arcID)
-				story = &almanack.ArcStory{FeedItem: rawStory}
-				break
-			}
-		}
-	}
-	if story == nil {
-		app.Printf("Arc ID %q not found in feed; trying DB", arcID)
-		dbArt, err := app.svc.Queries.GetArticleByArcID(r.Context(), arcID)
-		if err != nil {
-			err = db.NoRowsAs404(err, "could not find Arc ID %q", arcID)
-			app.replyErr(w, r, err)
-			return
-		}
-		story, err = almanack.ArcStoryFromDB(&dbArt)
-		if err != nil {
-			app.replyErr(w, r, err)
-			return
-		}
 	}
 
-	if err = app.svc.RefreshPageFromArcStory(r.Context(), story, &page); err != nil {
+	story, err := app.svc.Queries.GetArcByArcID(r.Context(), arcID)
+	if err != nil {
+		if db.IsNotFound(err) {
+			err = fmt.Errorf("page %d refers to bad arc-id %q: %w", id, arcID, err)
+		}
+		app.replyErr(w, r, err)
+		return
+	}
+
+	if err = app.svc.RefreshPageFromArcStory(r.Context(), &page, &story); err != nil {
 		app.replyErr(w, r, err)
 		return
 	}

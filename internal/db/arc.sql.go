@@ -11,6 +11,29 @@ import (
 	"github.com/jackc/pgtype"
 )
 
+const getArcByArcID = `-- name: GetArcByArcID :one
+SELECT
+  id, arc_id, raw_data, last_updated, created_at, updated_at
+FROM
+  arc
+WHERE
+  arc_id = $1
+`
+
+func (q *Queries) GetArcByArcID(ctx context.Context, arcID string) (Arc, error) {
+	row := q.db.QueryRow(ctx, getArcByArcID, arcID)
+	var i Arc
+	err := row.Scan(
+		&i.ID,
+		&i.ArcID,
+		&i.RawData,
+		&i.LastUpdated,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+	)
+	return i, err
+}
+
 const listArcByLastUpdated = `-- name: ListArcByLastUpdated :many
 SELECT
   id, arc_id, raw_data, last_updated, created_at, updated_at

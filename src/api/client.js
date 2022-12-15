@@ -30,7 +30,6 @@ const endpoints = {
   getPage: (id) => `/api/page/${id}`,
   getPageWithContent: (id) => `/api/page-with-content/${id}`,
   // post id endpoints
-  postRefreshPageFromArc: (id) => `/api/refresh-page-from-arc/${id}`,
   postRefreshPageFromMailchimp: (id) =>
     `/api/refresh-page-from-mailchimp/${id}`,
   // list page points
@@ -195,10 +194,7 @@ function makeClient($auth) {
     let endpointFn = endpoints[action];
     actions[action] = (id) => tryTo(request(endpointFn(id)));
   }
-  let idPostActions = [
-    "postRefreshPageFromArc",
-    "postRefreshPageFromMailchimp",
-  ];
+  let idPostActions = ["postRefreshPageFromMailchimp"];
   for (let action of idPostActions) {
     let endpointFn = endpoints[action];
     actions[action] = (id) => tryTo(post(endpointFn(id)));
