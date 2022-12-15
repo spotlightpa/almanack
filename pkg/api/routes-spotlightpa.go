@@ -8,107 +8,12 @@ import (
 	"github.com/carlmjohnson/emailx"
 	"github.com/carlmjohnson/errutil"
 	"github.com/carlmjohnson/resperr"
-	"github.com/spotlightpa/almanack/internal/arc"
 	"github.com/spotlightpa/almanack/internal/db"
 	"github.com/spotlightpa/almanack/internal/mailchimp"
 	"github.com/spotlightpa/almanack/internal/paginate"
 	"github.com/spotlightpa/almanack/pkg/almanack"
 	"golang.org/x/exp/slices"
 )
-
-func (app *appEnv) listAllArcStories(w http.ResponseWriter, r *http.Request) {
-	var page int32
-	mustIntParam(r, "page", &page)
-	app.Printf("start listAllArcStories page %d", page)
-
-	var (
-		resp struct {
-			Contents []almanack.ArcStory `json:"contents"`
-			NextPage int32               `json:"next_page,string,omitempty"`
-		}
-		err error
-	)
-	resp.Contents, resp.NextPage, err = app.svc.ListAllArcStories(r.Context(), page)
-	if err != nil {
-		app.replyErr(w, r, err)
-		return
-	}
-	app.replyJSON(http.StatusOK, w, &resp)
-}
-
-func (app *appEnv) listWithArcRefresh(w http.ResponseWriter, r *http.Request) {
-	app.Printf("starting listWithArcRefresh")
-	type response struct {
-		Contents []almanack.ArcStory `json:"contents"`
-		NextPage int32               `json:"next_page,string,omitempty"`
-	}
-	var (
-		feed *arc.API
-		err  error
-	)
-	if feed, err = app.svc.FetchArcFeed(r.Context()); err != nil {
-		// Keep trucking even if you can't load feed
-		app.logErr(r.Context(), err)
-	} else if err = app.svc.StoreFeed(r.Context(), feed); err != nil {
-		app.replyErr(w, r, err)
-		return
-	}
-	var resp response
-	resp.Contents, resp.NextPage, err = app.svc.ListAllArcStories(r.Context(), 0)
-	if err != nil {
-		app.replyErr(w, r, err)
-		return
-	}
-	app.replyJSON(http.StatusOK, w, resp)
-}
-
-func (app *appEnv) postAlmanackArcStory(w http.ResponseWriter, r *http.Request) {
-	app.Printf("starting postAlmanackArcStory")
-
-	var userData struct {
-		ID         string          `json:"_id"`
-		Note       string          `json:"almanack-note,omitempty"`
-		Status     almanack.Status `json:"almanack-status,omitempty"`
-		RefreshArc bool            `json:"almanack-refresh-arc"`
-	}
-	if !app.readJSON(w, r, &userData) {
-		return
-	}
-
-	var (
-		story        almanack.ArcStory
-		refreshStory bool
-	)
-	if userData.RefreshArc {
-		var (
-			feed *arc.API
-			err  error
-		)
-		if feed, err = app.svc.FetchArcFeed(r.Context()); err != nil {
-			app.replyErr(w, r, err)
-			return
-		}
-		if err := app.svc.StoreFeed(r.Context(), feed); err != nil {
-			app.replyErr(w, r, err)
-			return
-		}
-		for i := range feed.Contents {
-			if feed.Contents[i].ID == userData.ID {
-				story.FeedItem = feed.Contents[i]
-				refreshStory = true
-			}
-		}
-	}
-	story.ID = userData.ID
-	story.Note = userData.Note
-	story.Status = userData.Status
-
-	if err := app.svc.SaveAlmanackArticle(r.Context(), &story, refreshStory); err != nil {
-		app.replyErr(w, r, err)
-		return
-	}
-	app.replyJSON(http.StatusAccepted, w, &userData)
-}
 
 func (app *appEnv) postMessage(w http.ResponseWriter, r *http.Request) {
 	app.Printf("starting postMessage")
@@ -635,74 +540,6 @@ func (app *appEnv) postPage(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 	app.replyJSON(http.StatusOK, w, &res)
-}
-
-func (app *appEnv) getPageForArcID(w http.ResponseWriter, r *http.Request) {
-	arcID := r.URL.Query().Get("arc_id")
-	app.Printf("start getPageForArcID for %q", arcID)
-
-	dbArt, err := app.svc.Queries.GetArticleByArcID(r.Context(), arcID)
-	if err != nil {
-		err = db.NoRowsAs404(err, "could not find Arc ID %q", arcID)
-		app.replyErr(w, r, err)
-		return
-	}
-	filepath := dbArt.SpotlightPAPath.String
-	if filepath == "" {
-		// Empty string signals to bring up creation page
-		app.replyJSON(http.StatusOK, w, "")
-		return
-	}
-	app.pageIDForFilepath(w, r, filepath)
-}
-
-func (app *appEnv) pageIDForFilepath(w http.ResponseWriter, r *http.Request, filepath string) {
-	page, err := app.svc.Queries.GetPageByFilePath(r.Context(), filepath)
-	if err != nil {
-		app.replyErr(w, r, err)
-		return
-	}
-	app.replyJSON(http.StatusOK, w, page.ID)
-}
-
-func (app *appEnv) postPageForArcID(w http.ResponseWriter, r *http.Request) {
-	app.Print("start postPageForArcID")
-
-	var req struct {
-		ArcID    string `json:"arc_id"`
-		PageKind string `json:"page_kind"`
-	}
-	if !app.readJSON(w, r, &req) {
-		return
-	}
-	if !slices.Contains([]string{"news", "statecollege"}, req.PageKind) {
-		app.replyErr(w, r, resperr.WithUserMessage(nil, "Invalid page_kind"))
-		return
-	}
-
-	app.Printf("saving page for %q", req.ArcID)
-	dbArt, err := app.svc.Queries.GetArticleByArcID(r.Context(), req.ArcID)
-	if err != nil {
-		err = db.NoRowsAs404(err, "could not find Arc ID %q", req.ArcID)
-		app.replyErr(w, r, err)
-		return
-	}
-	filepath := dbArt.SpotlightPAPath.String
-	if filepath != "" {
-		app.logErr(r.Context(), fmt.Errorf(
-			"can't create new page for %q; page %q already exists",
-			req.ArcID, filepath))
-		app.pageIDForFilepath(w, r, filepath)
-		return
-	}
-
-	page, err := app.svc.PageFromArcArticle(r.Context(), &dbArt, req.PageKind)
-	if err != nil {
-		app.replyErr(w, r, err)
-		return
-	}
-
-	app.replyJSON(http.StatusOK, w, page.ID)
 }
 
 func (app *appEnv) postPageRefresh(w http.ResponseWriter, r *http.Request) {

@@ -30,8 +30,6 @@ func (app *appEnv) routes() http.Handler {
 		r.With(
 			app.hasRoleMiddleware("editor"),
 		).Group(func(r chi.Router) {
-			r.Get(`/available-articles/{id}`, app.getArcStory)
-			r.Get(`/list-available/{page:\d+}`, app.listAvailableArcStories)
 			r.Get(`/shared-article`, app.getSharedArticle)
 			r.Get(`/shared-articles`, app.listSharedArticles)
 			r.Get(`/mailchimp-signup-url`, app.getSignupURL)
@@ -46,7 +44,6 @@ func (app *appEnv) routes() http.Handler {
 			r.Post(`/authorized-addresses`, app.postAddress)
 			r.Get(`/authorized-domains`, app.listDomains)
 			r.Post(`/authorized-domains`, app.postDomain)
-			r.Post(`/available-articles`, app.postAlmanackArcStory)
 			r.Post(`/create-signed-upload`, app.postSignedUpload)
 			r.Get(`/editors-picks`, app.getSiteData(almanack.HomepageLoc))
 			r.Post(`/editors-picks`, app.setSiteData((almanack.HomepageLoc)))
@@ -55,15 +52,11 @@ func (app *appEnv) routes() http.Handler {
 			r.Post(`/files-update`, app.postFileUpdate)
 			r.Post(`/image-update`, app.postImageUpdate)
 			r.Get(`/images`, app.listImages)
-			r.Get(`/list-any-arc/{page:\d+}`, app.listAllArcStories)
-			r.Get(`/list-arc-refresh`, app.listWithArcRefresh)
 			r.Post(`/message`, app.postMessage)
 			r.Post(`/page`, app.postPage)
 			r.Get(`/page/{id:\d+}`, app.getPage)
 			r.Get(`/page-by-file-path`, app.getPageByFilePath)
 			r.Get(`/page-by-url-path`, app.getPageByURLPath)
-			r.Get(`/page-for-arc-id`, app.getPageForArcID)
-			r.Post(`/page-for-arc-id`, app.postPageForArcID)
 			r.Get(`/page-with-content/{id:\d+}`, app.getPageWithContent)
 			r.Get(`/pages`, app.listPages)
 			r.Get(`/pages-by-fts`, app.listPagesByFTS)

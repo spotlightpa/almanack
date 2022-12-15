@@ -136,57 +136,6 @@ func (svc Services) RefreshPageContents(ctx context.Context, id int64) (err erro
 	return err
 }
 
-func (svc Services) PageFromArcArticle(ctx context.Context, dbArt *db.Article, pagekind string) (page *db.Page, err error) {
-	defer errutil.Trace(&err)
-
-	story, err := ArcStoryFromDB(dbArt)
-	if err != nil {
-		return nil, err
-	}
-
-	var splArt SpotlightPAArticle
-	splArt.PageKind = pagekind
-	if err = story.ToArticle(ctx, svc, &splArt); err != nil {
-		return nil, err
-	}
-
-	content, err := splArt.ToTOML()
-	if err != nil {
-		return nil, err
-	}
-
-	var dbPage db.Page
-	if err = dbPage.FromTOML(content); err != nil {
-		return nil, err
-	}
-
-	if err = svc.Queries.EnsurePage(ctx, db.EnsurePageParams{
-		FilePath:   splArt.ContentFilepath(),
-		SourceType: "arc",
-		SourceID:   dbArt.ArcID.String,
-	}); err != nil {
-		return nil, err
-	}
-	if dbPage, err = svc.Queries.UpdatePage(ctx, db.UpdatePageParams{
-		FilePath:       splArt.ContentFilepath(),
-		SetFrontmatter: true,
-		Frontmatter:    dbPage.Frontmatter,
-		SetBody:        true,
-		Body:           dbPage.Body,
-		URLPath:        dbPage.URLPath.String,
-		ScheduleFor:    db.NullTime,
-	}); err != nil {
-		return nil, err
-	}
-	if _, err = svc.Queries.UpdateArcArticleSpotlightPAPath(ctx, db.UpdateArcArticleSpotlightPAPathParams{
-		ArcID:           dbArt.ArcID.String,
-		SpotlightPAPath: splArt.ContentFilepath(),
-	}); err != nil {
-		return nil, err
-	}
-	return &dbPage, nil
-}
-
 func (svc Services) RefreshPageFromArcStory(ctx context.Context, page *db.Page, story *db.Arc) (err error) {
 	defer errutil.Trace(&err)
 
