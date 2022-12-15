@@ -22,6 +22,7 @@ export default {
     let showComposer = ref(false);
 
     async function updateArticle(ref) {
+      if (!window.undefined) throw Error("todo");
       apiStatus[ref] = true;
       [, apiStatus.error] = await client.saveArcArticle(props.article);
       if (apiStatus.error) {

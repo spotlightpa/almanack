@@ -26,15 +26,11 @@ const responseError = async (rsp) => {
 const endpoints = {
   // Alphabetize lists by URL to show duplicates
   // get id endpoints
-  getAvailableArc: (id) => `/api/available-articles/${id}`,
   getPage: (id) => `/api/page/${id}`,
   getPageWithContent: (id) => `/api/page-with-content/${id}`,
   // post id endpoints
   postRefreshPageFromMailchimp: (id) =>
     `/api/refresh-page-from-mailchimp/${id}`,
-  // list page points
-  listAnyArc: (page = "0") => `/api/list-any-arc/${page}`,
-  listAvailableArc: (page = "0") => `/api/list-available/${page}`,
 
   // GET and POST listed as two endpoints
   listAllPages: `/api/all-pages`,
@@ -44,7 +40,6 @@ const endpoints = {
   listAuthorizedDomains: `/api/authorized-domains`,
   postAuthorizedEmailAddress: `/api/authorized-addresses`,
   listAuthorizedEmailAddresses: `/api/authorized-addresses`,
-  saveArcArticle: `/api/available-articles`,
   createSignedUpload: `/api/create-signed-upload`,
   getEditorsPicks: `/api/editors-picks`,
   saveEditorsPicks: `/api/editors-picks`,
@@ -55,14 +50,11 @@ const endpoints = {
   updateFile: `/api/files-update`,
   updateImage: `/api/image-update`,
   listImages: `/api/images`,
-  listRefreshArc: `/api/list-arc-refresh`,
   getSignupURL: `/api/mailchimp-signup-url`,
   sendMessage: `/api/message`,
   postPage: `/api/page`,
   getPageByFilePath: `/api/page-by-file-path`,
   getPageByURLPath: `/api/page-by-url-path`,
-  getPageForArcID: `/api/page-for-arc-id`,
-  postPageForArcID: `/api/page-for-arc-id`,
   listPages: `/api/pages`,
   listPagesByFTS: `/api/pages-by-fts`,
   getSharedArticle: `/api/shared-article`,
@@ -184,11 +176,8 @@ function makeClient($auth) {
   };
   let idGetActions = [
     // does not include proxy images…
-    "getAvailableArc",
     "getPage",
     "getPageWithContent",
-    "listAnyArc",
-    "listAvailableArc",
   ];
   for (let action of idGetActions) {
     let endpointFn = endpoints[action];
@@ -205,7 +194,6 @@ function makeClient($auth) {
     "getElectionFeature",
     "getPageByFilePath",
     "getPageByURLPath",
-    "getPageForArcID",
     "getSharedArticle",
     "getSidebar",
     "getSignupURL",
@@ -220,7 +208,6 @@ function makeClient($auth) {
     "listImages",
     "listPages",
     "listPagesByFTS",
-    "listRefreshArc",
     "listSharedArticles",
   ];
   for (let action of simpleGetActions) {
@@ -231,9 +218,7 @@ function makeClient($auth) {
     "postAuthorizedDomain",
     "postAuthorizedEmailAddress",
     "postPage",
-    "postPageForArcID",
     "postSiteParams",
-    "saveArcArticle",
     "saveArticle",
     "saveEditorsPicks",
     "saveElectionFeature",
