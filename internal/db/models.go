@@ -9,7 +9,6 @@ import (
 	"time"
 
 	"github.com/jackc/pgtype"
-	"github.com/spotlightpa/almanack/internal/arc"
 )
 
 type AddressRole struct {
@@ -27,17 +26,6 @@ type Arc struct {
 	LastUpdated pgtype.Timestamptz `json:"last_updated"`
 	CreatedAt   time.Time          `json:"created_at"`
 	UpdatedAt   time.Time          `json:"updated_at"`
-}
-
-type Article struct {
-	ID              int32        `json:"id"`
-	ArcID           pgtype.Text  `json:"arc_id"`
-	ArcData         arc.FeedItem `json:"arc_data"`
-	SpotlightPAPath pgtype.Text  `json:"spotlightpa_path"`
-	Note            string       `json:"note"`
-	Status          string       `json:"status"`
-	CreatedAt       time.Time    `json:"created_at"`
-	UpdatedAt       time.Time    `json:"updated_at"`
 }
 
 type ArticleStatus struct {

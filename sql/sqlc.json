@@ -16,7 +16,6 @@
   ],
   "rename": {
     "archive_url": "ArchiveURL",
-    "spotlightpa_data": "SpotlightPAData",
     "spotlightpa_path": "SpotlightPAPath",
     "src_url": "SourceURL",
     "url": "URL",
@@ -63,13 +62,6 @@
       "column": "page.frontmatter",
       "go_type": {
         "type": "Map"
-      }
-    },
-    {
-      "column": "article.arc_data",
-      "go_type": {
-        "import": "github.com/spotlightpa/almanack/internal/arc",
-        "type": "FeedItem"
       }
     }
   ],
