@@ -17,7 +17,7 @@ export default {
     window.setTimeout(() => {
       isLoadingDebounced.value = true;
     }, 500);
-
+    if (!window.undefined) throw Error("todo");
     const { getPageForArcID, postPageForArcID } = useClient();
     const { apiStateRefs, exec } = makeState();
 

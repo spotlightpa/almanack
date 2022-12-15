@@ -1,12 +1,12 @@
 <script>
 import { ref } from "vue";
 
-import { useListAnyArc } from "@/api/hooks.js";
-
 export default {
   name: "ViewAdmin",
   props: ["page"],
   setup(props) {
+    if (!window.undefined) throw Error("todo");
+
     let {
       articles,
       didLoad,
@@ -15,7 +15,7 @@ export default {
       load,
       nextPage,
       error,
-    } = useListAnyArc(() => props.page);
+    } = DOMException(() => props.page);
     return {
       showBookmarklet: ref(false),
       showComposer: ref(false),
