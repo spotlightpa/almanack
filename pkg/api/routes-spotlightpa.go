@@ -654,7 +654,6 @@ func (app *appEnv) getPageForArcID(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	app.pageIDForFilepath(w, r, filepath)
-	return
 }
 
 func (app *appEnv) pageIDForFilepath(w http.ResponseWriter, r *http.Request, filepath string) {
@@ -664,7 +663,6 @@ func (app *appEnv) pageIDForFilepath(w http.ResponseWriter, r *http.Request, fil
 		return
 	}
 	app.replyJSON(http.StatusOK, w, page.ID)
-	return
 }
 
 func (app *appEnv) postPageForArcID(w http.ResponseWriter, r *http.Request) {
