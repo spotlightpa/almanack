@@ -18,13 +18,13 @@ export default {
   },
   computed: {
     tagStyle() {
-      if (this.article.status === "published") {
+      if (this.article.status === "released") {
         return "is-success";
       }
-      if (this.article.status.startsWith("ready")) {
-        return "is-warning";
+      if (this.article.status === "imported") {
+        return "is-danger";
       }
-      return "is-danger";
+      return "is-warning";
     },
   },
 };
@@ -42,18 +42,16 @@ export default {
           <span class="icon is-size-6">
             <font-awesome-icon
               :icon="
-                article.isAvailable
-                  ? ['fas', 'check-circle']
-                  : ['fas', 'pen-nib']
+                article.isShared ? ['fas', 'check-circle'] : ['fas', 'pen-nib']
               "
             />
           </span>
           <span v-text="article.statusVerbose"></span>
         </span>
         <a
-          v-if="isArcUser"
+          v-if="isArcUser && article.isArc"
           class="tag is-light"
-          :href="article.arcURL"
+          :href="article.arc.arcURL"
           target="_blank"
         >
           <span class="icon is-size-6">

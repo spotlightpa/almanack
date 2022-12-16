@@ -41,10 +41,6 @@ let ignoreComponentTypes = {
   interstitial_link: true,
 };
 
-const STATUS_UNSET = 0;
-const STATUS_PLANNED = 1;
-const STATUS_AVAILABLE = 2;
-
 export default class ArcArticle {
   static from(data) {
     return data.contents
@@ -106,38 +102,8 @@ export default class ArcArticle {
     return slug.slice(start + 1, stop);
   }
 
-  setRefreshArc() {
-    this._refreshArcStatus = true;
-  }
-
-  unsetStatus() {
-    this._almanackStatus = STATUS_UNSET;
-  }
-
-  setStatusPlanned() {
-    this._almanackStatus = STATUS_PLANNED;
-  }
-
-  setStatusAvailable() {
-    this._almanackStatus = STATUS_AVAILABLE;
-  }
-
-  get isPlanned() {
-    return this._almanackStatus >= STATUS_PLANNED;
-  }
-
-  get isAvailable() {
-    return this._almanackStatus >= STATUS_AVAILABLE;
-  }
-
   get arcURL() {
     return `https://pmn.arcpublishing.com/composer/edit/${this.id}/`;
-  }
-  get detailsRoute() {
-    return { name: "article", params: { id: this.id } };
-  }
-  get spotlightPARedirectRoute() {
-    return { name: "redirect-arc-news-page", params: { id: this.id } };
   }
   get authors() {
     return this.getProp("credits.by", { fallback: [] }).map((item) => {
