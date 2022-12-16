@@ -13,31 +13,31 @@ export default {
 </script>
 
 <template>
-  <div class="level is-mobile is-clipped">
+  <div v-if="article.isArc" class="level is-mobile is-clipped">
     <div class="level-left">
-      <p v-if="article.plannedWordCount" class="level-item">
+      <p v-if="article.arc.plannedWordCount" class="level-item">
         <span>
           <strong>Planned Word Count:</strong>
-          {{ intcomma(article.plannedWordCount) }}
+          {{ intcomma(article.arc.plannedWordCount) }}
         </span>
       </p>
 
-      <p v-if="article.actualWordCount" class="level-item is-hidden-mobile">
+      <p v-if="article.arc.actualWordCount" class="level-item is-hidden-mobile">
         <span>
           <strong>Word Count:</strong>
-          {{ intcomma(article.actualWordCount) }}
+          {{ intcomma(article.arc.actualWordCount) }}
         </span>
       </p>
       <p class="level-item is-hidden-mobile">
         <span>
           <strong>Lines:</strong>
-          {{ article.actualLineCount }}
+          {{ article.arc.actualLineCount }}
         </span>
       </p>
       <p class="level-item is-hidden-mobile">
         <span>
           <strong>Column inches:</strong>
-          {{ article.actualInchCount }}
+          {{ article.arc.actualInchCount }}
         </span>
       </p>
     </div>
