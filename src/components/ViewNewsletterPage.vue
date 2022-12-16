@@ -64,10 +64,12 @@ export default {
         v-model="page.publishedAt"
         label="Publication Date"
         :icon="['fas', 'user-clock']"
+        :disabled="page.isPublished"
         help="Page will be listed on the site under this date"
       >
         <p class="content is-small">
           <a
+            v-show="!page.isPublished"
             href="#"
             class="has-text-info"
             @click.prevent="page.publishedAt = new Date()"
