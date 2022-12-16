@@ -39,8 +39,10 @@ export default {
         <title>{{ article.slug }} • Spotlight PA</title>
       </MetaHead>
 
-      <ArcArticleAvailable v-if="article.isAvailable" :article="article" />
-      <ArcArticlePlanned v-else :article="article" />
+      <template v-if="article.isArc">
+        <ArcArticleAvailable v-if="!article.isPreview" :article="article" />
+        <ArcArticlePlanned v-else :article="article" />
+      </template>
     </template>
   </APILoader>
 </template>
