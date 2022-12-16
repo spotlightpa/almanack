@@ -38,10 +38,10 @@ func (app *appEnv) listSharedArticles(w http.ResponseWriter, r *http.Request) {
 		}
 
 		pager := paginate.PageNumber(page)
-		pager.PageSize = 100
+		pager.PageSize = 50
 		stories, err := paginate.List(pager, r.Context(),
-			app.svc.Queries.ListSharedArticlesWhereActive,
-			db.ListSharedArticlesWhereActiveParams{
+			app.svc.Queries.ListSharedArticles,
+			db.ListSharedArticlesParams{
 				Offset: pager.Offset(),
 				Limit:  pager.Limit(),
 			})
@@ -57,13 +57,14 @@ func (app *appEnv) listSharedArticles(w http.ResponseWriter, r *http.Request) {
 			Stories:  stories,
 			NextPage: pager.NextPage,
 		})
+		return
 	}
 
 	pager := paginate.PageNumber(page)
 	pager.PageSize = 20
 	stories, err := paginate.List(pager, r.Context(),
-		app.svc.Queries.ListSharedArticles,
-		db.ListSharedArticlesParams{
+		app.svc.Queries.ListSharedArticlesWhereActive,
+		db.ListSharedArticlesWhereActiveParams{
 			Offset: pager.Offset(),
 			Limit:  pager.Limit(),
 		})
