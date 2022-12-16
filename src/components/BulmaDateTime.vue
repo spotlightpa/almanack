@@ -8,6 +8,7 @@ const props = defineProps({
   modelValue: Date,
   icon: [Array, String],
   required: Boolean,
+  disabled: Boolean,
 });
 
 const emit = defineEmits(["update:modelValue"]);
@@ -77,6 +78,7 @@ function emitTime(value) {
           class="input"
           type="date"
           :value="day"
+          :disabled="disabled || null"
           @input="emitDay($event.target.value)"
         />
         <span v-if="icon" class="icon is-left">
@@ -88,6 +90,7 @@ function emitTime(value) {
           class="input"
           type="time"
           :value="time"
+          :disabled="disabled || null"
           step="1"
           @input="emitTime($event.target.value)"
         />
