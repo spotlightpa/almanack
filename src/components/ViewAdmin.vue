@@ -1,35 +1,36 @@
 <script>
 import { ref } from "vue";
 
+import { get, listSharedArticles } from "@/api/client-v2.js";
+import { watchAPI } from "@/api/service-util.js";
+import SharedArticle from "@/api/shared-article.js";
+
 export default {
   name: "ViewAdmin",
   props: ["page"],
   setup(props) {
-    if (!window.undefined) throw Error("todo");
+    const { apiState, fetch, computer } = watchAPI(
+      () => props.page || 0,
+      (page) => get(listSharedArticles, { page, show: "all", select: "-body" })
+    );
 
-    let {
-      articles,
-      didLoad,
-      isLoading,
-      isLoadingThrottled,
-      load,
-      nextPage,
-      error,
-    } = DOMException(() => props.page);
     return {
       showBookmarklet: ref(false),
       showComposer: ref(false),
-      didLoad,
-      isLoading,
-      isLoadingThrottled,
-      load,
-      error,
-      articles,
-      nextPage,
-      async refresh({ apiStatus, ref }) {
-        await load();
-        apiStatus[ref] = false;
-      },
+
+      apiState,
+      fetch,
+      articles: computer((rawData) =>
+        (rawData?.stories ?? []).map((a) => new SharedArticle(a))
+      ),
+      nextPage: computer((rawData) => {
+        let page = rawData?.next_page;
+        if (!page) return null;
+        return {
+          name: "admin",
+          query: { page },
+        };
+      }),
     };
   },
 };
@@ -181,15 +182,11 @@ export default {
       />
     </keep-alive>
 
-    <ErrorReloader class="mt-5" :error="error" @reload="load" />
+    <ErrorReloader class="mt-5" :error="apiState.error.value" @reload="fetch" />
 
-    <AdminList
-      v-if="articles.length"
-      class="mt-5"
-      :articles="articles"
-      title="Arc Articles"
-      @refresh="refresh"
-    />
+    <li v-for="article in articles" :key="article.id">
+      {{ article.id }}
+    </li>
 
     <div class="buttons mt-5">
       <router-link
@@ -201,6 +198,6 @@ export default {
       </router-link>
     </div>
 
-    <SpinnerProgress :is-loading="isLoadingThrottled" />
+    <SpinnerProgress :is-loading="apiState.isLoadingThrottled.value" />
   </div>
 </template>
