@@ -1,5 +1,6 @@
 <script>
-import { useAuth, useClient } from "@/api/hooks.js";
+import { useAuth } from "@/api/hooks.js";
+import { get, getSignupURL, listSharedArticles } from "@/api/client-v2.js";
 import { watchAPI } from "@/api/service-util.js";
 import SharedArticle from "@/api/shared-article.js";
 
@@ -8,13 +9,9 @@ export default {
   setup(props) {
     let { fullName, roles } = useAuth();
 
-    let { listSharedArticles } = useClient();
     const { apiState, fetch, computer } = watchAPI(
       () => props.page || 0,
-      (page) =>
-        listSharedArticles({
-          params: { page },
-        })
+      (page) => get(listSharedArticles, { page })
     );
 
     return {
@@ -36,7 +33,7 @@ export default {
       roles,
 
       async redirectToSignup() {
-        let [url, err] = await useClient().getSignupURL();
+        let [url, err] = await get(getSignupURL);
         if (err) {
           alert(`Something went wrong: ${err}`);
           return;
