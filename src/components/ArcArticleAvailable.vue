@@ -23,7 +23,7 @@ export default {
 
       ...toRefs(data),
 
-      embeds: props.article.embedComponents,
+      embeds: props.article.arc.embedComponents,
 
       showRichText() {
         data.viewHTML = false;
@@ -69,7 +69,7 @@ export default {
     </h1>
     <h2 class="title">Planned time</h2>
     <p class="content has-margin-top-negative">
-      {{ formatDate(article.plannedDate) }}
+      {{ formatDate(article.arc.plannedDate) }}
     </p>
     <template v-if="article.note">
       <h2 class="title is-stacked">Publication Notes</h2>
@@ -79,20 +79,20 @@ export default {
     </template>
 
     <h2 class="title">Suggested Hed</h2>
-    <CopyWithButton :value="article.headline" label="hed" />
+    <CopyWithButton :value="article.arc.headline" label="hed" />
 
     <h2 class="title">Suggested Description</h2>
-    <CopyWithButton :value="article.description" label="description" />
+    <CopyWithButton :value="article.arc.description" label="description" />
 
     <h2 class="title">Byline</h2>
-    <CopyWithButton :value="article.byline" label="byline" />
+    <CopyWithButton :value="article.arc.byline" label="byline" />
 
-    <template v-if="article.featuredImage">
+    <template v-if="article.arc.featuredImage">
       <h2 class="title is-spaced">Featured Image</h2>
       <ImageThumbnail
-        :url="article.featuredImage"
-        :caption="article.featuredImageCaption"
-        :credits="article.featuredImageCredits"
+        :url="article.arc.featuredImage"
+        :caption="article.arc.featuredImageCaption"
+        :credits="article.arc.featuredImageCredits"
         class="block"
       />
     </template>
@@ -178,7 +178,7 @@ export default {
     >
       <component
         :is="block.component"
-        v-for="(block, i) of article.contentComponents"
+        v-for="(block, i) of article.arc.contentComponents"
         :key="i"
         :block="block.block"
       ></component>
@@ -187,7 +187,7 @@ export default {
     <DOMInnerHTML @mounted="articleHTML = $event">
       <component
         :is="block.component"
-        v-for="(block, i) of article.htmlComponents"
+        v-for="(block, i) of article.arc.htmlComponents"
         :key="i"
         :block="block.block"
       ></component>
@@ -203,7 +203,7 @@ export default {
     <details class="mt-5 block">
       <summary class="title">Budget details</summary>
       <p class="content">
-        {{ article.budgetLine }}
+        {{ article.arc.budgetLine }}
       </p>
       <ArticleWordCount :article="article" />
     </details>
