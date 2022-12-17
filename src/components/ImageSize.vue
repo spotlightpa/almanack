@@ -39,30 +39,20 @@ async function onclick() {
       :icon="['fas', 'file-image']"
       @click.prevent="onclick"
     />
-    <Teleport to="body">
-      <div v-if="open" class="modal is-active">
-        <div class="modal-background" @click="open = false"></div>
-        <div class="modal-content" tabindex="-1" @keyup.esc="open = false">
-          <div class="box">
-            <h3 class="title is-4">{{ path }}</h3>
-            <div v-if="error" class="message is-danger">
-              <div class="message-header">Could not load image.</div>
-              <div class="message-body">Something went wrong.</div>
-            </div>
-            <template v-else>
-              <span class="label">Image width</span>
-              <CopyWithButton :value="'' + width" label="Width" />
-              <span class="label">Image height</span>
-              <CopyWithButton :value="'' + height" label="Height" />
-            </template>
-          </div>
+    <BulmaModal v-model="open">
+      <div class="box">
+        <h3 class="title is-4">{{ path }}</h3>
+        <div v-if="error" class="message is-danger">
+          <div class="message-header">Could not load image.</div>
+          <div class="message-body">Something went wrong.</div>
         </div>
-        <button
-          class="modal-close is-large"
-          aria-label="close"
-          @click="open = false"
-        ></button>
+        <template v-else>
+          <span class="label">Image width</span>
+          <CopyWithButton :value="'' + width" label="Width" />
+          <span class="label">Image height</span>
+          <CopyWithButton :value="'' + height" label="Height" />
+        </template>
       </div>
-    </Teleport>
+    </BulmaModal>
   </div>
 </template>
