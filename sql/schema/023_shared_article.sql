@@ -42,10 +42,13 @@ CREATE TABLE shared_article (
   "source_type" text NOT NULL DEFAULT '',
   "source_id" text NOT NULL DEFAULT '',
   "raw_data" jsonb NOT NULL DEFAULT '{}' ::jsonb,
-  page_id bigint REFERENCES page (id),
+  page_id bigint REFERENCES page (id) UNIQUE,
   created_at timestamptz NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updated_at timestamptz NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
+
+CREATE UNIQUE INDEX shared_article_unique_source_key ON shared_article
+  (source_type, source_id);
 
 INSERT INTO shared_article (status, note, source_type, source_id, raw_data,
   page_id, created_at, updated_at)
