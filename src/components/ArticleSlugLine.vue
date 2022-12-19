@@ -60,14 +60,14 @@ export default {
           <span>Arc view</span>
         </a>
         <router-link
-          v-if="isSpotlightPAUser"
+          v-if="isSpotlightPAUser && article.pageRoute"
           class="tag is-light"
-          :to="article.spotlightPARedirectRoute"
+          :to="article.pageRoute"
         >
           <span class="icon">
             <font-awesome-icon :icon="['fas', 'user-clock']" />
           </span>
-          <span>Spotlight PA view</span>
+          <span>Spotlight PA page</span>
         </router-link>
       </span>
     </span>
