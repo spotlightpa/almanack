@@ -13,7 +13,7 @@ export default class SharedArticle {
     this["sourceType"] = data["source_type"] ?? "";
     this["sourceID"] = data["source_id"] ?? "";
     this["rawData"] = data["raw_data"] ?? "";
-    this["pageID"] = data["page_id"] ?? "";
+    this["pageID"] = "" + (data["page_id"]?.Int64 || "");
     this["embargoUntil"] = maybeDate(data, "embargo_until");
     this["createdAt"] = maybeDate(data, "created_at");
     this["updatedAt"] = maybeDate(data, "updated_at");
@@ -70,9 +70,11 @@ export default class SharedArticle {
   get detailsRoute() {
     return { name: "article", params: { id: this.id } };
   }
-  get spotlightPARedirectRoute() {
-    // TODO: fixme
-    return { name: "redirect-arc-news-page", params: { id: this.id } };
+  get pageRoute() {
+    if (!this.pageID) {
+      return null;
+    }
+    return { name: "news-page", params: { id: this.pageID } };
   }
   get slug() {
     return this.isArc ? this.arc.slug : "TKTK";
