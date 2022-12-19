@@ -16,17 +16,6 @@ export default {
       isArcUser,
     };
   },
-  computed: {
-    tagStyle() {
-      if (this.article.status === "released") {
-        return "is-success";
-      }
-      if (this.article.status === "imported") {
-        return "is-danger";
-      }
-      return "is-warning";
-    },
-  },
 };
 </script>
 
@@ -38,7 +27,7 @@ export default {
     </router-link>
     <span class="is-inline-flex middle">
       <span class="tags">
-        <span class="tag is-small" :class="tagStyle">
+        <span class="tag is-small" :class="article.statusClass">
           <span class="icon is-size-6">
             <font-awesome-icon
               :icon="

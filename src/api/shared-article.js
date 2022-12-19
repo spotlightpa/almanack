@@ -62,11 +62,22 @@ export default class SharedArticle {
       {
         imported: "Imported",
         preview: "Preview Available",
-        embargo: "Available Under Embargo",
+        embargo: "Embargoed until TKTK",
         released: "Released",
       }[this.status] || "System Error"
     );
   }
+
+  get statusClass() {
+    if (this.status === "released") {
+      return "is-success";
+    }
+    if (this.status === "imported") {
+      return "is-danger";
+    }
+    return "is-warning";
+  }
+
   get detailsRoute() {
     return { name: "article", params: { id: this.id } };
   }
