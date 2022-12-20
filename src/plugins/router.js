@@ -89,6 +89,15 @@ let router = createRouter({
       },
     },
     {
+      path: "/admin/arc-import",
+      name: "arc-import",
+      component: load(() => import("@/components/ViewArcImport.vue")),
+      props: (route) => ({ page: route.query.page || "0" }),
+      meta: {
+        requiresAuth: isSpotlightPAUser,
+      },
+    },
+    {
       path: "/admin/site-params",
       name: "site-params",
       component: load(() => import("@/components/ViewSiteParams.vue")),

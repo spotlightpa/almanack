@@ -235,6 +235,19 @@ func intFromString[Int int | int32 | int64](s string, p *Int) error {
 	return nil
 }
 
+func boolFromQuery(r *http.Request, param string) (val bool, err error) {
+	if !r.URL.Query().Has(param) {
+		return
+	}
+	s := r.URL.Query().Get(param)
+	val, err = strconv.ParseBool(s)
+	if err != nil {
+		err = resperr.WithUserMessagef(err,
+			"Could not interpret %s=%q", param, s)
+	}
+	return
+}
+
 func (app *appEnv) replyHTML(w http.ResponseWriter, r *http.Request, t *template.Template, data any) {
 	var buf bytes.Buffer
 	if err := t.Execute(&buf, data); err != nil {

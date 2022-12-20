@@ -38,6 +38,7 @@ func (app *appEnv) routes() http.Handler {
 		r.With(
 			app.hasRoleMiddleware("Spotlight PA"),
 		).Group(func(r chi.Router) {
+			r.Get(`/arc-by-last-updated`, app.listArcByLastUpdated)
 			r.Get(`/all-pages`, app.listAllPages)
 			r.Get(`/all-series`, app.listAllSeries)
 			r.Get(`/all-topics`, app.listAllTopics)
