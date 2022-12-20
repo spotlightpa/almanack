@@ -38,6 +38,15 @@ FROM
 WHERE
   id = $1;
 
+-- name: GetSharedArticleBySource :one
+SELECT
+  *
+FROM
+  shared_article
+WHERE
+  source_type = $1
+  AND source_id = $2;
+
 -- name: ListSharedArticles :many
 SELECT
   *

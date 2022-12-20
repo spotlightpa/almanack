@@ -111,3 +111,33 @@ func (app *appEnv) getSharedArticle(w http.ResponseWriter, r *http.Request) {
 
 	app.replyJSON(http.StatusOK, w, article)
 }
+
+func (app *appEnv) getSharedArticleBySource(w http.ResponseWriter, r *http.Request) {
+	app.Printf("starting getSharedArticleBySource")
+	q := r.URL.Query()
+	st := q.Get("source_type")
+	sid := q.Get("source_id")
+	article, err := app.svc.Queries.GetSharedArticleBySource(r.Context(),
+		db.GetSharedArticleBySourceParams{
+			SourceType: st,
+			SourceID:   sid,
+		})
+	if err != nil {
+		err = db.NoRowsAs404(err,
+			"missing shared_article type=%q id=%q", st, sid)
+		app.replyErr(w, r, err)
+		return
+	}
+
+	if article.Status != "S" &&
+		article.Status != "P" {
+		// Let Spotlight PA users get article regardless of its status
+		if err := app.auth.HasRole(r, "Spotlight PA"); err != nil {
+			app.replyNewErr(http.StatusNotFound, w, r,
+				"user unauthorized to view article: %w", err)
+			return
+		}
+	}
+
+	app.replyJSON(http.StatusOK, w, article)
+}

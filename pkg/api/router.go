@@ -31,6 +31,7 @@ func (app *appEnv) routes() http.Handler {
 			app.hasRoleMiddleware("editor"),
 		).Group(func(r chi.Router) {
 			r.Get(`/shared-article`, app.getSharedArticle)
+			r.Get(`/shared-article-by-source`, app.getSharedArticleBySource)
 			r.Get(`/shared-articles`, app.listSharedArticles)
 			r.Get(`/mailchimp-signup-url`, app.getSignupURL)
 		})

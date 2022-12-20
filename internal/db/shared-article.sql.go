@@ -39,6 +39,39 @@ func (q *Queries) GetSharedArticleByID(ctx context.Context, id int64) (SharedArt
 	return i, err
 }
 
+const getSharedArticleBySource = `-- name: GetSharedArticleBySource :one
+SELECT
+  id, status, embargo_until, note, source_type, source_id, raw_data, page_id, created_at, updated_at
+FROM
+  shared_article
+WHERE
+  source_type = $1
+  AND source_id = $2
+`
+
+type GetSharedArticleBySourceParams struct {
+	SourceType string `json:"source_type"`
+	SourceID   string `json:"source_id"`
+}
+
+func (q *Queries) GetSharedArticleBySource(ctx context.Context, arg GetSharedArticleBySourceParams) (SharedArticle, error) {
+	row := q.db.QueryRow(ctx, getSharedArticleBySource, arg.SourceType, arg.SourceID)
+	var i SharedArticle
+	err := row.Scan(
+		&i.ID,
+		&i.Status,
+		&i.EmbargoUntil,
+		&i.Note,
+		&i.SourceType,
+		&i.SourceID,
+		&i.RawData,
+		&i.PageID,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+	)
+	return i, err
+}
+
 const listSharedArticles = `-- name: ListSharedArticles :many
 SELECT
   id, status, embargo_until, note, source_type, source_id, raw_data, page_id, created_at, updated_at
