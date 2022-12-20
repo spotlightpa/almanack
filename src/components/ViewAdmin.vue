@@ -184,9 +184,86 @@ export default {
 
     <ErrorReloader class="mt-5" :error="apiState.error.value" @reload="fetch" />
 
-    <li v-for="article in articles" :key="article.id">
-      {{ article.id }}
-    </li>
+    <h2 class="mt-5 title">Import Articles</h2>
+    <LinkButtons>
+      <LinkRoute
+        label="Import from Arc"
+        to="statecollege-pages"
+        :icon="['fas', 'pen-nib']"
+      />
+    </LinkButtons>
+
+    <h2 class="mt-5 title">Shareable Articles</h2>
+
+    <div class="table-container">
+      <table
+        class="table is-bordered is-striped is-narrow is-hoverable is-fullwidth"
+      >
+        <thead>
+          <tr>
+            <th>Slug</th>
+            <th>Status</th>
+            <th>Links</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="article in articles" :key="article.id">
+            <td>
+              <router-link :to="article.detailsRoute" class="mr-2 middle">
+                <font-awesome-icon :icon="['far', 'newspaper']" />
+                {{ article.slug }}
+              </router-link>
+            </td>
+            <td>
+              <span class="tag is-small" :class="article.statusClass">
+                <span class="icon is-size-6">
+                  <font-awesome-icon
+                    :icon="
+                      article.isShared
+                        ? ['fas', 'check-circle']
+                        : ['fas', 'pen-nib']
+                    "
+                  />
+                </span>
+                <span v-text="article.statusVerbose"></span>
+              </span>
+            </td>
+            <td>
+              <span class="tags">
+                <router-link class="tag is-light" :to="article.detailsRoute">
+                  <span class="icon">
+                    <font-awesome-icon :icon="['fas', 'file-invoice']" />
+                  </span>
+                  <span>Partner view</span>
+                </router-link>
+
+                <a
+                  v-if="article.isArc"
+                  class="tag is-light"
+                  :href="article.arc.arcURL"
+                  target="_blank"
+                >
+                  <span class="icon is-size-6">
+                    <font-awesome-icon :icon="['fas', 'link']" />
+                  </span>
+                  <span>Arc</span>
+                </a>
+                <router-link
+                  v-if="article.pageRoute"
+                  class="tag is-light"
+                  :to="article.pageRoute"
+                >
+                  <span class="icon">
+                    <font-awesome-icon :icon="['fas', 'user-clock']" />
+                  </span>
+                  <span>Spotlight admin</span>
+                </router-link>
+              </span>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
 
     <div class="buttons mt-5">
       <router-link
