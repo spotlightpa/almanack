@@ -746,3 +746,46 @@ func (app *appEnv) listPagesByFTS(w http.ResponseWriter, r *http.Request) {
 	}
 	app.replyJSON(http.StatusOK, w, pages)
 }
+
+func (app *appEnv) listArcByLastUpdated(w http.ResponseWriter, r *http.Request) {
+	var page int32
+	_ = intFromQuery(r, "page", &page)
+	refresh, _ := boolFromQuery(r, "refresh")
+	app.Printf("starting listArcByLastUpdated page=%d refresh=%v", page, refresh)
+
+	if refresh {
+		feed, feedErr := app.svc.FetchArcFeed(r.Context())
+		if feedErr != nil {
+			// Keep trucking even if you can't load feed
+			app.logErr(r.Context(), feedErr)
+		}
+		if feedErr == nil {
+			if err := app.svc.StoreFeed(r.Context(), feed); err != nil {
+				app.replyErr(w, r, err)
+				return
+			}
+		}
+	}
+
+	var (
+		resp struct {
+			Stories  []db.Arc `json:"stories"`
+			NextPage int32    `json:"next_page,string,omitempty"`
+		}
+		err error
+	)
+	pager := paginate.PageNumber(page)
+	pager.PageSize = 20
+	resp.Stories, err = paginate.List(pager, r.Context(),
+		app.svc.Queries.ListArcByLastUpdated,
+		db.ListArcByLastUpdatedParams{
+			Limit:  pager.Limit(),
+			Offset: pager.Offset(),
+		})
+	resp.NextPage = pager.NextPage
+	if err != nil {
+		app.replyErr(w, r, err)
+		return
+	}
+	app.replyJSON(http.StatusOK, w, &resp)
+}

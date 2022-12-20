@@ -72,6 +72,7 @@ export function post(url, obj) {
 
 // Alphabetize lists by URL to show duplicates
 // GET and POST listed as two endpoints
+export const listArcByLastUpdated = `/api/arc-by-last-updated`;
 export const listAllPages = `/api/all-pages`;
 export const listAllSeries = `/api/all-series`;
 export const listAllTopics = `/api/all-topics`;

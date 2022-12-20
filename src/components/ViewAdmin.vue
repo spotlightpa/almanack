@@ -188,7 +188,7 @@ export default {
     <LinkButtons>
       <LinkRoute
         label="Import from Arc"
-        to="statecollege-pages"
+        to="arc-import"
         :icon="['fas', 'pen-nib']"
       />
     </LinkButtons>
