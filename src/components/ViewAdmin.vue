@@ -49,7 +49,7 @@ export default {
     <LinkButtons label="News Partners">
       <LinkRoute
         label="External Editor View"
-        to="articles"
+        to="shared-articles"
         :icon="['fas', 'file-invoice']"
       />
       <LinkRoute

@@ -31,7 +31,7 @@ let router = createRouter({
           return { name: "admin" };
         }
         if (isEditor.value) {
-          return { name: "articles" };
+          return { name: "shared-articles" };
         }
         if (isSignedIn.value) {
           return { name: "unauthorized" };
@@ -55,8 +55,12 @@ let router = createRouter({
     },
     {
       path: "/articles",
-      name: "articles",
-      component: load(() => import("@/components/ViewSharedList.vue")),
+      redirect: "/shared-articles",
+    },
+    {
+      path: "/shared-articles",
+      name: "shared-articles",
+      component: load(() => import("@/components/ViewSharedArticles.vue")),
       props: (route) => ({ page: route.query.page }),
       meta: {
         requiresAuth: isEditor,
@@ -64,8 +68,14 @@ let router = createRouter({
     },
     {
       path: "/articles/:id",
-      name: "article",
-      component: load(() => import("@/components/ViewArcArticle.vue")),
+      component: load(() => import("@/components/ViewArticleRedirect.vue")),
+      props: true,
+      meta: { requiresAuth: isEditor },
+    },
+    {
+      path: "/shared-articles/:id",
+      name: "shared-article",
+      component: load(() => import("@/components/ViewSharedArticle.vue")),
       props: true,
       meta: { requiresAuth: isEditor },
     },
@@ -142,17 +152,6 @@ let router = createRouter({
       name: "statecollege-pages",
       component: load(() => import("@/components/ViewStateCollegeList.vue")),
       props: (route) => ({ page: route.query.page }),
-      meta: {
-        requiresAuth: isSpotlightPAUser,
-      },
-    },
-    {
-      path: "/admin/redirect/arc-to-news/:id",
-      name: "redirect-arc-news-page",
-      component: load(() =>
-        import("@/components/ViewRedirectArcToNewsPage.vue")
-      ),
-      props: true,
       meta: {
         requiresAuth: isSpotlightPAUser,
       },

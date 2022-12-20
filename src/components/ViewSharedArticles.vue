@@ -24,7 +24,7 @@ export default {
         let page = rawData?.next_page;
         if (!page) return null;
         return {
-          name: "articles",
+          name: "shared-articles",
           query: { page },
         };
       }),
