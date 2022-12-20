@@ -59,6 +59,12 @@
   force = false
 
 [[redirects]]
+  from = "/shared-articles/*"
+  to = "/index.html"
+  status = 200
+  force = false
+
+[[redirects]]
   from = "/*"
   to = "/index.html"
   status = 404
