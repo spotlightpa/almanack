@@ -79,7 +79,7 @@ export default class SharedArticle {
   }
 
   get detailsRoute() {
-    return { name: "article", params: { id: this.id } };
+    return { name: "shared-article", params: { id: this.id } };
   }
   get pageRoute() {
     if (!this.pageID) {

@@ -120,7 +120,7 @@ export class Page {
     if (!this.arcID) {
       return "";
     }
-    return { name: "article", params: { id: this.arcID } };
+    return { name: "arc-article", params: { id: this.arcID } };
   }
 
   get mainTopic() {

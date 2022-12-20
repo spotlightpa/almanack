@@ -27,7 +27,7 @@ export default {
 
 <template>
   <MetaHead>
-    <title>Article • Spotlight PA</title>
+    <title>Shared Article • Spotlight PA</title>
   </MetaHead>
   <APILoader
     :is-loading="apiState.isLoading.value"
