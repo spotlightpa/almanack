@@ -7,6 +7,8 @@ package db
 
 import (
 	"context"
+	"database/sql"
+	"time"
 
 	"github.com/jackc/pgtype"
 )
@@ -36,12 +38,17 @@ func (q *Queries) GetArcByArcID(ctx context.Context, arcID string) (Arc, error) 
 
 const listArcByLastUpdated = `-- name: ListArcByLastUpdated :many
 SELECT
-  id, arc_id, raw_data, last_updated, created_at, updated_at
+  arc.id, arc.arc_id, arc.raw_data, arc.last_updated, arc.created_at, arc.updated_at,
+  shared_article.id AS shared_article_id,
+  coalesce(shared_article.status, ''),
+  shared_article.embargo_until
 FROM
   arc
-ORDER BY
-  last_updated DESC
-LIMIT $1 OFFSET $2
+  LEFT JOIN shared_article ON (arc.arc_id = shared_article.source_id
+      AND shared_article.source_type = 'arc')
+  ORDER BY
+    last_updated DESC
+  LIMIT $1 OFFSET $2
 `
 
 type ListArcByLastUpdatedParams struct {
@@ -49,15 +56,27 @@ type ListArcByLastUpdatedParams struct {
 	Offset int32 `json:"offset"`
 }
 
-func (q *Queries) ListArcByLastUpdated(ctx context.Context, arg ListArcByLastUpdatedParams) ([]Arc, error) {
+type ListArcByLastUpdatedRow struct {
+	ID              int64              `json:"id"`
+	ArcID           string             `json:"arc_id"`
+	RawData         pgtype.JSONB       `json:"raw_data"`
+	LastUpdated     pgtype.Timestamptz `json:"last_updated"`
+	CreatedAt       time.Time          `json:"created_at"`
+	UpdatedAt       time.Time          `json:"updated_at"`
+	SharedArticleID sql.NullInt64      `json:"shared_article_id"`
+	Status          string             `json:"status"`
+	EmbargoUntil    pgtype.Timestamptz `json:"embargo_until"`
+}
+
+func (q *Queries) ListArcByLastUpdated(ctx context.Context, arg ListArcByLastUpdatedParams) ([]ListArcByLastUpdatedRow, error) {
 	rows, err := q.db.Query(ctx, listArcByLastUpdated, arg.Limit, arg.Offset)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
-	var items []Arc
+	var items []ListArcByLastUpdatedRow
 	for rows.Next() {
-		var i Arc
+		var i ListArcByLastUpdatedRow
 		if err := rows.Scan(
 			&i.ID,
 			&i.ArcID,
@@ -65,6 +84,9 @@ func (q *Queries) ListArcByLastUpdated(ctx context.Context, arg ListArcByLastUpd
 			&i.LastUpdated,
 			&i.CreatedAt,
 			&i.UpdatedAt,
+			&i.SharedArticleID,
+			&i.Status,
+			&i.EmbargoUntil,
 		); err != nil {
 			return nil, err
 		}
