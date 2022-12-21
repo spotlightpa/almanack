@@ -10,16 +10,6 @@ WHERE
 RETURNING
   *;
 
--- name: UpdateSharedArticleData :one
-UPDATE
-  shared_article
-SET
-  raw_data = @raw_data::jsonb
-WHERE
-  id = @id
-RETURNING
-  *;
-
 -- name: UpdateSharedArticlePage :one
 UPDATE
   shared_article
@@ -72,3 +62,21 @@ ORDER BY
   END ASC,
   updated_at DESC
 LIMIT $1 OFFSET $2;
+
+-- name: InsertSharedArticleFromArc :one
+INSERT INTO shared_article (status, source_type, source_id, raw_data)
+SELECT
+  'U',
+  'arc',
+  arc.arc_id,
+  arc.raw_data
+FROM
+  arc
+WHERE
+  arc_id = $1
+ON CONFLICT (source_type,
+  source_id)
+  DO UPDATE SET
+    raw_data = excluded.raw_data
+  RETURNING
+    *;

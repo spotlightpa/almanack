@@ -567,16 +567,8 @@ func (app *appEnv) postPageRefresh(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	feed, feedErr := app.svc.FetchArcFeed(r.Context())
-	if feedErr != nil {
-		// Keep trucking even if you can't load feed
-		app.logErr(r.Context(), feedErr)
-	}
-	if feedErr == nil {
-		if err = app.svc.StoreFeed(r.Context(), feed); err != nil {
-			app.replyErr(w, r, err)
-			return
-		}
+	if !app.refreshArcFeed(w, r) {
+		return
 	}
 
 	story, err := app.svc.Queries.GetArcByArcID(r.Context(), arcID)
@@ -753,18 +745,8 @@ func (app *appEnv) listArcByLastUpdated(w http.ResponseWriter, r *http.Request) 
 	refresh, _ := boolFromQuery(r, "refresh")
 	app.Printf("starting listArcByLastUpdated page=%d refresh=%v", page, refresh)
 
-	if refresh {
-		feed, feedErr := app.svc.FetchArcFeed(r.Context())
-		if feedErr != nil {
-			// Keep trucking even if you can't load feed
-			app.logErr(r.Context(), feedErr)
-		}
-		if feedErr == nil {
-			if err := app.svc.StoreFeed(r.Context(), feed); err != nil {
-				app.replyErr(w, r, err)
-				return
-			}
-		}
+	if refresh && !app.refreshArcFeed(w, r) {
+		return
 	}
 
 	var (
@@ -788,4 +770,26 @@ func (app *appEnv) listArcByLastUpdated(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 	app.replyJSON(http.StatusOK, w, &resp)
+}
+
+func (app *appEnv) postSharedArticleFromArc(w http.ResponseWriter, r *http.Request) {
+	app.Println("start postSharedArticleFromArc")
+
+	var req struct {
+		ArcID string `json:"arc_id"`
+	}
+	if !app.readJSON(w, r, &req) {
+		return
+	}
+	if !app.refreshArcFeed(w, r) {
+		return
+	}
+
+	article, err := app.svc.Queries.InsertSharedArticleFromArc(r.Context(), req.ArcID)
+	if err != nil {
+		app.replyErr(w, r, err)
+		return
+	}
+
+	app.replyJSON(http.StatusOK, w, &article)
 }

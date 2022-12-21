@@ -72,6 +72,43 @@ func (q *Queries) GetSharedArticleBySource(ctx context.Context, arg GetSharedArt
 	return i, err
 }
 
+const insertSharedArticleFromArc = `-- name: InsertSharedArticleFromArc :one
+INSERT INTO shared_article (status, source_type, source_id, raw_data)
+SELECT
+  'U',
+  'arc',
+  arc.arc_id,
+  arc.raw_data
+FROM
+  arc
+WHERE
+  arc_id = $1
+ON CONFLICT (source_type,
+  source_id)
+  DO UPDATE SET
+    raw_data = excluded.raw_data
+  RETURNING
+    id, status, embargo_until, note, source_type, source_id, raw_data, page_id, created_at, updated_at
+`
+
+func (q *Queries) InsertSharedArticleFromArc(ctx context.Context, arcID string) (SharedArticle, error) {
+	row := q.db.QueryRow(ctx, insertSharedArticleFromArc, arcID)
+	var i SharedArticle
+	err := row.Scan(
+		&i.ID,
+		&i.Status,
+		&i.EmbargoUntil,
+		&i.Note,
+		&i.SourceType,
+		&i.SourceID,
+		&i.RawData,
+		&i.PageID,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+	)
+	return i, err
+}
+
 const listSharedArticles = `-- name: ListSharedArticles :many
 SELECT
   id, status, embargo_until, note, source_type, source_id, raw_data, page_id, created_at, updated_at
@@ -199,40 +236,6 @@ func (q *Queries) UpdateSharedArticle(ctx context.Context, arg UpdateSharedArtic
 		arg.Note,
 		arg.ID,
 	)
-	var i SharedArticle
-	err := row.Scan(
-		&i.ID,
-		&i.Status,
-		&i.EmbargoUntil,
-		&i.Note,
-		&i.SourceType,
-		&i.SourceID,
-		&i.RawData,
-		&i.PageID,
-		&i.CreatedAt,
-		&i.UpdatedAt,
-	)
-	return i, err
-}
-
-const updateSharedArticleData = `-- name: UpdateSharedArticleData :one
-UPDATE
-  shared_article
-SET
-  raw_data = $1::jsonb
-WHERE
-  id = $2
-RETURNING
-  id, status, embargo_until, note, source_type, source_id, raw_data, page_id, created_at, updated_at
-`
-
-type UpdateSharedArticleDataParams struct {
-	RawData pgtype.JSONB `json:"raw_data"`
-	ID      int64        `json:"id"`
-}
-
-func (q *Queries) UpdateSharedArticleData(ctx context.Context, arg UpdateSharedArticleDataParams) (SharedArticle, error) {
-	row := q.db.QueryRow(ctx, updateSharedArticleData, arg.RawData, arg.ID)
 	var i SharedArticle
 	err := row.Scan(
 		&i.ID,
