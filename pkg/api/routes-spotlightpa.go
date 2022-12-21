@@ -769,8 +769,8 @@ func (app *appEnv) listArcByLastUpdated(w http.ResponseWriter, r *http.Request) 
 
 	var (
 		resp struct {
-			Stories  []db.Arc `json:"stories"`
-			NextPage int32    `json:"next_page,string,omitempty"`
+			Stories  []db.ListArcByLastUpdatedRow `json:"stories"`
+			NextPage int32                        `json:"next_page,string,omitempty"`
 		}
 		err error
 	)
