@@ -12,7 +12,27 @@ import (
 	"github.com/spotlightpa/almanack/internal/arc"
 )
 
-func (svc Services) FetchArcFeed(ctx context.Context) (*arc.API, error) {
+func (svc Services) RefreshArcFromFeed(ctx context.Context) (fatal bool, err error) {
+	defer errutil.Trace(&err)
+
+	feed, feedErr := svc.fetchArcFeed(ctx)
+	if feedErr != nil {
+		return false, feedErr
+	}
+
+	var arcItems pgtype.JSONB
+	if err := arcItems.Set(&feed.Contents); err != nil {
+		return true, err
+	}
+
+	if err := svc.Queries.UpdateArc(ctx, arcItems); err != nil {
+		return true, err
+	}
+
+	return false, nil
+}
+
+func (svc Services) fetchArcFeed(ctx context.Context) (*arc.API, error) {
 	var feed arc.API
 	// Timeout needs to leave enough time to report errors to Sentry before
 	// AWS kills the Lambda…
@@ -28,14 +48,4 @@ func (svc Services) FetchArcFeed(ctx context.Context) (*arc.API, error) {
 			http.StatusBadGateway, "could not fetch Arc feed: %w", err)
 	}
 	return &feed, nil
-}
-
-func (svc Services) StoreFeed(ctx context.Context, newfeed *arc.API) (err error) {
-	defer errutil.Trace(&err)
-
-	var arcItems pgtype.JSONB
-	if err := arcItems.Set(&newfeed.Contents); err != nil {
-		return err
-	}
-	return svc.Queries.UpdateArc(ctx, arcItems)
 }
