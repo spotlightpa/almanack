@@ -100,6 +100,7 @@ export const listPages = `/api/pages`;
 export const listPagesByFTS = `/api/pages-by-fts`;
 export const getSharedArticle = `/api/shared-article`;
 export const getSharedArticleBySource = `/api/shared-article-by-source`;
+export const postSharedArticleFromArc = `/api/shared-article-from-arc`;
 export const listSharedArticles = `/api/shared-articles`;
 export const getSidebar = `/api/sidebar`;
 export const saveSidebar = `/api/sidebar`;
