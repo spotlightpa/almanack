@@ -6,6 +6,15 @@ export default class SharedArticle {
     this.init(rawData);
   }
 
+  static fromArc(data) {
+    return new SharedArticle({
+      ...data,
+      source_type: "arc",
+      source_id: data.arc_id,
+      id: data.shared_article_id.Int64,
+    });
+  }
+
   init(data) {
     this["id"] = data["id"] ?? "";
     this["_status"] = data["status"] ?? "";
@@ -17,6 +26,7 @@ export default class SharedArticle {
     this["embargoUntil"] = maybeDate(data, "embargo_until");
     this["createdAt"] = maybeDate(data, "created_at");
     this["updatedAt"] = maybeDate(data, "updated_at");
+    this["lastUpdated"] = maybeDate(data, "last_updated");
 
     this.arc = null;
     if (this.isArc) {
@@ -55,14 +65,18 @@ export default class SharedArticle {
     if (this.isPreviewed) {
       return "preview";
     }
-    return "imported";
+    if (this.id) {
+      return "imported";
+    }
+    return "draft";
   }
   get statusVerbose() {
     return (
       {
+        draft: "Drafting",
         imported: "Imported",
         preview: "Preview Available",
-        embargo: "Embargoed until TKTK",
+        embargo: "Under Embargo",
         released: "Released",
       }[this.status] || "System Error"
     );
@@ -73,6 +87,9 @@ export default class SharedArticle {
       return "is-success";
     }
     if (this.status === "imported") {
+      return "is-primary";
+    }
+    if (this.status === "draft") {
       return "is-danger";
     }
     return "is-warning";
