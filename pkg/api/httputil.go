@@ -284,3 +284,17 @@ func (app *appEnv) replyHTMLErr(w http.ResponseWriter, r *http.Request, err erro
 		return
 	}
 }
+
+func (app *appEnv) refreshArcFeed(w http.ResponseWriter, r *http.Request) (ok bool) {
+	feed, feedErr := app.svc.FetchArcFeed(r.Context())
+	if feedErr != nil {
+		app.logErr(r.Context(), feedErr)
+	}
+	if feedErr == nil {
+		if err := app.svc.StoreFeed(r.Context(), feed); err != nil {
+			app.replyErr(w, r, err)
+			return false
+		}
+	}
+	return true
+}
