@@ -115,15 +115,15 @@ func commaAndJoiner(ss []string) string {
 }
 
 func slugFromURL(s string) string {
-	stop := strings.LastIndexByte(s, '-')
-	if stop == -1 {
+	slug, _, ok := stringx.LastCut(s, "-")
+	if !ok {
 		return s
 	}
-	start := strings.LastIndexByte(s[:stop], '/')
-	if start == -1 {
+	_, slug, ok = stringx.LastCut(slug, "/")
+	if !ok {
 		return s
 	}
-	return s[start+1 : stop]
+	return slug
 }
 
 func readContentElements(ctx context.Context, svc Services, rawels []*json.RawMessage, body *strings.Builder) (warnings []string, err error) {
