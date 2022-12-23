@@ -26,7 +26,7 @@ func ArcFeedItemToBody(ctx context.Context, svc Services, arcStory *arc.FeedItem
 	return
 }
 
-func ArcFeedItemToFrontmatter(ctx context.Context, svc Services, arcStory *arc.FeedItem) (fm map[string]any, warnings []string, err error) {
+func ArcFeedItemToFrontmatter(ctx context.Context, svc Services, arcStory *arc.FeedItem) (fm map[string]any, err error) {
 	fm = make(map[string]any)
 
 	authors := make([]string, len(arcStory.Credits.By))
@@ -82,7 +82,7 @@ func ArcFeedItemToFrontmatter(ctx context.Context, svc Services, arcStory *arc.F
 		imageURL, imgerr = svc.ReplaceImageURL(
 			ctx, imageURL, imageDescription, imageCredit)
 		if imgerr != nil {
-			warnings = append(warnings, imgerr.Error())
+			return nil, imgerr
 		}
 	}
 
@@ -222,7 +222,7 @@ func readContentElements(ctx context.Context, svc Services, rawels []*json.RawMe
 			}
 			u, imgerr := svc.ReplaceImageURL(ctx, imageURL, v.Caption, credit)
 			if imgerr != nil {
-				warnings = append(warnings, imgerr.Error())
+				return nil, imgerr
 			}
 			u = html.EscapeString(u)
 			desc := html.EscapeString(v.Caption)

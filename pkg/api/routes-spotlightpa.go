@@ -584,10 +584,13 @@ func (app *appEnv) postPageRefresh(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// TODO: Use warnings
-	if _, err = app.svc.RefreshPageFromArcStory(r.Context(), &page, &story); err != nil {
+	if warnings, err := app.svc.RefreshPageFromArcStory(r.Context(), &page, &story); err != nil {
 		app.replyErr(w, r, err)
 		return
+	} else {
+		for _, w := range warnings {
+			app.logErr(r.Context(), fmt.Errorf("got warning: %s", w))
+		}
 	}
 	app.replyJSON(http.StatusOK, w, page)
 }

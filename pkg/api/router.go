@@ -89,6 +89,7 @@ func (app *appEnv) routes() http.Handler {
 
 	r.Route("/api-background", func(r chi.Router) {
 		r.Get(`/cron`, app.backgroundCron)
+		r.Get(`/images`, app.backgroundImages)
 		r.Get(`/refresh-pages`, app.backgroundRefreshPages)
 		r.Get(`/sleep/{duration}`, app.backgroundSleep)
 	})

@@ -9,6 +9,7 @@ import (
 	"github.com/spotlightpa/almanack/internal/db"
 	"github.com/spotlightpa/almanack/internal/paginate"
 	"github.com/spotlightpa/almanack/pkg/almanack"
+	"golang.org/x/sync/errgroup"
 )
 
 func (app *appEnv) backgroundSleep(w http.ResponseWriter, r *http.Request) {
@@ -97,5 +98,44 @@ func (app *appEnv) backgroundRefreshPages(w http.ResponseWriter, r *http.Request
 		hasMore = pager.HasMore()
 	}
 
+	app.replyJSON(http.StatusAccepted, w, "OK")
+}
+
+func (app *appEnv) backgroundImages(w http.ResponseWriter, r *http.Request) {
+	app.Println("start backgroundImages")
+
+	images, err := app.svc.Queries.ListImageWhereNotUploaded(r.Context())
+	if err != nil {
+		app.replyErr(w, r, err)
+		return
+	}
+
+	var eg errgroup.Group
+	eg.SetLimit(5)
+	for i := range images {
+		image := images[i]
+		eg.Go(func() error {
+			_, _, err := almanack.UploadFromURL(
+				r.Context(),
+				app.svc.Client,
+				app.svc.ImageStore,
+				image.Path,
+				image.SourceURL)
+			if err != nil {
+				app.logErr(r.Context(), err)
+				return nil
+			}
+			if _, err = app.svc.Queries.UpdateImage(r.Context(),
+				db.UpdateImageParams{
+					Path:      image.Path,
+					SourceURL: image.SourceURL,
+				}); err != nil {
+				app.logErr(r.Context(), err)
+				return nil
+			}
+			return nil
+		})
+	}
+	eg.Wait()
 	app.replyJSON(http.StatusAccepted, w, "OK")
 }
