@@ -68,11 +68,14 @@ SELECT
     FROM
       page
     WHERE
-      page.file_path = article.spotlightpa_path), created_at, updated_at
+      page.file_path = article.spotlightpa_path), --
+  created_at, updated_at
 FROM
   article
 WHERE
-  arc_id IS NOT NULL;
+  arc_id IS NOT NULL
+  AND (status = 'A'
+    OR status = 'P');
 
 CREATE TRIGGER row_updated_at_on_shared_article_trigger_
   BEFORE UPDATE ON shared_article
