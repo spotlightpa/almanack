@@ -205,7 +205,7 @@ let router = createRouter({
     },
   ],
   scrollBehavior(to, from, savedPosition) {
-    return savedPosition || { selector: "#top-nav" };
+    return savedPosition || { el: "#top-nav" };
   },
 });
 
