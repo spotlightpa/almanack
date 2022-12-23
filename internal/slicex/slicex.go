@@ -9,4 +9,5 @@ func DeleteFunc[T any, S ~[]T](sp *S, del func(T) bool) {
 		}
 	}
 	*sp = filtered
+	// TODO: clear tail once clear is in language
 }
