@@ -136,20 +136,20 @@ func (svc Services) RefreshPageContents(ctx context.Context, id int64) (err erro
 	return err
 }
 
-func (svc Services) RefreshPageFromArcStory(ctx context.Context, page *db.Page, story *db.Arc) (err error) {
+func (svc Services) RefreshPageFromArcStory(ctx context.Context, page *db.Page, story *db.Arc) (warnings []string, err error) {
 	defer errutil.Trace(&err)
 
-	var splArt SpotlightPAArticle
 	var feedItem arc.FeedItem
 	if err = story.RawData.AssignTo(&feedItem); err != nil {
-		return err
+		return nil, err
 	}
-	if err = ArcFeedItemToPage(ctx, svc, &feedItem, &splArt); err != nil {
-		return err
+	body, warnings, err := ArcFeedItemToBody(ctx, svc, &feedItem)
+	if err != nil {
+		return nil, err
 	}
 
-	page.Body = splArt.Body
-	return nil
+	page.Body = body
+	return warnings, nil
 }
 
 func (svc Services) Notify(ctx context.Context, page *db.Page, publishingNow bool) (err error) {

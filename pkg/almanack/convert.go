@@ -12,79 +12,83 @@ import (
 
 	"github.com/spotlightpa/almanack/internal/arc"
 	"github.com/spotlightpa/almanack/internal/must"
+	"github.com/spotlightpa/almanack/internal/slicex"
 	"github.com/spotlightpa/almanack/internal/stringx"
 	"github.com/spotlightpa/almanack/pkg/common"
 )
 
-func ArcFeedItemToPage(ctx context.Context, svc Services, arcStory *arc.FeedItem, article *SpotlightPAArticle) (err error) {
-	var body strings.Builder
-	if article.Warnings, err = readContentElements(ctx, svc, arcStory.ContentElements, &body); err != nil {
+func ArcFeedItemToBody(ctx context.Context, svc Services, arcStory *arc.FeedItem) (body string, warnings []string, err error) {
+	var buf strings.Builder
+	if warnings, err = readContentElements(ctx, svc, arcStory.ContentElements, &buf); err != nil {
 		return
 	}
-	article.Body = body.String()
-	if len(article.Warnings) > 0 {
-		article.ScheduleFor = nil
-	}
+	body = buf.String()
+	return
+}
 
-	// Don't process anything else if this has been saved before
-	if !article.LastArcSync.IsZero() {
-		return
-	}
+func ArcFeedItemToFrontmatter(ctx context.Context, svc Services, arcStory *arc.FeedItem) (fm map[string]any, warnings []string, err error) {
+	fm = make(map[string]any)
 
-	// Hacky: Add the of/for XX orgs then remove them
-	article.Authors = make([]string, len(arcStory.Credits.By))
+	authors := make([]string, len(arcStory.Credits.By))
 	for i := range arcStory.Credits.By {
-		article.Authors[i] = authorFrom(&arcStory.Credits.By[i])
+		authors[i] = authorFrom(&arcStory.Credits.By[i])
 	}
 
-	article.Byline = commaAndJoiner(article.Authors)
-	for i := range article.Authors {
-		if author, _, ok := strings.Cut(article.Authors[i], " of "); ok {
-			article.Authors[i] = author
-		} else if author, _, ok = strings.Cut(article.Authors[i], " for "); ok {
-			article.Authors[i] = author
+	fm["byline"] = commaAndJoiner(authors)
+
+	for i := range authors {
+		if author, _, ok := strings.Cut(authors[i], " of "); ok {
+			authors[i] = author
+		} else if author, _, ok = strings.Cut(authors[i], " for "); ok {
+			authors[i] = author
 		}
 	}
 
 	// Drop "Spotlight PA Staff" as an author
-	{
-		filteredAuthors := article.Authors[:0]
-		for _, author := range article.Authors {
-			switch {
-			case strings.EqualFold(author, "Spotlight PA Staff"):
-			case strings.EqualFold(author, "Spotlight PA State College Staff"):
-			default:
-				filteredAuthors = append(filteredAuthors, author)
-			}
-		}
-		article.Authors = filteredAuthors
+	slicex.DeleteFunc(&authors, func(author string) bool {
+		return strings.EqualFold(author, "Spotlight PA Staff") ||
+			strings.EqualFold(author, "Spotlight PA State College Staff")
+	})
+
+	fm["authors"] = authors
+
+	fm["arc-id"] = arcStory.ID
+	fm["internal-id"] = arcStory.Slug
+
+	fm["slug"] = slugFromURL(arcStory.CanonicalURL)
+	fm["published"] = arcStory.Planning.Scheduling.PlannedPublishDate
+	fm["internal-budget"] = arcStory.Planning.BudgetLine
+	fm["title"] = arcStory.Headlines.Basic
+	// Subtitle isn't exposed in the current layout
+	// fm["subtitle"] = arcStory.Subheadlines.Basic
+	fm["description"] = arcStory.Description.Basic
+	fm["blurb"] = arcStory.Description.Basic
+	fm["linktitle"] = arcStory.Headlines.Web
+
+	p := arcStory.PromoItems
+	imageURL := resolveFromInky(p.Basic.AdditionalProperties.ResizeURL)
+	if imageURL == "" && strings.Contains(p.Basic.URL, "public") {
+		imageURL = resolveFromInky(p.Basic.URL)
 	}
+	var credits []string
+	for _, credit := range p.Basic.Credits.By {
+		credits = append(credits, stringx.First(credit.Name, credit.Byline))
+	}
+	imageCredit := fixCredit(strings.Join(credits, " / "))
+	imageDescription := p.Basic.Caption
 
-	article.ArcID = arcStory.ID
-	article.InternalID = arcStory.Slug
-
-	article.Slug = slugFromURL(arcStory.CanonicalURL)
-	article.PubDate = arcStory.Planning.Scheduling.PlannedPublishDate
-	article.Budget = arcStory.Planning.BudgetLine
-	article.Hed = arcStory.Headlines.Basic
-	article.Subhead = arcStory.Subheadlines.Basic
-	article.Summary = arcStory.Description.Basic
-	article.Blurb = arcStory.Description.Basic
-	article.LinkTitle = arcStory.Headlines.Web
-
-	setArticleImage(article, arcStory.PromoItems)
-	if strings.HasPrefix(article.ImageURL, "http") {
+	if strings.HasPrefix(imageURL, "http") {
 		var imgerr error
-		article.ImageURL, imgerr = svc.ReplaceImageURL(
-			ctx, article.ImageURL, article.ImageDescription, article.ImageCredit)
+		imageURL, imgerr = svc.ReplaceImageURL(
+			ctx, imageURL, imageDescription, imageCredit)
 		if imgerr != nil {
-			article.Warnings = append(article.Warnings, imgerr.Error())
+			warnings = append(warnings, imgerr.Error())
 		}
 	}
 
-	if len(article.Warnings) > 0 {
-		article.ScheduleFor = nil
-	}
+	fm["image"] = imageURL
+	fm["image-credit"] = imageCredit
+	fm["image-description"] = imageDescription
 
 	return
 }
@@ -259,19 +263,6 @@ func resolveFromInky(s string) string {
 		return s
 	}
 	return u.String()
-}
-
-func setArticleImage(a *SpotlightPAArticle, p arc.PromoItems) {
-	a.ImageURL = resolveFromInky(p.Basic.AdditionalProperties.ResizeURL)
-	if a.ImageURL == "" && strings.Contains(p.Basic.URL, "public") {
-		a.ImageURL = resolveFromInky(p.Basic.URL)
-	}
-	var credits []string
-	for _, credit := range p.Basic.Credits.By {
-		credits = append(credits, stringx.First(credit.Name, credit.Byline))
-	}
-	a.ImageCredit = fixCredit(strings.Join(credits, " / "))
-	a.ImageDescription = p.Basic.Caption
 }
 
 var fixcreditre = regexp.MustCompile(`(?i)\b(staff( photographer)?)\b`)

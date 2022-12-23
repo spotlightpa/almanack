@@ -584,7 +584,8 @@ func (app *appEnv) postPageRefresh(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if err = app.svc.RefreshPageFromArcStory(r.Context(), &page, &story); err != nil {
+	// TODO: Use warnings
+	if _, err = app.svc.RefreshPageFromArcStory(r.Context(), &page, &story); err != nil {
 		app.replyErr(w, r, err)
 		return
 	}
