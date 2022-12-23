@@ -31,7 +31,7 @@ func (svc Services) ReplaceImageURL(ctx context.Context, srcURL, description, cr
 			"could not upload image %s: %w", srcURL, err,
 		)
 	}
-	_, err = svc.Queries.CreateImage(ctx, db.CreateImageParams{
+	_, err = svc.Queries.UpsertImage(ctx, db.UpsertImageParams{
 		Path:        path,
 		Type:        ext,
 		Description: description,

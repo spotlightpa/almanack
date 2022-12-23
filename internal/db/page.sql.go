@@ -12,21 +12,21 @@ import (
 	"github.com/jackc/pgtype"
 )
 
-const ensurePage = `-- name: EnsurePage :exec
+const createPage = `-- name: CreatePage :exec
 INSERT INTO page ("file_path", "source_type", "source_id")
   VALUES ($1, $2, $3)
 ON CONFLICT (file_path)
   DO NOTHING
 `
 
-type EnsurePageParams struct {
+type CreatePageParams struct {
 	FilePath   string `json:"file_path"`
 	SourceType string `json:"source_type"`
 	SourceID   string `json:"source_id"`
 }
 
-func (q *Queries) EnsurePage(ctx context.Context, arg EnsurePageParams) error {
-	_, err := q.db.Exec(ctx, ensurePage, arg.FilePath, arg.SourceType, arg.SourceID)
+func (q *Queries) CreatePage(ctx context.Context, arg CreatePageParams) error {
+	_, err := q.db.Exec(ctx, createPage, arg.FilePath, arg.SourceType, arg.SourceID)
 	return err
 }
 

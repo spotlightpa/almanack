@@ -72,43 +72,6 @@ func (q *Queries) GetSharedArticleBySource(ctx context.Context, arg GetSharedArt
 	return i, err
 }
 
-const insertSharedArticleFromArc = `-- name: InsertSharedArticleFromArc :one
-INSERT INTO shared_article (status, source_type, source_id, raw_data)
-SELECT
-  'U',
-  'arc',
-  arc.arc_id,
-  arc.raw_data
-FROM
-  arc
-WHERE
-  arc_id = $1
-ON CONFLICT (source_type,
-  source_id)
-  DO UPDATE SET
-    raw_data = excluded.raw_data
-  RETURNING
-    id, status, embargo_until, note, source_type, source_id, raw_data, page_id, created_at, updated_at
-`
-
-func (q *Queries) InsertSharedArticleFromArc(ctx context.Context, arcID string) (SharedArticle, error) {
-	row := q.db.QueryRow(ctx, insertSharedArticleFromArc, arcID)
-	var i SharedArticle
-	err := row.Scan(
-		&i.ID,
-		&i.Status,
-		&i.EmbargoUntil,
-		&i.Note,
-		&i.SourceType,
-		&i.SourceID,
-		&i.RawData,
-		&i.PageID,
-		&i.CreatedAt,
-		&i.UpdatedAt,
-	)
-	return i, err
-}
-
 const listSharedArticles = `-- name: ListSharedArticles :many
 SELECT
   id, status, embargo_until, note, source_type, source_id, raw_data, page_id, created_at, updated_at
@@ -270,6 +233,43 @@ type UpdateSharedArticlePageParams struct {
 
 func (q *Queries) UpdateSharedArticlePage(ctx context.Context, arg UpdateSharedArticlePageParams) (SharedArticle, error) {
 	row := q.db.QueryRow(ctx, updateSharedArticlePage, arg.PageID, arg.SharedArticleID)
+	var i SharedArticle
+	err := row.Scan(
+		&i.ID,
+		&i.Status,
+		&i.EmbargoUntil,
+		&i.Note,
+		&i.SourceType,
+		&i.SourceID,
+		&i.RawData,
+		&i.PageID,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+	)
+	return i, err
+}
+
+const upsertSharedArticleFromArc = `-- name: UpsertSharedArticleFromArc :one
+INSERT INTO shared_article (status, source_type, source_id, raw_data)
+SELECT
+  'U',
+  'arc',
+  arc.arc_id,
+  arc.raw_data
+FROM
+  arc
+WHERE
+  arc_id = $1
+ON CONFLICT (source_type,
+  source_id)
+  DO UPDATE SET
+    raw_data = excluded.raw_data
+  RETURNING
+    id, status, embargo_until, note, source_type, source_id, raw_data, page_id, created_at, updated_at
+`
+
+func (q *Queries) UpsertSharedArticleFromArc(ctx context.Context, arcID string) (SharedArticle, error) {
+	row := q.db.QueryRow(ctx, upsertSharedArticleFromArc, arcID)
 	var i SharedArticle
 	err := row.Scan(
 		&i.ID,

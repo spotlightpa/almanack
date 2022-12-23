@@ -152,9 +152,9 @@ func (app *appEnv) postDomain(w http.ResponseWriter, r *http.Request) {
 		roles = []string{"editor"}
 	}
 
-	if _, err := app.svc.Queries.SetRolesForDomain(
+	if _, err := app.svc.Queries.UpsertRolesForDomain(
 		r.Context(),
-		db.SetRolesForDomainParams{
+		db.UpsertRolesForDomainParams{
 			Domain: req.Domain,
 			Roles:  roles,
 		},
@@ -214,9 +214,9 @@ func (app *appEnv) postAddress(w http.ResponseWriter, r *http.Request) {
 		roles = []string{"editor"}
 	}
 
-	if _, err := app.svc.Queries.SetRolesForAddress(
+	if _, err := app.svc.Queries.UpsertRolesForAddress(
 		r.Context(),
-		db.SetRolesForAddressParams{
+		db.UpsertRolesForAddressParams{
 			EmailAddress: req.Address,
 			Roles:        roles,
 		},
@@ -800,7 +800,7 @@ func (app *appEnv) postSharedArticleFromArc(w http.ResponseWriter, r *http.Reque
 		app.logErr(r.Context(), err)
 	}
 
-	article, err := app.svc.Queries.InsertSharedArticleFromArc(r.Context(), req.ArcID)
+	article, err := app.svc.Queries.UpsertSharedArticleFromArc(r.Context(), req.ArcID)
 	if err != nil {
 		app.replyErr(w, r, err)
 		return
