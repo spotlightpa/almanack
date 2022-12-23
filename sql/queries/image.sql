@@ -15,7 +15,7 @@ INSERT INTO image ("path", "type")
 ON CONFLICT (path)
   DO NOTHING;
 
--- name: CreateImage :execrows
+-- name: UpsertImage :execrows
 INSERT INTO image ("path", "type", "description", "credit", "src_url", "is_uploaded")
   VALUES (@path, @type, @description, @credit, @src_url, @is_uploaded)
 ON CONFLICT (path)

@@ -56,7 +56,7 @@ func (q *Queries) ListAddressesWithRole(ctx context.Context, role string) ([]str
 	return items, nil
 }
 
-const setRolesForAddress = `-- name: SetRolesForAddress :one
+const upsertRolesForAddress = `-- name: UpsertRolesForAddress :one
 INSERT INTO address_roles ("email_address", roles)
   VALUES ($1, $2)
 ON CONFLICT (lower("email_address"))
@@ -66,13 +66,13 @@ ON CONFLICT (lower("email_address"))
     id, email_address, roles, created_at, updated_at
 `
 
-type SetRolesForAddressParams struct {
+type UpsertRolesForAddressParams struct {
 	EmailAddress string   `json:"email_address"`
 	Roles        []string `json:"roles"`
 }
 
-func (q *Queries) SetRolesForAddress(ctx context.Context, arg SetRolesForAddressParams) (AddressRole, error) {
-	row := q.db.QueryRow(ctx, setRolesForAddress, arg.EmailAddress, arg.Roles)
+func (q *Queries) UpsertRolesForAddress(ctx context.Context, arg UpsertRolesForAddressParams) (AddressRole, error) {
+	row := q.db.QueryRow(ctx, upsertRolesForAddress, arg.EmailAddress, arg.Roles)
 	var i AddressRole
 	err := row.Scan(
 		&i.ID,

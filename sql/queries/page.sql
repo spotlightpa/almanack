@@ -1,4 +1,4 @@
--- name: EnsurePage :exec
+-- name: CreatePage :exec
 INSERT INTO page ("file_path", "source_type", "source_id")
   VALUES (@file_path, @source_type, @source_id)
 ON CONFLICT (file_path)

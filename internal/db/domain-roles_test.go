@@ -19,14 +19,14 @@ func TestRoles(t *testing.T) {
 	be.NilErr(t, err)
 	q := db.New(p)
 	ctx := context.Background()
-	r, err := q.SetRolesForAddress(ctx, db.SetRolesForAddressParams{
+	r, err := q.UpsertRolesForAddress(ctx, db.UpsertRolesForAddressParams{
 		EmailAddress: "a@foo.com",
 		Roles:        []string{"fooer"},
 	})
 	be.NilErr(t, err)
 
 	t.Cleanup(func() {
-		q.SetRolesForAddress(ctx, db.SetRolesForAddressParams{
+		q.UpsertRolesForAddress(ctx, db.UpsertRolesForAddressParams{
 			EmailAddress: "a@foo.com",
 			Roles:        []string{},
 		})
@@ -34,14 +34,14 @@ func TestRoles(t *testing.T) {
 	be.Equal(t, "a@foo.com", r.EmailAddress)
 	be.Equal(t, "fooer", strings.Join(r.Roles, ","))
 
-	_, err = q.SetRolesForDomain(ctx, db.SetRolesForDomainParams{
+	_, err = q.UpsertRolesForDomain(ctx, db.UpsertRolesForDomainParams{
 		Domain: "foo.com",
 		Roles:  []string{"bar"},
 	})
 	be.NilErr(t, err)
 
 	t.Cleanup(func() {
-		q.SetRolesForDomain(ctx, db.SetRolesForDomainParams{
+		q.UpsertRolesForDomain(ctx, db.UpsertRolesForDomainParams{
 			Domain: "foo.com",
 			Roles:  []string{},
 		})
@@ -51,7 +51,7 @@ func TestRoles(t *testing.T) {
 	be.NilErr(t, err)
 	be.Equal(t, "fooer", strings.Join(roles, ","))
 
-	_, err = q.SetRolesForAddress(ctx, db.SetRolesForAddressParams{
+	_, err = q.UpsertRolesForAddress(ctx, db.UpsertRolesForAddressParams{
 		EmailAddress: "a@foo.com",
 		Roles:        []string{},
 	})
@@ -61,7 +61,7 @@ func TestRoles(t *testing.T) {
 	be.NilErr(t, err)
 	be.Equal(t, "bar", strings.Join(roles, ","))
 
-	_, err = q.SetRolesForDomain(ctx, db.SetRolesForDomainParams{
+	_, err = q.UpsertRolesForDomain(ctx, db.UpsertRolesForDomainParams{
 		Domain: "foo.com",
 		Roles:  []string{},
 	})

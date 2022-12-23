@@ -88,7 +88,7 @@ func (q *Queries) ListDomainsWithRole(ctx context.Context, role string) ([]strin
 	return items, nil
 }
 
-const setRolesForDomain = `-- name: SetRolesForDomain :one
+const upsertRolesForDomain = `-- name: UpsertRolesForDomain :one
 INSERT INTO domain_roles ("domain", roles)
   VALUES ($1, $2)
 ON CONFLICT (lower("domain"))
@@ -98,13 +98,13 @@ ON CONFLICT (lower("domain"))
     id, domain, roles, created_at, updated_at
 `
 
-type SetRolesForDomainParams struct {
+type UpsertRolesForDomainParams struct {
 	Domain string   `json:"domain"`
 	Roles  []string `json:"roles"`
 }
 
-func (q *Queries) SetRolesForDomain(ctx context.Context, arg SetRolesForDomainParams) (DomainRole, error) {
-	row := q.db.QueryRow(ctx, setRolesForDomain, arg.Domain, arg.Roles)
+func (q *Queries) UpsertRolesForDomain(ctx context.Context, arg UpsertRolesForDomainParams) (DomainRole, error) {
+	row := q.db.QueryRow(ctx, upsertRolesForDomain, arg.Domain, arg.Roles)
 	var i DomainRole
 	err := row.Scan(
 		&i.ID,

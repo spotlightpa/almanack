@@ -63,7 +63,7 @@ ORDER BY
   updated_at DESC
 LIMIT $1 OFFSET $2;
 
--- name: InsertSharedArticleFromArc :one
+-- name: UpsertSharedArticleFromArc :one
 INSERT INTO shared_article (status, source_type, source_id, raw_data)
 SELECT
   'U',

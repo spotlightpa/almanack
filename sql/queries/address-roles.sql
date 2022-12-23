@@ -6,7 +6,7 @@ FROM
 WHERE
   "email_address" ILIKE $1;
 
--- name: SetRolesForAddress :one
+-- name: UpsertRolesForAddress :one
 INSERT INTO address_roles ("email_address", roles)
   VALUES ($1, $2)
 ON CONFLICT (lower("email_address"))

@@ -9,50 +9,6 @@ import (
 	"context"
 )
 
-const createImage = `-- name: CreateImage :execrows
-INSERT INTO image ("path", "type", "description", "credit", "src_url", "is_uploaded")
-  VALUES ($1, $2, $3, $4, $5, $6)
-ON CONFLICT (path)
-  DO UPDATE SET
-    credit = CASE WHEN image.credit = '' THEN
-      excluded.credit
-    ELSE
-      image.credit
-    END, description = CASE WHEN image.description = '' THEN
-      excluded.description
-    ELSE
-      image.description
-    END, src_url = CASE WHEN image.src_url = '' THEN
-      excluded.src_url
-    ELSE
-      image.src_url
-    END
-`
-
-type CreateImageParams struct {
-	Path        string `json:"path"`
-	Type        string `json:"type"`
-	Description string `json:"description"`
-	Credit      string `json:"credit"`
-	SourceURL   string `json:"src_url"`
-	IsUploaded  bool   `json:"is_uploaded"`
-}
-
-func (q *Queries) CreateImage(ctx context.Context, arg CreateImageParams) (int64, error) {
-	result, err := q.db.Exec(ctx, createImage,
-		arg.Path,
-		arg.Type,
-		arg.Description,
-		arg.Credit,
-		arg.SourceURL,
-		arg.IsUploaded,
-	)
-	if err != nil {
-		return 0, err
-	}
-	return result.RowsAffected(), nil
-}
-
 const createImagePlaceholder = `-- name: CreateImagePlaceholder :execrows
 INSERT INTO image ("path", "type")
   VALUES ($1, $2)
@@ -206,4 +162,48 @@ func (q *Queries) UpdateImage(ctx context.Context, arg UpdateImageParams) (Image
 		&i.UpdatedAt,
 	)
 	return i, err
+}
+
+const upsertImage = `-- name: UpsertImage :execrows
+INSERT INTO image ("path", "type", "description", "credit", "src_url", "is_uploaded")
+  VALUES ($1, $2, $3, $4, $5, $6)
+ON CONFLICT (path)
+  DO UPDATE SET
+    credit = CASE WHEN image.credit = '' THEN
+      excluded.credit
+    ELSE
+      image.credit
+    END, description = CASE WHEN image.description = '' THEN
+      excluded.description
+    ELSE
+      image.description
+    END, src_url = CASE WHEN image.src_url = '' THEN
+      excluded.src_url
+    ELSE
+      image.src_url
+    END
+`
+
+type UpsertImageParams struct {
+	Path        string `json:"path"`
+	Type        string `json:"type"`
+	Description string `json:"description"`
+	Credit      string `json:"credit"`
+	SourceURL   string `json:"src_url"`
+	IsUploaded  bool   `json:"is_uploaded"`
+}
+
+func (q *Queries) UpsertImage(ctx context.Context, arg UpsertImageParams) (int64, error) {
+	result, err := q.db.Exec(ctx, upsertImage,
+		arg.Path,
+		arg.Type,
+		arg.Description,
+		arg.Credit,
+		arg.SourceURL,
+		arg.IsUploaded,
+	)
+	if err != nil {
+		return 0, err
+	}
+	return result.RowsAffected(), nil
 }
