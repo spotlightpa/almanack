@@ -57,12 +57,12 @@ function sql:sqlc() {
 	}
 }
 
-function migrate() {
+function db:migrate() {
 	cd sql/schema
 	tern migrate "$@"
 }
 
-function migrate:prod() {
+function db:migrate:prod() {
 	cd sql/schema
 	tern migrate -c prod.conf "$@"
 }
