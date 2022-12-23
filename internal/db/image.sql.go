@@ -58,6 +58,46 @@ func (q *Queries) GetImageBySourceURL(ctx context.Context, srcUrl string) (Image
 	return i, err
 }
 
+const listImageWhereNotUploaded = `-- name: ListImageWhereNotUploaded :many
+SELECT
+  id, path, type, description, credit, src_url, is_uploaded, created_at, updated_at
+FROM
+  image
+WHERE
+  is_uploaded = FALSE
+  AND src_url <> ''
+`
+
+func (q *Queries) ListImageWhereNotUploaded(ctx context.Context) ([]Image, error) {
+	rows, err := q.db.Query(ctx, listImageWhereNotUploaded)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []Image
+	for rows.Next() {
+		var i Image
+		if err := rows.Scan(
+			&i.ID,
+			&i.Path,
+			&i.Type,
+			&i.Description,
+			&i.Credit,
+			&i.SourceURL,
+			&i.IsUploaded,
+			&i.CreatedAt,
+			&i.UpdatedAt,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const listImages = `-- name: ListImages :many
 SELECT
   id, path, type, description, credit, src_url, is_uploaded, created_at, updated_at

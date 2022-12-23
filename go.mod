@@ -31,6 +31,7 @@ require (
 	golang.org/x/exp v0.0.0-20221230185412-738e83a70c30
 	golang.org/x/net v0.4.0
 	golang.org/x/oauth2 v0.3.0
+	golang.org/x/sync v0.1.0
 )
 
 require (

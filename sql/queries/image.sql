@@ -69,3 +69,15 @@ WHERE
 ORDER BY
   updated_at DESC
 LIMIT 1;
+
+-- name: ListImageWhereNotUploaded :many
+SELECT
+  *
+FROM
+  image
+WHERE
+  is_uploaded = FALSE
+  AND src_url <> '';
+
+-- No limit because we want them all uploaded,
+-- but revisit if queue gets too long

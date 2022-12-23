@@ -3,10 +3,10 @@ package almanack
 import (
 	"context"
 	"fmt"
-	"net/http"
+	"path"
+	"strings"
 
 	"github.com/carlmjohnson/errutil"
-	"github.com/carlmjohnson/resperr"
 	"github.com/spotlightpa/almanack/internal/db"
 	"github.com/spotlightpa/almanack/pkg/common"
 )
@@ -18,28 +18,25 @@ func (svc Services) ReplaceImageURL(ctx context.Context, srcURL, description, cr
 		return "", fmt.Errorf("no image provided")
 	}
 	image, err := svc.Queries.GetImageBySourceURL(ctx, srcURL)
-	if err != nil && !db.IsNotFound(err) {
-		return "", err
-	}
-	if !db.IsNotFound(err) && image.IsUploaded {
+	if err == nil { // found entry
 		return image.Path, nil
 	}
-	var path, ext string
-	if path, ext, err = UploadFromURL(ctx, svc.Client, svc.ImageStore, srcURL); err != nil {
-		return "", resperr.New(
-			http.StatusBadGateway,
-			"could not upload image %s: %w", srcURL, err,
-		)
+	if !db.IsNotFound(err) {
+		return "", err
 	}
+
+	ext := path.Ext(srcURL)
+	ext = strings.TrimPrefix(ext, ".")
+	uploadPath := hashURLpath(srcURL, ext)
 	_, err = svc.Queries.UpsertImage(ctx, db.UpsertImageParams{
-		Path:        path,
+		Path:        uploadPath,
 		Type:        ext,
 		Description: description,
 		Credit:      credit,
 		SourceURL:   srcURL,
-		IsUploaded:  true,
+		IsUploaded:  false,
 	})
-	return path, err
+	return uploadPath, err
 }
 
 func (svc Services) UpdateMostPopular(ctx context.Context) (err error) {
