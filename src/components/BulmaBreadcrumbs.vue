@@ -1,6 +1,22 @@
 <script>
+import { useRouter } from "vue-router";
 export default {
   props: { links: Array },
+  setup() {
+    const { resolve, currentRoute } = useRouter();
+    return {
+      isSelf({ to }) {
+        let route = resolve(to);
+        if (route.name !== currentRoute.value.name) {
+          return false;
+        }
+        return (
+          JSON.stringify(route.query) ===
+          JSON.stringify(currentRoute.value.query)
+        );
+      },
+    };
+  },
 };
 </script>
 
@@ -10,9 +26,9 @@ export default {
       <li
         v-for="(link, i) of links"
         :key="i"
-        :class="{ 'is-active': i === links.length - 1 }"
+        :class="{ 'is-active': isSelf(link) }"
       >
-        <router-link exact :to="link.to">
+        <router-link :to="link.to">
           {{ link.name }}
         </router-link>
       </li>
