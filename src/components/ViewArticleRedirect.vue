@@ -2,7 +2,7 @@
 import { ref } from "vue";
 import { useRouter } from "vue-router";
 
-import { get, getSharedArticleBySource } from "@/api/client-v2.js";
+import { get, getSharedArticle } from "@/api/client-v2.js";
 
 const router = useRouter();
 const props = defineProps({
@@ -18,7 +18,7 @@ const error = ref(null);
 
 async function load() {
   isLoading.value = true;
-  let [article, err] = await get(getSharedArticleBySource, {
+  let [article, err] = await get(getSharedArticle, {
     source_type: "arc",
     source_id: props.id,
   });

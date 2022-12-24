@@ -84,47 +84,30 @@ func (app *appEnv) listSharedArticles(w http.ResponseWriter, r *http.Request) {
 
 func (app *appEnv) getSharedArticle(w http.ResponseWriter, r *http.Request) {
 	app.Printf("starting getSharedArticle")
-	var id int64
-	if !intFromQuery(r, "id", &id) {
-		app.replyErr(w, r, resperr.WithUserMessage(nil,
-			"Must provide article ID"))
-		return
-	}
 
-	article, err := app.svc.Queries.GetSharedArticleByID(r.Context(), id)
-	if err != nil {
-		err = db.NoRowsAs404(err,
-			"missing shared_article id = %d", id)
-		app.replyErr(w, r, err)
-		return
-	}
-
-	if article.Status != "S" &&
-		article.Status != "P" {
-		// Let Spotlight PA users get article regardless of its status
-		if err := app.auth.HasRole(r, "Spotlight PA"); err != nil {
-			app.replyNewErr(http.StatusNotFound, w, r,
-				"user unauthorized to view article: %w", err)
+	var (
+		article db.SharedArticle
+		err     error
+	)
+	q := r.URL.Query()
+	if st := q.Get("source_type"); st != "" {
+		article, err = app.svc.Queries.GetSharedArticleBySource(r.Context(),
+			db.GetSharedArticleBySourceParams{
+				SourceType: st,
+				SourceID:   q.Get("source_id"),
+			})
+	} else {
+		var id int64
+		if !intFromQuery(r, "id", &id) {
+			app.replyErr(w, r, resperr.WithUserMessage(nil,
+				"Must provide article ID"))
 			return
 		}
+		article, err = app.svc.Queries.GetSharedArticleByID(r.Context(), id)
 	}
-
-	app.replyJSON(http.StatusOK, w, article)
-}
-
-func (app *appEnv) getSharedArticleBySource(w http.ResponseWriter, r *http.Request) {
-	app.Printf("starting getSharedArticleBySource")
-	q := r.URL.Query()
-	st := q.Get("source_type")
-	sid := q.Get("source_id")
-	article, err := app.svc.Queries.GetSharedArticleBySource(r.Context(),
-		db.GetSharedArticleBySourceParams{
-			SourceType: st,
-			SourceID:   sid,
-		})
 	if err != nil {
 		err = db.NoRowsAs404(err,
-			"missing shared_article type=%q id=%q", st, sid)
+			"missing shared_article %v", q)
 		app.replyErr(w, r, err)
 		return
 	}
