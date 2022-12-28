@@ -786,6 +786,23 @@ func (app *appEnv) listArcByLastUpdated(w http.ResponseWriter, r *http.Request) 
 	app.replyJSON(http.StatusOK, w, &resp)
 }
 
+func (app *appEnv) postSharedArticle(w http.ResponseWriter, r *http.Request) {
+	app.Println("start postSharedArticle")
+
+	var req db.UpdateSharedArticleParams
+	if !app.readJSON(w, r, &req) {
+		return
+	}
+
+	article, err := app.svc.Queries.UpdateSharedArticle(r.Context(), req)
+	if err != nil {
+		app.replyErr(w, r, err)
+		return
+	}
+
+	app.replyJSON(http.StatusOK, w, &article)
+}
+
 func (app *appEnv) postSharedArticleFromArc(w http.ResponseWriter, r *http.Request) {
 	app.Println("start postSharedArticleFromArc")
 
