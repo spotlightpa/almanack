@@ -3,8 +3,9 @@ import { computed, ref } from "vue";
 
 import { intcomma } from "journalize";
 
+import { post, postSharedArticleFromArc } from "@/api/client-v2.js";
+import { makeState } from "@/api/service-util.js";
 import { formatDate } from "@/utils/time-format.js";
-import BulmaDateTime from "./BulmaDateTime.vue";
 
 const isOpen = ref(false);
 const showComposer = ref(false);
@@ -62,6 +63,14 @@ Column inches: ${a.arc.actualInchCount}
 `;
   return text.trim();
 });
+
+const { exec: arcExec, apiStateRefs: arcState } = makeState();
+const { isLoadingThrottled: arcLoading, error: arcError } = arcState;
+function refreshArc() {
+  arcExec(() =>
+    post(postSharedArticleFromArc, { arc_id: article.value.sourceID })
+  );
+}
 
 defineExpose({ open });
 </script>
@@ -156,9 +165,15 @@ defineExpose({ open });
           "
         />
 
-        <button class="button is-warning has-text-weight-semibold">
+        <button
+          class="button is-warning has-text-weight-semibold"
+          type="button"
+          :class="arcLoading && 'is-loading'"
+          @click="refreshArc"
+        >
           Refresh from Arc
         </button>
+        <ErrorSimple :error="arcError" class="mt-1" />
 
         <div class="mt-5 buttons">
           <button
