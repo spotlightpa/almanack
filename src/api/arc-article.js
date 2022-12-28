@@ -1,12 +1,8 @@
 import { h, reactive } from "vue";
 
-import { intcomma } from "journalize";
-
 import getProp from "@/utils/getter.js";
 import cmp from "@/utils/cmp.js";
 import commaAnd from "@/utils/comma-and.js";
-
-import { formatDate } from "@/utils/time-format.js";
 
 import ArcArticleDivider from "@/components/ArcArticleDivider.vue";
 import ArcArticleImage from "@/components/ArcArticleImage.vue";
@@ -270,31 +266,5 @@ export default class ArcArticle {
       console.warn("unknown block type", block.type, block);
       return [];
     });
-  }
-
-  get emailSubject() {
-    return `New Spotlight PA story ${this.slug}`;
-  }
-
-  get emailBody() {
-    let text = `
-New ${this.slug}
-
-https://almanack.data.spotlightpa.org/articles/${this.id}
-
-Planned for ${formatDate(this.plannedDate)}${
-      this.note ? `\n\nPublication Notes:\n\n${this.note}` : ""
-    }
-
-Budget:
-
-${this.budgetLine}
-
-Word count planned: ${intcomma(this.plannedWordCount)}
-Word count actual: ${intcomma(this.actualWordCount)}
-Lines: ${this.actualLineCount}
-Column inches: ${this.actualInchCount}
-`;
-    return text.trim();
   }
 }
