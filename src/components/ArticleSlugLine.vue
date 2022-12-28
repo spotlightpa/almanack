@@ -37,27 +37,6 @@ export default {
           </span>
           <span v-text="article.statusVerbose"></span>
         </span>
-        <a
-          v-if="isArcUser && article.isArc"
-          class="tag is-light"
-          :href="article.arc.arcURL"
-          target="_blank"
-        >
-          <span class="icon is-size-6">
-            <font-awesome-icon :icon="['fas', 'link']" />
-          </span>
-          <span>Arc view</span>
-        </a>
-        <router-link
-          v-if="isSpotlightPAUser && article.pageRoute"
-          class="tag is-light"
-          :to="article.pageRoute"
-        >
-          <span class="icon">
-            <font-awesome-icon :icon="['fas', 'user-clock']" />
-          </span>
-          <span>Spotlight PA page</span>
-        </router-link>
       </span>
     </span>
   </span>
