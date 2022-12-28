@@ -5,7 +5,7 @@ import { intcomma } from "journalize";
 
 import { post, postSharedArticleFromArc } from "@/api/client-v2.js";
 import { makeState } from "@/api/service-util.js";
-import { formatDate } from "@/utils/time-format.js";
+import { formatDate, tomorrow } from "@/utils/time-format.js";
 
 const isOpen = ref(false);
 const showComposer = ref(false);
@@ -144,16 +144,29 @@ defineExpose({ open });
               isDirty = true;
             "
           >
-            Released
+            Release
           </button>
         </div>
 
-        <BulmaDateTime
-          v-if="status === 'embargo'"
-          :model-value="null"
-          label="Embargo time"
-          help="List the latest time that an article will be under embargo for partners."
-        />
+        <div v-if="status === 'embargo'" class="mb-5">
+          <BulmaDateTime
+            :model-value="embargo"
+            label="Embargo time"
+            help="List the latest time that an article will be under embargo for partners."
+            @update:modelValue="
+              embargo = $event;
+              isDirty = true;
+            "
+          />
+          <a
+            @click="
+              embargo = tomorrow();
+              isDirty = true;
+            "
+          >
+            Set for tomorrow
+          </a>
+        </div>
 
         <BulmaTextarea
           :model-value="note"
