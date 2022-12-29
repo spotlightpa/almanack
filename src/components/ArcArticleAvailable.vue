@@ -1,7 +1,7 @@
 <script>
 import { reactive, ref, toRefs } from "vue";
 import { sendGAEvent } from "@/utils/google-analytics.js";
-import { formatDate } from "@/utils/time-format.js";
+import { formatDate, formatDateTime } from "@/utils/time-format.js";
 
 export default {
   props: {
@@ -57,6 +57,7 @@ export default {
       },
 
       formatDate,
+      formatDateTime,
     };
   },
 };
@@ -67,6 +68,17 @@ export default {
     <h1 class="title has-text-grey">
       <ArticleSlugLine :article="article" />
     </h1>
+    <template v-if="article.isUnderEmbargo">
+      <h2 class="title" style="color: red">
+        Embargoed until {{ formatDateTime(article.embargoUntil) }}
+      </h2>
+    </template>
+    <h2 class="title">Budget details</h2>
+    <p class="content">
+      {{ article.arc.budgetLine }}
+    </p>
+    <ArticleWordCount :article="article" />
+
     <h2 class="title">Planned time</h2>
     <p class="content has-margin-top-negative">
       {{ formatDate(article.arc.plannedDate) }}
@@ -199,14 +211,6 @@ export default {
       size="is-small height-50vh"
       >{{ articleHTML }}</CopyTextarea
     >
-
-    <details class="mt-5 block">
-      <summary class="title">Budget details</summary>
-      <p class="content">
-        {{ article.arc.budgetLine }}
-      </p>
-      <ArticleWordCount :article="article" />
-    </details>
   </div>
 </template>
 
