@@ -595,6 +595,47 @@ func (app *appEnv) postPageRefresh(w http.ResponseWriter, r *http.Request) {
 	app.replyJSON(http.StatusOK, w, page)
 }
 
+func (app *appEnv) postPageCreate(w http.ResponseWriter, r *http.Request) {
+	app.Print("start postPageCreate")
+
+	var req struct {
+		SharedArticleID int64  `json:"shared_article_id,string"`
+		PageKind        string `json:"page_kind"`
+	}
+	if !app.readJSON(w, r, &req) {
+		return
+	}
+	if !slices.Contains([]string{"news", "statecollege"}, req.PageKind) {
+		app.replyErr(w, r, resperr.WithUserMessage(nil, "Invalid page_kind"))
+		return
+	}
+
+	sharedArt, err := app.svc.Queries.GetSharedArticleByID(r.Context(), req.SharedArticleID)
+	if err != nil {
+		err = db.NoRowsAs404(err, "missing id=%q", req.SharedArticleID)
+		app.replyErr(w, r, err)
+		return
+	}
+
+	if sharedArt.PageID.Valid {
+		app.replyErr(w, r, fmt.Errorf(
+			"can't create new page for %d; page %d already exists",
+			req.SharedArticleID, sharedArt.PageID.Int64))
+		return
+	}
+
+	warnings, err := app.svc.CreatePageFromArcSource(r.Context(), &sharedArt, req.PageKind)
+	for _, w := range warnings {
+		app.logErr(r.Context(), fmt.Errorf("got warning: %s", w))
+	}
+	if err != nil {
+		app.replyErr(w, r, err)
+		return
+	}
+
+	app.replyJSON(http.StatusOK, w, sharedArt)
+}
+
 func (app *appEnv) listAllPages(w http.ResponseWriter, r *http.Request) {
 	app.Printf("starting listSpotlightPAArticles")
 	type response struct {
