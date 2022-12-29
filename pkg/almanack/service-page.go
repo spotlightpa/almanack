@@ -2,6 +2,7 @@ package almanack
 
 import (
 	"context"
+	"database/sql"
 	"fmt"
 
 	"github.com/carlmjohnson/errutil"
@@ -150,6 +151,84 @@ func (svc Services) RefreshPageFromArcStory(ctx context.Context, page *db.Page, 
 
 	page.Body = body
 	return warnings, nil
+}
+
+func (svc Services) CreatePageFromArcSource(ctx context.Context, shared *db.SharedArticle, kind string) (warnings []string, err error) {
+	defer errutil.Trace(&err)
+
+	if shared.SourceType != "arc" {
+		return nil, fmt.Errorf(
+			"can't create new page for %d; wrong source type %q %q",
+			shared.ID, shared.SourceType, shared.SourceID)
+	}
+
+	var feedItem arc.FeedItem
+	if err = shared.RawData.AssignTo(&feedItem); err != nil {
+		return nil, err
+	}
+	body, warnings, err := ArcFeedItemToBody(ctx, svc, &feedItem)
+	if err != nil {
+		return nil, err
+	}
+
+	fm, err := ArcFeedItemToFrontmatter(ctx, svc, &feedItem)
+	if err != nil {
+		return nil, err
+	}
+
+	filepath := buildFilePath(fm, kind)
+
+	err = svc.Tx.Begin(ctx, pgx.TxOptions{}, func(q *db.Queries) (txerr error) {
+		defer errutil.Trace(&txerr)
+
+		if txerr = q.CreatePage(ctx, db.CreatePageParams{
+			FilePath:   filepath,
+			SourceType: shared.SourceType,
+			SourceID:   shared.SourceID,
+		}); txerr != nil {
+			return txerr
+		}
+
+		page, txerr := q.UpdatePage(ctx, db.UpdatePageParams{
+			FilePath:         filepath,
+			SetFrontmatter:   true,
+			Frontmatter:      fm,
+			SetBody:          true,
+			Body:             body,
+			SetScheduleFor:   false,
+			ScheduleFor:      db.NullTime,
+			SetLastPublished: false,
+		})
+		if txerr != nil {
+			return txerr
+		}
+
+		newSharedArt, txerr := q.UpdateSharedArticlePage(ctx, db.UpdateSharedArticlePageParams{
+			PageID:          sql.NullInt64{Int64: page.ID, Valid: true},
+			SharedArticleID: shared.ID,
+		})
+		if txerr != nil {
+			return txerr
+		}
+
+		*shared = newSharedArt
+		return nil
+	})
+	if err != nil {
+		return nil, err
+	}
+	return warnings, nil
+}
+
+func buildFilePath(fm map[string]any, kind string) string {
+	date := "1999-01-01"
+	if t, ok := timex.Unwrap(fm["published"]); ok {
+		date = timex.ToEST(t).Format("2006-01-02")
+	}
+	slug, _ := fm["internal-id"].(string)
+	slug = stringx.First(slug, "SPLXXX")
+	filepath := fmt.Sprintf("content/%s/%s-%s.md", kind, date, slug)
+	return filepath
 }
 
 func (svc Services) Notify(ctx context.Context, page *db.Page, publishingNow bool) (err error) {

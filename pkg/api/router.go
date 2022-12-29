@@ -58,6 +58,7 @@ func (app *appEnv) routes() http.Handler {
 			r.Get(`/page/{id:\d+}`, app.getPage)
 			r.Get(`/page-by-file-path`, app.getPageByFilePath)
 			r.Get(`/page-by-url-path`, app.getPageByURLPath)
+			r.Post(`/page-create`, app.postPageCreate)
 			r.Get(`/page-with-content/{id:\d+}`, app.getPageWithContent)
 			r.Get(`/pages`, app.listPages)
 			r.Get(`/pages-by-fts`, app.listPagesByFTS)
