@@ -1,6 +1,7 @@
 package common
 
 import (
+	"io"
 	"net/http"
 	"time"
 
@@ -13,10 +14,29 @@ func init() {
 	http.DefaultTransport = requests.RoundTripFunc(func(req *http.Request) (res *http.Response, err error) {
 		start := time.Now()
 		res, err = oldTransport.RoundTrip(req)
-		Logger.Printf("request to %s%s%s %s%q%s took %s%v%s",
-			purple, req.Method, reset, cyan, req.Host, reset, yellow, time.Since(start), reset)
+		logReq(start, req)
+		if err != nil {
+			return
+		}
+		res.Body = closeLogger{start, req, res.Body}
 		return
 	})
+}
+
+func logReq(start time.Time, req *http.Request) {
+	Logger.Printf("request to %s%s%s %s%q%s took %s%v%s",
+		purple, req.Method, reset, cyan, req.Host, reset, yellow, time.Since(start), reset)
+}
+
+type closeLogger struct {
+	start time.Time
+	req   *http.Request
+	io.ReadCloser
+}
+
+func (cl closeLogger) Close() error {
+	logReq(cl.start, cl.req)
+	return cl.ReadCloser.Close()
 }
 
 var (
