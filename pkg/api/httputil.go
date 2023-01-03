@@ -187,15 +187,11 @@ func (app *appEnv) hasRoleMiddleware(role string) func(next http.Handler) http.H
 }
 
 func (app *appEnv) maxSizeMiddleware(next http.Handler) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		const (
-			megabyte = 1 << 20
-			maxSize  = 5 * megabyte
-		)
-		r2 := *r // shallow copy
-		r2.Body = http.MaxBytesReader(w, r.Body, maxSize)
-		next.ServeHTTP(w, &r2)
-	})
+	const (
+		megabyte = 1 << 20
+		maxSize  = 5 * megabyte
+	)
+	return http.MaxBytesHandler(next, maxSize)
 }
 
 func mustIntParam[Int int | int32 | int64](r *http.Request, param string, p *Int) {
