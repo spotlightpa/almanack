@@ -36,13 +36,15 @@ export function makeState() {
 
 export function watchAPI(watchCb, fetcher) {
   const { exec, apiStateRefs } = makeState();
-  const fetch = (newVal) => exec(() => fetcher(newVal));
+  const doFetch = (newVal) => exec(() => fetcher(newVal));
 
-  watch(watchCb, fetch, { immediate: true });
+  watch(watchCb, doFetch, { immediate: true });
 
   return {
     apiState: apiStateRefs,
-    fetch,
+    async fetch() {
+      return doFetch(watchCb());
+    },
     computer(cb) {
       return computed(() => cb(apiStateRefs.rawData.value));
     },
