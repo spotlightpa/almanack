@@ -31,8 +31,6 @@ export default {
           query: { page },
         };
       }),
-
-      modal: ref(null),
     };
   },
 };
@@ -195,8 +193,6 @@ export default {
       />
     </LinkButtons>
 
-    <AdminArticleModal ref="modal" />
-
     <h2 class="mt-5 title">Shareable Articles</h2>
 
     <div class="table-container">
@@ -213,10 +209,10 @@ export default {
         <tbody>
           <tr v-for="article in articles" :key="article.id">
             <td>
-              <a class="mr-2 middle" @click.prevent="$refs.modal.open(article)">
+              <router-link class="mr-2 middle" :to="article.adminRoute">
                 <font-awesome-icon :icon="['far', 'newspaper']" />
                 {{ article.slug }}
-              </a>
+              </router-link>
             </td>
             <td>
               <span class="tag is-small" :class="article.statusClass">

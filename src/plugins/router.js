@@ -166,6 +166,15 @@ let router = createRouter({
       },
     },
     {
+      path: "/admin/shared-articles/:id",
+      name: "shared-article-admin",
+      component: load(() => import("@/components/ViewSharedArticleAdmin.vue")),
+      props: true,
+      meta: {
+        requiresAuth: isSpotlightPAUser,
+      },
+    },
+    {
       path: "/admin/news/:id",
       name: "news-page",
       component: load(() => import("@/components/ViewNewsPage.vue")),

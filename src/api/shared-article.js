@@ -95,6 +95,9 @@ export default class SharedArticle {
     return "is-warning";
   }
 
+  get adminRoute() {
+    return { name: "shared-article-admin", params: { id: this.id } };
+  }
   get detailsRoute() {
     return { name: "shared-article", params: { id: this.id } };
   }

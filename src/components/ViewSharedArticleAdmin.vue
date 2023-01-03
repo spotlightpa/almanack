@@ -3,37 +3,40 @@ import { computed, ref } from "vue";
 
 import { intcomma } from "journalize";
 
-import { post, postSharedArticleFromArc } from "@/api/client-v2.js";
-import { makeState } from "@/api/service-util.js";
-import { formatDate, tomorrow } from "@/utils/time-format.js";
+import {
+  get,
+  post,
+  getSharedArticle,
+  postSharedArticleFromArc,
+} from "@/api/client-v2.js";
+import { watchAPI, makeState } from "@/api/service-util.js";
+import SharedArticle from "@/api/shared-article.js";
+import { formatDate, formatDateTime, tomorrow } from "@/utils/time-format.js";
 
-const isOpen = ref(false);
+const props = defineProps({
+  id: String,
+});
+
+const { apiState, fetch, computer } = watchAPI(
+  () => props.id,
+  (id) => get(getSharedArticle, { id })
+);
+
 const showComposer = ref(false);
 const isDirty = ref(false);
-const article = ref(null);
 const status = ref(null);
 const note = ref("");
 const embargo = ref(null);
 
-function open(obj) {
-  isOpen.value = true;
-  showComposer.value = false;
+const article = computer((rawData) => {
+  if (!rawData) return null;
+  let a = new SharedArticle(rawData);
   isDirty.value = false;
-  article.value = obj;
-  status.value = obj.status;
-  note.value = obj.note;
-  embargo.value = obj.embargoUntil;
-}
-
-function close() {
-  if (!isDirty.value) {
-    isOpen.value = false;
-    article.value = null;
-  } else if (window.confirm("Discard unsaved changes?")) {
-    isOpen.value = false;
-    article.value = null;
-  }
-}
+  status.value = a.status;
+  note.value = a.note;
+  embargo.value = a.embargoUntil;
+  return a;
+});
 
 function statusClass(val) {
   return {
@@ -44,24 +47,30 @@ function statusClass(val) {
 
 const emailBody = computed(() => {
   let a = article.value;
-  let noteText = note.value ? `\n\nPublication Notes:\n\n${note.value}` : "";
-  let text = `
-New ${a.slug}
+  let noteText = !note.value ? "" : `\n\nPublication Notes:\n\n${note.value}`;
+  let embargoText =
+    status.value !== "embargo" || !embargo.value
+      ? ""
+      : `\n\nEmbargoed until ${formatDateTime(embargo.value)}`;
 
-https://almanack.data.spotlightpa.org/shared-articles/${a.id}
-
-Planned for ${formatDate(a.arc.plannedDate)}${noteText}
-
-Budget:
-
-${a.arc.budgetLine}
-
+  let segments = [
+    `New ${a.slug}`,
+    `https://almanack.data.spotlightpa.org/shared-articles/${a.id}`,
+    `Planned for ${formatDate(a.arc.plannedDate)}`,
+    embargoText,
+    noteText,
+    `Budget:`,
+    a.arc.budgetLine,
+    `
 Word count planned: ${intcomma(a.arc.plannedWordCount)}
 Word count actual: ${intcomma(a.arc.actualWordCount)}
 Lines: ${a.arc.actualLineCount}
-Column inches: ${a.arc.actualInchCount}
-`;
-  return text.trim();
+Column inches: ${a.arc.actualInchCount}`,
+  ];
+  return segments
+    .map((text) => text.trim())
+    .filter((text) => !!text)
+    .join("\n\n");
 });
 
 const { exec: arcExec, apiStateRefs: arcState } = makeState();
@@ -71,13 +80,32 @@ function refreshArc() {
     post(postSharedArticleFromArc, { arc_id: article.value.sourceID })
   );
 }
-
-defineExpose({ open });
 </script>
 
 <template>
-  <BulmaModal :model-value="isOpen" @update:modelValue="close">
+  <div>
+    <MetaHead>
+      <title>Shared Article Admin • Spotlight PA</title>
+    </MetaHead>
+
+    <BulmaBreadcrumbs
+      :links="[
+        { name: 'Admin', to: { name: 'admin' } },
+        {
+          name: 'Shared Article',
+          to: { name: 'shared-article-admin', params: { id } },
+        },
+      ]"
+    />
+
+    <SpinnerProgress :is-loading="apiState.isLoading.value" />
+    <ErrorReloader :error="apiState.error.value" @reload="fetch" />
+
     <article v-if="article" class="message is-primary">
+      <MetaHead>
+        <title>{{ article.slug }} Admin • Spotlight PA</title>
+      </MetaHead>
+
       <div class="message-header">
         <p>
           <font-awesome-icon :icon="['far', 'newspaper']" /> {{ article.slug }}
@@ -226,5 +254,5 @@ defineExpose({ open });
         />
       </div>
     </article>
-  </BulmaModal>
+  </div>
 </template>
