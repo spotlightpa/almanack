@@ -91,13 +91,21 @@ export default {
       <tbody>
         <tr v-for="article in articles" :key="article.sourceID">
           <td>
-            <span v-if="article.id">
-              <font-awesome-icon :icon="['far', 'newspaper']" />
-              {{ article.slug }}
-            </span>
-            <a v-else @click.prevent="doImport(article)">
-              <font-awesome-icon :icon="['far', 'newspaper']" />
-              {{ article.slug }}
+            <router-link
+              v-if="article.id"
+              class="tag is-light"
+              :to="article.adminRoute"
+            >
+              <span class="icon is-size-6">
+                <font-awesome-icon :icon="['far', 'newspaper']" />
+              </span>
+              <span>{{ article.slug }}</span>
+            </router-link>
+            <a v-else class="tag is-dark" @click.prevent="doImport(article)">
+              <span class="icon is-size-6">
+                <font-awesome-icon :icon="['far', 'newspaper']" />
+              </span>
+              <span>{{ article.slug }}</span>
             </a>
           </td>
           <td>
