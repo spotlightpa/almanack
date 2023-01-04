@@ -110,7 +110,35 @@ function refreshArc() {
         <p>
           <font-awesome-icon :icon="['far', 'newspaper']" /> {{ article.slug }}
         </p>
-        <button class="delete" aria-label="close" @click="close"></button>
+        <span class="tags">
+          <router-link v-if="article.id" class="tag" :to="article.detailsRoute">
+            <span class="icon">
+              <font-awesome-icon :icon="['fas', 'file-invoice']" />
+            </span>
+            <span>Partner view</span>
+          </router-link>
+          <a
+            v-if="article.isArc"
+            class="tag"
+            :href="article.arc.arcURL"
+            target="_blank"
+          >
+            <span class="icon">
+              <font-awesome-icon :icon="['fas', 'link']" />
+            </span>
+            <span>Arc</span>
+          </a>
+          <router-link
+            v-if="article.pageRoute"
+            class="tag is-light"
+            :to="article.pageRoute"
+          >
+            <span class="icon">
+              <font-awesome-icon :icon="['fas', 'user-clock']" />
+            </span>
+            <span>Spotlight admin</span>
+          </router-link>
+        </span>
       </div>
       <div class="message-body">
         <div v-if="!article.pageID" class="mb-5">
