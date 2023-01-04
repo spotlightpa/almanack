@@ -7,6 +7,7 @@ import {
   get,
   post,
   getSharedArticle,
+  postSharedArticle,
   postSharedArticleFromArc,
 } from "@/api/client-v2.js";
 import { watchAPI, makeState } from "@/api/service-util.js";
@@ -80,6 +81,20 @@ function refreshArc() {
     post(postSharedArticleFromArc, { arc_id: article.value.sourceID })
   );
 }
+
+const { exec: saveExec, apiStateRefs: saveState } = makeState();
+const { isLoadingThrottled: saveLoading, error: saveError } = saveState;
+async function save() {
+  const obj = {
+    id: +props.id,
+    note: note.value,
+    embargo_until: status.value === "embargo" ? embargo.value : null,
+    status: status.value === "imported" ? "U" : "S",
+  };
+  await saveExec(() => post(postSharedArticle, obj));
+  await fetch();
+  isDirty.value = false;
+}
 </script>
 
 <template>
@@ -147,10 +162,7 @@ function refreshArc() {
             <button class="button is-primary has-text-weight-semibold">
               As News article
             </button>
-            <button
-              class="button is-primary has-text-weight-semibold"
-              @click="close"
-            >
+            <button class="button is-primary has-text-weight-semibold">
               As State College article
             </button>
           </div>
@@ -168,17 +180,6 @@ function refreshArc() {
             "
           >
             Imported
-          </button>
-          <button
-            class="button is-small has-text-weight-semibold"
-            :class="statusClass('preview')"
-            type="button"
-            @click="
-              status = 'preview';
-              isDirty = true;
-            "
-          >
-            Preview
           </button>
           <button
             class="button is-small has-text-weight-semibold"
@@ -242,19 +243,22 @@ function refreshArc() {
         >
           Refresh from Arc
         </button>
-        <ErrorSimple :error="arcError" class="mt-1" />
+        <ErrorSimple :error="saveError || arcError" class="mt-1" />
 
         <div class="mt-5 buttons">
           <button
             class="button is-success has-text-weight-semibold"
+            :class="saveLoading ? 'is-loading' : ''"
             :disabled="!isDirty || null"
+            @click="save()"
           >
             Save changes
           </button>
           <button
             class="button is-danger has-text-weight-semibold"
+            :class="saveLoading ? 'is-loading' : ''"
             :disabled="!isDirty || null"
-            @click="close"
+            @click="clear"
           >
             Discard changes
           </button>

@@ -99,6 +99,7 @@ export const postPageRefresh = `/api/page-refresh`;
 export const listPages = `/api/pages`;
 export const listPagesByFTS = `/api/pages-by-fts`;
 export const getSharedArticle = `/api/shared-article`;
+export const postSharedArticle = `/api/shared-article`;
 export const postSharedArticleFromArc = `/api/shared-article-from-arc`;
 export const listSharedArticles = `/api/shared-articles`;
 export const getSidebar = `/api/sidebar`;
