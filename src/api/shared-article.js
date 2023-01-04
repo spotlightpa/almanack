@@ -75,8 +75,8 @@ export default class SharedArticle {
       {
         draft: "Drafting",
         imported: "Imported",
-        preview: "Preview Available",
-        embargo: "Under Embargo",
+        preview: "Preview",
+        embargo: "Embargo",
         released: "Released",
       }[this.status] || "System Error"
     );
