@@ -77,7 +77,7 @@ SELECT
 FROM
   shared_article
 ORDER BY
-  updated_at DESC
+  created_at DESC
 LIMIT $1 OFFSET $2
 `
 
@@ -131,7 +131,7 @@ ORDER BY
   WHEN 'S' THEN
     '1'
   END ASC,
-  updated_at DESC
+  created_at DESC
 LIMIT $1 OFFSET $2
 `
 
