@@ -58,6 +58,22 @@ func (q *Queries) GetImageBySourceURL(ctx context.Context, srcUrl string) (Image
 	return i, err
 }
 
+const getImageTypeForExtension = `-- name: GetImageTypeForExtension :one
+SELECT
+  name, mime, extensions
+FROM
+  image_type
+WHERE
+  $1::text = ANY (extensions)
+`
+
+func (q *Queries) GetImageTypeForExtension(ctx context.Context, extension string) (ImageType, error) {
+	row := q.db.QueryRow(ctx, getImageTypeForExtension, extension)
+	var i ImageType
+	err := row.Scan(&i.Name, &i.Mime, &i.Extensions)
+	return i, err
+}
+
 const listImageWhereNotUploaded = `-- name: ListImageWhereNotUploaded :many
 SELECT
   id, path, type, description, credit, src_url, is_uploaded, created_at, updated_at
@@ -68,6 +84,9 @@ WHERE
   AND src_url <> ''
 `
 
+// ListImageWhereNotUploaded has no limit
+// because we want them all uploaded,
+// but revisit if queue gets too long.
 func (q *Queries) ListImageWhereNotUploaded(ctx context.Context) ([]Image, error) {
 	rows, err := q.db.Query(ctx, listImageWhereNotUploaded)
 	if err != nil {

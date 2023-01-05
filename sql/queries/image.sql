@@ -70,6 +70,9 @@ ORDER BY
   updated_at DESC
 LIMIT 1;
 
+-- ListImageWhereNotUploaded has no limit
+-- because we want them all uploaded,
+-- but revisit if queue gets too long.
 -- name: ListImageWhereNotUploaded :many
 SELECT
   *
@@ -79,5 +82,10 @@ WHERE
   is_uploaded = FALSE
   AND src_url <> '';
 
--- No limit because we want them all uploaded,
--- but revisit if queue gets too long
+-- name: GetImageTypeForExtension :one
+SELECT
+  *
+FROM
+  image_type
+WHERE
+  @extension::text = ANY (extensions);

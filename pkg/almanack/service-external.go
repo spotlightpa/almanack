@@ -28,9 +28,13 @@ func (svc Services) ReplaceImageURL(ctx context.Context, srcURL, description, cr
 	ext := path.Ext(srcURL)
 	ext = strings.TrimPrefix(ext, ".")
 	uploadPath := hashURLpath(srcURL, ext)
+	itype, err := svc.Queries.GetImageTypeForExtension(ctx, ext)
+	if err != nil {
+		return "", err
+	}
 	_, err = svc.Queries.UpsertImage(ctx, db.UpsertImageParams{
 		Path:        uploadPath,
-		Type:        ext,
+		Type:        itype.Name,
 		Description: description,
 		Credit:      credit,
 		SourceURL:   srcURL,
