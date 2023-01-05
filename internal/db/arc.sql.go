@@ -7,7 +7,6 @@ package db
 
 import (
 	"context"
-	"database/sql"
 	"time"
 
 	"github.com/jackc/pgtype"
@@ -63,7 +62,7 @@ type ListArcByLastUpdatedRow struct {
 	LastUpdated     pgtype.Timestamptz `json:"last_updated"`
 	CreatedAt       time.Time          `json:"created_at"`
 	UpdatedAt       time.Time          `json:"updated_at"`
-	SharedArticleID sql.NullInt64      `json:"shared_article_id"`
+	SharedArticleID pgtype.Int8        `json:"shared_article_id"`
 	Status          string             `json:"status"`
 	EmbargoUntil    pgtype.Timestamptz `json:"embargo_until"`
 }
