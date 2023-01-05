@@ -27,11 +27,6 @@ type Arc struct {
 	UpdatedAt   time.Time          `json:"updated_at"`
 }
 
-type ArticleStatus struct {
-	StatusID    string `json:"status_id"`
-	Description string `json:"description"`
-}
-
 type DomainRole struct {
 	ID        int64     `json:"id"`
 	Domain    string    `json:"domain"`
