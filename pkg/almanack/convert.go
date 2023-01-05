@@ -29,6 +29,7 @@ func ArcFeedItemToBody(ctx context.Context, svc Services, arcStory *arc.FeedItem
 func ArcFeedItemToFrontmatter(ctx context.Context, svc Services, arcStory *arc.FeedItem) (fm map[string]any, err error) {
 	fm = make(map[string]any)
 
+	// Hacky: Add the of/for XX orgs then remove them
 	authors := make([]string, len(arcStory.Credits.By))
 	for i := range arcStory.Credits.By {
 		authors[i] = authorFrom(&arcStory.Credits.By[i])
