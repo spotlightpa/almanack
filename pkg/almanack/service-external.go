@@ -30,6 +30,10 @@ func (svc Services) ReplaceImageURL(ctx context.Context, srcURL, description, cr
 	uploadPath := hashURLpath(srcURL, ext)
 	itype, err := svc.Queries.GetImageTypeForExtension(ctx, ext)
 	if err != nil {
+		if db.IsNotFound(err) {
+			return "", fmt.Errorf("unknown image extension (%q) on source: %q",
+				ext, srcURL)
+		}
 		return "", err
 	}
 	_, err = svc.Queries.UpsertImage(ctx, db.UpsertImageParams{
