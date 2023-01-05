@@ -11,7 +11,7 @@ export default class SharedArticle {
       ...data,
       source_type: "arc",
       source_id: data.arc_id,
-      id: data.shared_article_id.Int64,
+      id: data.shared_article_id,
     });
   }
 
@@ -22,7 +22,7 @@ export default class SharedArticle {
     this["sourceType"] = data["source_type"] ?? "";
     this["sourceID"] = data["source_id"] ?? "";
     this["rawData"] = data["raw_data"] ?? "";
-    this["pageID"] = "" + (data["page_id"]?.Int64 || "");
+    this["pageID"] = "" + (data["page_id"] || "");
     this["embargoUntil"] = maybeDate(data, "embargo_until");
     this["createdAt"] = maybeDate(data, "created_at");
     this["updatedAt"] = maybeDate(data, "updated_at");

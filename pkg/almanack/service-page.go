@@ -2,10 +2,10 @@ package almanack
 
 import (
 	"context"
-	"database/sql"
 	"fmt"
 
 	"github.com/carlmjohnson/errutil"
+	"github.com/jackc/pgtype"
 	"github.com/jackc/pgx/v4"
 	"github.com/spotlightpa/almanack/internal/arc"
 	"github.com/spotlightpa/almanack/internal/db"
@@ -204,7 +204,7 @@ func (svc Services) CreatePageFromArcSource(ctx context.Context, shared *db.Shar
 		}
 
 		newSharedArt, txerr := q.UpdateSharedArticlePage(ctx, db.UpdateSharedArticlePageParams{
-			PageID:          sql.NullInt64{Int64: page.ID, Valid: true},
+			PageID:          pgtype.Int8{Int: page.ID, Status: pgtype.Present},
 			SharedArticleID: shared.ID,
 		})
 		if txerr != nil {
