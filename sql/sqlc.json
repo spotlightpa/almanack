@@ -23,6 +23,11 @@
   },
   "overrides": [
     {
+      "db_type": "pg_catalog.int8",
+      "go_type": "github.com/jackc/pgtype.Int8",
+      "nullable": true
+    },
+    {
       "db_type": "pg_catalog.varchar",
       "go_type": "github.com/jackc/pgtype.Text",
       "nullable": true

@@ -5,7 +5,6 @@
 package db
 
 import (
-	"database/sql"
 	"time"
 
 	"github.com/jackc/pgtype"
@@ -118,7 +117,7 @@ type SharedArticle struct {
 	SourceType   string             `json:"source_type"`
 	SourceID     string             `json:"source_id"`
 	RawData      pgtype.JSONB       `json:"raw_data"`
-	PageID       sql.NullInt64      `json:"page_id"`
+	PageID       pgtype.Int8        `json:"page_id"`
 	CreatedAt    time.Time          `json:"created_at"`
 	UpdatedAt    time.Time          `json:"updated_at"`
 }

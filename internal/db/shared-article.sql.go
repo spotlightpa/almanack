@@ -7,7 +7,6 @@ package db
 
 import (
 	"context"
-	"database/sql"
 
 	"github.com/jackc/pgtype"
 )
@@ -227,8 +226,8 @@ RETURNING
 `
 
 type UpdateSharedArticlePageParams struct {
-	PageID          sql.NullInt64 `json:"page_id"`
-	SharedArticleID int64         `json:"shared_article_id"`
+	PageID          pgtype.Int8 `json:"page_id"`
+	SharedArticleID int64       `json:"shared_article_id"`
 }
 
 func (q *Queries) UpdateSharedArticlePage(ctx context.Context, arg UpdateSharedArticlePageParams) (SharedArticle, error) {

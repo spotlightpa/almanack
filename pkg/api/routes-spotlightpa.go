@@ -8,6 +8,7 @@ import (
 	"github.com/carlmjohnson/emailx"
 	"github.com/carlmjohnson/errutil"
 	"github.com/carlmjohnson/resperr"
+	"github.com/jackc/pgtype"
 	"github.com/spotlightpa/almanack/internal/db"
 	"github.com/spotlightpa/almanack/internal/mailchimp"
 	"github.com/spotlightpa/almanack/internal/paginate"
@@ -617,10 +618,10 @@ func (app *appEnv) postPageCreate(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if sharedArt.PageID.Valid {
+	if sharedArt.PageID.Status == pgtype.Present {
 		app.replyErr(w, r, fmt.Errorf(
 			"can't create new page for %d; page %d already exists",
-			req.SharedArticleID, sharedArt.PageID.Int64))
+			req.SharedArticleID, sharedArt.PageID.Int))
 		return
 	}
 
