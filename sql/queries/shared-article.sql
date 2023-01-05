@@ -43,7 +43,7 @@ SELECT
 FROM
   shared_article
 ORDER BY
-  updated_at DESC
+  created_at DESC
 LIMIT $1 OFFSET $2;
 
 -- name: ListSharedArticlesWhereActive :many
@@ -60,7 +60,7 @@ ORDER BY
   WHEN 'S' THEN
     '1'
   END ASC,
-  updated_at DESC
+  created_at DESC
 LIMIT $1 OFFSET $2;
 
 -- name: UpsertSharedArticleFromArc :one
