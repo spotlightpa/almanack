@@ -1,7 +1,6 @@
-import { h, reactive } from "vue";
+import { h } from "vue";
 
 import getProp from "@/utils/getter.js";
-import cmp from "@/utils/cmp.js";
 import commaAnd from "@/utils/comma-and.js";
 
 import ArcArticleDivider from "@/components/ArcArticleDivider.vue";
@@ -38,17 +37,7 @@ let ignoreComponentTypes = {
 };
 
 export default class ArcArticle {
-  static from(data) {
-    return data.contents
-      .map((a) => reactive(new ArcArticle(a)))
-      .sort((a, b) => cmp(b.plannedDate, a.plannedDate));
-  }
-
   constructor(rawData) {
-    this.init(rawData);
-  }
-
-  init(rawData) {
     let props = {
       actualInchCount: "planning.story_length.inch_count_actual",
       actualLineCount: "planning.story_length.line_count_actual",
@@ -68,21 +57,10 @@ export default class ArcArticle {
     for (let [key, val] of Object.entries(props)) {
       this[key] = this.getProp(val);
     }
-    this._almanackStatus = this.getProp("almanack-status", { fallback: 0 });
-    this._refreshArcStatus = false;
   }
 
   getProp(pathStr, { fallback = null } = {}) {
     return getProp(this.rawData, pathStr, { fallback });
-  }
-
-  toJSON() {
-    return {
-      _id: this.id,
-      "almanack-status": this._almanackStatus,
-      "almanack-note": this.note,
-      "almanack-refresh-arc": this._refreshArcStatus,
-    };
   }
 
   pubslug() {
@@ -121,42 +99,6 @@ export default class ArcArticle {
   }
   get byline() {
     return commaAnd(this.authors);
-  }
-  get status() {
-    if (this.isAvailable) {
-      return "published";
-    }
-    let published =
-      this.getProp("additional_properties.is_published") ||
-      this.getProp("additional_properties.has_published_copy");
-    if (published) {
-      return "readyPublished";
-    }
-    let statusCode = this.getProp("workflow.status_code");
-    return (
-      {
-        1: "notReadyWorking",
-        2: "notReadyAssigning",
-        3: "notReadySecondEdit",
-        4: "notReadyRim",
-        5: "readySlot",
-        6: "readyDone",
-      }[statusCode] || "unknown"
-    );
-  }
-  get statusVerbose() {
-    return (
-      {
-        notReadyWorking: "Working",
-        notReadyAssigning: "Assigning",
-        notReadySecondEdit: "Second Edit",
-        notReadyRim: "Rim",
-        readySlot: "Slot",
-        readyDone: "Done",
-        readyPublished: "Released",
-        published: "Ready",
-      }[this.status] || "Unknown"
-    );
   }
   get featuredImage() {
     let srcURL = this.getProp("promo_items.basic.url", { fallback: "" });
