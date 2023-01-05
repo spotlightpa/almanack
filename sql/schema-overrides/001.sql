@@ -13,3 +13,5 @@ ALTER TABLE page
   DROP COLUMN internal_id_fts;
 
 DROP TABLE article;
+
+DROP TABLE article_status;
