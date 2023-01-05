@@ -95,6 +95,7 @@ export const sendMessage = `/api/message`;
 export const postPage = `/api/page`;
 export const getPageByFilePath = `/api/page-by-file-path`;
 export const getPageByURLPath = `/api/page-by-url-path`;
+export const postPageCreate = `/api/page-create`;
 export const postPageRefresh = `/api/page-refresh`;
 export const listPages = `/api/pages`;
 export const listPagesByFTS = `/api/pages-by-fts`;

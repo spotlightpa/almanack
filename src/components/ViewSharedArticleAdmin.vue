@@ -6,6 +6,7 @@ import { intcomma } from "journalize";
 import {
   get,
   post,
+  postPageCreate,
   getSharedArticle,
   postSharedArticle,
   postSharedArticleFromArc,
@@ -73,6 +74,16 @@ Column inches: ${a.arc.actualInchCount}`,
     .filter((text) => !!text)
     .join("\n\n");
 });
+
+const { exec: pageExec, apiStateRefs: pageState } = makeState();
+const { isLoadingThrottled: pageLoading, error: pageError } = pageState;
+async function createPage(kind) {
+  await pageExec(() =>
+    post(postPageCreate, { shared_article_id: props.id, page_kind: kind })
+  );
+  await fetch();
+  await window.fetch("/api-background/images");
+}
 
 const { exec: arcExec, apiStateRefs: arcState } = makeState();
 const { isLoadingThrottled: arcLoading, error: arcError } = arcState;
@@ -159,14 +170,24 @@ async function save() {
         <div v-if="!article.pageID" class="mb-5">
           <div class="label">Import to Spotlight PA</div>
           <div class="buttons">
-            <button class="button is-primary has-text-weight-semibold">
+            <button
+              class="button is-primary has-text-weight-semibold"
+              :class="pageLoading ? 'is-loading' : ''"
+              @click="createPage('news')"
+            >
               As News article
             </button>
-            <button class="button is-primary has-text-weight-semibold">
+            <button
+              class="button is-primary has-text-weight-semibold"
+              :class="pageLoading ? 'is-loading' : ''"
+              @click="createPage('statecollege')"
+            >
               As State College article
             </button>
           </div>
         </div>
+
+        <ErrorSimple :error="pageError" />
 
         <h3 class="label">Status</h3>
         <div class="buttons">
