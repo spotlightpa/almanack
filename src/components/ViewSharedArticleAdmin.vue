@@ -112,6 +112,12 @@ async function save() {
   isDirty.value = false;
 }
 
+const savingEnabled = computed(() => {
+  if (!isDirty.value) return false;
+  if (status.value === "embargo" && !embargo.value) return false;
+  return true;
+});
+
 async function toggleComposer() {
   showComposer.value = !showComposer.value;
   if (!showComposer.value) {
@@ -284,7 +290,7 @@ async function toggleComposer() {
           <button
             class="button is-success has-text-weight-semibold"
             :class="saveLoading ? 'is-loading' : ''"
-            :disabled="!isDirty || null"
+            :disabled="!savingEnabled || null"
             @click="save()"
           >
             Save changes
@@ -292,8 +298,8 @@ async function toggleComposer() {
           <button
             class="button is-danger has-text-weight-semibold"
             :class="saveLoading ? 'is-loading' : ''"
-            :disabled="!isDirty || null"
-            @click="clear"
+            :disabled="!savingEnabled || null"
+            @click="fetch"
           >
             Discard changes
           </button>
