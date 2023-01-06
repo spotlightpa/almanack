@@ -1,5 +1,6 @@
 <script setup>
-import { computed, ref } from "vue";
+import { computed, ref, nextTick } from "vue";
+import { useRouter } from "vue-router";
 
 import { intcomma } from "journalize";
 
@@ -49,6 +50,9 @@ function statusClass(val) {
 
 const emailBody = computed(() => {
   let a = article.value;
+
+  const { resolve } = useRouter();
+  let { href } = resolve(a.detailsRoute);
   let noteText = !note.value ? "" : `\n\nPublication Notes:\n\n${note.value}`;
   let embargoText =
     status.value !== "embargo" || !embargo.value
@@ -57,7 +61,7 @@ const emailBody = computed(() => {
 
   let segments = [
     `New ${a.slug}`,
-    `https://almanack.data.spotlightpa.org/shared-articles/${a.id}`,
+    `https://almanack.data.spotlightpa.org${href}`,
     `Planned for ${formatDate(a.arc.plannedDate)}`,
     embargoText,
     noteText,
