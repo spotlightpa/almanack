@@ -11,7 +11,7 @@ export default {
   setup(props) {
     const { apiState, fetch, computer } = watchAPI(
       () => props.page || 0,
-      (page) => get(listSharedArticles, { page, show: "all", select: "-body" })
+      (page) => get(listSharedArticles, { page, show: "all" })
     );
 
     return {
