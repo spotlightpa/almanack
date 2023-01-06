@@ -26,6 +26,7 @@ const { apiState, fetch, computer } = watchAPI(
 );
 
 const showComposer = ref(false);
+const composer = ref(null);
 const isDirty = ref(false);
 const status = ref(null);
 const note = ref("");
@@ -109,6 +110,15 @@ async function save() {
   await saveExec(() => post(postSharedArticle, obj));
   await fetch();
   isDirty.value = false;
+}
+
+async function toggleComposer() {
+  showComposer.value = !showComposer.value;
+  if (!showComposer.value) {
+    return;
+  }
+  await nextTick();
+  composer.value.$el.scrollIntoView({ behavior: "smooth", block: "center" });
 }
 </script>
 
@@ -292,7 +302,7 @@ async function save() {
           type="button"
           class="button is-small has-text-weight-semibold"
           :class="showComposer ? 'is-danger' : 'is-primary'"
-          @click="showComposer = !showComposer"
+          @click="toggleComposer()"
         >
           <span class="icon">
             <font-awesome-icon :icon="['fas', 'paper-plane']" />
@@ -304,6 +314,7 @@ async function save() {
 
         <EmailComposer
           v-if="showComposer"
+          ref="composer"
           class="mt-5"
           :initial-subject="`New Spotlight PA story ${article.slug}`"
           :initial-body="emailBody"
