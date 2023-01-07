@@ -68,19 +68,26 @@ export default {
     <h1 class="title has-text-grey">
       <ArticleSlugLine :article="article" />
     </h1>
-    <template v-if="article.isUnderEmbargo">
-      <h2 class="title" style="color: red">
-        Embargoed until {{ formatDateTime(article.embargoUntil) }}
-      </h2>
-    </template>
-    <h2 class="title">Budget details</h2>
-    <p class="content">
+    <h2 class="mb-2 title">Budget details</h2>
+    <p class="mb-2 content">
       {{ article.arc.budgetLine }}
     </p>
     <ArticleWordCount :article="article" />
 
-    <h2 class="title">Planned time</h2>
-    <p class="content has-margin-top-negative">
+    <h2 v-if="article.isUnderEmbargo" class="title" style="color: red">
+      Embargoed until {{ formatDateTime(article.embargoUntil) }}
+    </h2>
+    <template v-else-if="article.embargoUntil">
+      <h2 class="mb-2 title">Embargo notes</h2>
+      <p class="content">
+        This article had been under embargoed until
+        {{ formatDateTime(article.embargoUntil) }}. It is now available for
+        publication.
+      </p>
+    </template>
+
+    <h2 class="mb-2 title">Planned time</h2>
+    <p class="content">
       {{ formatDate(article.arc.plannedDate) }}
     </p>
     <template v-if="article.note">
