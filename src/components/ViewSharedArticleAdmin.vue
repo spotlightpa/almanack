@@ -36,7 +36,7 @@ const article = computer((rawData) => {
   if (!rawData) return null;
   let a = new SharedArticle(rawData);
   isDirty.value = false;
-  status.value = a.status;
+  status.value = a._status;
   note.value = a.note;
   embargo.value = a.embargoUntil;
   return a;
@@ -55,10 +55,9 @@ const emailBody = computed(() => {
   const { resolve } = useRouter();
   let { href } = resolve(a.detailsRoute);
   let noteText = !note.value ? "" : `\n\nPublication Notes:\n\n${note.value}`;
-  let embargoText =
-    status.value !== "embargo" || !embargo.value
-      ? ""
-      : `\n\nEmbargoed until ${formatDateTime(embargo.value)}`;
+  let embargoText = !embargo.value
+    ? ""
+    : `\n\nEmbargoed until ${formatDateTime(embargo.value)}`;
 
   let segments = [
     `New ${a.slug}`,
@@ -104,8 +103,8 @@ async function save() {
   const obj = {
     id: +props.id,
     note: note.value,
-    embargo_until: status.value === "embargo" ? embargo.value : null,
-    status: status.value === "imported" ? "U" : "S",
+    embargo_until: embargo.value,
+    status: status.value,
   };
   await saveExec(() => post(postSharedArticle, obj));
   await fetch();
@@ -114,7 +113,6 @@ async function save() {
 
 const savingEnabled = computed(() => {
   if (!isDirty.value) return false;
-  if (status.value === "embargo" && !embargo.value) return false;
   return true;
 });
 
@@ -187,6 +185,8 @@ async function toggleComposer() {
         </span>
       </div>
       <div class="message-body">
+        <p class="label">Budget</p>
+        <p class="mb-5 content">{{ article.arc.budgetLine }}</p>
         <div v-if="!article.pageID" class="mb-5">
           <div class="label">Import to Spotlight PA</div>
           <div class="buttons">
@@ -213,40 +213,29 @@ async function toggleComposer() {
         <div class="buttons">
           <button
             class="button is-small has-text-weight-semibold"
-            :class="statusClass('imported')"
+            :class="statusClass('U')"
             type="button"
             @click="
-              status = 'imported';
+              status = 'U';
               isDirty = true;
             "
           >
-            Imported
+            Not Shared
           </button>
           <button
             class="button is-small has-text-weight-semibold"
-            :class="statusClass('embargo')"
+            :class="statusClass('S')"
             type="button"
             @click="
-              status = 'embargo';
+              status = 'S';
               isDirty = true;
             "
           >
-            Embargo
-          </button>
-          <button
-            class="button is-small has-text-weight-semibold"
-            :class="statusClass('released')"
-            type="button"
-            @click="
-              status = 'released';
-              isDirty = true;
-            "
-          >
-            Release
+            Shared with partners
           </button>
         </div>
 
-        <div v-if="status === 'embargo'" class="mb-5">
+        <div class="mb-5">
           <BulmaDateTime
             :model-value="embargo"
             label="Embargo time"
