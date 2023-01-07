@@ -118,7 +118,7 @@ a.navbar-burger:hover {
   color: $yellow;
 }
 
-@media screen and (max-width: $navbar-breakpoint - 1px) {
+@media screen and (max-width: ($navbar-breakpoint - 1px)) {
   .navbar-end {
     border-top: 1px solid $yellow;
   }
