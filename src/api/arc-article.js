@@ -2,6 +2,7 @@ import { h } from "vue";
 
 import getProp from "@/utils/getter.js";
 import commaAnd from "@/utils/comma-and.js";
+import maybeDate from "@/utils/maybe-date.js";
 
 import ArcArticleDivider from "@/components/ArcArticleDivider.vue";
 import ArcArticleImage from "@/components/ArcArticleImage.vue";
@@ -47,7 +48,6 @@ export default class ArcArticle {
       headline: "headlines.basic",
       id: "_id",
       note: "almanack-note",
-      plannedDate: "planning.scheduling.planned_publish_date",
       plannedWordCount: "planning.story_length.word_count_planned",
       slug: "slug",
       featuredImageCaption: "promo_items.basic.caption",
@@ -57,6 +57,10 @@ export default class ArcArticle {
     for (let [key, val] of Object.entries(props)) {
       this[key] = this.getProp(val);
     }
+    this.plannedDate = maybeDate(
+      rawData,
+      "planning.scheduling.planned_publish_date"
+    );
   }
 
   getProp(pathStr, { fallback = null } = {}) {
