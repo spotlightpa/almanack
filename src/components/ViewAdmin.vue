@@ -1,33 +1,27 @@
-<script>
+<script setup>
 import { ref } from "vue";
 
 import { get, listSharedArticles } from "@/api/client-v2.js";
 import { watchAPI } from "@/api/service-util.js";
 import SharedArticle from "@/api/shared-article.js";
 
-export default {
-  name: "ViewAdmin",
-  props: ["page"],
-  setup(props) {
-    const { apiState, fetch, computedList, computedProp } = watchAPI(
-      () => props.page || 0,
-      (page) => get(listSharedArticles, { page, show: "all" })
-    );
+const props = defineProps({
+  page: String,
+});
 
-    return {
-      showBookmarklet: ref(false),
-      showComposer: ref(false),
+const { apiState, fetch, computedList, computedProp } = watchAPI(
+  () => props.page || 0,
+  (page) => get(listSharedArticles, { page, show: "all" })
+);
 
-      apiState,
-      fetch,
-      articles: computedList("stories", (a) => new SharedArticle(a)),
-      nextPage: computedProp("next_page", (page) => ({
-        name: "admin",
-        query: { page },
-      })),
-    };
-  },
-};
+const showBookmarklet = ref(false);
+const showComposer = ref(false);
+
+const articles = computedList("stories", (a) => new SharedArticle(a));
+const nextPage = computedProp("next_page", (page) => ({
+  name: "admin",
+  query: { page },
+}));
 </script>
 
 <template>

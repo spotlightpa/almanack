@@ -1,4 +1,4 @@
-<script>
+<script setup>
 import {
   get,
   post,
@@ -8,39 +8,28 @@ import {
 import { makeState, watchAPI } from "@/api/service-util.js";
 import SharedArticle from "@/api/shared-article.js";
 
-import { formatDate } from "@/utils/time-format";
+const props = defineProps({
+  page: String,
+});
+const { apiState, fetch, computedList, computedProp } = watchAPI(
+  () => ({ page: props.page, refresh: props.page === "0" }),
+  (params) => get(listArcByLastUpdated, params)
+);
 
-export default {
-  props: ["page"],
-  setup(props) {
-    const { apiState, fetch, computedList, computedProp } = watchAPI(
-      () => ({ page: props.page, refresh: props.page === "0" }),
-      (params) => get(listArcByLastUpdated, params)
-    );
+const { apiStateRefs: importState, exec: execImport } = makeState();
 
-    const { apiStateRefs: importState, exec: execImport } = makeState();
+const articles = computedList("stories", (s) => SharedArticle.fromArc(s));
+const nextPage = computedProp("next_page", (page) => ({
+  name: "arc-import",
+  query: { page },
+}));
 
-    return {
-      apiState,
-      fetch,
-      articles: computedList("stories", (s) => SharedArticle.fromArc(s)),
-      nextPage: computedProp("next_page", (page) => ({
-        name: "arc-import",
-        query: { page },
-      })),
-
-      importState,
-      async doImport(article) {
-        await execImport(() =>
-          post(postSharedArticleFromArc, { arc_id: article.sourceID })
-        );
-        await fetch();
-      },
-
-      formatDate,
-    };
-  },
-};
+async function doImport(article) {
+  await execImport(() =>
+    post(postSharedArticleFromArc, { arc_id: article.sourceID })
+  );
+  await fetch();
+}
 </script>
 
 <template>
@@ -119,12 +108,12 @@ export default {
                   <span>Partner view</span>
                 </router-link>
               </div>
-              <p class="mb-1 content">
+              <p class="mb-2 content">
                 {{ article.arc.budgetLine }}
               </p>
               <div v-if="!article.id" class="buttons">
                 <button
-                  class="button is-light is-small has-text-weight-semibold"
+                  class="button is-primary is-small has-text-weight-semibold"
                   type="button"
                   @click.prevent="doImport(article)"
                 >

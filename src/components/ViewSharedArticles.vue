@@ -1,42 +1,34 @@
-<script>
+<script setup>
 import { useAuth } from "@/api/hooks.js";
 import { get, getSignupURL, listSharedArticles } from "@/api/client-v2.js";
 import { watchAPI } from "@/api/service-util.js";
 import SharedArticle from "@/api/shared-article.js";
 
-export default {
-  props: ["page"],
-  setup(props) {
-    let { fullName, roles } = useAuth();
+const props = defineProps({
+  page: String,
+});
 
-    const { apiState, fetch, computedList, computedProp } = watchAPI(
-      () => props.page || 0,
-      (page) => get(listSharedArticles, { page })
-    );
+let { fullName } = useAuth();
 
-    return {
-      apiState,
-      fetch,
-      articles: computedList("stories", (a) => new SharedArticle(a)),
-      nextPage: computedProp("next_page", (page) => ({
-        name: "shared-articles",
-        query: { page },
-      })),
+const { apiState, fetch, computedList, computedProp } = watchAPI(
+  () => props.page || 0,
+  (page) => get(listSharedArticles, { page })
+);
 
-      fullName,
-      roles,
+const articles = computedList("stories", (a) => new SharedArticle(a));
+const nextPage = computedProp("next_page", (page) => ({
+  name: "shared-articles",
+  query: { page },
+}));
 
-      async redirectToSignup() {
-        let [url, err] = await get(getSignupURL);
-        if (err) {
-          alert(`Something went wrong: ${err}`);
-          return;
-        }
-        window.location = url;
-      },
-    };
-  },
-};
+async function redirectToSignup() {
+  let [url, err] = await get(getSignupURL);
+  if (err) {
+    alert(`Something went wrong: ${err}`);
+    return;
+  }
+  window.location = url;
+}
 </script>
 
 <template>
