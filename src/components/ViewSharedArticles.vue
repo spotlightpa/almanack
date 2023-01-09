@@ -9,7 +9,7 @@ export default {
   setup(props) {
     let { fullName, roles } = useAuth();
 
-    const { apiState, fetch, computer } = watchAPI(
+    const { apiState, fetch, computedList, computedProp } = watchAPI(
       () => props.page || 0,
       (page) => get(listSharedArticles, { page })
     );
@@ -17,17 +17,11 @@ export default {
     return {
       apiState,
       fetch,
-      articles: computer((rawData) =>
-        (rawData?.stories ?? []).map((a) => new SharedArticle(a))
-      ),
-      nextPage: computer((rawData) => {
-        let page = rawData?.next_page;
-        if (!page) return null;
-        return {
-          name: "shared-articles",
-          query: { page },
-        };
-      }),
+      articles: computedList("stories", (a) => new SharedArticle(a)),
+      nextPage: computedProp("next_page", (page) => ({
+        name: "shared-articles",
+        query: { page },
+      })),
 
       fullName,
       roles,

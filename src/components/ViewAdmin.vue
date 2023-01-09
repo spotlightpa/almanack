@@ -9,7 +9,7 @@ export default {
   name: "ViewAdmin",
   props: ["page"],
   setup(props) {
-    const { apiState, fetch, computer } = watchAPI(
+    const { apiState, fetch, computedList, computedProp } = watchAPI(
       () => props.page || 0,
       (page) => get(listSharedArticles, { page, show: "all" })
     );
@@ -20,17 +20,11 @@ export default {
 
       apiState,
       fetch,
-      articles: computer((rawData) =>
-        (rawData?.stories ?? []).map((a) => new SharedArticle(a))
-      ),
-      nextPage: computer((rawData) => {
-        let page = rawData?.next_page;
-        if (!page) return null;
-        return {
-          name: "admin",
-          query: { page },
-        };
-      }),
+      articles: computedList("stories", (a) => new SharedArticle(a)),
+      nextPage: computedProp("next_page", (page) => ({
+        name: "admin",
+        query: { page },
+      })),
     };
   },
 };

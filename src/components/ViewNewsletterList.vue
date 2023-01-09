@@ -7,7 +7,7 @@ export default {
   props: { page: { default: "" } },
   setup(props) {
     let { listPages } = useClient();
-    const { apiState, fetch, computer } = watchAPI(
+    const { apiState, fetch, computedList, computedProp } = watchAPI(
       () => props.page,
       (page) =>
         listPages({
@@ -18,15 +18,11 @@ export default {
     return {
       apiState,
       fetch,
-      pages: computer((rawData) => (rawData ? PageListItem.from(rawData) : [])),
-      nextPage: computer((rawData) => {
-        let page = rawData?.next_page;
-        if (!page) return null;
-        return {
-          name: "newsletters",
-          query: { page },
-        };
-      }),
+      pages: computedList("pages", (page) => new PageListItem(page)),
+      nextPage: computedProp("next_page", (page) => ({
+        name: "newsletters",
+        query: { page },
+      })),
     };
   },
 };

@@ -9,7 +9,7 @@ export default {
   },
 
   setup(props) {
-    const { apiState, fetch, computer } = watchAPI(
+    const { apiState, fetch, computedObj } = watchAPI(
       () => props.id,
       (id) => get(getSharedArticle, { id })
     );
@@ -17,9 +17,7 @@ export default {
     return {
       apiState,
       fetch,
-      article: computer((rawData) =>
-        rawData ? new SharedArticle(rawData) : null
-      ),
+      article: computedObj((data) => new SharedArticle(data)),
     };
   },
 };
