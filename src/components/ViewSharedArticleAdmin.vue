@@ -20,7 +20,7 @@ const props = defineProps({
   id: String,
 });
 
-const { apiState, fetch, computer } = watchAPI(
+const { apiState, fetch, computedObj } = watchAPI(
   () => props.id,
   (id) => get(getSharedArticle, { id })
 );
@@ -32,8 +32,7 @@ const status = ref(null);
 const note = ref("");
 const embargo = ref(null);
 
-const article = computer((rawData) => {
-  if (!rawData) return null;
+const article = computedObj((rawData) => {
   let a = new SharedArticle(rawData);
   isDirty.value = false;
   status.value = a._status;

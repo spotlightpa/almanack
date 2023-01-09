@@ -46,5 +46,32 @@ export function watchAPI(watchCb, fetcher) {
     computer(cb) {
       return computed(() => cb(apiStateRefs.rawData.value));
     },
+    computedObj(cb) {
+      return computed(() => {
+        let val = apiStateRefs.rawData.value;
+        if (!val) {
+          return null;
+        }
+        return cb(val);
+      });
+    },
+    computedList(prop, cb) {
+      return computed(() => {
+        let val = apiStateRefs.rawData.value;
+        if (!val?.[prop]) {
+          return [];
+        }
+        return val[prop].map((obj) => cb(obj));
+      });
+    },
+    computedProp(prop, cb) {
+      return computed(() => {
+        let val = apiStateRefs.rawData.value;
+        if (!val?.[prop]) {
+          return null;
+        }
+        return cb(val[prop]);
+      });
+    },
   };
 }

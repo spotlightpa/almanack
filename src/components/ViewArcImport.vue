@@ -1,6 +1,4 @@
 <script>
-import { ref } from "vue";
-
 import {
   get,
   post,
@@ -15,9 +13,8 @@ import { formatDate } from "@/utils/time-format";
 export default {
   props: ["page"],
   setup(props) {
-    const first = ref(true);
-    const { apiState, fetch, computer } = watchAPI(
-      () => ({ page: props.page, refresh: props.page === "0" && !first.value }),
+    const { apiState, fetch, computedList, computedProp } = watchAPI(
+      () => ({ page: props.page, refresh: props.page === "0" }),
       (params) => get(listArcByLastUpdated, params)
     );
 
@@ -26,22 +23,11 @@ export default {
     return {
       apiState,
       fetch,
-      articles: computer((rawData) => {
-        if (!rawData?.stories) {
-          return [];
-        }
-        first.value = false;
-        let { stories } = rawData;
-        return stories.map((s) => SharedArticle.fromArc(s));
-      }),
-      nextPage: computer((rawData) => {
-        let page = rawData?.next_page;
-        if (!page) return null;
-        return {
-          name: "arc-import",
-          query: { page },
-        };
-      }),
+      articles: computedList("stories", (s) => SharedArticle.fromArc(s)),
+      nextPage: computedProp("next_page", (page) => ({
+        name: "arc-import",
+        query: { page },
+      })),
 
       importState,
       async doImport(article) {
