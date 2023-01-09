@@ -4,6 +4,7 @@ import { makeState } from "@/api/service-util.js";
 import { useClient } from "@/api/client.js";
 import { post as clientPost, postPageRefresh } from "@/api/client-v2.js";
 import imgproxyURL from "@/api/imgproxy-url.js";
+import maybeDate from "@/utils/maybe-date.js";
 
 export class Page {
   constructor(data) {
@@ -15,11 +16,11 @@ export class Page {
     this.sourceType = data["source_type"] ?? "";
     this.sourceID = data["source_id"] ?? "";
     this.createdAt = data["created_at"] ?? "";
-    this.publishedAt = Page.getDate(this.frontmatter, "published");
-    this.updatedAt = Page.getDate(data, "updated_at");
-    this.lastPublished = Page.getDate(data, "last_published");
-    this.scheduleFor = Page.getDate(data, "schedule_for");
-    this.eventDate = Page.getDate(this.frontmatter, "event-date");
+    this.publishedAt = maybeDate(this.frontmatter, "published");
+    this.updatedAt = maybeDate(data, "updated_at");
+    this.lastPublished = maybeDate(data, "last_published");
+    this.scheduleFor = maybeDate(data, "schedule_for");
+    this.eventDate = maybeDate(this.frontmatter, "event-date");
     this.eventTitle = this.frontmatter["event-title"] ?? "";
     this.eventURL = this.frontmatter["event-url"] ?? "";
     this.arcID = this.frontmatter["arc-id"] ?? "";
@@ -59,11 +60,6 @@ export class Page {
     }
   }
 
-  static getDate(data, prop) {
-    let date = data[prop] ?? null;
-    return date && new Date(date);
-  }
-
   get isPublished() {
     return !!this.lastPublished;
   }
@@ -90,7 +86,7 @@ export class Page {
     let [, dir, fname] = this.filePath.match(/^content\/(.+)\/([^/]+)\.md/);
     let slug = this.slug || fname;
     if (dir === "news" || dir === "statecollege") {
-      let date = this.scheduleFor ? new Date(this.scheduleFor) : new Date();
+      let date = this.publishedAt ?? new Date();
       let year = date.getFullYear();
       let month = (date.getMonth() + 1).toString().padStart(2, "0");
       dir = `${dir}/${year}/${month}`;
