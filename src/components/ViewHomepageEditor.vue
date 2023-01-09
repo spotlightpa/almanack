@@ -58,7 +58,6 @@ export default {
     let { apiState: listState, exec: listExec } = makeState();
     let { apiState: edPicksState, exec: edPickExec } = makeState();
     let state = reactive({
-      didLoad: computed(() => listState.didLoad && edPicksState.didLoad),
       isLoading: computed(() => listState.isLoading || edPicksState.isLoading),
       error: computed(() => listState.error ?? edPicksState.error),
       pages: computed(
