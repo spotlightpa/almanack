@@ -196,71 +196,67 @@ export default {
     <h2 class="mt-5 title">Shareable Articles</h2>
 
     <div class="table-container">
-      <table
-        class="table is-bordered is-striped is-narrow is-hoverable is-fullwidth"
-      >
-        <thead>
-          <tr>
-            <th>Slug</th>
-            <th>Status</th>
-            <th>Links</th>
-          </tr>
-        </thead>
+      <table class="table is-bordered is-striped is-narrow is-fullwidth">
         <tbody>
-          <tr v-for="article in articles" :key="article.id">
-            <td>
-              <router-link class="mr-2 middle" :to="article.adminRoute">
-                <font-awesome-icon :icon="['far', 'newspaper']" />
-                {{ article.slug }}
-              </router-link>
-            </td>
-            <td>
-              <span class="tag is-small" :class="article.statusClass">
-                <span class="icon is-size-6">
-                  <font-awesome-icon
-                    :icon="
-                      article.isShared
-                        ? ['fas', 'check-circle']
-                        : ['fas', 'pen-nib']
-                    "
-                  />
-                </span>
-                <span v-text="article.statusVerbose"></span>
-              </span>
-            </td>
-            <td>
-              <span class="tags">
-                <router-link class="tag is-light" :to="article.detailsRoute">
-                  <span class="icon">
-                    <font-awesome-icon :icon="['fas', 'file-invoice']" />
+          <template v-for="article in articles" :key="article.id">
+            <tr>
+              <td>
+                <h3 class="mt-1 mb-1 title is-3">
+                  <router-link class="mr-2 middle" :to="article.adminRoute">
+                    <font-awesome-icon :icon="['far', 'newspaper']" />
+                    {{ article.slug }}
+                  </router-link>
+                  <TagDate :date="article.arc.plannedDate" />
+                </h3>
+                <div class="mb-1 tags">
+                  <span class="tag is-small" :class="article.statusClass">
+                    <span class="icon is-size-6">
+                      <font-awesome-icon
+                        :icon="
+                          article.isShared
+                            ? ['fas', 'check-circle']
+                            : ['fas', 'pen-nib']
+                        "
+                      />
+                    </span>
+                    <span v-text="article.statusVerbose"></span>
                   </span>
-                  <span>Partner view</span>
-                </router-link>
 
-                <a
-                  v-if="article.isArc"
-                  class="tag is-light"
-                  :href="article.arc.arcURL"
-                  target="_blank"
-                >
-                  <span class="icon is-size-6">
-                    <font-awesome-icon :icon="['fas', 'link']" />
-                  </span>
-                  <span>Arc</span>
-                </a>
-                <router-link
-                  v-if="article.pageRoute"
-                  class="tag is-light"
-                  :to="article.pageRoute"
-                >
-                  <span class="icon">
-                    <font-awesome-icon :icon="['fas', 'user-clock']" />
-                  </span>
-                  <span>Spotlight admin</span>
-                </router-link>
-              </span>
-            </td>
-          </tr>
+                  <router-link class="tag is-light" :to="article.detailsRoute">
+                    <span class="icon">
+                      <font-awesome-icon :icon="['fas', 'file-invoice']" />
+                    </span>
+                    <span>Partner view</span>
+                  </router-link>
+
+                  <a
+                    v-if="article.isArc"
+                    class="tag is-light"
+                    :href="article.arc.arcURL"
+                    target="_blank"
+                  >
+                    <span class="icon is-size-6">
+                      <font-awesome-icon :icon="['fas', 'link']" />
+                    </span>
+                    <span>Arc</span>
+                  </a>
+                  <router-link
+                    v-if="article.pageRoute"
+                    class="tag is-light"
+                    :to="article.pageRoute"
+                  >
+                    <span class="icon">
+                      <font-awesome-icon :icon="['fas', 'user-clock']" />
+                    </span>
+                    <span>Spotlight admin</span>
+                  </router-link>
+                </div>
+                <p class="mb-1 content">
+                  {{ article.arc.budgetLine }}
+                </p>
+              </td>
+            </tr>
+          </template>
         </tbody>
       </table>
     </div>
