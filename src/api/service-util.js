@@ -7,7 +7,6 @@ export function makeState() {
     rawData: null,
     isLoading: false,
     error: null,
-    didLoad: false,
     isLoadingThrottled: null,
   });
 
@@ -28,7 +27,6 @@ export function makeState() {
       apiState.isLoading = false;
       if (!apiState.error) {
         apiState.rawData = data;
-        apiState.didLoad = true;
       }
     },
   };

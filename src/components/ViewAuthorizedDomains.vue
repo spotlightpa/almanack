@@ -10,7 +10,6 @@ function domainState() {
   let { apiState: addState, exec: addExec } = makeState();
 
   let apiState = reactive({
-    didLoad: computed(() => listState.didLoad || addState.didLoad),
     isLoading: computed(() => listState.isLoading || addState.isLoading),
     errors: computed(() =>
       [listState.error, addState.error].filter((o) => !!o)
@@ -53,7 +52,6 @@ function addressState() {
   let { apiState: addState, exec: addExec } = makeState();
 
   let apiState = reactive({
-    didLoad: computed(() => listState.didLoad || addState.didLoad),
     isLoading: computed(() => listState.isLoading || addState.isLoading),
     errors: computed(() =>
       [listState.error, addState.error].filter((o) => !!o)
