@@ -6,6 +6,7 @@ import Page from "@/api/spotlightpa-all-pages-item.js";
 
 import { formatDateTime, today, tomorrow } from "@/utils/time-format.js";
 import useScrollTo from "@/utils/use-scroll-to.js";
+import maybeDate from "@/utils/maybe-date.js";
 
 class EditorsPicksData {
   constructor(siteConfig, pagesByPath) {
@@ -18,9 +19,8 @@ class EditorsPicksData {
       let a = siteConfig.data?.[prop] ?? [];
       this[prop] = a.map((s) => this.pagesByPath.get(s)).filter((a) => !!a);
     }
-    this.scheduleFor = siteConfig.schedule_for;
-    let pub = siteConfig.published_at;
-    this.publishedAt = pub ? new Date(pub) : null;
+    this.scheduleFor = maybeDate(siteConfig, "schedule_for");
+    this.publishedAt = maybeDate(siteConfig, "published_at");
     this.isCurrent = !!this.publishedAt;
   }
 

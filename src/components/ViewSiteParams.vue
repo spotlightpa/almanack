@@ -6,13 +6,12 @@ import { useFileList } from "@/api/file-list.js";
 
 import { formatDateTime, today, tomorrow } from "@/utils/time-format.js";
 import useScrollTo from "@/utils/use-scroll-to.js";
+import maybeDate from "@/utils/maybe-date.js";
 
 class SiteParams {
   constructor(config) {
-    let scheduleFor = config.schedule_for;
-    this.scheduleFor = scheduleFor ? new Date(scheduleFor) : null;
-    let pub = config.published_at;
-    this.publishedAt = pub ? new Date(pub) : null;
+    this.scheduleFor = maybeDate(config, "schedule_for");
+    this.publishedAt = maybeDate(config, "published_at");
     this.isCurrent = !!this.publishedAt;
     this.data = config.data;
   }
