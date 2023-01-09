@@ -1,26 +1,17 @@
-<script>
+<script setup>
 import { get, getSharedArticle } from "@/api/client-v2.js";
 import { watchAPI } from "@/api/service-util.js";
 import SharedArticle from "@/api/shared-article.js";
 
-export default {
-  props: {
-    id: String,
-  },
+const props = defineProps({
+  id: String,
+});
 
-  setup(props) {
-    const { apiState, fetch, computedObj } = watchAPI(
-      () => props.id,
-      (id) => get(getSharedArticle, { id })
-    );
-
-    return {
-      apiState,
-      fetch,
-      article: computedObj((data) => new SharedArticle(data)),
-    };
-  },
-};
+const { apiState, fetch, computedObj } = watchAPI(
+  () => props.id,
+  (id) => get(getSharedArticle, { id })
+);
+const article = computedObj((data) => new SharedArticle(data));
 </script>
 
 <template>
