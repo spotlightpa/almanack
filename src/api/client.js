@@ -28,9 +28,6 @@ const endpoints = {
   // get id endpoints
   getPage: (id) => `/api/page/${id}`,
   getPageWithContent: (id) => `/api/page-with-content/${id}`,
-  // post id endpoints
-  postRefreshPageFromMailchimp: (id) =>
-    `/api/refresh-page-from-mailchimp/${id}`,
 
   // GET and POST listed as two endpoints
   listAllPages: `/api/all-pages`,
@@ -182,11 +179,6 @@ function makeClient($auth) {
   for (let action of idGetActions) {
     let endpointFn = endpoints[action];
     actions[action] = (id) => tryTo(request(endpointFn(id)));
-  }
-  let idPostActions = ["postRefreshPageFromMailchimp"];
-  for (let action of idPostActions) {
-    let endpointFn = endpoints[action];
-    actions[action] = (id) => tryTo(post(endpointFn(id)));
   }
 
   let simpleGetActions = [

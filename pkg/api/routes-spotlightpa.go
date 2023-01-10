@@ -10,7 +10,6 @@ import (
 	"github.com/carlmjohnson/resperr"
 	"github.com/jackc/pgtype"
 	"github.com/spotlightpa/almanack/internal/db"
-	"github.com/spotlightpa/almanack/internal/mailchimp"
 	"github.com/spotlightpa/almanack/internal/paginate"
 	"github.com/spotlightpa/almanack/pkg/almanack"
 	"golang.org/x/exp/slices"
@@ -546,7 +545,8 @@ func (app *appEnv) postPage(w http.ResponseWriter, r *http.Request) {
 func (app *appEnv) postPageRefresh(w http.ResponseWriter, r *http.Request) {
 	app.Print("start postPageRefresh")
 	var req struct {
-		ID int64 `json:"id,string"`
+		ID              int64 `json:"id,string"`
+		RefreshMetadata bool  `json:"refresh_metadata"`
 	}
 	if !app.readJSON(w, r, &req) {
 		return
@@ -561,8 +561,23 @@ func (app *appEnv) postPageRefresh(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// TODO: test if it's a MailChimp page
-	arcID, _ := page.Frontmatter["arc-id"].(string)
+	if page.SourceType == "mailchimp" {
+		err = app.svc.RefreshPageFromMailchimp(r.Context(), &page)
+		if err != nil {
+			app.replyErr(w, r, err)
+			return
+		}
+		app.replyJSON(http.StatusOK, w, &page)
+		return
+	}
+
+	if page.SourceType != "arc" {
+		app.replyNewErr(http.StatusConflict, w, r,
+			"cannot refresh page %d type %q", id, page.SourceType)
+		return
+	}
+
+	arcID := page.SourceID
 	if arcID == "" {
 		app.replyNewErr(http.StatusConflict, w, r, "no arc-id on page %d", id)
 		return
@@ -585,7 +600,7 @@ func (app *appEnv) postPageRefresh(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if warnings, err := app.svc.RefreshPageFromArcStory(r.Context(), &page, &story); err != nil {
+	if warnings, err := app.svc.RefreshPageFromArcStory(r.Context(), &page, &story, req.RefreshMetadata); err != nil {
 		app.replyErr(w, r, err)
 		return
 	} else {
@@ -705,35 +720,6 @@ func (app *appEnv) setSiteData(loc string) http.HandlerFunc {
 
 		app.replyJSON(http.StatusOK, w, res)
 	}
-}
-
-func (app *appEnv) postRefreshPageFromMailchimp(w http.ResponseWriter, r *http.Request) {
-	var id int64
-	mustIntParam(r, "id", &id)
-	app.Printf("start postRefreshPageFromMailchimp for %d", id)
-
-	archiveURL, err := app.svc.Queries.GetArchiveURLForPageID(r.Context(), id)
-	if err != nil {
-		app.replyErr(w, r, err)
-		return
-	}
-	if archiveURL == "" {
-		app.replyNewErr(http.StatusConflict, w, r, "no archiveURL for page %d", id)
-	}
-	body, err := mailchimp.ImportPage(r.Context(), app.svc.Client, archiveURL)
-	if err != nil {
-		app.replyErr(w, r, err)
-		return
-	}
-	page, err := app.svc.Queries.UpdatePageRawContent(r.Context(), db.UpdatePageRawContentParams{
-		ID:         id,
-		RawContent: body,
-	})
-	if err != nil {
-		app.replyErr(w, r, err)
-		return
-	}
-	app.replyJSON(http.StatusOK, w, &page)
 }
 
 func (app *appEnv) listPagesByFTS(w http.ResponseWriter, r *http.Request) {

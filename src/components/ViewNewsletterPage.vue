@@ -359,7 +359,7 @@ export default {
           type="button"
           title="Remember to update published pages after refreshing"
           @click.prevent="
-            mailchimpRefresh().then(() =>
+            refreshFromSource().then(() =>
               $refs.iframe.contentDocument.location.reload(true)
             )
           "

@@ -412,18 +412,33 @@ export default {
         </a>
       </div>
 
-      <BulmaTextarea v-model="page.body" label="Page content" :rows="8" />
-
-      <button
-        v-if="page.arcID"
-        class="block button is-warning has-text-weight-semibold"
-        :class="{ 'is-loading': isLoadingThrottled }"
-        type="button"
-        title="Remember to update published pages after refreshing"
-        @click.prevent="arcRefresh"
+      <BulmaField
+        label="Content"
+        help="Remember to save pages after refreshing"
       >
-        Refresh content from Arc
-      </button>
+        <BulmaTextarea v-model="page.body" label="Page content" :rows="8" />
+
+        <div class="buttons">
+          <button
+            v-if="page.arcID"
+            class="block button is-warning is-small has-text-weight-semibold"
+            :class="{ 'is-loading': isLoadingThrottled }"
+            type="button"
+            @click.prevent="refreshFromSource({ metadata: false })"
+          >
+            Refresh content from Arc
+          </button>
+          <button
+            v-if="page.arcID"
+            class="block button is-warning is-small has-text-weight-semibold"
+            :class="{ 'is-loading': isLoadingThrottled }"
+            type="button"
+            @click.prevent="refreshFromSource({ metadata: true })"
+          >
+            Refresh content and metadata from Arc
+          </button>
+        </div>
+      </BulmaField>
 
       <details class="field">
         <summary class="has-text-weight-semibold">Advanced options</summary>
