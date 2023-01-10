@@ -412,12 +412,9 @@ export default {
         </a>
       </div>
 
-      <BulmaField
-        label="Content"
-        help="Remember to save pages after refreshing"
-      >
-        <BulmaTextarea v-model="page.body" label="Page content" :rows="8" />
+      <BulmaTextarea v-model="page.body" label="Content" :rows="8" />
 
+      <BulmaField help="Remember to save pages after refreshing">
         <div class="buttons">
           <button
             v-if="page.arcID"
