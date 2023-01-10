@@ -78,7 +78,7 @@ func ArcFeedItemToFrontmatter(ctx context.Context, svc Services, arcStory *arc.F
 	imageCredit := fixCredit(strings.Join(credits, " / "))
 	imageDescription := p.Basic.Caption
 
-	if strings.HasPrefix(imageURL, "http") {
+	if imageURL != "" {
 		var imgerr error
 		imageURL, imgerr = svc.ReplaceImageURL(
 			ctx, imageURL, imageDescription, imageCredit)
