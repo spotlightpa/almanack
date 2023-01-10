@@ -211,12 +211,7 @@ function useAutocompletions() {
 }
 
 export function usePage(id) {
-  const {
-    getPageWithContent,
-    postPage,
-    listImages,
-    postRefreshPageFromMailchimp,
-  } = useClient();
+  const { getPageWithContent, postPage, listImages } = useClient();
   const { apiState, exec } = makeState();
 
   const fetch = (id) => exec(() => getPageWithContent(id));
@@ -282,11 +277,13 @@ export function usePage(id) {
       page.value.scheduleFor = null;
       return post(page.value);
     },
-    arcRefresh() {
-      return exec(() => clientPost(postPageRefresh, { id: id.value }));
-    },
-    mailchimpRefresh() {
-      return exec(() => postRefreshPageFromMailchimp(id.value));
+    refreshFromSource({ metadata } = {}) {
+      return exec(() =>
+        clientPost(postPageRefresh, {
+          id: id.value,
+          refresh_metadata: metadata,
+        })
+      );
     },
     imageState,
     images: computed(() =>

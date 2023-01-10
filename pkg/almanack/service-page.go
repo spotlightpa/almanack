@@ -3,16 +3,20 @@ package almanack
 import (
 	"context"
 	"fmt"
+	"net/http"
 
 	"github.com/carlmjohnson/errutil"
+	"github.com/carlmjohnson/resperr"
 	"github.com/jackc/pgtype"
 	"github.com/jackc/pgx/v4"
 	"github.com/spotlightpa/almanack/internal/arc"
 	"github.com/spotlightpa/almanack/internal/db"
+	"github.com/spotlightpa/almanack/internal/mailchimp"
 	"github.com/spotlightpa/almanack/internal/slack"
 	"github.com/spotlightpa/almanack/internal/stringx"
 	"github.com/spotlightpa/almanack/internal/timex"
 	"github.com/spotlightpa/almanack/pkg/common"
+	"golang.org/x/exp/maps"
 )
 
 func (svc Services) PublishPage(ctx context.Context, q *db.Queries, page *db.Page) (err, warning error) {
@@ -137,7 +141,7 @@ func (svc Services) RefreshPageContents(ctx context.Context, id int64) (err erro
 	return err
 }
 
-func (svc Services) RefreshPageFromArcStory(ctx context.Context, page *db.Page, story *db.Arc) (warnings []string, err error) {
+func (svc Services) RefreshPageFromArcStory(ctx context.Context, page *db.Page, story *db.Arc, refreshMetadata bool) (warnings []string, err error) {
 	defer errutil.Trace(&err)
 
 	var feedItem arc.FeedItem
@@ -150,6 +154,19 @@ func (svc Services) RefreshPageFromArcStory(ctx context.Context, page *db.Page, 
 	}
 
 	page.Body = body
+
+	if refreshMetadata {
+		fm, err := ArcFeedItemToFrontmatter(ctx, svc, &feedItem)
+		if err != nil {
+			return nil, err
+		}
+		// Update existing metadata without overwriting missing keys
+		if page.Frontmatter == nil {
+			page.Frontmatter = make(db.Map)
+		}
+		maps.Copy(page.Frontmatter, fm)
+	}
+
 	return warnings, nil
 }
 
@@ -265,4 +282,30 @@ func (svc Services) Notify(ctx context.Context, page *db.Page, publishingNow boo
 			},
 		},
 	})
+}
+
+func (svc Services) RefreshPageFromMailchimp(ctx context.Context, page *db.Page) (err error) {
+	defer errutil.Trace(&err)
+
+	id := page.ID
+	archiveURL, err := svc.Queries.GetArchiveURLForPageID(ctx, id)
+	if err != nil {
+		return err
+	}
+	if archiveURL == "" {
+		return resperr.New(http.StatusConflict, "no archiveURL for page %d", id)
+	}
+
+	body, err := mailchimp.ImportPage(ctx, svc.Client, archiveURL)
+	if err != nil {
+		return err
+	}
+	*page, err = svc.Queries.UpdatePageRawContent(ctx, db.UpdatePageRawContentParams{
+		ID:         id,
+		RawContent: body,
+	})
+	if err != nil {
+		return err
+	}
+	return nil
 }

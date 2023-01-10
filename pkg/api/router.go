@@ -63,7 +63,6 @@ func (app *appEnv) routes() http.Handler {
 			r.Get(`/pages`, app.listPages)
 			r.Get(`/pages-by-fts`, app.listPagesByFTS)
 			r.Post(`/page-refresh`, app.postPageRefresh)
-			r.Post(`/refresh-page-from-mailchimp/{id:\d+}`, app.postRefreshPageFromMailchimp)
 			r.Post(`/shared-article`, app.postSharedArticle)
 			r.Post(`/shared-article-from-arc`, app.postSharedArticleFromArc)
 			r.Get(`/sidebar`, app.getSiteData(almanack.SidebarLoc))
