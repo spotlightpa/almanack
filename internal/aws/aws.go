@@ -30,15 +30,15 @@ func AddFlags(fl *flag.FlagSet) func() (imageStore, fileStore BlobStore) {
 	return func() (imageStore, fileStore BlobStore) {
 		err := register("s3-cli", *region, *accessKeyID, *secretAccessKey)
 		if err != nil {
-			almlog.Slogger.Error("aws.register", err)
+			almlog.Logger.Error("aws.register", err)
 		}
 		imageStore = BlobStore{*ibucket}
 		if *ibucket == "mem://" {
-			almlog.Slogger.Warn("mocking AWS image bucket")
+			almlog.Logger.Warn("mocking AWS image bucket")
 		}
 		fileStore = BlobStore{*fbucket}
 		if *fbucket == "mem://" {
-			almlog.Slogger.Warn("mocking AWS file bucket")
+			almlog.Logger.Warn("mocking AWS file bucket")
 		}
 		return
 	}

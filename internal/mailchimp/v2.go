@@ -21,7 +21,7 @@ type EmailService interface {
 
 func NewMailService(apiKey, listID string, c *http.Client) EmailService {
 	if apiKey == "" || listID == "" {
-		almlog.Slogger.Warn("mocking email service")
+		almlog.Logger.Warn("mocking email service")
 		return MockEmailService{}
 	}
 	return V2{apiKey, listID, c}

@@ -19,7 +19,7 @@ func NewService(isLambda bool) AuthService {
 	if isLambda {
 		return NetlifyAuth{}
 	}
-	almlog.Slogger.Warn("mocking auth")
+	almlog.Logger.Warn("mocking auth")
 	return MockAuthService{}
 }
 

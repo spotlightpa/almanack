@@ -15,7 +15,7 @@ func AddFlags(fl *flag.FlagSet) func() Indexer {
 	indexName := fl.String("indexer-index-name", "", "`index` name for Algolia")
 	return func() Indexer {
 		if *apiKey == "" {
-			almlog.Slogger.Warn("mocking indexer")
+			almlog.Logger.Warn("mocking indexer")
 			return MockIndexer{}
 		}
 
@@ -33,7 +33,7 @@ type MockIndexer struct {
 }
 
 func (mi MockIndexer) SaveObject(object any, opts ...any) (res search.SaveObjectRes, err error) {
-	l := almlog.Slogger
+	l := almlog.Logger
 	for _, opt := range opts {
 		if ctx, ok := opt.(context.Context); ok {
 			l = slog.FromContext(ctx)
