@@ -8,7 +8,7 @@ import (
 	"golang.org/x/exp/slog"
 )
 
-var Slogger *slog.Logger
+var Logger *slog.Logger
 
 var Level = &slog.LevelVar{}
 
@@ -24,13 +24,13 @@ func removeTime(groups []string, a slog.Attr) slog.Attr {
 	return a
 }
 
-func LambdaLogger() {
+func UseLambdaLogger() {
 	opts := slog.HandlerOptions{
 		Level:       Level,
 		ReplaceAttr: removeTime,
 	}
-	Slogger = slog.New(opts.NewTextHandler(os.Stderr))
-	slog.SetDefault(Slogger)
+	Logger = slog.New(opts.NewTextHandler(os.Stderr))
+	slog.SetDefault(Logger)
 }
 
 func shortenTime(groups []string, a slog.Attr) slog.Attr {
@@ -41,13 +41,13 @@ func shortenTime(groups []string, a slog.Attr) slog.Attr {
 	return a
 }
 
-func DevLogger() {
+func UseDevLogger() {
 	opts := slog.HandlerOptions{
 		Level:       Level,
 		ReplaceAttr: shortenTime,
 	}
-	Slogger = slog.New(opts.NewTextHandler(colorize{os.Stderr}))
-	slog.SetDefault(Slogger)
+	Logger = slog.New(opts.NewTextHandler(colorize{os.Stderr}))
+	slog.SetDefault(Logger)
 }
 
 func LevelThreshold[T time.Duration | int](val, warn, err T) slog.Level {

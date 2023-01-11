@@ -35,7 +35,7 @@ func (app *appEnv) replyJSON(statusCode int, w http.ResponseWriter, data any) {
 	w.WriteHeader(statusCode)
 	enc := json.NewEncoder(w)
 	if err := enc.Encode(data); err != nil {
-		almlog.Slogger.Error("replyJSON", err)
+		almlog.Logger.Error("replyJSON", err)
 	}
 }
 

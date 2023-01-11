@@ -12,7 +12,7 @@ func Middleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		start := time.Now()
 		ww := middleware.NewWrapResponseWriter(w, r.ProtoMajor)
-		ctx := slog.NewContext(r.Context(), Slogger)
+		ctx := slog.NewContext(r.Context(), Logger)
 		r = r.WithContext(ctx)
 
 		defer func() {
@@ -22,7 +22,7 @@ func Middleware(next http.Handler) http.Handler {
 			if l2 := LevelThreshold(status, 400, 500); l2 > level {
 				level = l2
 			}
-			Slogger.Log(level, "ServeHTTP",
+			Logger.Log(level, "ServeHTTP",
 				"req_method", r.Method,
 				"req_ip", r.RemoteAddr,
 				"req_path", r.RequestURI,

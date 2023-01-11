@@ -60,9 +60,9 @@ func (app *appEnv) parseArgs(args []string) error {
 		return err
 	}
 	if app.isLambda {
-		almlog.LambdaLogger()
+		almlog.UseLambdaLogger()
 	} else {
-		almlog.DevLogger()
+		almlog.UseDevLogger()
 	}
 	if err := app.initSentry(*sentryDSN); err != nil {
 		return err
@@ -96,7 +96,7 @@ func (app *appEnv) exec() error {
 		u, _ := url.Parse(almanack.DeployURL)
 		host = u.Hostname()
 	}
-	almlog.Slogger.Info("appEnv.exec",
+	almlog.Logger.Info("appEnv.exec",
 		"app", AppName,
 		"version", versioninfo.Short(),
 		"is-lambda", app.isLambda,
@@ -113,10 +113,10 @@ func (app *appEnv) exec() error {
 func (app *appEnv) initSentry(dsn string) error {
 	var transport sentry.Transport
 	if app.isLambda {
-		almlog.Slogger.Debug("initSentry", "sync", true, "timeout", 5*time.Second)
+		almlog.Logger.Debug("initSentry", "sync", true, "timeout", 5*time.Second)
 		transport = &sentry.HTTPSyncTransport{Timeout: 5 * time.Second}
 	} else {
-		almlog.Slogger.Debug("initSentry", "sync", false, "timeout", false)
+		almlog.Logger.Debug("initSentry", "sync", false, "timeout", false)
 	}
 	return sentry.Init(sentry.ClientOptions{
 		Dsn:       dsn,

@@ -14,14 +14,14 @@ type MockClient struct {
 }
 
 func NewMockClient(dir string) *MockClient {
-	almlog.Slogger.Warn("mocking Github", "dir", dir)
+	almlog.Logger.Warn("mocking Github", "dir", dir)
 	if dir == "" {
 		var err error
 		// we don't clean up temp dir:
 		// good for testing but don't use this in prod!
 		dir, err = os.MkdirTemp("", "example")
 		if err != nil {
-			almlog.Slogger.Error("creating temporary directory",
+			almlog.Logger.Error("creating temporary directory",
 				err, "dir", dir)
 		}
 	}
