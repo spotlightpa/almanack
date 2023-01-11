@@ -9,10 +9,11 @@ import (
 	"github.com/carlmjohnson/errutil"
 	"github.com/jackc/pgx/v4"
 	"github.com/spotlightpa/almanack/internal/db"
-	"github.com/spotlightpa/almanack/pkg/common"
+	"golang.org/x/exp/slog"
 )
 
 func (svc Services) PopScheduledSiteChanges(ctx context.Context, loc string) error {
+	l := slog.FromContext(ctx)
 	err := svc.Tx.Begin(ctx, pgx.TxOptions{}, func(q *db.Queries) (txerr error) {
 		defer errutil.Trace(&txerr)
 
@@ -28,10 +29,10 @@ func (svc Services) PopScheduledSiteChanges(ctx context.Context, loc string) err
 			}
 		}
 		if currentConfig == nil {
-			common.Logger.Printf("site data: no changes to %s", loc)
+			l.Info("Services.PopScheduledSiteChanges: no changes", "location", loc)
 			return nil
 		}
-		common.Logger.Printf("site data: updating %s", loc)
+		l.Info("Services.PopScheduledSiteChanges: updating", "location", loc)
 
 		return svc.PublishSiteConfig(ctx, currentConfig)
 	})

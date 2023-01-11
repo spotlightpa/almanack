@@ -10,8 +10,9 @@ import (
 	"github.com/carlmjohnson/requests"
 	"github.com/carlmjohnson/resperr"
 	"github.com/mattbaird/gochimp"
+	"golang.org/x/exp/slog"
 
-	"github.com/spotlightpa/almanack/pkg/common"
+	"github.com/spotlightpa/almanack/pkg/almlog"
 )
 
 type EmailService interface {
@@ -20,7 +21,7 @@ type EmailService interface {
 
 func NewMailService(apiKey, listID string, c *http.Client) EmailService {
 	if apiKey == "" || listID == "" {
-		common.Logger.Printf("using mock mail service")
+		almlog.Slogger.Warn("mocking email service")
 		return MockEmailService{}
 	}
 	return V2{apiKey, listID, c}
@@ -66,7 +67,9 @@ func (v2 V2) SendEmail(ctx context.Context, subject, body string) (err error) {
 	if err != nil {
 		return err
 	}
-	common.Logger.Printf("created campaign %q", resp.Id)
+	l := slog.FromContext(ctx)
+	l.Info("mailchimp.SendEmail: created campaign", "campaign_id", resp.Id)
+
 	type v2CampaignSend struct {
 		APIKey     string `json:"apikey"`
 		CampaignID string `json:"cid"`
@@ -82,7 +85,7 @@ func (v2 V2) SendEmail(ctx context.Context, subject, body string) (err error) {
 		}).
 		ToJSON(&resp2).
 		Fetch(ctx)
-	common.Logger.Printf("sent %v", resp2.Complete)
+	l.Info("mailchimp.SendEmail: sent campaign", "campaign_id", resp.Id, "complete", resp2.Complete)
 	return err
 }
 
@@ -90,7 +93,9 @@ type MockEmailService struct {
 }
 
 func (mock MockEmailService) SendEmail(ctx context.Context, subject, body string) error {
-	common.Logger.Printf("no MailChimp client, debugging output\n")
+	l := slog.FromContext(ctx)
+	l.Info("mocking campaign, debug output")
+	fmt.Println()
 	fmt.Println(subject)
 	fmt.Println("----")
 	fmt.Println(body)

@@ -8,7 +8,7 @@ import (
 
 	"github.com/carlmjohnson/errutil"
 	"github.com/spotlightpa/almanack/internal/db"
-	"github.com/spotlightpa/almanack/pkg/common"
+	"golang.org/x/exp/slog"
 )
 
 func (svc Services) ReplaceImageURL(ctx context.Context, srcURL, description, credit string) (s string, err error) {
@@ -50,7 +50,8 @@ func (svc Services) ReplaceImageURL(ctx context.Context, srcURL, description, cr
 func (svc Services) UpdateMostPopular(ctx context.Context) (err error) {
 	defer errutil.Trace(&err)
 
-	common.Logger.Printf("updating most popular")
+	l := slog.FromContext(ctx)
+	l.Info("Services.UpdateMostPopular")
 	cl, err := svc.gsvc.GAClient(ctx)
 	if err != nil {
 		return err

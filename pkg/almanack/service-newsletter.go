@@ -12,7 +12,7 @@ import (
 	"github.com/spotlightpa/almanack/internal/mailchimp"
 	"github.com/spotlightpa/almanack/internal/stringx"
 	"github.com/spotlightpa/almanack/internal/timex"
-	"github.com/spotlightpa/almanack/pkg/common"
+	"golang.org/x/exp/slog"
 )
 
 func (svc Services) UpdateNewsletterArchives(ctx context.Context, types []db.NewsletterType) (err error) {
@@ -36,18 +36,16 @@ func (svc Services) UpdateNewsletterArchive(ctx context.Context, campaigns *mail
 	if err = data.Set(newItems); err != nil {
 		return err
 	}
-	if n, err := svc.Queries.UpdateNewsletterArchives(ctx, db.UpdateNewsletterArchivesParams{
+	n, err := svc.Queries.UpdateNewsletterArchives(ctx, db.UpdateNewsletterArchivesParams{
 		Type: dbType,
 		Data: data,
-	}); err != nil {
+	})
+	if err != nil {
 		return err
-	} else if n == 0 {
-		// abort if there's nothing new to update
-		common.Logger.Printf("%q got no new items", mcType)
-		return nil
-	} else {
-		common.Logger.Printf("%q got %d new items", mcType, n)
 	}
+	l := slog.FromContext(ctx)
+	l.Info("Services.UpdateNewsletterArchive",
+		"mcType", mcType, "new-items", n)
 
 	return nil
 }
@@ -62,7 +60,10 @@ func (svc Services) ImportNewsletterPages(ctx context.Context, types []db.Newsle
 	if err != nil {
 		return err
 	}
-	common.Logger.Printf("importing %d newsletter pages", len(nls))
+	l := slog.FromContext(ctx)
+	l.Info("Services.ImportNewsletterPages",
+		"new-items", len(nls))
+
 	for _, nl := range nls {
 		body, err := mailchimp.ImportPage(ctx, svc.Client, nl.ArchiveURL)
 		if err != nil {

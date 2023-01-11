@@ -24,11 +24,12 @@ import (
 )
 
 func (app *appEnv) notFound(w http.ResponseWriter, r *http.Request) {
+	app.logStart(r)
 	app.replyErr(w, r, resperr.NotFound(r))
 }
 
 func (app *appEnv) ping(w http.ResponseWriter, r *http.Request) {
-	app.Println("start ping")
+	app.logStart(r)
 	w.Header().Set("Content-Type", "text/plain")
 	w.Header().Set("Cache-Control", "public, max-age=60")
 	b, err := httputil.DumpRequest(r, true)
@@ -43,7 +44,7 @@ func (app *appEnv) ping(w http.ResponseWriter, r *http.Request) {
 func (app *appEnv) pingErr(w http.ResponseWriter, r *http.Request) {
 	code := chi.URLParam(r, "code")
 	statusCode, _ := strconv.Atoi(code)
-	app.Printf("start pingErr %q", code)
+	app.logStart(r, "code", code)
 
 	app.replyNewErr(statusCode, w, r, "got test ping %q", code)
 }
@@ -51,7 +52,7 @@ func (app *appEnv) pingErr(w http.ResponseWriter, r *http.Request) {
 var inkyURL = must.Get(url.Parse("https://www.inquirer.com"))
 
 func (app *appEnv) getProxyImage(w http.ResponseWriter, r *http.Request) {
-	app.Println("start getProxyImage")
+	app.logStart(r)
 
 	encURL := chi.URLParam(r, "encURL")
 	decURL, err := base64.URLEncoding.DecodeString(encURL)
@@ -88,7 +89,7 @@ func (app *appEnv) getProxyImage(w http.ResponseWriter, r *http.Request) {
 
 func (app *appEnv) getBookmarklet(w http.ResponseWriter, r *http.Request) {
 	slug := chi.URLParam(r, "slug")
-	app.Printf("starting getBookmarklet for %q", slug)
+	app.logStart(r, "slug", slug)
 
 	page, err := app.svc.Queries.GetPageByURLPath(r.Context(), "%"+slug+"%")
 	if err != nil {
@@ -106,7 +107,8 @@ func (app *appEnv) getBookmarklet(w http.ResponseWriter, r *http.Request) {
 }
 
 func (app *appEnv) postIdentityHook(w http.ResponseWriter, r *http.Request) {
-	app.Println("start postIdentityHook")
+	app.logStart(r)
+
 	var req struct {
 		EventType string         `json:"event"`
 		User      netlifyid.User `json:"user"`

@@ -7,7 +7,7 @@ import (
 
 	"github.com/jackc/pgx/v4"
 	"github.com/jackc/pgx/v4/pgxpool"
-	"github.com/spotlightpa/almanack/pkg/common"
+	"github.com/spotlightpa/almanack/pkg/almlog"
 )
 
 // AddFlags adds an option to the specified FlagSet that creates and tests a DB
@@ -36,7 +36,7 @@ func Open(dbURL string) (p *pgxpool.Pool, err error) {
 		ctx2, cancel := context.WithTimeout(context.Background(), 1*time.Second)
 		defer cancel()
 		if err := db.Ping(ctx2); err != nil {
-			common.Logger.Printf("error in initial ping database: %v", err)
+			almlog.Slogger.Error("db.Ping", err)
 		}
 	}()
 

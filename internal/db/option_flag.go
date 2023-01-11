@@ -4,10 +4,11 @@ import (
 	"context"
 	"flag"
 
-	"github.com/spotlightpa/almanack/pkg/common"
+	"golang.org/x/exp/slog"
 )
 
 func FlagFromOption(ctx context.Context, q *Queries, fl *flag.FlagSet, name string) error {
+	l := slog.FromContext(ctx)
 	needsVal := true
 	fl.Visit(func(f *flag.Flag) {
 		if f.Name == name {
@@ -15,10 +16,10 @@ func FlagFromOption(ctx context.Context, q *Queries, fl *flag.FlagSet, name stri
 		}
 	})
 	if !needsVal {
-		common.Logger.Printf("flag option: override of %s", name)
+		l.Info("db.FlagFromOption: override", "name", name)
 		return nil
 	}
-	common.Logger.Printf("flag option: getting %s", name)
+	l.Info("db.FlagFromOption: get", "name", name)
 
 	val, err := q.GetOption(ctx, name)
 	if err != nil {

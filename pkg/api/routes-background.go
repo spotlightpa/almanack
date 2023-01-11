@@ -9,15 +9,17 @@ import (
 	"github.com/spotlightpa/almanack/internal/db"
 	"github.com/spotlightpa/almanack/internal/paginate"
 	"github.com/spotlightpa/almanack/pkg/almanack"
+	"golang.org/x/exp/slog"
 	"golang.org/x/sync/errgroup"
 )
 
 func (app *appEnv) backgroundSleep(w http.ResponseWriter, r *http.Request) {
-	app.Println("start backgroundSleep")
+	app.logStart(r)
+	l := slog.FromContext(r.Context())
 	if deadline, ok := r.Context().Deadline(); ok {
-		app.Printf("deadline: %s", deadline.Format(time.RFC1123))
+		l.Info("backgroundSleep", "deadline", deadline)
 	} else {
-		app.Printf("no deadline")
+		l.Info("backgroundSleep", "deadline", false)
 	}
 	durationStr := chi.URLParam(r, "duration")
 	duration, err := time.ParseDuration(durationStr)
@@ -32,7 +34,7 @@ func (app *appEnv) backgroundSleep(w http.ResponseWriter, r *http.Request) {
 }
 
 func (app *appEnv) backgroundCron(w http.ResponseWriter, r *http.Request) {
-	app.Println("start background cron")
+	app.logStart(r)
 
 	if err := errutil.ExecParallel(func() error {
 		var errs errutil.Slice
@@ -74,7 +76,7 @@ func (app *appEnv) backgroundCron(w http.ResponseWriter, r *http.Request) {
 }
 
 func (app *appEnv) backgroundRefreshPages(w http.ResponseWriter, r *http.Request) {
-	app.Println("start backgroundRefreshPages")
+	app.logStart(r)
 
 	hasMore := true
 	for queryPage := int32(0); hasMore; queryPage++ {
@@ -105,7 +107,7 @@ func (app *appEnv) backgroundRefreshPages(w http.ResponseWriter, r *http.Request
 }
 
 func (app *appEnv) backgroundImages(w http.ResponseWriter, r *http.Request) {
-	app.Println("start backgroundImages")
+	app.logStart(r)
 
 	images, err := app.svc.Queries.ListImageWhereNotUploaded(r.Context())
 	if err != nil {

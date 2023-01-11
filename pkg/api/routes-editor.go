@@ -10,18 +10,18 @@ import (
 )
 
 func (app *appEnv) userInfo(w http.ResponseWriter, r *http.Request) {
-	app.Println("start userInfo")
+	app.logStart(r)
 	userinfo := netlifyid.FromContext(r.Context())
 	app.replyJSON(http.StatusOK, w, userinfo)
 }
 
 func (app *appEnv) getSignupURL(w http.ResponseWriter, r *http.Request) {
-	app.Println("start getSignupURL")
+	app.logStart(r)
 	app.replyJSON(http.StatusOK, w, app.svc.MailchimpSignupURL)
 }
 
 func (app *appEnv) listSharedArticles(w http.ResponseWriter, r *http.Request) {
-	app.Printf("starting listSharedArticles")
+	app.logStart(r)
 
 	var page int32
 	_ = intFromQuery(r, "page", &page)
@@ -83,7 +83,7 @@ func (app *appEnv) listSharedArticles(w http.ResponseWriter, r *http.Request) {
 }
 
 func (app *appEnv) getSharedArticle(w http.ResponseWriter, r *http.Request) {
-	app.Printf("starting getSharedArticle")
+	app.logStart(r)
 
 	var (
 		article db.SharedArticle

@@ -3,11 +3,10 @@ package api
 import (
 	"flag"
 	"fmt"
-	"io"
-	"log"
 	"net/http"
 	"net/url"
 	"os"
+	"strconv"
 	"time"
 
 	"github.com/carlmjohnson/flagx"
@@ -15,10 +14,11 @@ import (
 	"github.com/carlmjohnson/versioninfo"
 	"github.com/getsentry/sentry-go"
 	sentryhttp "github.com/getsentry/sentry-go/http"
+	"golang.org/x/exp/slog"
 
 	"github.com/spotlightpa/almanack/internal/netlifyid"
 	"github.com/spotlightpa/almanack/pkg/almanack"
-	"github.com/spotlightpa/almanack/pkg/common"
+	"github.com/spotlightpa/almanack/pkg/almlog"
 )
 
 const AppName = "almanack-api"
@@ -41,10 +41,10 @@ func (app *appEnv) parseArgs(args []string) error {
 
 	fl.BoolVar(&app.isLambda, "lambda", false, "use AWS Lambda rather than HTTP")
 	fl.StringVar(&app.port, "port", ":33160", "listen on port (HTTP only)")
-	app.Logger = common.Logger
-	app.Logger.SetPrefix(AppName + " ")
-	flagx.BoolFunc(fl, "silent", "don't log debug output", func() error {
-		app.Logger.SetOutput(io.Discard)
+	fl.Func("level", "log level", func(s string) error {
+		l, _ := strconv.Atoi(s)
+		almlog.Slogger.Info("parseArgs: set log level", "level", slog.Level(l))
+		almlog.Level.Set(slog.Level(l))
 		return nil
 	})
 	sentryDSN := fl.String("sentry-dsn", "", "DSN `pseudo-URL` for Sentry")
@@ -60,6 +60,7 @@ func (app *appEnv) parseArgs(args []string) error {
 	if err := flagx.ParseEnv(fl, "almanack"); err != nil {
 		return err
 	}
+	almlog.IsLambda.Store(app.isLambda)
 	if err := app.initSentry(*sentryDSN); err != nil {
 		return err
 	}
@@ -74,13 +75,11 @@ func (app *appEnv) parseArgs(args []string) error {
 type appEnv struct {
 	port     string
 	isLambda bool
-	*log.Logger
-	auth netlifyid.AuthService
-	svc  almanack.Services
+	auth     netlifyid.AuthService
+	svc      almanack.Services
 }
 
 func (app *appEnv) exec() error {
-	app.Printf("starting %s (%s)", AppName, versioninfo.Short())
 	routes := sentryhttp.
 		New(sentryhttp.Options{
 			WaitForDelivery: true,
@@ -89,17 +88,21 @@ func (app *appEnv) exec() error {
 		}).
 		Handle(app.routes())
 
+	var host string
 	if app.isLambda {
-		var host string
-		{
-			u, _ := url.Parse(almanack.DeployURL)
-			host = u.Hostname()
-		}
-		app.Printf("starting on AWS Lambda for %s", host)
+		u, _ := url.Parse(almanack.DeployURL)
+		host = u.Hostname()
+	}
+	almlog.Slogger.Info("appEnv.exec",
+		"app", AppName,
+		"version", versioninfo.Short(),
+		"is-lambda", app.isLambda,
+		"host", host,
+		"port", app.port,
+	)
+	if app.isLambda {
 		return gateway.ListenAndServe(host, routes)
 	}
-
-	app.Printf("starting on port %s", app.port)
 
 	return http.ListenAndServe(app.port, routes)
 }
@@ -107,8 +110,10 @@ func (app *appEnv) exec() error {
 func (app *appEnv) initSentry(dsn string) error {
 	var transport sentry.Transport
 	if app.isLambda {
-		common.Logger.Printf("setting sentry sync with timeout")
+		almlog.Slogger.Debug("initSentry", "sync", true, "timeout", 5*time.Second)
 		transport = &sentry.HTTPSyncTransport{Timeout: 5 * time.Second}
+	} else {
+		almlog.Slogger.Debug("initSentry", "sync", false, "timeout", false)
 	}
 	return sentry.Init(sentry.ClientOptions{
 		Dsn:       dsn,

@@ -11,14 +11,15 @@ import (
 	"github.com/aws/aws-lambda-go/lambdacontext"
 	"github.com/carlmjohnson/errutil"
 	"github.com/carlmjohnson/resperr"
-	"github.com/spotlightpa/almanack/pkg/common"
+	"github.com/spotlightpa/almanack/pkg/almlog"
+	"golang.org/x/exp/slog"
 )
 
 func NewService(isLambda bool) AuthService {
 	if isLambda {
 		return NetlifyAuth{}
 	}
-	common.Logger.Printf("mocking auth")
+	almlog.Slogger.Warn("mocking auth")
 	return MockAuthService{}
 }
 
@@ -35,7 +36,8 @@ var _ AuthService = NetlifyAuth{}
 func (as NetlifyAuth) AuthFromHeader(r *http.Request) (*http.Request, error) {
 	netID, err := FromLambdaContext(r.Context())
 	if err != nil {
-		common.Logger.Printf("could not wrap request: %v", err)
+		l := slog.FromContext(r.Context())
+		l.Error("netlify.AuthFromHeader", err)
 		return nil, err
 	}
 	return addJWTToRequest(netID, r), nil
@@ -44,17 +46,25 @@ func (as NetlifyAuth) AuthFromHeader(r *http.Request) (*http.Request, error) {
 func (as NetlifyAuth) AuthFromCookie(r *http.Request) (*http.Request, error) {
 	netID, err := FromCookie(r)
 	if err != nil {
-		common.Logger.Printf("could not wrap request: %v", err)
+		l := slog.FromContext(r.Context())
+		l.Error("netlify.AuthFromCookie", err)
 		return nil, err
 	}
 	return addJWTToRequest(netID, r), nil
 }
 
 func (as NetlifyAuth) HasRole(r *http.Request, role string) error {
+	l := slog.FromContext(r.Context())
 	if jwt := FromContext(r.Context()); jwt != nil {
 		hasRole := jwt.HasRole(role)
-		common.Logger.Printf("permission middleware: %s has role %s == %t",
-			jwt.User.Email, role, hasRole)
+		level := slog.LevelInfo
+		if !hasRole {
+			level = slog.LevelWarn
+		}
+		l.Log(level, "permission middleware",
+			"requires-role", role,
+			"has-role", hasRole,
+		)
 		if hasRole {
 			return nil
 		}
@@ -66,12 +76,14 @@ func (as NetlifyAuth) HasRole(r *http.Request, role string) error {
 			jwt.User.AppMetadata.Roles,
 		)
 	}
-	common.Logger.Printf("no identity found: running on AWS?")
 
-	return resperr.WithUserMessage(
+	err := resperr.WithUserMessage(
 		fmt.Errorf("no user info provided: is this localhost?"),
 		"no user info provided",
 	)
+	l.Error("netlify.HasRole: no identity found: running on AWS?", err)
+
+	return err
 }
 
 func FromLambdaContext(ctx context.Context) (*JWT, error) {

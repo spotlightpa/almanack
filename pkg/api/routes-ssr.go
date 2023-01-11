@@ -10,13 +10,15 @@ import (
 )
 
 func (app *appEnv) renderNotFound(w http.ResponseWriter, r *http.Request) {
+	app.logStart(r)
 	app.replyHTMLErr(w, r, resperr.NotFound(r))
 }
 
 func (app *appEnv) renderPage(w http.ResponseWriter, r *http.Request) {
 	var id int64
 	mustIntParam(r, "id", &id)
-	app.Printf("start renderPage for %d", id)
+	app.logStart(r, "id", id)
+
 	page, err := app.svc.Queries.GetPageByID(r.Context(), id)
 	if err != nil {
 		err = db.NoRowsAs404(err, "could not find page ID %d", id)
@@ -37,6 +39,7 @@ func (app *appEnv) renderPage(w http.ResponseWriter, r *http.Request) {
 
 func (app *appEnv) redirectImageURL(w http.ResponseWriter, r *http.Request) {
 	src := r.URL.Query().Get("src")
+	app.logStart(r, "src", src)
 	if src == "" {
 		http.Error(w, "Missing required parameter src", http.StatusBadRequest)
 		return

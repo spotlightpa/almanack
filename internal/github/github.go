@@ -9,7 +9,8 @@ import (
 
 	"github.com/google/go-github/v48/github"
 	"github.com/spotlightpa/almanack/internal/netlifyid"
-	"github.com/spotlightpa/almanack/pkg/common"
+	"github.com/spotlightpa/almanack/internal/stringx"
+	"golang.org/x/exp/slog"
 	"golang.org/x/oauth2"
 )
 
@@ -18,13 +19,13 @@ type ContentStore interface {
 	UpdateFile(ctx context.Context, msg, path string, content []byte) error
 }
 
-func AddFlags(fl *flag.FlagSet) func() (ContentStore, error) {
+func AddFlags(fl *flag.FlagSet) func() ContentStore {
 	token := fl.String("github-token", "", "personal access `token` for Github")
 	owner := fl.String("github-owner", "", "owning `organization` for Github repo")
 	repo := fl.String("github-repo", "", "name of Github `repo`")
 	branch := fl.String("github-branch", "", "Github `branch` to use")
 	mock := fl.String("github-mock-path", "", "`path` for mock Github files")
-	return func() (ContentStore, error) {
+	return func() ContentStore {
 		if *token == "" || *owner == "" || *repo == "" || *branch == "" {
 			return NewMockClient(*mock)
 		}
@@ -37,7 +38,7 @@ type Client struct {
 	owner, repo, branch string
 }
 
-func NewClient(token, owner, repo, branch string) (*Client, error) {
+func NewClient(token, owner, repo, branch string) *Client {
 	ctx := context.Background()
 	ts := oauth2.StaticTokenSource(
 		&oauth2.Token{AccessToken: token},
@@ -50,16 +51,17 @@ func NewClient(token, owner, repo, branch string) (*Client, error) {
 	// if err := cl.Ping(ctx); err != nil {
 	// 	return nil, err
 	// }
-	return cl, nil
-}
-
-func (cl *Client) printf(format string, v ...any) {
-	common.Logger.Printf(format, v...)
+	return cl
 }
 
 func (cl *Client) CreateFile(ctx context.Context, msg, path string, content []byte) error {
-	cl.printf("creating file %s on Github %s/%s@%s",
-		path, cl.owner, cl.repo, cl.branch)
+	l := slog.FromContext(ctx)
+	l.Info("github.CreateFile",
+		"org", cl.owner,
+		"repo", cl.repo,
+		"branch", cl.branch,
+		"path", path,
+	)
 
 	// Note: the file needs to be absent from the repository as you are not
 	// specifying a SHA reference here.
@@ -74,8 +76,13 @@ func (cl *Client) CreateFile(ctx context.Context, msg, path string, content []by
 }
 
 func (cl *Client) GetFile(ctx context.Context, path string) (contents string, err error) {
-	cl.printf("getting file %s from Github %s/%s@%s",
-		path, cl.owner, cl.repo, cl.branch)
+	l := slog.FromContext(ctx)
+	l.Info("github.GetFile",
+		"org", cl.owner,
+		"repo", cl.repo,
+		"branch", cl.branch,
+		"path", path,
+	)
 
 	fileInfo, _, _, err := cl.client.Repositories.GetContents(
 		ctx,
@@ -91,8 +98,13 @@ func (cl *Client) GetFile(ctx context.Context, path string) (contents string, er
 }
 
 func (cl *Client) UpdateFile(ctx context.Context, msg, path string, content []byte) error {
-	cl.printf("updating file %s on Github %s/%s@%s",
-		path, cl.owner, cl.repo, cl.branch)
+	l := slog.FromContext(ctx)
+	l.Info("github.UpdateFile",
+		"org", cl.owner,
+		"repo", cl.repo,
+		"branch", cl.branch,
+		"path", path,
+	)
 
 	fileInfo, _, _, err := cl.client.Repositories.GetContents(
 		ctx,
@@ -104,7 +116,12 @@ func (cl *Client) UpdateFile(ctx context.Context, msg, path string, content []by
 	if err == nil {
 		sha = fileInfo.SHA
 		if oldcontent, err2 := fileInfo.GetContent(); err2 == nil && string(content) == oldcontent {
-			cl.printf("file %s already updated", path)
+			l.Info("github.UpdateFile skipping; already updated",
+				"org", cl.owner,
+				"repo", cl.repo,
+				"branch", cl.branch,
+				"path", path,
+			)
 			return nil
 		}
 	} else {
@@ -128,21 +145,21 @@ func (cl *Client) UpdateFile(ctx context.Context, msg, path string, content []by
 }
 
 func (cl *Client) Ping(ctx context.Context) error {
-	cl.printf("pinging Github %s/%s@%s", cl.owner, cl.repo, cl.branch)
+	l := slog.FromContext(ctx)
+	l.Info("github.Ping",
+		"org", cl.owner,
+		"repo", cl.repo,
+		"branch", cl.branch,
+	)
 	_, _, err := cl.client.Repositories.GetBranch(ctx, cl.owner, cl.repo, cl.branch, true)
 	return err
 }
 
 func makeAuthor(ctx context.Context) *github.CommitAuthor {
 	jwt := netlifyid.FromContext(ctx)
-	name := jwt.Username()
-	if name == "" {
-		name = "Almanack"
-	}
-	email := jwt.Email()
-	if email == "" {
-		email = "webmaster@spotlightpa.org"
-	}
+	name := stringx.First(jwt.Username(), "Almanack")
+	email := stringx.First(jwt.Email(), "webmaster@spotlightpa.org")
+
 	return &github.CommitAuthor{
 		Name:  github.String(name),
 		Email: github.String(email),
