@@ -6,17 +6,16 @@ import (
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/spotlightpa/almanack/pkg/almanack"
+	"github.com/spotlightpa/almanack/pkg/almlog"
 )
 
 func (app *appEnv) routes() http.Handler {
 	r := chi.NewRouter()
-	if app.isLambda {
-		r.Use(middleware.RequestID)
-		r.Use(middleware.RealIP)
-	} else {
+	r.Use(middleware.RealIP)
+	if !app.isLambda {
 		r.Use(middleware.Recoverer)
 	}
-	r.Use(middleware.RequestLogger(&middleware.DefaultLogFormatter{Logger: app.Logger}))
+	r.Use(almlog.Middleware)
 	r.Use(app.versionMiddleware)
 	r.Use(app.maxSizeMiddleware)
 	r.Get(`/api/bookmarklet/{slug}`, app.getBookmarklet)

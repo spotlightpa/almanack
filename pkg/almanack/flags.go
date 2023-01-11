@@ -14,7 +14,6 @@ import (
 	"github.com/spotlightpa/almanack/internal/index"
 	"github.com/spotlightpa/almanack/internal/mailchimp"
 	"github.com/spotlightpa/almanack/internal/slack"
-	"github.com/spotlightpa/almanack/pkg/common"
 )
 
 func AddFlags(fl *flag.FlagSet) func() (svc Services, err error) {
@@ -47,11 +46,6 @@ func AddFlags(fl *flag.FlagSet) func() (svc Services, err error) {
 
 		client := *http.DefaultClient
 
-		if svc.ContentStore, err = getGithub(); err != nil {
-			common.Logger.Printf("could not connect to Github: %v", err)
-			return
-		}
-
 		is, fs := getS3Store()
 		mc := mailchimp.NewMailService(*mailServiceAPIKey, *mailServiceListID, &client)
 
@@ -62,7 +56,7 @@ func AddFlags(fl *flag.FlagSet) func() (svc Services, err error) {
 			Client:               &client,
 			Queries:              pg,
 			Tx:                   tx,
-			ContentStore:         svc.ContentStore,
+			ContentStore:         getGithub(),
 			SlackSocial:          slack.New(*slackSocialURL),
 			SlackTech:            slack.New(*slackTechURL),
 			ImageStore:           is,

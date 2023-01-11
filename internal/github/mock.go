@@ -5,25 +5,28 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/spotlightpa/almanack/pkg/common"
+	"github.com/spotlightpa/almanack/pkg/almlog"
+	"golang.org/x/exp/slog"
 )
 
 type MockClient struct {
 	basepath string
 }
 
-func NewMockClient(dir string) (*MockClient, error) {
+func NewMockClient(dir string) *MockClient {
+	almlog.Slogger.Warn("mocking Github", "dir", dir)
 	if dir == "" {
 		var err error
 		// we don't clean up temp dir:
 		// good for testing but don't use this in prod!
 		dir, err = os.MkdirTemp("", "example")
 		if err != nil {
-			return nil, err
+			almlog.Slogger.Error("creating temporary directory",
+				err, "dir", dir)
 		}
 	}
-	common.Logger.Printf("mock Github base dir is %s", dir)
-	return &MockClient{dir}, nil
+
+	return &MockClient{dir}
 }
 
 func (mc *MockClient) abspath(path string) string {
@@ -37,14 +40,20 @@ func (mc *MockClient) ensureParent(fn string) {
 
 func (mc *MockClient) CreateFile(ctx context.Context, msg, path string, content []byte) error {
 	tmpfn := mc.abspath(path)
-	common.Logger.Printf("creating file %s on mock Github", tmpfn)
+	l := slog.FromContext(ctx)
+	l.Info("github.mock.CreateFile",
+		"path", tmpfn,
+	)
 	mc.ensureParent(tmpfn)
 	return os.WriteFile(tmpfn, content, 0644)
 }
 
 func (mc *MockClient) GetFile(ctx context.Context, path string) (contents string, err error) {
 	tmpfn := mc.abspath(path)
-	common.Logger.Printf("getting file %s from mock Github", tmpfn)
+	l := slog.FromContext(ctx)
+	l.Info("github.mock.GetFile",
+		"path", tmpfn,
+	)
 	var b []byte
 	b, err = os.ReadFile(tmpfn)
 	return string(b), err
@@ -52,7 +61,10 @@ func (mc *MockClient) GetFile(ctx context.Context, path string) (contents string
 
 func (mc *MockClient) UpdateFile(ctx context.Context, msg, path string, content []byte) error {
 	tmpfn := mc.abspath(path)
-	common.Logger.Printf("updating file %s on mock Github", tmpfn)
+	l := slog.FromContext(ctx)
+	l.Info("github.mock.UpdateFile",
+		"path", tmpfn,
+	)
 	mc.ensureParent(tmpfn)
 	return os.WriteFile(tmpfn, content, 0644)
 }

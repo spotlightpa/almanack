@@ -7,7 +7,7 @@ import (
 	"os"
 
 	"github.com/carlmjohnson/slackhook"
-	"github.com/spotlightpa/almanack/pkg/common"
+	"golang.org/x/exp/slog"
 )
 
 type Client struct {
@@ -25,16 +25,13 @@ func New(hookURL string) Client {
 }
 
 func (sc Client) Post(ctx context.Context, msg Message) error {
+	l := slog.FromContext(ctx)
 	if sc.c == nil {
-		sc.printf("no slack client; skipping posting message")
+		l.Info("slack.Post: mocking; debug output")
 		b, _ := json.MarshalIndent(&msg, "", "  ")
-		fmt.Fprintf(os.Stderr, "%s\n", b)
+		fmt.Fprintf(os.Stderr, "\n%s\n", b)
 		return nil
 	}
-	sc.printf("posting Slack message")
+	l.Info("slack.Post")
 	return sc.c.PostCtx(ctx, msg)
-}
-
-func (sc Client) printf(format string, args ...any) {
-	common.Logger.Printf(format, args...)
 }

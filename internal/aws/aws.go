@@ -13,10 +13,11 @@ import (
 	"github.com/aws/aws-sdk-go/service/s3"
 	"github.com/carlmjohnson/errutil"
 	"gocloud.dev/blob"
+	"golang.org/x/exp/slog"
 
 	"github.com/spotlightpa/almanack/internal/httpx"
 	"github.com/spotlightpa/almanack/internal/must"
-	"github.com/spotlightpa/almanack/pkg/common"
+	"github.com/spotlightpa/almanack/pkg/almlog"
 )
 
 func AddFlags(fl *flag.FlagSet) func() (imageStore, fileStore BlobStore) {
@@ -29,15 +30,15 @@ func AddFlags(fl *flag.FlagSet) func() (imageStore, fileStore BlobStore) {
 	return func() (imageStore, fileStore BlobStore) {
 		err := register("s3-cli", *region, *accessKeyID, *secretAccessKey)
 		if err != nil {
-			common.Logger.Printf("problem registering gocloud: %v", err)
+			almlog.Slogger.Error("aws.register", err)
 		}
 		imageStore = BlobStore{*ibucket}
 		if *ibucket == "mem://" {
-			common.Logger.Printf("using mock AWS image bucket")
+			almlog.Slogger.Warn("mocking AWS image bucket")
 		}
 		fileStore = BlobStore{*fbucket}
 		if *fbucket == "mem://" {
-			common.Logger.Printf("using mock AWS file bucket")
+			almlog.Slogger.Warn("mocking AWS file bucket")
 		}
 		return
 	}
@@ -48,7 +49,8 @@ type BlobStore struct {
 }
 
 func (bs BlobStore) SignPutURL(ctx context.Context, srcPath string, h http.Header) (signedURL string, err error) {
-	common.Logger.Printf("creating presigned put URL for %q", srcPath)
+	l := slog.FromContext(ctx)
+	l.Info("aws.SignPutURL", "url", srcPath)
 	b, err := blob.OpenBucket(ctx, bs.bucket)
 	if err != nil {
 		return "", err
@@ -75,7 +77,8 @@ func (bs BlobStore) SignPutURL(ctx context.Context, srcPath string, h http.Heade
 }
 
 func (bs BlobStore) SignGetURL(ctx context.Context, srcPath string) (signedURL string, err error) {
-	common.Logger.Printf("creating presigned get URL for %q", srcPath)
+	l := slog.FromContext(ctx)
+	l.Info("aws.SignGetURL", "url", srcPath)
 	b, err := blob.OpenBucket(ctx, bs.bucket)
 	if err != nil {
 		return "", err
@@ -104,6 +107,7 @@ func (bs BlobStore) BuildURL(srcPath string) string {
 }
 
 func (bs BlobStore) WriteFile(ctx context.Context, path string, h http.Header, data []byte) (err error) {
+	l := slog.FromContext(ctx)
 	b, err := blob.OpenBucket(ctx, bs.bucket)
 	if err != nil {
 		return err
@@ -122,12 +126,13 @@ func (bs BlobStore) WriteFile(ctx context.Context, path string, h http.Header, d
 		a := md5.Sum(data)
 		checksum = a[:]
 		if string(checksum) == string(attrs.MD5) {
-			common.Logger.Printf("skipping %q %q; already uploaded", bs.bucket, path)
+			l.Info("aws.WriteFile: skipping; already uploaded",
+				"bucket", bs.bucket, "path", path)
 			return nil
 		}
 	}
 
-	common.Logger.Printf("writing to %q %q", bs.bucket, path)
+	l.Info("aws.WriteFile: writing", "bucket", bs.bucket, "path", path)
 	return b.WriteAll(ctx, path, data, &blob.WriterOptions{
 		CacheControl:       h.Get("Cache-Control"),
 		ContentType:        h.Get("Content-Type"),

@@ -11,6 +11,8 @@ import (
 	"mime"
 	"net/http"
 	"net/url"
+	"path/filepath"
+	"runtime"
 	"strconv"
 	"strings"
 
@@ -18,12 +20,14 @@ import (
 	"github.com/carlmjohnson/resperr"
 	"github.com/getsentry/sentry-go"
 	"github.com/go-chi/chi/v5"
+	"golang.org/x/exp/slog"
 
 	"github.com/spotlightpa/almanack/internal/must"
 	"github.com/spotlightpa/almanack/internal/netlifyid"
 	"github.com/spotlightpa/almanack/internal/stringx"
 	"github.com/spotlightpa/almanack/layouts"
 	"github.com/spotlightpa/almanack/pkg/almanack"
+	"github.com/spotlightpa/almanack/pkg/almlog"
 )
 
 func (app *appEnv) replyJSON(statusCode int, w http.ResponseWriter, data any) {
@@ -31,7 +35,7 @@ func (app *appEnv) replyJSON(statusCode int, w http.ResponseWriter, data any) {
 	w.WriteHeader(statusCode)
 	enc := json.NewEncoder(w)
 	if err := enc.Encode(data); err != nil {
-		app.Printf("replyJSON problem: %v", err)
+		almlog.Slogger.Error("replyJSON", err)
 	}
 }
 
@@ -56,6 +60,7 @@ func (app *appEnv) replyNewErr(code int, w http.ResponseWriter, r *http.Request,
 }
 
 func (app *appEnv) logErr(ctx context.Context, err error) {
+	l := slog.FromContext(ctx)
 	if hub := sentry.GetHubFromContext(ctx); hub != nil {
 		hub.WithScope(func(scope *sentry.Scope) {
 			userinfo := netlifyid.FromContext(ctx)
@@ -67,9 +72,9 @@ func (app *appEnv) logErr(ctx context.Context, err error) {
 			}
 		})
 	} else {
-		app.Printf("sentry not in context")
+		l.Warn("sentry not in context")
 	}
-	app.Printf("err: %+v", err)
+	l.Error("logErr", err)
 }
 
 func (app *appEnv) tryReadJSON(w http.ResponseWriter, r *http.Request, dst any) error {
@@ -283,4 +288,16 @@ func (app *appEnv) replyHTMLErr(w http.ResponseWriter, r *http.Request, err erro
 		app.logErr(r.Context(), err)
 		return
 	}
+}
+
+func (app *appEnv) logStart(r *http.Request, args ...any) {
+	pc, file, line, ok := runtime.Caller(1)
+	name := "unknown"
+	if ok {
+		f := runtime.FuncForPC(pc)
+		file = filepath.Base(file)
+		_, name, _ = stringx.LastCut(f.Name(), ".")
+	}
+	l := slog.FromContext(r.Context())
+	l.With(args...).Info("logStart", "name", name, "file", file, "line", line)
 }

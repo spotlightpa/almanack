@@ -15,8 +15,8 @@ import (
 	"github.com/spotlightpa/almanack/internal/slack"
 	"github.com/spotlightpa/almanack/internal/stringx"
 	"github.com/spotlightpa/almanack/internal/timex"
-	"github.com/spotlightpa/almanack/pkg/common"
 	"golang.org/x/exp/maps"
+	"golang.org/x/exp/slog"
 )
 
 func (svc Services) PublishPage(ctx context.Context, q *db.Queries, page *db.Page) (err, warning error) {
@@ -126,7 +126,9 @@ func (svc Services) RefreshPageContents(ctx context.Context, id int64) (err erro
 		return nil
 	}
 
-	common.Logger.Printf("%s changed", page.FilePath)
+	l := slog.FromContext(ctx)
+	l.Info("Services.RefreshPageContents: page changed",
+		"filepath", page.FilePath)
 
 	_, err = svc.Queries.UpdatePage(ctx, db.UpdatePageParams{
 		FilePath:       page.FilePath,

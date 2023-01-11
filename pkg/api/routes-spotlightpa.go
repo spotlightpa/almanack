@@ -16,7 +16,8 @@ import (
 )
 
 func (app *appEnv) postMessage(w http.ResponseWriter, r *http.Request) {
-	app.Printf("starting postMessage")
+	app.logStart(r)
+
 	type request struct {
 		Subject string `json:"subject"`
 		Body    string `json:"body"`
@@ -47,7 +48,8 @@ var supportedContentTypes = map[string]string{
 }
 
 func (app *appEnv) postSignedUpload(w http.ResponseWriter, r *http.Request) {
-	app.Printf("start postSignedUpload")
+	app.logStart(r)
+
 	var userData struct {
 		Type string `json:"type"`
 	}
@@ -92,7 +94,7 @@ func (app *appEnv) postSignedUpload(w http.ResponseWriter, r *http.Request) {
 }
 
 func (app *appEnv) postImageUpdate(w http.ResponseWriter, r *http.Request) {
-	app.Println("start postImageUpdate")
+	app.logStart(r)
 
 	var userData db.UpdateImageParams
 	if !app.readJSON(w, r, &userData) {
@@ -110,7 +112,8 @@ func (app *appEnv) postImageUpdate(w http.ResponseWriter, r *http.Request) {
 }
 
 func (app *appEnv) listDomains(w http.ResponseWriter, r *http.Request) {
-	app.Println("start listDomains")
+	app.logStart(r)
+
 	type response struct {
 		Domains []string `json:"domains"`
 	}
@@ -126,7 +129,8 @@ func (app *appEnv) listDomains(w http.ResponseWriter, r *http.Request) {
 }
 
 func (app *appEnv) postDomain(w http.ResponseWriter, r *http.Request) {
-	app.Println("start postDomain")
+	app.logStart(r)
+
 	type request struct {
 		Domain string `json:"domain"`
 		Remove bool   `json:"remove"`
@@ -174,7 +178,8 @@ func (app *appEnv) postDomain(w http.ResponseWriter, r *http.Request) {
 }
 
 func (app *appEnv) listAddresses(w http.ResponseWriter, r *http.Request) {
-	app.Println("start listAddresses")
+	app.logStart(r)
+
 	var (
 		resp struct {
 			Addresses []string `json:"addresses"`
@@ -190,7 +195,8 @@ func (app *appEnv) listAddresses(w http.ResponseWriter, r *http.Request) {
 }
 
 func (app *appEnv) postAddress(w http.ResponseWriter, r *http.Request) {
-	app.Println("start postAddresses")
+	app.logStart(r)
+
 	type request struct {
 		Address string `json:"address"`
 		Remove  bool   `json:"remove"`
@@ -238,7 +244,7 @@ func (app *appEnv) postAddress(w http.ResponseWriter, r *http.Request) {
 }
 
 func (app *appEnv) listImages(w http.ResponseWriter, r *http.Request) {
-	app.Printf("starting listImages")
+	app.logStart(r)
 
 	var page int32
 	_ = intFromQuery(r, "page", &page)
@@ -272,7 +278,8 @@ func (app *appEnv) listImages(w http.ResponseWriter, r *http.Request) {
 }
 
 func (app *appEnv) listAllTopics(w http.ResponseWriter, r *http.Request) {
-	app.Printf("starting listAllTopics")
+	app.logStart(r)
+
 	t, err := app.svc.Queries.ListAllTopics(r.Context())
 	if err != nil {
 		app.replyErr(w, r, err)
@@ -284,7 +291,8 @@ func (app *appEnv) listAllTopics(w http.ResponseWriter, r *http.Request) {
 }
 
 func (app *appEnv) listAllSeries(w http.ResponseWriter, r *http.Request) {
-	app.Printf("starting listAllSeries")
+	app.logStart(r)
+
 	s, err := app.svc.Queries.ListAllSeries(r.Context())
 	if err != nil {
 		app.replyErr(w, r, err)
@@ -296,7 +304,7 @@ func (app *appEnv) listAllSeries(w http.ResponseWriter, r *http.Request) {
 }
 
 func (app *appEnv) listFiles(w http.ResponseWriter, r *http.Request) {
-	app.Printf("starting listFiles")
+	app.logStart(r)
 
 	var page int32
 	_ = intFromQuery(r, "page", &page)
@@ -330,7 +338,8 @@ func (app *appEnv) listFiles(w http.ResponseWriter, r *http.Request) {
 }
 
 func (app *appEnv) postFileCreate(w http.ResponseWriter, r *http.Request) {
-	app.Printf("start postFileCreate")
+	app.logStart(r)
+
 	var userData struct {
 		MimeType string `json:"mimeType"`
 		FileName string `json:"filename"`
@@ -376,7 +385,7 @@ func (app *appEnv) postFileCreate(w http.ResponseWriter, r *http.Request) {
 }
 
 func (app *appEnv) postFileUpdate(w http.ResponseWriter, r *http.Request) {
-	app.Println("start postFileUpdate")
+	app.logStart(r)
 
 	var userData db.UpdateFileParams
 	if !app.readJSON(w, r, &userData) {
@@ -394,7 +403,7 @@ func (app *appEnv) postFileUpdate(w http.ResponseWriter, r *http.Request) {
 }
 
 func (app *appEnv) listPages(w http.ResponseWriter, r *http.Request) {
-	app.Printf("start listPages")
+	app.logStart(r)
 
 	var page int32
 	_ = intFromQuery(r, "page", &page)
@@ -432,7 +441,8 @@ func (app *appEnv) listPages(w http.ResponseWriter, r *http.Request) {
 func (app *appEnv) getPage(w http.ResponseWriter, r *http.Request) {
 	var id int64
 	mustIntParam(r, "id", &id)
-	app.Printf("start getPage for %d", id)
+	app.logStart(r, "id", id)
+
 	page, err := app.svc.Queries.GetPageByID(r.Context(), id)
 	if err != nil {
 		err = db.NoRowsAs404(err, "could not find page ID %d", id)
@@ -446,7 +456,8 @@ func (app *appEnv) getPage(w http.ResponseWriter, r *http.Request) {
 func (app *appEnv) getPageByFilePath(w http.ResponseWriter, r *http.Request) {
 	q := r.URL.Query()
 	path := q.Get("path")
-	app.Printf("start getPageByFilePath for %q", path)
+	app.logStart(r, "path", path)
+
 	page, err := app.svc.Queries.GetPageByFilePath(r.Context(), path)
 	if err != nil {
 		err = db.NoRowsAs404(err, "could not find page %q", path)
@@ -463,7 +474,8 @@ func (app *appEnv) getPageByFilePath(w http.ResponseWriter, r *http.Request) {
 func (app *appEnv) getPageByURLPath(w http.ResponseWriter, r *http.Request) {
 	q := r.URL.Query()
 	path := q.Get("path")
-	app.Printf("starting getPageByURLPath for %q", path)
+	app.logStart(r, "path", path)
+
 	var v resperr.Validator
 	v.AddIf("path", strings.Contains(path, "%"), "Contains forbidden character.")
 	if err := v.Err(); err != nil {
@@ -487,7 +499,8 @@ func (app *appEnv) getPageByURLPath(w http.ResponseWriter, r *http.Request) {
 func (app *appEnv) getPageWithContent(w http.ResponseWriter, r *http.Request) {
 	var id int64
 	mustIntParam(r, "id", &id)
-	app.Printf("start getPage for %d", id)
+	app.logStart(r, "id", id)
+
 	page, err := app.svc.Queries.GetPageByID(r.Context(), id)
 	if err != nil {
 		err = db.NoRowsAs404(err, "could not find page ID %d", id)
@@ -501,7 +514,7 @@ func (app *appEnv) getPageWithContent(w http.ResponseWriter, r *http.Request) {
 }
 
 func (app *appEnv) postPage(w http.ResponseWriter, r *http.Request) {
-	app.Printf("start postPage")
+	app.logStart(r)
 
 	var userUpdate db.UpdatePageParams
 	if !app.readJSON(w, r, &userUpdate) {
@@ -543,7 +556,7 @@ func (app *appEnv) postPage(w http.ResponseWriter, r *http.Request) {
 }
 
 func (app *appEnv) postPageRefresh(w http.ResponseWriter, r *http.Request) {
-	app.Print("start postPageRefresh")
+	app.logStart(r)
 	var req struct {
 		ID              int64 `json:"id,string"`
 		RefreshMetadata bool  `json:"refresh_metadata"`
@@ -612,7 +625,7 @@ func (app *appEnv) postPageRefresh(w http.ResponseWriter, r *http.Request) {
 }
 
 func (app *appEnv) postPageCreate(w http.ResponseWriter, r *http.Request) {
-	app.Print("start postPageCreate")
+	app.logStart(r)
 
 	var req struct {
 		SharedArticleID int64  `json:"shared_article_id,string"`
@@ -653,7 +666,8 @@ func (app *appEnv) postPageCreate(w http.ResponseWriter, r *http.Request) {
 }
 
 func (app *appEnv) listAllPages(w http.ResponseWriter, r *http.Request) {
-	app.Printf("starting listSpotlightPAArticles")
+	app.logStart(r)
+
 	type response struct {
 		Pages []db.ListAllPagesRow `json:"pages"`
 	}
@@ -672,7 +686,7 @@ func (app *appEnv) listAllPages(w http.ResponseWriter, r *http.Request) {
 
 func (app *appEnv) getSiteData(loc string) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		app.Printf("starting getSiteData(%q)", loc)
+		app.logStart(r, "location", loc)
 
 		type response struct {
 			Configs []db.SiteDatum `json:"configs"`
@@ -692,7 +706,7 @@ func (app *appEnv) getSiteData(loc string) http.HandlerFunc {
 
 func (app *appEnv) setSiteData(loc string) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		app.Printf("starting setSiteData(%q)", loc)
+		app.logStart(r, "location", loc)
 
 		var req struct {
 			Configs []almanack.ScheduledSiteConfig `json:"configs"`
@@ -725,7 +739,7 @@ func (app *appEnv) setSiteData(loc string) http.HandlerFunc {
 func (app *appEnv) listPagesByFTS(w http.ResponseWriter, r *http.Request) {
 	q := r.URL.Query()
 	query := q.Get("query")
-	app.Printf("start getPageByFTS for %q", query)
+	app.logStart(r, "query", query)
 
 	var (
 		pages []db.Page
@@ -779,7 +793,7 @@ func (app *appEnv) listArcByLastUpdated(w http.ResponseWriter, r *http.Request) 
 	var page int32
 	_ = intFromQuery(r, "page", &page)
 	refresh, _ := boolFromQuery(r, "refresh")
-	app.Printf("starting listArcByLastUpdated page=%d refresh=%v", page, refresh)
+	app.logStart(r, "page", page, "refresh", refresh)
 
 	if refresh {
 		if fatal, err := app.svc.RefreshArcFromFeed(r.Context()); err != nil {
@@ -815,7 +829,7 @@ func (app *appEnv) listArcByLastUpdated(w http.ResponseWriter, r *http.Request) 
 }
 
 func (app *appEnv) postSharedArticle(w http.ResponseWriter, r *http.Request) {
-	app.Println("start postSharedArticle")
+	app.logStart(r)
 
 	var req db.UpdateSharedArticleParams
 	if !app.readJSON(w, r, &req) {
@@ -832,7 +846,7 @@ func (app *appEnv) postSharedArticle(w http.ResponseWriter, r *http.Request) {
 }
 
 func (app *appEnv) postSharedArticleFromArc(w http.ResponseWriter, r *http.Request) {
-	app.Println("start postSharedArticleFromArc")
+	app.logStart(r)
 
 	var req struct {
 		ArcID string `json:"arc_id"`

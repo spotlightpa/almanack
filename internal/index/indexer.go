@@ -1,10 +1,12 @@
 package index
 
 import (
+	"context"
 	"flag"
 
 	"github.com/algolia/algoliasearch-client-go/v3/algolia/search"
-	"github.com/spotlightpa/almanack/pkg/common"
+	"github.com/spotlightpa/almanack/pkg/almlog"
+	"golang.org/x/exp/slog"
 )
 
 func AddFlags(fl *flag.FlagSet) func() Indexer {
@@ -13,7 +15,7 @@ func AddFlags(fl *flag.FlagSet) func() Indexer {
 	indexName := fl.String("indexer-index-name", "", "`index` name for Algolia")
 	return func() Indexer {
 		if *apiKey == "" {
-			common.Logger.Printf("using mock indexer")
+			almlog.Slogger.Warn("mocking indexer")
 			return MockIndexer{}
 		}
 
@@ -31,6 +33,12 @@ type MockIndexer struct {
 }
 
 func (mi MockIndexer) SaveObject(object any, opts ...any) (res search.SaveObjectRes, err error) {
-	common.Logger.Printf("mock indexing")
+	l := almlog.Slogger
+	for _, opt := range opts {
+		if ctx, ok := opt.(context.Context); ok {
+			l = slog.FromContext(ctx)
+		}
+	}
+	l.Info("index.Mock.SaveObject")
 	return
 }

@@ -1,16 +1,13 @@
 package github_test
 
 import (
-	"bytes"
 	"context"
-	"log"
 	"os"
 	"testing"
 	"time"
 
 	"github.com/carlmjohnson/be"
 	"github.com/spotlightpa/almanack/internal/github"
-	"github.com/spotlightpa/almanack/pkg/common"
 )
 
 func TestGithub(t *testing.T) {
@@ -22,15 +19,13 @@ func TestGithub(t *testing.T) {
 	if token == "" || owner == "" || repo == "" || branch == "" {
 		t.Skip("Missing Github ENV vars")
 	}
-	var buf bytes.Buffer
-	common.Logger = log.New(&buf, "", 0)
-	client, err := github.NewClient(token, owner, repo, branch)
-	be.NilErr(t, err)
+
+	client := github.NewClient(token, owner, repo, branch)
 	ctx := context.Background()
 	// create
 	testFileContents := time.Now().Format(time.Stamp)
 	fname := time.Now().Format("test-" + time.RFC3339 + ".txt")
-	err = client.UpdateFile(ctx, "test create", fname, []byte(testFileContents))
+	err := client.UpdateFile(ctx, "test create", fname, []byte(testFileContents))
 	be.NilErr(t, err)
 	// get
 	returned, err := client.GetFile(ctx, fname)

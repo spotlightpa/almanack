@@ -14,7 +14,7 @@ import (
 	"github.com/spotlightpa/almanack/internal/must"
 	"github.com/spotlightpa/almanack/internal/slicex"
 	"github.com/spotlightpa/almanack/internal/stringx"
-	"github.com/spotlightpa/almanack/pkg/common"
+	"golang.org/x/exp/slog"
 )
 
 func ArcFeedItemToBody(ctx context.Context, svc Services, arcStory *arc.FeedItem) (body string, warnings []string, err error) {
@@ -132,11 +132,12 @@ func slugFromURL(s string) string {
 }
 
 func readContentElements(ctx context.Context, svc Services, rawels []*json.RawMessage, body *strings.Builder) (warnings []string, err error) {
+	l := slog.FromContext(ctx)
 	for i, raw := range rawels {
 		var _type string
 		wrapper := arc.ContentElementType{Type: &_type}
 		if err := json.Unmarshal(*raw, &wrapper); err != nil {
-			common.Logger.Printf("runtime error: %v", err)
+			l.Error("readContentElements unwrap", err)
 		}
 		var graf string
 		switch _type {
@@ -149,7 +150,7 @@ func readContentElements(ctx context.Context, svc Services, rawels []*json.RawMe
 		case "header":
 			var v arc.ContentElementHeading
 			if err := json.Unmarshal(*raw, &v); err != nil {
-				common.Logger.Printf("runtime error: %v", err)
+				l.Error("readContentElements header", err)
 			}
 			graf = strings.Repeat("#", v.Level) + " " + v.Content
 		case "oembed_response":
