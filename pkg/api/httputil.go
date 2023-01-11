@@ -292,12 +292,13 @@ func (app *appEnv) replyHTMLErr(w http.ResponseWriter, r *http.Request, err erro
 
 func (app *appEnv) logStart(r *http.Request, args ...any) {
 	pc, file, line, ok := runtime.Caller(1)
-	name := "unknown"
+	route := "unknown"
 	if ok {
 		f := runtime.FuncForPC(pc)
 		file = filepath.Base(file)
-		_, name, _ = stringx.LastCut(f.Name(), ".")
+		_, name, _ := stringx.LastCut(f.Name(), ".")
+		route = fmt.Sprintf("%s(%s:%d)", name, file, line)
 	}
 	l := slog.FromContext(r.Context())
-	l.With(args...).Info("logStart", "name", name, "file", file, "line", line)
+	l.With(args...).Info("logStart", "route", route)
 }

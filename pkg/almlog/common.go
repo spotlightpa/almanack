@@ -3,39 +3,51 @@ package almlog
 
 import (
 	"os"
-	"sync/atomic"
 	"time"
 
 	"golang.org/x/exp/slog"
 )
 
-var IsLambda = atomic.Bool{}
+var Slogger *slog.Logger
 
 var Level = &slog.LevelVar{}
 
-func replace(groups []string, a slog.Attr) slog.Attr {
+func init() {
+	Level.Set(slog.LevelDebug)
+}
+
+func removeTime(groups []string, a slog.Attr) slog.Attr {
+	// Netlify already logs time
 	if a.Key == slog.TimeKey && len(groups) == 0 {
-		if IsLambda.Load() {
-			// Netlify already logs time
-			a.Key = ""
-		} else {
-			// Omit date from dev
-			a.Value = slog.StringValue(a.Value.Time().Format("03:04:05"))
-		}
+		a.Key = ""
 	}
 	return a
 }
 
-var opts = slog.HandlerOptions{
-	Level:       Level,
-	ReplaceAttr: replace,
+func LambdaLogger() {
+	opts := slog.HandlerOptions{
+		Level:       Level,
+		ReplaceAttr: removeTime,
+	}
+	Slogger = slog.New(opts.NewTextHandler(os.Stderr))
+	slog.SetDefault(Slogger)
 }
 
-var Slogger = slog.New(opts.NewTextHandler(os.Stderr))
+func shortenTime(groups []string, a slog.Attr) slog.Attr {
+	// Omit date from dev
+	if a.Key == slog.TimeKey && len(groups) == 0 {
+		a.Value = slog.StringValue(a.Value.Time().Format("03:04:05"))
+	}
+	return a
+}
 
-func init() {
+func DevLogger() {
+	opts := slog.HandlerOptions{
+		Level:       Level,
+		ReplaceAttr: shortenTime,
+	}
+	Slogger = slog.New(opts.NewTextHandler(colorize{os.Stderr}))
 	slog.SetDefault(Slogger)
-	Level.Set(slog.LevelDebug)
 }
 
 func LevelThreshold[T time.Duration | int](val, warn, err T) slog.Level {

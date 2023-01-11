@@ -43,7 +43,6 @@ func (app *appEnv) parseArgs(args []string) error {
 	fl.StringVar(&app.port, "port", ":33160", "listen on port (HTTP only)")
 	fl.Func("level", "log level", func(s string) error {
 		l, _ := strconv.Atoi(s)
-		almlog.Slogger.Info("parseArgs: set log level", "level", slog.Level(l))
 		almlog.Level.Set(slog.Level(l))
 		return nil
 	})
@@ -60,7 +59,11 @@ func (app *appEnv) parseArgs(args []string) error {
 	if err := flagx.ParseEnv(fl, "almanack"); err != nil {
 		return err
 	}
-	almlog.IsLambda.Store(app.isLambda)
+	if app.isLambda {
+		almlog.LambdaLogger()
+	} else {
+		almlog.DevLogger()
+	}
 	if err := app.initSentry(*sentryDSN); err != nil {
 		return err
 	}

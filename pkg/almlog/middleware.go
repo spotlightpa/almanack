@@ -23,10 +23,13 @@ func Middleware(next http.Handler) http.Handler {
 				level = l2
 			}
 			Slogger.Log(level, "ServeHTTP",
-				"status", status,
-				"ip", r.RemoteAddr,
-				"size", ww.BytesWritten(),
-				"path", r.RequestURI,
+				"req_method", r.Method,
+				"req_ip", r.RemoteAddr,
+				"req_path", r.RequestURI,
+				"req_agent", r.UserAgent(),
+				"res_status", status,
+				"res_size", ww.BytesWritten(),
+				"res_content_type", ww.Header().Get("Content-Type"),
 				"duration", duration,
 			)
 		}()
