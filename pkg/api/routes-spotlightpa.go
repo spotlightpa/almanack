@@ -438,21 +438,6 @@ func (app *appEnv) listPages(w http.ResponseWriter, r *http.Request) {
 	app.replyJSON(http.StatusOK, w, &resp)
 }
 
-func (app *appEnv) getPage(w http.ResponseWriter, r *http.Request) {
-	var id int64
-	mustIntParam(r, "id", &id)
-	app.logStart(r, "id", id)
-
-	page, err := app.svc.Queries.GetPageByID(r.Context(), id)
-	if err != nil {
-		err = db.NoRowsAs404(err, "could not find page ID %d", id)
-		app.replyErr(w, r, err)
-		return
-	}
-
-	app.replyJSON(http.StatusOK, w, page)
-}
-
 func (app *appEnv) getPageByFilePath(w http.ResponseWriter, r *http.Request) {
 	q := r.URL.Query()
 	path := q.Get("path")
