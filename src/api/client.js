@@ -26,7 +26,6 @@ const responseError = async (rsp) => {
 const endpoints = {
   // Alphabetize lists by URL to show duplicates
   // get id endpoints
-  getPage: (id) => `/api/page/${id}`,
   getPageWithContent: (id) => `/api/page-with-content/${id}`,
 
   // GET and POST listed as two endpoints
@@ -173,7 +172,6 @@ function makeClient($auth) {
   };
   let idGetActions = [
     // does not include proxy images…
-    "getPage",
     "getPageWithContent",
   ];
   for (let action of idGetActions) {

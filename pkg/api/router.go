@@ -54,7 +54,6 @@ func (app *appEnv) routes() http.Handler {
 			r.Get(`/images`, app.listImages)
 			r.Post(`/message`, app.postMessage)
 			r.Post(`/page`, app.postPage)
-			r.Get(`/page/{id:\d+}`, app.getPage)
 			r.Get(`/page-by-file-path`, app.getPageByFilePath)
 			r.Get(`/page-by-url-path`, app.getPageByURLPath)
 			r.Post(`/page-create`, app.postPageCreate)
