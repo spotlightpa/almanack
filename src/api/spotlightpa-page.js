@@ -2,7 +2,12 @@ import { computed, reactive, ref, toRefs, watch } from "vue";
 
 import { makeState } from "@/api/service-util.js";
 import { useClient } from "@/api/client.js";
-import { post as clientPost, postPageRefresh } from "@/api/client-v2.js";
+import {
+  get as clientGet,
+  post as clientPost,
+  getPage,
+  postPageRefresh,
+} from "@/api/client-v2.js";
 import imgproxyURL from "@/api/imgproxy-url.js";
 import maybeDate from "@/utils/maybe-date.js";
 
@@ -211,10 +216,13 @@ function useAutocompletions() {
 }
 
 export function usePage(id) {
-  const { getPageWithContent, postPage, listImages } = useClient();
+  const { postPage, listImages } = useClient();
   const { apiState, exec } = makeState();
 
-  const fetch = (id) => exec(() => getPageWithContent(id));
+  const fetch = (id) =>
+    exec(() =>
+      clientGet(getPage, { by: "id", value: id, refresh_content_store: true })
+    );
   const post = (page) => exec(() => postPage(page));
 
   const page = computed(() =>
