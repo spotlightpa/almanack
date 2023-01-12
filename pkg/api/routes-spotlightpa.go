@@ -1,6 +1,7 @@
 package api
 
 import (
+	"errors"
 	"fmt"
 	"net/http"
 	"strings"
@@ -438,62 +439,57 @@ func (app *appEnv) listPages(w http.ResponseWriter, r *http.Request) {
 	app.replyJSON(http.StatusOK, w, &resp)
 }
 
-func (app *appEnv) getPageByFilePath(w http.ResponseWriter, r *http.Request) {
+func (app *appEnv) getPage(w http.ResponseWriter, r *http.Request) {
 	q := r.URL.Query()
-	path := q.Get("path")
-	app.logStart(r, "path", path)
+	by := q.Get("by")
+	val := q.Get("value")
+	refresh, _ := boolFromQuery(r, "refresh_content_store")
+	var id int64
 
-	page, err := app.svc.Queries.GetPageByFilePath(r.Context(), path)
-	if err != nil {
-		err = db.NoRowsAs404(err, "could not find page %q", path)
-		app.replyErr(w, r, err)
-		return
-	}
-	if slices.Contains(q["select"], "-body") {
-		page.Body = ""
-		delete(page.Frontmatter, "raw-content")
-	}
-	app.replyJSON(http.StatusOK, w, page)
-}
-
-func (app *appEnv) getPageByURLPath(w http.ResponseWriter, r *http.Request) {
-	q := r.URL.Query()
-	path := q.Get("path")
-	app.logStart(r, "path", path)
+	app.logStart(r, "by", by, "value", val, "refresh_content_store", refresh)
 
 	var v resperr.Validator
-	v.AddIf("path", strings.Contains(path, "%"), "Contains forbidden character.")
+	v.AddIf("by",
+		!slices.Contains([]string{"id", "filepath", "urlpath"}, by),
+		"Must specify look up method")
+	v.AddIf("value",
+		by == "filepath" && strings.Contains(val, "%"),
+		"Filepath contains forbidden character.")
+	v.AddIf("value",
+		by == "id" && !intFromQuery(r, "value", &id),
+		"ID must be integer")
 	if err := v.Err(); err != nil {
 		app.replyErr(w, r, err)
 		return
 	}
-	page, err := app.svc.Queries.GetPageByURLPath(r.Context(), path)
+	var (
+		page db.Page
+		err  error
+	)
+	switch by {
+	case "id":
+		page, err = app.svc.Queries.GetPageByID(r.Context(), id)
+	case "filepath":
+		page, err = app.svc.Queries.GetPageByFilePath(r.Context(), val)
+	case "urlpath":
+		page, err = app.svc.Queries.GetPageByURLPath(r.Context(), val)
+	default:
+		err = errors.New("unreachable")
+	}
 	if err != nil {
-		err = db.NoRowsAs404(err, "could not find page %q", path)
+		err = db.NoRowsAs404(err, "could not find page %v", q)
 		app.replyErr(w, r, err)
 		return
+	}
+
+	if refresh {
+		if warning := app.svc.RefreshPageFromContentStore(r.Context(), &page); warning != nil {
+			app.logErr(r.Context(), warning)
+		}
 	}
 	if slices.Contains(q["select"], "-body") {
 		page.Body = ""
 		delete(page.Frontmatter, "raw-content")
-	}
-	app.replyJSON(http.StatusOK, w, page)
-
-}
-
-func (app *appEnv) getPageWithContent(w http.ResponseWriter, r *http.Request) {
-	var id int64
-	mustIntParam(r, "id", &id)
-	app.logStart(r, "id", id)
-
-	page, err := app.svc.Queries.GetPageByID(r.Context(), id)
-	if err != nil {
-		err = db.NoRowsAs404(err, "could not find page ID %d", id)
-		app.replyErr(w, r, err)
-		return
-	}
-	if warning := app.svc.RefreshPageFromContentStore(r.Context(), &page); warning != nil {
-		app.logErr(r.Context(), warning)
 	}
 	app.replyJSON(http.StatusOK, w, page)
 }
