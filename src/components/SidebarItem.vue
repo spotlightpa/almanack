@@ -1,43 +1,29 @@
-<script>
-import { computed, reactive, watch } from "vue";
-import { useClient, makeState } from "@/api/hooks.js";
+<script setup>
+import { watchAPI } from "@/api/service-util.js";
+import { get, getPage } from "@/api/client-v2.js";
 import { Page } from "@/api/spotlightpa-page.js";
 
 import useData from "@/utils/use-data.js";
 
-export default {
-  props: { item: Object, pos: Number, length: Number },
-  setup(props) {
-    let { getPageByFilePath } = useClient();
-    let { apiStateRefs, exec } = makeState();
-    const { rawData } = apiStateRefs;
+const props = defineProps({
+  item: Object,
+  pos: Number,
+  length: Number,
+});
 
-    async function load(path) {
-      let params = { path, select: "-body" };
-      return await exec(() => getPageByFilePath({ params }));
-    }
-    const page = computed(() =>
-      rawData.value ? reactive(new Page(rawData.value)) : null
-    );
-    watch(
-      () => props.item,
-      (item) => load(item.page),
-      { immediate: true }
-    );
+const { computedObj } = watchAPI(
+  () => props.item.page,
+  (path) => get(getPage, { by: "filepath", value: path, select: "-body" })
+);
 
-    return {
-      ...apiStateRefs,
-      page,
+const page = computedObj((obj) => new Page(obj));
 
-      ...useData(() => props.item, {
-        label: ["label"],
-        labelColor: ["labelColor"],
-        bgColor: ["backgroundColor"],
-        linkColor: ["linkColor"],
-      }),
-    };
-  },
-};
+const data = useData(() => props.item, {
+  label: ["label"],
+  labelColor: ["labelColor"],
+  bgColor: ["backgroundColor"],
+  linkColor: ["linkColor"],
+});
 </script>
 
 <template>
@@ -48,11 +34,17 @@ export default {
     <details open>
       <summary>Settings</summary>
 
-      <BulmaFieldInput v-model="label" label="Label for item" />
-      <BulmaFieldColor v-model="bgColor" label="Item Background Color" />
-      <BulmaFieldColor v-model="labelColor" label="Item Label Color" />
+      <BulmaFieldInput v-model="data.label.value" label="Label for item" />
       <BulmaFieldColor
-        v-model="linkColor"
+        v-model="data.bgColor.value"
+        label="Item Background Color"
+      />
+      <BulmaFieldColor
+        v-model="data.labelColor.value"
+        label="Item Label Color"
+      />
+      <BulmaFieldColor
+        v-model="data.linkColor.value"
         label="Item Link Color"
         help="Our orange is #ff6c36. Our yellow is #ffcb05. Our dark blue is #009edb. Our light blue is #99d9f1."
       />
@@ -63,13 +55,13 @@ export default {
         <div
           class="mt-4 plain-notification"
           data-ga-category="editors-pick"
-          :style="{ backgroundColor: bgColor }"
+          :style="{ backgroundColor: data.bgColor.value }"
         >
           <h1
             class="title is-size-5 is-size-4-mobile has-text-centered is-uppercase"
-            :style="{ color: labelColor }"
+            :style="{ color: data.labelColor.value }"
           >
-            {{ label }}
+            {{ data.label.value }}
           </h1>
 
           <article class="mb-5">
@@ -94,7 +86,7 @@ export default {
             <h2 class="title is-4 is-spaced mt-2">
               <a
                 class="hover-underline"
-                :style="{ color: linkColor }"
+                :style="{ color: data.linkColor.value }"
                 :href="page.link"
                 target="_blank"
               >
@@ -108,7 +100,7 @@ export default {
             >
               <a
                 :href="page.link"
-                :style="{ color: linkColor }"
+                :style="{ color: data.linkColor.value }"
                 class="hover-underline"
                 target="_blank"
               >

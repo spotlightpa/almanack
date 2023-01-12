@@ -25,9 +25,6 @@ const responseError = async (rsp) => {
 
 const endpoints = {
   // Alphabetize lists by URL to show duplicates
-  // get id endpoints
-  getPageWithContent: (id) => `/api/page-with-content/${id}`,
-
   // GET and POST listed as two endpoints
   listAllPages: `/api/all-pages`,
   listAllSeries: `/api/all-series`,
@@ -49,8 +46,6 @@ const endpoints = {
   getSignupURL: `/api/mailchimp-signup-url`,
   sendMessage: `/api/message`,
   postPage: `/api/page`,
-  getPageByFilePath: `/api/page-by-file-path`,
-  getPageByURLPath: `/api/page-by-url-path`,
   listPages: `/api/pages`,
   listPagesByFTS: `/api/pages-by-fts`,
   getSharedArticle: `/api/shared-article`,
@@ -170,20 +165,10 @@ function makeClient($auth) {
       return await tryTo(post(endpoints.updateFile, file));
     },
   };
-  let idGetActions = [
-    // does not include proxy images…
-    "getPageWithContent",
-  ];
-  for (let action of idGetActions) {
-    let endpointFn = endpoints[action];
-    actions[action] = (id) => tryTo(request(endpointFn(id)));
-  }
 
   let simpleGetActions = [
     "getEditorsPicks",
     "getElectionFeature",
-    "getPageByFilePath",
-    "getPageByURLPath",
     "getSharedArticle",
     "getSidebar",
     "getSignupURL",

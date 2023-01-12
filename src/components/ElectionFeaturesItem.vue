@@ -1,34 +1,20 @@
-<script>
-import { computed, reactive, watch } from "vue";
-import { useClient, makeState } from "@/api/hooks.js";
+<script setup>
+import { watchAPI } from "@/api/service-util.js";
+import { get, getPage } from "@/api/client-v2.js";
 import { Page } from "@/api/spotlightpa-page.js";
 
-export default {
-  props: { item: Object, pos: Number, length: Number },
-  setup(props) {
-    let { getPageByFilePath } = useClient();
-    let { apiStateRefs, exec } = makeState();
-    const { rawData } = apiStateRefs;
+const props = defineProps({
+  item: Object,
+  pos: Number,
+  length: Number,
+});
 
-    async function load(path) {
-      let params = { path, select: "-body" };
-      return await exec(() => getPageByFilePath({ params }));
-    }
-    const page = computed(() =>
-      rawData.value ? reactive(new Page(rawData.value)) : null
-    );
-    watch(
-      () => props.item,
-      (item) => load(item.page),
-      { immediate: true }
-    );
+const { computedObj } = watchAPI(
+  () => props.item.page,
+  (path) => get(getPage, { by: "filepath", value: path, select: "-body" })
+);
 
-    return {
-      ...apiStateRefs,
-      page,
-    };
-  },
-};
+const page = computedObj((obj) => new Page(obj));
 </script>
 
 <template>

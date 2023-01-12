@@ -1,64 +1,60 @@
-<script>
-import { defineComponent, ref, watch } from "vue";
+<script setup>
+import { ref } from "vue";
 import { useRouter } from "vue-router";
 
-import { makeState } from "@/api/service-util.js";
-import { useClient } from "@/api/client.js";
+import { watchAPI } from "@/api/service-util.js";
+import { get, getPage } from "@/api/client-v2.js";
 
-export default defineComponent({
-  setup() {
-    const router = useRouter();
-    const url = ref("");
-    const { getPageByURLPath } = useClient();
-    const { apiStateRefs, exec } = makeState();
+const router = useRouter();
+const searchBox = ref("");
+const url = ref("");
 
-    async function lookup() {
-      const select = "-body";
-      let path = url.value;
-      try {
-        path = new URL(path).pathname;
-        // eslint-disable-next-line no-empty
-      } catch (e) {}
-      await exec(() => getPageByURLPath({ params: { path, select } }));
-    }
+async function lookup(fullurl) {
+  if (!fullurl) return [null, null];
 
-    watch(apiStateRefs.rawData, (page) => {
-      if (!page) {
-        return;
-      }
-      let name = page.file_path.match(/content\/(news|statecollege)\//)
-        ? "news-page"
-        : page.file_path.match(/content\/newsletters/)
-        ? "newsletter-page"
-        : null;
-      if (!name) {
-        apiStateRefs.error.value = { name: "No admin associate with page." };
-        return;
-      }
+  const select = "-body";
+  let path = null;
+  try {
+    path = new URL(fullurl).pathname;
+    // eslint-disable-next-line no-empty
+  } catch (e) {
+    return [null, e];
+  }
 
-      router.push({
-        name,
-        params: {
-          id: "" + page.id,
-        },
-      });
-    });
-    return {
-      ...apiStateRefs,
-      lookup,
-      url,
-    };
-  },
+  if (!path) return [null, null];
+
+  return await get(getPage, { by: "urlpath", value: path, select });
+}
+
+const { apiState, computedObj } = watchAPI(() => url.value, lookup);
+
+const invisible = computedObj((page) => {
+  let name = page.file_path.match(/content\/(news|statecollege)\//)
+    ? "news-page"
+    : page.file_path.match(/content\/newsletters/)
+    ? "newsletter-page"
+    : null;
+  if (!name) {
+    apiState.error.value = { message: "No admin associate with page." };
+    return;
+  }
+
+  router.push({
+    name,
+    params: {
+      id: "" + page.id,
+    },
+  });
 });
 </script>
 
 <template>
-  <form class="notification" @submit.prevent="lookup">
+  <form class="notification" @submit.prevent="url = searchBox">
     <label class="label">Get page by URL</label>
     <div class="field is-grouped">
       <p class="control is-expanded">
         <input
-          v-model="url"
+          v-model="searchBox"
           class="input"
           type="url"
           placeholder="https://www.spotlightpa.org/story/"
@@ -67,8 +63,8 @@ export default defineComponent({
       <p class="control">
         <button
           class="button is-primary has-text-weight-semibold"
-          :class="{ 'is-loading': isLoadingThrottled }"
-          :disabled="isLoadingThrottled || null"
+          :class="{ 'is-loading': apiState.isLoading.value }"
+          @click="url = searchBox"
         >
           Search
         </button>
@@ -83,6 +79,11 @@ export default defineComponent({
         />
       </p>
     </div>
-    <p v-if="error" class="help is-danger" v-text="error.name"></p>
+    <p
+      v-if="apiState.error.value"
+      class="help is-danger"
+      v-text="apiState.error.value.message"
+    ></p>
+    {{ invisible }}
   </form>
 </template>
