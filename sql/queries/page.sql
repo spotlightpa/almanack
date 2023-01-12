@@ -124,11 +124,10 @@ WHERE
 -- name: ListAllTopics :many
 WITH topics AS (
   SELECT
-    jsonb_array_elements_text(frontmatter -> 'topics') AS topic
+    json_array_elements_text( --
+      coalesce((frontmatter ->> 'topics'), '[]')::json) AS topic
   FROM
     page
-  WHERE
-    frontmatter ->> 'topics' IS NOT NULL
 )
 SELECT DISTINCT ON (upper(topic)
 )
@@ -139,14 +138,19 @@ ORDER BY
   upper(topic) ASC;
 
 -- name: ListAllSeries :many
-WITH series_dates AS (
+WITH page_series AS (
   SELECT
-    jsonb_array_elements_text(frontmatter -> 'series') AS series,
+    json_array_elements_text( --
+      coalesce((frontmatter ->> 'series'), '[]')::json) AS series,
     published_at
   FROM
     page
-  WHERE
-    frontmatter ->> 'series' IS NOT NULL
+),
+series_dates AS (
+  SELECT
+    *
+  FROM
+    page_series
   ORDER BY
     published_at DESC,
     series DESC
