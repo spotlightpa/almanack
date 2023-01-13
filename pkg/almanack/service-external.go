@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	"github.com/carlmjohnson/errutil"
+	"github.com/carlmjohnson/resperr"
 	"github.com/spotlightpa/almanack/internal/db"
 	"golang.org/x/exp/slog"
 )
@@ -28,15 +29,16 @@ func (svc Services) ReplaceImageURL(ctx context.Context, srcURL, description, cr
 	ext := path.Ext(srcURL)
 	ext = strings.TrimPrefix(ext, ".")
 	ext = strings.ToLower(ext)
-	uploadPath := hashURLpath(srcURL, ext)
 	itype, err := svc.Queries.GetImageTypeForExtension(ctx, ext)
 	if err != nil {
 		if db.IsNotFound(err) {
-			return "", fmt.Errorf("unknown image extension (%q) on source: %q",
+			return "", resperr.WithUserMessagef(err,
+				"Unknown image extension (%q) on source: %q",
 				ext, srcURL)
 		}
 		return "", err
 	}
+	uploadPath := hashURLpath(srcURL, itype.Name)
 	_, err = svc.Queries.UpsertImage(ctx, db.UpsertImageParams{
 		Path:        uploadPath,
 		Type:        itype.Name,
