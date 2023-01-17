@@ -48,6 +48,8 @@ export default {
 
     let actions = {
       async fetch() {
+        // Trigger image upload queue if not triggered already
+        window.fetch("/api-background/images").catch(() => {});
         return exec(() => listImages({ params: { page: props.page } }));
       },
       updateDescription(image) {
