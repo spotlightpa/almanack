@@ -166,6 +166,10 @@ func (svc Services) RefreshPageFromArcStory(ctx context.Context, page *db.Page, 
 		if page.Frontmatter == nil {
 			page.Frontmatter = make(db.Map)
 		}
+		if page.LastPublished.Status == pgtype.Present {
+			delete(fm, "slug")
+			delete(fm, "published")
+		}
 		maps.Copy(page.Frontmatter, fm)
 	}
 
