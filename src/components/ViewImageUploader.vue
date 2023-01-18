@@ -16,11 +16,7 @@ const {
   computedProp,
 } = watchAPI(
   () => props.page || 0,
-  async (page) => {
-    // Trigger image upload queue if not triggered already
-    window.fetch("/api-background/images").catch(() => {});
-    return get(listImages, { page });
-  }
+  (page) => get(listImages, { page })
 );
 
 const { apiStateRefs: saveState, exec } = makeState();
@@ -47,6 +43,12 @@ const nextPage = computedProp("next_page", (page) => ({
     page,
   },
 }));
+
+const showReload = computedProp("waiting_for_upload", () => {
+  // Trigger image upload queue if not triggered already
+  window.fetch("/api-background/images").catch(() => {});
+  return true;
+});
 
 function updateObj(path, { credit = "", description = "" } = {}) {
   return {
@@ -94,11 +96,22 @@ function updateCredit(image) {
 
     <ImageUploader @update-image-list="fetch" />
 
-    <h2 class="title has-margin-top">Existing Images</h2>
+    <div v-if="showReload" class="mt-5 message is-warning">
+      <p class="message-header">Waiting for background uploads</p>
+      <p class="message-body">
+        <button
+          class="button is-warning has-text-weight-semibold"
+          @click="fetch"
+        >
+          Reload now
+        </button>
+      </p>
+    </div>
 
-    <SpinnerProgress :is-loading="listState.isLoading.value" />
+    <SpinnerProgress :is-loading="listState.isLoadingThrottled.value" />
     <ErrorSimple :error="saveState.error.value" />
     <ErrorReloader :error="listState.error.value" @reload="fetch" />
+    <h2 class="title has-margin-top">Existing Images</h2>
 
     <table class="table is-striped is-fullwidth">
       <tbody>
