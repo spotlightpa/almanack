@@ -269,12 +269,20 @@ func (app *appEnv) listImages(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	waitingFor, err := app.svc.Queries.ListImageWhereNotUploaded(r.Context())
+	if err != nil {
+		app.replyErr(w, r, err)
+		return
+	}
+
 	app.replyJSON(http.StatusOK, w, struct {
-		Images   []db.Image `json:"images"`
-		NextPage int32      `json:"next_page,string,omitempty"`
+		Images           []db.Image `json:"images"`
+		NextPage         int32      `json:"next_page,string,omitempty"`
+		WaitingForUpload bool       `json:"waiting_for_upload"`
 	}{
-		Images:   images,
-		NextPage: pager.NextPage,
+		Images:           images,
+		NextPage:         pager.NextPage,
+		WaitingForUpload: len(waitingFor) != 0,
 	})
 }
 
