@@ -53,7 +53,7 @@ func (app *appEnv) pingErr(w http.ResponseWriter, r *http.Request) {
 var inkyURL = must.Get(url.Parse("https://www.inquirer.com"))
 
 var imageWhitelist = syncx.Once(func() *regexp.Regexp {
-	return regexp.MustCompile(`^https://[^/]*(.inquirer.com|.arcpublishing.com|arc-anglerfish-arc2-prod-pmn.s3.amazonaws.com)/`)
+	return regexp.MustCompile(`^https://[^/]*(\.inquirer\.com|\.arcpublishing\.com|arc-anglerfish-arc2-prod-pmn\.s3\.amazonaws\.com)/`)
 })
 
 func (app *appEnv) getArcImage(w http.ResponseWriter, r *http.Request) {
