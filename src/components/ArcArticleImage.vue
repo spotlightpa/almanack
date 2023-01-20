@@ -18,7 +18,7 @@ export default {
       if (!srcURL) {
         return "";
       }
-      return `/api/proxy-image/${window.btoa(srcURL)}`;
+      return `/api/arc-image?${new URLSearchParams({ src_url: srcURL })}`;
     },
   },
 };

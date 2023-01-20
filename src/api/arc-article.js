@@ -118,7 +118,7 @@ export default class ArcArticle {
     if (!srcURL) {
       return "";
     }
-    return `/api/proxy-image/${window.btoa(srcURL)}`;
+    return `/api/arc-image?${new URLSearchParams({ src_url: srcURL })}`;
   }
   get featuredImageCredits() {
     return this.getProp("promo_items.basic.credits.by", { fallback: [] }).map(
