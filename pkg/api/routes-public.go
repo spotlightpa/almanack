@@ -2,16 +2,15 @@ package api
 
 import (
 	"context"
-	"encoding/base64"
 	"fmt"
 	"net/http"
 	"net/http/httputil"
 	"net/url"
+	"regexp"
 	"strconv"
 	"strings"
 	"time"
 
-	"github.com/carlmjohnson/requests"
 	"github.com/carlmjohnson/resperr"
 	"github.com/go-chi/chi/v5"
 	"github.com/spotlightpa/almanack/internal/db"
@@ -20,6 +19,7 @@ import (
 	"github.com/spotlightpa/almanack/internal/must"
 	"github.com/spotlightpa/almanack/internal/netlifyid"
 	"github.com/spotlightpa/almanack/internal/slack"
+	"github.com/spotlightpa/almanack/internal/syncx"
 	"github.com/spotlightpa/almanack/pkg/almanack"
 	"golang.org/x/exp/slog"
 )
@@ -52,26 +52,31 @@ func (app *appEnv) pingErr(w http.ResponseWriter, r *http.Request) {
 
 var inkyURL = must.Get(url.Parse("https://www.inquirer.com"))
 
-func (app *appEnv) getProxyImage(w http.ResponseWriter, r *http.Request) {
-	app.logStart(r)
+var imageWhitelist = syncx.Once(func() *regexp.Regexp {
+	return regexp.MustCompile(`^https://[^/]*(.inquirer.com|.arcpublishing.com|arc-anglerfish-arc2-prod-pmn.s3.amazonaws.com)/`)
+})
 
-	encURL := chi.URLParam(r, "encURL")
-	decURL, err := base64.URLEncoding.DecodeString(encURL)
+func (app *appEnv) getArcImage(w http.ResponseWriter, r *http.Request) {
+	srcURL := r.URL.Query().Get("src_url")
+	app.logStart(r, "src_url", srcURL)
+
+	u, err := inkyURL.Parse(srcURL)
 	if err != nil {
 		app.replyErr(w, r, resperr.WithUserMessagef(
-			nil, "Could not decode URL param: %q", encURL,
-		))
-		return
-	}
-	u, err := inkyURL.Parse(string(decURL))
-	if err != nil {
-		app.replyErr(w, r, resperr.WithUserMessagef(
-			nil, "Bad image URL: %q", decURL,
+			nil, "Bad image URL: %q", srcURL,
 		))
 		return
 	}
 
-	srcURL := u.String()
+	srcURL = u.String()
+
+	if !imageWhitelist().MatchString(srcURL) {
+		app.replyErr(w, r, resperr.WithUserMessagef(
+			nil, "Bad image URL: %q", srcURL,
+		))
+		return
+	}
+
 	l := slog.FromContext(r.Context())
 
 	dbImage, err := app.svc.Queries.GetImageBySourceURL(r.Context(), srcURL)
@@ -100,10 +105,7 @@ func (app *appEnv) getProxyImage(w http.ResponseWriter, r *http.Request) {
 
 	l.Info("getProxyImage: proxying", "src", srcURL)
 
-	const urlWhitelist = `^https://[^/]*(.inquirer.com|.arcpublishing.com|arc-anglerfish-arc2-prod-pmn.s3.amazonaws.com)/`
-	cl := *app.svc.Client
-	cl.Transport = requests.PermitURLTransport(cl.Transport, urlWhitelist)
-	body, ctype, err := almanack.FetchImageURL(r.Context(), &cl, u.String())
+	body, ctype, err := almanack.FetchImageURL(r.Context(), app.svc.Client, u.String())
 	if err != nil {
 		app.replyHTMLErr(w, r, err)
 		return
