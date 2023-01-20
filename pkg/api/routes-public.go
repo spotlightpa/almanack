@@ -21,6 +21,7 @@ import (
 	"github.com/spotlightpa/almanack/internal/netlifyid"
 	"github.com/spotlightpa/almanack/internal/slack"
 	"github.com/spotlightpa/almanack/pkg/almanack"
+	"golang.org/x/exp/slog"
 )
 
 func (app *appEnv) notFound(w http.ResponseWriter, r *http.Request) {
@@ -70,12 +71,41 @@ func (app *appEnv) getProxyImage(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	srcURL := u.String()
+	l := slog.FromContext(r.Context())
+
+	dbImage, err := app.svc.Queries.GetImageBySourceURL(r.Context(), srcURL)
+	switch {
+	case db.IsNotFound(err):
+		l.Info("getProxyImage: image not found", "src", srcURL)
+
+	case err != nil:
+		app.replyHTMLErr(w, r, err)
+		return
+
+	case err == nil && !dbImage.IsUploaded:
+		l.Info("getProxyImage: image found but awaiting upload", "src", srcURL)
+
+	case err == nil && dbImage.IsUploaded:
+		l.Info("getProxyImage: redirecting", "src", srcURL)
+		redirect, err := app.svc.ImageStore.SignGetURL(r.Context(), dbImage.Path)
+		if err != nil {
+			app.logErr(r.Context(), err)
+			app.replyHTMLErr(w, r, err)
+			return
+		}
+		http.Redirect(w, r, redirect, http.StatusFound)
+		return
+	}
+
+	l.Info("getProxyImage: proxying", "src", srcURL)
+
 	const urlWhitelist = `^https://[^/]*(.inquirer.com|.arcpublishing.com|arc-anglerfish-arc2-prod-pmn.s3.amazonaws.com)/`
 	cl := *app.svc.Client
 	cl.Transport = requests.PermitURLTransport(cl.Transport, urlWhitelist)
 	body, ctype, err := almanack.FetchImageURL(r.Context(), &cl, u.String())
 	if err != nil {
-		app.replyErr(w, r, err)
+		app.replyHTMLErr(w, r, err)
 		return
 	}
 	w.Header().Set("Content-Type", ctype)
