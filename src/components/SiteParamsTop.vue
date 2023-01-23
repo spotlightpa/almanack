@@ -27,7 +27,7 @@ export default {
 <template>
   <div>
     <details class="mt-4">
-      <summary class="title is-4">Top Promo</summary>
+      <summary class="title is-4">Top promo</summary>
       <BulmaField label="Top promo">
         <div>
           <label class="checkbox">
