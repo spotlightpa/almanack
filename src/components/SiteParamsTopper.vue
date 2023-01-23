@@ -27,7 +27,7 @@ export default {
 <template>
   <div>
     <details class="mt-4">
-      <summary class="title is-4">Topper</summary>
+      <summary class="title is-4">Topper promo</summary>
       <BulmaField
         label="Topper"
         help="Topper is a full width promo at the top of the page under the navbar"

@@ -34,7 +34,7 @@ export default {
 <template>
   <div>
     <details class="mt-4">
-      <summary class="title is-4">Support Us Box</summary>
+      <summary class="title is-4">Support us box</summary>
       <BulmaField label="Support Us Box">
         <div>
           <label class="checkbox">
