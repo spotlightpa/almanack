@@ -263,6 +263,12 @@ export function usePage(id) {
       }
     },
     publishNow(formEl) {
+      if (
+        !page.value.isPublished &&
+        !window.confirm("Are you sure you want to publish this now?")
+      ) {
+        return;
+      }
       if (!formEl.reportValidity()) {
         return;
       }
