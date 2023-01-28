@@ -1,8 +1,20 @@
+<script setup>
+const isProd = !!window.location.host.match(/spotlightpa\.org$/);
+const isStage = !!window.location.host.match(/netlify\.app$/);
+const isDev = !isProd && !isStage;
+</script>
+
 <template>
   <div class="body">
     <AppNav id="top-nav" />
     <div>
-      <main class="section">
+      <main
+        class="section"
+        :class="{
+          'has-background-success-light': isDev,
+          'has-background-warning-light': isStage,
+        }"
+      >
         <div class="mx-auto content-width">
           <router-view />
         </div>
