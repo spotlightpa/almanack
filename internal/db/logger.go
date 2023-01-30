@@ -11,7 +11,6 @@ import (
 	"github.com/jackc/pgx/v4"
 	"github.com/spotlightpa/almanack/internal/stringx"
 	"github.com/spotlightpa/almanack/pkg/almlog"
-	"golang.org/x/exp/slog"
 )
 
 type logger struct {
@@ -49,7 +48,7 @@ func (l logger) log(ctx context.Context, kind string, d time.Duration) {
 		prefix = fmt.Sprintf("%s(%s:%d)", name, file, line)
 	}
 	level := almlog.LevelThreshold(d, 200*time.Millisecond, 1*time.Second)
-	slog.FromContext(ctx).
+	almlog.FromContext(ctx).
 		Log(level, "DBTX",
 			"kind", kind,
 			"query", prefix,

@@ -3,7 +3,7 @@ package netlifyid
 import (
 	"net/http"
 
-	"golang.org/x/exp/slog"
+	"github.com/spotlightpa/almanack/pkg/almlog"
 )
 
 type MockAuthService struct{}
@@ -20,7 +20,7 @@ func (mas MockAuthService) AuthFromCookie(r *http.Request) (*http.Request, error
 }
 
 func (mas MockAuthService) HasRole(r *http.Request, role string) error {
-	l := slog.FromContext(r.Context())
+	l := almlog.FromContext(r.Context())
 	l.Debug("mock permission middleware",
 		"requires-role", role,
 		"has-role", true)

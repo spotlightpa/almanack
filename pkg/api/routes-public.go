@@ -21,7 +21,7 @@ import (
 	"github.com/spotlightpa/almanack/internal/slack"
 	"github.com/spotlightpa/almanack/internal/syncx"
 	"github.com/spotlightpa/almanack/pkg/almanack"
-	"golang.org/x/exp/slog"
+	"github.com/spotlightpa/almanack/pkg/almlog"
 )
 
 func (app *appEnv) notFound(w http.ResponseWriter, r *http.Request) {
@@ -77,7 +77,7 @@ func (app *appEnv) getArcImage(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	l := slog.FromContext(r.Context())
+	l := almlog.FromContext(r.Context())
 
 	dbImage, err := app.svc.Queries.GetImageBySourceURL(r.Context(), srcURL)
 	switch {

@@ -1,6 +1,6 @@
 module github.com/spotlightpa/almanack
 
-go 1.19
+go 1.20
 
 require (
 	github.com/BurntSushi/toml v1.2.1
@@ -10,14 +10,15 @@ require (
 	github.com/carlmjohnson/be v0.22.5
 	github.com/carlmjohnson/crockford v0.22.2
 	github.com/carlmjohnson/emailx v0.20.2
-	github.com/carlmjohnson/errutil v0.21.5
+	github.com/carlmjohnson/errorx v0.0.0-20230119205311-c48cb3ba5528
 	github.com/carlmjohnson/exitcode v0.20.2
 	github.com/carlmjohnson/flagx v0.22.2
 	github.com/carlmjohnson/gateway v1.22.2
-	github.com/carlmjohnson/requests v0.22.3
+	github.com/carlmjohnson/requests v0.23.2-0.20230125161233-cfeecdd30395
 	github.com/carlmjohnson/resperr v0.22.0
-	github.com/carlmjohnson/slackhook v0.21.2
+	github.com/carlmjohnson/slackhook v0.21.3-0.20230120183306-fc067de180a3
 	github.com/carlmjohnson/versioninfo v0.22.4
+	github.com/carlmjohnson/workgroup v0.22.1-0.20230127023702-655214c5182d
 	github.com/gabriel-vasile/mimetype v1.4.1
 	github.com/getsentry/sentry-go v0.16.0
 	github.com/go-chi/chi/v5 v5.0.8
@@ -29,8 +30,8 @@ require (
 	github.com/mattbaird/gochimp v0.0.0-20200820164431-f1082bcdf63f
 	github.com/microcosm-cc/bluemonday v1.0.21
 	gocloud.dev v0.27.0
-	golang.org/x/exp v0.0.0-20230108222341-4b8118a2686a
-	golang.org/x/net v0.4.0
+	golang.org/x/exp v0.0.0-20230129154200-a960b3787bd2
+	golang.org/x/net v0.5.0
 	golang.org/x/oauth2 v0.3.0
 	golang.org/x/sync v0.1.0
 )
@@ -58,6 +59,7 @@ require (
 	github.com/aws/aws-sdk-go-v2/service/sts v1.17.7 // indirect
 	github.com/aws/smithy-go v1.13.5 // indirect
 	github.com/aymerick/douceur v0.2.0 // indirect
+	github.com/carlmjohnson/deque v0.22.0 // indirect
 	github.com/golang/groupcache v0.0.0-20210331224755-41bb18bfe9da // indirect
 	github.com/golang/protobuf v1.5.2 // indirect
 	github.com/google/go-querystring v1.1.0 // indirect
@@ -73,8 +75,8 @@ require (
 	github.com/jmespath/go-jmespath v0.4.0 // indirect
 	go.opencensus.io v0.24.0 // indirect
 	golang.org/x/crypto v0.4.0 // indirect
-	golang.org/x/sys v0.3.0 // indirect
-	golang.org/x/text v0.5.0 // indirect
+	golang.org/x/sys v0.4.0 // indirect
+	golang.org/x/text v0.6.0 // indirect
 	golang.org/x/xerrors v0.0.0-20220907171357-04be3eba64a2 // indirect
 	google.golang.org/api v0.105.0 // indirect
 	google.golang.org/appengine v1.6.7 // indirect

@@ -9,7 +9,7 @@ import (
 	"strings"
 
 	"github.com/aws/aws-lambda-go/lambdacontext"
-	"github.com/carlmjohnson/errutil"
+	"github.com/carlmjohnson/errorx"
 	"github.com/carlmjohnson/resperr"
 	"github.com/spotlightpa/almanack/pkg/almlog"
 	"golang.org/x/exp/slog"
@@ -36,7 +36,7 @@ var _ AuthService = NetlifyAuth{}
 func (as NetlifyAuth) AuthFromHeader(r *http.Request) (*http.Request, error) {
 	netID, err := FromLambdaContext(r.Context())
 	if err != nil {
-		l := slog.FromContext(r.Context())
+		l := almlog.FromContext(r.Context())
 		l.Error("netlify.AuthFromHeader", err)
 		return nil, err
 	}
@@ -46,7 +46,7 @@ func (as NetlifyAuth) AuthFromHeader(r *http.Request) (*http.Request, error) {
 func (as NetlifyAuth) AuthFromCookie(r *http.Request) (*http.Request, error) {
 	netID, err := FromCookie(r)
 	if err != nil {
-		l := slog.FromContext(r.Context())
+		l := almlog.FromContext(r.Context())
 		l.Error("netlify.AuthFromCookie", err)
 		return nil, err
 	}
@@ -54,7 +54,7 @@ func (as NetlifyAuth) AuthFromCookie(r *http.Request) (*http.Request, error) {
 }
 
 func (as NetlifyAuth) HasRole(r *http.Request, role string) error {
-	l := slog.FromContext(r.Context())
+	l := almlog.FromContext(r.Context())
 	if jwt := FromContext(r.Context()); jwt != nil {
 		hasRole := jwt.HasRole(role)
 		level := slog.LevelInfo
@@ -108,13 +108,18 @@ func FromLambdaContext(ctx context.Context) (*JWT, error) {
 
 // Danger! Does not verify JWT! Do not use in insecure context.
 func FromCookie(r *http.Request) (id *JWT, err error) {
-	defer errutil.Prefix(&err, "problem retrieving JWT from cookie")
+	defer errorx.Trace(&err)
 
 	c, err := r.Cookie("nf_jwt")
 	if err != nil {
 		return nil, err
 	}
-	defer errutil.Prefix(&err, fmt.Sprintf("malformed cookie value: %q", c.Value))
+	defer func(value string) {
+		if err != nil {
+			err = fmt.Errorf("malformed cookie value %q: %w",
+				value, err)
+		}
+	}(c.Value)
 	_, s, ok := strings.Cut(c.Value, ".")
 	if !ok {
 		return nil, fmt.Errorf("missing initial dot")

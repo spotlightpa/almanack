@@ -6,16 +6,16 @@ import (
 	"net/http"
 	"net/url"
 
-	"github.com/carlmjohnson/errutil"
+	"github.com/carlmjohnson/errorx"
 	"github.com/carlmjohnson/requests"
-	"golang.org/x/exp/slog"
+	"github.com/spotlightpa/almanack/pkg/almlog"
 	"golang.org/x/oauth2"
 	"golang.org/x/oauth2/google"
 )
 
 func (gsvc *Service) GAClient(ctx context.Context) (cl *http.Client, err error) {
 	if len(gsvc.cert) == 0 {
-		l := slog.FromContext(ctx)
+		l := almlog.FromContext(ctx)
 		l.Warn("using default Google credentials")
 		cl, err = google.DefaultClient(ctx, "https://www.googleapis.com/auth/analytics.readonly")
 		return
@@ -31,7 +31,7 @@ func (gsvc *Service) GAClient(ctx context.Context) (cl *http.Client, err error) 
 }
 
 func (gsvc *Service) MostPopularNews(ctx context.Context, cl *http.Client) (pages []string, err error) {
-	defer errutil.Prefix(&err, "problem getting most popular news")
+	defer errorx.Trace(&err)
 
 	if gsvc.viewID == "" {
 		return nil, fmt.Errorf("view ID not set")
@@ -92,7 +92,7 @@ func (gsvc *Service) MostPopularNews(ctx context.Context, cl *http.Client) (page
 			pages = append(pages, page)
 		}
 	}
-	l := slog.FromContext(ctx)
+	l := almlog.FromContext(ctx)
 	l.Info("google.MostPopularNews", "count", len(pages))
 	return pages, nil
 }

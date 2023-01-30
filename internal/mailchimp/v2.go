@@ -6,11 +6,10 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/carlmjohnson/errutil"
+	"github.com/carlmjohnson/errorx"
 	"github.com/carlmjohnson/requests"
 	"github.com/carlmjohnson/resperr"
 	"github.com/mattbaird/gochimp"
-	"golang.org/x/exp/slog"
 
 	"github.com/spotlightpa/almanack/pkg/almlog"
 )
@@ -40,7 +39,7 @@ func (v2 V2) SendEmail(ctx context.Context, subject, body string) (err error) {
 			err = resperr.New(http.StatusBadGateway, "MailChimp problem: %w", err)
 		}
 	}()
-	defer errutil.Trace(&err)
+	defer errorx.Trace(&err)
 
 	// API keys end with 123XYZ-us1, where us1 is the datacenter
 	_, datacenter, _ := strings.Cut(v2.apiKey, "-")
@@ -67,7 +66,7 @@ func (v2 V2) SendEmail(ctx context.Context, subject, body string) (err error) {
 	if err != nil {
 		return err
 	}
-	l := slog.FromContext(ctx)
+	l := almlog.FromContext(ctx)
 	l.Info("mailchimp.SendEmail: created campaign", "campaign_id", resp.Id)
 
 	type v2CampaignSend struct {
@@ -93,7 +92,7 @@ type MockEmailService struct {
 }
 
 func (mock MockEmailService) SendEmail(ctx context.Context, subject, body string) error {
-	l := slog.FromContext(ctx)
+	l := almlog.FromContext(ctx)
 	l.Info("mocking campaign, debug output")
 	fmt.Println()
 	fmt.Println(subject)

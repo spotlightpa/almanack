@@ -6,14 +6,14 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/carlmjohnson/errutil"
+	"github.com/carlmjohnson/errorx"
 	"github.com/carlmjohnson/requests"
 	"golang.org/x/net/html"
 	"golang.org/x/net/html/atom"
 )
 
 func ImportPage(ctx context.Context, cl *http.Client, page string) (body string, err error) {
-	defer errutil.Trace(&err)
+	defer errorx.Trace(&err)
 
 	var node html.Node
 	err = requests.

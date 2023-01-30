@@ -9,7 +9,7 @@ import (
 	"time"
 
 	"github.com/BurntSushi/toml"
-	"github.com/carlmjohnson/errutil"
+	"github.com/carlmjohnson/errorx"
 	"github.com/jackc/pgtype"
 	"github.com/microcosm-cc/bluemonday"
 	"github.com/spotlightpa/almanack/internal/stringx"
@@ -57,7 +57,7 @@ func (page *Page) ToTOML() (string, error) {
 }
 
 func (page *Page) FromTOML(content string) (err error) {
-	defer errutil.Prefix(&err, "problem reading TOML")
+	defer errorx.Trace(&err)
 
 	const delimiter = "+++\n"
 

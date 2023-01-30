@@ -7,7 +7,6 @@ import (
 	"strings"
 
 	"github.com/carlmjohnson/emailx"
-	"github.com/carlmjohnson/errutil"
 	"github.com/carlmjohnson/resperr"
 	"github.com/jackc/pgtype"
 	"github.com/spotlightpa/almanack/internal/db"
@@ -512,14 +511,14 @@ func (app *appEnv) postPage(w http.ResponseWriter, r *http.Request) {
 
 	oldPage, err := app.svc.Queries.GetPageByFilePath(r.Context(), userUpdate.FilePath)
 	if err != nil {
-		errutil.Prefix(&err, "postPage connection problem")
+		err = fmt.Errorf("postPage connection problem: %w", err)
 		app.replyErr(w, r, err)
 		return
 	}
 
 	res, err := app.svc.Queries.UpdatePage(r.Context(), userUpdate)
 	if err != nil {
-		errutil.Prefix(&err, "postPage update problem")
+		err = fmt.Errorf("postPage update problem: %w", err)
 		app.replyErr(w, r, err)
 		return
 	}
@@ -536,7 +535,7 @@ func (app *appEnv) postPage(w http.ResponseWriter, r *http.Request) {
 			app.logErr(r.Context(), warning)
 		}
 		if err != nil {
-			errutil.Prefix(&err, "postPage publish problem")
+			err = fmt.Errorf("postPage publish problem: %w", err)
 			app.replyErr(w, r, err)
 			return
 		}

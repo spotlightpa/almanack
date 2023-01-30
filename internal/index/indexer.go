@@ -6,7 +6,6 @@ import (
 
 	"github.com/algolia/algoliasearch-client-go/v3/algolia/search"
 	"github.com/spotlightpa/almanack/pkg/almlog"
-	"golang.org/x/exp/slog"
 )
 
 func AddFlags(fl *flag.FlagSet) func() Indexer {
@@ -36,7 +35,7 @@ func (mi MockIndexer) SaveObject(object any, opts ...any) (res search.SaveObject
 	l := almlog.Logger
 	for _, opt := range opts {
 		if ctx, ok := opt.(context.Context); ok {
-			l = slog.FromContext(ctx)
+			l = almlog.FromContext(ctx)
 		}
 	}
 	l.Info("index.Mock.SaveObject")

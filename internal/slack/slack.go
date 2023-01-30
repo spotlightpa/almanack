@@ -7,7 +7,7 @@ import (
 	"os"
 
 	"github.com/carlmjohnson/slackhook"
-	"golang.org/x/exp/slog"
+	"github.com/spotlightpa/almanack/pkg/almlog"
 )
 
 type Client struct {
@@ -25,7 +25,7 @@ func New(hookURL string) Client {
 }
 
 func (sc Client) Post(ctx context.Context, msg Message) error {
-	l := slog.FromContext(ctx)
+	l := almlog.FromContext(ctx)
 	if sc.c == nil {
 		l.Info("slack.Post: mocking; debug output")
 		b, _ := json.MarshalIndent(&msg, "", "  ")

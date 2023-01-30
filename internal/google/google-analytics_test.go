@@ -9,9 +9,11 @@ import (
 	"github.com/carlmjohnson/be"
 	"github.com/carlmjohnson/requests"
 	"github.com/spotlightpa/almanack/internal/stringx"
+	"github.com/spotlightpa/almanack/pkg/almlog"
 )
 
 func TestMostPopularNews(t *testing.T) {
+	_ = almlog.UseTestLogger()
 	svc := Service{}
 	svc.viewID = stringx.First(os.Getenv("ALMANACK_GOOGLE_TEST_VIEW"), "1")
 	ctx := context.Background()
