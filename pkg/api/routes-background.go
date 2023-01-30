@@ -11,7 +11,6 @@ import (
 	"github.com/spotlightpa/almanack/internal/paginate"
 	"github.com/spotlightpa/almanack/pkg/almanack"
 	"github.com/spotlightpa/almanack/pkg/almlog"
-	"golang.org/x/sync/errgroup"
 )
 
 func (app *appEnv) backgroundSleep(w http.ResponseWriter, r *http.Request) {
@@ -117,11 +116,8 @@ func (app *appEnv) backgroundImages(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var eg errgroup.Group
-	eg.SetLimit(5)
-	for i := range images {
-		image := images[i]
-		eg.Go(func() error {
+	err = workgroup.DoTasks(5, images,
+		func(image db.Image) error {
 			_, _, err := almanack.UploadFromURL(
 				r.Context(),
 				app.svc.Client,
@@ -129,20 +125,21 @@ func (app *appEnv) backgroundImages(w http.ResponseWriter, r *http.Request) {
 				image.Path,
 				image.SourceURL)
 			if err != nil {
-				app.logErr(r.Context(), err)
-				return nil
+				return err
 			}
 			if _, err = app.svc.Queries.UpdateImage(r.Context(),
 				db.UpdateImageParams{
 					Path:      image.Path,
 					SourceURL: image.SourceURL,
 				}); err != nil {
-				app.logErr(r.Context(), err)
-				return nil
+				return err
 			}
 			return nil
 		})
+	if err != nil {
+		app.replyErr(w, r, err)
+		return
 	}
-	eg.Wait()
+
 	app.replyJSON(http.StatusAccepted, w, "OK")
 }
