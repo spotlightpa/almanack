@@ -98,7 +98,7 @@ function test:frontend() {
 }
 
 function test:backend() {
-	go test ./... -v
+	go test -race ./... -v
 }
 
 function test:misc() {

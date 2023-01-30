@@ -2,17 +2,18 @@ package almanack
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"strconv"
 	"strings"
 
-	"github.com/carlmjohnson/errutil"
+	"github.com/carlmjohnson/errorx"
 	"github.com/jackc/pgtype"
 	"github.com/spotlightpa/almanack/internal/db"
 	"github.com/spotlightpa/almanack/internal/mailchimp"
 	"github.com/spotlightpa/almanack/internal/stringx"
 	"github.com/spotlightpa/almanack/internal/timex"
-	"golang.org/x/exp/slog"
+	"github.com/spotlightpa/almanack/pkg/almlog"
 )
 
 func (svc Services) UpdateNewsletterArchives(ctx context.Context, types []db.NewsletterType) (err error) {
@@ -20,15 +21,15 @@ func (svc Services) UpdateNewsletterArchives(ctx context.Context, types []db.New
 	if err != nil {
 		return err
 	}
-	var errs errutil.Slice
+	var errs []error
 	for _, nltype := range types {
-		errs.Push(svc.UpdateNewsletterArchive(ctx, campaigns, nltype.Name, nltype.Shortname))
+		errs = append(errs, svc.UpdateNewsletterArchive(ctx, campaigns, nltype.Name, nltype.Shortname))
 	}
-	return errs.Merge()
+	return errors.Join(errs...)
 }
 
 func (svc Services) UpdateNewsletterArchive(ctx context.Context, campaigns *mailchimp.ListCampaignsResp, mcType, dbType string) (err error) {
-	defer errutil.Trace(&err)
+	defer errorx.Trace(&err)
 
 	newItems := campaigns.ToNewsletters(mcType)
 	// update DB
@@ -43,7 +44,7 @@ func (svc Services) UpdateNewsletterArchive(ctx context.Context, campaigns *mail
 	if err != nil {
 		return err
 	}
-	l := slog.FromContext(ctx)
+	l := almlog.FromContext(ctx)
 	l.Info("Services.UpdateNewsletterArchive",
 		"mcType", mcType, "new-items", n)
 
@@ -51,7 +52,7 @@ func (svc Services) UpdateNewsletterArchive(ctx context.Context, campaigns *mail
 }
 
 func (svc Services) ImportNewsletterPages(ctx context.Context, types []db.NewsletterType) (err error) {
-	defer errutil.Trace(&err)
+	defer errorx.Trace(&err)
 
 	nls, err := svc.Queries.ListNewslettersWithoutPage(ctx, db.ListNewslettersWithoutPageParams{
 		Offset: 0,
@@ -60,7 +61,7 @@ func (svc Services) ImportNewsletterPages(ctx context.Context, types []db.Newsle
 	if err != nil {
 		return err
 	}
-	l := slog.FromContext(ctx)
+	l := almlog.FromContext(ctx)
 	l.Info("Services.ImportNewsletterPages",
 		"new-items", len(nls))
 
@@ -77,7 +78,7 @@ func (svc Services) ImportNewsletterPages(ctx context.Context, types []db.Newsle
 }
 
 func (svc Services) SaveNewsletterPage(ctx context.Context, nl *db.Newsletter, body string, types []db.NewsletterType) (err error) {
-	defer errutil.Trace(&err)
+	defer errorx.Trace(&err)
 
 	needsUpdate := false
 	if nl.SpotlightPAPath.String == "" {

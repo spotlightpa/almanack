@@ -4,11 +4,11 @@ import (
 	"context"
 	"flag"
 
-	"golang.org/x/exp/slog"
+	"github.com/spotlightpa/almanack/pkg/almlog"
 )
 
 func FlagFromOption(ctx context.Context, q *Queries, fl *flag.FlagSet, name string) error {
-	l := slog.FromContext(ctx)
+	l := almlog.FromContext(ctx)
 	needsVal := true
 	fl.Visit(func(f *flag.Flag) {
 		if f.Name == name {

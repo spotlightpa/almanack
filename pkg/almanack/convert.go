@@ -14,7 +14,7 @@ import (
 	"github.com/spotlightpa/almanack/internal/must"
 	"github.com/spotlightpa/almanack/internal/slicex"
 	"github.com/spotlightpa/almanack/internal/stringx"
-	"golang.org/x/exp/slog"
+	"github.com/spotlightpa/almanack/pkg/almlog"
 )
 
 func ArcFeedItemToBody(ctx context.Context, svc Services, arcStory *arc.FeedItem) (body string, warnings []string, err error) {
@@ -132,7 +132,7 @@ func slugFromURL(s string) string {
 }
 
 func readContentElements(ctx context.Context, svc Services, rawels []*json.RawMessage, body *strings.Builder) (warnings []string, err error) {
-	l := slog.FromContext(ctx)
+	l := almlog.FromContext(ctx)
 	for i, raw := range rawels {
 		var _type string
 		wrapper := arc.ContentElementType{Type: &_type}

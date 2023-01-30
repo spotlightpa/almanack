@@ -10,7 +10,7 @@ import (
 	"github.com/google/go-github/v48/github"
 	"github.com/spotlightpa/almanack/internal/netlifyid"
 	"github.com/spotlightpa/almanack/internal/stringx"
-	"golang.org/x/exp/slog"
+	"github.com/spotlightpa/almanack/pkg/almlog"
 	"golang.org/x/oauth2"
 )
 
@@ -55,7 +55,7 @@ func NewClient(token, owner, repo, branch string) *Client {
 }
 
 func (cl *Client) CreateFile(ctx context.Context, msg, path string, content []byte) error {
-	l := slog.FromContext(ctx)
+	l := almlog.FromContext(ctx)
 	l.Info("github.CreateFile",
 		"org", cl.owner,
 		"repo", cl.repo,
@@ -76,7 +76,7 @@ func (cl *Client) CreateFile(ctx context.Context, msg, path string, content []by
 }
 
 func (cl *Client) GetFile(ctx context.Context, path string) (contents string, err error) {
-	l := slog.FromContext(ctx)
+	l := almlog.FromContext(ctx)
 	l.Info("github.GetFile",
 		"org", cl.owner,
 		"repo", cl.repo,
@@ -98,7 +98,7 @@ func (cl *Client) GetFile(ctx context.Context, path string) (contents string, er
 }
 
 func (cl *Client) UpdateFile(ctx context.Context, msg, path string, content []byte) error {
-	l := slog.FromContext(ctx)
+	l := almlog.FromContext(ctx)
 	l.Info("github.UpdateFile",
 		"org", cl.owner,
 		"repo", cl.repo,
@@ -145,7 +145,7 @@ func (cl *Client) UpdateFile(ctx context.Context, msg, path string, content []by
 }
 
 func (cl *Client) Ping(ctx context.Context) error {
-	l := slog.FromContext(ctx)
+	l := almlog.FromContext(ctx)
 	l.Info("github.Ping",
 		"org", cl.owner,
 		"repo", cl.repo,

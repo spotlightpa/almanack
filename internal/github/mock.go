@@ -6,7 +6,6 @@ import (
 	"path/filepath"
 
 	"github.com/spotlightpa/almanack/pkg/almlog"
-	"golang.org/x/exp/slog"
 )
 
 type MockClient struct {
@@ -40,7 +39,7 @@ func (mc *MockClient) ensureParent(fn string) {
 
 func (mc *MockClient) CreateFile(ctx context.Context, msg, path string, content []byte) error {
 	tmpfn := mc.abspath(path)
-	l := slog.FromContext(ctx)
+	l := almlog.FromContext(ctx)
 	l.Info("github.mock.CreateFile",
 		"path", tmpfn,
 	)
@@ -50,7 +49,7 @@ func (mc *MockClient) CreateFile(ctx context.Context, msg, path string, content 
 
 func (mc *MockClient) GetFile(ctx context.Context, path string) (contents string, err error) {
 	tmpfn := mc.abspath(path)
-	l := slog.FromContext(ctx)
+	l := almlog.FromContext(ctx)
 	l.Info("github.mock.GetFile",
 		"path", tmpfn,
 	)
@@ -61,7 +60,7 @@ func (mc *MockClient) GetFile(ctx context.Context, path string) (contents string
 
 func (mc *MockClient) UpdateFile(ctx context.Context, msg, path string, content []byte) error {
 	tmpfn := mc.abspath(path)
-	l := slog.FromContext(ctx)
+	l := almlog.FromContext(ctx)
 	l.Info("github.mock.UpdateFile",
 		"path", tmpfn,
 	)

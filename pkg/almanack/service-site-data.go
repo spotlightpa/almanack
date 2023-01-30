@@ -6,16 +6,16 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/carlmjohnson/errutil"
+	"github.com/carlmjohnson/errorx"
 	"github.com/jackc/pgx/v4"
 	"github.com/spotlightpa/almanack/internal/db"
-	"golang.org/x/exp/slog"
+	"github.com/spotlightpa/almanack/pkg/almlog"
 )
 
 func (svc Services) PopScheduledSiteChanges(ctx context.Context, loc string) error {
-	l := slog.FromContext(ctx)
+	l := almlog.FromContext(ctx)
 	err := svc.Tx.Begin(ctx, pgx.TxOptions{}, func(q *db.Queries) (txerr error) {
-		defer errutil.Trace(&txerr)
+		defer errorx.Trace(&txerr)
 
 		configs, txerr := q.PopScheduledSiteChanges(ctx, loc)
 		if txerr != nil {
@@ -43,7 +43,7 @@ func (svc Services) PopScheduledSiteChanges(ctx context.Context, loc string) err
 }
 
 func (svc Services) PublishSiteConfig(ctx context.Context, siteConfig *db.SiteDatum) (err error) {
-	defer errutil.Trace(&err)
+	defer errorx.Trace(&err)
 
 	data, err := json.MarshalIndent(siteConfig.Data, "", "  ")
 	if err != nil {
@@ -65,7 +65,7 @@ type ScheduledSiteConfig struct {
 func (svc Services) UpdateSiteConfig(ctx context.Context, loc string, configs []ScheduledSiteConfig) ([]db.SiteDatum, error) {
 	var dbConfigs []db.SiteDatum
 	err := svc.Tx.Begin(ctx, pgx.TxOptions{}, func(q *db.Queries) (txerr error) {
-		defer errutil.Trace(&txerr)
+		defer errorx.Trace(&txerr)
 
 		// Clear existing future entries before upserting current/future entries
 		if txerr = q.DeleteSiteData(ctx, loc); txerr != nil {

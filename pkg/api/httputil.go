@@ -16,11 +16,9 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/carlmjohnson/errutil"
 	"github.com/carlmjohnson/resperr"
 	"github.com/getsentry/sentry-go"
 	"github.com/go-chi/chi/v5"
-	"golang.org/x/exp/slog"
 
 	"github.com/spotlightpa/almanack/internal/must"
 	"github.com/spotlightpa/almanack/internal/netlifyid"
@@ -60,16 +58,13 @@ func (app *appEnv) replyNewErr(code int, w http.ResponseWriter, r *http.Request,
 }
 
 func (app *appEnv) logErr(ctx context.Context, err error) {
-	l := slog.FromContext(ctx)
+	l := almlog.FromContext(ctx)
 	if hub := sentry.GetHubFromContext(ctx); hub != nil {
 		hub.WithScope(func(scope *sentry.Scope) {
 			userinfo := netlifyid.FromContext(ctx)
 			scope.SetTag("username", stringx.First(userinfo.Username(), "anonymous"))
 			scope.SetTag("email", stringx.First(userinfo.Email(), "not set"))
-
-			for _, suberr := range errutil.AsSlice(err) {
-				hub.CaptureException(suberr)
-			}
+			hub.CaptureException(err)
 		})
 	} else {
 		l.Warn("sentry not in context")
@@ -299,6 +294,6 @@ func (app *appEnv) logStart(r *http.Request, args ...any) {
 		_, name, _ := stringx.LastCut(f.Name(), ".")
 		route = fmt.Sprintf("%s(%s:%d)", name, file, line)
 	}
-	l := slog.FromContext(r.Context())
+	l := almlog.FromContext(r.Context())
 	l.With(args...).Info("logStart", "route", route)
 }

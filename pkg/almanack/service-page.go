@@ -2,11 +2,13 @@ package almanack
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"net/http"
 
-	"github.com/carlmjohnson/errutil"
+	"github.com/carlmjohnson/errorx"
 	"github.com/carlmjohnson/resperr"
+	"github.com/carlmjohnson/workgroup"
 	"github.com/jackc/pgtype"
 	"github.com/jackc/pgx/v4"
 	"github.com/spotlightpa/almanack/internal/arc"
@@ -15,12 +17,12 @@ import (
 	"github.com/spotlightpa/almanack/internal/slack"
 	"github.com/spotlightpa/almanack/internal/stringx"
 	"github.com/spotlightpa/almanack/internal/timex"
+	"github.com/spotlightpa/almanack/pkg/almlog"
 	"golang.org/x/exp/maps"
-	"golang.org/x/exp/slog"
 )
 
 func (svc Services) PublishPage(ctx context.Context, q *db.Queries, page *db.Page) (err, warning error) {
-	defer errutil.Prefix(&err, "Service.PublishPage(%d)", page.ID)
+	defer errorx.Trace(&err)
 
 	page.SetURLPath()
 	data, err := page.ToTOML()
@@ -28,15 +30,16 @@ func (svc Services) PublishPage(ctx context.Context, q *db.Queries, page *db.Pag
 		return
 	}
 
-	err = errutil.ExecParallel(func() error {
-		internalID, _ := page.Frontmatter["internal-id"].(string)
-		title := stringx.First(internalID, page.FilePath)
-		msg := fmt.Sprintf("Content: publishing %q", title)
-		return svc.ContentStore.UpdateFile(ctx, msg, page.FilePath, []byte(data))
-	}, func() error {
-		_, warning = svc.Indexer.SaveObject(page.ToIndex(), ctx)
-		return nil
-	})
+	err = workgroup.DoFuncs(workgroup.MaxProcs,
+		func() error {
+			internalID, _ := page.Frontmatter["internal-id"].(string)
+			title := stringx.First(internalID, page.FilePath)
+			msg := fmt.Sprintf("Content: publishing %q", title)
+			return svc.ContentStore.UpdateFile(ctx, msg, page.FilePath, []byte(data))
+		}, func() error {
+			_, warning = svc.Indexer.SaveObject(page.ToIndex(), ctx)
+			return nil
+		})
 	if err != nil {
 		return
 	}
@@ -58,7 +61,7 @@ func (svc Services) PublishPage(ctx context.Context, q *db.Queries, page *db.Pag
 }
 
 func (svc Services) RefreshPageFromContentStore(ctx context.Context, page *db.Page) (err error) {
-	defer errutil.Prefix(&err, "Service.RefreshPageFromContentStore(%d)", page.ID)
+	defer errorx.Trace(&err)
 
 	if db.IsNull(page.LastPublished) {
 		return
@@ -74,33 +77,38 @@ func (svc Services) RefreshPageFromContentStore(ctx context.Context, page *db.Pa
 }
 
 func (svc Services) PopScheduledPages(ctx context.Context) (err, warning error) {
-	var warnings errutil.Slice
+	var warnings []error
 	err = svc.Tx.Begin(ctx, pgx.TxOptions{}, func(q *db.Queries) (txerr error) {
-		defer errutil.Trace(&txerr)
+		defer errorx.Trace(&txerr)
 
 		pages, txerr := q.PopScheduledPages(ctx)
 		if txerr != nil {
 			return
 		}
-		var errs errutil.Slice
+		var errs []error
 		for _, page := range pages {
 			txerr, warning = svc.PublishPage(ctx, q, &page)
-			errs.Push(txerr)
-			warnings.Push(warning)
+			errs = append(errs, txerr)
+			warnings = append(warnings, warning)
 		}
-		return errs.Merge()
+		return errors.Join(errs...)
 	})
-	return err, warnings.Merge()
+	return err, errors.Join(warnings...)
 }
 
 func (svc Services) RefreshPageContents(ctx context.Context, id int64) (err error) {
-	defer errutil.Trace(&err)
+	defer errorx.Trace(&err)
 
 	page, err := svc.Queries.GetPageByID(ctx, id)
 	if err != nil {
 		return err
 	}
-	defer errutil.Prefix(&err, fmt.Sprintf("problem refreshing contents of %s", page.FilePath))
+	defer func(filepath string) {
+		if err != nil {
+			err = fmt.Errorf("problem refreshing contents of %q: %w",
+				filepath, err)
+		}
+	}(page.FilePath)
 
 	oldURLPath := page.URLPath.String
 	contentBefore, err := page.ToTOML()
@@ -126,7 +134,7 @@ func (svc Services) RefreshPageContents(ctx context.Context, id int64) (err erro
 		return nil
 	}
 
-	l := slog.FromContext(ctx)
+	l := almlog.FromContext(ctx)
 	l.Info("Services.RefreshPageContents: page changed",
 		"filepath", page.FilePath)
 
@@ -144,7 +152,7 @@ func (svc Services) RefreshPageContents(ctx context.Context, id int64) (err erro
 }
 
 func (svc Services) RefreshPageFromArcStory(ctx context.Context, page *db.Page, story *db.Arc, refreshMetadata bool) (warnings []string, err error) {
-	defer errutil.Trace(&err)
+	defer errorx.Trace(&err)
 
 	var feedItem arc.FeedItem
 	if err = story.RawData.AssignTo(&feedItem); err != nil {
@@ -177,7 +185,7 @@ func (svc Services) RefreshPageFromArcStory(ctx context.Context, page *db.Page, 
 }
 
 func (svc Services) CreatePageFromArcSource(ctx context.Context, shared *db.SharedArticle, kind string) (warnings []string, err error) {
-	defer errutil.Trace(&err)
+	defer errorx.Trace(&err)
 
 	if shared.SourceType != "arc" {
 		return nil, fmt.Errorf(
@@ -202,7 +210,7 @@ func (svc Services) CreatePageFromArcSource(ctx context.Context, shared *db.Shar
 	filepath := buildFilePath(fm, kind)
 
 	err = svc.Tx.Begin(ctx, pgx.TxOptions{}, func(q *db.Queries) (txerr error) {
-		defer errutil.Trace(&txerr)
+		defer errorx.Trace(&txerr)
 
 		if txerr = q.CreatePage(ctx, db.CreatePageParams{
 			FilePath:   filepath,
@@ -255,7 +263,7 @@ func buildFilePath(fm map[string]any, kind string) string {
 }
 
 func (svc Services) Notify(ctx context.Context, page *db.Page, publishingNow bool) (err error) {
-	defer errutil.Trace(&err)
+	defer errorx.Trace(&err)
 
 	const (
 		green  = "#78bc20"
@@ -291,7 +299,7 @@ func (svc Services) Notify(ctx context.Context, page *db.Page, publishingNow boo
 }
 
 func (svc Services) RefreshPageFromMailchimp(ctx context.Context, page *db.Page) (err error) {
-	defer errutil.Trace(&err)
+	defer errorx.Trace(&err)
 
 	id := page.ID
 	archiveURL, err := svc.Queries.GetArchiveURLForPageID(ctx, id)

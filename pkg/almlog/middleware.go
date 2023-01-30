@@ -5,14 +5,13 @@ import (
 	"time"
 
 	"github.com/go-chi/chi/v5/middleware"
-	"golang.org/x/exp/slog"
 )
 
 func Middleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		start := time.Now()
 		ww := middleware.NewWrapResponseWriter(w, r.ProtoMajor)
-		ctx := slog.NewContext(r.Context(), Logger)
+		ctx := NewContext(r.Context(), Logger)
 		r = r.WithContext(ctx)
 
 		defer func() {

@@ -1,21 +1,22 @@
 package api
 
 import (
+	"errors"
 	"net/http"
 	"time"
 
-	"github.com/carlmjohnson/errutil"
+	"github.com/carlmjohnson/workgroup"
 	"github.com/go-chi/chi/v5"
 	"github.com/spotlightpa/almanack/internal/db"
 	"github.com/spotlightpa/almanack/internal/paginate"
 	"github.com/spotlightpa/almanack/pkg/almanack"
-	"golang.org/x/exp/slog"
+	"github.com/spotlightpa/almanack/pkg/almlog"
 	"golang.org/x/sync/errgroup"
 )
 
 func (app *appEnv) backgroundSleep(w http.ResponseWriter, r *http.Request) {
 	app.logStart(r)
-	l := slog.FromContext(r.Context())
+	l := almlog.FromContext(r.Context())
 	if deadline, ok := r.Context().Deadline(); ok {
 		l.Info("backgroundSleep", "deadline", deadline)
 	} else {
@@ -36,37 +37,38 @@ func (app *appEnv) backgroundSleep(w http.ResponseWriter, r *http.Request) {
 func (app *appEnv) backgroundCron(w http.ResponseWriter, r *http.Request) {
 	app.logStart(r)
 
-	if err := errutil.ExecParallel(func() error {
-		var errs errutil.Slice
-		// Publish any scheduled pages before pushing new site config
-		poperr, warning := app.svc.PopScheduledPages(r.Context())
-		if warning != nil {
-			app.logErr(r.Context(), warning)
-		}
-		errs.Push(poperr)
-		// TODO: Query all locations from DB side
-		errs.Push(app.svc.PopScheduledSiteChanges(r.Context(), almanack.ElectionFeatLoc))
-		errs.Push(app.svc.PopScheduledSiteChanges(r.Context(), almanack.HomepageLoc))
-		errs.Push(app.svc.PopScheduledSiteChanges(r.Context(), almanack.SidebarLoc))
-		errs.Push(app.svc.PopScheduledSiteChanges(r.Context(), almanack.SiteParamsLoc))
-		errs.Push(app.svc.PopScheduledSiteChanges(r.Context(), almanack.StateCollegeLoc))
-		return errs.Merge()
-	}, func() error {
-		return app.svc.UpdateMostPopular(r.Context())
-	}, func() error {
-		types, err := app.svc.Queries.ListNewsletterTypes(r.Context())
-		if err != nil {
-			return err
-		}
-		var errs errutil.Slice
-		// Update newsletter archives first and then import anything new
-		errs.Push(app.svc.UpdateNewsletterArchives(r.Context(), types))
-		errs.Push(app.svc.ImportNewsletterPages(r.Context(), types))
-		return errs.Merge()
-	}, func() error {
-		app.backgroundImages(w, r)
-		return nil
-	}); err != nil {
+	if err := workgroup.DoFuncs(workgroup.MaxProcs,
+		func() error {
+			var errs []error
+			// Publish any scheduled pages before pushing new site config
+			poperr, warning := app.svc.PopScheduledPages(r.Context())
+			if warning != nil {
+				app.logErr(r.Context(), warning)
+			}
+			errs = append(errs, poperr)
+			// TODO: Query all locations from DB side
+			errs = append(errs, app.svc.PopScheduledSiteChanges(r.Context(), almanack.ElectionFeatLoc))
+			errs = append(errs, app.svc.PopScheduledSiteChanges(r.Context(), almanack.HomepageLoc))
+			errs = append(errs, app.svc.PopScheduledSiteChanges(r.Context(), almanack.SidebarLoc))
+			errs = append(errs, app.svc.PopScheduledSiteChanges(r.Context(), almanack.SiteParamsLoc))
+			errs = append(errs, app.svc.PopScheduledSiteChanges(r.Context(), almanack.StateCollegeLoc))
+			return errors.Join(errs...)
+		}, func() error {
+			return app.svc.UpdateMostPopular(r.Context())
+		}, func() error {
+			types, err := app.svc.Queries.ListNewsletterTypes(r.Context())
+			if err != nil {
+				return err
+			}
+			var errs []error
+			// Update newsletter archives first and then import anything new
+			errs = append(errs, app.svc.UpdateNewsletterArchives(r.Context(), types))
+			errs = append(errs, app.svc.ImportNewsletterPages(r.Context(), types))
+			return errors.Join(errs...)
+		}, func() error {
+			app.backgroundImages(w, r)
+			return nil
+		}); err != nil {
 		// reply shows up in dev only
 		app.replyErr(w, r, err)
 		return

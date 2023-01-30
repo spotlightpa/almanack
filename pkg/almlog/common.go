@@ -2,6 +2,7 @@
 package almlog
 
 import (
+	"bytes"
 	"os"
 	"time"
 
@@ -58,4 +59,15 @@ func LevelThreshold[T time.Duration | int](val, warn, err T) slog.Level {
 		return slog.LevelWarn
 	}
 	return slog.LevelInfo
+}
+
+func UseTestLogger() *bytes.Buffer {
+	var buf bytes.Buffer
+	opts := slog.HandlerOptions{
+		Level:       Level,
+		ReplaceAttr: shortenTime,
+	}
+	Logger = slog.New(opts.NewJSONHandler(&buf))
+	slog.SetDefault(Logger)
+	return &buf
 }

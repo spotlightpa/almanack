@@ -11,9 +11,8 @@ import (
 	"time"
 
 	"github.com/aws/aws-sdk-go/service/s3"
-	"github.com/carlmjohnson/errutil"
+	"github.com/carlmjohnson/errorx"
 	"gocloud.dev/blob"
-	"golang.org/x/exp/slog"
 
 	"github.com/spotlightpa/almanack/internal/httpx"
 	"github.com/spotlightpa/almanack/internal/must"
@@ -49,7 +48,7 @@ type BlobStore struct {
 }
 
 func (bs BlobStore) SignPutURL(ctx context.Context, srcPath string, h http.Header) (signedURL string, err error) {
-	l := slog.FromContext(ctx)
+	l := almlog.FromContext(ctx)
 	l.Info("aws.SignPutURL", "url", srcPath)
 	b, err := blob.OpenBucket(ctx, bs.bucket)
 	if err != nil {
@@ -77,7 +76,7 @@ func (bs BlobStore) SignPutURL(ctx context.Context, srcPath string, h http.Heade
 }
 
 func (bs BlobStore) SignGetURL(ctx context.Context, srcPath string) (signedURL string, err error) {
-	l := slog.FromContext(ctx)
+	l := almlog.FromContext(ctx)
 	l.Info("aws.SignGetURL", "url", srcPath)
 	b, err := blob.OpenBucket(ctx, bs.bucket)
 	if err != nil {
@@ -107,12 +106,12 @@ func (bs BlobStore) BuildURL(srcPath string) string {
 }
 
 func (bs BlobStore) WriteFile(ctx context.Context, path string, h http.Header, data []byte) (err error) {
-	l := slog.FromContext(ctx)
+	l := almlog.FromContext(ctx)
 	b, err := blob.OpenBucket(ctx, bs.bucket)
 	if err != nil {
 		return err
 	}
-	defer errutil.Defer(&err, b.Close)
+	defer errorx.Defer(&err, b.Close)
 
 	var checksum []byte
 

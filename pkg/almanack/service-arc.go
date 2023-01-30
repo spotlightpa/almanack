@@ -5,7 +5,7 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/carlmjohnson/errutil"
+	"github.com/carlmjohnson/errorx"
 	"github.com/carlmjohnson/requests"
 	"github.com/carlmjohnson/resperr"
 	"github.com/jackc/pgtype"
@@ -13,7 +13,7 @@ import (
 )
 
 func (svc Services) RefreshArcFromFeed(ctx context.Context) (fatal bool, err error) {
-	defer errutil.Trace(&err)
+	defer errorx.Trace(&err)
 
 	feed, feedErr := svc.fetchArcFeed(ctx)
 	if feedErr != nil {

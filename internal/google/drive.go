@@ -5,7 +5,7 @@ import (
 	"net/http"
 
 	"github.com/carlmjohnson/requests"
-	"golang.org/x/exp/slog"
+	"github.com/spotlightpa/almanack/pkg/almlog"
 	"golang.org/x/oauth2"
 	"golang.org/x/oauth2/google"
 )
@@ -22,7 +22,7 @@ func (gsvc *Service) DriveClient(ctx context.Context) (cl *http.Client, err erro
 		"https://www.googleapis.com/auth/drive.scripts",
 	}
 	if len(gsvc.cert) == 0 {
-		l := slog.FromContext(ctx)
+		l := almlog.FromContext(ctx)
 		l.Warn("using default Google credentials")
 		cl, err = google.DefaultClient(ctx, scopes...)
 		return

@@ -6,14 +6,14 @@ import (
 	"path"
 	"strings"
 
-	"github.com/carlmjohnson/errutil"
+	"github.com/carlmjohnson/errorx"
 	"github.com/carlmjohnson/resperr"
 	"github.com/spotlightpa/almanack/internal/db"
-	"golang.org/x/exp/slog"
+	"github.com/spotlightpa/almanack/pkg/almlog"
 )
 
 func (svc Services) ReplaceImageURL(ctx context.Context, srcURL, description, credit string) (s string, err error) {
-	defer errutil.Trace(&err)
+	defer errorx.Trace(&err)
 
 	if srcURL == "" {
 		return "", fmt.Errorf("no image provided")
@@ -51,9 +51,9 @@ func (svc Services) ReplaceImageURL(ctx context.Context, srcURL, description, cr
 }
 
 func (svc Services) UpdateMostPopular(ctx context.Context) (err error) {
-	defer errutil.Trace(&err)
+	defer errorx.Trace(&err)
 
-	l := slog.FromContext(ctx)
+	l := almlog.FromContext(ctx)
 	l.Info("Services.UpdateMostPopular")
 	cl, err := svc.gsvc.GAClient(ctx)
 	if err != nil {
