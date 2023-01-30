@@ -17,7 +17,7 @@ func logReq(req *http.Request, res *http.Response, err error, duration time.Dura
 		Log(level, "RoundTrip",
 			"req_method", req.Method,
 			"req_host", req.Host,
-			"res_status", res.Status,
+			"res_status", res.StatusCode,
 			"duration", duration,
 		)
 }
