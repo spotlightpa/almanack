@@ -65,7 +65,7 @@ func UseTestLogger() *bytes.Buffer {
 	var buf bytes.Buffer
 	opts := slog.HandlerOptions{
 		Level:       Level,
-		ReplaceAttr: shortenTime,
+		ReplaceAttr: removeTime,
 	}
 	Logger = slog.New(opts.NewJSONHandler(&buf))
 	slog.SetDefault(Logger)
