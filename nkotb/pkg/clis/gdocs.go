@@ -5,13 +5,14 @@ import (
 	"encoding/json"
 	"flag"
 	"fmt"
+	"io"
 	"log"
 	"net/http"
 	"net/http/httptest"
 	"os"
 	"os/exec"
 
-	"github.com/carlmjohnson/flagext"
+	"github.com/carlmjohnson/flagx"
 	"github.com/carlmjohnson/versioninfo"
 	"github.com/spotlightpa/nkotb/pkg/gdocs"
 	"golang.org/x/net/html"
@@ -43,12 +44,11 @@ func (app *gdocsAppEnv) ParseArgs(args []string) error {
 	fl.StringVar(&app.oauthClientID, "oauth-client-id", "", "client `id` for Google OAuth 2.0 authentication")
 	fl.StringVar(&app.oauthClientSecret, "oauth-client-secret", "", "client `secret` for Google OAuth 2.0 authentication")
 
-	app.Logger = log.New(nil, GDocsApp+" ", log.LstdFlags)
-	fl.Var(
-		flagext.Logger(app.Logger, flagext.LogSilent),
-		"silent",
-		`don't log debug output`,
-	)
+	app.Logger = log.New(os.Stderr, GDocsApp+" ", log.LstdFlags)
+	flagx.BoolFunc(fl, "silent", `don't log debug output`, func() error {
+		app.Logger.SetOutput(io.Discard)
+		return nil
+	})
 
 	fl.Usage = func() {
 		fmt.Fprintf(fl.Output(), `gdocs %s - extracts a document from Google Docs
@@ -70,7 +70,7 @@ Options:
 	if err := fl.Parse(args); err != nil {
 		return err
 	}
-	if err := flagext.ParseEnv(fl, GDocsApp); err != nil {
+	if err := flagx.ParseEnv(fl, GDocsApp); err != nil {
 		return err
 	}
 

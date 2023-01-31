@@ -7,7 +7,8 @@ import (
 	"io"
 	"os"
 
-	"github.com/carlmjohnson/flagext"
+	"github.com/carlmjohnson/flagx"
+	"github.com/carlmjohnson/flagx/lazyio"
 	"github.com/carlmjohnson/versioninfo"
 	"github.com/spotlightpa/nkotb/pkg/blocko"
 )
@@ -42,12 +43,12 @@ Options:
 		fl.PrintDefaults()
 		fmt.Fprintln(fl.Output())
 	}
-	src := flagext.FileOrURL(flagext.StdIO, nil)
+	src := lazyio.FileOrURL(lazyio.StdIO, nil)
 	app.src = src
 	if err := fl.Parse(args); err != nil {
 		return err
 	}
-	if err := flagext.ParseEnv(fl, NKOTBApp); err != nil {
+	if err := flagx.ParseEnv(fl, NKOTBApp); err != nil {
 		return err
 	}
 	if fl.NArg() > 0 {
