@@ -7,18 +7,13 @@ jobs:
     name: Build
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-go@v3
+        with:
+          go-version: '^1.19'
+          cache: true
+      - name: Get dependencies
+        run: go mod download
 
-    - name: Set up Go 1.x
-      uses: actions/setup-go@v2
-      with:
-        go-version: ^1.17
-      id: go
-
-    - name: Check out code into the Go module directory
-      uses: actions/checkout@v2
-
-    - name: Get dependencies
-      run: go mod download
-
-    - name: Test
-      run: go test -v ./...
+      - name: Test
+        run: go test -race ./...
