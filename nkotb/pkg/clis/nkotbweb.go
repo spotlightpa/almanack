@@ -8,7 +8,7 @@ import (
 	"os"
 	"time"
 
-	"github.com/carlmjohnson/flagext"
+	"github.com/carlmjohnson/flagx"
 	"github.com/carlmjohnson/gateway"
 	"github.com/carlmjohnson/versioninfo"
 	"github.com/getsentry/sentry-go"
@@ -45,7 +45,7 @@ func (app *nkotbWebAppEnv) ParseArgs(args []string) error {
 	if err := fl.Parse(args); err != nil {
 		return err
 	}
-	if err := flagext.ParseEnv(fl, NKOTBWebApp); err != nil {
+	if err := flagx.ParseEnv(fl, NKOTBWebApp); err != nil {
 		return err
 	}
 	if err := app.initSentry(*sentryDSN); err != nil {
