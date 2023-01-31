@@ -1,29 +1,30 @@
-package blocko
+package blocko_test
 
 import (
+	"os"
+	"path/filepath"
 	"strings"
 	"testing"
 
+	"github.com/carlmjohnson/be"
+	"github.com/spotlightpa/nkotb/pkg/blocko"
 	"golang.org/x/net/html"
 	"golang.org/x/net/html/atom"
 )
-
-func assert(t *testing.T, v bool, format string, args ...interface{}) {
-	t.Helper()
-	if !v {
-		t.Fatalf(format, args...)
-	}
-}
-
-func assertErrNil(t *testing.T, err error) {
-	t.Helper()
-	assert(t, err == nil, "err != nil: %v", err)
-}
 
 func toString(n *html.Node) string {
 	var buf strings.Builder
 	html.Render(&buf, n)
 	return buf.String()
+}
+
+func read(t testing.TB, name string) string {
+	t.Helper()
+	b, err := os.ReadFile(name)
+	if err != nil {
+		t.Fatal(err)
+	}
+	return strings.TrimSpace(string(b))
 }
 
 func TestIsEmpty(t *testing.T) {
@@ -47,12 +48,39 @@ func TestIsEmpty(t *testing.T) {
 				Data:     "p",
 			}
 			children, err := html.ParseFragment(strings.NewReader(tc.in), p)
-			assertErrNil(t, err)
+			be.NilErr(t, err)
 			for _, c := range children {
 				p.AppendChild(c)
 			}
-			s := toString(p)
-			assert(t, isEmpty(p) == tc.empty, "got: %q", s)
+			be.DebugLog(t, "got: %q", toString(p))
+			be.Equal(t, blocko.IsEmpty(p), tc.empty)
+		})
+	}
+}
+
+func TestGoldenFiles(t *testing.T) {
+	inputs, err := filepath.Glob("testdata/*.html")
+	be.NilErr(t, err)
+	for i := range inputs {
+		inHTML := inputs[i]
+		name := filepath.Base(inHTML)
+		name = strings.TrimSuffix(name, ".html")
+		t.Run(name, func(t *testing.T) {
+			in := strings.NewReader(read(t, inHTML))
+
+			var buf strings.Builder
+			blocko.HTMLToMarkdown(&buf, in)
+
+			wantMD := strings.TrimSuffix(inHTML, ".html") + ".md"
+			want := read(t, wantMD)
+			be.NilErr(t, err)
+			got := buf.String()
+			be.Debug(t, func() {
+				bad := filepath.Join("testdata", name+".bad.md")
+				os.WriteFile(bad, []byte(got), 0644)
+			})
+
+			be.Equal(t, want, got)
 		})
 	}
 }

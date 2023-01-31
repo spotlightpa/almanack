@@ -43,7 +43,7 @@ loop:
 			needsNL = output(w, &wbuf)
 			continue
 		}
-		if isEmpty(p) {
+		if IsEmpty(p) {
 			fmt.Fprint(w, "")
 			needsNL = false
 			continue
@@ -155,7 +155,7 @@ var stylisticElements = map[atom.Atom]bool{
 	atom.Wbr:     true,
 }
 
-func isEmpty(n *html.Node) bool {
+func IsEmpty(n *html.Node) bool {
 	root := n
 	n = findNode(n, func(n *html.Node) *html.Node {
 		if n == root {
