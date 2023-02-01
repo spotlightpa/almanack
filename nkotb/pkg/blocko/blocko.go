@@ -33,9 +33,13 @@ loop:
 			fmt.Fprint(w, "\n\n")
 		}
 		if depth > 0 {
-			if p == bNode.FirstChild {
+			switch {
+			case p.Parent.Parent.DataAtom == atom.Ol &&
+				p == bNode.FirstChild:
+				fmt.Fprint(w, "1. ")
+			case p == bNode.FirstChild:
 				fmt.Fprint(w, "- ")
-			} else {
+			default:
 				fmt.Fprint(w, strings.Repeat("    ", depth))
 			}
 		}

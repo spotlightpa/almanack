@@ -35,7 +35,7 @@ func TestGoldenFiles(t *testing.T) {
 			wantMD := strings.TrimSuffix(inHTML, ".html") + ".md"
 			want := read(t, wantMD)
 			be.NilErr(t, err)
-			got := buf.String()
+			got := strings.TrimSpace(buf.String())
 			be.Debug(t, func() {
 				bad := filepath.Join("testdata", name+".xxx.md")
 				os.WriteFile(bad, []byte(got), 0644)
