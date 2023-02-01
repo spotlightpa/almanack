@@ -13,6 +13,7 @@ require (
 	github.com/carlmjohnson/versioninfo v0.22.4
 	github.com/getsentry/sentry-go v0.17.0
 	github.com/tdewolff/minify/v2 v2.12.4
+	golang.org/x/exp v0.0.0-20230131160201-f062dba9d201
 	golang.org/x/net v0.5.0
 	golang.org/x/oauth2 v0.4.0
 	google.golang.org/api v0.109.0
