@@ -37,7 +37,7 @@ func TestGoldenFiles(t *testing.T) {
 			be.NilErr(t, err)
 			got := buf.String()
 			be.Debug(t, func() {
-				bad := filepath.Join("testdata", name+".bad.md")
+				bad := filepath.Join("testdata", name+".xxx.md")
 				os.WriteFile(bad, []byte(got), 0644)
 			})
 
