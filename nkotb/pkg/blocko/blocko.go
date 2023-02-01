@@ -17,17 +17,19 @@ func HTMLToMarkdown(w io.Writer, r io.Reader) error {
 		return err
 	}
 
+	Clean(bNode)
+
 	return outputBlocks(w, bNode, 0)
 }
 
 func outputBlocks(w io.Writer, bNode *html.Node, depth int) (err error) {
-	var (
-		wbuf    strings.Builder
-		needsNL = false
-	)
+	var wbuf strings.Builder
+	first := true
 loop:
 	for p := bNode.FirstChild; p != nil; p = p.NextSibling {
-		if needsNL {
+		if first {
+			first = false
+		} else {
 			fmt.Fprint(w, "\n\n")
 		}
 		if depth > 0 {
@@ -41,12 +43,7 @@ loop:
 			if err = html.Render(&wbuf, p); err != nil {
 				return err
 			}
-			needsNL = output(w, &wbuf)
-			continue
-		}
-		if xhtml.IsEmpty(p) {
-			fmt.Fprint(w, "")
-			needsNL = false
+			output(w, &wbuf)
 			continue
 		}
 		switch p.DataAtom {
@@ -76,15 +73,14 @@ loop:
 				return err
 			}
 		}
-		needsNL = output(w, &wbuf)
+		output(w, &wbuf)
 	}
 	return nil
 }
 
-func output(w io.Writer, wbuf *strings.Builder) bool {
+func output(w io.Writer, wbuf *strings.Builder) {
 	s := wbuf.String()
 	s = strings.TrimSpace(s)
 	wbuf.Reset()
 	fmt.Fprint(w, s)
-	return s != ""
 }
