@@ -34,7 +34,7 @@ That man was Timothy Loehmann.
 
 Loehmann shot and killed 12-year-old Tamir Rice — a Black boy who was playing with a toy gun at a park — in Cleveland in 2014. The shooting prompted national outrage and several nights of protest in Cleveland and other cities, but a grand jury declined to indict Loehmann. He was later fired for failing to disclose that his prior employer had deemed him unfit for duty.
 
-Eight years later and 300 miles east, that history would thrust remote Tioga borough and its 700 residents into an intense but fleeting national limelight. But the story of what led to the controversial decision, and what it revealed about this place and its leaders, hasn’t been told — until now.
+Eight years later and 300 miles east, that history would thrust remote Tioga borough and its 700 residents into an intense but fleeting national limelight. But the story of what led to the controversial decision, and what it revealed about this place and its leaders, hasn’t been told —&nbsp;until now.
 
 A five-month investigation by Spotlight PA found Tioga’s hiring of Loehmann and the ensuing fallout was only the latest episode in long-simmering infighting — fueled by hearsay, half-truths, and accusations — among the borough’s elected officials. The event almost completely imploded the borough’s small government.
 

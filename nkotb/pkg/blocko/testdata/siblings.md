@@ -1,5 +1,4 @@
-<b>Hello, world!</b>.
-<b>One, <i>two,</i> three</b>.
+<b>Hello, world!</b>. <b>One, <i>two,</i> three</b>.
 
 <a href="one">Link one and one</a>
 

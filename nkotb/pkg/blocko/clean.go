@@ -1,6 +1,8 @@
 package blocko
 
 import (
+	"strings"
+
 	"github.com/spotlightpa/nkotb/pkg/xhtml"
 	"golang.org/x/exp/slices"
 	"golang.org/x/net/html"
@@ -10,6 +12,7 @@ import (
 func Clean(root *html.Node) {
 	mergeSiblings(root)
 	removeEmptyP(root)
+	replaceWhitespace(root)
 }
 
 func mergeSiblings(root *html.Node) {
@@ -47,4 +50,20 @@ func removeEmptyP(root *html.Node) {
 	for _, n := range emptyP {
 		n.Parent.RemoveChild(n)
 	}
+}
+
+var whitespaceReplacer = strings.NewReplacer(
+	"\r", " ",
+	"\n", " ",
+	"\v", "\u2028",
+	"\u2029", "\u2028",
+	"  ", " ",
+)
+
+func replaceWhitespace(root *html.Node) {
+	xhtml.VisitAll(root, func(n *html.Node) {
+		if n.Type == html.TextNode {
+			n.Data = whitespaceReplacer.Replace(n.Data)
+		}
+	})
 }
