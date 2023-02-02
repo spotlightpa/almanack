@@ -82,9 +82,15 @@ loop:
 	return nil
 }
 
+var replaceSpecial = strings.NewReplacer(
+	"\u2028", "<br />",
+	" ", "&nbsp;",
+)
+
 func output(w io.Writer, wbuf *strings.Builder) {
 	s := wbuf.String()
 	s = strings.TrimSpace(s)
+	s = replaceSpecial.Replace(s)
 	wbuf.Reset()
 	fmt.Fprint(w, s)
 }
