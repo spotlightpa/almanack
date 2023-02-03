@@ -8,12 +8,26 @@ import (
 )
 
 func ToString(n *html.Node) string {
+	// TODO: Benchmark pooling
 	var buf strings.Builder
-	html.Render(&buf, n)
+	if err := html.Render(&buf, n); err != nil {
+		panic(err)
+	}
 	return buf.String()
 }
 
-var BlockElements = map[atom.Atom]bool{
+func ContentsToString(n *html.Node) string {
+	// TODO: Benchmark pooling
+	var buf strings.Builder
+	for c := n.FirstChild; c != nil; c = c.NextSibling {
+		if err := html.Render(&buf, c); err != nil {
+			panic(err)
+		}
+	}
+	return buf.String()
+}
+
+var MarkdownBlockElements = map[atom.Atom]bool{
 	atom.P:  true,
 	atom.H1: true,
 	atom.H2: true,
