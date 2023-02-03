@@ -14,7 +14,9 @@ import (
 
 func prep(r io.Reader) (*nethtml.Node, error) {
 	m := minify.New()
-	m.AddFunc("text/html", html.Minify)
+	m.AddFunc("text/html", (&html.Minifier{
+		KeepEndTags: true,
+	}).Minify)
 
 	var out bytes.Buffer
 	if err := m.Minify("text/html", &out, r); err != nil {
