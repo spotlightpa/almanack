@@ -38,3 +38,13 @@ func VisitAll(n *html.Node, callback func(*html.Node)) {
 		return true
 	})
 }
+
+func FindAll(root *html.Node, filter func(*html.Node) bool) []*html.Node {
+	var found []*html.Node
+	VisitAll(root, func(n *html.Node) {
+		if filter(n) {
+			found = append(found, n)
+		}
+	})
+	return found
+}
