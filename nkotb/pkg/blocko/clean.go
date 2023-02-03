@@ -17,16 +17,12 @@ func Clean(root *html.Node) {
 
 func mergeSiblings(root *html.Node) {
 	// find all matches first
-	var inlineSiblings []*html.Node
-	xhtml.VisitAll(root, func(n *html.Node) {
+	inlineSiblings := xhtml.FindAll(root, func(n *html.Node) bool {
 		brother := n.NextSibling
-		if brother == nil ||
-			!xhtml.InlineElements[n.DataAtom] ||
-			n.DataAtom != brother.DataAtom ||
-			!slices.Equal(n.Attr, brother.Attr) {
-			return
-		}
-		inlineSiblings = append(inlineSiblings, n)
+		return brother != nil &&
+			xhtml.InlineElements[n.DataAtom] &&
+			n.DataAtom == brother.DataAtom &&
+			slices.Equal(n.Attr, brother.Attr)
 	})
 	// then do mutation.
 	// no mutating while iterating!
@@ -40,12 +36,8 @@ func mergeSiblings(root *html.Node) {
 }
 
 func removeEmptyP(root *html.Node) {
-	var emptyP []*html.Node
-	xhtml.VisitAll(root, func(n *html.Node) {
-		if n.DataAtom == atom.P && xhtml.IsEmpty(n) {
-			emptyP = append(emptyP, n)
-			return
-		}
+	emptyP := xhtml.FindAll(root, func(n *html.Node) bool {
+		return n.DataAtom == atom.P && xhtml.IsEmpty(n)
 	})
 	for _, n := range emptyP {
 		n.Parent.RemoveChild(n)
@@ -62,6 +54,7 @@ var whitespaceReplacer = strings.NewReplacer(
 
 func replaceWhitespace(root *html.Node) {
 	xhtml.VisitAll(root, func(n *html.Node) {
+		// TODO: Ignore children of pre/code
 		if n.Type == html.TextNode {
 			n.Data = whitespaceReplacer.Replace(n.Data)
 		}
