@@ -48,3 +48,12 @@ func FindAll(root *html.Node, filter func(*html.Node) bool) []*html.Node {
 	})
 	return found
 }
+
+func Closest(n *html.Node, cond func(*html.Node) bool) *html.Node {
+	for p := n.Parent; p != nil; p = p.Parent {
+		if cond(p) {
+			return p
+		}
+	}
+	return nil
+}

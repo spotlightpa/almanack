@@ -54,8 +54,14 @@ var whitespaceReplacer = strings.NewReplacer(
 
 func replaceWhitespace(root *html.Node) {
 	xhtml.VisitAll(root, func(n *html.Node) {
-		// TODO: Ignore children of pre/code
-		if n.Type == html.TextNode {
+		if n.Type != html.TextNode {
+			return
+		}
+		// Ignore children of pre/code
+		codeblock := xhtml.Closest(n, func(n *html.Node) bool {
+			return n.DataAtom == atom.Pre || n.DataAtom == atom.Code
+		})
+		if codeblock == nil {
 			n.Data = whitespaceReplacer.Replace(n.Data)
 		}
 	})
