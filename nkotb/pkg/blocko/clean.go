@@ -13,6 +13,7 @@ func Clean(root *html.Node) {
 	mergeSiblings(root)
 	removeEmptyP(root)
 	replaceWhitespace(root)
+	fixBareLI(root)
 }
 
 func mergeSiblings(root *html.Node) {
@@ -65,4 +66,18 @@ func replaceWhitespace(root *html.Node) {
 			n.Data = whitespaceReplacer.Replace(n.Data)
 		}
 	})
+}
+
+func fixBareLI(root *html.Node) {
+	bareLIs := xhtml.FindAll(root, func(n *html.Node) bool {
+		child := n.FirstChild
+		return n.DataAtom == atom.Li &&
+			(child.Type == html.TextNode ||
+				xhtml.InlineElements[child.DataAtom])
+	})
+	for _, li := range bareLIs {
+		p := xhtml.New("p")
+		xhtml.AdoptChildren(p, li)
+		li.AppendChild(p)
+	}
 }

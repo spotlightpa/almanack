@@ -23,41 +23,48 @@ func HTMLToMarkdown(w io.Writer, r io.Reader) error {
 }
 
 func outputBlocks(w io.Writer, root *html.Node, depth int) (err error) {
+	var blocks []string
 	for p := root.FirstChild; p != nil; p = p.NextSibling {
-		if depth > 0 {
-			switch {
-			case p.Parent.Parent.DataAtom == atom.Ol &&
-				p == root.FirstChild:
-				fmt.Fprint(w, "1. ")
-			case p == root.FirstChild:
-				fmt.Fprint(w, "- ")
-			default:
-				fmt.Fprint(w, strings.Repeat("    ", depth))
-			}
-		}
-		block := strings.TrimSpace(blockToString(p))
-		if _, err = io.WriteString(w, block); err != nil {
-			return err
-		}
-		if _, err = io.WriteString(w, "\n\n"); err != nil {
-			return err
-		}
+		blocks = append(blocks, blockToStrings(p)...)
+	}
+	s := strings.Join(blocks, "\n\n")
+	if _, err = io.WriteString(w, s); err != nil {
+		return err
 	}
 	return nil
 }
 
-func blockToString(p *html.Node) string {
+func blockToStrings(p *html.Node) []string {
 	if !xhtml.MarkdownBlockElements[p.DataAtom] {
-		return xhtml.ToString(p)
+		return []string{xhtml.ToString(p)}
 	}
 	prefix := ""
 	switch p.DataAtom {
 	case atom.Ul, atom.Ol:
-		var buf strings.Builder
-		for c := p.FirstChild; c != nil; c = c.NextSibling {
-			outputBlocks(&buf, c, 1)
+		counter := 0
+		if p.DataAtom == atom.Ol {
+			counter = 1
 		}
-		return buf.String()
+		var blocks []string
+		for li := p.FirstChild; li != nil; li = li.NextSibling {
+			marker := "- "
+			if counter > 0 {
+				marker = fmt.Sprintf("%d. ", counter)
+				counter++
+			}
+			for c := li.FirstChild; c != nil; c = c.NextSibling {
+				subblocks := blockToStrings(c)
+				for i := range subblocks {
+					if i > 0 {
+						marker = "  "
+					}
+					subblocks[i] = marker + subblocks[i]
+				}
+				blocks = append(blocks, subblocks...)
+				marker = "  "
+			}
+		}
+		return blocks
 	case atom.H1:
 		prefix = "# "
 	case atom.H2:
@@ -74,7 +81,7 @@ func blockToString(p *html.Node) string {
 	contents := xhtml.ContentsToString(p)
 	contents = strings.TrimSpace(contents)
 	contents = replaceSpecial.Replace(contents)
-	return prefix + contents
+	return []string{prefix + contents}
 }
 
 var replaceSpecial = strings.NewReplacer(
