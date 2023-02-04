@@ -1,6 +1,9 @@
 package xhtml
 
-import "golang.org/x/net/html"
+import (
+	"golang.org/x/net/html"
+	"golang.org/x/net/html/atom"
+)
 
 func New(tag string, attrs ...string) *html.Node {
 	var attrslice []html.Attribute
@@ -17,9 +20,10 @@ func New(tag string, attrs ...string) *html.Node {
 		}
 	}
 	return &html.Node{
-		Type: html.ElementNode,
-		Data: tag,
-		Attr: attrslice,
+		Type:     html.ElementNode,
+		Data:     tag,
+		DataAtom: atom.Lookup([]byte(tag)),
+		Attr:     attrslice,
 	}
 }
 
