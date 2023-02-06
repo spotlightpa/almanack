@@ -14,7 +14,7 @@ func read(t testing.TB, name string) string {
 	t.Helper()
 	b, err := os.ReadFile(name)
 	if err != nil {
-		t.Fatal(err)
+		t.Fatalf("%v", err)
 	}
 	return strings.TrimSpace(string(b))
 }
@@ -27,21 +27,19 @@ func TestGoldenFiles(t *testing.T) {
 		name := filepath.Base(inHTML)
 		name = strings.TrimSuffix(name, ".html")
 		t.Run(name, func(t *testing.T) {
-			in := strings.NewReader(read(t, inHTML))
-
-			var buf strings.Builder
-			blocko.HTMLToMarkdown(&buf, in)
-
 			wantMD := strings.TrimSuffix(inHTML, ".html") + ".md"
-			want := read(t, wantMD)
+			want := read(be.Relaxed(t), wantMD)
+
+			in := read(t, inHTML)
+			got, err := blocko.HTMLToMarkdown(in)
 			be.NilErr(t, err)
-			got := strings.TrimSpace(buf.String())
+
 			be.Debug(t, func() {
 				bad := filepath.Join("testdata", name+".xxx.md")
 				os.WriteFile(bad, []byte(got), 0644)
 			})
 
-			be.Equal(t, want, got)
+			be.Equal(t, want, strings.TrimSpace(got))
 		})
 	}
 }

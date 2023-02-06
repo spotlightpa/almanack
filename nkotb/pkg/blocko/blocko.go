@@ -3,7 +3,6 @@ package blocko
 
 import (
 	"fmt"
-	"io"
 	"strings"
 
 	"github.com/spotlightpa/nkotb/pkg/xhtml"
@@ -11,27 +10,20 @@ import (
 	"golang.org/x/net/html/atom"
 )
 
-func HTMLToMarkdown(w io.Writer, r io.Reader) error {
-	bNode, err := prep(r)
+func HTMLToMarkdown(htmlstr string) (string, error) {
+	root, err := prep(htmlstr)
 	if err != nil {
-		return err
+		return "", err
 	}
 
-	Clean(bNode)
+	Clean(root)
 
-	return outputBlocks(w, bNode, 0)
-}
-
-func outputBlocks(w io.Writer, root *html.Node, depth int) (err error) {
 	var blocks []string
 	for p := root.FirstChild; p != nil; p = p.NextSibling {
 		blocks = append(blocks, blockToStrings(p)...)
 	}
-	s := strings.Join(blocks, "\n\n")
-	if _, err = io.WriteString(w, s); err != nil {
-		return err
-	}
-	return nil
+
+	return strings.Join(blocks, "\n\n"), nil
 }
 
 func blockToStrings(p *html.Node) []string {

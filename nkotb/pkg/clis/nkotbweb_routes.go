@@ -8,6 +8,8 @@ import (
 	"encoding/base64"
 	"encoding/gob"
 	"fmt"
+	"io"
+	"log"
 	"net/http"
 	"net/url"
 
@@ -18,7 +20,7 @@ import (
 	"github.com/spotlightpa/nkotb/build"
 	"github.com/spotlightpa/nkotb/pkg/blocko"
 	"github.com/spotlightpa/nkotb/pkg/gdocs"
-	"golang.org/x/net/html"
+	"github.com/spotlightpa/nkotb/pkg/xhtml"
 	"golang.org/x/oauth2"
 	"golang.org/x/oauth2/google"
 )
@@ -210,11 +212,17 @@ func (app *nkotbWebAppEnv) convert(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	n := gdocs.Convert(doc)
-	var buf bytes.Buffer
-	html.Render(&buf, n)
+	md, err := blocko.HTMLToMarkdown(xhtml.ToString(n))
+	if err != nil {
+		app.replyErr(w, r, err)
+		return
+	}
+
 	w.Header().Set("Cache-Control", "no-cache")
 	w.Header().Set("Content-Type", "text/plain; charset=UTF-8")
-	blocko.HTMLToMarkdown(w, &buf)
+	if _, err = io.WriteString(w, md); err != nil {
+		log.Println("write error", err)
+	}
 }
 
 func (app *nkotbWebAppEnv) authRedirect(w http.ResponseWriter, r *http.Request) {
