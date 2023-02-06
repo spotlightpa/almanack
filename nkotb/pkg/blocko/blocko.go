@@ -23,7 +23,7 @@ func HTMLToMarkdown(htmlstr string) (string, error) {
 		blocks = append(blocks, blockToStrings(p)...)
 	}
 
-	return strings.Join(blocks, "\n\n"), nil
+	return strings.Join(blocks, "\n\n") + "\n", nil
 }
 
 func blockToStrings(p *html.Node) []string {

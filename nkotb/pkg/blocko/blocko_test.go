@@ -24,8 +24,6 @@ func TestGoldenFiles(t *testing.T) {
 			testfile.Write(t, badname, got)
 		})
 
-		be.Equal(t,
-			strings.TrimSpace(want),
-			strings.TrimSpace(got))
+		be.Equal(t, want, got)
 	})
 }
