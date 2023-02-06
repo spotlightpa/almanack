@@ -65,6 +65,14 @@ type nkotbAppEnv struct {
 
 func (app *nkotbAppEnv) Exec() (err error) {
 	defer app.src.Close()
-	buf := bufio.NewReader(app.src)
-	return blocko.HTMLToMarkdown(os.Stdout, buf)
+	b, err := io.ReadAll(bufio.NewReader(app.src))
+	if err != nil {
+		return err
+	}
+	md, err := blocko.HTMLToMarkdown(string(b))
+	if err != nil {
+		return err
+	}
+	_, err = io.WriteString(os.Stdout, md)
+	return err
 }
