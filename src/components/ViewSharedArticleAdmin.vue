@@ -314,6 +314,16 @@ async function toggleComposer() {
           :initial-body="emailBody"
           @hide="showComposer = false"
         />
+
+        <div
+          v-if="showComposer && article._status !== 'S'"
+          class="mt-5 message is-danger"
+        >
+          <p class="message-body">
+            <strong>Warning:</strong> Article has not been shared with partners
+            yet.
+          </p>
+        </div>
       </div>
     </article>
   </div>
