@@ -1,45 +1,31 @@
 package blocko_test
 
 import (
-	"os"
-	"path/filepath"
 	"strings"
 	"testing"
 
 	"github.com/carlmjohnson/be"
 	"github.com/spotlightpa/nkotb/pkg/blocko"
+	"github.com/spotlightpa/nkotb/pkg/testfile"
 )
 
-func read(t testing.TB, name string) string {
-	t.Helper()
-	b, err := os.ReadFile(name)
-	if err != nil {
-		t.Fatalf("%v", err)
-	}
-	return strings.TrimSpace(string(b))
-}
-
 func TestGoldenFiles(t *testing.T) {
-	inputs, err := filepath.Glob("testdata/*.html")
-	be.NilErr(t, err)
-	for i := range inputs {
-		inHTML := inputs[i]
-		name := filepath.Base(inHTML)
-		name = strings.TrimSuffix(name, ".html")
-		t.Run(name, func(t *testing.T) {
-			wantMD := strings.TrimSuffix(inHTML, ".html") + ".md"
-			want := read(be.Relaxed(t), wantMD)
+	testfile.GlobRun(t, "testdata/*.html", func(path string, t *testing.T) {
+		bareName := strings.TrimSuffix(path, ".html")
+		wantMD := bareName + ".md"
+		want := testfile.Read(be.Relaxed(t), wantMD)
 
-			in := read(t, inHTML)
-			got, err := blocko.HTMLToMarkdown(in)
-			be.NilErr(t, err)
+		in := testfile.Read(t, path)
+		got, err := blocko.HTMLToMarkdown(in)
+		be.NilErr(t, err)
 
-			be.Debug(t, func() {
-				bad := filepath.Join("testdata", name+".xxx.md")
-				os.WriteFile(bad, []byte(got), 0644)
-			})
-
-			be.Equal(t, want, strings.TrimSpace(got))
+		be.Debug(t, func() {
+			badname := bareName + ".xxx.md"
+			testfile.Write(t, badname, got)
 		})
-	}
+
+		be.Equal(t,
+			strings.TrimSpace(want),
+			strings.TrimSpace(got))
+	})
 }
