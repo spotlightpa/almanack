@@ -15,7 +15,7 @@ import (
 func TestConvert(t *testing.T) {
 	testfile.GlobRun(t, "testdata/*.json", func(path string, t *testing.T) {
 		bareName := strings.TrimSuffix(path, ".json")
-		want := testfile.Read(t, bareName+".html")
+		want := testfile.Read(be.Relaxed(t), bareName+".html")
 
 		s := testfile.Read(t, path)
 
