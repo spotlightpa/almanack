@@ -1,26 +1,40 @@
 package xhtml
 
 import (
+	"bytes"
 	"strings"
+	"sync"
 
 	"golang.org/x/net/html"
 	"golang.org/x/net/html/atom"
 )
 
+var pool sync.Pool
+
+func poolGet() *bytes.Buffer {
+	if v := pool.Get(); v != nil {
+		buf := v.(*bytes.Buffer)
+		buf.Reset()
+		return buf
+	}
+	return &bytes.Buffer{}
+}
+
 func ToString(n *html.Node) string {
-	// TODO: Benchmark pooling
-	var buf strings.Builder
-	if err := html.Render(&buf, n); err != nil {
+	buf := poolGet()
+	defer pool.Put(buf)
+	if err := html.Render(buf, n); err != nil {
 		panic(err)
 	}
 	return buf.String()
 }
 
 func ContentsToString(n *html.Node) string {
-	// TODO: Benchmark pooling
-	var buf strings.Builder
+	buf := poolGet()
+	defer pool.Put(buf)
+
 	for c := n.FirstChild; c != nil; c = c.NextSibling {
-		if err := html.Render(&buf, c); err != nil {
+		if err := html.Render(buf, c); err != nil {
 			panic(err)
 		}
 	}
