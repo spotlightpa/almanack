@@ -5,38 +5,46 @@ import (
 	"golang.org/x/net/html/atom"
 )
 
-func Tables(root *html.Node, f func(tbl *html.Node, rows Table)) {
+func Tables(root *html.Node, f func(tbl *html.Node, rows TableNodes)) {
 	tables := FindAll(root, func(n *html.Node) bool {
 		return n.DataAtom == atom.Table
 	})
-	for _, tbl := range tables {
-		var text Table
-		rows := FindAll(tbl, func(n *html.Node) bool {
+	for _, tblNode := range tables {
+		var tbl TableNodes
+		rows := FindAll(tblNode, func(n *html.Node) bool {
 			return n.DataAtom == atom.Tr
 		})
 		for _, row := range rows {
-			var rowText []string
 			tds := FindAll(row, func(n *html.Node) bool {
 				return n.DataAtom == atom.Td || n.DataAtom == atom.Th
 			})
-			for _, td := range tds {
-				rowText = append(rowText, ContentsToString(td))
-			}
-			text = append(text, rowText)
+			tbl = append(tbl, tds)
 		}
-		f(tbl, text)
+		f(tblNode, tbl)
 	}
 }
 
-type Table [][]string
+type TableNodes [][]*html.Node
 
-func (tbl Table) At(row, col int) string {
+func (tbl TableNodes) At(row, col int) *html.Node {
 	if row >= len(tbl) {
-		return ""
+		return &html.Node{Type: html.TextNode}
 	}
 	r := tbl[row]
 	if col >= len(r) {
-		return ""
+		return &html.Node{Type: html.TextNode}
 	}
 	return r[col]
+}
+
+func Map[T any](tbl TableNodes, f func(*html.Node) T) [][]T {
+	rows := make([][]T, 0, len(tbl))
+	for _, row := range tbl {
+		rowT := make([]T, 0, len(row))
+		for _, col := range row {
+			rowT = append(rowT, f(col))
+		}
+		rows = append(rows, rowT)
+	}
+	return rows
 }

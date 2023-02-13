@@ -22,7 +22,8 @@ func TestTable(t *testing.T) {
 		be.NilErr(t, err)
 		var buf strings.Builder
 		w := csv.NewWriter(&buf)
-		xhtml.Tables(root, func(tbl *html.Node, rows xhtml.Table) {
+		xhtml.Tables(root, func(_ *html.Node, tbl xhtml.TableNodes) {
+			rows := xhtml.Map(tbl, xhtml.ContentsToString)
 			be.NilErr(t, w.WriteAll(rows))
 		})
 		w.Flush()
