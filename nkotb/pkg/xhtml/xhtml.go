@@ -41,6 +41,16 @@ func ContentsToString(n *html.Node) string {
 	return buf.String()
 }
 
+func InnerText(n *html.Node) string {
+	var buf strings.Builder
+	VisitAll(n, func(n *html.Node) {
+		if n.Type == html.TextNode {
+			buf.WriteString(n.Data)
+		}
+	})
+	return buf.String()
+}
+
 var MarkdownBlockElements = map[atom.Atom]bool{
 	atom.P:  true,
 	atom.H1: true,
