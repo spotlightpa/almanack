@@ -3,7 +3,6 @@ package db_test
 import (
 	"context"
 	"fmt"
-	"os"
 	"testing"
 
 	"github.com/carlmjohnson/be"
@@ -11,16 +10,12 @@ import (
 )
 
 func TestMap(t *testing.T) {
-	dbURL := os.Getenv("ALMANACK_TEST_DATABASE")
-	if dbURL == "" {
-		t.Skip("ALMANACK_TEST_DATABASE not set")
-	}
-	p, err := db.Open(dbURL)
+	p := createTestDB(t)
 	q := db.New(p)
-	be.NilErr(t, err)
+
 	ctx := context.Background()
 	const testpath = "test/hello.md"
-	err = q.CreatePage(ctx, db.CreatePageParams{
+	err := q.CreatePage(ctx, db.CreatePageParams{
 		FilePath:   testpath,
 		SourceType: "testing",
 	})
