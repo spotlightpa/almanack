@@ -3,7 +3,7 @@ package db
 import (
 	"database/sql/driver"
 	"encoding/json"
-	"errors"
+	"fmt"
 )
 
 type Map map[string]any
@@ -21,9 +21,12 @@ func (m *Map) Scan(value any) error {
 		*m = dbMap
 		return nil
 	}
+	if buf, ok := value.(string); ok {
+		value = []byte(buf)
+	}
 	buf, ok := value.([]byte)
 	if !ok {
-		return errors.New("canot parse to bytes")
+		return fmt.Errorf("canot parse %T to bytes", value)
 	}
 	if err := json.Unmarshal(buf, &dbMap); err != nil {
 		return err
