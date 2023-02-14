@@ -16,19 +16,19 @@ func GetRolesForEmail(ctx context.Context, q *Queries, email string) (roles []st
 	if domain == "" {
 		return nil, fmt.Errorf("invalid email: %q", email)
 	}
-	roles, err = q.GetRolesForAddress(ctx, email)
+	roleArr, err := q.GetRolesForAddress(ctx, email)
 	if err != nil && !IsNotFound(err) {
 		return
 	}
+	roles = roleArr.Elements
 	// if user has specific roles, early exit
 	if err == nil && len(roles) > 0 {
 		return
 	}
-	roles, err = q.GetRolesForDomain(ctx, domain)
+	roleArr, err = q.GetRolesForDomain(ctx, domain)
 	if err != nil && !IsNotFound(err) {
 		return
 	}
 	// ignore any not found errors
-	err = nil
-	return
+	return roleArr.Elements, nil
 }

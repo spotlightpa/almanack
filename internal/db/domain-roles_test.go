@@ -7,6 +7,7 @@ import (
 	"testing"
 
 	"github.com/carlmjohnson/be"
+	"github.com/jackc/pgx/v5/pgtype"
 	"github.com/spotlightpa/almanack/internal/db"
 )
 
@@ -21,29 +22,29 @@ func TestRoles(t *testing.T) {
 	ctx := context.Background()
 	r, err := q.UpsertRolesForAddress(ctx, db.UpsertRolesForAddressParams{
 		EmailAddress: "a@foo.com",
-		Roles:        []string{"fooer"},
+		Roles:        db.Array("fooer"),
 	})
 	be.NilErr(t, err)
 
 	t.Cleanup(func() {
 		q.UpsertRolesForAddress(ctx, db.UpsertRolesForAddressParams{
 			EmailAddress: "a@foo.com",
-			Roles:        []string{},
+			Roles:        pgtype.Array[string]{},
 		})
 	})
 	be.Equal(t, "a@foo.com", r.EmailAddress)
-	be.Equal(t, "fooer", strings.Join(r.Roles, ","))
+	be.Equal(t, "fooer", strings.Join(r.Roles.Elements, ","))
 
 	_, err = q.UpsertRolesForDomain(ctx, db.UpsertRolesForDomainParams{
 		Domain: "foo.com",
-		Roles:  []string{"bar"},
+		Roles:  db.Array("bar"),
 	})
 	be.NilErr(t, err)
 
 	t.Cleanup(func() {
 		q.UpsertRolesForDomain(ctx, db.UpsertRolesForDomainParams{
 			Domain: "foo.com",
-			Roles:  []string{},
+			Roles:  pgtype.Array[string]{},
 		})
 	})
 
@@ -53,7 +54,7 @@ func TestRoles(t *testing.T) {
 
 	_, err = q.UpsertRolesForAddress(ctx, db.UpsertRolesForAddressParams{
 		EmailAddress: "a@foo.com",
-		Roles:        []string{},
+		Roles:        pgtype.Array[string]{},
 	})
 	be.NilErr(t, err)
 
@@ -63,7 +64,7 @@ func TestRoles(t *testing.T) {
 
 	_, err = q.UpsertRolesForDomain(ctx, db.UpsertRolesForDomainParams{
 		Domain: "foo.com",
-		Roles:  []string{},
+		Roles:  pgtype.Array[string]{},
 	})
 	be.NilErr(t, err)
 

@@ -10,7 +10,6 @@ import (
 
 	"github.com/BurntSushi/toml"
 	"github.com/carlmjohnson/errorx"
-	"github.com/jackc/pgtype"
 	"github.com/microcosm-cc/bluemonday"
 	"github.com/spotlightpa/almanack/internal/stringx"
 	"github.com/spotlightpa/almanack/internal/timex"
@@ -92,12 +91,12 @@ func (page *Page) FromTOML(content string) (err error) {
 }
 
 func (page *Page) SetURLPath() {
-	if IsPresent(page.URLPath) && page.URLPath.String != "" {
+	if page.URLPath.Valid && page.URLPath.String != "" {
 		return
 	}
 	if u, _ := page.Frontmatter["url"].(string); u != "" {
 		page.URLPath.String = u
-		page.URLPath.Status = pgtype.Present
+		page.URLPath.Valid = true
 		return
 	}
 	upath := page.FilePath
@@ -119,14 +118,12 @@ func (page *Page) SetURLPath() {
 		upath += "/"
 	}
 	page.URLPath.String = upath
-	if upath != "" {
-		page.URLPath.Status = pgtype.Present
-	}
+	page.URLPath.Valid = upath != ""
 }
 
 func (page *Page) FullURL() string {
 	page.SetURLPath()
-	if IsNull(page.URLPath) {
+	if !page.URLPath.Valid {
 		return ""
 	}
 	return fmt.Sprintf("https://www.spotlightpa.org%s", page.URLPath.String)
@@ -215,7 +212,7 @@ func (page *Page) ToIndex() any {
 
 func (page *Page) ShouldPublish() bool {
 	soon := time.Now().Add(5 * time.Minute)
-	isScheduled := IsPresent(page.ScheduleFor)
+	isScheduled := page.ScheduleFor.Valid
 	return isScheduled && page.ScheduleFor.Time.Before(soon)
 }
 
@@ -232,11 +229,11 @@ func (page *Page) IsStateCollegePage() bool {
 }
 
 func (page *Page) ShouldNotify(oldPage *Page) bool {
-	if !page.IsNewsyPage() || !IsPresent(page.ScheduleFor) {
+	if !page.IsNewsyPage() || !page.ScheduleFor.Valid {
 		return false
 	}
 	if page.ShouldPublish() {
-		return IsNull(oldPage.LastPublished)
+		return !oldPage.LastPublished.Valid
 	}
 
 	return !timex.Equalish(oldPage.ScheduleFor, page.ScheduleFor)

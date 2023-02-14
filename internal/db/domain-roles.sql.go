@@ -7,6 +7,8 @@ package db
 
 import (
 	"context"
+
+	"github.com/jackc/pgx/v5/pgtype"
 )
 
 const appendRoleToDomain = `-- name: AppendRoleToDomain :one
@@ -50,9 +52,9 @@ WHERE
   "domain" ILIKE $1
 `
 
-func (q *Queries) GetRolesForDomain(ctx context.Context, domain string) ([]string, error) {
+func (q *Queries) GetRolesForDomain(ctx context.Context, domain string) (pgtype.Array[string], error) {
 	row := q.db.QueryRow(ctx, getRolesForDomain, domain)
-	var roles []string
+	var roles pgtype.Array[string]
 	err := row.Scan(&roles)
 	return roles, err
 }
@@ -99,8 +101,8 @@ ON CONFLICT (lower("domain"))
 `
 
 type UpsertRolesForDomainParams struct {
-	Domain string   `json:"domain"`
-	Roles  []string `json:"roles"`
+	Domain string               `json:"domain"`
+	Roles  pgtype.Array[string] `json:"roles"`
 }
 
 func (q *Queries) UpsertRolesForDomain(ctx context.Context, arg UpsertRolesForDomainParams) (DomainRole, error) {

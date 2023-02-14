@@ -7,7 +7,7 @@ import (
 	"time"
 
 	"github.com/carlmjohnson/errorx"
-	"github.com/jackc/pgx/v4"
+	"github.com/jackc/pgx/v5"
 	"github.com/spotlightpa/almanack/internal/db"
 	"github.com/spotlightpa/almanack/pkg/almlog"
 )

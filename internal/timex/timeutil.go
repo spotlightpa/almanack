@@ -3,7 +3,7 @@ package timex
 import (
 	"time"
 
-	"github.com/jackc/pgtype"
+	"github.com/jackc/pgx/v5/pgtype"
 	"github.com/spotlightpa/almanack/internal/must"
 	"github.com/spotlightpa/almanack/internal/syncx"
 )
@@ -32,10 +32,10 @@ func Unwrap(v any) (t time.Time, ok bool) {
 const timeWindow = 5 * time.Minute
 
 func Equalish(old, new pgtype.Timestamptz) bool {
-	if old.Status != new.Status {
+	if old.Valid != new.Valid {
 		return false
 	}
-	if old.Status != pgtype.Present {
+	if !old.Valid {
 		return true
 	}
 	diff := old.Time.Sub(new.Time).Abs()

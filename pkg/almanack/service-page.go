@@ -2,6 +2,7 @@ package almanack
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"net/http"
@@ -9,8 +10,8 @@ import (
 	"github.com/carlmjohnson/errorx"
 	"github.com/carlmjohnson/resperr"
 	"github.com/carlmjohnson/workgroup"
-	"github.com/jackc/pgtype"
-	"github.com/jackc/pgx/v4"
+	"github.com/jackc/pgx/v5"
+	"github.com/jackc/pgx/v5/pgtype"
 	"github.com/spotlightpa/almanack/internal/arc"
 	"github.com/spotlightpa/almanack/internal/db"
 	"github.com/spotlightpa/almanack/internal/mailchimp"
@@ -63,7 +64,7 @@ func (svc Services) PublishPage(ctx context.Context, q *db.Queries, page *db.Pag
 func (svc Services) RefreshPageFromContentStore(ctx context.Context, page *db.Page) (err error) {
 	defer errorx.Trace(&err)
 
-	if db.IsNull(page.LastPublished) {
+	if !page.LastPublished.Valid {
 		return
 	}
 	content, err := svc.ContentStore.GetFile(ctx, page.FilePath)
@@ -155,7 +156,7 @@ func (svc Services) RefreshPageFromArcStory(ctx context.Context, page *db.Page, 
 	defer errorx.Trace(&err)
 
 	var feedItem arc.FeedItem
-	if err = story.RawData.AssignTo(&feedItem); err != nil {
+	if err = json.Unmarshal(story.RawData, &feedItem); err != nil {
 		return nil, err
 	}
 	body, warnings, err := ArcFeedItemToBody(ctx, svc, &feedItem)
@@ -174,7 +175,7 @@ func (svc Services) RefreshPageFromArcStory(ctx context.Context, page *db.Page, 
 		if page.Frontmatter == nil {
 			page.Frontmatter = make(db.Map)
 		}
-		if page.LastPublished.Status == pgtype.Present {
+		if page.LastPublished.Valid {
 			delete(fm, "slug")
 			delete(fm, "published")
 		}
@@ -194,7 +195,7 @@ func (svc Services) CreatePageFromArcSource(ctx context.Context, shared *db.Shar
 	}
 
 	var feedItem arc.FeedItem
-	if err = shared.RawData.AssignTo(&feedItem); err != nil {
+	if err = json.Unmarshal(shared.RawData, &feedItem); err != nil {
 		return nil, err
 	}
 	body, warnings, err := ArcFeedItemToBody(ctx, svc, &feedItem)
@@ -235,7 +236,7 @@ func (svc Services) CreatePageFromArcSource(ctx context.Context, shared *db.Shar
 		}
 
 		newSharedArt, txerr := q.UpdateSharedArticlePage(ctx, db.UpdateSharedArticlePageParams{
-			PageID:          pgtype.Int8{Int: page.ID, Status: pgtype.Present},
+			PageID:          pgtype.Int8{Int64: page.ID, Valid: true},
 			SharedArticleID: shared.ID,
 		})
 		if txerr != nil {

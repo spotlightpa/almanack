@@ -6,7 +6,7 @@ import (
 	"net/http"
 
 	"github.com/carlmjohnson/resperr"
-	"github.com/jackc/pgx/v4"
+	"github.com/jackc/pgx/v5"
 )
 
 func IsNotFound(err error) bool {

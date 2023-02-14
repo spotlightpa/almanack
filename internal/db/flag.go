@@ -5,8 +5,8 @@ import (
 	"flag"
 	"time"
 
-	"github.com/jackc/pgx/v4"
-	"github.com/jackc/pgx/v4/pgxpool"
+	"github.com/jackc/pgx/v5"
+	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/spotlightpa/almanack/pkg/almlog"
 )
 
@@ -28,7 +28,7 @@ func AddFlags(fl *flag.FlagSet, name, usage string) (q *Queries, tx *Txable) {
 func Open(dbURL string) (p *pgxpool.Pool, err error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 1*time.Second)
 	defer cancel()
-	db, err := pgxpool.Connect(ctx, dbURL)
+	db, err := pgxpool.New(ctx, dbURL)
 	if err != nil {
 		return nil, err
 	}
@@ -48,7 +48,7 @@ type Txable struct {
 }
 
 func (txable Txable) Begin(ctx context.Context, o pgx.TxOptions, f func(*Queries) error) error {
-	return txable.p.BeginTxFunc(ctx, o, func(tx pgx.Tx) error {
+	return pgx.BeginTxFunc(ctx, txable.p, o, func(tx pgx.Tx) error {
 		return f(New(logger{tx}))
 	})
 }

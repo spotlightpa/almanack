@@ -52,8 +52,8 @@ function sql:sqlc() {
 	_installed sqlc || _die "sqlc not installed"
 	{
 		cd sql
-		sqlc generate
-		sqlc compile
+		sqlc generate --experimental
+		sqlc compile --experimental
 	}
 }
 

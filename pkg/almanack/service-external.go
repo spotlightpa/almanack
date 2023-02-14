@@ -66,7 +66,7 @@ func (svc Services) UpdateMostPopular(ctx context.Context) (err error) {
 	if len(pages) < 5 {
 		return fmt.Errorf("expected more popular pages; got %q", pages)
 	}
-	data, err := svc.Queries.ListPagesByURLPaths(ctx, pages)
+	data, err := svc.Queries.ListPagesByURLPaths(ctx, db.Array(pages...))
 	if err != nil {
 		return err
 	}

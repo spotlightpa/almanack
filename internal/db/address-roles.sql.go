@@ -7,6 +7,8 @@ package db
 
 import (
 	"context"
+
+	"github.com/jackc/pgx/v5/pgtype"
 )
 
 const getRolesForAddress = `-- name: GetRolesForAddress :one
@@ -18,9 +20,9 @@ WHERE
   "email_address" ILIKE $1
 `
 
-func (q *Queries) GetRolesForAddress(ctx context.Context, emailAddress string) ([]string, error) {
+func (q *Queries) GetRolesForAddress(ctx context.Context, emailAddress string) (pgtype.Array[string], error) {
 	row := q.db.QueryRow(ctx, getRolesForAddress, emailAddress)
-	var roles []string
+	var roles pgtype.Array[string]
 	err := row.Scan(&roles)
 	return roles, err
 }
@@ -67,8 +69,8 @@ ON CONFLICT (lower("email_address"))
 `
 
 type UpsertRolesForAddressParams struct {
-	EmailAddress string   `json:"email_address"`
-	Roles        []string `json:"roles"`
+	EmailAddress string               `json:"email_address"`
+	Roles        pgtype.Array[string] `json:"roles"`
 }
 
 func (q *Queries) UpsertRolesForAddress(ctx context.Context, arg UpsertRolesForAddressParams) (AddressRole, error) {

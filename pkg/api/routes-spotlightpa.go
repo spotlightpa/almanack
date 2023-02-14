@@ -8,7 +8,6 @@ import (
 
 	"github.com/carlmjohnson/emailx"
 	"github.com/carlmjohnson/resperr"
-	"github.com/jackc/pgtype"
 	"github.com/spotlightpa/almanack/internal/db"
 	"github.com/spotlightpa/almanack/internal/paginate"
 	"github.com/spotlightpa/almanack/pkg/almanack"
@@ -160,7 +159,7 @@ func (app *appEnv) postDomain(w http.ResponseWriter, r *http.Request) {
 		r.Context(),
 		db.UpsertRolesForDomainParams{
 			Domain: req.Domain,
-			Roles:  roles,
+			Roles:  db.Array(roles...),
 		},
 	); err != nil {
 		app.replyErr(w, r, err)
@@ -224,7 +223,7 @@ func (app *appEnv) postAddress(w http.ResponseWriter, r *http.Request) {
 		r.Context(),
 		db.UpsertRolesForAddressParams{
 			EmailAddress: req.Address,
-			Roles:        roles,
+			Roles:        db.Array(roles...),
 		},
 	); err != nil {
 		app.replyErr(w, r, err)
@@ -634,10 +633,10 @@ func (app *appEnv) postPageCreate(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if sharedArt.PageID.Status == pgtype.Present {
+	if sharedArt.PageID.Valid {
 		app.replyErr(w, r, fmt.Errorf(
 			"can't create new page for %d; page %d already exists",
-			req.SharedArticleID, sharedArt.PageID.Int))
+			req.SharedArticleID, sharedArt.PageID.Int64))
 		return
 	}
 

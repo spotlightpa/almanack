@@ -5,34 +5,35 @@
 package db
 
 import (
+	"encoding/json"
 	"time"
 
-	"github.com/jackc/pgtype"
+	"github.com/jackc/pgx/v5/pgtype"
 )
 
 type AddressRole struct {
-	ID           int64     `json:"id"`
-	EmailAddress string    `json:"email_address"`
-	Roles        []string  `json:"roles"`
-	CreatedAt    time.Time `json:"created_at"`
-	UpdatedAt    time.Time `json:"updated_at"`
+	ID           int64                `json:"id"`
+	EmailAddress string               `json:"email_address"`
+	Roles        pgtype.Array[string] `json:"roles"`
+	CreatedAt    time.Time            `json:"created_at"`
+	UpdatedAt    time.Time            `json:"updated_at"`
 }
 
 type Arc struct {
 	ID          int64              `json:"id"`
 	ArcID       string             `json:"arc_id"`
-	RawData     pgtype.JSONB       `json:"raw_data"`
+	RawData     json.RawMessage    `json:"raw_data"`
 	LastUpdated pgtype.Timestamptz `json:"last_updated"`
 	CreatedAt   time.Time          `json:"created_at"`
 	UpdatedAt   time.Time          `json:"updated_at"`
 }
 
 type DomainRole struct {
-	ID        int64     `json:"id"`
-	Domain    string    `json:"domain"`
-	Roles     []string  `json:"roles"`
-	CreatedAt time.Time `json:"created_at"`
-	UpdatedAt time.Time `json:"updated_at"`
+	ID        int64                `json:"id"`
+	Domain    string               `json:"domain"`
+	Roles     pgtype.Array[string] `json:"roles"`
+	CreatedAt time.Time            `json:"created_at"`
+	UpdatedAt time.Time            `json:"updated_at"`
 }
 
 type File struct {
@@ -59,9 +60,9 @@ type Image struct {
 }
 
 type ImageType struct {
-	Name       string   `json:"name"`
-	Mime       string   `json:"mime"`
-	Extensions []string `json:"extensions"`
+	Name       string               `json:"name"`
+	Mime       string               `json:"mime"`
+	Extensions pgtype.Array[string] `json:"extensions"`
 }
 
 type Newsletter struct {
@@ -111,7 +112,7 @@ type SharedArticle struct {
 	Note         string             `json:"note"`
 	SourceType   string             `json:"source_type"`
 	SourceID     string             `json:"source_id"`
-	RawData      pgtype.JSONB       `json:"raw_data"`
+	RawData      json.RawMessage    `json:"raw_data"`
 	PageID       pgtype.Int8        `json:"page_id"`
 	CreatedAt    time.Time          `json:"created_at"`
 	UpdatedAt    time.Time          `json:"updated_at"`
