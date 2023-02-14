@@ -2,7 +2,6 @@ package db_test
 
 import (
 	"context"
-	"os"
 	"strings"
 	"testing"
 
@@ -12,12 +11,8 @@ import (
 )
 
 func TestRoles(t *testing.T) {
-	dbURL := os.Getenv("ALMANACK_TEST_DATABASE")
-	if dbURL == "" {
-		t.Skip("ALMANACK_TEST_DATABASE not set")
-	}
-	p, err := db.Open(dbURL)
-	be.NilErr(t, err)
+	p := createTestDB(t)
+
 	q := db.New(p)
 	ctx := context.Background()
 	r, err := q.UpsertRolesForAddress(ctx, db.UpsertRolesForAddressParams{
@@ -26,12 +21,6 @@ func TestRoles(t *testing.T) {
 	})
 	be.NilErr(t, err)
 
-	t.Cleanup(func() {
-		q.UpsertRolesForAddress(ctx, db.UpsertRolesForAddressParams{
-			EmailAddress: "a@foo.com",
-			Roles:        pgtype.Array[string]{},
-		})
-	})
 	be.Equal(t, "a@foo.com", r.EmailAddress)
 	be.Equal(t, "fooer", strings.Join(r.Roles.Elements, ","))
 
@@ -40,13 +29,6 @@ func TestRoles(t *testing.T) {
 		Roles:  db.Array("bar"),
 	})
 	be.NilErr(t, err)
-
-	t.Cleanup(func() {
-		q.UpsertRolesForDomain(ctx, db.UpsertRolesForDomainParams{
-			Domain: "foo.com",
-			Roles:  pgtype.Array[string]{},
-		})
-	})
 
 	roles, err := db.GetRolesForEmail(ctx, q, "a@foo.com")
 	be.NilErr(t, err)
