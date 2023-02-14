@@ -2,13 +2,13 @@ package almanack
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"strconv"
 	"strings"
 
 	"github.com/carlmjohnson/errorx"
-	"github.com/jackc/pgtype"
 	"github.com/spotlightpa/almanack/internal/db"
 	"github.com/spotlightpa/almanack/internal/mailchimp"
 	"github.com/spotlightpa/almanack/internal/stringx"
@@ -33,8 +33,8 @@ func (svc Services) UpdateNewsletterArchive(ctx context.Context, campaigns *mail
 
 	newItems := campaigns.ToNewsletters(mcType)
 	// update DB
-	var data pgtype.JSONB
-	if err = data.Set(newItems); err != nil {
+	data, err := json.Marshal(newItems)
+	if err != nil {
 		return err
 	}
 	n, err := svc.Queries.UpdateNewsletterArchives(ctx, db.UpdateNewsletterArchivesParams{
@@ -83,7 +83,7 @@ func (svc Services) SaveNewsletterPage(ctx context.Context, nl *db.Newsletter, b
 	needsUpdate := false
 	if nl.SpotlightPAPath.String == "" {
 		nl.PublishedAt = timex.ToEST(nl.PublishedAt)
-		nl.SpotlightPAPath.Status = pgtype.Present
+		nl.SpotlightPAPath.Valid = true
 		nl.SpotlightPAPath.String = fmt.Sprintf("content/newsletters/%s/%s.md",
 			nl.Type, nl.PublishedAt.Format("2006-01-02-1504"),
 		)

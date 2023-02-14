@@ -9,7 +9,7 @@ import (
 	"context"
 	"time"
 
-	"github.com/jackc/pgtype"
+	"github.com/jackc/pgx/v5/pgtype"
 )
 
 const createPage = `-- name: CreatePage :exec
@@ -159,12 +159,12 @@ ORDER BY
 `
 
 type ListAllPagesRow struct {
-	ID         int64     `json:"id"`
-	FilePath   string    `json:"file_path"`
-	InternalID string    `json:"internal_id"`
-	Hed        string    `json:"hed"`
-	Authors    []string  `json:"authors"`
-	PubDate    time.Time `json:"pub_date"`
+	ID         int64                `json:"id"`
+	FilePath   string               `json:"file_path"`
+	InternalID string               `json:"internal_id"`
+	Hed        string               `json:"hed"`
+	Authors    pgtype.Array[string] `json:"authors"`
+	PubDate    time.Time            `json:"pub_date"`
 }
 
 func (q *Queries) ListAllPages(ctx context.Context) ([]ListAllPagesRow, error) {
@@ -633,7 +633,7 @@ type ListPagesByURLPathsRow struct {
 	PublishedAt time.Time `json:"published_at"`
 }
 
-func (q *Queries) ListPagesByURLPaths(ctx context.Context, paths []string) ([]ListPagesByURLPathsRow, error) {
+func (q *Queries) ListPagesByURLPaths(ctx context.Context, paths pgtype.Array[string]) ([]ListPagesByURLPathsRow, error) {
 	rows, err := q.db.Query(ctx, listPagesByURLPaths, paths)
 	if err != nil {
 		return nil, err

@@ -2,27 +2,27 @@ package almanack
 
 import (
 	"context"
+	"encoding/json"
 	"net/http"
 	"time"
 
 	"github.com/carlmjohnson/errorx"
 	"github.com/carlmjohnson/requests"
 	"github.com/carlmjohnson/resperr"
-	"github.com/jackc/pgtype"
 	"github.com/spotlightpa/almanack/internal/arc"
 )
 
-func (svc Services) RefreshArcFromFeed(ctx context.Context) (fatal bool, err error) {
-	defer errorx.Trace(&err)
+func (svc Services) RefreshArcFromFeed(ctx context.Context) (fatal bool, merr error) {
+	defer errorx.Trace(&merr)
 
 	feed, feedErr := svc.fetchArcFeed(ctx)
 	if feedErr != nil {
 		return false, feedErr
 	}
 
-	var arcItems pgtype.JSONB
-	if err := arcItems.Set(&feed.Contents); err != nil {
-		return true, err
+	arcItems, merr := json.Marshal(feed.Contents)
+	if merr != nil {
+		return true, merr
 	}
 
 	if err := svc.Queries.UpdateArc(ctx, arcItems); err != nil {

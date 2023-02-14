@@ -5,21 +5,21 @@ import (
 	"time"
 
 	"github.com/carlmjohnson/be"
-	"github.com/jackc/pgtype"
+	"github.com/jackc/pgx/v5/pgtype"
 	"github.com/spotlightpa/almanack/internal/timex"
 )
 
 func TestEqualish(t *testing.T) {
 	parseTime := func(s string) pgtype.Timestamptz {
 		if s == "0" {
-			return pgtype.Timestamptz{Status: pgtype.Present}
+			return pgtype.Timestamptz{Valid: true}
 		}
 		t, err := time.Parse("15:04:05", s)
-		status := pgtype.Present
+		valid := true
 		if err != nil {
-			status = pgtype.Null
+			valid = false
 		}
-		return pgtype.Timestamptz{Time: t, Status: status}
+		return pgtype.Timestamptz{Time: t, Valid: valid}
 	}
 	cases := map[string]struct {
 		a, b string

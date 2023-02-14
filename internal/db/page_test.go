@@ -7,7 +7,7 @@ import (
 	"time"
 
 	"github.com/carlmjohnson/be"
-	"github.com/jackc/pgtype"
+	"github.com/jackc/pgx/v5/pgtype"
 	"github.com/spotlightpa/almanack/internal/db"
 )
 
@@ -86,8 +86,8 @@ func TestSetURLPath(t *testing.T) {
 			db.Page{
 				FilePath: "content/abc/123.md",
 				URLPath: pgtype.Text{
-					Status: pgtype.Present,
 					String: "/xyz/345/",
+					Valid:  true,
 				},
 			},
 			"/xyz/345/",
@@ -155,7 +155,7 @@ func TestSetURLPath(t *testing.T) {
 		t.Run(name, func(t *testing.T) {
 			tc.Page.SetURLPath()
 			be.Equal(t,
-				tc.Page.URLPath.Status == pgtype.Present,
+				tc.Page.URLPath.Valid,
 				tc.Page.URLPath.String != "")
 			be.Equal(t, tc.string, tc.Page.URLPath.String)
 		})
@@ -164,10 +164,10 @@ func TestSetURLPath(t *testing.T) {
 
 func TestShouldPublishShouldNotify(t *testing.T) {
 	past := pgtype.Timestamptz{
-		Status: pgtype.Present}
+		Valid: true}
 	future := pgtype.Timestamptz{
-		Status: pgtype.Present,
-		Time:   time.Now().Add(24 * time.Hour)}
+		Valid: true,
+		Time:  time.Now().Add(24 * time.Hour)}
 	cases := map[string]struct {
 		old, new    db.Page
 		pub, notify bool

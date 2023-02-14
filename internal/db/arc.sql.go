@@ -7,9 +7,10 @@ package db
 
 import (
 	"context"
+	"encoding/json"
 	"time"
 
-	"github.com/jackc/pgtype"
+	"github.com/jackc/pgx/v5/pgtype"
 )
 
 const getArcByArcID = `-- name: GetArcByArcID :one
@@ -58,7 +59,7 @@ type ListArcByLastUpdatedParams struct {
 type ListArcByLastUpdatedRow struct {
 	ID              int64              `json:"id"`
 	ArcID           string             `json:"arc_id"`
-	RawData         pgtype.JSONB       `json:"raw_data"`
+	RawData         json.RawMessage    `json:"raw_data"`
 	LastUpdated     pgtype.Timestamptz `json:"last_updated"`
 	CreatedAt       time.Time          `json:"created_at"`
 	UpdatedAt       time.Time          `json:"updated_at"`
@@ -112,7 +113,7 @@ ON CONFLICT (arc_id)
     raw_data = excluded.raw_data
 `
 
-func (q *Queries) UpdateArc(ctx context.Context, arcItems pgtype.JSONB) error {
+func (q *Queries) UpdateArc(ctx context.Context, arcItems []byte) error {
 	_, err := q.db.Exec(ctx, updateArc, arcItems)
 	return err
 }

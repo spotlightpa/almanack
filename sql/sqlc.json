@@ -11,7 +11,7 @@
         "schema/",
         "schema-overrides/"
       ],
-      "sql_package": "pgx/v4"
+      "sql_package": "pgx/v5"
     }
   ],
   "rename": {
@@ -23,38 +23,24 @@
   },
   "overrides": [
     {
-      "db_type": "bigserial",
-      "go_type": "github.com/jackc/pgtype.Int8",
-      "nullable": true
-    },
-    {
-      "db_type": "pg_catalog.int8",
-      "go_type": "github.com/jackc/pgtype.Int8",
-      "nullable": true
-    },
-    {
-      "db_type": "pg_catalog.varchar",
-      "go_type": "github.com/jackc/pgtype.Text",
-      "nullable": true
-    },
-    {
-      "db_type": "text",
-      "go_type": "github.com/jackc/pgtype.Text",
-      "nullable": true
-    },
-    {
       "db_type": "timestamptz",
-      "go_type": "github.com/jackc/pgtype.Timestamptz",
-      "nullable": true
+      "go_type": {
+        "import": "time",
+        "type": "Time"
+      },
+      "nullable": false
     },
     {
       "db_type": "pg_catalog.timestamptz",
-      "go_type": "github.com/jackc/pgtype.Timestamptz",
-      "nullable": true
+      "go_type": {
+        "import": "time",
+        "type": "Time"
+      },
+      "nullable": false
     },
     {
       "db_type": "citext",
-      "go_type": "github.com/jackc/pgtype.Text",
+      "go_type": "github.com/jackc/pgx/v5/pgtype.Text",
       "nullable": true
     },
     {
@@ -66,6 +52,20 @@
       "column": "site_data.data",
       "go_type": {
         "type": "Map"
+      }
+    },
+    {
+      "column": "shared_article.raw_data",
+      "go_type": {
+        "import":"encoding/json",
+        "type":"RawMessage"
+      }
+    },
+    {
+      "column": "arc.raw_data",
+      "go_type": {
+        "import":"encoding/json",
+        "type":"RawMessage"
       }
     },
     {
