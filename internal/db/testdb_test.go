@@ -2,11 +2,18 @@ package db_test
 
 import (
 	"os"
+	"sync"
 	"testing"
 
 	"github.com/carlmjohnson/be"
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/spotlightpa/almanack/internal/db"
+)
+
+var (
+	once    sync.Once
+	pool    *pgxpool.Pool
+	poolErr error
 )
 
 func createTestDB(t *testing.T) *pgxpool.Pool {
@@ -15,7 +22,9 @@ func createTestDB(t *testing.T) *pgxpool.Pool {
 	if dbURL == "" {
 		t.Skip("ALMANACK_POSTGRES not set")
 	}
-	p, err := db.CreateTestDatabase(dbURL)
-	be.NilErr(t, err)
-	return p
+	once.Do(func() {
+		pool, poolErr = db.CreateTestDatabase(dbURL)
+	})
+	be.NilErr(t, poolErr)
+	return pool
 }
