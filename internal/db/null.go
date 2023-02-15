@@ -15,5 +15,6 @@ func Array[T any](elems ...T) pgtype.Array[T] {
 		Dims: []pgtype.ArrayDimension{
 			{Length: int32(len(elems))},
 		},
+		Valid: true,
 	}
 }
