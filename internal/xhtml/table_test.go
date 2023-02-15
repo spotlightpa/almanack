@@ -6,8 +6,8 @@ import (
 	"testing"
 
 	"github.com/carlmjohnson/be"
-	"github.com/spotlightpa/nkotb/pkg/testfile"
-	"github.com/spotlightpa/nkotb/pkg/xhtml"
+	"github.com/spotlightpa/almanack/internal/testfile"
+	"github.com/spotlightpa/almanack/internal/xhtml"
 	"golang.org/x/net/html"
 )
 

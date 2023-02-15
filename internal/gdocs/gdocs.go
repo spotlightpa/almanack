@@ -8,7 +8,7 @@ import (
 	"strings"
 
 	"github.com/carlmjohnson/requests"
-	"github.com/spotlightpa/nkotb/pkg/xhtml"
+	"github.com/spotlightpa/almanack/internal/xhtml"
 	"golang.org/x/net/html"
 	"google.golang.org/api/docs/v1"
 )
