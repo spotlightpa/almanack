@@ -3,7 +3,7 @@ package blocko
 import (
 	"strings"
 
-	"github.com/spotlightpa/nkotb/pkg/xhtml"
+	"github.com/spotlightpa/almanack/internal/xhtml"
 	"golang.org/x/exp/slices"
 	"golang.org/x/net/html"
 	"golang.org/x/net/html/atom"

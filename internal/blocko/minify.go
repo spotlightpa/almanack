@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/spotlightpa/nkotb/pkg/xhtml"
+	"github.com/spotlightpa/almanack/internal/xhtml"
 	"github.com/tdewolff/minify/v2"
 	"github.com/tdewolff/minify/v2/html"
 	nethtml "golang.org/x/net/html"

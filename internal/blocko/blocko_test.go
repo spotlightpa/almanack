@@ -5,8 +5,8 @@ import (
 	"testing"
 
 	"github.com/carlmjohnson/be"
-	"github.com/spotlightpa/nkotb/pkg/blocko"
-	"github.com/spotlightpa/nkotb/pkg/testfile"
+	"github.com/spotlightpa/almanack/internal/blocko"
+	"github.com/spotlightpa/almanack/internal/testfile"
 )
 
 func TestGoldenFiles(t *testing.T) {
