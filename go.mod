@@ -30,7 +30,7 @@ require (
 	github.com/microcosm-cc/bluemonday v1.0.22
 	gocloud.dev v0.28.0
 	golang.org/x/exp v0.0.0-20230131160201-f062dba9d201
-	golang.org/x/net v0.6.0
+	golang.org/x/net v0.7.0
 	golang.org/x/oauth2 v0.4.0
 )
 
