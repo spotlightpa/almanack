@@ -54,7 +54,7 @@ export default {
             :link="page.link"
             :status="page.status"
             :label="page.internalID"
-            :date="page.publishedAt"
+            :date="page.publicationDate"
             :hed="page.title"
             :dek="page.blurb"
             :image="page.image"

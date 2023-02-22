@@ -21,7 +21,7 @@ export class Page {
     this.sourceType = data["source_type"] ?? "";
     this.sourceID = data["source_id"] ?? "";
     this.createdAt = data["created_at"] ?? "";
-    this.publishedAt = maybeDate(this.frontmatter, "published");
+    this.publicationDate = maybeDate(this.frontmatter, "published");
     this.updatedAt = maybeDate(data, "updated_at");
     this.lastPublished = maybeDate(data, "last_published");
     this.scheduleFor = maybeDate(data, "schedule_for");
@@ -70,7 +70,7 @@ export class Page {
   }
 
   get isFutureDated() {
-    return this.publishedAt && this.publishedAt > new Date();
+    return this.publicationDate && this.publicationDate > new Date();
   }
 
   get statusVerbose() {
@@ -91,7 +91,7 @@ export class Page {
     let [, dir, fname] = this.filePath.match(/^content\/(.+)\/([^/]+)\.md/);
     let slug = this.slug || fname;
     if (dir === "news" || dir === "statecollege") {
-      let date = this.publishedAt ?? new Date();
+      let date = this.publicationDate ?? new Date();
       let year = date.getFullYear();
       let month = (date.getMonth() + 1).toString().padStart(2, "0");
       dir = `${dir}/${year}/${month}`;
@@ -146,7 +146,7 @@ export class Page {
         // preserve unknown props
         ...this.frontmatter,
         // copy others
-        published: this.publishedAt,
+        published: this.publicationDate,
         "event-date": this.eventDate,
         "event-title": this.eventTitle,
         "event-url": this.eventURL,

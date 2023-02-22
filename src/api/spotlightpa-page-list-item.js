@@ -17,7 +17,7 @@ export default class PageListItem {
     this.urlPath = data["url_path"] || "";
     this.image = data["image"] || "";
     this.createdAt = PageListItem.getDate(data, "created_at");
-    this.publishedAt = PageListItem.getDate(data, "published_at");
+    this.publicationDate = PageListItem.getDate(data, "publication_date");
     this.updatedAt = PageListItem.getDate(data, "updated_at");
     this.lastPublished = PageListItem.getDate(data, "last_published");
     this.scheduleFor = PageListItem.getDate(data, "schedule_for");
