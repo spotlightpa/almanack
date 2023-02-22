@@ -15,3 +15,6 @@ ALTER TABLE page
 DROP TABLE article;
 
 DROP TABLE article_status;
+
+ALTER TABLE "page"
+  DROP COLUMN "published_at";

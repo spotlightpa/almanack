@@ -91,18 +91,18 @@ type Option struct {
 }
 
 type Page struct {
-	ID            int64              `json:"id"`
-	FilePath      string             `json:"file_path"`
-	Frontmatter   Map                `json:"frontmatter"`
-	Body          string             `json:"body"`
-	ScheduleFor   pgtype.Timestamptz `json:"schedule_for"`
-	LastPublished pgtype.Timestamptz `json:"last_published"`
-	CreatedAt     time.Time          `json:"created_at"`
-	UpdatedAt     time.Time          `json:"updated_at"`
-	URLPath       pgtype.Text        `json:"url_path"`
-	SourceType    string             `json:"source_type"`
-	SourceID      string             `json:"source_id"`
-	PublishedAt   pgtype.Timestamptz `json:"published_at"`
+	ID              int64              `json:"id"`
+	FilePath        string             `json:"file_path"`
+	Frontmatter     Map                `json:"frontmatter"`
+	Body            string             `json:"body"`
+	ScheduleFor     pgtype.Timestamptz `json:"schedule_for"`
+	LastPublished   pgtype.Timestamptz `json:"last_published"`
+	CreatedAt       time.Time          `json:"created_at"`
+	UpdatedAt       time.Time          `json:"updated_at"`
+	URLPath         pgtype.Text        `json:"url_path"`
+	SourceType      string             `json:"source_type"`
+	SourceID        string             `json:"source_id"`
+	PublicationDate pgtype.Timestamptz `json:"publication_date"`
 }
 
 type SharedArticle struct {

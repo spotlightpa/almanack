@@ -61,7 +61,7 @@ export default {
 
     <form v-if="page" ref="form">
       <BulmaDateTime
-        v-model="page.publishedAt"
+        v-model="page.publicationDate"
         label="Publication Date"
         :icon="['fas', 'user-clock']"
         :disabled="page.isPublished"
@@ -72,7 +72,7 @@ export default {
             v-show="!page.isPublished"
             href="#"
             class="has-text-info"
-            @click.prevent="page.publishedAt = new Date()"
+            @click.prevent="page.publicationDate = new Date()"
           >
             Set to now
           </a>
@@ -484,7 +484,7 @@ export default {
               <a
                 href="#"
                 class="has-text-info"
-                @click.prevent="page.scheduleFor = page.publishedAt"
+                @click.prevent="page.scheduleFor = page.publicationDate"
               >
                 Schedule for publication date
               </a>

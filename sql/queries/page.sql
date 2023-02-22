@@ -65,8 +65,6 @@ WHERE
 RETURNING
   *;
 
--- Treating published_at as text because it sorts faster and we don't do
--- date stuff on the backend, just frontend.
 -- name: ListPages :many
 WITH paths AS (
   SELECT
@@ -82,7 +80,7 @@ ordered AS (
   FROM
     paths
   ORDER BY
-    published_at DESC
+    publication_date DESC
 )
 SELECT
   id,
@@ -97,7 +95,7 @@ SELECT
   created_at,
   updated_at,
   schedule_for,
-  published_at
+  publication_date
 FROM
   ordered
 LIMIT $2 OFFSET $3;
@@ -142,7 +140,7 @@ WITH page_series AS (
   SELECT
     json_array_elements_text( --
       coalesce((frontmatter ->> 'series'), '[]')::json) AS series,
-    published_at
+    publication_date
   FROM
     page
 ),
@@ -152,7 +150,7 @@ series_dates AS (
   FROM
     page_series
   ORDER BY
-    published_at DESC,
+    publication_date DESC,
     series DESC
 ),
 distinct_series_dates AS (
@@ -162,14 +160,14 @@ distinct_series_dates AS (
     series_dates
   ORDER BY
     series DESC,
-    published_at DESC
+    publication_date DESC
 )
 SELECT
   series::text
 FROM
   distinct_series_dates
 ORDER BY
-  published_at DESC;
+  publication_date DESC;
 
 -- name: ListPagesByURLPaths :many
 WITH query_paths AS (
@@ -196,7 +194,7 @@ SELECT
   coalesce(frontmatter ->> 'blurb', '')::text AS "blurb",
   coalesce(frontmatter ->> 'image', '')::text AS "image",
   coalesce(url_path, '')::text AS "url_path",
-  published_at::timestamptz
+  publication_date::timestamptz
 FROM
   page_paths
   CROSS JOIN query_paths
@@ -243,7 +241,7 @@ FROM
   page
   JOIN query USING (id)
 ORDER BY
-  published_at DESC;
+  publication_date DESC;
 
 -- name: ListPagesByPublished :many
 SELECT
@@ -251,7 +249,7 @@ SELECT
 FROM
   page
 ORDER BY
-  published_at DESC
+  publication_date DESC
 LIMIT $1 OFFSET $2;
 
 -- name: ListPagesByInternalID :many
@@ -274,4 +272,4 @@ FROM
   page
   JOIN query USING (id)
 ORDER BY
-  published_at DESC;
+  publication_date DESC;
