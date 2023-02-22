@@ -106,16 +106,25 @@ type Page struct {
 }
 
 type SharedArticle struct {
-	ID           int64              `json:"id"`
-	Status       string             `json:"status"`
-	EmbargoUntil pgtype.Timestamptz `json:"embargo_until"`
-	Note         string             `json:"note"`
-	SourceType   string             `json:"source_type"`
-	SourceID     string             `json:"source_id"`
-	RawData      json.RawMessage    `json:"raw_data"`
-	PageID       pgtype.Int8        `json:"page_id"`
-	CreatedAt    time.Time          `json:"created_at"`
-	UpdatedAt    time.Time          `json:"updated_at"`
+	ID                   int64              `json:"id"`
+	Status               string             `json:"status"`
+	EmbargoUntil         pgtype.Timestamptz `json:"embargo_until"`
+	Note                 string             `json:"note"`
+	SourceType           string             `json:"source_type"`
+	SourceID             string             `json:"source_id"`
+	RawData              json.RawMessage    `json:"raw_data"`
+	PageID               pgtype.Int8        `json:"page_id"`
+	CreatedAt            time.Time          `json:"created_at"`
+	UpdatedAt            time.Time          `json:"updated_at"`
+	PublicationDate      pgtype.Timestamptz `json:"publication_date"`
+	InternalID           string             `json:"internal_id"`
+	Budget               string             `json:"budget"`
+	Hed                  string             `json:"hed"`
+	Description          string             `json:"description"`
+	LedeImage            string             `json:"lede_image"`
+	LedeImageSource      string             `json:"lede_image_source"`
+	LedeImageDescription string             `json:"lede_image_description"`
+	LedeImageCaption     string             `json:"lede_image_caption"`
 }
 
 type SharedStatus struct {
