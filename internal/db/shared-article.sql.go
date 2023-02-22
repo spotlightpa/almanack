@@ -303,12 +303,19 @@ func (q *Queries) UpdateSharedArticlePage(ctx context.Context, arg UpdateSharedA
 }
 
 const upsertSharedArticleFromArc = `-- name: UpsertSharedArticleFromArc :one
-INSERT INTO shared_article (status, source_type, source_id, raw_data)
+INSERT INTO shared_article (status, source_type, source_id, raw_data,
+  publication_date, budget, description, hed, internal_id)
 SELECT
   'U',
   'arc',
   arc.arc_id,
-  arc.raw_data
+  arc.raw_data,
+  iso_to_timestamptz ( --
+    arc.raw_data -> 'planning' -> 'scheduling' ->> 'planned_publish_date'),
+  arc.raw_data -> 'planning' ->> 'budget_line',
+  arc.raw_data -> 'description' ->> 'basic',
+  arc.raw_data -> 'headlines' ->> 'basic',
+  arc.raw_data ->> 'slug'
 FROM
   arc
 WHERE
@@ -316,7 +323,13 @@ WHERE
 ON CONFLICT (source_type,
   source_id)
   DO UPDATE SET
-    raw_data = excluded.raw_data
+    raw_data = excluded.raw_data,
+    "publication_date" = iso_to_timestamptz ( --
+      excluded.raw_data -> 'planning' -> 'scheduling' ->> 'planned_publish_date'),
+    "budget" = excluded.raw_data -> 'planning' ->> 'budget_line',
+    "description" = excluded.raw_data -> 'description' ->> 'basic',
+    "hed" = excluded.raw_data -> 'headlines' ->> 'basic',
+    "internal_id" = excluded.raw_data ->> 'slug'
   RETURNING
     id, status, embargo_until, note, source_type, source_id, raw_data, page_id, created_at, updated_at, publication_date, internal_id, budget, hed, description, lede_image, lede_image_source, lede_image_description, lede_image_caption
 `
