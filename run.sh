@@ -101,6 +101,10 @@ function test:backend() {
 	go test -race ./... -v
 }
 
+function test:db() {
+	ALMANACK_POSTGRES=$PG_LOCAL_URL go test -v ./internal/db
+}
+
 function test:misc() {
 	_git-xargs '*.sh' shellcheck _
 }
