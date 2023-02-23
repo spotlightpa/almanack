@@ -118,6 +118,7 @@ type SharedArticle struct {
 	UpdatedAt            time.Time          `json:"updated_at"`
 	PublicationDate      pgtype.Timestamptz `json:"publication_date"`
 	InternalID           string             `json:"internal_id"`
+	Byline               string             `json:"byline"`
 	Budget               string             `json:"budget"`
 	Hed                  string             `json:"hed"`
 	Description          string             `json:"description"`
