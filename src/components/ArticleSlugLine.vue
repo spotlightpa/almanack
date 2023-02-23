@@ -23,7 +23,7 @@ export default {
   <span>
     <router-link :to="article.detailsRoute" class="mr-2 middle">
       <font-awesome-icon :icon="['far', 'newspaper']" />
-      {{ article.slug }}
+      {{ article.internalID }}
     </router-link>
     <span class="is-inline-flex middle">
       <span class="tags">

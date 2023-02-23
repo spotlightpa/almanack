@@ -59,13 +59,13 @@ const emailBody = computed(() => {
     : `\n\nEmbargoed until ${formatDateTime(embargo.value)}`;
 
   let segments = [
-    `New ${a.slug}`,
+    `New ${a.internalID}`,
     `https://almanack.data.spotlightpa.org${href}`,
-    `Planned for ${formatDate(a.arc.plannedDate)}`,
+    `Planned for ${formatDate(a.publicationDate)}`,
     embargoText,
     noteText,
     `Budget:`,
-    a.arc.budgetLine,
+    a.budget,
     `
 Word count planned: ${intcomma(a.arc.plannedWordCount)}
 Word count actual: ${intcomma(a.arc.actualWordCount)}
@@ -146,12 +146,13 @@ async function toggleComposer() {
 
     <article v-if="article" class="message is-primary">
       <MetaHead>
-        <title>{{ article.slug }} Admin • Spotlight PA</title>
+        <title>{{ article.internalID }} Admin • Spotlight PA</title>
       </MetaHead>
 
       <div class="message-header">
         <p>
-          <font-awesome-icon :icon="['far', 'newspaper']" /> {{ article.slug }}
+          <font-awesome-icon :icon="['far', 'newspaper']" />
+          {{ article.internalID }}
         </p>
         <span class="tags">
           <router-link v-if="article.id" class="tag" :to="article.detailsRoute">
@@ -185,7 +186,7 @@ async function toggleComposer() {
       </div>
       <div class="message-body">
         <p class="label">Budget</p>
-        <p class="mb-5 content">{{ article.arc.budgetLine }}</p>
+        <p class="mb-5 content">{{ article.budget }}</p>
         <div v-if="!article.pageID" class="mb-5">
           <div class="label">Import to Spotlight PA</div>
           <div class="buttons">
@@ -310,7 +311,7 @@ async function toggleComposer() {
           v-if="showComposer"
           ref="composer"
           class="mt-5"
-          :initial-subject="`New Spotlight PA story ${article.slug}`"
+          :initial-subject="`New Spotlight PA story ${article.internalID}`"
           :initial-body="emailBody"
           @hide="showComposer = false"
         />
