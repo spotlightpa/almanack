@@ -159,7 +159,7 @@ func (app *appEnv) postDomain(w http.ResponseWriter, r *http.Request) {
 		r.Context(),
 		db.UpsertRolesForDomainParams{
 			Domain: req.Domain,
-			Roles:  db.Array(roles...),
+			Roles:  roles,
 		},
 	); err != nil {
 		app.replyErr(w, r, err)
@@ -223,7 +223,7 @@ func (app *appEnv) postAddress(w http.ResponseWriter, r *http.Request) {
 		r.Context(),
 		db.UpsertRolesForAddressParams{
 			EmailAddress: req.Address,
-			Roles:        db.Array(roles...),
+			Roles:        roles,
 		},
 	); err != nil {
 		app.replyErr(w, r, err)

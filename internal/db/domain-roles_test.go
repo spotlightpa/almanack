@@ -6,7 +6,6 @@ import (
 	"testing"
 
 	"github.com/carlmjohnson/be"
-	"github.com/jackc/pgx/v5/pgtype"
 	"github.com/spotlightpa/almanack/internal/db"
 )
 
@@ -17,16 +16,16 @@ func TestRoles(t *testing.T) {
 	ctx := context.Background()
 	r, err := q.UpsertRolesForAddress(ctx, db.UpsertRolesForAddressParams{
 		EmailAddress: "a@foo.com",
-		Roles:        db.Array("fooer"),
+		Roles:        []string{"fooer"},
 	})
 	be.NilErr(t, err)
 
 	be.Equal(t, "a@foo.com", r.EmailAddress)
-	be.Equal(t, "fooer", strings.Join(r.Roles.Elements, ","))
+	be.Equal(t, "fooer", strings.Join(r.Roles, ","))
 
 	_, err = q.UpsertRolesForDomain(ctx, db.UpsertRolesForDomainParams{
 		Domain: "foo.com",
-		Roles:  db.Array("bar"),
+		Roles:  []string{"bar"},
 	})
 	be.NilErr(t, err)
 
@@ -36,7 +35,7 @@ func TestRoles(t *testing.T) {
 
 	_, err = q.UpsertRolesForAddress(ctx, db.UpsertRolesForAddressParams{
 		EmailAddress: "a@foo.com",
-		Roles:        pgtype.Array[string]{},
+		Roles:        []string{},
 	})
 	be.NilErr(t, err)
 
@@ -46,7 +45,7 @@ func TestRoles(t *testing.T) {
 
 	_, err = q.UpsertRolesForDomain(ctx, db.UpsertRolesForDomainParams{
 		Domain: "foo.com",
-		Roles:  pgtype.Array[string]{},
+		Roles:  []string{},
 	})
 	be.NilErr(t, err)
 
