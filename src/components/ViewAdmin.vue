@@ -192,9 +192,9 @@ const nextPage = computedProp("next_page", (page) => ({
                 <h3 class="mt-1 mb-1 title is-3">
                   <router-link class="mr-2 middle" :to="article.adminRoute">
                     <font-awesome-icon :icon="['far', 'newspaper']" />
-                    {{ article.slug }}
+                    {{ article.internalID }}
                   </router-link>
-                  <TagDate :date="article.arc.plannedDate" />
+                  <TagDate :date="article.publicationDate" />
                 </h3>
                 <div class="mb-1 tags">
                   <span class="tag is-small" :class="article.statusClass">
@@ -240,7 +240,7 @@ const nextPage = computedProp("next_page", (page) => ({
                   </router-link>
                 </div>
                 <p class="mb-1 content">
-                  {{ article.arc.budgetLine }}
+                  {{ article.budget }}
                 </p>
               </td>
             </tr>

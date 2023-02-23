@@ -64,11 +64,11 @@ async function doImport(article) {
                   :to="article.adminRoute"
                 >
                   <font-awesome-icon :icon="['far', 'newspaper']" />
-                  {{ article.slug }}
+                  {{ article.arc.slug }}
                 </router-link>
                 <span v-else class="mr-2 middle">
                   <font-awesome-icon :icon="['far', 'newspaper']" />
-                  {{ article.slug }}
+                  {{ article.arc.slug }}
                 </span>
                 <TagDate :date="article.arc.plannedDate" />
               </h3>

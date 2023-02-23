@@ -21,14 +21,14 @@ export default {
         <template v-if="article.isArc">
           <p class="has-margin-top-negative">
             <strong>Byline:</strong>
-            {{ article.arc.byline }}
+            {{ article.byline }}
           </p>
           <p>
             <strong>Planned time:</strong>
-            {{ formatDate(article.arc.plannedDate) }}
+            {{ formatDate(article.publicationDate) }}
           </p>
           <p class="has-margin-top-thin content is-small">
-            {{ article.arc.budgetLine }}
+            {{ article.budget }}
           </p>
         </template>
         <ArticleWordCount :article="article" />

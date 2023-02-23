@@ -25,7 +25,7 @@ const article = computedObj((data) => new SharedArticle(data));
   >
     <template v-if="article">
       <MetaHead>
-        <title>{{ article.slug }} • Spotlight PA</title>
+        <title>{{ article.internalID }} • Spotlight PA</title>
       </MetaHead>
 
       <template v-if="article.isArc">

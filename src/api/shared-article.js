@@ -23,6 +23,11 @@ export default class SharedArticle {
     this["sourceID"] = data["source_id"] ?? "";
     this["rawData"] = data["raw_data"] ?? "";
     this["pageID"] = "" + (data["page_id"] || "");
+    this["internalID"] = data["internal_id"] ?? "";
+    this["budget"] = data["budget"] ?? "";
+    this["hed"] = data["hed"] ?? "";
+    this["description"] = data["description"] ?? "";
+    this["publicationDate"] = maybeDate(data, "publication_date");
     this["embargoUntil"] = maybeDate(data, "embargo_until");
     this["createdAt"] = maybeDate(data, "created_at");
     this["updatedAt"] = maybeDate(data, "updated_at");
@@ -106,8 +111,5 @@ export default class SharedArticle {
       return null;
     }
     return { name: "news-page", params: { id: this.pageID } };
-  }
-  get slug() {
-    return this.isArc ? this.arc.slug : "TKTK";
   }
 }
