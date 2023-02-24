@@ -41,3 +41,21 @@ type Service struct {
 	viewID  string
 	driveID string
 }
+
+func (gsvc *Service) ConfigureCert(s string) error {
+	b, err := base64.StdEncoding.DecodeString(s)
+	if err != nil {
+		return err
+	}
+	g, err := gzip.NewReader(bytes.NewReader(b))
+	if err != nil {
+		return err
+	}
+	defer g.Close()
+
+	gsvc.cert, err = io.ReadAll(g)
+	if err != nil {
+		return err
+	}
+	return nil
+}
