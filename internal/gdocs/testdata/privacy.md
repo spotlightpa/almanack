@@ -134,4 +134,4 @@ This Statement may change from time to time. If we need to change this Statement
 
 <strong>10. Contact Us</strong>
 
-If you have any questions about this Privacy Policy, please contact us by email at webmaster@spotlightpa.org, via phone at 973-943-9130, or in writing at Spotlight PA, 228 Walnut St., #11728, Harrisburg, PA 17108-1728.
+If you have any questions about this Privacy Policy, please contact us by email at webmaster@spotlightpa.org, via phone at 973-943-9130, or in writing at Spotlight PA, 228 Walnut St., \#11728, Harrisburg, PA 17108-1728.
