@@ -55,6 +55,14 @@ func (svc Services) UpdateMostPopular(ctx context.Context) (err error) {
 
 	l := almlog.FromContext(ctx)
 	l.Info("Services.UpdateMostPopular")
+
+	opt, err := svc.Queries.GetOption(ctx, "google-json")
+	if err != nil {
+		return err
+	}
+	if err = svc.gsvc.ConfigureCert(opt); err != nil {
+		return err
+	}
 	cl, err := svc.gsvc.GAClient(ctx)
 	if err != nil {
 		return err
