@@ -3,8 +3,9 @@ package gdocs
 
 import (
 	"context"
+	"fmt"
 	"net/http"
-	"net/url"
+	"path/filepath"
 	"strings"
 
 	"github.com/carlmjohnson/requests"
@@ -28,13 +29,11 @@ func Request(ctx context.Context, cl *http.Client, docID string) (d *docs.Docume
 }
 
 func NormalizeID(id string) string {
-	if strings.Contains(id, "docID=") {
-		if u, err := url.Parse(id); err == nil {
-			id = u.Query().Get("docID")
-		}
-	}
 	id = strings.TrimPrefix(id, "https://docs.google.com/document/d/")
 	id, _, _ = strings.Cut(id, "/")
+	if !filepath.IsLocal(id) {
+		return ""
+	}
 	return id
 }
 
@@ -134,6 +133,20 @@ func convertEl(n *html.Node, el *docs.StructuralElement, listInfo map[string]str
 	for _, subel := range el.Paragraph.Elements {
 		if subel.HorizontalRule != nil {
 			n.AppendChild(xhtml.New("hr"))
+		}
+
+		if person := subel.Person; person != nil {
+			inner := xhtml.LastChildOrNew(n, blockType)
+			link := xhtml.New("a", "href", fmt.Sprintf("mailto:%s", person.PersonProperties.Email))
+			xhtml.AppendText(link, person.PersonProperties.Name)
+			inner.AppendChild(link)
+		}
+
+		if richLink := subel.RichLink; richLink != nil {
+			inner := xhtml.LastChildOrNew(n, blockType)
+			link := xhtml.New("a", "href", richLink.RichLinkProperties.Uri)
+			xhtml.AppendText(link, richLink.RichLinkProperties.Title)
+			inner.AppendChild(link)
 		}
 
 		if subel.InlineObjectElement != nil {
