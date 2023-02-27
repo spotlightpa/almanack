@@ -20,7 +20,7 @@
 
 <strong>EYEBROW/TOPIC</strong>: Local Government
 
-<strong>LEAD ART</strong>: <a href="https://drive.google.com/file/d/1kIhd-oJRHVL5LAGpY84or2g58URXadiC/view?usp=sharing">SPLTIOGA_Tioga birdseye</a>
+<strong>LEAD ART</strong>: <a href="https://drive.google.com/file/d/1kIhd-oJRHVL5LAGpY84or2g58URXadiC/view?usp=sharing">SPLTIOGA\_Tioga birdseye</a>
 
 <strong>LEAD ART CAPTION:</strong> Infighting was rife among elected officials in Tioga, a tiny borough in northern Pennsylvania, when they hired Timothy Loehmann, the police officer who killed Tamir Rice.
 
@@ -180,7 +180,7 @@ But Spotlight PA’s review found state law allowed the borough to employ Loehma
 
 The only form that must be completed and submitted by an applicant for an Act 57 check is what’s called an LE-003 Waiver Form, according to Snyder.
 
-“If Timothy Loehmann correctly completed and submitted a notarized LE-003 Waiver Form, MPOETC would have everything it required of Mr. Loehmann [to conduct a check],” he told Spotlight PA.
+“If Timothy Loehmann correctly completed and submitted a notarized LE-003 Waiver Form, MPOETC would have everything it required of Mr. Loehmann \[to conduct a check\],” he told Spotlight PA.
 
 <mark>Loehmann completed such a form, which was notarized and dated June 8, according to a copy Spotlight PA obtained. Stone, borough secretary at the time, told Spotlight PA that she uploaded the form to an MPOETC website for review. In response to a Right-to-Know request, the state police said the agency was not in possession of that record.</mark>
 
@@ -196,9 +196,9 @@ Rhoads also refused to explain how exactly Tioga borough broke the law and said 
 
 A <a href="https://www.spotlightpa.org/news/2022/06/pennsylvania-police-hiring-misconduct-database/">June Spotlight PA report</a> found that the database is hampered by loopholes and a lack of enforcement mechanisms when municipalities do not follow the law.
 
-But Shapiro’s letter inflamed concerned residents. A woman asked about it after the Borough Council met for a special meeting on July 12. “So what the Attorney General said is true?” she said. “There was no background check done?” When Brooks replied that he was not sure, the woman asked again, “But [the attorney general] would have had no reason to lie, right?”
+But Shapiro’s letter inflamed concerned residents. A woman asked about it after the Borough Council met for a special meeting on July 12. “So what the Attorney General said is true?” she said. “There was no background check done?” When Brooks replied that he was not sure, the woman asked again, “But \[the attorney general\] would have had no reason to lie, right?”
 
-<strong>[</strong><a href="https://drive.google.com/file/d/1k972KNifPoJkalMk9hEcJfELTDEkYTPE/view?usp=sharing"><strong>SPLTIOGA_meeting exterior</strong></a><strong>: The July 12 special meeting, when Loehmann’s withdrawal from the police position was on the agenda, had to be moved outside to accommodate the crowd size.]</strong>
+<strong>\[</strong><a href="https://drive.google.com/file/d/1k972KNifPoJkalMk9hEcJfELTDEkYTPE/view?usp=sharing"><strong>SPLTIOGA\_meeting exterior</strong></a><strong>: The July 12 special meeting, when Loehmann’s withdrawal from the police position was on the agenda, had to be moved outside to accommodate the crowd size.\]</strong>
 
 Subodh Chandra, attorney for the family of Tamir Rice, told Spotlight PA that Loehmann should not be eligible to be a police officer “anywhere in America.”
 
@@ -242,7 +242,7 @@ The crowd of about 60 watched closely and cheered as Brooks amended the agenda t
 
 As a motion was brought to the table, Irwin questioned the lack of hard copies and an argument ensued. “If we’re going to play this game,” Wheeler said as he got up from his seat, “I apologize to the borough. I’m out of here.”
 
-<strong>[</strong><a href="https://drive.google.com/file/d/1kgvNXs860OlnZsJQ9pIsOIRVMdHQEgIC/view?usp=sharing"><strong>SPLTIOGA_Wheeler</strong></a><strong>: Council Member Robert Wheeler walks out of the July 12 special meeting. He resigned from Tioga Borough Council in August. ]</strong>
+<strong>\[</strong><a href="https://drive.google.com/file/d/1kgvNXs860OlnZsJQ9pIsOIRVMdHQEgIC/view?usp=sharing"><strong>SPLTIOGA\_Wheeler</strong></a><strong>: Council Member Robert Wheeler walks out of the July 12 special meeting. He resigned from Tioga Borough Council in August. \]</strong>
 
 “You risked the public safety by allowing that officer be hired!” someone in the crowd shouted at Wheeler as he crossed Main Street.
 
@@ -268,6 +268,6 @@ The borough is working to get back on its feet, said Relaford, by cleaning up un
 
 Wilcox pointed to a three-hour Borough Council meeting in October that had no “petty arguments.”
 
-“It was a long meeting, don’t get me wrong, but it was refreshing to sit through that. … To see everybody bouncing ideas off each other,” he said. Maybe people wouldn’t always agree, “but they do it in a way that is good for all, [for] the benefit [of] everybody.”
+“It was a long meeting, don’t get me wrong, but it was refreshing to sit through that. … To see everybody bouncing ideas off each other,” he said. Maybe people wouldn’t always agree, “but they do it in a way that is good for all, \[for\] the benefit \[of\] everybody.”
 
 “I believe we’re on the right track,” Wilcox said.

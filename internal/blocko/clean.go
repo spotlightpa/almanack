@@ -12,8 +12,9 @@ import (
 func Clean(root *html.Node) {
 	mergeSiblings(root)
 	removeEmptyP(root)
-	replaceWhitespace(root)
 	fixBareLI(root)
+	replaceWhitespace(root)
+	replaceSpecials(root)
 }
 
 func mergeSiblings(root *html.Node) {
@@ -65,6 +66,35 @@ func replaceWhitespace(root *html.Node) {
 		if codeblock == nil {
 			n.Data = whitespaceReplacer.Replace(n.Data)
 		}
+	})
+}
+
+var specialReplacer = strings.NewReplacer(
+	`\`, `\\`,
+	`#`, `\#`,
+	`*`, `\*`,
+	`+`, `\+`,
+	`[`, `\[`,
+	`]`, `\]`,
+	`^`, `\^`,
+	`_`, `\_`,
+	`~`, `\~`,
+	"`", "\\`",
+)
+
+func replaceSpecials(root *html.Node) {
+	xhtml.VisitAll(root, func(n *html.Node) {
+		if n.Type != html.TextNode {
+			return
+		}
+		// Ignore children not of p
+		codeblock := xhtml.Closest(n, func(n *html.Node) bool {
+			return n.DataAtom == atom.P
+		})
+		if codeblock == nil {
+			return
+		}
+		n.Data = specialReplacer.Replace(n.Data)
 	})
 }
 
