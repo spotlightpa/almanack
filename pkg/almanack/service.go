@@ -26,6 +26,6 @@ type Services struct {
 	SlackTech        slack.Client
 	Indexer          index.Indexer
 	NewletterService mailchimp.V3
-	gsvc             *google.Service
+	Gsvc             *google.Service
 	mailchimp.EmailService
 }
