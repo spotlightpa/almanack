@@ -181,6 +181,30 @@ const nextPage = computedProp("next_page", (page) => ({
       />
     </LinkButtons>
 
+    <label for="gdocs-importer" class="mt-4 label">
+      Import from Google Docs
+    </label>
+    <div class="field is-grouped">
+      <div class="control is-expanded">
+        <input
+          id="gdocs-importer"
+          class="input"
+          placeholder="https://docs.google.com/document/d/abc123/edit"
+        />
+      </div>
+      <div class="control">
+        <BulmaPaste />
+      </div>
+      <div class="control">
+        <button
+          class="button is-success has-text-weight-semibold"
+          type="button"
+        >
+          Import
+        </button>
+      </div>
+    </div>
+
     <h2 class="mt-5 title">Shareable Articles</h2>
 
     <div class="table-container">
