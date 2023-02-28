@@ -54,7 +54,7 @@ func AddFlags(fl *flag.FlagSet) func() (svc Services, err error) {
 			FileStore:            fs,
 			Indexer:              getIndex(),
 			NewletterService:     getNewsletter(&client),
-			gsvc:                 getGoogle(),
+			Gsvc:                 getGoogle(),
 			EmailService:         mc,
 		}, nil
 	}

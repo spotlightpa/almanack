@@ -56,18 +56,14 @@ func (svc Services) UpdateMostPopular(ctx context.Context) (err error) {
 	l := almlog.FromContext(ctx)
 	l.InfoCtx(ctx, "Services.UpdateMostPopular")
 
-	opt, err := svc.Queries.GetOption(ctx, "google-json")
+	if err = svc.ConfigureGoogleCert(ctx); err != nil {
+		return err
+	}
+	cl, err := svc.Gsvc.GAClient(ctx)
 	if err != nil {
 		return err
 	}
-	if err = svc.gsvc.ConfigureCert(opt); err != nil {
-		return err
-	}
-	cl, err := svc.gsvc.GAClient(ctx)
-	if err != nil {
-		return err
-	}
-	pages, err := svc.gsvc.MostPopularNews(ctx, cl)
+	pages, err := svc.Gsvc.MostPopularNews(ctx, cl)
 	if err != nil {
 		return err
 	}
@@ -93,4 +89,16 @@ func (svc Services) UpdateMostPopular(ctx context.Context) (err error) {
 			data,
 		},
 	)
+}
+
+func (svc Services) ConfigureGoogleCert(ctx context.Context) (err error) {
+	defer errorx.Trace(&err)
+	opt, err := svc.Queries.GetOption(ctx, "google-json")
+	if err != nil {
+		return err
+	}
+	if err = svc.Gsvc.ConfigureCert(opt); err != nil {
+		return err
+	}
+	return nil
 }
