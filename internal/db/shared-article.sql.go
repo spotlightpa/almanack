@@ -361,3 +361,47 @@ func (q *Queries) UpsertSharedArticleFromArc(ctx context.Context, arcID string) 
 	)
 	return i, err
 }
+
+const upsertSharedArticleFromGDocs = `-- name: UpsertSharedArticleFromGDocs :one
+INSERT INTO shared_article (status, source_type, source_id, raw_data, internal_id)
+  VALUES ('U', 'gdocs', $1, $2::jsonb, $3)
+ON CONFLICT (source_type, source_id)
+  DO UPDATE SET
+    raw_data = excluded.raw_data
+  RETURNING
+    id, status, embargo_until, note, source_type, source_id, raw_data, page_id, created_at, updated_at, publication_date, internal_id, byline, budget, hed, description, lede_image, lede_image_credit, lede_image_description, lede_image_caption
+`
+
+type UpsertSharedArticleFromGDocsParams struct {
+	GdocsID    string `json:"gdocs_id"`
+	RawData    []byte `json:"raw_data"`
+	InternalID string `json:"internal_id"`
+}
+
+func (q *Queries) UpsertSharedArticleFromGDocs(ctx context.Context, arg UpsertSharedArticleFromGDocsParams) (SharedArticle, error) {
+	row := q.db.QueryRow(ctx, upsertSharedArticleFromGDocs, arg.GdocsID, arg.RawData, arg.InternalID)
+	var i SharedArticle
+	err := row.Scan(
+		&i.ID,
+		&i.Status,
+		&i.EmbargoUntil,
+		&i.Note,
+		&i.SourceType,
+		&i.SourceID,
+		&i.RawData,
+		&i.PageID,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+		&i.PublicationDate,
+		&i.InternalID,
+		&i.Byline,
+		&i.Budget,
+		&i.Hed,
+		&i.Description,
+		&i.LedeImage,
+		&i.LedeImageCredit,
+		&i.LedeImageDescription,
+		&i.LedeImageCaption,
+	)
+	return i, err
+}
