@@ -17,7 +17,6 @@ import (
 )
 
 func Request(ctx context.Context, cl *http.Client, docID string) (d *docs.Document, err error) {
-	docID = NormalizeID(docID)
 	var doc docs.Document
 	type errorReply struct {
 		Error googleapi.Error `json:"error"`
@@ -38,13 +37,23 @@ func Request(ctx context.Context, cl *http.Client, docID string) (d *docs.Docume
 	return &doc, nil
 }
 
-func NormalizeID(id string) string {
-	id = strings.TrimPrefix(id, "https://docs.google.com/document/d/")
-	id, _, _ = strings.Cut(id, "/")
-	if !filepath.IsLocal(id) {
-		return ""
+func NormalizeID(id string) (string, error) {
+	const magicLength = 44
+	if len(id) == magicLength {
+		return id, nil
 	}
-	return id
+	var v resperr.Validator
+	v.AddIf("gdocs_id", len(id) == 0, "ID must be set")
+	rawID := id
+	var found bool
+	id, found = strings.CutPrefix(id, "https://docs.google.com/document/d/")
+	v.AddIfUnset("gdocs_id", !found, "Unrecognized ID: %s", rawID)
+	if found {
+		id, _, _ = strings.Cut(id, "/")
+	}
+	v.AddIfUnset("gdocs_id", !filepath.IsLocal(id), "Bad ID: %s", rawID)
+	v.AddIfUnset("gdocs_id", len(id) != magicLength, "Invalid ID: %s", rawID)
+	return id, v.Err()
 }
 
 func Convert(doc *docs.Document) (n *html.Node) {
