@@ -9,21 +9,31 @@ import (
 	"strings"
 
 	"github.com/carlmjohnson/requests"
+	"github.com/carlmjohnson/resperr"
 	"github.com/spotlightpa/almanack/internal/xhtml"
 	"golang.org/x/net/html"
 	"google.golang.org/api/docs/v1"
+	"google.golang.org/api/googleapi"
 )
 
 func Request(ctx context.Context, cl *http.Client, docID string) (d *docs.Document, err error) {
 	docID = NormalizeID(docID)
 	var doc docs.Document
+	type errorReply struct {
+		Error googleapi.Error `json:"error"`
+	}
+	var errJSON errorReply
 	if err = requests.
 		URL("https://docs.googleapis.com").
 		Pathf("/v1/documents/%s", docID).
+		Param("suggestionsViewMode", "PREVIEW_WITHOUT_SUGGESTIONS").
 		Client(cl).
+		ErrorJSON(&errJSON).
 		ToJSON(&doc).
 		Fetch(ctx); err != nil {
-		return nil, err
+		e := &errJSON.Error
+		e.Wrap(err)
+		return nil, resperr.WithCodeAndMessage(e, e.Code, e.Message)
 	}
 	return &doc, nil
 }
