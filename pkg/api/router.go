@@ -61,6 +61,7 @@ func (app *appEnv) routes() http.Handler {
 			r.Post(`/page-refresh`, app.postPageRefresh)
 			r.Post(`/shared-article`, app.postSharedArticle)
 			r.Post(`/shared-article-from-arc`, app.postSharedArticleFromArc)
+			r.Post(`/shared-article-from-gdocs`, app.postSharedArticleFromGDocs)
 			r.Get(`/sidebar`, app.getSiteData(almanack.SidebarLoc))
 			r.Post(`/sidebar`, app.setSiteData((almanack.SidebarLoc)))
 			r.Get(`/election-feature`, app.getSiteData(almanack.ElectionFeatLoc))

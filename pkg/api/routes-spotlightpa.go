@@ -1,6 +1,7 @@
 package api
 
 import (
+	"encoding/json"
 	"errors"
 	"fmt"
 	"net/http"
@@ -9,8 +10,10 @@ import (
 	"github.com/carlmjohnson/emailx"
 	"github.com/carlmjohnson/resperr"
 	"github.com/spotlightpa/almanack/internal/db"
+	"github.com/spotlightpa/almanack/internal/gdocs"
 	"github.com/spotlightpa/almanack/internal/paginate"
 	"github.com/spotlightpa/almanack/pkg/almanack"
+	"github.com/spotlightpa/almanack/pkg/almlog"
 	"golang.org/x/exp/slices"
 )
 
@@ -856,4 +859,57 @@ func (app *appEnv) postSharedArticleFromArc(w http.ResponseWriter, r *http.Reque
 	}
 
 	app.replyJSON(http.StatusOK, w, &article)
+}
+
+func (app *appEnv) postSharedArticleFromGDocs(w http.ResponseWriter, r *http.Request) {
+	app.logStart(r)
+
+	var req struct {
+		ID string `json:"gdocs_id"`
+	}
+	if !app.readJSON(w, r, &req) {
+		return
+	}
+	id := gdocs.NormalizeID(req.ID)
+
+	l := almlog.FromContext(r.Context())
+	l.Debug("postSharedArticleFromGDocs", "id", id)
+
+	if id == "" {
+		var v resperr.Validator
+		v.Add("id", "Bad Google Docs ID %q", req.ID)
+		app.replyErr(w, r, v.Err())
+	}
+
+	if err := app.svc.ConfigureGoogleCert(r.Context()); err != nil {
+		app.replyErr(w, r, err)
+		return
+	}
+	cl, err := app.svc.Gsvc.GdocsClient(r.Context())
+	if err != nil {
+		app.replyErr(w, r, err)
+		return
+	}
+	doc, err := gdocs.Request(r.Context(), cl, id)
+	if err != nil {
+		// TODO: figure out common errors, like no-permissions
+		app.replyErr(w, r, err)
+		return
+	}
+	b, err := json.Marshal(doc)
+	if err != nil {
+		app.replyErr(w, r, err)
+		return
+	}
+
+	art, err := app.svc.Queries.UpsertSharedArticleFromGDocs(r.Context(), db.UpsertSharedArticleFromGDocsParams{
+		GdocsID:    id,
+		InternalID: doc.Title,
+		RawData:    b,
+	})
+	if err != nil {
+		app.replyErr(w, r, err)
+		return
+	}
+	app.replyJSON(http.StatusOK, w, art)
 }
