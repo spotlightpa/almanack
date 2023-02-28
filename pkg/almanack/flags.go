@@ -1,10 +1,8 @@
 package almanack
 
 import (
-	"context"
 	"flag"
 	"net/http"
-	"time"
 
 	"github.com/carlmjohnson/flagx"
 	"github.com/spotlightpa/almanack/internal/aws"
@@ -34,13 +32,6 @@ func AddFlags(fl *flag.FlagSet) func() (svc Services, err error) {
 
 	return func() (svc Services, err error) {
 		if err = flagx.MustHave(fl, "postgres"); err != nil {
-			return
-		}
-
-		ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
-		defer cancel()
-
-		if err = db.FlagFromOption(ctx, pg, fl, "google-json"); err != nil {
 			return
 		}
 
