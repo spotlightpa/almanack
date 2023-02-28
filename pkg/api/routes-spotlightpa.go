@@ -863,6 +863,7 @@ func (app *appEnv) postSharedArticleFromArc(w http.ResponseWriter, r *http.Reque
 
 func (app *appEnv) postSharedArticleFromGDocs(w http.ResponseWriter, r *http.Request) {
 	app.logStart(r)
+	l := almlog.FromContext(r.Context())
 
 	var req struct {
 		ID string `json:"gdocs_id"`
@@ -870,16 +871,13 @@ func (app *appEnv) postSharedArticleFromGDocs(w http.ResponseWriter, r *http.Req
 	if !app.readJSON(w, r, &req) {
 		return
 	}
-	id := gdocs.NormalizeID(req.ID)
-
-	l := almlog.FromContext(r.Context())
-	l.Debug("postSharedArticleFromGDocs", "id", id)
-
-	if id == "" {
-		var v resperr.Validator
-		v.Add("id", "Bad Google Docs ID %q", req.ID)
-		app.replyErr(w, r, v.Err())
+	id, err := gdocs.NormalizeID(req.ID)
+	if err != nil {
+		l.Warn("postSharedArticleFromGDocs: bad id", "id", req.ID)
+		app.replyErr(w, r, err)
 	}
+
+	l.Debug("postSharedArticleFromGDocs", "id", id)
 
 	if err := app.svc.ConfigureGoogleCert(r.Context()); err != nil {
 		app.replyErr(w, r, err)
