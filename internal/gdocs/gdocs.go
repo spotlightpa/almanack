@@ -111,6 +111,7 @@ func buildObjectInfo(objs map[string]docs.InlineObject) map[string][]string {
 			"src", src,
 			"title", innerObj.Title,
 			"alt", innerObj.Description,
+			"data-oid", obj.ObjectId,
 		}
 	}
 	return m
