@@ -5,9 +5,9 @@ import (
 	"context"
 	"fmt"
 	"net/http"
-	"path/filepath"
 	"strings"
 
+	"github.com/carlmjohnson/bytemap"
 	"github.com/carlmjohnson/requests"
 	"github.com/carlmjohnson/resperr"
 	"github.com/spotlightpa/almanack/internal/xhtml"
@@ -37,6 +37,14 @@ func Request(ctx context.Context, cl *http.Client, docID string) (d *docs.Docume
 	return &doc, nil
 }
 
+// https://developers.google.com/docs/api/how-tos/overview#document_id
+var validIDChars = bytemap.Union(
+	bytemap.Range('A', 'Z'),
+	bytemap.Range('a', 'z'),
+	bytemap.Range('0', '9'),
+	bytemap.Make("_-"),
+)
+
 func NormalizeID(id string) (string, error) {
 	const magicLength = 44
 	if len(id) == magicLength {
@@ -51,8 +59,8 @@ func NormalizeID(id string) (string, error) {
 	if found {
 		id, _, _ = strings.Cut(id, "/")
 	}
-	v.AddIfUnset("gdocs_id", !filepath.IsLocal(id), "Bad ID: %s", rawID)
 	v.AddIfUnset("gdocs_id", len(id) != magicLength, "Invalid ID: %s", rawID)
+	v.AddIfUnset("gdocs_id", validIDChars.Contains(id), "Illegal characters in ID: %s", rawID)
 	return id, v.Err()
 }
 
