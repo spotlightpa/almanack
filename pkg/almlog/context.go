@@ -22,9 +22,3 @@ func FromContext(ctx context.Context) *slog.Logger {
 	}
 	return Logger
 }
-
-// Ctx retrieves a Logger from the given context using FromContext. Then it adds
-// the given context to the Logger using WithContext and returns the result.
-func Ctx(ctx context.Context) *slog.Logger {
-	return FromContext(ctx).WithContext(ctx)
-}

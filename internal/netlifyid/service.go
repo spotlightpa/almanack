@@ -61,7 +61,7 @@ func (as NetlifyAuth) HasRole(r *http.Request, role string) error {
 		if !hasRole {
 			level = slog.LevelWarn
 		}
-		l.Log(level, "permission middleware",
+		l.Log(r.Context(), level, "permission middleware",
 			"requires-role", role,
 			"has-role", hasRole,
 		)

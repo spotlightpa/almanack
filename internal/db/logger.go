@@ -49,7 +49,7 @@ func (l logger) log(ctx context.Context, kind string, d time.Duration) {
 	}
 	level := almlog.LevelThreshold(d, 200*time.Millisecond, 1*time.Second)
 	almlog.FromContext(ctx).
-		Log(level, "DBTX",
+		Log(ctx, level, "DBTX",
 			"kind", kind,
 			"query", prefix,
 			"duration", d,

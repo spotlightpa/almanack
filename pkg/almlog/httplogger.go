@@ -14,7 +14,7 @@ func init() {
 func logReq(req *http.Request, res *http.Response, err error, duration time.Duration) {
 	level := LevelThreshold(duration, 500*time.Millisecond, 1*time.Second)
 	FromContext(req.Context()).
-		Log(level, "RoundTrip",
+		Log(req.Context(), level, "RoundTrip",
 			"req_method", req.Method,
 			"req_host", req.Host,
 			"res_status", res.StatusCode,
