@@ -132,3 +132,12 @@ func AdoptChildren(dst, src *html.Node) {
 		dst.AppendChild(c)
 	}
 }
+
+func Attr(n *html.Node, name string) string {
+	for _, attr := range n.Attr {
+		if attr.Key == name {
+			return attr.Val
+		}
+	}
+	return ""
+}
