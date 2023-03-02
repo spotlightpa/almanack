@@ -23,7 +23,7 @@ func (gsvc *Service) DriveClient(ctx context.Context) (cl *http.Client, err erro
 	}
 	if len(gsvc.cert) == 0 {
 		l := almlog.FromContext(ctx)
-		l.Warn("using default Google credentials")
+		l.WarnCtx(ctx, "using default Google credentials")
 		cl, err = google.DefaultClient(ctx, scopes...)
 		return
 	}

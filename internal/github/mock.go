@@ -40,7 +40,7 @@ func (mc *MockClient) ensureParent(fn string) {
 func (mc *MockClient) CreateFile(ctx context.Context, msg, path string, content []byte) error {
 	tmpfn := mc.abspath(path)
 	l := almlog.FromContext(ctx)
-	l.Info("github.mock.CreateFile",
+	l.InfoCtx(ctx, "github.mock.CreateFile",
 		"path", tmpfn,
 	)
 	mc.ensureParent(tmpfn)
@@ -50,7 +50,7 @@ func (mc *MockClient) CreateFile(ctx context.Context, msg, path string, content 
 func (mc *MockClient) GetFile(ctx context.Context, path string) (contents string, err error) {
 	tmpfn := mc.abspath(path)
 	l := almlog.FromContext(ctx)
-	l.Info("github.mock.GetFile",
+	l.InfoCtx(ctx, "github.mock.GetFile",
 		"path", tmpfn,
 	)
 	var b []byte
@@ -61,7 +61,7 @@ func (mc *MockClient) GetFile(ctx context.Context, path string) (contents string
 func (mc *MockClient) UpdateFile(ctx context.Context, msg, path string, content []byte) error {
 	tmpfn := mc.abspath(path)
 	l := almlog.FromContext(ctx)
-	l.Info("github.mock.UpdateFile",
+	l.InfoCtx(ctx, "github.mock.UpdateFile",
 		"path", tmpfn,
 	)
 	mc.ensureParent(tmpfn)

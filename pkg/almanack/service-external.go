@@ -54,7 +54,7 @@ func (svc Services) UpdateMostPopular(ctx context.Context) (err error) {
 	defer errorx.Trace(&err)
 
 	l := almlog.FromContext(ctx)
-	l.Info("Services.UpdateMostPopular")
+	l.InfoCtx(ctx, "Services.UpdateMostPopular")
 
 	opt, err := svc.Queries.GetOption(ctx, "google-json")
 	if err != nil {

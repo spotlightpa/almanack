@@ -49,7 +49,7 @@ type BlobStore struct {
 
 func (bs BlobStore) SignPutURL(ctx context.Context, srcPath string, h http.Header) (signedURL string, err error) {
 	l := almlog.FromContext(ctx)
-	l.Info("aws.SignPutURL", "url", srcPath)
+	l.InfoCtx(ctx, "aws.SignPutURL", "url", srcPath)
 	b, err := blob.OpenBucket(ctx, bs.bucket)
 	if err != nil {
 		return "", err
@@ -77,7 +77,7 @@ func (bs BlobStore) SignPutURL(ctx context.Context, srcPath string, h http.Heade
 
 func (bs BlobStore) SignGetURL(ctx context.Context, srcPath string) (signedURL string, err error) {
 	l := almlog.FromContext(ctx)
-	l.Info("aws.SignGetURL", "url", srcPath)
+	l.InfoCtx(ctx, "aws.SignGetURL", "url", srcPath)
 	b, err := blob.OpenBucket(ctx, bs.bucket)
 	if err != nil {
 		return "", err
@@ -125,13 +125,13 @@ func (bs BlobStore) WriteFile(ctx context.Context, path string, h http.Header, d
 		a := md5.Sum(data)
 		checksum = a[:]
 		if string(checksum) == string(attrs.MD5) {
-			l.Info("aws.WriteFile: skipping; already uploaded",
+			l.InfoCtx(ctx, "aws.WriteFile: skipping; already uploaded",
 				"bucket", bs.bucket, "path", path)
 			return nil
 		}
 	}
 
-	l.Info("aws.WriteFile: writing", "bucket", bs.bucket, "path", path)
+	l.InfoCtx(ctx, "aws.WriteFile: writing", "bucket", bs.bucket, "path", path)
 	return b.WriteAll(ctx, path, data, &blob.WriterOptions{
 		CacheControl:       h.Get("Cache-Control"),
 		ContentType:        h.Get("Content-Type"),
