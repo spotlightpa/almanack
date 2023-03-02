@@ -1,7 +1,6 @@
 package api
 
 import (
-	"encoding/json"
 	"errors"
 	"fmt"
 	"net/http"
@@ -875,36 +874,11 @@ func (app *appEnv) postSharedArticleFromGDocs(w http.ResponseWriter, r *http.Req
 	if err != nil {
 		l.Warn("postSharedArticleFromGDocs: bad id", "id", req.ID)
 		app.replyErr(w, r, err)
+		return
 	}
 
 	l.Debug("postSharedArticleFromGDocs", "id", id)
-
-	if err := app.svc.ConfigureGoogleCert(r.Context()); err != nil {
-		app.replyErr(w, r, err)
-		return
-	}
-	cl, err := app.svc.Gsvc.GdocsClient(r.Context())
-	if err != nil {
-		app.replyErr(w, r, err)
-		return
-	}
-	doc, err := gdocs.Request(r.Context(), cl, id)
-	if err != nil {
-		// TODO: figure out common errors, like no-permissions
-		app.replyErr(w, r, err)
-		return
-	}
-	b, err := json.Marshal(doc)
-	if err != nil {
-		app.replyErr(w, r, err)
-		return
-	}
-
-	art, err := app.svc.Queries.UpsertSharedArticleFromGDocs(r.Context(), db.UpsertSharedArticleFromGDocsParams{
-		GdocsID:    id,
-		InternalID: doc.Title,
-		RawData:    b,
-	})
+	art, err := app.svc.SharedArticleFromGDocs(r.Context(), id)
 	if err != nil {
 		app.replyErr(w, r, err)
 		return
