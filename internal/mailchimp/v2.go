@@ -67,7 +67,7 @@ func (v2 V2) SendEmail(ctx context.Context, subject, body string) (err error) {
 		return err
 	}
 	l := almlog.FromContext(ctx)
-	l.Info("mailchimp.SendEmail: created campaign", "campaign_id", resp.Id)
+	l.InfoCtx(ctx, "mailchimp.SendEmail: created campaign", "campaign_id", resp.Id)
 
 	type v2CampaignSend struct {
 		APIKey     string `json:"apikey"`
@@ -84,7 +84,7 @@ func (v2 V2) SendEmail(ctx context.Context, subject, body string) (err error) {
 		}).
 		ToJSON(&resp2).
 		Fetch(ctx)
-	l.Info("mailchimp.SendEmail: sent campaign", "campaign_id", resp.Id, "complete", resp2.Complete)
+	l.InfoCtx(ctx, "mailchimp.SendEmail: sent campaign", "campaign_id", resp.Id, "complete", resp2.Complete)
 	return err
 }
 
@@ -93,7 +93,7 @@ type MockEmailService struct {
 
 func (mock MockEmailService) SendEmail(ctx context.Context, subject, body string) error {
 	l := almlog.FromContext(ctx)
-	l.Info("mocking campaign, debug output")
+	l.InfoCtx(ctx, "mocking campaign, debug output")
 	fmt.Println()
 	fmt.Println(subject)
 	fmt.Println("----")

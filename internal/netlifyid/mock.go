@@ -21,7 +21,7 @@ func (mas MockAuthService) AuthFromCookie(r *http.Request) (*http.Request, error
 
 func (mas MockAuthService) HasRole(r *http.Request, role string) error {
 	l := almlog.FromContext(r.Context())
-	l.Debug("mock permission middleware",
+	l.DebugCtx(r.Context(), "mock permission middleware",
 		"requires-role", role,
 		"has-role", true)
 
@@ -31,6 +31,6 @@ func (mas MockAuthService) HasRole(r *http.Request, role string) error {
 	if _, err := r.Cookie("nf_jwt"); err == nil {
 		return nil
 	}
-	l.Warn("missing Authorization header/cookie")
+	l.WarnCtx(r.Context(), "missing Authorization header/cookie")
 	return nil
 }

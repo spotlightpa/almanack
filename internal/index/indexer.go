@@ -33,11 +33,13 @@ type MockIndexer struct {
 
 func (mi MockIndexer) SaveObject(object any, opts ...any) (res search.SaveObjectRes, err error) {
 	l := almlog.Logger
+	var ctx context.Context
+	var ok bool
 	for _, opt := range opts {
-		if ctx, ok := opt.(context.Context); ok {
+		if ctx, ok = opt.(context.Context); ok {
 			l = almlog.FromContext(ctx)
 		}
 	}
-	l.Info("index.Mock.SaveObject")
+	l.InfoCtx(ctx, "index.Mock.SaveObject")
 	return
 }

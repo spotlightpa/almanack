@@ -33,6 +33,7 @@ func (app *appEnv) replyJSON(statusCode int, w http.ResponseWriter, data any) {
 	w.WriteHeader(statusCode)
 	enc := json.NewEncoder(w)
 	if err := enc.Encode(data); err != nil {
+		// TODO: Log to Sentry
 		almlog.Logger.Error("replyJSON", err)
 	}
 }
@@ -69,7 +70,7 @@ func (app *appEnv) logErr(ctx context.Context, err error) {
 	} else {
 		l.Warn("sentry not in context")
 	}
-	l.Error("logErr", err)
+	l.ErrorCtx(ctx, "logErr", err)
 }
 
 func (app *appEnv) tryReadJSON(w http.ResponseWriter, r *http.Request, dst any) error {
@@ -295,5 +296,5 @@ func (app *appEnv) logStart(r *http.Request, args ...any) {
 		route = fmt.Sprintf("%s(%s:%d)", name, file, line)
 	}
 	l := almlog.FromContext(r.Context())
-	l.With(args...).Info("logStart", "route", route)
+	l.With(args...).InfoCtx(r.Context(), "logStart", "route", route)
 }

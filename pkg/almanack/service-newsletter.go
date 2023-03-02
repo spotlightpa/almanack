@@ -45,7 +45,7 @@ func (svc Services) UpdateNewsletterArchive(ctx context.Context, campaigns *mail
 		return err
 	}
 	l := almlog.FromContext(ctx)
-	l.Info("Services.UpdateNewsletterArchive",
+	l.InfoCtx(ctx, "Services.UpdateNewsletterArchive",
 		"mcType", mcType, "new-items", n)
 
 	return nil
@@ -62,7 +62,7 @@ func (svc Services) ImportNewsletterPages(ctx context.Context, types []db.Newsle
 		return err
 	}
 	l := almlog.FromContext(ctx)
-	l.Info("Services.ImportNewsletterPages",
+	l.InfoCtx(ctx, "Services.ImportNewsletterPages",
 		"new-items", len(nls))
 
 	for _, nl := range nls {

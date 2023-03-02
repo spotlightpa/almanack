@@ -16,10 +16,10 @@ func FlagFromOption(ctx context.Context, q *Queries, fl *flag.FlagSet, name stri
 		}
 	})
 	if !needsVal {
-		l.Info("db.FlagFromOption: override", "name", name)
+		l.InfoCtx(ctx, "db.FlagFromOption: override", "name", name)
 		return nil
 	}
-	l.Info("db.FlagFromOption: get", "name", name)
+	l.InfoCtx(ctx, "db.FlagFromOption: get", "name", name)
 
 	val, err := q.GetOption(ctx, name)
 	if err != nil {

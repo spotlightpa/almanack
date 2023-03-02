@@ -137,7 +137,7 @@ func readContentElements(ctx context.Context, svc Services, rawels []*json.RawMe
 		var _type string
 		wrapper := arc.ContentElementType{Type: &_type}
 		if err := json.Unmarshal(*raw, &wrapper); err != nil {
-			l.Error("readContentElements unwrap", err)
+			l.ErrorCtx(ctx, "readContentElements unwrap", err)
 		}
 		var graf string
 		switch _type {
@@ -150,7 +150,7 @@ func readContentElements(ctx context.Context, svc Services, rawels []*json.RawMe
 		case "header":
 			var v arc.ContentElementHeading
 			if err := json.Unmarshal(*raw, &v); err != nil {
-				l.Error("readContentElements header", err)
+				l.ErrorCtx(ctx, "readContentElements header", err)
 			}
 			graf = strings.Repeat("#", v.Level) + " " + v.Content
 		case "oembed_response":

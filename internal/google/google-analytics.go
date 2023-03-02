@@ -16,7 +16,7 @@ import (
 func (gsvc *Service) GAClient(ctx context.Context) (cl *http.Client, err error) {
 	if len(gsvc.cert) == 0 {
 		l := almlog.FromContext(ctx)
-		l.Warn("using default Google credentials")
+		l.WarnCtx(ctx, "using default Google credentials")
 		cl, err = google.DefaultClient(ctx, "https://www.googleapis.com/auth/analytics.readonly")
 		return
 	}
@@ -93,7 +93,7 @@ func (gsvc *Service) MostPopularNews(ctx context.Context, cl *http.Client) (page
 		}
 	}
 	l := almlog.FromContext(ctx)
-	l.Info("google.MostPopularNews", "count", len(pages))
+	l.InfoCtx(ctx, "google.MostPopularNews", "count", len(pages))
 	return pages, nil
 }
 

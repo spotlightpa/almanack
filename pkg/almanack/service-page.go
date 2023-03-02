@@ -136,7 +136,7 @@ func (svc Services) RefreshPageContents(ctx context.Context, id int64) (err erro
 	}
 
 	l := almlog.FromContext(ctx)
-	l.Info("Services.RefreshPageContents: page changed",
+	l.InfoCtx(ctx, "Services.RefreshPageContents: page changed",
 		"filepath", page.FilePath)
 
 	_, err = svc.Queries.UpdatePage(ctx, db.UpdatePageParams{
