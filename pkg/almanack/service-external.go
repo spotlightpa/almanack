@@ -26,6 +26,23 @@ func (svc Services) ReplaceImageURL(ctx context.Context, srcURL, description, cr
 		return "", err
 	}
 
+	itype, err := svc.typeForImage(ctx, srcURL)
+	if err != nil {
+		return "", err
+	}
+	uploadPath := hashURLpath(srcURL, itype)
+	_, err = svc.Queries.UpsertImage(ctx, db.UpsertImageParams{
+		Path:        uploadPath,
+		Type:        itype,
+		Description: description,
+		Credit:      credit,
+		SourceURL:   srcURL,
+		IsUploaded:  false,
+	})
+	return uploadPath, err
+}
+
+func (svc Services) typeForImage(ctx context.Context, srcURL string) (typeName string, err error) {
 	ext := path.Ext(srcURL)
 	ext = strings.TrimPrefix(ext, ".")
 	ext = strings.ToLower(ext)
@@ -38,16 +55,7 @@ func (svc Services) ReplaceImageURL(ctx context.Context, srcURL, description, cr
 		}
 		return "", err
 	}
-	uploadPath := hashURLpath(srcURL, itype.Name)
-	_, err = svc.Queries.UpsertImage(ctx, db.UpsertImageParams{
-		Path:        uploadPath,
-		Type:        itype.Name,
-		Description: description,
-		Credit:      credit,
-		SourceURL:   srcURL,
-		IsUploaded:  false,
-	})
-	return uploadPath, err
+	return itype.Name, nil
 }
 
 func (svc Services) UpdateMostPopular(ctx context.Context) (err error) {
