@@ -21,7 +21,7 @@ func Middleware(next http.Handler) http.Handler {
 			if l2 := LevelThreshold(status, 400, 500); l2 > level {
 				level = l2
 			}
-			Logger.Log(level, "ServeHTTP",
+			Logger.Log(r.Context(), level, "ServeHTTP",
 				"req_method", r.Method,
 				"req_ip", r.RemoteAddr,
 				"req_path", r.RequestURI,
