@@ -107,11 +107,12 @@ func (svc Services) saveImage(img imageData) (err error) {
 }
 
 func gdocsHashPath(docID, imageID, ext string) string {
-	prefix := fmt.Append(nil, "spl:", docID)
-	prefixHash := crockford.MD5(crockford.Lower, prefix)[:16]
-	prefixHash = crockford.Partition(prefixHash, 4)
-	suffix := fmt.Append(nil, "spl:", imageID)
-	suffixHash := crockford.MD5(crockford.Lower, suffix)[:12]
-	suffixHash = crockford.Partition(suffixHash, 4)
-	return fmt.Sprintf("docs/%s/%s.%s", prefixHash, suffixHash, ext)
+	var buf, buf2 [100]byte
+	prefix := fmt.Append(buf[:0], "spl:", docID)
+	prefix = crockford.AppendMD5(crockford.Lower, prefix[:0], prefix)[:12]
+	prefix = crockford.AppendPartition(prefix[:0], prefix, 4)
+	suffix := fmt.Append(buf2[:0], "spl:", imageID)
+	suffix = crockford.AppendMD5(crockford.Lower, suffix[:0], suffix)[:8]
+	suffix = crockford.AppendPartition(suffix[:0], suffix, 4)
+	return fmt.Sprintf("docs/%s/%s.%s", prefix, suffix, ext)
 }
