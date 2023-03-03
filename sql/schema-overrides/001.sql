@@ -12,9 +12,5 @@ ALTER TABLE page
 ALTER TABLE page
   DROP COLUMN internal_id_fts;
 
-DROP TABLE article;
-
-DROP TABLE article_status;
-
-ALTER TABLE "page"
-  DROP COLUMN "published_at";
+ALTER TABLE shared_article
+  DROP COLUMN lede_image_source;
