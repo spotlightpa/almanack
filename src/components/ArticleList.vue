@@ -21,7 +21,7 @@ export default {
         <template v-if="article.isArc">
           <p class="has-margin-top-negative">
             <strong>Byline:</strong>
-            {{ article.byline }}
+            {{ article.arc.byline }}
           </p>
           <p>
             <strong>Planned time:</strong>
