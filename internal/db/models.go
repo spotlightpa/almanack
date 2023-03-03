@@ -123,7 +123,7 @@ type SharedArticle struct {
 	Hed                  string             `json:"hed"`
 	Description          string             `json:"description"`
 	LedeImage            string             `json:"lede_image"`
-	LedeImageSource      string             `json:"lede_image_source"`
+	LedeImageCredit      string             `json:"lede_image_credit"`
 	LedeImageDescription string             `json:"lede_image_description"`
 	LedeImageCaption     string             `json:"lede_image_caption"`
 }
