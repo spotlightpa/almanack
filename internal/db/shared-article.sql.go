@@ -155,12 +155,6 @@ FROM
 WHERE
   status <> 'U'
 ORDER BY
-  CASE status
-  WHEN 'P' THEN
-    '0'
-  WHEN 'S' THEN
-    '1'
-  END ASC,
   publication_date DESC
 LIMIT $1 OFFSET $2
 `
