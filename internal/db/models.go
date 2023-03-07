@@ -47,6 +47,16 @@ type File struct {
 	UpdatedAt   time.Time `json:"updated_at"`
 }
 
+type GDocsImage struct {
+	ID          int64       `json:"id"`
+	GDocsID     string      `json:"g_docs_id"`
+	DocObjectID string      `json:"doc_object_id"`
+	SourceURL   string      `json:"src_url"`
+	ImageID     pgtype.Int8 `json:"image_id"`
+	CreatedAt   time.Time   `json:"created_at"`
+	UpdatedAt   time.Time   `json:"updated_at"`
+}
+
 type Image struct {
 	ID          int64     `json:"id"`
 	Path        string    `json:"path"`
