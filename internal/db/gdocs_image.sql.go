@@ -11,6 +11,50 @@ import (
 	"github.com/jackc/pgx/v5/pgtype"
 )
 
+const listGDocsImagesByGDocsID = `-- name: ListGDocsImagesByGDocsID :many
+SELECT
+  "doc_object_id",
+  COALESCE("path", ''), COALESCE("type", ''),
+  "is_uploaded"
+FROM
+  g_docs_image
+  LEFT JOIN image ON (image_id = image.id)
+WHERE
+  g_docs_id = $1
+`
+
+type ListGDocsImagesByGDocsIDRow struct {
+	DocObjectID string      `json:"doc_object_id"`
+	Path        string      `json:"path"`
+	Type        string      `json:"type"`
+	IsUploaded  pgtype.Bool `json:"is_uploaded"`
+}
+
+func (q *Queries) ListGDocsImagesByGDocsID(ctx context.Context, gDocsID string) ([]ListGDocsImagesByGDocsIDRow, error) {
+	rows, err := q.db.Query(ctx, listGDocsImagesByGDocsID, gDocsID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []ListGDocsImagesByGDocsIDRow
+	for rows.Next() {
+		var i ListGDocsImagesByGDocsIDRow
+		if err := rows.Scan(
+			&i.DocObjectID,
+			&i.Path,
+			&i.Type,
+			&i.IsUploaded,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const listGDocsImagesWhereUnset = `-- name: ListGDocsImagesWhereUnset :many
 SELECT
   id, g_docs_id, doc_object_id, src_url, image_id, created_at, updated_at
