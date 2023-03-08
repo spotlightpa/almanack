@@ -70,6 +70,9 @@ func (app *appEnv) backgroundCron(w http.ResponseWriter, r *http.Request) {
 		func() error {
 			return app.svc.UploadImages(r.Context())
 		},
+		func() error {
+			return app.svc.UploadGoogleImages(r.Context())
+		},
 	); err != nil {
 		// reply shows up in dev only
 		app.replyErr(w, r, err)
@@ -122,7 +125,15 @@ func (app *appEnv) backgroundRefreshPages(w http.ResponseWriter, r *http.Request
 func (app *appEnv) backgroundImages(w http.ResponseWriter, r *http.Request) {
 	app.logStart(r)
 
-	if err := app.svc.UploadImages(r.Context()); err != nil {
+	err := workgroup.DoFuncs(workgroup.MaxProcs,
+		func() error {
+			return app.svc.UploadImages(r.Context())
+		},
+		func() error {
+			return app.svc.UploadGoogleImages(r.Context())
+		},
+	)
+	if err != nil {
 		app.replyErr(w, r, err)
 		return
 	}

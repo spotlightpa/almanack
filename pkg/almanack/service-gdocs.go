@@ -4,15 +4,16 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"net/http"
+	"strings"
 
 	"github.com/carlmjohnson/crockford"
 	"github.com/carlmjohnson/errorx"
 	"github.com/carlmjohnson/workgroup"
+	"github.com/jackc/pgx/v5/pgtype"
 	"github.com/spotlightpa/almanack/internal/db"
 	"github.com/spotlightpa/almanack/internal/gdocs"
-	"github.com/spotlightpa/almanack/internal/stringx"
 	"github.com/spotlightpa/almanack/internal/xhtml"
-	"golang.org/x/exp/slices"
 	"golang.org/x/net/html"
 	"golang.org/x/net/html/atom"
 )
@@ -35,7 +36,7 @@ func (svc Services) SharedArticleFromGDocs(ctx context.Context, id string) (obj 
 
 	// Extract images
 	n := gdocs.Convert(doc)
-	if err = svc.EnsureImages(id, n); err != nil {
+	if err = svc.EnsureImages(ctx, id, n); err != nil {
 		return nil, err
 	}
 
@@ -51,68 +52,104 @@ func (svc Services) SharedArticleFromGDocs(ctx context.Context, id string) (obj 
 	})
 }
 
-type imageData struct {
-	URL, DocID, ImageID, Description, Credit, Caption string
-}
-
-func (svc Services) EnsureImages(id string, n *html.Node) (err error) {
-	var imgs []imageData
-	xhtml.Tables(n, func(tbl *html.Node, rows xhtml.TableNodes) {
-		if !slices.Contains([]string{
-			"picture",
-			"photo",
-			"photograph",
-			"graphic",
-			"illustration",
-			"illo",
-		}, rows.Label()) {
-			return
-		}
-		img := imageData{DocID: id}
-		xhtml.BreadFirst(tbl, func(n *html.Node) bool {
-			if n.DataAtom == atom.Img {
-				img.URL = xhtml.Attr(n, "src")
-				img.ImageID = xhtml.Attr(n, "data-oid")
-				return xhtml.Done
-			}
-			return xhtml.Continue
-		})
-		img.Credit = rows.Value("credit")
-		img.Description = stringx.First(
-			rows.Value("description"),
-			rows.Value("alt"))
-		img.Caption = rows.Value("caption")
-		imgs = append(imgs, img)
+func (svc Services) EnsureImages(ctx context.Context, id string, n *html.Node) (err error) {
+	imgs := xhtml.FindAll(n, func(n *html.Node) bool {
+		return n.DataAtom == atom.Img
 	})
-
-	return workgroup.DoTasks(workgroup.MaxProcs, imgs, svc.saveImage)
-}
-
-func (svc Services) saveImage(img imageData) (err error) {
-	ctx := context.Background()
-	itype, err := svc.typeForImage(ctx, img.URL)
+	if len(imgs) < 1 {
+		return nil
+	}
+	var pairs [][2]string
+	for _, img := range imgs {
+		imageID := xhtml.Attr(img, "data-oid")
+		srcURL := xhtml.Attr(img, "src")
+		pairs = append(pairs, [2]string{imageID, srcURL})
+	}
+	pairsBytes, err := json.Marshal(pairs)
 	if err != nil {
 		return err
 	}
-	path := gdocsHashPath(img.DocID, img.ImageID, itype)
-	_, err = svc.Queries.UpsertImage(ctx, db.UpsertImageParams{
-		Path:        path,
-		Type:        itype,
-		Description: img.Description,
-		Credit:      img.Credit,
-		SourceURL:   img.URL,
-		IsUploaded:  false,
+	return svc.Queries.UpsertGDocsIDObjectID(ctx, db.UpsertGDocsIDObjectIDParams{
+		GDocsID:        id,
+		ObjectUrlPairs: pairsBytes,
+	})
+}
+
+func (svc Services) UploadGoogleImages(ctx context.Context) (err error) {
+	images, err := svc.Queries.ListGDocsImagesWhereUnset(ctx)
+	if err != nil {
+		return err
+	}
+
+	return workgroup.DoTasks(5, images, func(image db.GDocsImage) error {
+		return svc.UploadGoogleImage(ctx, image)
+	})
+}
+
+func (svc Services) UploadGoogleImage(ctx context.Context, gdi db.GDocsImage) (err error) {
+	defer errorx.Trace(&err)
+
+	// Download the image + headers
+	body, ct, err := FetchImageURL(ctx, svc.Client, gdi.SourceURL)
+	if err != nil {
+		return err
+	}
+
+	itype, ok := strings.CutPrefix(ct, "image/")
+	if !ok {
+		return fmt.Errorf("bad image content-type: %q", ct)
+	}
+
+	// Hash the file
+	uploadPath := makeCASaddress(body, ct)
+
+	// Look up file hash
+	dbImage, err := svc.Queries.GetImageByPath(ctx, uploadPath)
+	switch {
+	case err == nil:
+		_, err = svc.Queries.UpdateGDocsImage(ctx, db.UpdateGDocsImageParams{
+			ID:      gdi.ID,
+			ImageID: pgtype.Int8{Int64: dbImage.ID, Valid: true},
+		})
+		return err
+	case db.IsNotFound(err):
+		break
+	case err != nil:
+		return err
+	}
+	// Upload file
+	h := make(http.Header, 1)
+	h.Set("Content-Type", ct)
+	if err = svc.ImageStore.WriteFile(ctx, uploadPath, h, body); err != nil {
+		return err
+	}
+
+	// Save file hash as an image
+	dbImage, err = svc.Queries.UpsertImage(ctx, db.UpsertImageParams{
+		Path:       uploadPath,
+		Type:       itype,
+		IsUploaded: true,
+	})
+	if err != nil {
+		return err
+	}
+
+	// Update the google image table
+	_, err = svc.Queries.UpdateGDocsImage(ctx, db.UpdateGDocsImageParams{
+		ID:      gdi.ID,
+		ImageID: pgtype.Int8{Int64: dbImage.ID, Valid: true},
 	})
 	return err
 }
 
-func gdocsHashPath(docID, imageID, ext string) string {
-	var buf, buf2 [100]byte
-	prefix := fmt.Append(buf[:0], "spl:", docID)
-	prefix = crockford.AppendMD5(crockford.Lower, prefix[:0], prefix)[:12]
-	prefix = crockford.AppendPartition(prefix[:0], prefix, 4)
-	suffix := fmt.Append(buf2[:0], "spl:", imageID)
-	suffix = crockford.AppendMD5(crockford.Lower, suffix[:0], suffix)[:8]
-	suffix = crockford.AppendPartition(suffix[:0], suffix, 4)
-	return fmt.Sprintf("docs/%s/%s.%s", prefix, suffix, ext)
+func makeCASaddress(body []byte, ct string) string {
+	// https://en.wikipedia.org/wiki/Content-addressable_storage
+	b := make([]byte, 0, crockford.LenMD5)
+	b = crockford.AppendMD5(crockford.Lower, b, body)[:16]
+	b = crockford.AppendPartition(b[:0], b, 4)
+	ext, ok := strings.CutPrefix(ct, "image/")
+	if !ok {
+		ext = "bin"
+	}
+	return fmt.Sprintf("cas/%s.%s", b, ext)
 }
