@@ -15,7 +15,7 @@ INSERT INTO image ("path", "type")
 ON CONFLICT (path)
   DO NOTHING;
 
--- name: UpsertImage :execrows
+-- name: UpsertImage :one
 INSERT INTO image ("path", "type", "description", "credit", "src_url", "is_uploaded")
   VALUES (@path, @type, @description, @credit, @src_url, @is_uploaded)
 ON CONFLICT (path)
@@ -32,7 +32,9 @@ ON CONFLICT (path)
       excluded.src_url
     ELSE
       image.src_url
-    END;
+    END
+  RETURNING
+    *;
 
 -- name: UpdateImage :one
 UPDATE
@@ -89,3 +91,11 @@ FROM
   image_type
 WHERE
   @extension::text = ANY (extensions);
+
+-- name: GetImageByPath :one
+SELECT
+  *
+FROM
+  "image"
+WHERE
+  "path" = $1;

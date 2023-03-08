@@ -6,19 +6,28 @@ import (
 	"github.com/carlmjohnson/be"
 )
 
-func TestGdocsHashPath(t *testing.T) {
-	cases := map[string]struct {
-		doc, img, ext string
+func TestImageCAS(t *testing.T) {
+	cases := []struct {
+		body, ct, want string
 	}{
-		"docs/pw1a-jp8n-k7ft/pw1a-jp8n.":     {"", "", ""},
-		"docs/3t9h-5had-dccc/7x0z-d5em.jpeg": {"a", "b", "jpeg"},
-		"docs/3t9h-5had-dccc/d9zb-tfes.jpeg": {"a", "c", "jpeg"},
-		"docs/9m1c-wx3a-5cq1/7x0z-d5em.png":  {"x", "b", "png"},
-		"docs/9m1c-wx3a-5cq1/hphp-dwr4.png":  {"x", "y", "png"},
+		{"", "", "cas/tger-spcf-02s0-9tc0.bin"},
+		{"", "image/png", "cas/tger-spcf-02s0-9tc0.png"},
+		{"Hello, World!", "image/jpeg", "cas/cpme-4zc8-f4m3-gcdp.jpeg"},
 	}
-	for name, tc := range cases {
-		got := gdocsHashPath(tc.doc, tc.img, tc.ext)
-		be.Equal(be.Relaxed(t), name, got)
+	for _, tc := range cases {
+		tc := tc
+		t.Run("", func(t *testing.T) {
+			got := makeCASaddress([]byte(tc.body), tc.ct)
+			be.Equal(t, tc.want, got)
+		})
+		// var s string
+		// body := []byte(tc.body)
+		// allocs := testing.AllocsPerRun(10, func() {
+		// 	s = makeCASaddress(body, tc.ct)
+		// })
+		// if allocs > 4 {
+		// 	t.Errorf("benchmark regression %q: %v", s, allocs)
+		// }
 	}
 
 }

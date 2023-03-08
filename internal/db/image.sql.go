@@ -29,6 +29,32 @@ func (q *Queries) CreateImagePlaceholder(ctx context.Context, arg CreateImagePla
 	return result.RowsAffected(), nil
 }
 
+const getImageByPath = `-- name: GetImageByPath :one
+SELECT
+  id, path, type, description, credit, src_url, is_uploaded, created_at, updated_at
+FROM
+  "image"
+WHERE
+  "path" = $1
+`
+
+func (q *Queries) GetImageByPath(ctx context.Context, path string) (Image, error) {
+	row := q.db.QueryRow(ctx, getImageByPath, path)
+	var i Image
+	err := row.Scan(
+		&i.ID,
+		&i.Path,
+		&i.Type,
+		&i.Description,
+		&i.Credit,
+		&i.SourceURL,
+		&i.IsUploaded,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+	)
+	return i, err
+}
+
 const getImageBySourceURL = `-- name: GetImageBySourceURL :one
 SELECT
   id, path, type, description, credit, src_url, is_uploaded, created_at, updated_at
@@ -223,7 +249,7 @@ func (q *Queries) UpdateImage(ctx context.Context, arg UpdateImageParams) (Image
 	return i, err
 }
 
-const upsertImage = `-- name: UpsertImage :execrows
+const upsertImage = `-- name: UpsertImage :one
 INSERT INTO image ("path", "type", "description", "credit", "src_url", "is_uploaded")
   VALUES ($1, $2, $3, $4, $5, $6)
 ON CONFLICT (path)
@@ -241,6 +267,8 @@ ON CONFLICT (path)
     ELSE
       image.src_url
     END
+  RETURNING
+    id, path, type, description, credit, src_url, is_uploaded, created_at, updated_at
 `
 
 type UpsertImageParams struct {
@@ -252,8 +280,8 @@ type UpsertImageParams struct {
 	IsUploaded  bool   `json:"is_uploaded"`
 }
 
-func (q *Queries) UpsertImage(ctx context.Context, arg UpsertImageParams) (int64, error) {
-	result, err := q.db.Exec(ctx, upsertImage,
+func (q *Queries) UpsertImage(ctx context.Context, arg UpsertImageParams) (Image, error) {
+	row := q.db.QueryRow(ctx, upsertImage,
 		arg.Path,
 		arg.Type,
 		arg.Description,
@@ -261,8 +289,17 @@ func (q *Queries) UpsertImage(ctx context.Context, arg UpsertImageParams) (int64
 		arg.SourceURL,
 		arg.IsUploaded,
 	)
-	if err != nil {
-		return 0, err
-	}
-	return result.RowsAffected(), nil
+	var i Image
+	err := row.Scan(
+		&i.ID,
+		&i.Path,
+		&i.Type,
+		&i.Description,
+		&i.Credit,
+		&i.SourceURL,
+		&i.IsUploaded,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+	)
+	return i, err
 }
