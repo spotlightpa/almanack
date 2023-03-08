@@ -1,3 +1,4 @@
+// Package db contains database junk.
 package db
 
 import (
