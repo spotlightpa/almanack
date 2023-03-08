@@ -28,6 +28,17 @@ FROM
 WHERE
   image_id IS NULL;
 
+-- name: ListGDocsImagesByGDocsID :many
+SELECT
+  "doc_object_id",
+  COALESCE("path", ''), COALESCE("type", ''),
+  "is_uploaded"
+FROM
+  g_docs_image
+  LEFT JOIN image ON (image_id = image.id)
+WHERE
+  g_docs_id = $1;
+
 -- name: UpdateGDocsImage :one
 UPDATE
   g_docs_image
