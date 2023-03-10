@@ -247,7 +247,10 @@ const nextPage = computedProp("next_page", (page) => ({
                     <font-awesome-icon :icon="['far', 'newspaper']" />
                     {{ article.internalID }}
                   </router-link>
-                  <TagDate :date="article.publicationDate" />
+                  <TagDate
+                    v-if="article.publicationDate"
+                    :date="article.publicationDate"
+                  />
                 </h3>
                 <div class="mb-1 tags">
                   <span class="tag is-small" :class="article.statusClass">
