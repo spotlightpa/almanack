@@ -865,7 +865,8 @@ func (app *appEnv) postSharedArticleFromGDocs(w http.ResponseWriter, r *http.Req
 	l := almlog.FromContext(r.Context())
 
 	var req struct {
-		ID string `json:"gdocs_id"`
+		ID          string `json:"gdocs_id"`
+		ForceUpdate bool   `json:"force_update"`
 	}
 	if !app.readJSON(w, r, &req) {
 		return
@@ -878,6 +879,21 @@ func (app *appEnv) postSharedArticleFromGDocs(w http.ResponseWriter, r *http.Req
 	}
 
 	l.Debug("postSharedArticleFromGDocs", "id", id)
+	if !req.ForceUpdate {
+		art, err := app.svc.Queries.GetSharedArticleBySource(r.Context(), db.GetSharedArticleBySourceParams{
+			SourceType: "gdocs",
+			SourceID:   id,
+		})
+		switch {
+		case err == nil: // found article
+			l.Debug("postSharedArticleFromGDocs: found existing article",
+				"shared_article.id", art.ID)
+			app.replyJSON(http.StatusOK, w, art)
+			return
+		case !db.IsNotFound(err):
+			app.logErr(r.Context(), err)
+		}
+	}
 	art, err := app.svc.SharedArticleFromGDocs(r.Context(), id)
 	if err != nil {
 		app.replyErr(w, r, err)
