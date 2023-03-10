@@ -1,8 +1,13 @@
 <script setup>
 import { ref } from "vue";
 
-import { get, listSharedArticles } from "@/api/client-v2.js";
-import { watchAPI } from "@/api/service-util.js";
+import {
+  get,
+  post,
+  listSharedArticles,
+  postSharedArticleFromGDocs,
+} from "@/api/client-v2.js";
+import { makeState, watchAPI } from "@/api/service-util.js";
 import SharedArticle from "@/api/shared-article.js";
 
 const props = defineProps({
@@ -13,6 +18,17 @@ const { apiState, fetch, computedList, computedProp } = watchAPI(
   () => props.page || 0,
   (page) => get(listSharedArticles, { page, show: "all" })
 );
+
+const gdocsImportURL = ref("");
+const { apiStateRefs: gdocsState, exec: gdocsExec } = makeState();
+async function importGDocsURL(id) {
+  await gdocsExec(() =>
+    post(postSharedArticleFromGDocs, {
+      gdocs_id: id,
+    })
+  );
+  alert(JSON.stringify(gdocsState.rawData));
+}
 
 const showBookmarklet = ref(false);
 const showComposer = ref(false);
@@ -184,25 +200,38 @@ const nextPage = computedProp("next_page", (page) => ({
     <label for="gdocs-importer" class="mt-4 label">
       Import from Google Docs
     </label>
-    <div class="field is-grouped">
+    <form
+      class="field is-grouped"
+      @submit.prevent="importGDocsURL(gdocsImportURL.value)"
+    >
       <div class="control is-expanded">
         <input
           id="gdocs-importer"
+          v-model="gdocsImportURL"
           class="input"
           placeholder="https://docs.google.com/document/d/abc123/edit"
         />
       </div>
       <div class="control">
-        <BulmaPaste />
+        <BulmaPaste
+          @paste="
+            gdocsImportURL = $event;
+            importGDocsURL(gdocsImportURL);
+          "
+        />
       </div>
       <div class="control">
         <button
           class="button is-success has-text-weight-semibold"
-          type="button"
+          :class="gdocsState.isLoading.value && 'is-loading'"
+          :disabled="!gdocsImportURL || null"
         >
           Import
         </button>
       </div>
+    </form>
+    <div v-if="gdocsState.error.value" class="field">
+      <ErrorSimple :error="gdocsState.error.value" />
     </div>
 
     <h2 class="mt-5 title">Shareable Articles</h2>
