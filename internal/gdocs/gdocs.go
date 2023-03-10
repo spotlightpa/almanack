@@ -225,6 +225,9 @@ func convertEl(n *html.Node, el *docs.StructuralElement, listInfo map[string]str
 				inner = newinner
 			}
 		}
-		xhtml.AppendText(inner, subel.TextRun.Content)
+		// Remove PUA characters
+		content := subel.TextRun.Content
+		content = strings.ReplaceAll(content, "\uE907", "")
+		xhtml.AppendText(inner, content)
 	}
 }
