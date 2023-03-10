@@ -60,7 +60,7 @@ func NormalizeID(id string) (string, error) {
 		id, _, _ = strings.Cut(id, "/")
 	}
 	v.AddIfUnset("gdocs_id", len(id) != magicLength, "Invalid ID: %s", rawID)
-	v.AddIfUnset("gdocs_id", validIDChars.Contains(id), "Illegal characters in ID: %s", rawID)
+	v.AddIfUnset("gdocs_id", !validIDChars.Contains(id), "Illegal characters in ID: %s", rawID)
 	return id, v.Err()
 }
 
