@@ -99,11 +99,22 @@ function refreshArc() {
 const { exec: saveExec, apiStateRefs: saveState } = makeState();
 const { isLoadingThrottled: saveLoading, error: saveError } = saveState;
 async function save() {
+  let av = article.value;
   const obj = {
     id: +props.id,
     note: note.value,
     embargo_until: embargo.value,
     status: status.value,
+    publication_date: av.publicationDate,
+    internal_id: av.internalID,
+    byline: av.byline,
+    budget: av.budget,
+    hed: av.hed,
+    description: av.description,
+    lede_image: av.ledeImage,
+    lede_image_credit: av.ledeImageCredit,
+    lede_image_description: av.ledeImageDescription,
+    lede_image_caption: av.ledeImageCaption,
   };
   await saveExec(() => post(postSharedArticle, obj));
   await fetch();

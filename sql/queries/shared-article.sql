@@ -2,9 +2,19 @@
 UPDATE
   shared_article
 SET
-  embargo_until = @embargo_until,
-  status = @status,
-  note = @note
+  "embargo_until" = @embargo_until,
+  "status" = @status,
+  "note" = @note,
+  "publication_date" = @publication_date,
+  "internal_id" = @internal_id,
+  "byline" = @byline,
+  "budget" = @budget,
+  "hed" = @hed,
+  "description" = @description,
+  "lede_image" = @lede_image,
+  "lede_image_credit" = @lede_image_credit,
+  "lede_image_description" = @lede_image_description,
+  "lede_image_caption" = @lede_image_caption
 WHERE
   id = @id
 RETURNING

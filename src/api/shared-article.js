@@ -32,6 +32,11 @@ export default class SharedArticle {
     this["createdAt"] = maybeDate(data, "created_at");
     this["updatedAt"] = maybeDate(data, "updated_at");
     this["lastUpdated"] = maybeDate(data, "last_updated");
+    this["byline"] = data["byline"] ?? "";
+    this["ledeImage"] = data["lede_image"] ?? "";
+    this["ledeImageCredit"] = data["lede_image_credit"] ?? "";
+    this["ledeImageDescription"] = data["lede_image_description"] ?? "";
+    this["ledeImageCaption"] = data["lede_image_caption"] ?? "";
 
     this.arc = null;
     if (this.isArc) {
