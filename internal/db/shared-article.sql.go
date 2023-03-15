@@ -209,20 +209,40 @@ const updateSharedArticle = `-- name: UpdateSharedArticle :one
 UPDATE
   shared_article
 SET
-  embargo_until = $1,
-  status = $2,
-  note = $3
+  "embargo_until" = $1,
+  "status" = $2,
+  "note" = $3,
+  "publication_date" = $4,
+  "internal_id" = $5,
+  "byline" = $6,
+  "budget" = $7,
+  "hed" = $8,
+  "description" = $9,
+  "lede_image" = $10,
+  "lede_image_credit" = $11,
+  "lede_image_description" = $12,
+  "lede_image_caption" = $13
 WHERE
-  id = $4
+  id = $14
 RETURNING
   id, status, embargo_until, note, source_type, source_id, raw_data, page_id, created_at, updated_at, publication_date, internal_id, byline, budget, hed, description, lede_image, lede_image_credit, lede_image_description, lede_image_caption
 `
 
 type UpdateSharedArticleParams struct {
-	EmbargoUntil pgtype.Timestamptz `json:"embargo_until"`
-	Status       string             `json:"status"`
-	Note         string             `json:"note"`
-	ID           int64              `json:"id"`
+	EmbargoUntil         pgtype.Timestamptz `json:"embargo_until"`
+	Status               string             `json:"status"`
+	Note                 string             `json:"note"`
+	PublicationDate      pgtype.Timestamptz `json:"publication_date"`
+	InternalID           string             `json:"internal_id"`
+	Byline               string             `json:"byline"`
+	Budget               string             `json:"budget"`
+	Hed                  string             `json:"hed"`
+	Description          string             `json:"description"`
+	LedeImage            string             `json:"lede_image"`
+	LedeImageCredit      string             `json:"lede_image_credit"`
+	LedeImageDescription string             `json:"lede_image_description"`
+	LedeImageCaption     string             `json:"lede_image_caption"`
+	ID                   int64              `json:"id"`
 }
 
 func (q *Queries) UpdateSharedArticle(ctx context.Context, arg UpdateSharedArticleParams) (SharedArticle, error) {
@@ -230,6 +250,16 @@ func (q *Queries) UpdateSharedArticle(ctx context.Context, arg UpdateSharedArtic
 		arg.EmbargoUntil,
 		arg.Status,
 		arg.Note,
+		arg.PublicationDate,
+		arg.InternalID,
+		arg.Byline,
+		arg.Budget,
+		arg.Hed,
+		arg.Description,
+		arg.LedeImage,
+		arg.LedeImageCredit,
+		arg.LedeImageDescription,
+		arg.LedeImageCaption,
 		arg.ID,
 	)
 	var i SharedArticle
