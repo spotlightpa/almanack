@@ -122,5 +122,10 @@ func (app *appEnv) getSharedArticle(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	app.replyJSON(http.StatusOK, w, article)
+	val, err := app.svc.InflateSharedArticle(r.Context(), &article)
+	if err != nil {
+		app.replyErr(w, r, err)
+		return
+	}
+	app.replyJSON(http.StatusOK, w, val)
 }

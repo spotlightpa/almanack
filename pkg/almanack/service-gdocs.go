@@ -16,6 +16,7 @@ import (
 	"github.com/spotlightpa/almanack/internal/xhtml"
 	"golang.org/x/net/html"
 	"golang.org/x/net/html/atom"
+	"google.golang.org/api/docs/v1"
 )
 
 func (svc Services) SharedArticleFromGDocs(ctx context.Context, id string) (obj any, err error) {
@@ -152,4 +153,43 @@ func makeCASaddress(body []byte, ct string) string {
 		ext = "bin"
 	}
 	return fmt.Sprintf("cas/%s.%s", b, ext)
+}
+
+func (svc Services) InflateSharedArticle(ctx context.Context, a *db.SharedArticle) (v any, err error) {
+	defer errorx.Trace(&err)
+
+	if a.SourceType != "gdocs" {
+		return a, nil
+	}
+	rows, err := svc.Queries.ListGDocsImagesByGDocsID(ctx, a.SourceID)
+	if err != nil {
+		return nil, err
+	}
+	// Warn if it has outstanding images
+	for _, row := range rows {
+		if !row.IsUploaded.Bool {
+			type response struct {
+				*db.SharedArticle
+				RawData      string `json:"raw_data"`
+				IsProcessing bool   `json:"is_processing"`
+			}
+			return response{a, "", true}, nil
+		}
+	}
+
+	var doc docs.Document
+	if err = json.Unmarshal(a.RawData, &doc); err != nil {
+		return nil, err
+	}
+	root := gdocs.Convert(&doc)
+	var items []string
+	for el := root.FirstChild; el != nil; el = el.NextSibling {
+		items = append(items, xhtml.ToString(el))
+	}
+	type response struct {
+		*db.SharedArticle
+		RawData string   `json:"raw_data"`
+		Items   []string `json:"items"`
+	}
+	return response{a, "", items}, nil
 }
