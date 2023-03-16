@@ -66,11 +66,11 @@ const emailBody = computed(() => {
     noteText,
     `Budget:`,
     a.budget,
-    `
-Word count planned: ${intcomma(a.arc.plannedWordCount)}
-Word count actual: ${intcomma(a.arc.actualWordCount)}
+    a.arc
+      ? `Word count actual: ${intcomma(a.arc.actualWordCount)}
 Lines: ${a.arc.actualLineCount}
-Column inches: ${a.arc.actualInchCount}`,
+Column inches: ${a.arc.actualInchCount}`
+      : ``,
   ];
   return segments
     .map((text) => text.trim())
