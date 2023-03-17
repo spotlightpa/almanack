@@ -1,5 +1,6 @@
 <script setup>
 import { ref } from "vue";
+import { useRouter } from "vue-router";
 
 import {
   get,
@@ -13,6 +14,7 @@ import SharedArticle from "@/api/shared-article.js";
 const props = defineProps({
   page: String,
 });
+const router = useRouter();
 
 const { apiState, fetch, computedList, computedProp } = watchAPI(
   () => props.page || 0,
@@ -27,7 +29,20 @@ async function importGDocsURL(id) {
       gdocs_id: id,
     })
   );
-  alert(JSON.stringify(gdocsState.rawData));
+  if (gdocsState.error.value) {
+    return;
+  }
+
+  // Trigger background image processing
+  window.fetch("/api-background/images").catch(() => {});
+
+  let article = new SharedArticle(gdocsState.rawData.value);
+  router.push({
+    name: "shared-article-admin",
+    params: {
+      id: "" + article.id,
+    },
+  });
 }
 
 const showBookmarklet = ref(false);
@@ -202,7 +217,7 @@ const nextPage = computedProp("next_page", (page) => ({
     </label>
     <form
       class="field is-grouped"
-      @submit.prevent="importGDocsURL(gdocsImportURL.value)"
+      @submit.prevent="importGDocsURL(gdocsImportURL)"
     >
       <div class="control is-expanded">
         <input
