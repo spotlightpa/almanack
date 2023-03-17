@@ -230,6 +230,9 @@ const nextPage = computedProp("next_page", (page) => ({
         </button>
       </div>
     </form>
+    <div class="field">
+      <p class="help">Document must be shared with Spotlight PA.</p>
+    </div>
     <div v-if="gdocsState.error.value" class="field">
       <ErrorSimple :error="gdocsState.error.value" />
     </div>
@@ -283,6 +286,17 @@ const nextPage = computedProp("next_page", (page) => ({
                       <font-awesome-icon :icon="['fas', 'link']" />
                     </span>
                     <span>Arc</span>
+                  </a>
+                  <a
+                    v-if="article.isGdoc"
+                    class="tag is-light"
+                    :href="article.gdocsURL"
+                    target="_blank"
+                  >
+                    <span class="icon is-size-6">
+                      <font-awesome-icon :icon="['fas', 'link']" />
+                    </span>
+                    <span>Google Docs</span>
                   </a>
                   <router-link
                     v-if="article.pageRoute"

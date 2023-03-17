@@ -50,6 +50,17 @@ export default class SharedArticle {
   get isArc() {
     return this.sourceType === "arc";
   }
+
+  get isGdoc() {
+    return this.sourceType === "gdocs";
+  }
+
+  get gdocsURL() {
+    return !this.isGdoc
+      ? ""
+      : `https://docs.google.com/document/d/${this.sourceID}/edit`;
+  }
+
   get isUnderEmbargo() {
     if (!this.embargoUntil) {
       return false;
