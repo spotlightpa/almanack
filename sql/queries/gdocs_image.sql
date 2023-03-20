@@ -1,3 +1,8 @@
+-- name: DeleteGDocsImagesWhereUnset :exec
+DELETE FROM g_docs_image
+WHERE g_docs_id = @g_docs_id
+  AND image_id IS NULL;
+
 -- name: UpsertGDocsIDObjectID :exec
 WITH objects_with_url (
   object_id,

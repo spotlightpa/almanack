@@ -11,6 +11,17 @@ import (
 	"github.com/jackc/pgx/v5/pgtype"
 )
 
+const deleteGDocsImagesWhereUnset = `-- name: DeleteGDocsImagesWhereUnset :exec
+DELETE FROM g_docs_image
+WHERE g_docs_id = $1
+  AND image_id IS NULL
+`
+
+func (q *Queries) DeleteGDocsImagesWhereUnset(ctx context.Context, gDocsID string) error {
+	_, err := q.db.Exec(ctx, deleteGDocsImagesWhereUnset, gDocsID)
+	return err
+}
+
 const listGDocsImagesByGDocsID = `-- name: ListGDocsImagesByGDocsID :many
 SELECT
   "doc_object_id",

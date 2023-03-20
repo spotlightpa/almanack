@@ -10,6 +10,7 @@ import (
 	"github.com/carlmjohnson/crockford"
 	"github.com/carlmjohnson/errorx"
 	"github.com/carlmjohnson/workgroup"
+	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgtype"
 	"github.com/spotlightpa/almanack/internal/db"
 	"github.com/spotlightpa/almanack/internal/gdocs"
@@ -70,9 +71,15 @@ func (svc Services) EnsureImages(ctx context.Context, id string, n *html.Node) (
 	if err != nil {
 		return err
 	}
-	return svc.Queries.UpsertGDocsIDObjectID(ctx, db.UpsertGDocsIDObjectIDParams{
-		GDocsID:        id,
-		ObjectUrlPairs: pairsBytes,
+	return svc.Tx.Begin(ctx, pgx.TxOptions{}, func(q *db.Queries) error {
+		if err = q.DeleteGDocsImagesWhereUnset(ctx, id); err != nil {
+			return err
+		}
+
+		return q.UpsertGDocsIDObjectID(ctx, db.UpsertGDocsIDObjectIDParams{
+			GDocsID:        id,
+			ObjectUrlPairs: pairsBytes,
+		})
 	})
 }
 
