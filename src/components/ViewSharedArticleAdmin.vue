@@ -31,6 +31,16 @@ const isDirty = ref(false);
 const status = ref(null);
 const note = ref("");
 const embargo = ref(null);
+const publicationDate = ref(null);
+const internalID = ref("");
+const byline = ref("");
+const budget = ref("");
+const hed = ref("");
+const description = ref("");
+const ledeImage = ref("");
+const ledeImageCredit = ref("");
+const ledeImageDescription = ref("");
+const ledeImageCaption = ref("");
 
 const article = computedObj((rawData) => {
   let a = new SharedArticle(rawData);
@@ -38,6 +48,16 @@ const article = computedObj((rawData) => {
   status.value = a._status;
   note.value = a.note;
   embargo.value = a.embargoUntil;
+  publicationDate.value = a.publicationDate;
+  internalID.value = a.internalID;
+  byline.value = a.byline;
+  budget.value = a.budget;
+  hed.value = a.hed;
+  description.value = a.description;
+  ledeImage.value = a.ledeImage;
+  ledeImageCredit.value = a.ledeImageCredit;
+  ledeImageDescription.value = a.ledeImageDescription;
+  ledeImageCaption.value = a.ledeImageCaption;
   return a;
 });
 
@@ -155,7 +175,7 @@ async function toggleComposer() {
     <SpinnerProgress :is-loading="apiState.isLoading.value" />
     <ErrorReloader :error="apiState.error.value" @reload="fetch" />
 
-    <article v-if="article" class="message is-primary">
+    <article v-if="article && !article.isProcessing" class="message is-primary">
       <MetaHead>
         <title>{{ article.internalID }} Admin • Spotlight PA</title>
       </MetaHead>
@@ -335,6 +355,23 @@ async function toggleComposer() {
             <strong>Warning:</strong> Article has not been shared with partners
             yet.
           </p>
+        </div>
+      </div>
+    </article>
+
+    <article v-if="article && article.isProcessing" class="">
+      <div class="message is-warning">
+        <div class="message-body">
+          <p>Article contents are being processed.</p>
+          <div class="mt-5">
+            <button
+              class="button is-warning has-text-weight-semibold"
+              type="button"
+              @click="fetch"
+            >
+              Reload
+            </button>
+          </div>
         </div>
       </div>
     </article>

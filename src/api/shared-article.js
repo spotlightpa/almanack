@@ -37,6 +37,7 @@ export default class SharedArticle {
     this["ledeImageCredit"] = data["lede_image_credit"] ?? "";
     this["ledeImageDescription"] = data["lede_image_description"] ?? "";
     this["ledeImageCaption"] = data["lede_image_caption"] ?? "";
+    this["isProcessing"] = data["is_processing"] || false;
 
     this.arc = null;
     if (this.isArc) {
