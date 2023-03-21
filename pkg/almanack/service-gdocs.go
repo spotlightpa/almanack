@@ -12,6 +12,7 @@ import (
 	"github.com/carlmjohnson/workgroup"
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgtype"
+	"github.com/spotlightpa/almanack/internal/blocko"
 	"github.com/spotlightpa/almanack/internal/db"
 	"github.com/spotlightpa/almanack/internal/gdocs"
 	"github.com/spotlightpa/almanack/internal/xhtml"
@@ -55,9 +56,7 @@ func (svc Services) SharedArticleFromGDocs(ctx context.Context, id string) (obj 
 }
 
 func (svc Services) EnsureImages(ctx context.Context, id string, n *html.Node) (err error) {
-	imgs := xhtml.FindAll(n, func(n *html.Node) bool {
-		return n.DataAtom == atom.Img
-	})
+	imgs := xhtml.FindAll(n, xhtml.WithAtom(atom.Img))
 	if len(imgs) < 1 {
 		return nil
 	}
@@ -162,6 +161,21 @@ func makeCASaddress(body []byte, ct string) string {
 	return fmt.Sprintf("cas/%s.%s", b, ext)
 }
 
+type SharedArticleEmbed struct {
+	Type  string `json:"type"`
+	Value string `json:"value"`
+}
+
+type SharedArticle struct {
+	*db.SharedArticle
+	RawData      string               `json:"raw_data"`
+	IsProcessing bool                 `json:"is_processing"`
+	Embeds       []SharedArticleEmbed `json:"embeds"`
+	RichText     string               `json:"rich_text"`
+	RawHTML      string               `json:"raw_html"`
+	Warnings     []string             `json:"warnings"`
+}
+
 func (svc Services) InflateSharedArticle(ctx context.Context, a *db.SharedArticle) (v any, err error) {
 	defer errorx.Trace(&err)
 
@@ -175,12 +189,11 @@ func (svc Services) InflateSharedArticle(ctx context.Context, a *db.SharedArticl
 	// Warn if it has outstanding images
 	for _, row := range rows {
 		if !row.IsUploaded.Bool {
-			type response struct {
-				*db.SharedArticle
-				RawData      string `json:"raw_data"`
-				IsProcessing bool   `json:"is_processing"`
-			}
-			return response{a, "", true}, nil
+			return SharedArticle{
+				SharedArticle: a,
+				IsProcessing:  true,
+				Warnings:      []string{"Waiting for image upload."},
+			}, nil
 		}
 	}
 
@@ -188,15 +201,13 @@ func (svc Services) InflateSharedArticle(ctx context.Context, a *db.SharedArticl
 	if err = json.Unmarshal(a.RawData, &doc); err != nil {
 		return nil, err
 	}
-	root := gdocs.Convert(&doc)
-	var items []string
-	for el := root.FirstChild; el != nil; el = el.NextSibling {
-		items = append(items, xhtml.ToString(el))
-	}
-	type response struct {
-		*db.SharedArticle
-		RawData string   `json:"raw_data"`
-		Items   []string `json:"items"`
-	}
-	return response{a, "", items}, nil
+	rawHTML := gdocs.Convert(&doc)
+	blocko.Clean(rawHTML)
+	richText := xhtml.Clone(rawHTML)
+
+	return SharedArticle{
+		SharedArticle: a,
+		RawHTML:       xhtml.ContentsToString(rawHTML),
+		RichText:      xhtml.ContentsToString(richText),
+	}, nil
 }
