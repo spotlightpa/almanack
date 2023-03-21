@@ -9,7 +9,6 @@ import (
 	"github.com/tdewolff/minify/v2"
 	"github.com/tdewolff/minify/v2/html"
 	nethtml "golang.org/x/net/html"
-	"golang.org/x/net/html/atom"
 )
 
 func prep(s string) (*nethtml.Node, error) {
@@ -27,12 +26,7 @@ func prep(s string) (*nethtml.Node, error) {
 	if err != nil {
 		return nil, err
 	}
-	body := xhtml.Find(doc, func(n *nethtml.Node) *nethtml.Node {
-		if n.DataAtom == atom.Body {
-			return n
-		}
-		return nil
-	})
+	body := xhtml.Find(doc, xhtml.WithBody)
 	if body == nil {
 		return nil, fmt.Errorf("could not find body")
 	}

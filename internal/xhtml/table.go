@@ -8,14 +8,10 @@ import (
 )
 
 func Tables(root *html.Node, f func(tbl *html.Node, rows TableNodes)) {
-	tables := FindAll(root, func(n *html.Node) bool {
-		return n.DataAtom == atom.Table
-	})
+	tables := FindAll(root, WithAtom(atom.Table))
 	for _, tblNode := range tables {
 		var tbl TableNodes
-		rows := FindAll(tblNode, func(n *html.Node) bool {
-			return n.DataAtom == atom.Tr
-		})
+		rows := FindAll(tblNode, WithAtom(atom.Tr))
 		for _, row := range rows {
 			tds := FindAll(row, func(n *html.Node) bool {
 				return n.DataAtom == atom.Td || n.DataAtom == atom.Th

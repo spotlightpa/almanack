@@ -7,6 +7,7 @@ import (
 	"github.com/carlmjohnson/be"
 	"github.com/spotlightpa/almanack/internal/xhtml"
 	"golang.org/x/net/html"
+	"golang.org/x/net/html/atom"
 )
 
 func TestClone(t *testing.T) {
@@ -20,11 +21,16 @@ func TestClone(t *testing.T) {
 		n, err := html.Parse(strings.NewReader(tc))
 		be.NilErr(t, err)
 		body := n.FirstChild.FirstChild.NextSibling
+		be.Equal(t, xhtml.Find(n, xhtml.WithAtom(atom.Body)), body)
+
 		s := xhtml.ContentsToString(body)
 		be.Equal(be.Relaxed(t), tc, s)
 
 		n2 := xhtml.Clone(n)
 		body2 := n2.FirstChild.FirstChild.NextSibling
+		be.Equal(t, xhtml.Find(n2, xhtml.WithAtom(atom.Body)), body2)
+		be.Unequal(t, body, body2)
+
 		s = xhtml.ContentsToString(body2)
 		be.Equal(be.Relaxed(t), tc, s)
 
