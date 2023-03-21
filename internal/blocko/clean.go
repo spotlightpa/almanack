@@ -88,9 +88,7 @@ func replaceSpecials(root *html.Node) {
 			return
 		}
 		// Ignore children not of p
-		codeblock := xhtml.Closest(n, func(n *html.Node) bool {
-			return n.DataAtom == atom.P
-		})
+		codeblock := xhtml.Closest(n, xhtml.WithAtom(atom.P))
 		if codeblock == nil {
 			return
 		}

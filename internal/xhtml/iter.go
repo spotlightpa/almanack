@@ -1,14 +1,17 @@
 // Package xhtml makes x/net/html easier
 package xhtml
 
-import "golang.org/x/net/html"
-
-const (
-	Done     = false
-	Continue = true
+import (
+	"golang.org/x/net/html"
+	"golang.org/x/net/html/atom"
 )
 
-func BreadFirst(n *html.Node, yield func(*html.Node) bool) bool {
+const (
+	Done = iota
+	Continue
+)
+
+func BreadFirst(n *html.Node, yield func(*html.Node) int8) int8 {
 	if yield(n) == Done {
 		return Done
 	}
@@ -20,11 +23,11 @@ func BreadFirst(n *html.Node, yield func(*html.Node) bool) bool {
 	return Continue
 }
 
-func Find(n *html.Node, callback func(*html.Node) *html.Node) *html.Node {
+func Find(n *html.Node, callback func(*html.Node) bool) *html.Node {
 	var found *html.Node
-	BreadFirst(n, func(n *html.Node) bool {
-		if child := callback(n); child != nil {
-			found = child
+	BreadFirst(n, func(n *html.Node) int8 {
+		if callback(n) {
+			found = n
 			return Done
 		}
 		return Continue
@@ -33,9 +36,9 @@ func Find(n *html.Node, callback func(*html.Node) *html.Node) *html.Node {
 }
 
 func VisitAll(n *html.Node, callback func(*html.Node)) {
-	BreadFirst(n, func(n *html.Node) bool {
+	BreadFirst(n, func(n *html.Node) int8 {
 		callback(n)
-		return true
+		return Continue
 	})
 }
 
@@ -57,3 +60,11 @@ func Closest(n *html.Node, cond func(*html.Node) bool) *html.Node {
 	}
 	return nil
 }
+
+func WithAtom(a atom.Atom) func(n *html.Node) bool {
+	return func(n *html.Node) bool {
+		return n.DataAtom == a
+	}
+}
+
+var WithBody = WithAtom(atom.Body)
