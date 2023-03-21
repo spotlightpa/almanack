@@ -1,6 +1,7 @@
 package xhtml
 
 import (
+	"golang.org/x/exp/slices"
 	"golang.org/x/net/html"
 	"golang.org/x/net/html/atom"
 )
@@ -41,4 +42,20 @@ func AppendText(n *html.Node, text string) {
 		Type: html.TextNode,
 		Data: text,
 	})
+}
+
+// Clone n and all of its children.
+func Clone(n *html.Node) *html.Node {
+	new := &html.Node{
+		Type:      n.Type,
+		DataAtom:  n.DataAtom,
+		Data:      n.Data,
+		Namespace: n.Namespace,
+		Attr:      slices.Clone(n.Attr),
+	}
+	for c := n.FirstChild; c != nil; c = c.NextSibling {
+		c2 := Clone(c)
+		new.AppendChild(c2)
+	}
+	return new
 }
