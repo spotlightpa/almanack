@@ -99,7 +99,7 @@ func replaceSpecials(root *html.Node) {
 func fixBareLI(root *html.Node) {
 	bareLIs := xhtml.FindAll(root, func(n *html.Node) bool {
 		child := n.FirstChild
-		return n.DataAtom == atom.Li &&
+		return n.DataAtom == atom.Li && child != nil &&
 			(child.Type == html.TextNode ||
 				xhtml.InlineElements[child.DataAtom])
 	})
