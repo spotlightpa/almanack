@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"strings"
 
+	"github.com/carlmjohnson/bytemap"
 	"github.com/carlmjohnson/crockford"
 	"github.com/carlmjohnson/errorx"
 	"github.com/carlmjohnson/workgroup"
@@ -15,7 +16,10 @@ import (
 	"github.com/spotlightpa/almanack/internal/blocko"
 	"github.com/spotlightpa/almanack/internal/db"
 	"github.com/spotlightpa/almanack/internal/gdocs"
+	"github.com/spotlightpa/almanack/internal/slicex"
+	"github.com/spotlightpa/almanack/internal/stringx"
 	"github.com/spotlightpa/almanack/internal/xhtml"
+	"golang.org/x/exp/slices"
 	"golang.org/x/net/html"
 	"golang.org/x/net/html/atom"
 	"google.golang.org/api/docs/v1"
@@ -161,9 +165,17 @@ func makeCASaddress(body []byte, ct string) string {
 	return fmt.Sprintf("cas/%s.%s", b, ext)
 }
 
+type SharedArticleImage struct {
+	Path        string `json:"path"`
+	Credit      string `json:"credit"`
+	Caption     string `json:"caption"`
+	Description string `json:"description"`
+}
+
 type SharedArticleEmbed struct {
+	N     int    `json:"n"`
 	Type  string `json:"type"`
-	Value string `json:"value"`
+	Value any    `json:"value"`
 }
 
 type SharedArticle struct {
@@ -173,8 +185,11 @@ type SharedArticle struct {
 	Embeds       []SharedArticleEmbed `json:"embeds"`
 	RichText     string               `json:"rich_text"`
 	RawHTML      string               `json:"raw_html"`
+	WordCount    int                  `json:"word_count"`
 	Warnings     []string             `json:"warnings"`
 }
+
+var nonASCII = bytemap.Range(128, 255)
 
 func (svc Services) InflateSharedArticle(ctx context.Context, a *db.SharedArticle) (v any, err error) {
 	defer errorx.Trace(&err)
@@ -187,6 +202,7 @@ func (svc Services) InflateSharedArticle(ctx context.Context, a *db.SharedArticl
 		return nil, err
 	}
 	// Warn if it has outstanding images
+	objID2Path := make(map[string]string, len(rows))
 	for _, row := range rows {
 		if !row.IsUploaded.Bool {
 			return SharedArticle{
@@ -195,6 +211,7 @@ func (svc Services) InflateSharedArticle(ctx context.Context, a *db.SharedArticl
 				Warnings:      []string{"Waiting for image upload."},
 			}, nil
 		}
+		objID2Path[row.DocObjectID] = row.Path
 	}
 
 	var doc docs.Document
@@ -203,11 +220,97 @@ func (svc Services) InflateSharedArticle(ctx context.Context, a *db.SharedArticl
 	}
 	rawHTML := gdocs.Convert(&doc)
 	blocko.Clean(rawHTML)
+
+	// First collect the embeds array
+	var embeds []SharedArticleEmbed
+	var warnings []string
+	n := 0
+	xhtml.Tables(rawHTML, func(tbl *html.Node, rows xhtml.TableNodes) {
+		label := rows.Label()
+		embedHTML := ""
+		if slices.Contains([]string{"html", "embed", "raw", "script"}, label) {
+			embedHTML = xhtml.InnerText(rows.At(1, 0))
+			embedHTML = strings.TrimSpace(embedHTML)
+			embeds = append(embeds, SharedArticleEmbed{
+				N:     n,
+				Type:  "raw",
+				Value: embedHTML,
+			})
+			if nonASCII.Contains(embedHTML) {
+				warnings = append(warnings, fmt.Sprintf(
+					"Embed #%d contains unusual characters", n,
+				))
+			}
+		} else if slices.Contains([]string{
+			"photo", "image", "photograph", "illustration", "illo",
+		}, label) {
+			image := xhtml.Find(tbl, xhtml.WithAtom(atom.Img))
+			imageEmbed := SharedArticleImage{
+				Path:    objID2Path[xhtml.Attr(image, "data-oid")],
+				Credit:  rows.Value("credit"),
+				Caption: rows.Value("caption"),
+				Description: stringx.First(
+					rows.Value("alt"),
+					rows.Value("description")),
+			}
+			embeds = append(embeds, SharedArticleEmbed{
+				N:     n,
+				Type:  "image",
+				Value: imageEmbed,
+			})
+		} else {
+			warnings = append(warnings, fmt.Sprintf(
+				"Unrecognized table type: %q", label,
+			))
+			tbl.Parent.RemoveChild(tbl)
+			return
+		}
+		n++
+		placeholder := xhtml.New("h2", "style", "color: red;")
+		xhtml.AppendText(placeholder, fmt.Sprintf("Embed #%d", n))
+		if embedHTML != "" {
+			placeholder.Attr = append(placeholder.Attr, html.Attribute{
+				Key: "raw_html",
+				Val: embedHTML,
+			})
+		}
+		tbl.Parent.InsertBefore(placeholder, tbl)
+		tbl.Parent.RemoveChild(tbl)
+	})
+
+	// Clone and remove raw_html attributes
 	richText := xhtml.Clone(rawHTML)
+	xhtml.VisitAll(richText, func(n *html.Node) {
+		if n.DataAtom == atom.H2 && xhtml.Attr(n, "raw_html") != "" {
+			slicex.DeleteFunc(&n.Attr, func(a html.Attribute) bool {
+				return a.Key == "raw_html"
+			})
+		}
+	})
+
+	// For rawHTML, convert to raw nodes
+	htmlEmbeds := xhtml.FindAll(rawHTML, func(n *html.Node) bool {
+		return n.DataAtom == atom.H2 && xhtml.Attr(n, "raw_html") != ""
+	})
+	for _, n := range htmlEmbeds {
+		rawNode := &html.Node{
+			Type: html.RawNode,
+			Data: xhtml.Attr(n, "raw_html"),
+		}
+		n.Parent.InsertBefore(rawNode, n)
+		n.Parent.RemoveChild(n)
+	}
 
 	return SharedArticle{
 		SharedArticle: a,
+		Embeds:        embeds,
 		RawHTML:       xhtml.ContentsToString(rawHTML),
 		RichText:      xhtml.ContentsToString(richText),
+		WordCount:     stringx.WordCount(xhtml.InnerText(richText)),
+		Warnings:      warnings,
 	}, nil
+}
+
+var tableFuncs = map[string]func(tbl *html.Node, rows xhtml.TableNodes){
+	"": nil,
 }
