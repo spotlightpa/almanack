@@ -67,9 +67,9 @@ const emailBody = computed(() => {
     `Budget:`,
     a.budget,
     a.arc
-      ? `Word count actual: ${intcomma(a.arc.actualWordCount)}
-Lines: ${a.arc.actualLineCount}
-Column inches: ${a.arc.actualInchCount}`
+      ? `Word count: ${intcomma(a.arc.actualWordCount)}
+Lines: ${intcomma(a.arc.actualLineCount)}
+Column inches: ${intcomma(a.arc.actualInchCount)}`
       : ``,
   ];
   return segments
