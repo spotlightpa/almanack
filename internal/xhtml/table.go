@@ -46,6 +46,11 @@ func (rows TableNodes) Label() string {
 func (rows TableNodes) Value(name string) string {
 	for i := range rows {
 		if slugify(rows.At(i, 0)) == name {
+			for _, col := range rows[i][1:] {
+				if s := InnerText(col); s != "" {
+					return s
+				}
+			}
 			return InnerText(rows.At(i+1, 0))
 		}
 	}
