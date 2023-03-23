@@ -3,6 +3,7 @@ package almanack
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"net/http"
 	"strings"
@@ -10,9 +11,6 @@ import (
 	"github.com/carlmjohnson/bytemap"
 	"github.com/carlmjohnson/crockford"
 	"github.com/carlmjohnson/errorx"
-	"github.com/carlmjohnson/workgroup"
-	"github.com/jackc/pgx/v5"
-	"github.com/jackc/pgx/v5/pgtype"
 	"github.com/spotlightpa/almanack/internal/blocko"
 	"github.com/spotlightpa/almanack/internal/db"
 	"github.com/spotlightpa/almanack/internal/gdocs"
@@ -22,7 +20,6 @@ import (
 	"golang.org/x/exp/slices"
 	"golang.org/x/net/html"
 	"golang.org/x/net/html/atom"
-	"google.golang.org/api/docs/v1"
 )
 
 func (svc Services) SharedArticleFromGDocs(ctx context.Context, id string) (obj any, err error) {
@@ -41,13 +38,17 @@ func (svc Services) SharedArticleFromGDocs(ctx context.Context, id string) (obj 
 		return nil, err
 	}
 
-	// Extract images
-	n := gdocs.Convert(doc)
-	if err = svc.EnsureImages(ctx, id, n); err != nil {
+	// TODO: Extract metadata
+
+	dbDoc, err := svc.Queries.CreateGDocsDoc(ctx, db.CreateGDocsDocParams{
+		GDocsID:  id,
+		Document: *doc,
+	})
+	if err != nil {
 		return nil, err
 	}
 
-	b, err := json.Marshal(doc)
+	idJSON, err := json.Marshal(dbDoc.ID)
 	if err != nil {
 		return nil, err
 	}
@@ -55,205 +56,90 @@ func (svc Services) SharedArticleFromGDocs(ctx context.Context, id string) (obj 
 	return svc.Queries.UpsertSharedArticleFromGDocs(ctx, db.UpsertSharedArticleFromGDocsParams{
 		GdocsID:    id,
 		InternalID: doc.Title,
-		RawData:    b,
+		RawData:    idJSON,
 	})
 }
 
-func (svc Services) EnsureImages(ctx context.Context, id string, n *html.Node) (err error) {
-	imgs := xhtml.FindAll(n, xhtml.WithAtom(atom.Img))
-	if len(imgs) < 1 {
-		return nil
-	}
-	var pairs [][2]string
-	for _, img := range imgs {
-		imageID := xhtml.Attr(img, "data-oid")
-		srcURL := xhtml.Attr(img, "src")
-		pairs = append(pairs, [2]string{imageID, srcURL})
-	}
-	pairsBytes, err := json.Marshal(pairs)
-	if err != nil {
-		return err
-	}
-	return svc.Tx.Begin(ctx, pgx.TxOptions{}, func(q *db.Queries) error {
-		if err = q.DeleteGDocsImagesWhereUnset(ctx, id); err != nil {
-			return err
-		}
-
-		return q.UpsertGDocsIDObjectID(ctx, db.UpsertGDocsIDObjectIDParams{
-			GDocsID:        id,
-			ObjectUrlPairs: pairsBytes,
-		})
-	})
-}
-
-func (svc Services) UploadGoogleImages(ctx context.Context) (err error) {
-	images, err := svc.Queries.ListGDocsImagesWhereUnset(ctx)
+func (svc Services) ProcessGDocs(ctx context.Context) error {
+	docs, err := svc.Queries.ListGDocsWhereUnprocessed(ctx)
 	if err != nil {
 		return err
 	}
 
-	return workgroup.DoTasks(5, images, func(image db.GDocsImage) error {
-		return svc.UploadGoogleImage(ctx, image)
-	})
+	var errs []error
+	for _, doc := range docs {
+		docErr := svc.ProcessGDocsDoc(ctx, doc)
+		errs = append(errs, docErr)
+	}
+	return errors.Join(errs...)
 }
 
-func (svc Services) UploadGoogleImage(ctx context.Context, gdi db.GDocsImage) (err error) {
+func (svc Services) ProcessGDocsDoc(ctx context.Context, dbDoc db.GDocsDoc) (err error) {
 	defer errorx.Trace(&err)
 
-	// Download the image + headers
-	body, ct, err := FetchImageURL(ctx, svc.Client, gdi.SourceURL)
+	// Get existing image uploads
+	rows, err := svc.Queries.ListGDocsImagesByGDocsID(ctx, dbDoc.GDocsID)
 	if err != nil {
 		return err
 	}
 
-	itype, ok := strings.CutPrefix(ct, "image/")
-	if !ok {
-		return fmt.Errorf("bad image content-type: %q", ct)
-	}
-
-	// Hash the file
-	uploadPath := makeCASaddress(body, ct)
-
-	// Look up file hash
-	dbImage, err := svc.Queries.GetImageByPath(ctx, uploadPath)
-	switch {
-	case err == nil:
-		_, err = svc.Queries.UpdateGDocsImage(ctx, db.UpdateGDocsImageParams{
-			ID:      gdi.ID,
-			ImageID: pgtype.Int8{Int64: dbImage.ID, Valid: true},
-		})
-		return err
-	case db.IsNotFound(err):
-		break
-	case err != nil:
-		return err
-	}
-	// Upload file
-	h := make(http.Header, 1)
-	h.Set("Content-Type", ct)
-	if err = svc.ImageStore.WriteFile(ctx, uploadPath, h, body); err != nil {
-		return err
-	}
-
-	// Save file hash as an image
-	dbImage, err = svc.Queries.UpsertImage(ctx, db.UpsertImageParams{
-		Path:       uploadPath,
-		Type:       itype,
-		IsUploaded: true,
-	})
-	if err != nil {
-		return err
-	}
-
-	// Update the google image table
-	_, err = svc.Queries.UpdateGDocsImage(ctx, db.UpdateGDocsImageParams{
-		ID:      gdi.ID,
-		ImageID: pgtype.Int8{Int64: dbImage.ID, Valid: true},
-	})
-	return err
-}
-
-func makeCASaddress(body []byte, ct string) string {
-	// https://en.wikipedia.org/wiki/Content-addressable_storage
-	b := make([]byte, 0, crockford.LenMD5)
-	b = crockford.AppendMD5(crockford.Lower, b, body)[:16]
-	b = crockford.AppendPartition(b[:0], b, 4)
-	ext, ok := strings.CutPrefix(ct, "image/")
-	if !ok {
-		ext = "bin"
-	}
-	return fmt.Sprintf("cas/%s.%s", b, ext)
-}
-
-type SharedArticleImage struct {
-	Path        string `json:"path"`
-	Credit      string `json:"credit"`
-	Caption     string `json:"caption"`
-	Description string `json:"description"`
-}
-
-type SharedArticleEmbed struct {
-	N     int    `json:"n"`
-	Type  string `json:"type"`
-	Value any    `json:"value"`
-}
-
-type SharedArticle struct {
-	*db.SharedArticle
-	RawData      string               `json:"raw_data"`
-	IsProcessing bool                 `json:"is_processing"`
-	Embeds       []SharedArticleEmbed `json:"embeds"`
-	RichText     string               `json:"rich_text"`
-	RawHTML      string               `json:"raw_html"`
-	WordCount    int                  `json:"word_count"`
-	Warnings     []string             `json:"warnings"`
-}
-
-var nonASCII = bytemap.Range(128, 255)
-
-func (svc Services) InflateSharedArticle(ctx context.Context, a *db.SharedArticle) (v any, err error) {
-	defer errorx.Trace(&err)
-
-	if a.SourceType != "gdocs" {
-		return a, nil
-	}
-	rows, err := svc.Queries.ListGDocsImagesByGDocsID(ctx, a.SourceID)
-	if err != nil {
-		return nil, err
-	}
-	// Warn if it has outstanding images
 	objID2Path := make(map[string]string, len(rows))
 	for _, row := range rows {
-		if !row.IsUploaded.Bool {
-			return SharedArticle{
-				SharedArticle: a,
-				IsProcessing:  true,
-				Warnings:      []string{"Waiting for image upload."},
-			}, nil
-		}
 		objID2Path[row.DocObjectID] = row.Path
 	}
 
-	var doc docs.Document
-	if err = json.Unmarshal(a.RawData, &doc); err != nil {
-		return nil, err
-	}
-	rawHTML := gdocs.Convert(&doc)
+	rawHTML := gdocs.Convert(&dbDoc.Document)
 	blocko.Clean(rawHTML)
 
 	// First collect the embeds array
-	var embeds []SharedArticleEmbed
+	var embeds []db.Embed
 	var warnings []string
 	n := 0
+	var imageUploadErrs []error
+
 	xhtml.Tables(rawHTML, func(tbl *html.Node, rows xhtml.TableNodes) {
 		label := rows.Label()
 		embedHTML := ""
 		if slices.Contains([]string{"html", "embed", "raw", "script"}, label) {
 			embedHTML = xhtml.InnerText(rows.At(1, 0))
 			embedHTML = strings.TrimSpace(embedHTML)
-			embeds = append(embeds, SharedArticleEmbed{
+			embeds = append(embeds, db.Embed{
 				N:     n,
 				Type:  "raw",
 				Value: embedHTML,
 			})
 			if nonASCII.Contains(embedHTML) {
 				warnings = append(warnings, fmt.Sprintf(
-					"Embed #%d contains unusual characters", n,
+					"Embed #%d contains unusual characters.", n,
 				))
 			}
 		} else if slices.Contains([]string{
 			"photo", "image", "photograph", "illustration", "illo",
 		}, label) {
-			image := xhtml.Find(tbl, xhtml.WithAtom(atom.Img))
-			imageEmbed := SharedArticleImage{
-				Path:    objID2Path[xhtml.Attr(image, "data-oid")],
+			imageEmbed := db.EmbedImage{
 				Credit:  rows.Value("credit"),
 				Caption: rows.Value("caption"),
 				Description: stringx.First(
 					rows.Value("alt"),
 					rows.Value("description")),
 			}
-			embeds = append(embeds, SharedArticleEmbed{
+			image := xhtml.Find(tbl, xhtml.WithAtom(atom.Img))
+			objID := xhtml.Attr(image, "data-oid")
+			path := objID2Path[objID]
+			if path == "" {
+				src := xhtml.Attr(image, "src")
+				if uploadErr := svc.UploadGDocsImage(ctx, UploadGDocsImageParams{
+					GDocsID:     dbDoc.GDocsID,
+					DocObjectID: objID,
+					ImageURL:    src,
+					Embed:       &imageEmbed,
+				}); uploadErr != nil {
+					imageUploadErrs = append(imageUploadErrs, uploadErr)
+					return
+				}
+			}
+
+			embeds = append(embeds, db.Embed{
 				N:     n,
 				Type:  "image",
 				Value: imageEmbed,
@@ -278,6 +164,10 @@ func (svc Services) InflateSharedArticle(ctx context.Context, a *db.SharedArticl
 		tbl.Parent.RemoveChild(tbl)
 	})
 
+	if len(imageUploadErrs) > 0 {
+		return errors.Join(imageUploadErrs...)
+	}
+
 	// Clone and remove raw_html attributes
 	richText := xhtml.Clone(rawHTML)
 	xhtml.VisitAll(richText, func(n *html.Node) {
@@ -301,16 +191,121 @@ func (svc Services) InflateSharedArticle(ctx context.Context, a *db.SharedArticl
 		n.Parent.RemoveChild(n)
 	}
 
-	return SharedArticle{
-		SharedArticle: a,
-		Embeds:        embeds,
-		RawHTML:       xhtml.ContentsToString(rawHTML),
-		RichText:      xhtml.ContentsToString(richText),
-		WordCount:     stringx.WordCount(xhtml.InnerText(richText)),
-		Warnings:      warnings,
-	}, nil
+	// TODO: Markdown conversion
+	mdDoc := xhtml.Clone(rawHTML)
+	md, err := blocko.HTMLToMarkdown(xhtml.ContentsToString(mdDoc))
+	if err != nil {
+		return err
+	}
+
+	// Save to database
+	_, err = svc.Queries.UpdateGDocsDoc(ctx, db.UpdateGDocsDocParams{
+		ID:              dbDoc.ID,
+		Embeds:          embeds,
+		RichText:        xhtml.ContentsToString(richText),
+		RawHtml:         xhtml.ContentsToString(rawHTML),
+		ArticleMarkdown: md,
+		WordCount:       int32(stringx.WordCount(xhtml.InnerText(richText))),
+	})
+	return err
 }
 
-var tableFuncs = map[string]func(tbl *html.Node, rows xhtml.TableNodes){
-	"": nil,
+type UploadGDocsImageParams struct {
+	GDocsID     string
+	DocObjectID string
+	ImageURL    string
+	Embed       *db.EmbedImage // In-out param
+}
+
+func (svc Services) UploadGDocsImage(ctx context.Context, arg UploadGDocsImageParams) (err error) {
+	// Download the image + headers
+	body, ct, err := FetchImageURL(ctx, svc.Client, arg.ImageURL)
+	if err != nil {
+		return err
+	}
+
+	itype, ok := strings.CutPrefix(ct, "image/")
+	if !ok {
+		return fmt.Errorf("bad image content-type: %q", ct)
+	}
+
+	// Hash the file
+	uploadPath := makeCASaddress(body, ct)
+
+	// Look up file hash
+	dbImage, err := svc.Queries.GetImageByPath(ctx, uploadPath)
+	switch {
+	// If it's not found, it needs to be uploaded & saved
+	case db.IsNotFound(err):
+		// Upload file
+		h := make(http.Header, 1)
+		h.Set("Content-Type", ct)
+		if err = svc.ImageStore.WriteFile(ctx, uploadPath, h, body); err != nil {
+			return err
+		}
+
+		// Save file hash as an image
+		dbImage, err = svc.Queries.UpsertImage(ctx, db.UpsertImageParams{
+			Path:        uploadPath,
+			Type:        itype,
+			Description: arg.Embed.Description,
+			Credit:      arg.Embed.Credit,
+			IsUploaded:  true,
+		})
+		if err != nil {
+			return err
+		}
+	// Other errors are bad
+	case err != nil:
+		return err
+	// If it is found, return & save the relationship for next refresh
+	case err == nil:
+		break
+	}
+
+	arg.Embed.Path = dbImage.Path
+	err = svc.Queries.UpsertGDocsImage(ctx, db.UpsertGDocsImageParams{
+		GDocsID:     arg.GDocsID,
+		DocObjectID: arg.DocObjectID,
+		ImageID:     dbImage.ID,
+	})
+	return err
+}
+
+func makeCASaddress(body []byte, ct string) string {
+	// https://en.wikipedia.org/wiki/Content-addressable_storage
+	b := make([]byte, 0, crockford.LenMD5)
+	b = crockford.AppendMD5(crockford.Lower, b, body)[:16]
+	b = crockford.AppendPartition(b[:0], b, 4)
+	ext, ok := strings.CutPrefix(ct, "image/")
+	if !ok {
+		ext = "bin"
+	}
+	return fmt.Sprintf("cas/%s.%s", b, ext)
+}
+
+type SharedArticle struct {
+	*db.SharedArticle
+	GDocs *db.GDocsDoc `json:"gdocs"`
+}
+
+var nonASCII = bytemap.Range(128, 255)
+
+func (svc Services) InflateSharedArticle(ctx context.Context, a *db.SharedArticle) (v any, err error) {
+	defer errorx.Trace(&err)
+
+	if a.SourceType != "gdocs" {
+		return a, nil
+	}
+	var id int64
+	if err = json.Unmarshal(a.RawData, &id); err != nil {
+		return nil, err
+	}
+
+	doc, err := svc.Queries.GetGDocsByID(ctx, id)
+	if err != nil {
+		return nil, err
+	}
+
+	return SharedArticle{a, &doc}, err
 }
