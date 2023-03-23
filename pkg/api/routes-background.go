@@ -71,7 +71,7 @@ func (app *appEnv) backgroundCron(w http.ResponseWriter, r *http.Request) {
 			return app.svc.UploadImages(r.Context())
 		},
 		func() error {
-			return app.svc.UploadGoogleImages(r.Context())
+			return app.svc.ProcessGDocs(r.Context())
 		},
 	); err != nil {
 		// reply shows up in dev only
@@ -130,7 +130,7 @@ func (app *appEnv) backgroundImages(w http.ResponseWriter, r *http.Request) {
 			return app.svc.UploadImages(r.Context())
 		},
 		func() error {
-			return app.svc.UploadGoogleImages(r.Context())
+			return app.svc.ProcessGDocs(r.Context())
 		},
 	)
 	if err != nil {
