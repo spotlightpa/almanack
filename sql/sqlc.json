@@ -49,6 +49,19 @@
       "nullable": false
     },
     {
+      "column": "g_docs_doc.document",
+      "go_type": {
+        "import": "google.golang.org/api/docs/v1",
+        "type": "Document"
+      }
+    },
+    {
+      "column": "g_docs_doc.embeds",
+      "go_type": {
+        "type": "[]Embed"
+      }
+    },
+    {
       "column": "site_data.data",
       "go_type": {
         "type": "Map"
