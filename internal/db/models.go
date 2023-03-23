@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/jackc/pgx/v5/pgtype"
+	docs "google.golang.org/api/docs/v1"
 )
 
 type AddressRole struct {
@@ -45,6 +46,19 @@ type File struct {
 	IsUploaded  bool      `json:"is_uploaded"`
 	CreatedAt   time.Time `json:"created_at"`
 	UpdatedAt   time.Time `json:"updated_at"`
+}
+
+type GDocsDoc struct {
+	ID              int64              `json:"id"`
+	GDocsID         string             `json:"g_docs_id"`
+	Document        docs.Document      `json:"document"`
+	Embeds          []Embed            `json:"embeds"`
+	RichText        string             `json:"rich_text"`
+	RawHtml         string             `json:"raw_html"`
+	ArticleMarkdown string             `json:"article_markdown"`
+	WordCount       int32              `json:"word_count"`
+	ProcessedAt     pgtype.Timestamptz `json:"processed_at"`
+	CreatedAt       time.Time          `json:"created_at"`
 }
 
 type GDocsImage struct {
