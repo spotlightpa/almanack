@@ -57,18 +57,17 @@ type GDocsDoc struct {
 	RawHtml         string             `json:"raw_html"`
 	ArticleMarkdown string             `json:"article_markdown"`
 	WordCount       int32              `json:"word_count"`
+	Warnings        []string           `json:"warnings"`
 	ProcessedAt     pgtype.Timestamptz `json:"processed_at"`
 	CreatedAt       time.Time          `json:"created_at"`
 }
 
 type GDocsImage struct {
-	ID          int64       `json:"id"`
-	GDocsID     string      `json:"g_docs_id"`
-	DocObjectID string      `json:"doc_object_id"`
-	SourceURL   string      `json:"src_url"`
-	ImageID     pgtype.Int8 `json:"image_id"`
-	CreatedAt   time.Time   `json:"created_at"`
-	UpdatedAt   time.Time   `json:"updated_at"`
+	ID          int64     `json:"id"`
+	GDocsID     string    `json:"g_docs_id"`
+	DocObjectID string    `json:"doc_object_id"`
+	ImageID     int64     `json:"image_id"`
+	CreatedAt   time.Time `json:"created_at"`
 }
 
 type Image struct {
