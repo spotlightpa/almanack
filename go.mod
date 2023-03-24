@@ -8,6 +8,7 @@ require (
 	github.com/aws/aws-lambda-go v1.37.0
 	github.com/aws/aws-sdk-go v1.44.212
 	github.com/carlmjohnson/be v0.22.5
+	github.com/carlmjohnson/bytemap v0.23.4
 	github.com/carlmjohnson/crockford v0.22.2
 	github.com/carlmjohnson/emailx v0.23.1
 	github.com/carlmjohnson/errorx v0.23.1
@@ -62,7 +63,6 @@ require (
 	github.com/aws/aws-sdk-go-v2/service/sts v1.18.5 // indirect
 	github.com/aws/smithy-go v1.13.5 // indirect
 	github.com/aymerick/douceur v0.2.0 // indirect
-	github.com/carlmjohnson/bytemap v0.23.4 // indirect
 	github.com/carlmjohnson/deque v0.22.0 // indirect
 	github.com/golang/groupcache v0.0.0-20210331224755-41bb18bfe9da // indirect
 	github.com/golang/protobuf v1.5.2 // indirect
