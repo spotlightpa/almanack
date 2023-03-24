@@ -79,10 +79,9 @@ func (app *appEnv) backgroundCron(w http.ResponseWriter, r *http.Request) {
 func (app *appEnv) backgroundRefreshPages(w http.ResponseWriter, r *http.Request) {
 	app.logStart(r)
 
-	hasMore := true
-	for queryPage := int32(0); hasMore; queryPage++ {
-		pager := paginate.PageNumber(queryPage)
-		pager.PageSize = 10
+	pager := paginate.PageNumber[int32](0)
+	pager.PageSize = 10
+	for pager.HasMore() {
 		pageIDs, err := paginate.List(
 			pager, r.Context(),
 			app.svc.Queries.ListPageIDs,
@@ -101,7 +100,6 @@ func (app *appEnv) backgroundRefreshPages(w http.ResponseWriter, r *http.Request
 				return
 			}
 		}
-		hasMore = pager.HasMore()
 	}
 
 	app.replyJSON(http.StatusAccepted, w, "OK")
