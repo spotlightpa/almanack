@@ -140,7 +140,7 @@ func (svc Services) ProcessGDocsDoc(ctx context.Context, dbDoc db.GDocsDoc) (err
 			}
 
 			embeds = append(embeds, db.Embed{
-				N:     n,
+				N:     n + 1,
 				Type:  "image",
 				Value: imageEmbed,
 			})
@@ -205,6 +205,7 @@ func (svc Services) ProcessGDocsDoc(ctx context.Context, dbDoc db.GDocsDoc) (err
 		RichText:        xhtml.ContentsToString(richText),
 		RawHtml:         xhtml.ContentsToString(rawHTML),
 		ArticleMarkdown: md,
+		Warnings:        warnings,
 		WordCount:       int32(stringx.WordCount(xhtml.InnerText(richText))),
 	})
 	return err
