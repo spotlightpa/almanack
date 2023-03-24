@@ -29,6 +29,7 @@ SET
   "raw_html" = @raw_html,
   "article_markdown" = @article_markdown,
   "word_count" = @word_count,
+  "warnings" = @warnings,
   "processed_at" = CURRENT_TIMESTAMP
 WHERE
   id = @id

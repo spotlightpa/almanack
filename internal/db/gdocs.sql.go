@@ -158,20 +158,22 @@ SET
   "raw_html" = $3,
   "article_markdown" = $4,
   "word_count" = $5,
+  "warnings" = $6,
   "processed_at" = CURRENT_TIMESTAMP
 WHERE
-  id = $6
+  id = $7
 RETURNING
   id, g_docs_id, document, embeds, rich_text, raw_html, article_markdown, word_count, warnings, processed_at, created_at
 `
 
 type UpdateGDocsDocParams struct {
-	Embeds          []Embed `json:"embeds"`
-	RichText        string  `json:"rich_text"`
-	RawHtml         string  `json:"raw_html"`
-	ArticleMarkdown string  `json:"article_markdown"`
-	WordCount       int32   `json:"word_count"`
-	ID              int64   `json:"id"`
+	Embeds          []Embed  `json:"embeds"`
+	RichText        string   `json:"rich_text"`
+	RawHtml         string   `json:"raw_html"`
+	ArticleMarkdown string   `json:"article_markdown"`
+	WordCount       int32    `json:"word_count"`
+	Warnings        []string `json:"warnings"`
+	ID              int64    `json:"id"`
 }
 
 func (q *Queries) UpdateGDocsDoc(ctx context.Context, arg UpdateGDocsDocParams) (GDocsDoc, error) {
@@ -181,6 +183,7 @@ func (q *Queries) UpdateGDocsDoc(ctx context.Context, arg UpdateGDocsDocParams) 
 		arg.RawHtml,
 		arg.ArticleMarkdown,
 		arg.WordCount,
+		arg.Warnings,
 		arg.ID,
 	)
 	var i GDocsDoc
