@@ -78,27 +78,38 @@ func (app *appEnv) backgroundCron(w http.ResponseWriter, r *http.Request) {
 
 func (app *appEnv) backgroundRefreshPages(w http.ResponseWriter, r *http.Request) {
 	app.logStart(r)
+	l := almlog.FromContext(r.Context())
+	count := 0
+	for _, filepath := range []string{
+		"content/news/%",
+		"content/statecollege/%",
+	} {
+		pager := paginate.PageNumber[int32](0)
+		pager.PageSize = 10
 
-	pager := paginate.PageNumber[int32](0)
-	pager.PageSize = 10
-	for pager.HasMore() {
-		pageIDs, err := paginate.List(
-			pager, r.Context(),
-			app.svc.Queries.ListPageIDs,
-			db.ListPageIDsParams{
-				FilePath: "content/news/%",
-				Offset:   pager.Offset(),
-				Limit:    pager.Limit(),
-			})
-		if err != nil {
-			app.replyErr(w, r, err)
-			return
-		}
-		for _, id := range pageIDs {
-			if err := app.svc.RefreshPageContents(r.Context(), id); err != nil {
+		for pager.HasMore() {
+			pager.Advance()
+			pageIDs, err := paginate.List(
+				pager, r.Context(),
+				app.svc.Queries.ListPageIDs,
+				db.ListPageIDsParams{
+					FilePath: filepath,
+					Offset:   pager.Offset(),
+					Limit:    pager.Limit(),
+				})
+			if err != nil {
 				app.replyErr(w, r, err)
 				return
 			}
+			err = workgroup.DoTasks(workgroup.MaxProcs, pageIDs, func(id int64) error {
+				return app.svc.RefreshPageContents(r.Context(), id)
+			})
+			if err != nil {
+				app.replyErr(w, r, err)
+				return
+			}
+			count += len(pageIDs)
+			l.Info("backgroundRefreshPages", "processed", count)
 		}
 	}
 

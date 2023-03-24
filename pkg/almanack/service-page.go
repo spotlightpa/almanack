@@ -125,14 +125,14 @@ func (svc Services) RefreshPageContents(ctx context.Context, id int64) (err erro
 		return err
 	}
 
-	if _, err = svc.Indexer.SaveObject(page.ToIndex(), ctx); err != nil {
-		return err
-	}
-
 	page.SetURLPath()
 	newURLPath := page.URLPath.String
 	if contentBefore == contentAfter && oldURLPath == newURLPath {
 		return nil
+	}
+
+	if _, err = svc.Indexer.SaveObject(page.ToIndex(), ctx); err != nil {
+		return err
 	}
 
 	l := almlog.FromContext(ctx)
