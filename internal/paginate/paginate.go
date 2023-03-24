@@ -14,7 +14,8 @@ type Paginator[I int | int32 | int64] struct {
 
 func PageNumber[I int | int32 | int64](pageNum I) *Paginator[I] {
 	return &Paginator[I]{
-		PageNum: pageNum,
+		PageNum:  pageNum,
+		NextPage: pageNum,
 	}
 }
 
@@ -27,7 +28,13 @@ func (pg Paginator[I]) Limit() I {
 }
 
 func (pg Paginator[I]) HasMore() bool {
-	return pg.NextPage > 0
+	return pg.NextPage >= pg.PageNum
+}
+
+func (pg *Paginator[I]) Advance() {
+	if pg.HasMore() {
+		pg.PageNum = pg.NextPage
+	}
 }
 
 type CtxFunc[Param, Result any] func(context.Context, Param) ([]Result, error)
@@ -49,6 +56,8 @@ func List[Param, Result any, I int | int32 | int64](
 	if len(results) > int(pg.PageSize) {
 		pg.NextPage = pg.PageNum + 1
 		results = results[:pg.PageSize]
+	} else {
+		pg.NextPage = 0
 	}
 	return results, nil
 }
