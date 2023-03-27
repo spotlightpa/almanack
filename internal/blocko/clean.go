@@ -10,14 +10,14 @@ import (
 )
 
 func Clean(root *html.Node) {
-	mergeSiblings(root)
-	removeEmptyP(root)
+	MergeSiblings(root)
+	RemoveEmptyP(root)
 	fixBareLI(root)
 	replaceWhitespace(root)
 	replaceSpecials(root)
 }
 
-func mergeSiblings(root *html.Node) {
+func MergeSiblings(root *html.Node) {
 	// find all matches first
 	inlineSiblings := xhtml.FindAll(root, func(n *html.Node) bool {
 		brother := n.NextSibling
@@ -37,7 +37,7 @@ func mergeSiblings(root *html.Node) {
 	}
 }
 
-func removeEmptyP(root *html.Node) {
+func RemoveEmptyP(root *html.Node) {
 	emptyP := xhtml.FindAll(root, func(n *html.Node) bool {
 		return n.DataAtom == atom.P && xhtml.IsEmpty(n)
 	})
@@ -61,7 +61,9 @@ func replaceWhitespace(root *html.Node) {
 		}
 		// Ignore children of pre/code
 		codeblock := xhtml.Closest(n, func(n *html.Node) bool {
-			return n.DataAtom == atom.Pre || n.DataAtom == atom.Code
+			return n.DataAtom == atom.Pre ||
+				n.DataAtom == atom.Code ||
+				n.Type == html.RawNode
 		})
 		if codeblock == nil {
 			n.Data = whitespaceReplacer.Replace(n.Data)

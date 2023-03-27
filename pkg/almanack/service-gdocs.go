@@ -89,7 +89,8 @@ func (svc Services) ProcessGDocsDoc(ctx context.Context, dbDoc db.GDocsDoc) (err
 	}
 
 	rawHTML := gdocs.Convert(&dbDoc.Document)
-	blocko.Clean(rawHTML)
+	blocko.MergeSiblings(rawHTML)
+	blocko.RemoveEmptyP(rawHTML)
 
 	// First collect the embeds array
 	var embeds []db.Embed
