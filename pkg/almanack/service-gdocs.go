@@ -283,7 +283,7 @@ func makeCASaddress(body []byte, ct string) string {
 	if !ok {
 		ext = "bin"
 	}
-	return fmt.Sprintf("cas/%s.%s", b, ext)
+	return "cas/" + string(b) + "." + ext
 }
 
 type SharedArticle struct {
