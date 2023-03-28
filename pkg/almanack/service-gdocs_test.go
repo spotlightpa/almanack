@@ -20,14 +20,13 @@ func TestImageCAS(t *testing.T) {
 			got := makeCASaddress([]byte(tc.body), tc.ct)
 			be.Equal(t, tc.want, got)
 		})
-		// var s string
-		// body := []byte(tc.body)
-		// allocs := testing.AllocsPerRun(10, func() {
-		// 	s = makeCASaddress(body, tc.ct)
-		// })
-		// if allocs > 4 {
-		// 	t.Errorf("benchmark regression %q: %v", s, allocs)
-		// }
+		var s string
+		body := []byte(tc.body)
+		allocs := testing.AllocsPerRun(10, func() {
+			s = makeCASaddress(body, tc.ct)
+		})
+		if allocs > 1 {
+			t.Errorf("benchmark regression %q: %v", s, allocs)
+		}
 	}
-
 }
