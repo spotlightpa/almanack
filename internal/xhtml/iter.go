@@ -7,38 +7,45 @@ import (
 )
 
 const (
-	Done = iota
-	Continue
+	done = iota
+	continue_
 )
 
-func BreadFirst(n *html.Node, yield func(*html.Node) int8) int8 {
-	if yield(n) == Done {
-		return Done
-	}
-	for c := n.FirstChild; c != nil; c = c.NextSibling {
-		if BreadFirst(c, yield) == Done {
-			return Done
+func breadthFirst(n *html.Node, yield func(*html.Node) int8) {
+	stack := make([]*html.Node, 1, 10)
+	stack[0] = n
+	for len(stack) > 0 {
+		// Pop head of the stack
+		var head *html.Node
+		head, stack = stack[0], stack[1:]
+
+		if yield(head) == done {
+			return
+		}
+
+		// Add the head node's children to the stack then loop
+		for c := head.FirstChild; c != nil; c = c.NextSibling {
+			stack = append(stack, c)
 		}
 	}
-	return Continue
 }
 
 func Find(n *html.Node, callback func(*html.Node) bool) *html.Node {
 	var found *html.Node
-	BreadFirst(n, func(n *html.Node) int8 {
+	breadthFirst(n, func(n *html.Node) int8 {
 		if callback(n) {
 			found = n
-			return Done
+			return done
 		}
-		return Continue
+		return continue_
 	})
 	return found
 }
 
 func VisitAll(n *html.Node, callback func(*html.Node)) {
-	BreadFirst(n, func(n *html.Node) int8 {
+	breadthFirst(n, func(n *html.Node) int8 {
 		callback(n)
-		return Continue
+		return continue_
 	})
 }
 
