@@ -137,6 +137,11 @@ func IsEmpty(n *html.Node) bool {
 	return n == nil
 }
 
+func ReplaceWith(old, new *html.Node) {
+	old.Parent.InsertBefore(new, old)
+	old.Parent.RemoveChild(old)
+}
+
 func AdoptChildren(dst, src *html.Node) {
 	if dst == src {
 		return
