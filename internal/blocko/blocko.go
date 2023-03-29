@@ -26,6 +26,15 @@ func HTMLToMarkdown(htmlstr string) (string, error) {
 	return strings.Join(blocks, "\n\n") + "\n", nil
 }
 
+func Blockize(root *html.Node) string {
+	var blocks []string
+	for p := root.FirstChild; p != nil; p = p.NextSibling {
+		blocks = append(blocks, blockToStrings(p)...)
+	}
+
+	return strings.Join(blocks, "\n\n") + "\n"
+}
+
 func blockToStrings(p *html.Node) []string {
 	if !xhtml.MarkdownBlockElements[p.DataAtom] {
 		return []string{xhtml.ToString(p)}

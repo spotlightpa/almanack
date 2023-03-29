@@ -6,6 +6,7 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+	"strconv"
 	"strings"
 
 	"github.com/carlmjohnson/bytemap"
@@ -14,7 +15,6 @@ import (
 	"github.com/spotlightpa/almanack/internal/blocko"
 	"github.com/spotlightpa/almanack/internal/db"
 	"github.com/spotlightpa/almanack/internal/gdocs"
-	"github.com/spotlightpa/almanack/internal/slicex"
 	"github.com/spotlightpa/almanack/internal/stringx"
 	"github.com/spotlightpa/almanack/internal/xhtml"
 	"golang.org/x/exp/slices"
@@ -88,9 +88,16 @@ func (svc Services) ProcessGDocsDoc(ctx context.Context, dbDoc db.GDocsDoc) (err
 		objID2Path[row.DocObjectID] = row.Path
 	}
 
-	rawHTML := gdocs.Convert(&dbDoc.Document)
-	blocko.MergeSiblings(rawHTML)
-	blocko.RemoveEmptyP(rawHTML)
+	docHTML := gdocs.Convert(&dbDoc.Document)
+	blocko.MergeSiblings(docHTML)
+	blocko.RemoveEmptyP(docHTML)
+
+	if n := xhtml.Find(docHTML, xhtml.WithAtom(atom.Data)); n != nil {
+		return fmt.Errorf(
+			"document unexpectedly contains <data> element: %q",
+			xhtml.ToString(n),
+		)
+	}
 
 	// First collect the embeds array
 	var embeds []db.Embed
@@ -98,17 +105,14 @@ func (svc Services) ProcessGDocsDoc(ctx context.Context, dbDoc db.GDocsDoc) (err
 	n := 0
 	var imageUploadErrs []error
 
-	xhtml.Tables(rawHTML, func(tbl *html.Node, rows xhtml.TableNodes) {
+	xhtml.Tables(docHTML, func(tbl *html.Node, rows xhtml.TableNodes) {
 		label := rows.Label()
-		embedHTML := ""
+		embed := db.Embed{N: n + 1}
 		if slices.Contains([]string{"html", "embed", "raw", "script"}, label) {
-			embedHTML = xhtml.InnerText(rows.At(1, 0))
+			embed.Type = "raw"
+			embedHTML := xhtml.InnerText(rows.At(1, 0))
 			embedHTML = strings.TrimSpace(embedHTML)
-			embeds = append(embeds, db.Embed{
-				N:     n,
-				Type:  "raw",
-				Value: embedHTML,
-			})
+			embed.Value = embedHTML
 			if nonASCII.Contains(embedHTML) {
 				warnings = append(warnings, fmt.Sprintf(
 					"Embed #%d contains unusual characters.", n,
@@ -139,12 +143,8 @@ func (svc Services) ProcessGDocsDoc(ctx context.Context, dbDoc db.GDocsDoc) (err
 					return
 				}
 			}
-
-			embeds = append(embeds, db.Embed{
-				N:     n + 1,
-				Type:  "image",
-				Value: imageEmbed,
-			})
+			embed.Type = "image"
+			embed.Value = imageEmbed
 		} else {
 			warnings = append(warnings, fmt.Sprintf(
 				"Unrecognized table type: %q", label,
@@ -152,64 +152,116 @@ func (svc Services) ProcessGDocsDoc(ctx context.Context, dbDoc db.GDocsDoc) (err
 			tbl.Parent.RemoveChild(tbl)
 			return
 		}
-		n++
-		placeholder := xhtml.New("h2", "style", "color: red;")
-		xhtml.AppendText(placeholder, fmt.Sprintf("Embed #%d", n))
-		if embedHTML != "" {
-			placeholder.Attr = append(placeholder.Attr, html.Attribute{
-				Key: "raw_html",
-				Val: embedHTML,
-			})
+		embeds = append(embeds, embed)
+		value, err := json.Marshal(embed.Value)
+		if err != nil {
+			panic(err)
 		}
-		tbl.Parent.InsertBefore(placeholder, tbl)
-		tbl.Parent.RemoveChild(tbl)
+		data := xhtml.New("data",
+			"n", strconv.Itoa(embed.N),
+			"type", embed.Type,
+			"value", string(value))
+
+		xhtml.ReplaceWith(tbl, data)
+		n++
 	})
 
 	if len(imageUploadErrs) > 0 {
 		return errors.Join(imageUploadErrs...)
 	}
 
-	// Clone and remove raw_html attributes
-	richText := xhtml.Clone(rawHTML)
-	xhtml.VisitAll(richText, func(n *html.Node) {
-		if n.DataAtom == atom.H2 && xhtml.Attr(n, "raw_html") != "" {
-			slicex.DeleteFunc(&n.Attr, func(a html.Attribute) bool {
-				return a.Key == "raw_html"
-			})
-		}
-	})
+	// Clone and remove turn data atoms into attributes
+	richText := xhtml.Clone(docHTML)
+	fixRichTextPlaceholders(richText)
 
 	// For rawHTML, convert to raw nodes
-	htmlEmbeds := xhtml.FindAll(rawHTML, func(n *html.Node) bool {
-		return n.DataAtom == atom.H2 && xhtml.Attr(n, "raw_html") != ""
-	})
-	for _, n := range htmlEmbeds {
-		rawNode := &html.Node{
-			Type: html.RawNode,
-			Data: xhtml.Attr(n, "raw_html"),
-		}
-		n.Parent.InsertBefore(rawNode, n)
-		n.Parent.RemoveChild(n)
-	}
+	rawHTML := xhtml.Clone(docHTML)
+	fixRawHTMLPlaceholders(rawHTML)
 
-	// TODO: Markdown conversion
-	mdDoc := xhtml.Clone(rawHTML)
-	md, err := blocko.HTMLToMarkdown(xhtml.ContentsToString(mdDoc))
-	if err != nil {
-		return err
-	}
+	// Markdown data conversion
+	fixMarkdownPlaceholders(docHTML)
+	md := blocko.Blockize(docHTML)
 
 	// Save to database
 	_, err = svc.Queries.UpdateGDocsDoc(ctx, db.UpdateGDocsDocParams{
 		ID:              dbDoc.ID,
 		Embeds:          embeds,
-		RichText:        xhtml.ContentsToString(richText),
-		RawHtml:         xhtml.ContentsToString(rawHTML),
+		RichText:        xhtml.InnerBlocksToString(richText),
+		RawHtml:         xhtml.InnerBlocksToString(rawHTML),
 		ArticleMarkdown: md,
 		Warnings:        warnings,
 		WordCount:       int32(stringx.WordCount(xhtml.InnerText(richText))),
 	})
 	return err
+}
+
+func fixRichTextPlaceholders(richText *html.Node) {
+	embeds := xhtml.FindAll(richText, xhtml.WithAtom(atom.Data))
+	for _, embed := range embeds {
+		placeholder := xhtml.New("h2", "style", "color: red;")
+		n := xhtml.Attr(embed, "n")
+		xhtml.AppendText(placeholder, fmt.Sprintf("Embed #%s", n))
+		xhtml.ReplaceWith(embed, placeholder)
+	}
+}
+
+func fixRawHTMLPlaceholders(rawHTML *html.Node) {
+	embeds := xhtml.FindAll(rawHTML, xhtml.WithAtom(atom.Data))
+	for _, embed := range embeds {
+		dataType := xhtml.Attr(embed, "type")
+		value := xhtml.Attr(embed, "value")
+		if dataType == "raw" {
+			var data string
+			if err := json.Unmarshal([]byte(value), &data); err != nil {
+				panic(err)
+			}
+			xhtml.ReplaceWith(embed, &html.Node{
+				Type: html.RawNode,
+				Data: data,
+			})
+			continue
+		}
+		placeholder := xhtml.New("h2", "style", "color: red;")
+		n := xhtml.Attr(embed, "n")
+		xhtml.AppendText(placeholder, fmt.Sprintf("Embed #%s", n))
+		xhtml.ReplaceWith(embed, placeholder)
+	}
+}
+
+func fixMarkdownPlaceholders(rawHTML *html.Node) {
+	embeds := xhtml.FindAll(rawHTML, xhtml.WithAtom(atom.Data))
+	for _, embed := range embeds {
+		dataType := xhtml.Attr(embed, "type")
+		value := xhtml.Attr(embed, "value")
+		if dataType == "raw" {
+			var data string
+			if err := json.Unmarshal([]byte(value), &data); err != nil {
+				panic(err)
+			}
+			xhtml.ReplaceWith(embed, &html.Node{
+				Type: html.RawNode,
+				Data: data,
+			})
+			continue
+		}
+		var image db.EmbedImage
+		if err := json.Unmarshal([]byte(value), &image); err != nil {
+			panic(err)
+		}
+
+		// TODO: distinguish image types
+		data := fmt.Sprintf(
+			`{{<picture src="%s" description="%s" caption="%s" credit="%s">}}`,
+			image.Path,
+			strings.TrimSpace(image.Description),
+			strings.TrimSpace(image.Caption),
+			strings.TrimSpace(image.Credit),
+		)
+		xhtml.ReplaceWith(embed, &html.Node{
+			Type: html.RawNode,
+			Data: data,
+		})
+	}
 }
 
 type UploadGDocsImageParams struct {
