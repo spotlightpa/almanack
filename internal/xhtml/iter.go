@@ -30,10 +30,11 @@ func breadthFirst(n *html.Node, yield func(*html.Node) int8) {
 	}
 }
 
-func Find(n *html.Node, callback func(*html.Node) bool) *html.Node {
+// Find returns the first matching child node or nil.
+func Find(n *html.Node, match func(*html.Node) bool) *html.Node {
 	var found *html.Node
 	breadthFirst(n, func(n *html.Node) int8 {
-		if callback(n) {
+		if match(n) {
 			found = n
 			return done
 		}
@@ -42,6 +43,7 @@ func Find(n *html.Node, callback func(*html.Node) bool) *html.Node {
 	return found
 }
 
+// VisitAll vists child nodes in breadth first order.
 func VisitAll(n *html.Node, callback func(*html.Node)) {
 	breadthFirst(n, func(n *html.Node) int8 {
 		callback(n)
@@ -49,19 +51,21 @@ func VisitAll(n *html.Node, callback func(*html.Node)) {
 	})
 }
 
-func FindAll(root *html.Node, filter func(*html.Node) bool) []*html.Node {
+// FindAll returns a slice of matching nodes.
+func FindAll(root *html.Node, match func(*html.Node) bool) []*html.Node {
 	var found []*html.Node
 	VisitAll(root, func(n *html.Node) {
-		if filter(n) {
+		if match(n) {
 			found = append(found, n)
 		}
 	})
 	return found
 }
 
-func Closest(n *html.Node, cond func(*html.Node) bool) *html.Node {
+// Closest returns the first parent node to match or nil.
+func Closest(n *html.Node, match func(*html.Node) bool) *html.Node {
 	for p := n.Parent; p != nil; p = p.Parent {
-		if cond(p) {
+		if match(p) {
 			return p
 		}
 	}
