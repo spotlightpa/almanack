@@ -41,6 +41,21 @@ func ContentsToString(n *html.Node) string {
 	return buf.String()
 }
 
+// InnerBlocksToString is the same as ContentsToString,
+// but it separates top level nodes with a line break.
+func InnerBlocksToString(n *html.Node) string {
+	buf := poolGet()
+	defer pool.Put(buf)
+
+	for c := n.FirstChild; c != nil; c = c.NextSibling {
+		if err := html.Render(buf, c); err != nil {
+			panic(err)
+		}
+		buf.WriteString("\n")
+	}
+	return buf.String()
+}
+
 func InnerText(n *html.Node) string {
 	var buf strings.Builder
 	VisitAll(n, func(n *html.Node) {
