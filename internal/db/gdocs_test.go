@@ -43,13 +43,17 @@ func TestProcessGDocsDoc(t *testing.T) {
 
 	rawHTML := testfile.Read(be.Relaxed(t), "testdata/raw.html")
 	be.Debug(t, func() {
-		testfile.Write(t, "testdata/raw-bad.html", dbDoc.RawHtml)
+		if rawHTML != dbDoc.RawHtml {
+			testfile.Write(t, "testdata/raw-bad.html", dbDoc.RawHtml)
+		}
 	})
 	be.Equal(t, rawHTML, dbDoc.RawHtml)
 
 	richText := testfile.Read(be.Relaxed(t), "testdata/rich.html")
 	be.Debug(t, func() {
-		testfile.Write(t, "testdata/rich-bad.html", dbDoc.RichText)
+		if richText != dbDoc.RichText {
+			testfile.Write(t, "testdata/rich-bad.html", dbDoc.RichText)
+		}
 	})
 	be.Equal(t, richText, dbDoc.RichText)
 
