@@ -44,6 +44,10 @@ func Open(dbURL string) (p *pgxpool.Pool, err error) {
 	return db, nil
 }
 
+func NewTxable(p *pgxpool.Pool) *Txable {
+	return &Txable{p}
+}
+
 type Txable struct {
 	p *pgxpool.Pool
 }
