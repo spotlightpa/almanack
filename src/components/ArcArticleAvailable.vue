@@ -215,7 +215,7 @@ export default {
     <CopyTextarea
       v-show="viewHTML"
       ref="htmlArea"
-      size="is-small height-50vh"
+      size="is-small pre-wrap height-50vh"
       >{{ articleHTML }}</CopyTextarea
     >
   </div>
