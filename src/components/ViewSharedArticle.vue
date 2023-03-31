@@ -32,6 +32,7 @@ const article = computedObj((data) => new SharedArticle(data));
         <ArcArticleAvailable v-if="!article.isPreview" :article="article" />
         <ArcArticlePlanned v-else :article="article" />
       </template>
+      <GDocsDoc v-else :article="article" />
     </template>
   </APILoader>
 </template>
