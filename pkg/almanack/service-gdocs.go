@@ -342,9 +342,14 @@ func makeCASaddress(body []byte, ct string) string {
 	return "cas/" + string(b) + "." + ext
 }
 
+type SharedArticleGDoc struct {
+	*db.GDocsDoc
+	Document string `json:"document,omitempty"`
+}
+
 type SharedArticle struct {
 	*db.SharedArticle
-	GDocs *db.GDocsDoc `json:"gdocs"`
+	GDocs SharedArticleGDoc `json:"gdocs"`
 }
 
 var nonASCII = bytemap.Range(128, 255)
@@ -365,5 +370,5 @@ func (svc Services) InflateSharedArticle(ctx context.Context, a *db.SharedArticl
 		return nil, err
 	}
 
-	return SharedArticle{a, &doc}, err
+	return SharedArticle{a, SharedArticleGDoc{&doc, ""}}, err
 }
