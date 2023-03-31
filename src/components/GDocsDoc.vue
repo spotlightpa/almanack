@@ -60,10 +60,12 @@ function copyHTML() {
       <p v-for="(w, i) of article.gdocs.warnings" :key="i" v-text="w"></p>
     </div>
   </div>
-  <h2 class="mb-2 title">Budget details</h2>
-  <p class="mb-2 content">
-    {{ article.budgetLine }}
-  </p>
+  <template v-if="article.budget">
+    <h2 class="mb-2 title">Budget details</h2>
+    <p class="mb-2 content">
+      {{ article.budget }}
+    </p>
+  </template>
   <ArticleWordCount :article="article" />
 
   <h2 v-if="article.isUnderEmbargo" class="title" style="color: red">
@@ -78,7 +80,7 @@ function copyHTML() {
     </p>
   </template>
 
-  <h2 class="mb-2 title">Planned time</h2>
+  <h2 v-if="article.publicationDate" class="mb-2 title">Planned time</h2>
   <p class="content">
     {{ formatDate(article.publicationDate) }}
   </p>
@@ -92,16 +94,20 @@ function copyHTML() {
   <h2 class="title">Suggested Hed</h2>
   <CopyWithButton :value="article.hed" label="hed" />
 
-  <h2 class="title">Suggested Description</h2>
-  <CopyWithButton :value="article.description" label="description" />
+  <template v-if="article.description">
+    <h2 class="title">Suggested Description</h2>
+    <CopyWithButton :value="article.description" label="description" />
+  </template>
 
-  <h2 class="title">Byline</h2>
-  <CopyWithButton :value="article.byline" label="byline" />
+  <template v-if="article.byline">
+    <h2 class="title">Byline</h2>
+    <CopyWithButton :value="article.byline" label="byline" />
+  </template>
 
   <template v-if="article.ledeImage">
     <h2 class="title is-spaced">Featured Image</h2>
-    <ImageThumbnail
-      :url="article.ledeImage"
+    <S3Thumbnail
+      :path="article.ledeImage"
       :caption="article.ledeImageCaption"
       :credits="article.ledeImageCredits"
       class="block"
@@ -113,6 +119,29 @@ function copyHTML() {
     Embeds: {{ article.gdocs.embeds.length }}
   </h2>
 
+  <div v-for="(e, i) of article.gdocs.embeds" :key="i">
+    <figure v-if="e.type === 'raw'" class="block">
+      <h2 class="subtitle is-4 has-text-weight-semibold">
+        Embed #{{ e.n }}: Raw HTML
+      </h2>
+      <CopyWithButton
+        :value="e.value"
+        :rows="4"
+        size="is-small is-clipped"
+        label="Code"
+      />
+    </figure>
+    <div v-else-if="e.type === 'image'" class="block">
+      <h2 class="subtitle is-4 has-text-weight-semibold">
+        Embed #{{ e.n }}: Inline Image
+      </h2>
+      <S3Thumbnail
+        :path="e.value.path"
+        :caption="e.value.caption"
+        :credits="e.value.credit"
+      />
+    </div>
+  </div>
   <!-- Loop through embeds -->
 
   <div class="level">
