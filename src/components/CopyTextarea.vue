@@ -43,7 +43,7 @@ export default {
 <template>
   <div
     ref="textarea"
-    class="textarea pre-wrap"
+    class="textarea"
     rows="bulmaoverride"
     :class="size"
     :contenteditable="true"
