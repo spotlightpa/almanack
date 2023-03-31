@@ -17,6 +17,7 @@ const src = computed(() =>
   })
 );
 
+// TODO: Fix SSR for editors
 const downloadURL = computed(
   () => "/ssr/download-image?src=" + encodeURIComponent(props.path)
 );
