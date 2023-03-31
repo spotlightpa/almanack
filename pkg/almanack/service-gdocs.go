@@ -133,6 +133,13 @@ func (svc Services) ProcessGDocsDoc(ctx context.Context, dbDoc db.GDocsDoc) (err
 					rows.Value("description")),
 			}
 			image := xhtml.Find(tbl, xhtml.WithAtom(atom.Img))
+			if image == nil {
+				warnings = append(warnings, fmt.Sprintf(
+					"Table %d missing image", n,
+				))
+				tbl.Parent.RemoveChild(tbl)
+				return
+			}
 			objID := xhtml.Attr(image, "data-oid")
 			path := objID2Path[objID]
 			if path == "" {
