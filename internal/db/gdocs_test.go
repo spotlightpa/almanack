@@ -42,23 +42,24 @@ func TestProcessGDocsDoc(t *testing.T) {
 		dbDoc, err = svc.Queries.GetGDocsByID(ctx, dbDoc.ID)
 		be.NilErr(t, err)
 
-		rawHTML := testfile.Read(be.Relaxed(t), path+"/raw.html")
+		rt := be.Relaxed(t)
+		rawHTML := testfile.Read(rt, path+"/raw.html")
 		be.Debug(t, func() {
 			if rawHTML != dbDoc.RawHtml {
 				testfile.Write(t, path+"/raw-bad.html", dbDoc.RawHtml)
 			}
 		})
-		be.Equal(t, rawHTML, dbDoc.RawHtml)
+		be.Equal(rt, rawHTML, dbDoc.RawHtml)
 
-		richText := testfile.Read(be.Relaxed(t), path+"/rich.html")
+		richText := testfile.Read(rt, path+"/rich.html")
 		be.Debug(t, func() {
 			if richText != dbDoc.RichText {
 				testfile.Write(t, path+"/rich-bad.html", dbDoc.RichText)
 			}
 		})
-		be.Equal(t, richText, dbDoc.RichText)
+		be.Equal(rt, richText, dbDoc.RichText)
 
-		md := testfile.Read(be.Relaxed(t), path+"/article.md")
+		md := testfile.Read(rt, path+"/article.md")
 		be.Debug(t, func() {
 			testfile.Write(t, path+"/article-bad.md", dbDoc.ArticleMarkdown)
 		})
