@@ -38,6 +38,11 @@ export default class SharedArticle {
     this["ledeImageDescription"] = data["lede_image_description"] ?? "";
     this["ledeImageCaption"] = data["lede_image_caption"] ?? "";
     this["isProcessing"] = data["is_processing"] || false;
+    if (this.sourceType === "gdocs") {
+      this["gdocs"] = data["gdocs"] ?? {};
+      this.gdocs.embeds = this.gdocs.embeds ?? [];
+      this.gdocs.warnings = this.gdocs.warnings ?? [];
+    }
 
     this.arc = null;
     if (this.isArc) {
