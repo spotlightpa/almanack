@@ -1,43 +1,58 @@
-<script>
+<script setup>
+import { computed } from "vue";
 import { intcomma } from "journalize";
 
-export default {
-  props: {
-    article: {
-      type: Object,
-      required: true,
-    },
+const props = defineProps({
+  article: {
+    type: Object,
+    required: true,
   },
-  methods: { intcomma },
-};
+});
+
+const wordCounts = computed(() => {
+  let article = props.article;
+  if (article.isArc) {
+    return {
+      actual: intcomma(article.arc.actualWordCount),
+      lines: intcomma(article.arc.actualLineCount),
+      inches: intcomma(article.arc.actualInchCount),
+    };
+  }
+  let wc = article.gdocs?.word_count;
+  if (wc) {
+    return {
+      actual: intcomma(wc),
+      lines: intcomma(Math.round(wc / 30)),
+      inches: intcomma(Math.ceil(wc / 30 / 8)),
+    };
+  }
+  return {
+    actual: "",
+    lines: "",
+    inches: "",
+  };
+});
 </script>
 
 <template>
-  <div v-if="article.isArc" class="level is-mobile is-clipped">
+  <div class="level is-mobile is-clipped">
     <div class="level-left">
-      <p v-if="article.arc.plannedWordCount" class="level-item">
-        <span>
-          <strong>Planned Word Count:</strong>
-          {{ intcomma(article.arc.plannedWordCount) }}
-        </span>
-      </p>
-
-      <p v-if="article.arc.actualWordCount" class="level-item is-hidden-mobile">
+      <p v-if="wordCounts.actual" class="level-item is-hidden-mobile">
         <span>
           <strong>Word Count:</strong>
-          {{ intcomma(article.arc.actualWordCount) }}
+          {{ wordCounts.actual }}
         </span>
       </p>
       <p class="level-item is-hidden-mobile">
         <span>
           <strong>Lines:</strong>
-          {{ article.arc.actualLineCount }}
+          {{ wordCounts.lines }}
         </span>
       </p>
       <p class="level-item is-hidden-mobile">
         <span>
           <strong>Column inches:</strong>
-          {{ article.arc.actualInchCount }}
+          {{ wordCounts.inches }}
         </span>
       </p>
     </div>
