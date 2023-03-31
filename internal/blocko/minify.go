@@ -11,7 +11,7 @@ import (
 	nethtml "golang.org/x/net/html"
 )
 
-func prep(s string) (*nethtml.Node, error) {
+func Minify(s string) (*nethtml.Node, error) {
 	m := minify.New()
 	m.AddFunc("text/html", (&html.Minifier{
 		KeepEndTags: true,
