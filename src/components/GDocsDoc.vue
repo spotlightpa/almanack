@@ -106,7 +106,7 @@ function copyHTML() {
 
   <template v-if="article.ledeImage">
     <h2 class="title is-spaced">Featured Image</h2>
-    <S3Thumbnail
+    <ThumbnailS3
       :path="article.ledeImage"
       :caption="article.ledeImageCaption"
       :credits="article.ledeImageCredits"
@@ -135,7 +135,7 @@ function copyHTML() {
       <h2 class="subtitle is-4 has-text-weight-semibold">
         Embed #{{ e.n }}: Inline Image
       </h2>
-      <S3Thumbnail
+      <ThumbnailS3
         :path="e.value.path"
         :caption="e.value.caption"
         :credits="e.value.credit"
