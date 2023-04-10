@@ -28,3 +28,13 @@ func TestListDriveFiles(t *testing.T) {
 	be.NilErr(t, err)
 	be.Nonzero(t, files)
 }
+
+func TestDownloadFile(t *testing.T) {
+	var gsvc Service
+	ctx := context.Background()
+	cl := *http.DefaultClient
+	cl.Transport = requests.Replay("testdata")
+	b, err := gsvc.DownloadFile(ctx, &cl, "1ssiQd8AKXHo99qkZZwYbHxfVJHY3RPnL")
+	be.NilErr(t, err)
+	be.Equal(t, "image/jpeg", http.DetectContentType(b))
+}
