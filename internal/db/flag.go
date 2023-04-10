@@ -37,7 +37,7 @@ func Open(dbURL string) (p *pgxpool.Pool, err error) {
 		ctx2, cancel := context.WithTimeout(context.Background(), 1*time.Second)
 		defer cancel()
 		if err := db.Ping(ctx2); err != nil {
-			almlog.Logger.Error("db.Ping", err)
+			almlog.Logger.Error("db.Ping", "err", err)
 		}
 	}()
 

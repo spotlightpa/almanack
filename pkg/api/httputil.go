@@ -34,7 +34,7 @@ func (app *appEnv) replyJSON(statusCode int, w http.ResponseWriter, data any) {
 	enc := json.NewEncoder(w)
 	if err := enc.Encode(data); err != nil {
 		// TODO: Log to Sentry
-		almlog.Logger.Error("replyJSON", err)
+		almlog.Logger.Error("replyJSON", "err", err)
 	}
 }
 
@@ -70,7 +70,7 @@ func (app *appEnv) logErr(ctx context.Context, err error) {
 	} else {
 		l.Warn("sentry not in context")
 	}
-	l.ErrorCtx(ctx, "logErr", err)
+	l.ErrorCtx(ctx, "logErr", "err", err)
 }
 
 func (app *appEnv) tryReadJSON(w http.ResponseWriter, r *http.Request, dst any) error {

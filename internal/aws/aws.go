@@ -29,7 +29,7 @@ func AddFlags(fl *flag.FlagSet) func() (imageStore, fileStore BlobStore) {
 	return func() (imageStore, fileStore BlobStore) {
 		err := register("s3-cli", *region, *accessKeyID, *secretAccessKey)
 		if err != nil {
-			almlog.Logger.Error("aws.register", err)
+			almlog.Logger.Error("aws.register", "err", err)
 		}
 		imageStore = BlobStore{*ibucket}
 		if *ibucket == "mem://" {

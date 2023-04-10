@@ -21,7 +21,7 @@ func NewMockClient(dir string) *MockClient {
 		dir, err = os.MkdirTemp("", "example")
 		if err != nil {
 			almlog.Logger.Error("creating temporary directory",
-				err, "dir", dir)
+				"err", err, "dir", dir)
 		}
 	}
 
