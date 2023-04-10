@@ -7,7 +7,7 @@ import (
 	"flag"
 	"net/http"
 
-	"github.com/google/go-github/v48/github"
+	"github.com/google/go-github/v51/github"
 	"github.com/spotlightpa/almanack/internal/netlifyid"
 	"github.com/spotlightpa/almanack/internal/stringx"
 	"github.com/spotlightpa/almanack/pkg/almlog"
