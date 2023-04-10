@@ -108,7 +108,7 @@ export default {
 
     <template v-if="article.arc.featuredImage">
       <h2 class="title is-spaced">Featured Image</h2>
-      <ImageThumbnail
+      <ThumbnailArc
         :url="article.arc.featuredImage"
         :caption="article.arc.featuredImageCaption"
         :credits="article.arc.featuredImageCredits"
