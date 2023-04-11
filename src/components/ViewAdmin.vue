@@ -303,7 +303,7 @@ const nextPage = computedProp("next_page", (page) => ({
                     <span>Arc</span>
                   </a>
                   <a
-                    v-if="article.isGdoc"
+                    v-if="article.isGDoc"
                     class="tag is-light"
                     :href="article.gdocsURL"
                     target="_blank"

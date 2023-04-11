@@ -37,11 +37,12 @@ export default class SharedArticle {
     this["ledeImageCredit"] = data["lede_image_credit"] ?? "";
     this["ledeImageDescription"] = data["lede_image_description"] ?? "";
     this["ledeImageCaption"] = data["lede_image_caption"] ?? "";
-    this["isProcessing"] = data["is_processing"] || false;
-    if (this.sourceType === "gdocs") {
+    if (this.isGDoc) {
       this["gdocs"] = data["gdocs"] ?? {};
       this.gdocs.embeds = this.gdocs.embeds ?? [];
       this.gdocs.warnings = this.gdocs.warnings ?? [];
+      this.gdocs.processedAt = maybeDate(data, "gdocs.processed_at");
+      this.isProcessing = !this.gdocs.processedAt;
     }
 
     this.arc = null;
@@ -57,12 +58,12 @@ export default class SharedArticle {
     return this.sourceType === "arc";
   }
 
-  get isGdoc() {
+  get isGDoc() {
     return this.sourceType === "gdocs";
   }
 
   get gdocsURL() {
-    return !this.isGdoc
+    return !this.isGDoc
       ? ""
       : `https://docs.google.com/document/d/${this.sourceID}/edit`;
   }
