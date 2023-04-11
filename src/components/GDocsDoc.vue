@@ -55,11 +55,24 @@ function copyHTML() {
     v-if="isSpotlightPAUser && article.gdocs.warnings.length"
     class="message is-warning"
   >
+    <div class="message-header">
+      <span>
+        <font-awesome-icon :icon="['fas', 'circle-exclamation']" />
+
+        <span
+          class="ml-1"
+          v-text="article.gdocs.warnings.length === 1 ? 'Warning' : 'Warnings'"
+        />
+      </span>
+    </div>
+
     <div class="message-body">
-      <p><strong>Warning:</strong></p>
-      <p v-for="(w, i) of article.gdocs.warnings" :key="i" v-text="w"></p>
+      <li v-for="(w, i) of article.gdocs.warnings" :key="i">
+        <p v-text="w"></p>
+      </li>
     </div>
   </div>
+
   <template v-if="article.budget">
     <h2 class="mb-2 title">Budget details</h2>
     <p class="mb-2 content">
