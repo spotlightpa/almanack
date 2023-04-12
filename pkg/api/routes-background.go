@@ -52,9 +52,11 @@ func (app *appEnv) backgroundCron(w http.ResponseWriter, r *http.Request) {
 			errs = append(errs, app.svc.PopScheduledSiteChanges(r.Context(), almanack.SiteParamsLoc))
 			errs = append(errs, app.svc.PopScheduledSiteChanges(r.Context(), almanack.StateCollegeLoc))
 			return errors.Join(errs...)
-		}, func() error {
+		},
+		func() error {
 			return app.svc.UpdateMostPopular(r.Context())
-		}, func() error {
+		},
+		func() error {
 			types, err := app.svc.Queries.ListNewsletterTypes(r.Context())
 			if err != nil {
 				return err
@@ -64,10 +66,11 @@ func (app *appEnv) backgroundCron(w http.ResponseWriter, r *http.Request) {
 			errs = append(errs, app.svc.UpdateNewsletterArchives(r.Context(), types))
 			errs = append(errs, app.svc.ImportNewsletterPages(r.Context(), types))
 			return errors.Join(errs...)
-		}, func() error {
-			app.backgroundImages(w, r)
-			return nil
-		}); err != nil {
+		},
+		func() error {
+			return app.svc.UploadImages(r.Context())
+		},
+	); err != nil {
 		// reply shows up in dev only
 		app.replyErr(w, r, err)
 		return
@@ -119,33 +122,7 @@ func (app *appEnv) backgroundRefreshPages(w http.ResponseWriter, r *http.Request
 func (app *appEnv) backgroundImages(w http.ResponseWriter, r *http.Request) {
 	app.logStart(r)
 
-	images, err := app.svc.Queries.ListImageWhereNotUploaded(r.Context())
-	if err != nil {
-		app.replyErr(w, r, err)
-		return
-	}
-
-	err = workgroup.DoTasks(5, images,
-		func(image db.Image) error {
-			_, _, err := almanack.UploadFromURL(
-				r.Context(),
-				app.svc.Client,
-				app.svc.ImageStore,
-				image.Path,
-				image.SourceURL)
-			if err != nil {
-				return err
-			}
-			if _, err = app.svc.Queries.UpdateImage(r.Context(),
-				db.UpdateImageParams{
-					Path:      image.Path,
-					SourceURL: image.SourceURL,
-				}); err != nil {
-				return err
-			}
-			return nil
-		})
-	if err != nil {
+	if err := app.svc.UploadImages(r.Context()); err != nil {
 		app.replyErr(w, r, err)
 		return
 	}
