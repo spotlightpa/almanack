@@ -17,6 +17,7 @@ import (
 	"github.com/spotlightpa/almanack/internal/gdocs"
 	"github.com/spotlightpa/almanack/internal/stringx"
 	"github.com/spotlightpa/almanack/internal/xhtml"
+	"github.com/spotlightpa/almanack/pkg/almlog"
 	"golang.org/x/exp/slices"
 	"golang.org/x/net/html"
 	"golang.org/x/net/html/atom"
@@ -106,12 +107,11 @@ func (svc Services) ProcessGDocsDoc(ctx context.Context, dbDoc db.GDocsDoc) (err
 	// First collect the embeds array
 	var embeds []db.Embed
 	var warnings []string
-	n := 0
-	var imageUploadErrs []error
+	n := 1
 
 	xhtml.Tables(docHTML, func(tbl *html.Node, rows xhtml.TableNodes) {
 		label := rows.Label()
-		embed := db.Embed{N: n + 1}
+		embed := db.Embed{N: n}
 		if slices.Contains([]string{"html", "embed", "raw", "script"}, label) {
 			embed.Type = "raw"
 			embedHTML := xhtml.InnerText(rows.At(1, 0))
@@ -150,7 +150,12 @@ func (svc Services) ProcessGDocsDoc(ctx context.Context, dbDoc db.GDocsDoc) (err
 					ImageURL:    src,
 					Embed:       &imageEmbed,
 				}); uploadErr != nil {
-					imageUploadErrs = append(imageUploadErrs, uploadErr)
+					l := almlog.FromContext(ctx)
+					l.ErrorCtx(ctx, "ProcessGDocsDoc: UploadGDocsImage", "err", uploadErr)
+					warnings = append(warnings, fmt.Sprintf(
+						"An error occurred when processing images in table %d: %v.",
+						n, uploadErr))
+					tbl.Parent.RemoveChild(tbl)
 					return
 				}
 			}
@@ -179,10 +184,6 @@ func (svc Services) ProcessGDocsDoc(ctx context.Context, dbDoc db.GDocsDoc) (err
 		xhtml.ReplaceWith(tbl, data)
 		n++
 	})
-
-	if len(imageUploadErrs) > 0 {
-		return errors.Join(imageUploadErrs...)
-	}
 
 	// Clone and remove turn data atoms into attributes
 	richText := xhtml.Clone(docHTML)
