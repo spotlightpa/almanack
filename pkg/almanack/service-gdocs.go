@@ -156,6 +156,9 @@ func (svc Services) ProcessGDocsDoc(ctx context.Context, dbDoc db.GDocsDoc) (err
 			}
 			embed.Type = "image"
 			embed.Value = imageEmbed
+		} else if label == "metadata" {
+			tbl.Parent.RemoveChild(tbl)
+			return
 		} else {
 			warnings = append(warnings, fmt.Sprintf(
 				"Unrecognized table type: %q", label,
