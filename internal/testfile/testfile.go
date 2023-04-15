@@ -3,6 +3,7 @@ package testfile
 import (
 	"os"
 	"path/filepath"
+	"strings"
 	"testing"
 )
 
@@ -23,6 +24,18 @@ func Write(t testing.TB, name, data string) {
 	if err != nil {
 		t.Fatalf("%v", err)
 	}
+}
+
+func Equal(t testing.TB, wantFile, gotStr string) {
+	t.Helper()
+	if w := Read(t, wantFile); w == gotStr {
+		return
+	}
+	ext := filepath.Ext(wantFile)
+	base := strings.TrimSuffix(wantFile, ext)
+	name := base + "-bad" + ext
+	Write(t, name, gotStr)
+	t.Fatalf("contents of %s != %s", wantFile, name)
 }
 
 func GlobRun(t *testing.T, pat string, f func(path string, t *testing.T)) {
