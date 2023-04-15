@@ -2,13 +2,16 @@ package db_test
 
 import (
 	"context"
+	"fmt"
 	"net/http"
+	"strings"
 	"testing"
 
 	"github.com/carlmjohnson/be"
 	"github.com/carlmjohnson/requests"
 	"github.com/spotlightpa/almanack/internal/aws"
 	"github.com/spotlightpa/almanack/internal/db"
+	"github.com/spotlightpa/almanack/internal/stringx"
 	"github.com/spotlightpa/almanack/internal/testfile"
 	"github.com/spotlightpa/almanack/pkg/almanack"
 	"github.com/spotlightpa/almanack/pkg/almlog"
@@ -32,37 +35,25 @@ func TestProcessGDocsDoc(t *testing.T) {
 		}
 		var doc docs.Document
 		testfile.Unmarshal(t, path+"/doc.json", &doc)
-		dbDoc, err := svc.Queries.CreateGDocsDoc(ctx, db.CreateGDocsDocParams{
-			GDocsID:  "abc123",
-			Document: doc,
-		})
-		be.NilErr(t, err)
-		err = svc.ProcessGDocsDoc(ctx, dbDoc)
-		be.NilErr(t, err)
-		dbDoc, err = svc.Queries.GetGDocsByID(ctx, dbDoc.ID)
-		be.NilErr(t, err)
+		// Run twice to test the already uploaded path
+		for i := 0; i < 2; i++ {
+			dbDoc, err := svc.Queries.CreateGDocsDoc(ctx, db.CreateGDocsDocParams{
+				GDocsID:  fmt.Sprintf("abc123_%s", stringx.Slugify(path)),
+				Document: doc,
+			})
+			be.NilErr(t, err)
+			err = svc.ProcessGDocsDoc(ctx, dbDoc)
+			be.NilErr(t, err)
+			dbDoc, err = svc.Queries.GetGDocsByID(ctx, dbDoc.ID)
+			be.NilErr(t, err)
 
-		rt := be.Relaxed(t)
-		rawHTML := testfile.Read(rt, path+"/raw.html")
-		be.Debug(t, func() {
-			if rawHTML != dbDoc.RawHtml {
-				testfile.Write(t, path+"/raw-bad.html", dbDoc.RawHtml)
-			}
-		})
-		be.Equal(rt, rawHTML, dbDoc.RawHtml)
+			rt := be.Relaxed(t)
 
-		richText := testfile.Read(rt, path+"/rich.html")
-		be.Debug(t, func() {
-			if richText != dbDoc.RichText {
-				testfile.Write(t, path+"/rich-bad.html", dbDoc.RichText)
-			}
-		})
-		be.Equal(rt, richText, dbDoc.RichText)
-
-		md := testfile.Read(rt, path+"/article.md")
-		be.Debug(t, func() {
-			testfile.Write(t, path+"/article-bad.md", dbDoc.ArticleMarkdown)
-		})
-		be.Equal(t, md, dbDoc.ArticleMarkdown)
+			testfile.Equal(rt, path+"/raw.html", dbDoc.RawHtml)
+			testfile.Equal(rt, path+"/rich.html", dbDoc.RichText)
+			testfile.Equal(rt, path+"/article.md", dbDoc.ArticleMarkdown)
+			gotWarnings := strings.Join(dbDoc.Warnings, "\n")
+			testfile.Equal(rt, path+"/warnings.txt", gotWarnings)
+		}
 	})
 }

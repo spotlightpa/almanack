@@ -132,6 +132,7 @@ func (svc Services) ProcessGDocsDoc(ctx context.Context, dbDoc db.GDocsDoc) (err
 					rows.Value("alt"),
 					rows.Value("description")),
 			}
+			// TODO: If there's a link, use that instead
 			image := xhtml.Find(tbl, xhtml.WithAtom(atom.Img))
 			if image == nil {
 				warnings = append(warnings, fmt.Sprintf(
@@ -141,8 +142,9 @@ func (svc Services) ProcessGDocsDoc(ctx context.Context, dbDoc db.GDocsDoc) (err
 				return
 			}
 			objID := xhtml.Attr(image, "data-oid")
-			path := objID2Path[objID]
-			if path == "" {
+			if path := objID2Path[objID]; path != "" {
+				imageEmbed.Path = path
+			} else {
 				src := xhtml.Attr(image, "src")
 				if uploadErr := svc.UploadGDocsImage(ctx, UploadGDocsImageParams{
 					GDocsID:     dbDoc.GDocsID,
