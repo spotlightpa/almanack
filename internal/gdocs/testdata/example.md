@@ -20,7 +20,7 @@ And maybe
 
 <table><tbody><tr><td><p>A table</p></td><td><p>with</p></td><td><p>multiple</p></td><td><p>different</p></td><td><p>columns</p></td></tr><tr><td><p>And</p></td><td><p>values</p></td><td><p>In</p></td><td><p>The</p></td><td><p>cells</p></td></tr></tbody></table>
 
-Plus <img src="https://lh3.googleusercontent.com/bFaNcbOEgAqFCE5Ns4uIeBy52uiblhQhb0DQ7GwQ55xeePpjZa0MJXprdnd1J17nrYpdgL1FZmbYXHs_oDdO1yLEX_0SyJfFsFiVOiNM079Ym8HNQRZPKGQZEvMhbbL8okqdqEza-TomEHxWUg=s0" title="" alt="" data-oid="kix.ybob8eysp3sn"/>a monkey.
+Plus <a href="https://upload.wikimedia.org/wikipedia/commons/thumb/d/df/Cute_Monkey_cropped.jpg/576px-Cute_Monkey_cropped.jpg"><img src="https://lh3.googleusercontent.com/bFaNcbOEgAqFCE5Ns4uIeBy52uiblhQhb0DQ7GwQ55xeePpjZa0MJXprdnd1J17nrYpdgL1FZmbYXHs_oDdO1yLEX_0SyJfFsFiVOiNM079Ym8HNQRZPKGQZEvMhbbL8okqdqEza-TomEHxWUg=s0" title="" alt="" data-oid="kix.ybob8eysp3sn"/></a>a monkey.
 
 Here are two<strong> </strong>words separated by invisible bold.
 
