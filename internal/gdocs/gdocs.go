@@ -10,6 +10,7 @@ import (
 	"github.com/carlmjohnson/bytemap"
 	"github.com/carlmjohnson/requests"
 	"github.com/carlmjohnson/resperr"
+	"github.com/spotlightpa/almanack/internal/slicex"
 	"github.com/spotlightpa/almanack/internal/xhtml"
 	"golang.org/x/net/html"
 	"google.golang.org/api/docs/v1"
@@ -112,14 +113,19 @@ func buildObjectInfo(objs map[string]docs.InlineObject) map[string][]string {
 		}
 		innerObj := obj.InlineObjectProperties.EmbeddedObject
 		src := ""
+		originalSource := ""
 		if innerObj.ImageProperties != nil {
 			src = innerObj.ImageProperties.ContentUri
+			originalSource = innerObj.ImageProperties.SourceUri
 		}
 		m[id] = []string{
 			"src", src,
 			"title", innerObj.Title,
 			"alt", innerObj.Description,
 			"data-oid", obj.ObjectId,
+		}
+		if originalSource != "" {
+			m[id] = append(m[id], []string{"data-src", originalSource}...)
 		}
 	}
 	return m
@@ -180,7 +186,16 @@ func convertEl(n *html.Node, el *docs.StructuralElement, listInfo map[string]str
 		if subel.InlineObjectElement != nil {
 			inner := xhtml.LastChildOrNew(n, blockType)
 			attrs := objInfo[subel.InlineObjectElement.InlineObjectId]
-			inner.AppendChild(xhtml.New("img", attrs...))
+			img := xhtml.New("img", attrs...)
+			if link := xhtml.Attr(img, "data-src"); link != "" {
+				slicex.DeleteFunc(&img.Attr, func(attr html.Attribute) bool {
+					return attr.Key == "data-src"
+				})
+				a := xhtml.New("a", "href", link)
+				a.AppendChild(img)
+				img = a
+			}
+			inner.AppendChild(img)
 		}
 
 		if subel.TextRun == nil {
