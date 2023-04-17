@@ -1,6 +1,7 @@
 package testfile
 
 import (
+	"encoding/json"
 	"os"
 	"path/filepath"
 	"strings"
@@ -28,7 +29,7 @@ func Write(t testing.TB, name, data string) {
 
 func Equal(t testing.TB, wantFile, gotStr string) {
 	t.Helper()
-	if w := Read(t, wantFile); w == gotStr {
+	if w := Read(t, wantFile); strings.TrimSpace(w) == gotStr {
 		return
 	}
 	ext := filepath.Ext(wantFile)
@@ -36,6 +37,16 @@ func Equal(t testing.TB, wantFile, gotStr string) {
 	name := base + "-bad" + ext
 	Write(t, name, gotStr)
 	t.Fatalf("contents of %s != %s", wantFile, name)
+}
+
+func JSON(t testing.TB, wantFile string, v any) {
+	t.Helper()
+	b, err := json.MarshalIndent(v, "", "  ")
+	if err != nil {
+		t.Fatalf("marshaling: %v", err)
+		return
+	}
+	Equal(t, wantFile, string(b))
 }
 
 func GlobRun(t *testing.T, pat string, f func(path string, t *testing.T)) {
