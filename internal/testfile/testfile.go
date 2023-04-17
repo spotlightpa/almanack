@@ -1,3 +1,4 @@
+// Package testfile has test helpers that work by comparing files.
 package testfile
 
 import (
