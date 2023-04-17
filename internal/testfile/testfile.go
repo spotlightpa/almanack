@@ -80,10 +80,10 @@ func GlobRun(t *testing.T, pat string, f func(path string, t *testing.T)) {
 	}
 }
 
-func Unmarshal(t testing.TB, name string, v any) {
+func ReadJSON(t testing.TB, name string, v any) {
 	t.Helper()
 	s := Read(t, name)
 	if err := json.Unmarshal([]byte(s), v); err != nil {
-		t.Fatalf("%v", err)
+		t.Fatalf("unmarshal %s: %v", name, err)
 	}
 }
