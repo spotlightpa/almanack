@@ -29,7 +29,22 @@ func Write(t testing.TB, name, data string) {
 
 func Equal(t testing.TB, wantFile, gotStr string) {
 	t.Helper()
-	if w := Read(t, wantFile); strings.TrimSpace(w) == gotStr {
+	equal(t, wantFile, gotStr, false)
+}
+
+func Equalish(t testing.TB, wantFile, gotStr string) {
+	t.Helper()
+	equal(t, wantFile, gotStr, true)
+}
+
+func equal(t testing.TB, wantFile, gotStr string, trim bool) {
+	t.Helper()
+	w := Read(t, wantFile)
+	if trim {
+		w = strings.TrimSpace(w)
+		gotStr = strings.TrimSpace(gotStr)
+	}
+	if w == gotStr {
 		return
 	}
 	ext := filepath.Ext(wantFile)
@@ -39,14 +54,14 @@ func Equal(t testing.TB, wantFile, gotStr string) {
 	t.Fatalf("contents of %s != %s", wantFile, name)
 }
 
-func JSON(t testing.TB, wantFile string, v any) {
+func EqualJSON(t testing.TB, wantFile string, v any) {
 	t.Helper()
 	b, err := json.MarshalIndent(v, "", "  ")
 	if err != nil {
 		t.Fatalf("marshaling: %v", err)
 		return
 	}
-	Equal(t, wantFile, string(b))
+	Equalish(t, wantFile, string(b))
 }
 
 func GlobRun(t *testing.T, pat string, f func(path string, t *testing.T)) {
@@ -63,3 +78,12 @@ func GlobRun(t *testing.T, pat string, f func(path string, t *testing.T)) {
 		})
 	}
 }
+
+func ReadJSON(t testing.TB, name string, v any) {
+	t.Helper()
+	s := Read(t, name)
+	if err := json.Unmarshal([]byte(s), v); err != nil {
+		t.Fatalf("unmarshal %s: %v", name, err)
+	}
+}
+
