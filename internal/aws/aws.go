@@ -47,6 +47,10 @@ type BlobStore struct {
 	bucket string
 }
 
+func NewBlobStore(s string) BlobStore {
+	return BlobStore{s}
+}
+
 func (bs BlobStore) SignPutURL(ctx context.Context, srcPath string, h http.Header) (signedURL string, err error) {
 	l := almlog.FromContext(ctx)
 	l.InfoCtx(ctx, "aws.SignPutURL", "url", srcPath)
