@@ -1,7 +1,6 @@
 package gdocs
 
 import (
-	"encoding/json"
 	"strings"
 	"testing"
 
@@ -15,52 +14,39 @@ import (
 
 func TestConvert(t *testing.T) {
 	testfile.GlobRun(t, "testdata/*.json", func(path string, t *testing.T) {
-		bareName := strings.TrimSuffix(path, ".json")
-		want := testfile.Read(be.Relaxed(t), bareName+".html")
-
-		s := testfile.Read(t, path)
-
 		var doc docs.Document
-		be.NilErr(t, json.Unmarshal([]byte(s), &doc))
+		testfile.ReadJSON(t, path, &doc)
+
 		n := Convert(&doc)
 		got := xhtml.ToString(n)
 
-		be.Debug(t, func() {
-			badname := bareName + "-bad.html"
-			testfile.Write(t, badname, got)
-		})
-		be.Equal(t, want, got)
+		bareName := strings.TrimSuffix(path, ".json")
+		testfile.Equal(t, bareName+".html", got)
 	})
 }
 
 func TestFullConvert(t *testing.T) {
 	t.Parallel()
 	testfile.GlobRun(t, "testdata/*.json", func(path string, t *testing.T) {
-		bareName := strings.TrimSuffix(path, ".json")
-		want := testfile.Read(be.Relaxed(t), bareName+".md")
-
-		s := testfile.Read(t, path)
-
 		var doc docs.Document
-		be.NilErr(t, json.Unmarshal([]byte(s), &doc))
+		testfile.ReadJSON(t, path, &doc)
+
 		n := Convert(&doc)
 		got, err := blocko.HTMLToMarkdown(xhtml.ToString(n))
 		be.NilErr(t, err)
 
-		be.Debug(t, func() {
-			badname := bareName + "-bad.md"
-			testfile.Write(t, badname, got)
-		})
-		be.Equal(t, want, got)
+		bareName := strings.TrimSuffix(path, ".json")
+		testfile.Equal(t, bareName+".md", got)
 	})
 }
 
 func BenchmarkConvert(b *testing.B) {
 	want := testfile.Read(be.Relaxed(b), "testdata/privacy.html")
-	s := testfile.Read(b, "testdata/privacy.json")
 	var got *html.Node
+
 	var doc docs.Document
-	be.NilErr(b, json.Unmarshal([]byte(s), &doc))
+	testfile.ReadJSON(b, "testdata/privacy.json", &doc)
+	b.ResetTimer()
 
 	for i := 0; i < b.N; i++ {
 		got = Convert(&doc)
@@ -70,11 +56,11 @@ func BenchmarkConvert(b *testing.B) {
 
 func BenchmarkFullConvert(b *testing.B) {
 	want := testfile.Read(be.Relaxed(b), "testdata/privacy.md")
-	s := testfile.Read(b, "testdata/privacy.json")
 	var got string
 
 	var doc docs.Document
-	be.NilErr(b, json.Unmarshal([]byte(s), &doc))
+	testfile.ReadJSON(b, "testdata/privacy.json", &doc)
+	b.ResetTimer()
 
 	for i := 0; i < b.N; i++ {
 		n := Convert(&doc)

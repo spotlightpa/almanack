@@ -34,7 +34,7 @@ func TestProcessGDocsDoc(t *testing.T) {
 			Transport: requests.Replay(path),
 		}
 		var doc docs.Document
-		testfile.Unmarshal(t, path+"/doc.json", &doc)
+		testfile.ReadJSON(t, path+"/doc.json", &doc)
 		// Run twice to test the already uploaded path
 		for i := 0; i < 2; i++ {
 			dbDoc, err := svc.Queries.CreateGDocsDoc(ctx, db.CreateGDocsDocParams{

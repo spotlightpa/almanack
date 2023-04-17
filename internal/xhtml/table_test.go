@@ -1,7 +1,7 @@
 package xhtml_test
 
 import (
-	"encoding/csv"
+	"fmt"
 	"strings"
 	"testing"
 
@@ -14,20 +14,16 @@ import (
 func TestTable(t *testing.T) {
 	t.Parallel()
 	testfile.GlobRun(t, "testdata/*.html", func(path string, t *testing.T) {
-		bareName := strings.TrimSuffix(path, ".html")
-		want := testfile.Read(t, bareName+".csv")
-
 		in := testfile.Read(t, path)
+		bareName := strings.TrimSuffix(path, ".html")
+
 		root, err := html.Parse(strings.NewReader(in))
 		be.NilErr(t, err)
-		var buf strings.Builder
-		w := csv.NewWriter(&buf)
+		i := 0
 		xhtml.Tables(root, func(_ *html.Node, tbl xhtml.TableNodes) {
+			i++
 			rows := xhtml.Map(tbl, xhtml.ContentsToString)
-			be.NilErr(t, w.WriteAll(rows))
+			testfile.EqualJSON(t, fmt.Sprintf("%s-%d.json", bareName, i), &rows)
 		})
-		w.Flush()
-		be.NilErr(t, w.Error())
-		be.Equal(t, want, buf.String())
 	})
 }
