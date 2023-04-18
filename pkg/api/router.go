@@ -77,10 +77,17 @@ func (app *appEnv) routes() http.Handler {
 		// Don't trust this middleware!
 		// Netlify should be verifying the role at the CDN level.
 		// This is just a fallback.
-		r.Use(app.hasRoleMiddleware("Spotlight PA"))
-		r.Get(`/page/{id:\d+}`, app.renderPage)
-		r.Get(`/user-info`, app.userInfo)
-		r.Get(`/download-image`, app.redirectImageURL)
+		r.With(
+			app.hasRoleMiddleware("editor"),
+		).Group(func(r chi.Router) {
+			r.Get(`/user-info`, app.userInfo)
+			r.Get(`/download-image`, app.redirectImageURL)
+		})
+		r.With(
+			app.hasRoleMiddleware("Spotlight PA"),
+		).Group(func(r chi.Router) {
+			r.Get(`/page/{id:\d+}`, app.renderPage)
+		})
 		r.NotFound(app.renderNotFound)
 	})
 
