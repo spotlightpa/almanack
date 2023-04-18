@@ -36,6 +36,13 @@
 
 [[redirects]]
   from = "/ssr/*"
+  to = "/.netlify/functions/almanack-api/:splat"
+  conditions = { Role = ["editor"]}
+  force = true
+  status = 200
+
+[[redirects]]
+  from = "/ssr/*"
   to = "/login"
   force = true
   status = 302
