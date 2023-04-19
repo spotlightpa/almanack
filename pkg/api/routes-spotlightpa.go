@@ -636,22 +636,42 @@ func (app *appEnv) postPageCreate(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if sharedArt.PageID.Valid {
-		app.replyErr(w, r, fmt.Errorf(
+		app.replyNewErr(http.StatusConflict, w, r,
 			"can't create new page for %d; page %d already exists",
-			req.SharedArticleID, sharedArt.PageID.Int64))
+			req.SharedArticleID, sharedArt.PageID.Int64)
 		return
 	}
 
-	warnings, err := app.svc.CreatePageFromArcSource(r.Context(), &sharedArt, req.PageKind)
-	for _, w := range warnings {
-		app.logErr(r.Context(), fmt.Errorf("got warning: %s", w))
-	}
-	if err != nil {
-		app.replyErr(w, r, err)
+	switch sharedArt.SourceType {
+	case "arc":
+		warnings, err := app.svc.CreatePageFromArcSource(r.Context(), &sharedArt, req.PageKind)
+		for _, w := range warnings {
+			app.logErr(r.Context(), fmt.Errorf("got warning: %s", w))
+		}
+		if err != nil {
+			app.replyErr(w, r, err)
+			return
+		}
+
+		app.replyJSON(http.StatusOK, w, sharedArt)
+		return
+
+	case "gdocs":
+		err = app.svc.CreatePageFromGDocsDoc(r.Context(), &sharedArt, req.PageKind)
+		if err != nil {
+			app.replyErr(w, r, err)
+			return
+		}
+
+		app.replyJSON(http.StatusOK, w, sharedArt)
+		return
+
+	default:
+		app.replyNewErr(http.StatusConflict, w, r,
+			"can't create new page for %d; bad source_type: %q",
+			req.SharedArticleID, sharedArt.SourceType)
 		return
 	}
-
-	app.replyJSON(http.StatusOK, w, sharedArt)
 }
 
 func (app *appEnv) listAllPages(w http.ResponseWriter, r *http.Request) {
