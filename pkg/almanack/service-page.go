@@ -210,7 +210,52 @@ func (svc Services) CreatePageFromArcSource(ctx context.Context, shared *db.Shar
 
 	filepath := buildFilePath(fm, kind)
 
-	err = svc.Tx.Begin(ctx, pgx.TxOptions{}, func(q *db.Queries) (txerr error) {
+	if err = svc.createPageForSharedArticle(ctx, shared, body, fm, filepath); err != nil {
+		return nil, err
+	}
+	return warnings, nil
+}
+
+func (svc Services) CreatePageFromGDocsDoc(ctx context.Context, shared *db.SharedArticle, kind string) (err error) {
+	defer errorx.Trace(&err)
+
+	if shared.SourceType != "gdocs" {
+		return fmt.Errorf(
+			"can't create new page for %d; wrong source type %q %q",
+			shared.ID, shared.SourceType, shared.SourceID)
+	}
+
+	var dbDocID int64
+	if err = json.Unmarshal(shared.RawData, &dbDocID); err != nil {
+		return err
+	}
+
+	dbDoc, err := svc.Queries.GetGDocsByID(ctx, dbDocID)
+	if !dbDoc.ProcessedAt.Valid {
+		// improve
+		return resperr.WithUserMessage(nil, "Document must be processed before conversion.")
+	}
+	body := dbDoc.ArticleMarkdown
+	fm := map[string]any{
+		"internal-id":       shared.InternalID,
+		"published":         shared.PublicationDate,
+		"byline":            shared.Byline, // TODO: Authors
+		"title":             shared.Hed,
+		"slug":              stringx.Slugify(shared.Hed),
+		"description":       shared.Description,
+		"image":             shared.LedeImage,
+		"image-credit":      shared.LedeImageCredit,
+		"image-description": shared.LedeImageDescription,
+		"image-caption":     shared.LedeImageCaption,
+	}
+
+	filepath := buildFilePath(fm, kind)
+
+	return svc.createPageForSharedArticle(ctx, shared, body, fm, filepath)
+}
+
+func (svc Services) createPageForSharedArticle(ctx context.Context, shared *db.SharedArticle, body string, fm map[string]any, filepath string) error {
+	return svc.Tx.Begin(ctx, pgx.TxOptions{}, func(q *db.Queries) (txerr error) {
 		defer errorx.Trace(&txerr)
 
 		if txerr = q.CreatePage(ctx, db.CreatePageParams{
@@ -246,10 +291,6 @@ func (svc Services) CreatePageFromArcSource(ctx context.Context, shared *db.Shar
 		*shared = newSharedArt
 		return nil
 	})
-	if err != nil {
-		return nil, err
-	}
-	return warnings, nil
 }
 
 func buildFilePath(fm map[string]any, kind string) string {
