@@ -42,6 +42,38 @@ func (q *Queries) CreateGDocsDoc(ctx context.Context, arg CreateGDocsDocParams) 
 	return i, err
 }
 
+const getGDocsByGDocIDWhereProcessed = `-- name: GetGDocsByGDocIDWhereProcessed :one
+SELECT
+  id, g_docs_id, document, embeds, rich_text, raw_html, article_markdown, word_count, warnings, processed_at, created_at
+FROM
+  g_docs_doc
+WHERE
+  g_docs_id = $1
+  AND processed_at IS NOT NULL
+ORDER BY
+  processed_at DESC
+LIMIT 1
+`
+
+func (q *Queries) GetGDocsByGDocIDWhereProcessed(ctx context.Context, gDocsID string) (GDocsDoc, error) {
+	row := q.db.QueryRow(ctx, getGDocsByGDocIDWhereProcessed, gDocsID)
+	var i GDocsDoc
+	err := row.Scan(
+		&i.ID,
+		&i.GDocsID,
+		&i.Document,
+		&i.Embeds,
+		&i.RichText,
+		&i.RawHtml,
+		&i.ArticleMarkdown,
+		&i.WordCount,
+		&i.Warnings,
+		&i.ProcessedAt,
+		&i.CreatedAt,
+	)
+	return i, err
+}
+
 const getGDocsByID = `-- name: GetGDocsByID :one
 SELECT
   id, g_docs_id, document, embeds, rich_text, raw_html, article_markdown, word_count, warnings, processed_at, created_at

@@ -12,6 +12,18 @@ FROM
 WHERE
   id = $1;
 
+-- name: GetGDocsByGDocIDWhereProcessed :one
+SELECT
+  *
+FROM
+  g_docs_doc
+WHERE
+  g_docs_id = $1
+  AND processed_at IS NOT NULL
+ORDER BY
+  processed_at DESC
+LIMIT 1;
+
 -- name: ListGDocsWhereUnprocessed :many
 SELECT
   *
