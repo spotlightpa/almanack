@@ -564,7 +564,8 @@ func (app *appEnv) postPageRefresh(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if page.SourceType == "mailchimp" {
+	switch page.SourceType {
+	case "mailchimp":
 		err = app.svc.RefreshPageFromMailchimp(r.Context(), &page)
 		if err != nil {
 			app.replyErr(w, r, err)
@@ -572,46 +573,54 @@ func (app *appEnv) postPageRefresh(w http.ResponseWriter, r *http.Request) {
 		}
 		app.replyJSON(http.StatusOK, w, &page)
 		return
-	}
+	case "gdocs":
+		dbDoc, err := app.svc.Queries.GetGDocsByGDocIDWhereProcessed(r.Context(), page.SourceID)
+		if err != nil {
+			app.replyErr(w, r, err)
+			return
+		}
+		page.Body = dbDoc.ArticleMarkdown
+		app.replyJSON(http.StatusOK, w, &page)
+		return
+	case "arc":
+		arcID := page.SourceID
+		if arcID == "" {
+			app.replyNewErr(http.StatusConflict, w, r, "no arc-id on page %d", id)
+			return
+		}
 
-	if page.SourceType != "arc" {
+		if fatal, err := app.svc.RefreshArcFromFeed(r.Context()); err != nil {
+			if fatal {
+				app.replyErr(w, r, err)
+				return
+			}
+			app.logErr(r.Context(), err)
+		}
+
+		story, err := app.svc.Queries.GetArcByArcID(r.Context(), arcID)
+		if err != nil {
+			if db.IsNotFound(err) {
+				err = fmt.Errorf("page %d refers to bad arc-id %q: %w", id, arcID, err)
+			}
+			app.replyErr(w, r, err)
+			return
+		}
+
+		if warnings, err := app.svc.RefreshPageFromArcStory(r.Context(), &page, &story, req.RefreshMetadata); err != nil {
+			app.replyErr(w, r, err)
+			return
+		} else {
+			for _, w := range warnings {
+				app.logErr(r.Context(), fmt.Errorf("got warning: %s", w))
+			}
+		}
+		app.replyJSON(http.StatusOK, w, page)
+		return
+	default:
 		app.replyNewErr(http.StatusConflict, w, r,
 			"cannot refresh page %d type %q", id, page.SourceType)
 		return
 	}
-
-	arcID := page.SourceID
-	if arcID == "" {
-		app.replyNewErr(http.StatusConflict, w, r, "no arc-id on page %d", id)
-		return
-	}
-
-	if fatal, err := app.svc.RefreshArcFromFeed(r.Context()); err != nil {
-		if fatal {
-			app.replyErr(w, r, err)
-			return
-		}
-		app.logErr(r.Context(), err)
-	}
-
-	story, err := app.svc.Queries.GetArcByArcID(r.Context(), arcID)
-	if err != nil {
-		if db.IsNotFound(err) {
-			err = fmt.Errorf("page %d refers to bad arc-id %q: %w", id, arcID, err)
-		}
-		app.replyErr(w, r, err)
-		return
-	}
-
-	if warnings, err := app.svc.RefreshPageFromArcStory(r.Context(), &page, &story, req.RefreshMetadata); err != nil {
-		app.replyErr(w, r, err)
-		return
-	} else {
-		for _, w := range warnings {
-			app.logErr(r.Context(), fmt.Errorf("got warning: %s", w))
-		}
-	}
-	app.replyJSON(http.StatusOK, w, page)
 }
 
 func (app *appEnv) postPageCreate(w http.ResponseWriter, r *http.Request) {
