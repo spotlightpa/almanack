@@ -23,44 +23,6 @@ import (
 	"golang.org/x/net/html/atom"
 )
 
-func (svc Services) SharedArticleFromGDocs(ctx context.Context, id string) (obj any, err error) {
-	defer errorx.Trace(&err)
-
-	if err := svc.ConfigureGoogleCert(ctx); err != nil {
-		return nil, err
-	}
-	cl, err := svc.Gsvc.GdocsClient(ctx)
-	if err != nil {
-		return nil, err
-	}
-	doc, err := gdocs.Request(ctx, cl, id)
-	if err != nil {
-		// TODO: figure out common errors, like no-permissions
-		return nil, err
-	}
-
-	// TODO: Extract metadata
-
-	dbDoc, err := svc.Queries.CreateGDocsDoc(ctx, db.CreateGDocsDocParams{
-		GDocsID:  id,
-		Document: *doc,
-	})
-	if err != nil {
-		return nil, err
-	}
-
-	idJSON, err := json.Marshal(dbDoc.ID)
-	if err != nil {
-		return nil, err
-	}
-
-	return svc.Queries.UpsertSharedArticleFromGDocs(ctx, db.UpsertSharedArticleFromGDocsParams{
-		GdocsID:    id,
-		InternalID: doc.Title,
-		RawData:    idJSON,
-	})
-}
-
 func (svc Services) CreateGDocsDoc(ctx context.Context, externalID string) (dbDoc *db.GDocsDoc, err error) {
 	defer errorx.Trace(&err)
 
