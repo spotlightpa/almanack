@@ -885,7 +885,8 @@ func (app *appEnv) postSharedArticleFromGDocs(w http.ResponseWriter, r *http.Req
 	app.logStart(r)
 
 	var req struct {
-		ID int64 `json:"gdocs_doc_id"`
+		ID          int64 `json:"gdocs_doc_id"`
+		ForceUpdate bool  `json:"force_update"`
 	}
 	if !app.readJSON(w, r, &req) {
 		return
@@ -901,6 +902,24 @@ func (app *appEnv) postSharedArticleFromGDocs(w http.ResponseWriter, r *http.Req
 		app.replyNewErr(http.StatusConflict, w, r,
 			"gdocs_doc.id=%d still processing", req.ID)
 		return
+	}
+
+	if !req.ForceUpdate {
+		art, err := app.svc.Queries.GetSharedArticleBySource(r.Context(), db.GetSharedArticleBySourceParams{
+			SourceType: "gdocs",
+			SourceID:   dbDoc.GDocsID,
+		})
+		switch {
+		// Skip update if it exists
+		case err == nil:
+			app.replyJSON(http.StatusOK, w, art)
+			return
+		case db.IsNotFound(err):
+			break
+		case err != nil:
+			app.replyErr(w, r, err)
+			return
+		}
 	}
 
 	idJSON, _ := json.Marshal(req.ID)
