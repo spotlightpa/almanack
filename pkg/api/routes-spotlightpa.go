@@ -1,6 +1,7 @@
 package api
 
 import (
+	"encoding/json"
 	"errors"
 	"fmt"
 	"net/http"
@@ -882,39 +883,34 @@ func (app *appEnv) postSharedArticleFromArc(w http.ResponseWriter, r *http.Reque
 
 func (app *appEnv) postSharedArticleFromGDocs(w http.ResponseWriter, r *http.Request) {
 	app.logStart(r)
-	l := almlog.FromContext(r.Context())
 
 	var req struct {
-		ID          string `json:"gdocs_id"`
-		ForceUpdate bool   `json:"force_update"`
+		ID int64 `json:"gdocs_doc_id"`
 	}
 	if !app.readJSON(w, r, &req) {
 		return
 	}
-	id, err := gdocs.NormalizeID(req.ID)
+
+	dbDoc, err := app.svc.Queries.GetGDocsByID(r.Context(), req.ID)
 	if err != nil {
-		l.Warn("postSharedArticleFromGDocs: bad id", "id", req.ID)
+		err = db.NoRowsAs404(err, "missing g_docs_doc.id=%d", req.ID)
 		app.replyErr(w, r, err)
 		return
 	}
-
-	l.Debug("postSharedArticleFromGDocs", "id", id)
-	if !req.ForceUpdate {
-		art, err := app.svc.Queries.GetSharedArticleBySource(r.Context(), db.GetSharedArticleBySourceParams{
-			SourceType: "gdocs",
-			SourceID:   id,
-		})
-		switch {
-		case err == nil: // found article
-			l.Debug("postSharedArticleFromGDocs: found existing article",
-				"shared_article.id", art.ID)
-			app.replyJSON(http.StatusOK, w, art)
-			return
-		case !db.IsNotFound(err):
-			app.logErr(r.Context(), err)
-		}
+	if !dbDoc.ProcessedAt.Valid {
+		app.replyNewErr(http.StatusConflict, w, r,
+			"gdocs_doc.id=%d still processing", req.ID)
+		return
 	}
-	art, err := app.svc.SharedArticleFromGDocs(r.Context(), id)
+
+	idJSON, _ := json.Marshal(req.ID)
+	// TODO: Extract more metadata
+	// Note: Upsert, so in a race, this just updates existing article
+	art, err := app.svc.Queries.UpsertSharedArticleFromGDocs(r.Context(), db.UpsertSharedArticleFromGDocsParams{
+		GdocsID:    dbDoc.GDocsID,
+		InternalID: dbDoc.Document.Title,
+		RawData:    idJSON,
+	})
 	if err != nil {
 		app.replyErr(w, r, err)
 		return
