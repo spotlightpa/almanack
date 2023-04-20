@@ -61,6 +61,34 @@ func (svc Services) SharedArticleFromGDocs(ctx context.Context, id string) (obj 
 	})
 }
 
+func (svc Services) CreateGDocsDoc(ctx context.Context, externalID string) (dbDoc *db.GDocsDoc, err error) {
+	defer errorx.Trace(&err)
+
+	if err := svc.ConfigureGoogleCert(ctx); err != nil {
+		return nil, err
+	}
+	cl, err := svc.Gsvc.GdocsClient(ctx)
+	if err != nil {
+		return nil, err
+	}
+	doc, err := gdocs.Request(ctx, cl, externalID)
+	if err != nil {
+		// TODO: figure out common errors, like no-permissions
+		return nil, err
+	}
+
+	// TODO: Extract metadata
+
+	newDoc, err := svc.Queries.CreateGDocsDoc(ctx, db.CreateGDocsDocParams{
+		GDocsID:  externalID,
+		Document: *doc,
+	})
+	if err != nil {
+		return nil, err
+	}
+	return &newDoc, nil
+}
+
 func (svc Services) ProcessGDocs(ctx context.Context) error {
 	docs, err := svc.Queries.ListGDocsWhereUnprocessed(ctx)
 	if err != nil {

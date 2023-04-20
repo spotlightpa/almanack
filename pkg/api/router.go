@@ -50,6 +50,8 @@ func (app *appEnv) routes() http.Handler {
 			r.Post(`/files-create`, app.postFileCreate)
 			r.Get(`/files-list`, app.listFiles)
 			r.Post(`/files-update`, app.postFileUpdate)
+			r.Get(`/gdocs-doc`, app.getGDocsDoc)
+			r.Post(`/gdocs-doc`, app.postGDocsDoc)
 			r.Post(`/image-update`, app.postImageUpdate)
 			r.Get(`/images`, app.listImages)
 			r.Post(`/message`, app.postMessage)

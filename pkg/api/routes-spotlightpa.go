@@ -921,3 +921,46 @@ func (app *appEnv) postSharedArticleFromGDocs(w http.ResponseWriter, r *http.Req
 	}
 	app.replyJSON(http.StatusOK, w, art)
 }
+
+func (app *appEnv) postGDocsDoc(w http.ResponseWriter, r *http.Request) {
+	app.logStart(r)
+	l := almlog.FromContext(r.Context())
+
+	var req struct {
+		ID string `json:"gdocs_id"`
+	}
+	if !app.readJSON(w, r, &req) {
+		return
+	}
+	id, err := gdocs.NormalizeID(req.ID)
+	if err != nil {
+		l.Warn("postSharedArticleFromGDocs: bad id", "id", req.ID)
+		app.replyErr(w, r, err)
+		return
+	}
+
+	art, err := app.svc.CreateGDocsDoc(r.Context(), id)
+	if err != nil {
+		app.replyErr(w, r, err)
+		return
+	}
+	app.replyJSON(http.StatusOK, w, art)
+}
+
+func (app *appEnv) getGDocsDoc(w http.ResponseWriter, r *http.Request) {
+	app.logStart(r)
+
+	var id int64
+	if !intFromQuery(r, "id", &id) {
+		app.replyNewErr(http.StatusBadRequest, w, r, "missing ID")
+		return
+	}
+
+	dbDoc, err := app.svc.Queries.GetGDocsByID(r.Context(), id)
+	if err != nil {
+		err = db.NoRowsAs404(err, "missing g_docs_doc.id=%d", id)
+		app.replyErr(w, r, err)
+		return
+	}
+	app.replyJSON(http.StatusOK, w, dbDoc)
+}
