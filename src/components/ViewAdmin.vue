@@ -8,6 +8,7 @@ import {
   listSharedArticles,
   postSharedArticleFromGDocs,
 } from "@/api/client-v2.js";
+import { processGDocsDoc } from "@/api/gdocs.js";
 import { makeState, watchAPI } from "@/api/service-util.js";
 import SharedArticle from "@/api/shared-article.js";
 
@@ -24,17 +25,19 @@ const { apiState, fetch, computedList, computedProp } = watchAPI(
 const gdocsImportURL = ref("");
 const { apiStateRefs: gdocsState, exec: gdocsExec } = makeState();
 async function importGDocsURL(id) {
-  await gdocsExec(() =>
-    post(postSharedArticleFromGDocs, {
-      gdocs_id: id,
-    })
-  );
+  await gdocsExec(async () => {
+    let [, err] = await processGDocsDoc(id);
+    if (err) {
+      return [null, err];
+    }
+    return await post(postSharedArticleFromGDocs, {
+      gdocs_doc_id: id,
+      force_update: false,
+    });
+  });
   if (gdocsState.error.value) {
     return;
   }
-
-  // Trigger background image processing
-  window.fetch("/api-background/images").catch(() => {});
 
   let article = new SharedArticle(gdocsState.rawData.value);
   router.push({
