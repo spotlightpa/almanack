@@ -892,28 +892,30 @@ func (app *appEnv) postSharedArticleFromArc(w http.ResponseWriter, r *http.Reque
 
 func (app *appEnv) postSharedArticleFromGDocs(w http.ResponseWriter, r *http.Request) {
 	app.logStart(r)
-
+	l := almlog.FromContext(r.Context())
 	var req struct {
-		ID          int64 `json:"gdocs_doc_id"`
-		ForceUpdate bool  `json:"force_update"`
+		ID          string `json:"gdocs_doc_id"`
+		ForceUpdate bool   `json:"force_update"`
 	}
 	if !app.readJSON(w, r, &req) {
 		return
 	}
 
-	dbDoc, err := app.svc.Queries.GetGDocsByID(r.Context(), req.ID)
+	id, err := gdocs.NormalizeID(req.ID)
 	if err != nil {
-		err = db.NoRowsAs404(err, "missing g_docs_doc.id=%d", req.ID)
 		app.replyErr(w, r, err)
 		return
 	}
-	if !dbDoc.ProcessedAt.Valid {
-		app.replyNewErr(http.StatusConflict, w, r,
-			"gdocs_doc.id=%d still processing", req.ID)
+
+	dbDoc, err := app.svc.Queries.GetGDocsByGDocIDWhereProcessed(r.Context(), id)
+	if err != nil {
+		err = db.NoRowsAs404(err, "missing g_docs_doc.id=%q", req.ID)
+		app.replyErr(w, r, err)
 		return
 	}
 
 	if !req.ForceUpdate {
+		l.Debug("postSharedArticleFromGDocs", "force_update", false)
 		art, err := app.svc.Queries.GetSharedArticleBySource(r.Context(), db.GetSharedArticleBySourceParams{
 			SourceType: "gdocs",
 			SourceID:   dbDoc.GDocsID,
@@ -921,6 +923,7 @@ func (app *appEnv) postSharedArticleFromGDocs(w http.ResponseWriter, r *http.Req
 		switch {
 		// Skip update if it exists
 		case err == nil:
+			l.Debug("postSharedArticleFromGDocs: skipping")
 			app.replyJSON(http.StatusOK, w, art)
 			return
 		case db.IsNotFound(err):
@@ -931,7 +934,7 @@ func (app *appEnv) postSharedArticleFromGDocs(w http.ResponseWriter, r *http.Req
 		}
 	}
 
-	idJSON, _ := json.Marshal(req.ID)
+	idJSON, _ := json.Marshal(dbDoc.ID)
 	// TODO: Extract more metadata
 	// Note: Upsert, so in a race, this just updates existing article
 	art, err := app.svc.Queries.UpsertSharedArticleFromGDocs(r.Context(), db.UpsertSharedArticleFromGDocsParams{
