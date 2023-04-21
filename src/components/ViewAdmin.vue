@@ -274,7 +274,10 @@ const nextPage = computedProp("next_page", (page) => ({
                   />
                 </h3>
                 <div class="mb-1 tags">
-                  <span class="tag is-small" :class="article.statusClass">
+                  <span
+                    class="tag is-small has-text-weight-semibold"
+                    :class="article.statusClass"
+                  >
                     <span class="icon is-size-6">
                       <font-awesome-icon
                         :icon="
@@ -286,46 +289,33 @@ const nextPage = computedProp("next_page", (page) => ({
                     </span>
                     <span v-text="article.statusVerbose"></span>
                   </span>
-
-                  <router-link class="tag is-light" :to="article.detailsRoute">
-                    <span class="icon">
-                      <font-awesome-icon :icon="['fas', 'file-invoice']" />
-                    </span>
-                    <span>Partner view</span>
-                  </router-link>
-
-                  <a
+                  <TagLink
+                    :to="article.detailsRoute"
+                    :icon="['fas', 'file-invoice']"
+                  >
+                    Partner view
+                  </TagLink>
+                  <TagLink
                     v-if="article.isArc"
-                    class="tag is-light"
                     :href="article.arc.arcURL"
-                    target="_blank"
+                    :icon="['fas', 'link']"
                   >
-                    <span class="icon is-size-6">
-                      <font-awesome-icon :icon="['fas', 'link']" />
-                    </span>
-                    <span>Arc</span>
-                  </a>
-                  <a
+                    Arc
+                  </TagLink>
+                  <TagLink
                     v-if="article.isGDoc"
-                    class="tag is-light"
                     :href="article.gdocsURL"
-                    target="_blank"
+                    :icon="['fas', 'link']"
                   >
-                    <span class="icon is-size-6">
-                      <font-awesome-icon :icon="['fas', 'link']" />
-                    </span>
-                    <span>Google Docs</span>
-                  </a>
-                  <router-link
+                    Google Docs
+                  </TagLink>
+                  <TagLink
                     v-if="article.pageRoute"
-                    class="tag is-light"
                     :to="article.pageRoute"
+                    :icon="['fas', 'user-clock']"
                   >
-                    <span class="icon">
-                      <font-awesome-icon :icon="['fas', 'user-clock']" />
-                    </span>
-                    <span>Spotlight admin</span>
-                  </router-link>
+                    Spotlight admin
+                  </TagLink>
                 </div>
                 <p class="mb-1 content">
                   {{ article.budget }}

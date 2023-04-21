@@ -37,6 +37,34 @@ export default {
           </span>
           <span v-text="article.statusVerbose"></span>
         </span>
+        <TagLink
+          v-if="isSpotlightPAUser && article.isGDoc"
+          :to="article.adminRoute"
+          :icon="['fas', 'sliders']"
+        >
+          Admin
+        </TagLink>
+        <TagLink
+          v-if="isArcUser && article.isArc"
+          :href="article.arc.arcURL"
+          :icon="['fas', 'link']"
+        >
+          Arc
+        </TagLink>
+        <TagLink
+          v-if="isSpotlightPAUser && article.isGDoc"
+          :href="article.gdocsURL"
+          :icon="['fas', 'link']"
+        >
+          Google Docs
+        </TagLink>
+        <TagLink
+          v-if="isSpotlightPAUser && article.pageRoute"
+          :to="article.pageRoute"
+          :icon="['fas', 'user-clock']"
+        >
+          Spotlight admin
+        </TagLink>
       </span>
     </span>
   </span>
