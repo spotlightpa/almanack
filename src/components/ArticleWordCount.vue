@@ -35,9 +35,9 @@ const wordCounts = computed(() => {
 </script>
 
 <template>
-  <div class="level is-mobile is-clipped">
+  <div v-if="wordCounts.actual" class="level is-mobile is-clipped">
     <div class="level-left">
-      <p v-if="wordCounts.actual" class="level-item is-hidden-mobile">
+      <p class="level-item is-hidden-mobile">
         <span>
           <strong>Word Count:</strong>
           {{ wordCounts.actual }}
