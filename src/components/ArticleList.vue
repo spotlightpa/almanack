@@ -18,19 +18,19 @@ export default {
         <h2 class="title is-spaced is-3">
           <ArticleSlugLine :article="article" />
         </h2>
-        <template v-if="article.isArc">
-          <p class="has-margin-top-negative">
-            <strong>Byline:</strong>
-            {{ article.arc.byline }}
-          </p>
-          <p>
-            <strong>Planned time:</strong>
-            {{ formatDate(article.publicationDate) }}
-          </p>
-          <p class="has-margin-top-thin content is-small">
-            {{ article.budget }}
-          </p>
-        </template>
+
+        <p class="has-margin-top-negative">
+          <strong>Byline:</strong>
+          {{ article.isArc ? article.arc.byline : article.byline }}
+        </p>
+        <p>
+          <strong>Planned time:</strong>
+          {{ formatDate(article.publicationDate) }}
+        </p>
+        <p class="has-margin-top-thin content is-small">
+          {{ article.budget }}
+        </p>
+
         <ArticleWordCount :article="article" />
       </div>
     </article>
