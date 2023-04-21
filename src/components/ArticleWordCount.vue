@@ -22,7 +22,7 @@ const wordCounts = computed(() => {
   if (wc) {
     return {
       actual: intcomma(wc),
-      lines: intcomma(Math.round(wc / 30)),
+      lines: intcomma(Math.ceil(wc / 30)),
       inches: intcomma(Math.ceil(wc / 30 / 8)),
     };
   }
