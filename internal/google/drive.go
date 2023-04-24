@@ -3,12 +3,12 @@ package google
 import (
 	"bytes"
 	"context"
-	"fmt"
 	"net/http"
 	"strings"
 
 	"github.com/carlmjohnson/bytemap"
 	"github.com/carlmjohnson/requests"
+	"github.com/carlmjohnson/resperr"
 	"github.com/spotlightpa/almanack/pkg/almlog"
 	"golang.org/x/oauth2"
 	"golang.org/x/oauth2/google"
@@ -91,25 +91,27 @@ func NormalizeFileID(s string) (string, error) {
 	if validIDChars.Contains(s) {
 		return s, nil
 	}
-	trimmed, ok := strings.CutPrefix(s, "https://drive.google.com/file/d/")
-	if !ok {
-		return "", fmt.Errorf("bad file ID prefix: %q", s)
+	var v resperr.Validator
+	v.AddIf("drive_id", len(s) == 0, "ID must be set")
+	id, found := strings.CutPrefix(s, "https://drive.google.com/file/d/")
+	v.AddIfUnset("drive_id", !found, "Unrecognized ID prefix: %s", s)
+	if found {
+		id, _, _ = strings.Cut(id, "/")
 	}
-	trimmed, _, _ = strings.Cut(trimmed, "/")
-	if !validIDChars.Contains(trimmed) {
-		return "", fmt.Errorf("file ID contains illegal characters: %q", s)
-	}
-	return trimmed, nil
+	v.AddIfUnset("drive_id", !validIDChars.Contains(id),
+		"Illegal characters in file ID: %s", s)
+	return id, v.Err()
 }
 
 func (gsvc Service) DownloadFile(ctx context.Context, cl *http.Client, fileID string) ([]byte, error) {
-	if !validIDChars.Contains(fileID) {
-		return nil, fmt.Errorf("bad fileID: %q", fileID)
+	id, err := NormalizeFileID(fileID)
+	if err != nil {
+		return nil, err
 	}
 	var buf bytes.Buffer
-	err := requests.
+	err = requests.
 		URL("https://www.googleapis.com").
-		Pathf("/drive/v3/files/%s", fileID).
+		Pathf("/drive/v3/files/%s", id).
 		Param("alt", "media").
 		Client(cl).
 		ToBytesBuffer(&buf).

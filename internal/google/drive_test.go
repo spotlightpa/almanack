@@ -37,4 +37,12 @@ func TestDownloadFile(t *testing.T) {
 	b, err := gsvc.DownloadFile(ctx, &cl, "1ssiQd8AKXHo99qkZZwYbHxfVJHY3RPnL")
 	be.NilErr(t, err)
 	be.Equal(t, "image/jpeg", http.DetectContentType(b))
+
+	b, err = gsvc.DownloadFile(ctx, &cl, "https://drive.google.com/file/d/1ssiQd8AKXHo99qkZZwYbHxfVJHY3RPnL/view?usp=share_link")
+	be.NilErr(t, err)
+	be.Equal(t, "image/jpeg", http.DetectContentType(b))
+
+	b, err = gsvc.DownloadFile(ctx, &cl, "https://drive.google.com/file/d/1ssiQd8AKXHo99qkZZwYbHxfVJHY3RPnL;;/view?usp=share_link")
+	be.Nonzero(t, err)
+	be.Zero(t, b)
 }
