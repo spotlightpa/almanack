@@ -1,6 +1,6 @@
 -- name: CreateGDocsDoc :one
-INSERT INTO g_docs_doc ("g_docs_id", "document")
-  VALUES (@g_docs_id, @document)
+INSERT INTO g_docs_doc ("external_id", "document")
+  VALUES (@external_id, @document)
 RETURNING
   *;
 
@@ -12,13 +12,13 @@ FROM
 WHERE
   id = $1;
 
--- name: GetGDocsByGDocIDWhereProcessed :one
+-- name: GetGDocsByExternalIDWhereProcessed :one
 SELECT
   *
 FROM
   g_docs_doc
 WHERE
-  g_docs_id = $1
+  external_id = $1
   AND processed_at IS NOT NULL
 ORDER BY
   processed_at DESC
@@ -49,12 +49,12 @@ RETURNING
   *;
 
 -- name: UpsertGDocsImage :exec
-INSERT INTO g_docs_image (g_docs_id, doc_object_id, image_id)
-  VALUES (@g_docs_id, @doc_object_id, @image_id)
-ON CONFLICT (g_docs_id, doc_object_id)
+INSERT INTO g_docs_image (external_id, doc_object_id, image_id)
+  VALUES (@external_id, @doc_object_id, @image_id)
+ON CONFLICT (external_id, doc_object_id)
   DO NOTHING;
 
--- name: ListGDocsImagesByGDocsID :many
+-- name: ListGDocsImagesByExternalID :many
 SELECT
   "doc_object_id",
   "path"::text,
@@ -63,4 +63,4 @@ FROM
   g_docs_image
   LEFT JOIN image ON (image_id = image.id)
 WHERE
-  g_docs_id = $1;
+  external_id = $1;

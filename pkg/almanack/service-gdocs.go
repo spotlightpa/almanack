@@ -42,8 +42,8 @@ func (svc Services) CreateGDocsDoc(ctx context.Context, externalID string) (dbDo
 	// TODO: Extract metadata
 
 	newDoc, err := svc.Queries.CreateGDocsDoc(ctx, db.CreateGDocsDocParams{
-		GDocsID:  externalID,
-		Document: *doc,
+		ExternalID: externalID,
+		Document:   *doc,
 	})
 	if err != nil {
 		return nil, err
@@ -69,7 +69,7 @@ func (svc Services) ProcessGDocsDoc(ctx context.Context, dbDoc db.GDocsDoc) (err
 	defer errorx.Trace(&err)
 
 	// Get existing image uploads
-	rows, err := svc.Queries.ListGDocsImagesByGDocsID(ctx, dbDoc.GDocsID)
+	rows, err := svc.Queries.ListGDocsImagesByExternalID(ctx, dbDoc.ExternalID)
 	if err != nil {
 		return err
 	}
@@ -137,7 +137,7 @@ func (svc Services) ProcessGDocsDoc(ctx context.Context, dbDoc db.GDocsDoc) (err
 			} else {
 				src := xhtml.Attr(image, "src")
 				if uploadErr := svc.UploadGDocsImage(ctx, UploadGDocsImageParams{
-					GDocsID:     dbDoc.GDocsID,
+					ExternalID:  dbDoc.ExternalID,
 					DocObjectID: objID,
 					ImageURL:    src,
 					Embed:       &imageEmbed,
@@ -272,7 +272,7 @@ func fixMarkdownPlaceholders(rawHTML *html.Node) {
 }
 
 type UploadGDocsImageParams struct {
-	GDocsID     string
+	ExternalID  string
 	DocObjectID string
 	ImageURL    string
 	Embed       *db.EmbedImage // In-out param
@@ -326,7 +326,7 @@ func (svc Services) UploadGDocsImage(ctx context.Context, arg UploadGDocsImagePa
 
 	arg.Embed.Path = dbImage.Path
 	err = svc.Queries.UpsertGDocsImage(ctx, db.UpsertGDocsImageParams{
-		GDocsID:     arg.GDocsID,
+		ExternalID:  arg.ExternalID,
 		DocObjectID: arg.DocObjectID,
 		ImageID:     dbImage.ID,
 	})

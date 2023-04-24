@@ -574,7 +574,7 @@ func (app *appEnv) postPageRefresh(w http.ResponseWriter, r *http.Request) {
 		app.replyJSON(http.StatusOK, w, &page)
 		return
 	case "gdocs":
-		dbDoc, err := app.svc.Queries.GetGDocsByGDocIDWhereProcessed(r.Context(), page.SourceID)
+		dbDoc, err := app.svc.Queries.GetGDocsByExternalIDWhereProcessed(r.Context(), page.SourceID)
 		if err != nil {
 			app.replyErr(w, r, err)
 			return
@@ -907,7 +907,7 @@ func (app *appEnv) postSharedArticleFromGDocs(w http.ResponseWriter, r *http.Req
 		return
 	}
 
-	dbDoc, err := app.svc.Queries.GetGDocsByGDocIDWhereProcessed(r.Context(), id)
+	dbDoc, err := app.svc.Queries.GetGDocsByExternalIDWhereProcessed(r.Context(), id)
 	if err != nil {
 		err = db.NoRowsAs404(err, "missing g_docs_doc.id=%q", req.ID)
 		app.replyErr(w, r, err)
@@ -918,7 +918,7 @@ func (app *appEnv) postSharedArticleFromGDocs(w http.ResponseWriter, r *http.Req
 		l.Debug("postSharedArticleFromGDocs", "force_update", false)
 		art, err := app.svc.Queries.GetSharedArticleBySource(r.Context(), db.GetSharedArticleBySourceParams{
 			SourceType: "gdocs",
-			SourceID:   dbDoc.GDocsID,
+			SourceID:   dbDoc.ExternalID,
 		})
 		switch {
 		// Skip update if it exists
@@ -938,7 +938,7 @@ func (app *appEnv) postSharedArticleFromGDocs(w http.ResponseWriter, r *http.Req
 	// TODO: Extract more metadata
 	// Note: Upsert, so in a race, this just updates existing article
 	art, err := app.svc.Queries.UpsertSharedArticleFromGDocs(r.Context(), db.UpsertSharedArticleFromGDocsParams{
-		GdocsID:    dbDoc.GDocsID,
+		GdocsID:    dbDoc.ExternalID,
 		InternalID: dbDoc.Document.Title,
 		RawData:    idJSON,
 	})

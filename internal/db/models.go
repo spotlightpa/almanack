@@ -50,7 +50,7 @@ type File struct {
 
 type GDocsDoc struct {
 	ID              int64              `json:"id"`
-	GDocsID         string             `json:"g_docs_id"`
+	ExternalID      string             `json:"external_id"`
 	Document        docs.Document      `json:"document"`
 	Embeds          []Embed            `json:"embeds"`
 	RichText        string             `json:"rich_text"`
@@ -64,7 +64,7 @@ type GDocsDoc struct {
 
 type GDocsImage struct {
 	ID          int64     `json:"id"`
-	GDocsID     string    `json:"g_docs_id"`
+	ExternalID  string    `json:"external_id"`
 	DocObjectID string    `json:"doc_object_id"`
 	ImageID     int64     `json:"image_id"`
 	CreatedAt   time.Time `json:"created_at"`
