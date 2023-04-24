@@ -11,7 +11,7 @@ import (
 )
 
 func HTMLToMarkdown(htmlstr string) (string, error) {
-	root, err := Minify(htmlstr)
+	root, err := Minify(strings.NewReader(htmlstr))
 	if err != nil {
 		return "", err
 	}

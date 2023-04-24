@@ -80,7 +80,7 @@ func (svc Services) ProcessGDocsDoc(ctx context.Context, dbDoc db.GDocsDoc) (err
 	}
 
 	docHTML := gdocs.Convert(&dbDoc.Document)
-	docHTML, err = blocko.Minify(xhtml.ToString(docHTML))
+	docHTML, err = blocko.Minify(xhtml.ToBuffer(docHTML))
 	if err != nil {
 		return err
 	}
