@@ -9,6 +9,14 @@ import (
 	"golang.org/x/net/html/atom"
 )
 
+func ToBuffer(n *html.Node) *bytes.Buffer {
+	var buf bytes.Buffer
+	if err := html.Render(&buf, n); err != nil {
+		panic(err)
+	}
+	return &buf
+}
+
 var pool sync.Pool
 
 func poolGet() *bytes.Buffer {
