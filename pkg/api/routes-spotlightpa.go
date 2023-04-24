@@ -894,7 +894,7 @@ func (app *appEnv) postSharedArticleFromGDocs(w http.ResponseWriter, r *http.Req
 	app.logStart(r)
 	l := almlog.FromContext(r.Context())
 	var req struct {
-		ID          string `json:"gdocs_doc_id"`
+		ID          string `json:"external_gdocs_id"`
 		ForceUpdate bool   `json:"force_update"`
 	}
 	if !app.readJSON(w, r, &req) {
@@ -909,7 +909,7 @@ func (app *appEnv) postSharedArticleFromGDocs(w http.ResponseWriter, r *http.Req
 
 	dbDoc, err := app.svc.Queries.GetGDocsByExternalIDWhereProcessed(r.Context(), id)
 	if err != nil {
-		err = db.NoRowsAs404(err, "missing g_docs_doc.id=%q", req.ID)
+		err = db.NoRowsAs404(err, "missing external_gdocs_id=%q", req.ID)
 		app.replyErr(w, r, err)
 		return
 	}
@@ -954,7 +954,7 @@ func (app *appEnv) postGDocsDoc(w http.ResponseWriter, r *http.Request) {
 	l := almlog.FromContext(r.Context())
 
 	var req struct {
-		ID string `json:"gdocs_id"`
+		ID string `json:"external_gdocs_id"`
 	}
 	if !app.readJSON(w, r, &req) {
 		return
