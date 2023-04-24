@@ -57,7 +57,9 @@ func InnerBlocksToString(n *html.Node) string {
 }
 
 func InnerText(n *html.Node) string {
-	var buf strings.Builder
+	buf := poolGet()
+	defer pool.Put(buf)
+
 	VisitAll(n, func(n *html.Node) {
 		if n.Type == html.TextNode {
 			buf.WriteString(n.Data)
