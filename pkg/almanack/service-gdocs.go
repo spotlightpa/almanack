@@ -29,7 +29,7 @@ func (svc Services) CreateGDocsDoc(ctx context.Context, externalID string) (dbDo
 	if err := svc.ConfigureGoogleCert(ctx); err != nil {
 		return nil, err
 	}
-	cl, err := svc.Gsvc.GdocsClient(ctx)
+	cl, err := svc.Gsvc.GDocsClient(ctx)
 	if err != nil {
 		return nil, err
 	}
