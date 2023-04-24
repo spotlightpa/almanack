@@ -12,23 +12,23 @@ import (
 )
 
 const createGDocsDoc = `-- name: CreateGDocsDoc :one
-INSERT INTO g_docs_doc ("g_docs_id", "document")
+INSERT INTO g_docs_doc ("external_id", "document")
   VALUES ($1, $2)
 RETURNING
-  id, g_docs_id, document, embeds, rich_text, raw_html, article_markdown, word_count, warnings, processed_at, created_at
+  id, external_id, document, embeds, rich_text, raw_html, article_markdown, word_count, warnings, processed_at, created_at
 `
 
 type CreateGDocsDocParams struct {
-	GDocsID  string        `json:"g_docs_id"`
-	Document docs.Document `json:"document"`
+	ExternalID string        `json:"external_id"`
+	Document   docs.Document `json:"document"`
 }
 
 func (q *Queries) CreateGDocsDoc(ctx context.Context, arg CreateGDocsDocParams) (GDocsDoc, error) {
-	row := q.db.QueryRow(ctx, createGDocsDoc, arg.GDocsID, arg.Document)
+	row := q.db.QueryRow(ctx, createGDocsDoc, arg.ExternalID, arg.Document)
 	var i GDocsDoc
 	err := row.Scan(
 		&i.ID,
-		&i.GDocsID,
+		&i.ExternalID,
 		&i.Document,
 		&i.Embeds,
 		&i.RichText,
@@ -42,25 +42,25 @@ func (q *Queries) CreateGDocsDoc(ctx context.Context, arg CreateGDocsDocParams) 
 	return i, err
 }
 
-const getGDocsByGDocIDWhereProcessed = `-- name: GetGDocsByGDocIDWhereProcessed :one
+const getGDocsByExternalIDWhereProcessed = `-- name: GetGDocsByExternalIDWhereProcessed :one
 SELECT
-  id, g_docs_id, document, embeds, rich_text, raw_html, article_markdown, word_count, warnings, processed_at, created_at
+  id, external_id, document, embeds, rich_text, raw_html, article_markdown, word_count, warnings, processed_at, created_at
 FROM
   g_docs_doc
 WHERE
-  g_docs_id = $1
+  external_id = $1
   AND processed_at IS NOT NULL
 ORDER BY
   processed_at DESC
 LIMIT 1
 `
 
-func (q *Queries) GetGDocsByGDocIDWhereProcessed(ctx context.Context, gDocsID string) (GDocsDoc, error) {
-	row := q.db.QueryRow(ctx, getGDocsByGDocIDWhereProcessed, gDocsID)
+func (q *Queries) GetGDocsByExternalIDWhereProcessed(ctx context.Context, externalID string) (GDocsDoc, error) {
+	row := q.db.QueryRow(ctx, getGDocsByExternalIDWhereProcessed, externalID)
 	var i GDocsDoc
 	err := row.Scan(
 		&i.ID,
-		&i.GDocsID,
+		&i.ExternalID,
 		&i.Document,
 		&i.Embeds,
 		&i.RichText,
@@ -76,7 +76,7 @@ func (q *Queries) GetGDocsByGDocIDWhereProcessed(ctx context.Context, gDocsID st
 
 const getGDocsByID = `-- name: GetGDocsByID :one
 SELECT
-  id, g_docs_id, document, embeds, rich_text, raw_html, article_markdown, word_count, warnings, processed_at, created_at
+  id, external_id, document, embeds, rich_text, raw_html, article_markdown, word_count, warnings, processed_at, created_at
 FROM
   g_docs_doc
 WHERE
@@ -88,7 +88,7 @@ func (q *Queries) GetGDocsByID(ctx context.Context, id int64) (GDocsDoc, error) 
 	var i GDocsDoc
 	err := row.Scan(
 		&i.ID,
-		&i.GDocsID,
+		&i.ExternalID,
 		&i.Document,
 		&i.Embeds,
 		&i.RichText,
@@ -102,7 +102,7 @@ func (q *Queries) GetGDocsByID(ctx context.Context, id int64) (GDocsDoc, error) 
 	return i, err
 }
 
-const listGDocsImagesByGDocsID = `-- name: ListGDocsImagesByGDocsID :many
+const listGDocsImagesByExternalID = `-- name: ListGDocsImagesByExternalID :many
 SELECT
   "doc_object_id",
   "path"::text,
@@ -111,24 +111,24 @@ FROM
   g_docs_image
   LEFT JOIN image ON (image_id = image.id)
 WHERE
-  g_docs_id = $1
+  external_id = $1
 `
 
-type ListGDocsImagesByGDocsIDRow struct {
+type ListGDocsImagesByExternalIDRow struct {
 	DocObjectID string `json:"doc_object_id"`
 	Path        string `json:"path"`
 	Type        string `json:"type"`
 }
 
-func (q *Queries) ListGDocsImagesByGDocsID(ctx context.Context, gDocsID string) ([]ListGDocsImagesByGDocsIDRow, error) {
-	rows, err := q.db.Query(ctx, listGDocsImagesByGDocsID, gDocsID)
+func (q *Queries) ListGDocsImagesByExternalID(ctx context.Context, externalID string) ([]ListGDocsImagesByExternalIDRow, error) {
+	rows, err := q.db.Query(ctx, listGDocsImagesByExternalID, externalID)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
-	var items []ListGDocsImagesByGDocsIDRow
+	var items []ListGDocsImagesByExternalIDRow
 	for rows.Next() {
-		var i ListGDocsImagesByGDocsIDRow
+		var i ListGDocsImagesByExternalIDRow
 		if err := rows.Scan(&i.DocObjectID, &i.Path, &i.Type); err != nil {
 			return nil, err
 		}
@@ -142,7 +142,7 @@ func (q *Queries) ListGDocsImagesByGDocsID(ctx context.Context, gDocsID string) 
 
 const listGDocsWhereUnprocessed = `-- name: ListGDocsWhereUnprocessed :many
 SELECT
-  id, g_docs_id, document, embeds, rich_text, raw_html, article_markdown, word_count, warnings, processed_at, created_at
+  id, external_id, document, embeds, rich_text, raw_html, article_markdown, word_count, warnings, processed_at, created_at
 FROM
   g_docs_doc
 WHERE
@@ -160,7 +160,7 @@ func (q *Queries) ListGDocsWhereUnprocessed(ctx context.Context) ([]GDocsDoc, er
 		var i GDocsDoc
 		if err := rows.Scan(
 			&i.ID,
-			&i.GDocsID,
+			&i.ExternalID,
 			&i.Document,
 			&i.Embeds,
 			&i.RichText,
@@ -195,7 +195,7 @@ SET
 WHERE
   id = $7
 RETURNING
-  id, g_docs_id, document, embeds, rich_text, raw_html, article_markdown, word_count, warnings, processed_at, created_at
+  id, external_id, document, embeds, rich_text, raw_html, article_markdown, word_count, warnings, processed_at, created_at
 `
 
 type UpdateGDocsDocParams struct {
@@ -221,7 +221,7 @@ func (q *Queries) UpdateGDocsDoc(ctx context.Context, arg UpdateGDocsDocParams) 
 	var i GDocsDoc
 	err := row.Scan(
 		&i.ID,
-		&i.GDocsID,
+		&i.ExternalID,
 		&i.Document,
 		&i.Embeds,
 		&i.RichText,
@@ -236,19 +236,19 @@ func (q *Queries) UpdateGDocsDoc(ctx context.Context, arg UpdateGDocsDocParams) 
 }
 
 const upsertGDocsImage = `-- name: UpsertGDocsImage :exec
-INSERT INTO g_docs_image (g_docs_id, doc_object_id, image_id)
+INSERT INTO g_docs_image (external_id, doc_object_id, image_id)
   VALUES ($1, $2, $3)
-ON CONFLICT (g_docs_id, doc_object_id)
+ON CONFLICT (external_id, doc_object_id)
   DO NOTHING
 `
 
 type UpsertGDocsImageParams struct {
-	GDocsID     string `json:"g_docs_id"`
+	ExternalID  string `json:"external_id"`
 	DocObjectID string `json:"doc_object_id"`
 	ImageID     int64  `json:"image_id"`
 }
 
 func (q *Queries) UpsertGDocsImage(ctx context.Context, arg UpsertGDocsImageParams) error {
-	_, err := q.db.Exec(ctx, upsertGDocsImage, arg.GDocsID, arg.DocObjectID, arg.ImageID)
+	_, err := q.db.Exec(ctx, upsertGDocsImage, arg.ExternalID, arg.DocObjectID, arg.ImageID)
 	return err
 }
