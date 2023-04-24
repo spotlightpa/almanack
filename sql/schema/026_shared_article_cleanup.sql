@@ -45,4 +45,4 @@ ALTER TABLE "shared_article" RENAME COLUMN "lede_image_credit" TO "lede_image_so
 
 ALTER TABLE "page"
   ADD COLUMN published_at timestamp with time zone GENERATED ALWAYS AS
-    (iso_to_timestamptz (frontmatter ->> 'published'::text)) STORED,
+    (iso_to_timestamptz (frontmatter ->> 'published'::text)) STORED;
