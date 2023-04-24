@@ -9,7 +9,7 @@ import (
 	"golang.org/x/oauth2/google"
 )
 
-func (gsvc *Service) GdocsClient(ctx context.Context) (cl *http.Client, err error) {
+func (gsvc *Service) GDocsClient(ctx context.Context) (cl *http.Client, err error) {
 	if len(gsvc.cert) == 0 {
 		l := almlog.FromContext(ctx)
 		l.Warn("using default Google credentials")
