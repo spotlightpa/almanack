@@ -6,9 +6,11 @@ function wait(milliseconds) {
   });
 }
 
-export async function processGDocsDoc(gdocsDocID) {
+export async function processGDocsDoc(externalGDocsID) {
   // Create job
-  let [dbDoc, err] = await post(postGDocsDoc, { gdocs_id: gdocsDocID });
+  let [dbDoc, err] = await post(postGDocsDoc, {
+    external_gdocs_id: externalGDocsID,
+  });
   if (err) {
     return [null, err];
   }

@@ -31,7 +31,7 @@ async function importGDocsURL(id) {
       return [null, err];
     }
     return await post(postSharedArticleFromGDocs, {
-      gdocs_doc_id: id,
+      external_gdocs_id: id,
       force_update: false,
     });
   });
