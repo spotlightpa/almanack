@@ -3,7 +3,7 @@ package blocko
 import (
 	"bytes"
 	"fmt"
-	"strings"
+	"io"
 
 	"github.com/spotlightpa/almanack/internal/xhtml"
 	"github.com/tdewolff/minify/v2"
@@ -11,14 +11,13 @@ import (
 	nethtml "golang.org/x/net/html"
 )
 
-func Minify(s string) (*nethtml.Node, error) {
+func Minify(r io.Reader) (*nethtml.Node, error) {
 	m := minify.New()
 	m.AddFunc("text/html", (&html.Minifier{
 		KeepEndTags: true,
 	}).Minify)
 
 	var out bytes.Buffer
-	r := strings.NewReader(s)
 	if err := m.Minify("text/html", &out, r); err != nil {
 		return nil, err
 	}
