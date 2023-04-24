@@ -5,8 +5,9 @@ import imgproxyURL from "@/api/imgproxy-url.js";
 
 const props = defineProps({
   path: { type: String, default: "" },
+  description: { type: String, default: "" },
   caption: { type: String, default: "" },
-  credits: { type: String, default: "" },
+  credit: { type: String, default: "" },
 });
 
 const imageURL = computed(() =>
@@ -17,7 +18,6 @@ const imageURL = computed(() =>
   })
 );
 
-// TODO: Fix SSR for editors
 const downloadURL = computed(
   () => "/ssr/download-image?src=" + encodeURIComponent(props.path)
 );
@@ -27,7 +27,8 @@ const downloadURL = computed(
   <ThumbnailImage
     :image-url="imageURL"
     :download-url="downloadURL"
+    :description="description"
     :caption="caption"
-    :credits="credits"
+    :credit="credit"
   />
 </template>

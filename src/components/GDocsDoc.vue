@@ -122,7 +122,8 @@ function copyHTML() {
     <ThumbnailS3
       :path="article.ledeImage"
       :caption="article.ledeImageCaption"
-      :credits="article.ledeImageCredits"
+      :credit="article.ledeImageCredit"
+      :description="article.ledeImageDescription"
       class="block"
     />
   </template>
@@ -151,7 +152,7 @@ function copyHTML() {
       <ThumbnailS3
         :path="e.value.path"
         :caption="e.value.caption"
-        :credits="e.value.credit"
+        :credit="e.value.credit"
       />
     </div>
   </div>
