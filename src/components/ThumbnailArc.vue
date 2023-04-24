@@ -27,6 +27,6 @@ export default {
     :image-url="url"
     :download-url="url"
     :caption="caption"
-    :credits="correctedCredits"
+    :credit="correctedCredits"
   />
 </template>

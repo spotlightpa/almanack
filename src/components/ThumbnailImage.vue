@@ -2,8 +2,9 @@
 defineProps({
   imageUrl: { type: String, default: "" },
   downloadUrl: { type: String, default: "" },
+  description: { type: String, default: "" },
+  credit: { type: String, default: "" },
   caption: { type: String, default: "" },
-  credits: { type: String, default: "" },
 });
 </script>
 
@@ -33,14 +34,24 @@ defineProps({
           <span>Download image</span>
         </a>
       </p>
-      <p class="has-margin-bottom-thin">
-        <strong>Caption:</strong>
-      </p>
-      <CopyWithButton :value="caption" label="caption" />
-      <p class="has-margin-bottom-thin">
-        <strong>Credit:</strong>
-      </p>
-      <CopyWithButton :value="credits" label="credit" />
+      <template v-if="description">
+        <p class="has-margin-bottom-thin">
+          <strong>Description (“alt” text):</strong>
+        </p>
+        <CopyWithButton :value="description" label="description" />
+      </template>
+      <template v-if="credit">
+        <p class="has-margin-bottom-thin">
+          <strong>Credit:</strong>
+        </p>
+        <CopyWithButton :value="credit" label="credit" />
+      </template>
+      <template v-if="caption">
+        <p class="has-margin-bottom-thin">
+          <strong>Caption:</strong>
+        </p>
+        <CopyWithButton :value="caption" label="caption" />
+      </template>
     </figcaption>
   </figure>
 </template>
