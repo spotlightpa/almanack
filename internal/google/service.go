@@ -1,3 +1,4 @@
+// Package google has Google API client stuff
 package google
 
 import (
