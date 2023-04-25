@@ -14,7 +14,7 @@ func TestGoldenFiles(t *testing.T) {
 		bareName := strings.TrimSuffix(path, ".html")
 		in := testfile.Read(t, path)
 
-		got, err := blocko.HTMLToMarkdown(in)
+		got, err := blocko.MinifyAndBlockize(in)
 		be.NilErr(t, err)
 
 		testfile.Equal(t, bareName+".md", got)

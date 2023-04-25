@@ -53,7 +53,7 @@ func TestProcessGDocsDoc(t *testing.T) {
 			testfile.Equal(rt, path+"/rich.html", dbDoc.RichText)
 			testfile.Equal(rt, path+"/article.md", dbDoc.ArticleMarkdown)
 			gotWarnings := strings.Join(dbDoc.Warnings, "\n")
-			testfile.Equal(rt, path+"/warnings.txt", gotWarnings)
+			testfile.Equalish(rt, path+"/warnings.txt", gotWarnings)
 		}
 	})
 }

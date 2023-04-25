@@ -10,23 +10,18 @@ import (
 	"golang.org/x/net/html/atom"
 )
 
-func HTMLToMarkdown(htmlstr string) (string, error) {
+func MinifyAndBlockize(htmlstr string) (string, error) {
 	root, err := Minify(strings.NewReader(htmlstr))
 	if err != nil {
 		return "", err
 	}
 
-	Clean(root)
-
-	var blocks []string
-	for p := root.FirstChild; p != nil; p = p.NextSibling {
-		blocks = append(blocks, blockToStrings(p)...)
-	}
-
-	return strings.Join(blocks, "\n\n") + "\n", nil
+	return Blockize(root), nil
 }
 
 func Blockize(root *html.Node) string {
+	Clean(root)
+
 	var blocks []string
 	for p := root.FirstChild; p != nil; p = p.NextSibling {
 		blocks = append(blocks, blockToStrings(p)...)
