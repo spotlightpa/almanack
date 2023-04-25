@@ -12,7 +12,9 @@ import {
   getSharedArticle,
   postSharedArticle,
   postSharedArticleFromArc,
+  postSharedArticleFromGDocs,
 } from "@/api/client-v2.js";
+import { processGDocsDoc } from "@/api/gdocs.js";
 import { watchAPI, makeState } from "@/api/service-util.js";
 import SharedArticle from "@/api/shared-article.js";
 import { formatDate, formatDateTime, tomorrow } from "@/utils/time-format.js";
@@ -117,6 +119,28 @@ function refreshArc() {
   );
 }
 
+const { apiStateRefs: gdocsState, exec: gdocsExec } = makeState();
+const { isLoadingThrottled: gdocsLoading, error: gdocsError } = gdocsState;
+async function refreshGDocs() {
+  await gdocsExec(async () => {
+    if (isDirty.value) {
+      return;
+    }
+    let [, err] = await processGDocsDoc(article.value.sourceID);
+    if (err) {
+      return [null, err];
+    }
+    return await post(postSharedArticleFromGDocs, {
+      external_gdocs_id: article.value.sourceID,
+      force_update: true,
+    });
+  });
+  if (gdocsState.error.value) {
+    return;
+  }
+  await fetch();
+}
+
 const { exec: saveExec, apiStateRefs: saveState } = makeState();
 const { isLoadingThrottled: saveLoading, error: saveError } = saveState;
 async function save() {
@@ -165,6 +189,7 @@ function setImageProps(image) {
   ledeImageDescription.value = image.description;
   ledeImageCredit.value = image.credit;
   ledeImageCaption.value = "";
+  isDirty.value = true;
 }
 </script>
 
@@ -252,9 +277,9 @@ function setImageProps(image) {
         <div class="message-body">
           <template v-if="article.isGDoc">
             <BulmaFieldInput
-              label="Internal ID"
+              label="Slug"
               :model-value="internalID"
-              help=""
+              help="Short internal ID for stories, such as SPLSTORY12."
               @update:modelValue="
                 isDirty = true;
                 internalID = $event;
@@ -263,28 +288,25 @@ function setImageProps(image) {
 
             <BulmaDateTime
               :model-value="publicationDate"
-              label="Planned Publication Date"
-              help="List when the article should be published."
+              label="Planned publication date"
               @update:modelValue="
                 publicationDate = $event;
                 isDirty = true;
               "
             >
-              Set to
               <a
                 @click="
                   publicationDate = new Date();
                   isDirty = true;
                 "
-                >now</a
-              >. Set to
-
+                >Set to now</a
+              >.
               <a
                 @click="
                   publicationDate = tomorrow();
                   isDirty = true;
                 "
-                >tomorrow</a
+                >Set to tomorrow</a
               >.
             </BulmaDateTime>
 
@@ -319,7 +341,7 @@ function setImageProps(image) {
             <BulmaFieldInput
               label="Byline"
               :model-value="byline"
-              help=""
+              help="Omit “by”; include “of Spotlight PA”"
               @update:modelValue="
                 isDirty = true;
                 byline = $event;
@@ -353,8 +375,8 @@ function setImageProps(image) {
 
             <BulmaTextarea
               :model-value="ledeImageDescription"
-              label="Lede image description (“alt” text)"
-              help="A description of the image for visually impaired readers"
+              label="Lede image description"
+              help="A description of the image for visually impaired readers (“alt” text)"
               @update:modelValue="
                 isDirty = true;
                 ledeImageDescription = $event;
@@ -472,6 +494,18 @@ function setImageProps(image) {
             Refresh from Arc
           </button>
           <ErrorSimple :error="saveError || arcError" class="mt-1" />
+
+          <button
+            v-if="article.isGDoc"
+            class="button is-warning has-text-weight-semibold"
+            type="button"
+            :class="gdocsLoading && 'is-loading'"
+            :disabled="isDirty || null"
+            @click="refreshGDocs"
+          >
+            Refresh from Google Docs
+          </button>
+          <ErrorSimple :error="saveError || gdocsError" class="mt-1" />
 
           <div class="mt-5 buttons">
             <button
