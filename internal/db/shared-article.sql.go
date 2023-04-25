@@ -403,13 +403,13 @@ ON CONFLICT (source_type, source_id)
 `
 
 type UpsertSharedArticleFromGDocsParams struct {
-	GdocsID    string `json:"gdocs_id"`
+	ExternalID string `json:"external_id"`
 	RawData    []byte `json:"raw_data"`
 	InternalID string `json:"internal_id"`
 }
 
 func (q *Queries) UpsertSharedArticleFromGDocs(ctx context.Context, arg UpsertSharedArticleFromGDocsParams) (SharedArticle, error) {
-	row := q.db.QueryRow(ctx, upsertSharedArticleFromGDocs, arg.GdocsID, arg.RawData, arg.InternalID)
+	row := q.db.QueryRow(ctx, upsertSharedArticleFromGDocs, arg.ExternalID, arg.RawData, arg.InternalID)
 	var i SharedArticle
 	err := row.Scan(
 		&i.ID,

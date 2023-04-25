@@ -100,7 +100,7 @@ ON CONFLICT (source_type,
 
 -- name: UpsertSharedArticleFromGDocs :one
 INSERT INTO shared_article (status, source_type, source_id, raw_data, internal_id)
-  VALUES ('U', 'gdocs', @gdocs_id, @raw_data::jsonb, @internal_id)
+  VALUES ('U', 'gdocs', @external_id, @raw_data::jsonb, @internal_id)
 ON CONFLICT (source_type, source_id)
   DO UPDATE SET
     raw_data = excluded.raw_data
