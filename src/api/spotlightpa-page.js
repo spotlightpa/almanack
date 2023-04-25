@@ -8,6 +8,7 @@ import {
   getPage,
   postPageRefresh,
 } from "@/api/client-v2.js";
+import { processGDocsDoc } from "@/api/gdocs.js";
 import imgproxyURL from "@/api/imgproxy-url.js";
 import maybeDate from "@/utils/maybe-date.js";
 
@@ -79,6 +80,10 @@ export class Page {
       sked: "scheduled to be published",
       none: "unpublished",
     }[this.status];
+  }
+
+  get isGDoc() {
+    return this.sourceType === "gdocs";
   }
 
   get link() {
@@ -292,12 +297,18 @@ export function usePage(id) {
       return post(page.value);
     },
     refreshFromSource({ metadata } = {}) {
-      return exec(() =>
-        clientPost(postPageRefresh, {
+      return exec(async () => {
+        if (page.value.isGDoc) {
+          let [, err] = await processGDocsDoc(page.value.sourceID);
+          if (err) {
+            return [null, err];
+          }
+        }
+        return clientPost(postPageRefresh, {
           id: id.value,
           refresh_metadata: metadata,
-        })
-      );
+        });
+      });
     },
     imageState,
     images: computed(() =>
