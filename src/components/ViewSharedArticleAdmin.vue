@@ -406,28 +406,6 @@ function setImageProps(image) {
           <p v-if="article.isArc" class="label">Budget</p>
           <p v-if="article.isArc" class="mb-5 content">{{ article.budget }}</p>
 
-          <div v-if="!article.pageID" class="mb-5">
-            <div class="label">Import to Spotlight PA</div>
-            <div class="buttons">
-              <button
-                class="button is-primary has-text-weight-semibold"
-                :class="pageLoading ? 'is-loading' : ''"
-                @click="createPage('news')"
-              >
-                As News article
-              </button>
-              <button
-                class="button is-primary has-text-weight-semibold"
-                :class="pageLoading ? 'is-loading' : ''"
-                @click="createPage('statecollege')"
-              >
-                As State College article
-              </button>
-            </div>
-          </div>
-
-          <ErrorSimple :error="pageError" />
-
           <h3 class="label">Sharing status</h3>
           <div class="buttons">
             <button
@@ -525,6 +503,39 @@ function setImageProps(image) {
               Discard changes
             </button>
           </div>
+
+          <div v-if="!article.pageID" class="mb-5">
+            <div class="label">Import to Spotlight PA</div>
+            <div class="buttons">
+              <button
+                class="button is-primary has-text-weight-semibold"
+                :class="pageLoading ? 'is-loading' : ''"
+                @click="createPage('news')"
+              >
+                As News article
+              </button>
+              <button
+                class="button is-primary has-text-weight-semibold"
+                :class="pageLoading ? 'is-loading' : ''"
+                @click="createPage('statecollege')"
+              >
+                As State College article
+              </button>
+            </div>
+          </div>
+          <div v-else class="mb-5">
+            <router-link
+              :to="article.pageRoute"
+              class="button is-primary has-text-weight-semibold"
+            >
+              <span class="icon">
+                <font-awesome-icon :icon="['fas', 'user-clock']" />
+              </span>
+              <span>Spotlight PA Page Admin</span>
+            </router-link>
+          </div>
+          <ErrorSimple :error="pageError" />
+
           <button
             type="button"
             class="button is-small has-text-weight-semibold"
