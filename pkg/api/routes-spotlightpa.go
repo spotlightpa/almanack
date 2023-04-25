@@ -938,7 +938,7 @@ func (app *appEnv) postSharedArticleFromGDocs(w http.ResponseWriter, r *http.Req
 	// TODO: Extract more metadata
 	// Note: Upsert, so in a race, this just updates existing article
 	art, err := app.svc.Queries.UpsertSharedArticleFromGDocs(r.Context(), db.UpsertSharedArticleFromGDocsParams{
-		GdocsID:    dbDoc.ExternalID,
+		ExternalID: dbDoc.ExternalID,
 		InternalID: dbDoc.Document.Title,
 		RawData:    idJSON,
 	})
