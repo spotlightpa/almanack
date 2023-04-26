@@ -104,8 +104,8 @@ func buildListInfo(lists map[string]docs.List) map[string]string {
 	return m
 }
 
-func buildObjectInfo(objs map[string]docs.InlineObject) map[string][]string {
-	m := map[string][]string{}
+func buildObjectInfo(objs map[string]docs.InlineObject) map[string]*html.Node {
+	m := make(map[string]*html.Node, len(objs))
 	for id, obj := range objs {
 		if obj.InlineObjectProperties == nil {
 			continue
@@ -117,20 +117,25 @@ func buildObjectInfo(objs map[string]docs.InlineObject) map[string][]string {
 			src = innerObj.ImageProperties.ContentUri
 			originalSource = innerObj.ImageProperties.SourceUri
 		}
-		m[id] = []string{
+		img := xhtml.New("img",
 			"src", src,
 			"title", innerObj.Title,
 			"alt", innerObj.Description,
 			"data-oid", obj.ObjectId,
-		}
+		)
+		el := img
 		if originalSource != "" {
-			m[id] = append(m[id], []string{"data-src", originalSource}...)
+			a := xhtml.New("a", "href", originalSource)
+			a.AppendChild(img)
+			el = a
 		}
+		m[id] = el
+
 	}
 	return m
 }
 
-func convertEl(n *html.Node, el *docs.StructuralElement, listInfo map[string]string, objInfo map[string][]string) {
+func convertEl(n *html.Node, el *docs.StructuralElement, listInfo map[string]string, objInfo map[string]*html.Node) {
 	if el.Table != nil && el.Table.TableRows != nil {
 		table := xhtml.New("table")
 		n.AppendChild(table)
@@ -184,15 +189,8 @@ func convertEl(n *html.Node, el *docs.StructuralElement, listInfo map[string]str
 
 		if subel.InlineObjectElement != nil {
 			inner := xhtml.LastChildOrNew(n, blockType)
-			attrs := objInfo[subel.InlineObjectElement.InlineObjectId]
-			img := xhtml.New("img", attrs...)
-			if link := xhtml.Attr(img, "data-src"); link != "" {
-				xhtml.DeleteAttr(img, "data-src")
-				a := xhtml.New("a", "href", link)
-				a.AppendChild(img)
-				img = a
-			}
-			inner.AppendChild(img)
+			el := objInfo[subel.InlineObjectElement.InlineObjectId]
+			inner.AppendChild(el)
 		}
 
 		if subel.TextRun == nil {
