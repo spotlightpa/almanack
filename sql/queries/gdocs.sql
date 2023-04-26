@@ -64,3 +64,14 @@ FROM
   LEFT JOIN image ON (image_id = image.id)
 WHERE
   external_id = $1;
+
+-- name: DeleteGDocsDocWhereUnunused :exec
+DELETE FROM g_docs_doc
+WHERE id NOT IN (
+    SELECT
+      raw_data::bigint
+    FROM
+      shared_article
+    WHERE
+      source_type = 'gdocs')
+  AND processed_at < CURRENT_TIMESTAMP - interval '1 hour';

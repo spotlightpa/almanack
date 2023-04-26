@@ -73,6 +73,9 @@ func (app *appEnv) backgroundCron(w http.ResponseWriter, r *http.Request) {
 		func() error {
 			return app.svc.ProcessGDocs(r.Context())
 		},
+		func() error {
+			return app.svc.Queries.DeleteGDocsDocWhereUnunused(r.Context())
+		},
 	); err != nil {
 		// reply shows up in dev only
 		app.replyErr(w, r, err)
