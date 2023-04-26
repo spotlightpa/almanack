@@ -65,6 +65,7 @@ func InnerBlocksToString(n *html.Node) string {
 	return buf.String()
 }
 
+// InnerText joins and trims the text node children of n.
 func InnerText(n *html.Node) string {
 	buf := poolGet()
 	defer pool.Put(buf)
@@ -74,7 +75,7 @@ func InnerText(n *html.Node) string {
 			buf.WriteString(n.Data)
 		}
 	})
-	return buf.String()
+	return strings.TrimSpace(buf.String())
 }
 
 var MarkdownBlockElements = map[atom.Atom]bool{
