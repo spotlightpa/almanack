@@ -5,6 +5,7 @@ import (
 	"strings"
 	"sync"
 
+	"github.com/spotlightpa/almanack/internal/slicex"
 	"golang.org/x/net/html"
 	"golang.org/x/net/html/atom"
 )
@@ -170,4 +171,23 @@ func Attr(n *html.Node, name string) string {
 		}
 	}
 	return ""
+}
+
+func SetAttr(n *html.Node, key, value string) {
+	for _, attr := range n.Attr {
+		if attr.Key == key {
+			attr.Val = value
+			return
+		}
+	}
+	n.Attr = append(n.Attr, html.Attribute{
+		Key: key,
+		Val: value,
+	})
+}
+
+func DeleteAttr(n *html.Node, key string) {
+	slicex.DeleteFunc(&n.Attr, func(a html.Attribute) bool {
+		return a.Key == key
+	})
 }
