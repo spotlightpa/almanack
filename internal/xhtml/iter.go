@@ -12,6 +12,9 @@ const (
 )
 
 func breadthFirst(n *html.Node, yield func(*html.Node) int8) {
+	if n == nil {
+		return
+	}
 	stack := make([]*html.Node, 1, 10)
 	stack[0] = n
 	for len(stack) > 0 {

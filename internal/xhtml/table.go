@@ -36,25 +36,25 @@ func (rows TableNodes) At(row, col int) *html.Node {
 }
 
 func slugify(n *html.Node) string {
-	return strings.TrimSpace(strings.ToLower(InnerText(n)))
+	return strings.ToLower(InnerText(n))
 }
 
 func (rows TableNodes) Label() string {
 	return slugify(rows.At(0, 0))
 }
 
-func (rows TableNodes) Value(name string) string {
+func (rows TableNodes) Value(name string) *html.Node {
 	for i := range rows {
 		if slugify(rows.At(i, 0)) == name {
 			for _, col := range rows[i][1:] {
 				if s := InnerText(col); s != "" {
-					return s
+					return col
 				}
 			}
-			return InnerText(rows.At(i+1, 0))
+			return rows.At(i+1, 0)
 		}
 	}
-	return ""
+	return nil
 }
 
 func Map[T any](tbl TableNodes, f func(*html.Node) T) [][]T {

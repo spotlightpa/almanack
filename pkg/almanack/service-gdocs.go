@@ -116,11 +116,12 @@ func (svc Services) ProcessGDocsDoc(ctx context.Context, dbDoc db.GDocsDoc) (err
 			"photo", "image", "photograph", "illustration", "illo",
 		}, label) {
 			imageEmbed := db.EmbedImage{
-				Credit:  rows.Value("credit"),
-				Caption: rows.Value("caption"),
+				Credit:  xhtml.InnerText(rows.Value("credit")),
+				Caption: xhtml.InnerText(rows.Value("caption")),
 				Description: stringx.First(
-					rows.Value("alt"),
-					rows.Value("description")),
+					xhtml.InnerText(rows.Value("description")),
+					xhtml.InnerText(rows.Value("alt")),
+				),
 			}
 			// TODO: If there's a link, use that instead
 			image := xhtml.Find(tbl, xhtml.WithAtom(atom.Img))
