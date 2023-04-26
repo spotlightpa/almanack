@@ -42,6 +42,23 @@ func (q *Queries) CreateGDocsDoc(ctx context.Context, arg CreateGDocsDocParams) 
 	return i, err
 }
 
+const deleteGDocsDocWhereUnunused = `-- name: DeleteGDocsDocWhereUnunused :exec
+DELETE FROM g_docs_doc
+WHERE id NOT IN (
+    SELECT
+      raw_data::bigint
+    FROM
+      shared_article
+    WHERE
+      source_type = 'gdocs')
+  AND processed_at < CURRENT_TIMESTAMP - interval '1 hour'
+`
+
+func (q *Queries) DeleteGDocsDocWhereUnunused(ctx context.Context) error {
+	_, err := q.db.Exec(ctx, deleteGDocsDocWhereUnunused)
+	return err
+}
+
 const getGDocsByExternalIDWhereProcessed = `-- name: GetGDocsByExternalIDWhereProcessed :one
 SELECT
   id, external_id, document, embeds, rich_text, raw_html, article_markdown, word_count, warnings, processed_at, created_at
