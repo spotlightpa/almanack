@@ -10,7 +10,6 @@ import (
 	"github.com/carlmjohnson/bytemap"
 	"github.com/carlmjohnson/requests"
 	"github.com/carlmjohnson/resperr"
-	"github.com/spotlightpa/almanack/internal/slicex"
 	"github.com/spotlightpa/almanack/internal/xhtml"
 	"golang.org/x/net/html"
 	"google.golang.org/api/docs/v1"
@@ -188,9 +187,7 @@ func convertEl(n *html.Node, el *docs.StructuralElement, listInfo map[string]str
 			attrs := objInfo[subel.InlineObjectElement.InlineObjectId]
 			img := xhtml.New("img", attrs...)
 			if link := xhtml.Attr(img, "data-src"); link != "" {
-				slicex.DeleteFunc(&img.Attr, func(attr html.Attribute) bool {
-					return attr.Key == "data-src"
-				})
+				xhtml.DeleteAttr(img, "data-src")
 				a := xhtml.New("a", "href", link)
 				a.AppendChild(img)
 				img = a
