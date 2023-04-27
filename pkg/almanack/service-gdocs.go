@@ -183,6 +183,11 @@ func (svc Services) replaceImageEmbed(
 		),
 	}
 
+	if path := xhtml.InnerText(rows.Value("path")); path != "" {
+		imageEmbed.Path = path
+		return imageEmbed, ""
+	}
+
 	linkTag := xhtml.Find(tbl, xhtml.WithAtom(atom.A))
 	if href := xhtml.Attr(linkTag, "href"); href != "" {
 		path, err := svc.ReplaceAndUploadImageURL(ctx, href, imageEmbed.Description, imageEmbed.Credit)
