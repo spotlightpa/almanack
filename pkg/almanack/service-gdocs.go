@@ -6,7 +6,6 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
-	"strconv"
 	"strings"
 
 	"github.com/carlmjohnson/bytemap"
@@ -38,8 +37,6 @@ func (svc Services) CreateGDocsDoc(ctx context.Context, externalID string) (dbDo
 		// TODO: figure out common errors, like no-permissions
 		return nil, err
 	}
-
-	// TODO: Extract metadata
 
 	newDoc, err := svc.Queries.CreateGDocsDoc(ctx, db.CreateGDocsDocParams{
 		ExternalID: externalID,
@@ -103,7 +100,7 @@ func (svc Services) ProcessGDocsDoc(ctx context.Context, dbDoc db.GDocsDoc) (err
 		label := rows.Label()
 		embed := db.Embed{N: n}
 		if slices.Contains([]string{"html", "embed", "raw", "script"}, label) {
-			embed.Type = "raw"
+			embed.Type = db.RawEmbedTag
 			embedHTML := xhtml.InnerText(rows.At(1, 0))
 			embedHTML = strings.TrimSpace(embedHTML)
 			embed.Value = embedHTML
@@ -115,6 +112,7 @@ func (svc Services) ProcessGDocsDoc(ctx context.Context, dbDoc db.GDocsDoc) (err
 		} else if slices.Contains([]string{
 			"photo", "image", "photograph", "illustration", "illo",
 		}, label) {
+			embed.Type = db.ImageEmbedTag
 			imageEmbed := db.EmbedImage{
 				Credit:  xhtml.InnerText(rows.Value("credit")),
 				Caption: xhtml.InnerText(rows.Value("caption")),
@@ -152,7 +150,6 @@ func (svc Services) ProcessGDocsDoc(ctx context.Context, dbDoc db.GDocsDoc) (err
 					return
 				}
 			}
-			embed.Type = "image"
 			embed.Value = imageEmbed
 		} else if label == "metadata" {
 			tbl.Parent.RemoveChild(tbl)
@@ -165,15 +162,11 @@ func (svc Services) ProcessGDocsDoc(ctx context.Context, dbDoc db.GDocsDoc) (err
 			return
 		}
 		embeds = append(embeds, embed)
-		value, err := json.Marshal(embed.Value)
+		value, err := json.Marshal(embed)
 		if err != nil {
 			panic(err)
 		}
-		data := xhtml.New("data",
-			"n", strconv.Itoa(embed.N),
-			"type", embed.Type,
-			"value", string(value))
-
+		data := xhtml.New("data", "value", string(value))
 		xhtml.ReplaceWith(tbl, data)
 		n++
 	})
@@ -205,70 +198,65 @@ func (svc Services) ProcessGDocsDoc(ctx context.Context, dbDoc db.GDocsDoc) (err
 
 func fixRichTextPlaceholders(richText *html.Node) {
 	embeds := xhtml.FindAll(richText, xhtml.WithAtom(atom.Data))
-	for _, embed := range embeds {
+	for _, dataEl := range embeds {
+		embed := extractEmbed(dataEl)
 		placeholder := xhtml.New("h2", "style", "color: red;")
-		n := xhtml.Attr(embed, "n")
-		xhtml.AppendText(placeholder, fmt.Sprintf("Embed #%s", n))
-		xhtml.ReplaceWith(embed, placeholder)
+		xhtml.AppendText(placeholder, fmt.Sprintf("Embed #%d", embed.N))
+		xhtml.ReplaceWith(dataEl, placeholder)
 	}
+}
+
+func extractEmbed(n *html.Node) db.Embed {
+	var embed db.Embed
+	if err := json.Unmarshal([]byte(xhtml.Attr(n, "value")), &embed); err != nil {
+		panic(err)
+	}
+	return embed
 }
 
 func fixRawHTMLPlaceholders(rawHTML *html.Node) {
 	embeds := xhtml.FindAll(rawHTML, xhtml.WithAtom(atom.Data))
-	for _, embed := range embeds {
-		dataType := xhtml.Attr(embed, "type")
-		value := xhtml.Attr(embed, "value")
-		if dataType == "raw" {
-			var data string
-			if err := json.Unmarshal([]byte(value), &data); err != nil {
-				panic(err)
-			}
-			xhtml.ReplaceWith(embed, &html.Node{
+	for _, dataEl := range embeds {
+		embed := extractEmbed(dataEl)
+		switch embed.Type {
+		case db.RawEmbedTag:
+			xhtml.ReplaceWith(dataEl, &html.Node{
 				Type: html.RawNode,
-				Data: data,
+				Data: embed.Value.(string),
 			})
-			continue
+		case db.ImageEmbedTag:
+			placeholder := xhtml.New("h2", "style", "color: red;")
+			xhtml.AppendText(placeholder, fmt.Sprintf("Embed #%d", embed.N))
+			xhtml.ReplaceWith(dataEl, placeholder)
 		}
-		placeholder := xhtml.New("h2", "style", "color: red;")
-		n := xhtml.Attr(embed, "n")
-		xhtml.AppendText(placeholder, fmt.Sprintf("Embed #%s", n))
-		xhtml.ReplaceWith(embed, placeholder)
 	}
 }
 
 func fixMarkdownPlaceholders(rawHTML *html.Node) {
 	embeds := xhtml.FindAll(rawHTML, xhtml.WithAtom(atom.Data))
-	for _, embed := range embeds {
-		dataType := xhtml.Attr(embed, "type")
-		value := xhtml.Attr(embed, "value")
-		if dataType == "raw" {
-			var data string
-			if err := json.Unmarshal([]byte(value), &data); err != nil {
-				panic(err)
-			}
-			xhtml.ReplaceWith(embed, &html.Node{
+	for _, dataEl := range embeds {
+		embed := extractEmbed(dataEl)
+		switch embed.Type {
+		case db.RawEmbedTag:
+			xhtml.ReplaceWith(dataEl, &html.Node{
+				Type: html.RawNode,
+				Data: embed.Value.(string),
+			})
+		case db.ImageEmbedTag:
+			// TODO: distinguish image types
+			image := embed.Value.(db.EmbedImage)
+			data := fmt.Sprintf(
+				`{{<picture src="%s" description="%s" caption="%s" credit="%s">}}`,
+				image.Path,
+				strings.TrimSpace(image.Description),
+				strings.TrimSpace(image.Caption),
+				strings.TrimSpace(image.Credit),
+			)
+			xhtml.ReplaceWith(dataEl, &html.Node{
 				Type: html.RawNode,
 				Data: data,
 			})
-			continue
 		}
-		var image db.EmbedImage
-		if err := json.Unmarshal([]byte(value), &image); err != nil {
-			panic(err)
-		}
-
-		// TODO: distinguish image types
-		data := fmt.Sprintf(
-			`{{<picture src="%s" description="%s" caption="%s" credit="%s">}}`,
-			image.Path,
-			strings.TrimSpace(image.Description),
-			strings.TrimSpace(image.Caption),
-			strings.TrimSpace(image.Credit),
-		)
-		xhtml.ReplaceWith(embed, &html.Node{
-			Type: html.RawNode,
-			Data: data,
-		})
 	}
 }
 
