@@ -12,6 +12,7 @@ import (
 	"github.com/carlmjohnson/requests"
 	"github.com/spotlightpa/almanack/internal/aws"
 	"github.com/spotlightpa/almanack/internal/db"
+	"github.com/spotlightpa/almanack/internal/google"
 	"github.com/spotlightpa/almanack/internal/stringx"
 	"github.com/spotlightpa/almanack/internal/testfile"
 	"github.com/spotlightpa/almanack/pkg/almanack"
@@ -28,11 +29,13 @@ func TestProcessGDocsDoc(t *testing.T) {
 		Tx:         db.NewTxable(p),
 		ImageStore: aws.NewBlobStore("mem://"),
 		FileStore:  aws.NewBlobStore("mem://"),
+		Gsvc:       new(google.Service),
 	}
 	ctx := context.Background()
 	testfile.GlobRun(t, "testdata/gdoc*", func(path string, t *testing.T) {
 		svc.Client = &http.Client{
 			Transport: requests.Replay(path),
+			// Transport: requests.Caching(nil, path),
 		}
 		var doc docs.Document
 		testfile.ReadJSON(t, path+"/doc.json", &doc)
