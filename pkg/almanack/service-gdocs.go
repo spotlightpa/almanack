@@ -283,15 +283,12 @@ type UploadGDocsImageParams struct {
 }
 
 func (svc Services) UploadGDocsImage(ctx context.Context, arg UploadGDocsImageParams) (err error) {
+	defer errorx.Trace(&err)
+
 	// Download the image + headers
 	body, ct, err := FetchImageURL(ctx, svc.Client, arg.ImageURL)
 	if err != nil {
 		return err
-	}
-
-	itype, ok := strings.CutPrefix(ct, "image/")
-	if !ok {
-		return fmt.Errorf("bad image content-type: %q", ct)
 	}
 
 	// Hash the file
@@ -299,42 +296,67 @@ func (svc Services) UploadGDocsImage(ctx context.Context, arg UploadGDocsImagePa
 
 	// Look up file hash
 	dbImage, err := svc.Queries.GetImageByPath(ctx, uploadPath)
+	var imageID int64
 	switch {
 	// If it's not found, it needs to be uploaded & saved
 	case db.IsNotFound(err):
-		// Upload file
-		h := make(http.Header, 1)
-		h.Set("Content-Type", ct)
-		if err = svc.ImageStore.WriteFile(ctx, uploadPath, h, body); err != nil {
-			return err
-		}
-
-		// Save file hash as an image
-		dbImage, err = svc.Queries.UpsertImage(ctx, db.UpsertImageParams{
-			Path:        uploadPath,
-			Type:        itype,
+		record, err := svc.uploadAndRecordImage(ctx, uploadAndRecordImageParams{
+			UploadPath:  uploadPath,
+			Body:        body,
+			ContentType: ct,
 			Description: arg.Embed.Description,
 			Credit:      arg.Embed.Credit,
-			IsUploaded:  true,
 		})
 		if err != nil {
 			return err
 		}
+		imageID = record.ID
 	// Other errors are bad
 	case err != nil:
 		return err
 	// If it is found, return & save the relationship for next refresh
 	case err == nil:
-		break
+		imageID = dbImage.ID
 	}
 
-	arg.Embed.Path = dbImage.Path
-	err = svc.Queries.UpsertGDocsImage(ctx, db.UpsertGDocsImageParams{
+	arg.Embed.Path = uploadPath
+	return svc.Queries.UpsertGDocsImage(ctx, db.UpsertGDocsImageParams{
 		ExternalID:  arg.ExternalID,
 		DocObjectID: arg.DocObjectID,
-		ImageID:     dbImage.ID,
+		ImageID:     imageID,
 	})
-	return err
+}
+
+type uploadAndRecordImageParams struct {
+	UploadPath  string
+	Body        []byte
+	ContentType string
+	Description string
+	Credit      string
+}
+
+func (svc Services) uploadAndRecordImage(ctx context.Context, arg uploadAndRecordImageParams) (*db.Image, error) {
+	itype, ok := strings.CutPrefix(arg.ContentType, "image/")
+	if !ok {
+		return nil, fmt.Errorf("bad image content-type: %q", arg.ContentType)
+	}
+
+	h := http.Header{"Content-Type": []string{arg.ContentType}}
+	if err := svc.ImageStore.WriteFile(ctx, arg.UploadPath, h, arg.Body); err != nil {
+		return nil, err
+	}
+
+	dbImage, err := svc.Queries.UpsertImage(ctx, db.UpsertImageParams{
+		Path:        arg.UploadPath,
+		Type:        itype,
+		Description: arg.Description,
+		Credit:      arg.Credit,
+		IsUploaded:  true,
+	})
+	if err != nil {
+		return nil, err
+	}
+	return &dbImage, nil
 }
 
 func makeCASaddress(body []byte, ct string) string {
