@@ -49,24 +49,6 @@ func hashURLpath(srcPath, ext string) string {
 	)
 }
 
-func UploadFromURL(ctx context.Context, c *http.Client, is aws.BlobStore, dstpath, srcurl string) (filename, ext string, err error) {
-	body, ctype, err := FetchImageURL(ctx, c, srcurl)
-	if err != nil {
-		return "", "", err
-	}
-
-	h := make(http.Header, 1)
-	h.Set("Content-Type", ctype)
-	if err = is.WriteFile(ctx, dstpath, h, body); err != nil {
-		return "", "", resperr.WithCodeAndMessage(
-			fmt.Errorf("problem writing to S3: %w", err),
-			http.StatusBadGateway,
-			"Could not upload image from URL",
-		)
-	}
-	return filename, ext, nil
-}
-
 func FetchImageURL(ctx context.Context, c *http.Client, srcurl string) (body []byte, ctype string, err error) {
 	var buf bytes.Buffer
 	if err = requests.

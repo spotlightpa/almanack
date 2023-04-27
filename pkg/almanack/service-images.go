@@ -2,12 +2,15 @@ package almanack
 
 import (
 	"context"
+	"fmt"
+	"net/http"
 
+	"github.com/carlmjohnson/errorx"
 	"github.com/carlmjohnson/workgroup"
 	"github.com/spotlightpa/almanack/internal/db"
 )
 
-func (svc Services) UploadImages(ctx context.Context) error {
+func (svc Services) UploadPendingImages(ctx context.Context) error {
 	images, err := svc.Queries.ListImageWhereNotUploaded(ctx)
 	if err != nil {
 		return err
@@ -15,22 +18,31 @@ func (svc Services) UploadImages(ctx context.Context) error {
 
 	return workgroup.DoTasks(5, images,
 		func(image db.Image) error {
-			_, _, err := UploadFromURL(
-				ctx,
-				svc.Client,
-				svc.ImageStore,
-				image.Path,
-				image.SourceURL)
-			if err != nil {
-				return err
-			}
-			if _, err = svc.Queries.UpdateImage(ctx,
-				db.UpdateImageParams{
-					Path:      image.Path,
-					SourceURL: image.SourceURL,
-				}); err != nil {
-				return err
-			}
-			return nil
+			return svc.uploadPendingImage(ctx, image.SourceURL, image.Path)
 		})
+}
+
+func (svc Services) uploadPendingImage(ctx context.Context, sourceURL, path string) (err error) {
+	defer errorx.Trace(&err)
+
+	body, ctype, err := FetchImageURL(ctx, svc.Client, sourceURL)
+	if err != nil {
+		return err
+	}
+
+	h := http.Header{"Content-Type": []string{ctype}}
+	if err = svc.ImageStore.WriteFile(ctx, path, h, body); err != nil {
+		return fmt.Errorf("uploadPendingImage: ImageStore.WriteFile: %w", err)
+	}
+	if err != nil {
+		return err
+	}
+	if _, err = svc.Queries.UpdateImage(ctx,
+		db.UpdateImageParams{
+			Path:      path,
+			SourceURL: sourceURL,
+		}); err != nil {
+		return err
+	}
+	return nil
 }

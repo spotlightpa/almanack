@@ -68,7 +68,7 @@ func (app *appEnv) backgroundCron(w http.ResponseWriter, r *http.Request) {
 			return errors.Join(errs...)
 		},
 		func() error {
-			return app.svc.UploadImages(r.Context())
+			return app.svc.UploadPendingImages(r.Context())
 		},
 		func() error {
 			return app.svc.ProcessGDocs(r.Context())
@@ -130,7 +130,7 @@ func (app *appEnv) backgroundImages(w http.ResponseWriter, r *http.Request) {
 
 	err := workgroup.DoFuncs(workgroup.MaxProcs,
 		func() error {
-			return app.svc.UploadImages(r.Context())
+			return app.svc.UploadPendingImages(r.Context())
 		},
 		func() error {
 			return app.svc.ProcessGDocs(r.Context())
