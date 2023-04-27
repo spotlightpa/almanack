@@ -165,6 +165,9 @@ func AdoptChildren(dst, src *html.Node) {
 }
 
 func Attr(n *html.Node, name string) string {
+	if n == nil {
+		return ""
+	}
 	for _, attr := range n.Attr {
 		if attr.Key == name {
 			return attr.Val
