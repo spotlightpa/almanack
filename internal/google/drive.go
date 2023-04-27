@@ -103,16 +103,27 @@ func NormalizeFileID(s string) (string, error) {
 	return id, v.Err()
 }
 
-func (gsvc Service) DownloadFile(ctx context.Context, cl *http.Client, fileID string) ([]byte, error) {
+func (gsvc Service) DownloadURLForDriveID(fileID string) (string, error) {
 	id, err := NormalizeFileID(fileID)
+	if err != nil {
+		return "", err
+	}
+	u, err := requests.
+		URL("https://www.googleapis.com").
+		Pathf("/drive/v3/files/%s", id).
+		Param("alt", "media").
+		URL()
+	return u.String(), err
+}
+
+func (gsvc Service) DownloadFile(ctx context.Context, cl *http.Client, fileID string) ([]byte, error) {
+	u, err := gsvc.DownloadURLForDriveID(fileID)
 	if err != nil {
 		return nil, err
 	}
 	var buf bytes.Buffer
 	err = requests.
-		URL("https://www.googleapis.com").
-		Pathf("/drive/v3/files/%s", id).
-		Param("alt", "media").
+		URL(u).
 		Client(cl).
 		ToBytesBuffer(&buf).
 		Fetch(ctx)
