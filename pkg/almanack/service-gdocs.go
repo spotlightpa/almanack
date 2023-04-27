@@ -102,7 +102,6 @@ func (svc Services) ProcessGDocsDoc(ctx context.Context, dbDoc db.GDocsDoc) (err
 		if slices.Contains([]string{"html", "embed", "raw", "script"}, label) {
 			embed.Type = db.RawEmbedTag
 			embedHTML := xhtml.InnerText(rows.At(1, 0))
-			embedHTML = strings.TrimSpace(embedHTML)
 			embed.Value = embedHTML
 			if nonASCII.Contains(embedHTML) {
 				warnings = append(warnings, fmt.Sprintf(
@@ -113,44 +112,15 @@ func (svc Services) ProcessGDocsDoc(ctx context.Context, dbDoc db.GDocsDoc) (err
 			"photo", "image", "photograph", "illustration", "illo",
 		}, label) {
 			embed.Type = db.ImageEmbedTag
-			imageEmbed := db.EmbedImage{
-				Credit:  xhtml.InnerText(rows.Value("credit")),
-				Caption: xhtml.InnerText(rows.Value("caption")),
-				Description: stringx.First(
-					xhtml.InnerText(rows.Value("description")),
-					xhtml.InnerText(rows.Value("alt")),
-				),
-			}
-			// TODO: If there's a link, use that instead
-			image := xhtml.Find(tbl, xhtml.WithAtom(atom.Img))
-			if image == nil {
-				warnings = append(warnings, fmt.Sprintf(
-					"Table %d missing image", n,
-				))
+			if imageEmbed, warning := svc.replaceImageEmbed(
+				ctx, tbl, rows, n, dbDoc.ExternalID, objID2Path,
+			); warning != "" {
 				tbl.Parent.RemoveChild(tbl)
+				warnings = append(warnings, warning)
 				return
-			}
-			objID := xhtml.Attr(image, "data-oid")
-			if path := objID2Path[objID]; path != "" {
-				imageEmbed.Path = path
 			} else {
-				src := xhtml.Attr(image, "src")
-				if uploadErr := svc.UploadGDocsImage(ctx, UploadGDocsImageParams{
-					ExternalID:  dbDoc.ExternalID,
-					DocObjectID: objID,
-					ImageURL:    src,
-					Embed:       &imageEmbed,
-				}); uploadErr != nil {
-					l := almlog.FromContext(ctx)
-					l.ErrorCtx(ctx, "ProcessGDocsDoc: UploadGDocsImage", "err", uploadErr)
-					warnings = append(warnings, fmt.Sprintf(
-						"An error occurred when processing images in table %d: %v.",
-						n, uploadErr))
-					tbl.Parent.RemoveChild(tbl)
-					return
-				}
+				embed.Value = *imageEmbed
 			}
-			embed.Value = imageEmbed
 		} else if label == "metadata" {
 			tbl.Parent.RemoveChild(tbl)
 			return
@@ -194,6 +164,51 @@ func (svc Services) ProcessGDocsDoc(ctx context.Context, dbDoc db.GDocsDoc) (err
 		WordCount:       int32(stringx.WordCount(xhtml.InnerText(richText))),
 	})
 	return err
+}
+
+func (svc Services) replaceImageEmbed(
+	ctx context.Context,
+	tbl *html.Node,
+	rows xhtml.TableNodes,
+	n int,
+	externalID string,
+	objID2Path map[string]string,
+) (imageEmbed *db.EmbedImage, warning string) {
+	imageEmbed = &db.EmbedImage{
+		Credit:  xhtml.InnerText(rows.Value("credit")),
+		Caption: xhtml.InnerText(rows.Value("caption")),
+		Description: stringx.First(
+			xhtml.InnerText(rows.Value("description")),
+			xhtml.InnerText(rows.Value("alt")),
+		),
+	}
+
+	// TODO: If there's a link, use that instead
+	image := xhtml.Find(tbl, xhtml.WithAtom(atom.Img))
+	if image == nil {
+		return nil, fmt.Sprintf(
+			"Table %d missing image", n,
+		)
+	}
+	objID := xhtml.Attr(image, "data-oid")
+	if path := objID2Path[objID]; path != "" {
+		imageEmbed.Path = path
+	} else {
+		src := xhtml.Attr(image, "src")
+		if uploadErr := svc.UploadGDocsImage(ctx, UploadGDocsImageParams{
+			ExternalID:  externalID,
+			DocObjectID: objID,
+			ImageURL:    src,
+			Embed:       imageEmbed,
+		}); uploadErr != nil {
+			l := almlog.FromContext(ctx)
+			l.ErrorCtx(ctx, "ProcessGDocsDoc: UploadGDocsImage", "err", uploadErr)
+			return nil, fmt.Sprintf(
+				"An error occurred when processing images in table %d: %v.",
+				n, uploadErr)
+		}
+	}
+	return imageEmbed, ""
 }
 
 func fixRichTextPlaceholders(richText *html.Node) {
