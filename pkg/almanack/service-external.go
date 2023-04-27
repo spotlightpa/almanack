@@ -9,6 +9,7 @@ import (
 	"github.com/carlmjohnson/errorx"
 	"github.com/carlmjohnson/resperr"
 	"github.com/spotlightpa/almanack/internal/db"
+	"github.com/spotlightpa/almanack/internal/google"
 	"github.com/spotlightpa/almanack/pkg/almlog"
 )
 
@@ -40,6 +41,58 @@ func (svc Services) ReplaceImageURL(ctx context.Context, srcURL, description, cr
 		IsUploaded:  false,
 	})
 	return uploadPath, err
+}
+
+func (svc Services) ReplaceAndUploadImageURL(ctx context.Context, srcURL, description, credit string) (path string, err error) {
+	defer errorx.Trace(&err)
+
+	if srcURL == "" {
+		return "", fmt.Errorf("no image provided")
+	}
+	image, err := svc.Queries.GetImageBySourceURL(ctx, srcURL)
+	switch {
+	case err == nil: // found entry
+		return image.Path, nil
+	case !db.IsNotFound(err): // unexpected DB problem
+		return "", err
+	}
+
+	cl := svc.Client
+	dlURL := srcURL
+	// See if it's a Drive URL
+	if id, err := google.NormalizeFileID(srcURL); err == nil {
+		cl, err = svc.Gsvc.DriveClient(ctx)
+		if err != nil {
+			return "", err
+		}
+		if dlURL, err = svc.Gsvc.DownloadURLForDriveID(id); err != nil {
+			return "", err
+		}
+	}
+	// Download the image + headers
+	body, ct, err := FetchImageURL(ctx, cl, dlURL)
+	if err != nil {
+		return "", err
+	}
+
+	itype, ok := strings.CutPrefix(ct, "image/")
+	if !ok {
+		return "", fmt.Errorf("bad image content-type for %s: %q", srcURL, ct)
+	}
+
+	uploadPath := hashURLpath(srcURL, itype)
+	if _, err = svc.uploadAndRecordImage(ctx, uploadAndRecordImageParams{
+		UploadPath:  uploadPath,
+		Body:        body,
+		ContentType: ct,
+		Description: description,
+		Credit:      credit,
+		SourceURL:   srcURL,
+	}); err != nil {
+		return "", err
+	}
+
+	return uploadPath, nil
 }
 
 func (svc Services) typeForImage(ctx context.Context, srcURL string) (typeName string, err error) {

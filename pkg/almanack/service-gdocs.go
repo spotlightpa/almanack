@@ -183,7 +183,20 @@ func (svc Services) replaceImageEmbed(
 		),
 	}
 
-	// TODO: If there's a link, use that instead
+	linkTag := xhtml.Find(tbl, xhtml.WithAtom(atom.A))
+	if href := xhtml.Attr(linkTag, "href"); href != "" {
+		path, err := svc.ReplaceAndUploadImageURL(ctx, href, imageEmbed.Description, imageEmbed.Credit)
+		if err != nil {
+			l := almlog.FromContext(ctx)
+			l.ErrorCtx(ctx, "ProcessGDocsDoc: ReplaceAndUploadImageURL", "err", err)
+			return nil, fmt.Sprintf(
+				"An error occurred when processing images in table %d: %v.",
+				n, err)
+		}
+		imageEmbed.Path = path
+		return imageEmbed, ""
+	}
+
 	image := xhtml.Find(tbl, xhtml.WithAtom(atom.Img))
 	if image == nil {
 		return nil, fmt.Sprintf(
@@ -306,6 +319,7 @@ func (svc Services) UploadGDocsImage(ctx context.Context, arg UploadGDocsImagePa
 			ContentType: ct,
 			Description: arg.Embed.Description,
 			Credit:      arg.Embed.Credit,
+			SourceURL:   "",
 		})
 		if err != nil {
 			return err
@@ -333,6 +347,7 @@ type uploadAndRecordImageParams struct {
 	ContentType string
 	Description string
 	Credit      string
+	SourceURL   string
 }
 
 func (svc Services) uploadAndRecordImage(ctx context.Context, arg uploadAndRecordImageParams) (*db.Image, error) {
@@ -351,6 +366,7 @@ func (svc Services) uploadAndRecordImage(ctx context.Context, arg uploadAndRecor
 		Type:        itype,
 		Description: arg.Description,
 		Credit:      arg.Credit,
+		SourceURL:   arg.SourceURL,
 		IsUploaded:  true,
 	})
 	if err != nil {
