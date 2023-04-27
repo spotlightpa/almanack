@@ -4,32 +4,23 @@ package google
 import (
 	"bytes"
 	"compress/gzip"
+	"context"
 	"encoding/base64"
 	"flag"
 	"io"
+	"net/http"
+	"sync"
+
+	"github.com/spotlightpa/almanack/pkg/almlog"
+	"golang.org/x/oauth2"
+	"golang.org/x/oauth2/google"
 )
 
 func AddFlags(fl *flag.FlagSet) func() *Service {
 	var gsvc Service
 	// Using a crazy Base64+GZIP because storing JSON containing \n in
 	//an env var breaks a lot for some reason
-	fl.Func("google-json", "GZIP Base64 JSON `credentials` for Google",
-		func(s string) error {
-			b, err := base64.StdEncoding.DecodeString(s)
-			if err != nil {
-				return err
-			}
-			g, err := gzip.NewReader(bytes.NewReader(b))
-			if err != nil {
-				return err
-			}
-			defer g.Close()
-			gsvc.cert, err = io.ReadAll(g)
-			if err != nil {
-				return err
-			}
-			return nil
-		})
+	fl.Func("google-json", "GZIP Base64 JSON `credentials` for Google", gsvc.ConfigureCert)
 	fl.StringVar(&gsvc.viewID, "ga-view-id", "", "view `ID` for Google Analytics")
 	fl.StringVar(&gsvc.driveID, "google-drive-id", "", "`ID` for shared Google Drive")
 	return func() *Service {
@@ -38,12 +29,23 @@ func AddFlags(fl *flag.FlagSet) func() *Service {
 }
 
 type Service struct {
-	cert    []byte
+	certMU sync.RWMutex
+	cert   []byte
+
 	viewID  string
 	driveID string
 }
 
+func (gsvc *Service) HasCert() bool {
+	gsvc.certMU.RLock()
+	defer gsvc.certMU.RUnlock()
+	return len(gsvc.cert) > 0
+}
+
 func (gsvc *Service) ConfigureCert(s string) error {
+	gsvc.certMU.Lock()
+	defer gsvc.certMU.Unlock()
+
 	b, err := base64.StdEncoding.DecodeString(s)
 	if err != nil {
 		return err
@@ -59,4 +61,22 @@ func (gsvc *Service) ConfigureCert(s string) error {
 		return err
 	}
 	return nil
+}
+
+func (gsvc *Service) client(ctx context.Context, scopes ...string) (cl *http.Client, err error) {
+	gsvc.certMU.RLock()
+	defer gsvc.certMU.RUnlock()
+
+	if len(gsvc.cert) == 0 {
+		l := almlog.FromContext(ctx)
+		l.WarnCtx(ctx, "using default Google credentials")
+		cl, err = google.DefaultClient(ctx, scopes...)
+		return
+	}
+	creds, err := google.CredentialsFromJSON(ctx, gsvc.cert, scopes...)
+	if err != nil {
+		return
+	}
+	cl = oauth2.NewClient(ctx, creds.TokenSource)
+	return
 }

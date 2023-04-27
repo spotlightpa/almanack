@@ -9,13 +9,10 @@ import (
 	"github.com/carlmjohnson/bytemap"
 	"github.com/carlmjohnson/requests"
 	"github.com/carlmjohnson/resperr"
-	"github.com/spotlightpa/almanack/pkg/almlog"
-	"golang.org/x/oauth2"
-	"golang.org/x/oauth2/google"
 )
 
 func (gsvc *Service) DriveClient(ctx context.Context) (cl *http.Client, err error) {
-	scopes := []string{
+	return gsvc.client(ctx,
 		"https://www.googleapis.com/auth/drive",
 		"https://www.googleapis.com/auth/drive.appdata",
 		"https://www.googleapis.com/auth/drive.file",
@@ -24,19 +21,7 @@ func (gsvc *Service) DriveClient(ctx context.Context) (cl *http.Client, err erro
 		"https://www.googleapis.com/auth/drive.photos.readonly",
 		"https://www.googleapis.com/auth/drive.readonly",
 		"https://www.googleapis.com/auth/drive.scripts",
-	}
-	if len(gsvc.cert) == 0 {
-		l := almlog.FromContext(ctx)
-		l.WarnCtx(ctx, "using default Google credentials")
-		cl, err = google.DefaultClient(ctx, scopes...)
-		return
-	}
-	creds, err := google.CredentialsFromJSON(ctx, gsvc.cert, scopes...)
-	if err != nil {
-		return
-	}
-	cl = oauth2.NewClient(ctx, creds.TokenSource)
-	return
+	)
 }
 
 func (gsvc *Service) Files(ctx context.Context, cl *http.Client) (files []*Files, err error) {
