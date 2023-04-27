@@ -153,6 +153,7 @@ function copyHTML() {
         :path="e.value.path"
         :caption="e.value.caption"
         :credit="e.value.credit"
+        :description="e.value.description"
       />
     </div>
   </div>
