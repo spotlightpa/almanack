@@ -2,6 +2,7 @@ package almanack
 
 import (
 	"net/http"
+	"sync"
 
 	"github.com/spotlightpa/almanack/internal/aws"
 	"github.com/spotlightpa/almanack/internal/db"
@@ -27,5 +28,7 @@ type Services struct {
 	Indexer          index.Indexer
 	NewletterService mailchimp.V3
 	Gsvc             *google.Service
+	gsvcOnce         sync.Once
+	gsvcErr          error
 	mailchimp.EmailService
 }

@@ -61,6 +61,9 @@ func (svc Services) ReplaceAndUploadImageURL(ctx context.Context, srcURL, descri
 	dlURL := srcURL
 	// See if it's a Drive URL
 	if id, err := google.NormalizeFileID(srcURL); err == nil {
+		if err = svc.ConfigureGoogleCert(ctx); err != nil {
+			return "", err
+		}
 		cl, err = svc.Gsvc.DriveClient(ctx)
 		if err != nil {
 			return "", err
@@ -153,13 +156,25 @@ func (svc Services) UpdateMostPopular(ctx context.Context) (err error) {
 }
 
 func (svc Services) ConfigureGoogleCert(ctx context.Context) (err error) {
-	defer errorx.Trace(&err)
-	opt, err := svc.Queries.GetOption(ctx, "google-json")
-	if err != nil {
-		return err
-	}
-	if err = svc.Gsvc.ConfigureCert(opt); err != nil {
-		return err
-	}
-	return nil
+	svc.gsvcOnce.Do(func() {
+		defer errorx.Trace(&err)
+
+		if svc.Gsvc.HasCert() {
+			return
+		}
+
+		opt, err := svc.Queries.GetOption(ctx, "google-json")
+		switch {
+		case db.IsNotFound(err):
+			l := almlog.FromContext(ctx)
+			l.Warn("ConfigureGoogleCert: no certificate in database")
+			return
+		case err != nil:
+			svc.gsvcErr = err
+			return
+		case err == nil:
+			svc.gsvcErr = svc.Gsvc.ConfigureCert(opt)
+		}
+	})
+	return svc.gsvcErr
 }

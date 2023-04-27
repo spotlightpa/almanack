@@ -9,25 +9,10 @@ import (
 	"github.com/carlmjohnson/errorx"
 	"github.com/carlmjohnson/requests"
 	"github.com/spotlightpa/almanack/pkg/almlog"
-	"golang.org/x/oauth2"
-	"golang.org/x/oauth2/google"
 )
 
 func (gsvc *Service) GAClient(ctx context.Context) (cl *http.Client, err error) {
-	if len(gsvc.cert) == 0 {
-		l := almlog.FromContext(ctx)
-		l.WarnCtx(ctx, "using default Google credentials")
-		cl, err = google.DefaultClient(ctx, "https://www.googleapis.com/auth/analytics.readonly")
-		return
-	}
-	creds, err := google.CredentialsFromJSON(
-		ctx, gsvc.cert, "https://www.googleapis.com/auth/analytics.readonly",
-	)
-	if err != nil {
-		return
-	}
-	cl = oauth2.NewClient(ctx, creds.TokenSource)
-	return
+	return gsvc.client(ctx, "https://www.googleapis.com/auth/analytics.readonly")
 }
 
 func (gsvc *Service) MostPopularNews(ctx context.Context, cl *http.Client) (pages []string, err error) {
