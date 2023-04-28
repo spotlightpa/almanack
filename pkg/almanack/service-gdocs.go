@@ -14,6 +14,7 @@ import (
 	"github.com/spotlightpa/almanack/internal/blocko"
 	"github.com/spotlightpa/almanack/internal/db"
 	"github.com/spotlightpa/almanack/internal/gdocs"
+	"github.com/spotlightpa/almanack/internal/must"
 	"github.com/spotlightpa/almanack/internal/stringx"
 	"github.com/spotlightpa/almanack/internal/xhtml"
 	"github.com/spotlightpa/almanack/pkg/almlog"
@@ -132,10 +133,7 @@ func (svc Services) ProcessGDocsDoc(ctx context.Context, dbDoc db.GDocsDoc) (err
 			return
 		}
 		embeds = append(embeds, embed)
-		value, err := json.Marshal(embed)
-		if err != nil {
-			panic(err)
-		}
+		value := must.Get(json.Marshal(embed))
 		data := xhtml.New("data", "value", string(value))
 		xhtml.ReplaceWith(tbl, data)
 		n++
@@ -241,9 +239,7 @@ func fixRichTextPlaceholders(richText *html.Node) {
 
 func extractEmbed(n *html.Node) db.Embed {
 	var embed db.Embed
-	if err := json.Unmarshal([]byte(xhtml.Attr(n, "value")), &embed); err != nil {
-		panic(err)
-	}
+	must.Do(json.Unmarshal([]byte(xhtml.Attr(n, "value")), &embed))
 	return embed
 }
 
