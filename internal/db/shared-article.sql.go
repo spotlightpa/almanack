@@ -393,8 +393,12 @@ func (q *Queries) UpsertSharedArticleFromArc(ctx context.Context, arcID string) 
 }
 
 const upsertSharedArticleFromGDocs = `-- name: UpsertSharedArticleFromGDocs :one
-INSERT INTO shared_article (status, source_type, source_id, raw_data, internal_id)
-  VALUES ('U', 'gdocs', $1, $2::jsonb, $3)
+INSERT INTO shared_article (status, source_type, source_id, raw_data,
+  internal_id, byline, budget, hed, description, lede_image, lede_image_credit,
+  lede_image_description, lede_image_caption)
+  VALUES ('U', 'gdocs', $1, $2::jsonb,
+    $3, $4, $5, $6, $7, $8,
+    $9, $10, $11)
 ON CONFLICT (source_type, source_id)
   DO UPDATE SET
     raw_data = excluded.raw_data
@@ -403,13 +407,33 @@ ON CONFLICT (source_type, source_id)
 `
 
 type UpsertSharedArticleFromGDocsParams struct {
-	ExternalID string `json:"external_id"`
-	RawData    []byte `json:"raw_data"`
-	InternalID string `json:"internal_id"`
+	ExternalID           string `json:"external_id"`
+	RawData              []byte `json:"raw_data"`
+	InternalID           string `json:"internal_id"`
+	Byline               string `json:"byline"`
+	Budget               string `json:"budget"`
+	Hed                  string `json:"hed"`
+	Description          string `json:"description"`
+	LedeImage            string `json:"lede_image"`
+	LedeImageCredit      string `json:"lede_image_credit"`
+	LedeImageDescription string `json:"lede_image_description"`
+	LedeImageCaption     string `json:"lede_image_caption"`
 }
 
 func (q *Queries) UpsertSharedArticleFromGDocs(ctx context.Context, arg UpsertSharedArticleFromGDocsParams) (SharedArticle, error) {
-	row := q.db.QueryRow(ctx, upsertSharedArticleFromGDocs, arg.ExternalID, arg.RawData, arg.InternalID)
+	row := q.db.QueryRow(ctx, upsertSharedArticleFromGDocs,
+		arg.ExternalID,
+		arg.RawData,
+		arg.InternalID,
+		arg.Byline,
+		arg.Budget,
+		arg.Hed,
+		arg.Description,
+		arg.LedeImage,
+		arg.LedeImageCredit,
+		arg.LedeImageDescription,
+		arg.LedeImageCaption,
+	)
 	var i SharedArticle
 	err := row.Scan(
 		&i.ID,
