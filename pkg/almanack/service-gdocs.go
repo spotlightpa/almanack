@@ -20,6 +20,7 @@ import (
 	"golang.org/x/exp/slices"
 	"golang.org/x/net/html"
 	"golang.org/x/net/html/atom"
+	"google.golang.org/api/docs/v1"
 )
 
 func (svc Services) CreateGDocsDoc(ctx context.Context, externalID string) (dbDoc *db.GDocsDoc, err error) {
@@ -382,4 +383,39 @@ func (svc Services) InflateSharedArticle(ctx context.Context, a *db.SharedArticl
 	}
 
 	return SharedArticle{a, SharedArticleGDoc{&doc, ""}}, err
+}
+
+func ExtractMetadata(doc *docs.Document, params *db.UpsertSharedArticleFromGDocsParams) (err error) {
+	defer errorx.Trace(&err)
+
+	docHTML := gdocs.Convert(doc)
+	docHTML, err = blocko.Minify(xhtml.ToBuffer(docHTML))
+	if err != nil {
+		return err
+	}
+	blocko.MergeSiblings(docHTML)
+	blocko.RemoveEmptyP(docHTML)
+
+	xhtml.Tables(docHTML, func(tbl *html.Node, rows xhtml.TableNodes) {
+		if label := rows.Label(); label != "metadata" {
+			return
+		}
+		params.InternalID = stringx.First(
+			xhtml.InnerText(rows.Value("slug")),
+			xhtml.InnerText(rows.Value("internal id")),
+			doc.Title,
+		)
+		params.Byline = xhtml.InnerText(rows.Value("byline"))
+		params.Budget = xhtml.InnerText(rows.Value("budget"))
+		params.Hed = stringx.First(
+			xhtml.InnerText(rows.Value("hed")),
+			xhtml.InnerText(rows.Value("headline")),
+			xhtml.InnerText(rows.Value("title")),
+		)
+		params.Description = stringx.First(
+			xhtml.InnerText(rows.Value("description")),
+			xhtml.InnerText(rows.Value("desc")),
+		)
+	})
+	return nil
 }

@@ -935,13 +935,16 @@ func (app *appEnv) postSharedArticleFromGDocs(w http.ResponseWriter, r *http.Req
 	}
 
 	idJSON, _ := json.Marshal(dbDoc.ID)
-	// TODO: Extract more metadata
-	// Note: Upsert, so in a race, this just updates existing article
-	art, err := app.svc.Queries.UpsertSharedArticleFromGDocs(r.Context(), db.UpsertSharedArticleFromGDocsParams{
+	params := db.UpsertSharedArticleFromGDocsParams{
 		ExternalID: dbDoc.ExternalID,
-		InternalID: dbDoc.Document.Title,
 		RawData:    idJSON,
-	})
+	}
+	if err := almanack.ExtractMetadata(&dbDoc.Document, &params); err != nil {
+		app.replyErr(w, r, err)
+		return
+	}
+	// Note: Upsert, so in a race, this just updates existing article
+	art, err := app.svc.Queries.UpsertSharedArticleFromGDocs(r.Context(), params)
 	if err != nil {
 		app.replyErr(w, r, err)
 		return
