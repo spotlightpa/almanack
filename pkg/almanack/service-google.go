@@ -52,7 +52,7 @@ func (svc Services) UpdateMostPopular(ctx context.Context) (err error) {
 
 func (svc Services) ConfigureGoogleCert(ctx context.Context) (err error) {
 	svc.gsvcOnce.Do(func() {
-		defer errorx.Trace(&err)
+		defer errorx.Trace(&svc.gsvcErr)
 
 		if svc.Gsvc.HasCert() {
 			return
