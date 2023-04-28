@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"net/http"
 	"strings"
 
 	"github.com/carlmjohnson/bytemap"
@@ -340,40 +339,6 @@ func (svc Services) UploadGDocsImage(ctx context.Context, arg UploadGDocsImagePa
 		DocObjectID: arg.DocObjectID,
 		ImageID:     imageID,
 	})
-}
-
-type uploadAndRecordImageParams struct {
-	UploadPath  string
-	Body        []byte
-	ContentType string
-	Description string
-	Credit      string
-	SourceURL   string
-}
-
-func (svc Services) uploadAndRecordImage(ctx context.Context, arg uploadAndRecordImageParams) (*db.Image, error) {
-	itype, ok := strings.CutPrefix(arg.ContentType, "image/")
-	if !ok {
-		return nil, fmt.Errorf("bad image content-type: %q", arg.ContentType)
-	}
-
-	h := http.Header{"Content-Type": []string{arg.ContentType}}
-	if err := svc.ImageStore.WriteFile(ctx, arg.UploadPath, h, arg.Body); err != nil {
-		return nil, err
-	}
-
-	dbImage, err := svc.Queries.UpsertImage(ctx, db.UpsertImageParams{
-		Path:        arg.UploadPath,
-		Type:        itype,
-		Description: arg.Description,
-		Credit:      arg.Credit,
-		SourceURL:   arg.SourceURL,
-		IsUploaded:  true,
-	})
-	if err != nil {
-		return nil, err
-	}
-	return &dbImage, nil
 }
 
 func makeCASaddress(body []byte, ct string) string {
