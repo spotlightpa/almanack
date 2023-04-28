@@ -88,7 +88,7 @@ func NormalizeFileID(s string) (string, error) {
 	return id, v.Err()
 }
 
-func (gsvc Service) DownloadURLForDriveID(fileID string) (string, error) {
+func (gsvc *Service) DownloadURLForDriveID(fileID string) (string, error) {
 	id, err := NormalizeFileID(fileID)
 	if err != nil {
 		return "", err
@@ -101,7 +101,7 @@ func (gsvc Service) DownloadURLForDriveID(fileID string) (string, error) {
 	return u.String(), err
 }
 
-func (gsvc Service) DownloadFile(ctx context.Context, cl *http.Client, fileID string) ([]byte, error) {
+func (gsvc *Service) DownloadFile(ctx context.Context, cl *http.Client, fileID string) ([]byte, error) {
 	u, err := gsvc.DownloadURLForDriveID(fileID)
 	if err != nil {
 		return nil, err
