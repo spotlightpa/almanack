@@ -11,6 +11,7 @@ import (
 	"github.com/carlmjohnson/resperr"
 	"github.com/spotlightpa/almanack/internal/db"
 	"github.com/spotlightpa/almanack/internal/gdocs"
+	"github.com/spotlightpa/almanack/internal/must"
 	"github.com/spotlightpa/almanack/internal/paginate"
 	"github.com/spotlightpa/almanack/pkg/almanack"
 	"github.com/spotlightpa/almanack/pkg/almlog"
@@ -934,17 +935,20 @@ func (app *appEnv) postSharedArticleFromGDocs(w http.ResponseWriter, r *http.Req
 		}
 	}
 
-	idJSON, _ := json.Marshal(dbDoc.ID)
-	params := db.UpsertSharedArticleFromGDocsParams{
-		ExternalID: dbDoc.ExternalID,
-		RawData:    idJSON,
-	}
-	if err := almanack.ExtractMetadata(&dbDoc.Document, &params); err != nil {
-		app.replyErr(w, r, err)
-		return
-	}
-	// Note: Upsert, so in a race, this just updates existing article
-	art, err := app.svc.Queries.UpsertSharedArticleFromGDocs(r.Context(), params)
+	idJSON := must.Get(json.Marshal(dbDoc.ID))
+	art, err := app.svc.Queries.UpsertSharedArticleFromGDocs(r.Context(), db.UpsertSharedArticleFromGDocsParams{
+		ExternalID:           dbDoc.ExternalID,
+		RawData:              idJSON,
+		InternalID:           dbDoc.Metadata.InternalID,
+		Byline:               dbDoc.Metadata.Byline,
+		Budget:               dbDoc.Metadata.Budget,
+		Hed:                  dbDoc.Metadata.Hed,
+		Description:          dbDoc.Metadata.Description,
+		LedeImage:            dbDoc.Metadata.LedeImage,
+		LedeImageCredit:      dbDoc.Metadata.LedeImageCredit,
+		LedeImageDescription: dbDoc.Metadata.LedeImageDescription,
+		LedeImageCaption:     dbDoc.Metadata.LedeImageCaption,
+	})
 	if err != nil {
 		app.replyErr(w, r, err)
 		return

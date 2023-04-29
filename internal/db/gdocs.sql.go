@@ -15,7 +15,7 @@ const createGDocsDoc = `-- name: CreateGDocsDoc :one
 INSERT INTO g_docs_doc ("external_id", "document")
   VALUES ($1, $2)
 RETURNING
-  id, external_id, document, embeds, rich_text, raw_html, article_markdown, word_count, warnings, processed_at, created_at
+  id, external_id, document, metadata, embeds, rich_text, raw_html, article_markdown, word_count, warnings, processed_at, created_at
 `
 
 type CreateGDocsDocParams struct {
@@ -30,6 +30,7 @@ func (q *Queries) CreateGDocsDoc(ctx context.Context, arg CreateGDocsDocParams) 
 		&i.ID,
 		&i.ExternalID,
 		&i.Document,
+		&i.Metadata,
 		&i.Embeds,
 		&i.RichText,
 		&i.RawHtml,
@@ -61,7 +62,7 @@ func (q *Queries) DeleteGDocsDocWhereUnunused(ctx context.Context) error {
 
 const getGDocsByExternalIDWhereProcessed = `-- name: GetGDocsByExternalIDWhereProcessed :one
 SELECT
-  id, external_id, document, embeds, rich_text, raw_html, article_markdown, word_count, warnings, processed_at, created_at
+  id, external_id, document, metadata, embeds, rich_text, raw_html, article_markdown, word_count, warnings, processed_at, created_at
 FROM
   g_docs_doc
 WHERE
@@ -79,6 +80,7 @@ func (q *Queries) GetGDocsByExternalIDWhereProcessed(ctx context.Context, extern
 		&i.ID,
 		&i.ExternalID,
 		&i.Document,
+		&i.Metadata,
 		&i.Embeds,
 		&i.RichText,
 		&i.RawHtml,
@@ -93,7 +95,7 @@ func (q *Queries) GetGDocsByExternalIDWhereProcessed(ctx context.Context, extern
 
 const getGDocsByID = `-- name: GetGDocsByID :one
 SELECT
-  id, external_id, document, embeds, rich_text, raw_html, article_markdown, word_count, warnings, processed_at, created_at
+  id, external_id, document, metadata, embeds, rich_text, raw_html, article_markdown, word_count, warnings, processed_at, created_at
 FROM
   g_docs_doc
 WHERE
@@ -107,6 +109,7 @@ func (q *Queries) GetGDocsByID(ctx context.Context, id int64) (GDocsDoc, error) 
 		&i.ID,
 		&i.ExternalID,
 		&i.Document,
+		&i.Metadata,
 		&i.Embeds,
 		&i.RichText,
 		&i.RawHtml,
@@ -159,7 +162,7 @@ func (q *Queries) ListGDocsImagesByExternalID(ctx context.Context, externalID st
 
 const listGDocsWhereUnprocessed = `-- name: ListGDocsWhereUnprocessed :many
 SELECT
-  id, external_id, document, embeds, rich_text, raw_html, article_markdown, word_count, warnings, processed_at, created_at
+  id, external_id, document, metadata, embeds, rich_text, raw_html, article_markdown, word_count, warnings, processed_at, created_at
 FROM
   g_docs_doc
 WHERE
@@ -179,6 +182,7 @@ func (q *Queries) ListGDocsWhereUnprocessed(ctx context.Context) ([]GDocsDoc, er
 			&i.ID,
 			&i.ExternalID,
 			&i.Document,
+			&i.Metadata,
 			&i.Embeds,
 			&i.RichText,
 			&i.RawHtml,
@@ -202,31 +206,34 @@ const updateGDocsDoc = `-- name: UpdateGDocsDoc :one
 UPDATE
   g_docs_doc
 SET
-  "embeds" = $1,
-  "rich_text" = $2,
-  "raw_html" = $3,
-  "article_markdown" = $4,
-  "word_count" = $5,
-  "warnings" = $6,
+  "metadata" = $1,
+  "embeds" = $2,
+  "rich_text" = $3,
+  "raw_html" = $4,
+  "article_markdown" = $5,
+  "word_count" = $6,
+  "warnings" = $7,
   "processed_at" = CURRENT_TIMESTAMP
 WHERE
-  id = $7
+  id = $8
 RETURNING
-  id, external_id, document, embeds, rich_text, raw_html, article_markdown, word_count, warnings, processed_at, created_at
+  id, external_id, document, metadata, embeds, rich_text, raw_html, article_markdown, word_count, warnings, processed_at, created_at
 `
 
 type UpdateGDocsDocParams struct {
-	Embeds          []Embed  `json:"embeds"`
-	RichText        string   `json:"rich_text"`
-	RawHtml         string   `json:"raw_html"`
-	ArticleMarkdown string   `json:"article_markdown"`
-	WordCount       int32    `json:"word_count"`
-	Warnings        []string `json:"warnings"`
-	ID              int64    `json:"id"`
+	Metadata        GDocsMetadata `json:"metadata"`
+	Embeds          []Embed       `json:"embeds"`
+	RichText        string        `json:"rich_text"`
+	RawHtml         string        `json:"raw_html"`
+	ArticleMarkdown string        `json:"article_markdown"`
+	WordCount       int32         `json:"word_count"`
+	Warnings        []string      `json:"warnings"`
+	ID              int64         `json:"id"`
 }
 
 func (q *Queries) UpdateGDocsDoc(ctx context.Context, arg UpdateGDocsDocParams) (GDocsDoc, error) {
 	row := q.db.QueryRow(ctx, updateGDocsDoc,
+		arg.Metadata,
 		arg.Embeds,
 		arg.RichText,
 		arg.RawHtml,
@@ -240,6 +247,7 @@ func (q *Queries) UpdateGDocsDoc(ctx context.Context, arg UpdateGDocsDocParams) 
 		&i.ID,
 		&i.ExternalID,
 		&i.Document,
+		&i.Metadata,
 		&i.Embeds,
 		&i.RichText,
 		&i.RawHtml,

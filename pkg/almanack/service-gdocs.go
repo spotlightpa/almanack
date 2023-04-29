@@ -17,10 +17,8 @@ import (
 	"github.com/spotlightpa/almanack/internal/stringx"
 	"github.com/spotlightpa/almanack/internal/xhtml"
 	"github.com/spotlightpa/almanack/pkg/almlog"
-	"golang.org/x/exp/slices"
 	"golang.org/x/net/html"
 	"golang.org/x/net/html/atom"
-	"google.golang.org/api/docs/v1"
 )
 
 func (svc Services) CreateGDocsDoc(ctx context.Context, externalID string) (dbDoc *db.GDocsDoc, err error) {
@@ -92,15 +90,22 @@ func (svc Services) ProcessGDocsDoc(ctx context.Context, dbDoc db.GDocsDoc) (err
 		)
 	}
 
-	// First collect the embeds array
-	var embeds []db.Embed
-	var warnings []string
-	n := 1
+	// First collect the embeds array and metadata
+	var (
+		metadata db.GDocsMetadata
+		embeds   []db.Embed
+		warnings []string
+		n        = 1
+	)
+
+	// Default slug is article title
+	metadata.InternalID = dbDoc.Document.Title
 
 	xhtml.Tables(docHTML, func(tbl *html.Node, rows xhtml.TableNodes) {
 		label := rows.Label()
 		embed := db.Embed{N: n}
-		if slices.Contains([]string{"html", "embed", "raw", "script"}, label) {
+		switch label {
+		case "html", "embed", "raw", "script":
 			embed.Type = db.RawEmbedTag
 			embedHTML := xhtml.InnerText(rows.At(1, 0))
 			embed.Value = embedHTML
@@ -109,9 +114,7 @@ func (svc Services) ProcessGDocsDoc(ctx context.Context, dbDoc db.GDocsDoc) (err
 					"Embed #%d contains unusual characters.", n,
 				))
 			}
-		} else if slices.Contains([]string{
-			"photo", "image", "photograph", "illustration", "illo",
-		}, label) {
+		case "photo", "image", "photograph", "illustration", "illo":
 			embed.Type = db.ImageEmbedTag
 			if imageEmbed, warning := svc.replaceImageEmbed(
 				ctx, tbl, rows, n, dbDoc.ExternalID, objID2Path,
@@ -122,10 +125,15 @@ func (svc Services) ProcessGDocsDoc(ctx context.Context, dbDoc db.GDocsDoc) (err
 			} else {
 				embed.Value = *imageEmbed
 			}
-		} else if label == "metadata" {
+		case "metadata", "info":
+			if warning := svc.replaceMetadata(
+				ctx, tbl, rows, dbDoc.ExternalID, objID2Path, &metadata,
+			); warning != "" {
+				warnings = append(warnings, warning)
+			}
 			tbl.Parent.RemoveChild(tbl)
 			return
-		} else {
+		default:
 			warnings = append(warnings, fmt.Sprintf(
 				"Unrecognized table type: %q", label,
 			))
@@ -154,6 +162,7 @@ func (svc Services) ProcessGDocsDoc(ctx context.Context, dbDoc db.GDocsDoc) (err
 	// Save to database
 	_, err = svc.Queries.UpdateGDocsDoc(ctx, db.UpdateGDocsDocParams{
 		ID:              dbDoc.ID,
+		Metadata:        metadata,
 		Embeds:          embeds,
 		RichText:        xhtml.InnerBlocksToString(richText),
 		RawHtml:         xhtml.InnerBlocksToString(rawHTML),
@@ -225,6 +234,109 @@ func (svc Services) replaceImageEmbed(
 		}
 	}
 	return imageEmbed, ""
+}
+
+func (svc Services) replaceMetadata(
+	ctx context.Context,
+	tbl *html.Node,
+	rows xhtml.TableNodes,
+	externalID string,
+	objID2Path map[string]string,
+	metadata *db.GDocsMetadata,
+) string {
+	metadata.InternalID = stringx.First(
+		xhtml.InnerText(rows.Value("slug")),
+		xhtml.InnerText(rows.Value("internal id")),
+		metadata.InternalID,
+	)
+	metadata.Byline = stringx.First(
+		xhtml.InnerText(rows.Value("byline")),
+		xhtml.InnerText(rows.Value("authors")),
+		xhtml.InnerText(rows.Value("author")),
+		xhtml.InnerText(rows.Value("by")),
+	)
+	metadata.Budget = xhtml.InnerText(rows.Value("budget"))
+	metadata.Hed = stringx.First(
+		xhtml.InnerText(rows.Value("hed")),
+		xhtml.InnerText(rows.Value("title")),
+		xhtml.InnerText(rows.Value("headline")),
+		xhtml.InnerText(rows.Value("hedline")),
+	)
+	metadata.Description = stringx.First(
+		xhtml.InnerText(rows.Value("description")),
+		xhtml.InnerText(rows.Value("desc")),
+	)
+	metadata.LedeImageCredit = stringx.First(
+		xhtml.InnerText(rows.Value("lede image credit")),
+		xhtml.InnerText(rows.Value("lead image credit")),
+		xhtml.InnerText(rows.Value("credit")),
+	)
+	metadata.LedeImageCaption = stringx.First(
+		xhtml.InnerText(rows.Value("lede image caption")),
+		xhtml.InnerText(rows.Value("lead image caption")),
+		xhtml.InnerText(rows.Value("caption")),
+	)
+	metadata.LedeImageDescription = stringx.First(
+		xhtml.InnerText(rows.Value("lede image description")),
+		xhtml.InnerText(rows.Value("lead image description")),
+		xhtml.InnerText(rows.Value("lede image alt")),
+		xhtml.InnerText(rows.Value("lead image alt")),
+		xhtml.InnerText(rows.Value("alt")),
+	)
+
+	if path := xhtml.InnerText(rows.Value("lede image path")); path != "" {
+		metadata.LedeImage = path
+		return ""
+	}
+	cell := rows.Value("lede image")
+	if cell == nil {
+		cell = rows.Value("lead image")
+	}
+	if cell == nil {
+		return ""
+	}
+
+	linkTag := xhtml.Find(cell, xhtml.WithAtom(atom.A))
+	if href := xhtml.Attr(linkTag, "href"); href != "" {
+		path, err := svc.ReplaceAndUploadImageURL(ctx, href, metadata.LedeImageDescription, metadata.LedeImageCredit)
+		if err != nil {
+			l := almlog.FromContext(ctx)
+			l.ErrorCtx(ctx, "ProcessGDocsDoc: replaceMetadata: ReplaceAndUploadImageURL",
+				"err", err)
+			return fmt.Sprintf("An error occurred when processing the lede image: %v.", err)
+		}
+		metadata.LedeImage = path
+		return ""
+	}
+
+	image := xhtml.Find(tbl, xhtml.WithAtom(atom.Img))
+	if image == nil {
+		return ""
+	}
+	objID := xhtml.Attr(image, "data-oid")
+	if path := objID2Path[objID]; path != "" {
+		metadata.LedeImage = path
+	} else {
+		src := xhtml.Attr(image, "src")
+		imageEmbed := db.EmbedImage{
+			Credit:      metadata.LedeImageCredit,
+			Caption:     metadata.LedeImageCaption,
+			Description: metadata.LedeImageDescription,
+		}
+		if uploadErr := svc.UploadGDocsImage(ctx, UploadGDocsImageParams{
+			ExternalID:  externalID,
+			DocObjectID: objID,
+			ImageURL:    src,
+			Embed:       &imageEmbed,
+		}); uploadErr != nil {
+			l := almlog.FromContext(ctx)
+			l.ErrorCtx(ctx, "ProcessGDocsDoc: replaceMetadata: UploadGDocsImage",
+				"err", uploadErr)
+			return fmt.Sprintf("An error occurred when processing the lede image: %v.", uploadErr)
+		}
+		metadata.LedeImage = imageEmbed.Path
+	}
+	return ""
 }
 
 func fixRichTextPlaceholders(richText *html.Node) {
@@ -383,39 +495,4 @@ func (svc Services) InflateSharedArticle(ctx context.Context, a *db.SharedArticl
 	}
 
 	return SharedArticle{a, SharedArticleGDoc{&doc, ""}}, err
-}
-
-func ExtractMetadata(doc *docs.Document, params *db.UpsertSharedArticleFromGDocsParams) (err error) {
-	defer errorx.Trace(&err)
-
-	docHTML := gdocs.Convert(doc)
-	docHTML, err = blocko.Minify(xhtml.ToBuffer(docHTML))
-	if err != nil {
-		return err
-	}
-	blocko.MergeSiblings(docHTML)
-	blocko.RemoveEmptyP(docHTML)
-
-	xhtml.Tables(docHTML, func(tbl *html.Node, rows xhtml.TableNodes) {
-		if label := rows.Label(); label != "metadata" {
-			return
-		}
-		params.InternalID = stringx.First(
-			xhtml.InnerText(rows.Value("slug")),
-			xhtml.InnerText(rows.Value("internal id")),
-			doc.Title,
-		)
-		params.Byline = xhtml.InnerText(rows.Value("byline"))
-		params.Budget = xhtml.InnerText(rows.Value("budget"))
-		params.Hed = stringx.First(
-			xhtml.InnerText(rows.Value("hed")),
-			xhtml.InnerText(rows.Value("headline")),
-			xhtml.InnerText(rows.Value("title")),
-		)
-		params.Description = stringx.First(
-			xhtml.InnerText(rows.Value("description")),
-			xhtml.InnerText(rows.Value("desc")),
-		)
-	})
-	return nil
 }

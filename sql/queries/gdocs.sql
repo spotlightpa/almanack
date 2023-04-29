@@ -36,6 +36,7 @@ WHERE
 UPDATE
   g_docs_doc
 SET
+  "metadata" = @metadata,
   "embeds" = @embeds,
   "rich_text" = @rich_text,
   "raw_html" = @raw_html,

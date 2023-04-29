@@ -52,6 +52,7 @@ type GDocsDoc struct {
 	ID              int64              `json:"id"`
 	ExternalID      string             `json:"external_id"`
 	Document        docs.Document      `json:"document"`
+	Metadata        GDocsMetadata      `json:"metadata"`
 	Embeds          []Embed            `json:"embeds"`
 	RichText        string             `json:"rich_text"`
 	RawHtml         string             `json:"raw_html"`
