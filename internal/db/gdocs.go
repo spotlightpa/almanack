@@ -3,7 +3,22 @@ package db
 import (
 	"encoding/json"
 	"fmt"
+
+	"github.com/jackc/pgx/v5/pgtype"
 )
+
+type GDocsMetadata struct {
+	PublicationDate      pgtype.Timestamptz `json:"publication_date"`
+	InternalID           string             `json:"internal_id"`
+	Byline               string             `json:"byline"`
+	Budget               string             `json:"budget"`
+	Hed                  string             `json:"hed"`
+	Description          string             `json:"description"`
+	LedeImage            string             `json:"lede_image"`
+	LedeImageCredit      string             `json:"lede_image_credit"`
+	LedeImageDescription string             `json:"lede_image_description"`
+	LedeImageCaption     string             `json:"lede_image_caption"`
+}
 
 const (
 	ImageEmbedTag = "image"

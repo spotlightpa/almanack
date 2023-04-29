@@ -56,6 +56,12 @@
       }
     },
     {
+      "column": "g_docs_doc.metadata",
+      "go_type": {
+        "type": "GDocsMetadata"
+      }
+    },
+    {
       "column": "g_docs_doc.embeds",
       "go_type": {
         "type": "[]Embed"
