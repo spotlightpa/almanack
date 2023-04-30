@@ -1,0 +1,3 @@
+GET /styles/news_large/s3/imagelibrary/T/TeenageEngineeringOP1_01-S7onF.JAz9Mm5jMOnoPrFKJJEdQPBwYP.jpg HTTP/1.1
+Host: dt7v1i9vyp3mf.cloudfront.net
+
