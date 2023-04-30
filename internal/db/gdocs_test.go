@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"os"
 	"strings"
 	"testing"
 
@@ -24,18 +25,21 @@ func TestProcessGDocsDoc(t *testing.T) {
 	almlog.UseDevLogger()
 	p := createTestDB(t)
 	q := db.New(p)
-	svc := almanack.Services{
-		Queries:    q,
-		Tx:         db.NewTxable(p),
-		ImageStore: aws.NewBlobStore("mem://"),
-		FileStore:  aws.NewBlobStore("mem://"),
-		Gsvc:       new(google.Service),
-	}
 	ctx := context.Background()
 	testfile.GlobRun(t, "testdata/gdoc*", func(path string, t *testing.T) {
-		svc.Client = &http.Client{
-			Transport: requests.Replay(path),
-			// Transport: requests.Caching(nil, path),
+		t.Parallel()
+		svc := almanack.Services{
+			Queries:    q,
+			Tx:         db.NewTxable(p),
+			ImageStore: aws.NewBlobStore("mem://"),
+			FileStore:  aws.NewBlobStore("mem://"),
+			Gsvc:       new(google.Service),
+			Client: &http.Client{
+				Transport: requests.Replay(path),
+			},
+		}
+		if os.Getenv("RECORD") != "" {
+			svc.Client.Transport = requests.Caching(nil, path)
 		}
 		var doc docs.Document
 		testfile.ReadJSON(t, path+"/doc.json", &doc)
@@ -56,6 +60,7 @@ func TestProcessGDocsDoc(t *testing.T) {
 			testfile.Equal(rt, path+"/raw.html", dbDoc.RawHtml)
 			testfile.Equal(rt, path+"/rich.html", dbDoc.RichText)
 			testfile.Equal(rt, path+"/article.md", dbDoc.ArticleMarkdown)
+			testfile.EqualJSON(rt, path+"/metadata.json", dbDoc.Metadata)
 			gotWarnings := strings.Join(dbDoc.Warnings, "\n")
 			testfile.Equalish(rt, path+"/warnings.txt", gotWarnings)
 		}
