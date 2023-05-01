@@ -10,6 +10,7 @@ import (
 	"github.com/carlmjohnson/bytemap"
 	"github.com/carlmjohnson/crockford"
 	"github.com/carlmjohnson/errorx"
+	"github.com/carlmjohnson/requests"
 	"github.com/spotlightpa/almanack/internal/blocko"
 	"github.com/spotlightpa/almanack/internal/db"
 	"github.com/spotlightpa/almanack/internal/gdocs"
@@ -198,15 +199,19 @@ func (svc Services) replaceImageEmbed(
 	linkTag := xhtml.Find(tbl, xhtml.WithAtom(atom.A))
 	if href := xhtml.Attr(linkTag, "href"); href != "" {
 		path, err := svc.ReplaceAndUploadImageURL(ctx, href, imageEmbed.Description, imageEmbed.Credit)
-		if err != nil {
+		switch {
+		case err == nil:
+			imageEmbed.Path = path
+			return imageEmbed, ""
+		case errors.Is(err, requests.ErrValidator):
+			// Try looking up the image
+		case err != nil:
 			l := almlog.FromContext(ctx)
 			l.ErrorCtx(ctx, "ProcessGDocsDoc: ReplaceAndUploadImageURL", "err", err)
 			return nil, fmt.Sprintf(
 				"An error occurred when processing images in table %d: %v.",
 				n, err)
 		}
-		imageEmbed.Path = path
-		return imageEmbed, ""
 	}
 
 	image := xhtml.Find(tbl, xhtml.WithAtom(atom.Img))
@@ -299,14 +304,18 @@ func (svc Services) replaceMetadata(
 	linkTag := xhtml.Find(cell, xhtml.WithAtom(atom.A))
 	if href := xhtml.Attr(linkTag, "href"); href != "" {
 		path, err := svc.ReplaceAndUploadImageURL(ctx, href, metadata.LedeImageDescription, metadata.LedeImageCredit)
-		if err != nil {
+		switch {
+		case err == nil:
+			metadata.LedeImage = path
+			return ""
+		case errors.Is(err, requests.ErrValidator):
+			// Try image URL next
+		case err != nil:
 			l := almlog.FromContext(ctx)
 			l.ErrorCtx(ctx, "ProcessGDocsDoc: replaceMetadata: ReplaceAndUploadImageURL",
 				"err", err)
 			return fmt.Sprintf("An error occurred when processing the lede image: %v.", err)
 		}
-		metadata.LedeImage = path
-		return ""
 	}
 
 	image := xhtml.Find(tbl, xhtml.WithAtom(atom.Img))
