@@ -29,8 +29,9 @@ func AddFlags(fl *flag.FlagSet) func() *Service {
 }
 
 type Service struct {
-	certMU sync.RWMutex
-	cert   []byte
+	certMU     sync.RWMutex
+	cert       []byte
+	mockClient *http.Client
 
 	viewID  string
 	driveID string
@@ -40,6 +41,12 @@ func (gsvc *Service) HasCert() bool {
 	gsvc.certMU.RLock()
 	defer gsvc.certMU.RUnlock()
 	return len(gsvc.cert) > 0
+}
+
+func (gsvc *Service) SetMockClient(cl *http.Client) {
+	gsvc.certMU.Lock()
+	defer gsvc.certMU.Unlock()
+	gsvc.mockClient = cl
 }
 
 func (gsvc *Service) ConfigureCert(s string) error {
@@ -66,6 +73,10 @@ func (gsvc *Service) ConfigureCert(s string) error {
 func (gsvc *Service) client(ctx context.Context, scopes ...string) (cl *http.Client, err error) {
 	gsvc.certMU.RLock()
 	defer gsvc.certMU.RUnlock()
+
+	if gsvc.mockClient != nil {
+		return gsvc.mockClient, nil
+	}
 
 	if len(gsvc.cert) == 0 {
 		l := almlog.FromContext(ctx)
