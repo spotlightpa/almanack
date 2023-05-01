@@ -40,7 +40,13 @@ func TestProcessGDocsDoc(t *testing.T) {
 		}
 		if os.Getenv("RECORD") != "" {
 			svc.Client.Transport = requests.Caching(nil, path)
+			cl, _ := svc.Gsvc.DriveClient(context.Background())
+			cl.Transport = requests.Caching(cl.Transport, path)
+			svc.Gsvc.SetMockClient(cl)
+		} else {
+			svc.Gsvc.SetMockClient(svc.Client)
 		}
+
 		var doc docs.Document
 		testfile.ReadJSON(t, path+"/doc.json", &doc)
 		// Run twice to test the already uploaded path
