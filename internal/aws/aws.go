@@ -5,6 +5,7 @@ import (
 	"crypto/md5"
 	"flag"
 	"fmt"
+	"io"
 	"net/http"
 	"net/url"
 	"path"
@@ -142,4 +143,30 @@ func (bs BlobStore) WriteFile(ctx context.Context, path string, h http.Header, d
 		ContentDisposition: h.Get("Content-Disposition"),
 		ContentMD5:         checksum,
 	})
+}
+
+func (bs BlobStore) ReadMD5(ctx context.Context, path string) (hash []byte, size int64, err error) {
+	l := almlog.FromContext(ctx)
+	b, err := blob.OpenBucket(ctx, bs.bucket)
+	if err != nil {
+		return nil, 0, err
+	}
+	defer errorx.Defer(&err, b.Close)
+
+	attrs, err := b.Attributes(ctx, path)
+	if err != nil {
+		return nil, 0, err
+	}
+	if attrs.MD5 != nil {
+		return attrs.MD5, attrs.Size, nil
+	}
+	l.InfoCtx(ctx, "ReadMD5: missing MD5 attribute")
+	r, err := b.NewReader(ctx, path, nil)
+	if err != nil {
+		return nil, 0, err
+	}
+	h := md5.New()
+	size, err = io.Copy(h, r)
+	hash = h.Sum(nil)
+	return
 }
