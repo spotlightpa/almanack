@@ -22,7 +22,7 @@ import (
 )
 
 func TestProcessGDocsDoc(t *testing.T) {
-	almlog.UseDevLogger()
+	almlog.UseTestLogger(t)
 	p := createTestDB(t)
 	q := db.New(p)
 	ctx := context.Background()
