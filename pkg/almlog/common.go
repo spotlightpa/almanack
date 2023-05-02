@@ -2,7 +2,6 @@
 package almlog
 
 import (
-	"bytes"
 	"os"
 	"time"
 
@@ -21,6 +20,7 @@ func removeTime(groups []string, a slog.Attr) slog.Attr {
 	// Netlify already logs time
 	if a.Key == slog.TimeKey && len(groups) == 0 {
 		a.Key = ""
+		a.Value = slog.Value{}
 	}
 	return a
 }
@@ -59,15 +59,4 @@ func LevelThreshold[T time.Duration | int](val, warn, err T) slog.Level {
 		return slog.LevelWarn
 	}
 	return slog.LevelInfo
-}
-
-func UseTestLogger() *bytes.Buffer {
-	var buf bytes.Buffer
-	opts := slog.HandlerOptions{
-		Level:       Level,
-		ReplaceAttr: removeTime,
-	}
-	Logger = slog.New(opts.NewJSONHandler(&buf))
-	slog.SetDefault(Logger)
-	return &buf
 }

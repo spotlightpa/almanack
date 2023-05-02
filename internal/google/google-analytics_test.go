@@ -13,7 +13,7 @@ import (
 )
 
 func TestMostPopularNews(t *testing.T) {
-	_ = almlog.UseTestLogger()
+	almlog.UseTestLogger(t)
 	svc := Service{}
 	svc.viewID = stringx.First(os.Getenv("ALMANACK_GOOGLE_TEST_VIEW"), "1")
 	ctx := context.Background()
