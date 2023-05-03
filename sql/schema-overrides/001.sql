@@ -14,3 +14,6 @@ ALTER TABLE page
 
 ALTER TABLE shared_article
   DROP COLUMN lede_image_source;
+
+ALTER TABLE "image"
+  DROP COLUMN "src_url";

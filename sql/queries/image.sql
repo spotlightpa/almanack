@@ -15,9 +15,15 @@ INSERT INTO image ("path", "type")
 ON CONFLICT (path)
   DO NOTHING;
 
+-- name: UpsertImageSource :exec
+INSERT INTO image_source (image_id, url)
+  VALUES (@image_id, @url)
+ON CONFLICT (url)
+  DO NOTHING;
+
 -- name: UpsertImage :one
-INSERT INTO image ("path", "type", "description", "credit", "src_url", "is_uploaded")
-  VALUES (@path, @type, @description, @credit, @src_url, @is_uploaded)
+INSERT INTO image ("path", "type", "description", "credit", "is_uploaded")
+  VALUES (@path, @type, @description, @credit, @is_uploaded)
 ON CONFLICT (path)
   DO UPDATE SET
     credit = CASE WHEN image.credit = '' THEN
@@ -28,10 +34,6 @@ ON CONFLICT (path)
       excluded.description
     ELSE
       image.description
-    END, src_url = CASE WHEN image.src_url = '' THEN
-      excluded.src_url
-    ELSE
-      image.src_url
     END
   RETURNING
     *;
@@ -50,11 +52,6 @@ SET
   ELSE
     description
   END,
-  src_url = CASE WHEN src_url = '' THEN
-    @src_url
-  ELSE
-    src_url
-  END,
   is_uploaded = TRUE
 WHERE
   path = @path
@@ -63,13 +60,22 @@ RETURNING
 
 -- name: GetImageBySourceURL :one
 SELECT
+  image.*
+FROM
+  image
+  LEFT JOIN image_source ON (image.id = image_source.image_id)
+WHERE
+  image_source.url = $1;
+
+-- name: GetImageByMD5 :one
+SELECT
   *
 FROM
   image
 WHERE
-  src_url = $1
+  md5 = $1
 ORDER BY
-  updated_at DESC
+  created_at DESC
 LIMIT 1;
 
 -- ListImageWhereNotUploaded has no limit
@@ -77,12 +83,14 @@ LIMIT 1;
 -- but revisit if queue gets too long.
 -- name: ListImageWhereNotUploaded :many
 SELECT
-  *
+  "path",
+  "url"::text
 FROM
   image
+  LEFT JOIN image_source ON (image.id = image_source.image_id)
 WHERE
   is_uploaded = FALSE
-  AND src_url <> '';
+  AND url IS NOT NULL;
 
 -- name: GetImageTypeForExtension :one
 SELECT
