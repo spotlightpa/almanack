@@ -10,6 +10,21 @@ ALTER TABLE "file"
 
 CREATE INDEX "file_md5" ON "file" ("md5");
 
+CREATE TABLE "image_source" (
+  "id" bigserial PRIMARY KEY,
+  "image_id" bigint NOT NULL REFERENCES "image" ("id"),
+  "url" text NOT NULL UNIQUE
+);
+
+INSERT INTO image_source (image_id, url)
+SELECT
+  id,
+  src_url
+FROM
+  image
+WHERE
+  src_url <> '';
+
 ---- create above / drop below ----
 ALTER TABLE "image"
   DROP COLUMN "md5",

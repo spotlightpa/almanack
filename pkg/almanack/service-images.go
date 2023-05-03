@@ -14,6 +14,7 @@ import (
 	"github.com/carlmjohnson/resperr"
 	"github.com/carlmjohnson/workgroup"
 	"github.com/gabriel-vasile/mimetype"
+	"github.com/jackc/pgx/v5"
 	"github.com/spotlightpa/almanack/internal/db"
 	"github.com/spotlightpa/almanack/internal/google"
 )
@@ -71,14 +72,24 @@ func (svc Services) ReplaceImageURL(ctx context.Context, srcURL, description, cr
 		return "", err
 	}
 	uploadPath := hashURLpath(srcURL, itype)
-	_, err = svc.Queries.UpsertImage(ctx, db.UpsertImageParams{
-		Path:        uploadPath,
-		Type:        itype,
-		Description: description,
-		Credit:      credit,
-		SourceURL:   srcURL,
-		IsUploaded:  false,
-	})
+	if err = svc.Tx.Begin(ctx, pgx.TxOptions{}, func(q *db.Queries) (txerr error) {
+		image, err := q.UpsertImage(ctx, db.UpsertImageParams{
+			Path:        uploadPath,
+			Type:        itype,
+			Description: description,
+			Credit:      credit,
+			IsUploaded:  false,
+		})
+		if err != nil {
+			return err
+		}
+		return q.UpsertImageSource(ctx, db.UpsertImageSourceParams{
+			ImageID: image.ID,
+			URL:     srcURL,
+		})
+	}); err != nil {
+		return "", err
+	}
 	return uploadPath, err
 }
 
@@ -169,10 +180,15 @@ func (svc Services) uploadAndRecordImage(ctx context.Context, arg uploadAndRecor
 		Type:        itype,
 		Description: arg.Description,
 		Credit:      arg.Credit,
-		SourceURL:   arg.SourceURL,
 		IsUploaded:  true,
 	})
 	if err != nil {
+		return nil, err
+	}
+	if err = svc.Queries.UpsertImageSource(ctx, db.UpsertImageSourceParams{
+		ImageID: dbImage.ID,
+		URL:     arg.SourceURL,
+	}); err != nil {
 		return nil, err
 	}
 	return &dbImage, nil
@@ -185,8 +201,8 @@ func (svc Services) UploadPendingImages(ctx context.Context) error {
 	}
 
 	return workgroup.DoTasks(5, images,
-		func(image db.Image) error {
-			return svc.uploadPendingImage(ctx, image.SourceURL, image.Path)
+		func(image db.ListImageWhereNotUploadedRow) error {
+			return svc.uploadPendingImage(ctx, image.URL, image.Path)
 		})
 }
 
@@ -207,8 +223,7 @@ func (svc Services) uploadPendingImage(ctx context.Context, sourceURL, path stri
 	}
 	if _, err = svc.Queries.UpdateImage(ctx,
 		db.UpdateImageParams{
-			Path:      path,
-			SourceURL: sourceURL,
+			Path: path,
 		}); err != nil {
 		return err
 	}
