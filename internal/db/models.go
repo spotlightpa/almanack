@@ -46,6 +46,8 @@ type File struct {
 	IsUploaded  bool      `json:"is_uploaded"`
 	CreatedAt   time.Time `json:"created_at"`
 	UpdatedAt   time.Time `json:"updated_at"`
+	Md5         []byte    `json:"md5"`
+	Bytes       int64     `json:"bytes"`
 }
 
 type GDocsDoc struct {
@@ -81,6 +83,8 @@ type Image struct {
 	IsUploaded  bool      `json:"is_uploaded"`
 	CreatedAt   time.Time `json:"created_at"`
 	UpdatedAt   time.Time `json:"updated_at"`
+	Md5         []byte    `json:"md5"`
+	Bytes       int64     `json:"bytes"`
 }
 
 type ImageType struct {
