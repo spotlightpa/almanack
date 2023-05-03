@@ -21,9 +21,24 @@ INSERT INTO image_source (image_id, url)
 ON CONFLICT (url)
   DO NOTHING;
 
+-- name: InsertImagePlaceholder :exec
+WITH i_id AS (
+INSERT INTO image ("path", "type", "description", "credit")
+    VALUES (@path, @type, @description, @credit)
+  RETURNING
+    *)
+  INSERT INTO image_source (image_id, url)
+  SELECT
+    i_id.id,
+    @source_url
+  FROM
+    i_id
+  RETURNING
+    *;
+
 -- name: UpsertImage :one
 INSERT INTO image ("path", "type", "description", "credit", "is_uploaded")
-  VALUES (@path, @type, @description, @credit, @is_uploaded)
+  VALUES (@path, @type, @description, @credit, TRUE)
 ON CONFLICT (path)
   DO UPDATE SET
     credit = CASE WHEN image.credit = '' THEN

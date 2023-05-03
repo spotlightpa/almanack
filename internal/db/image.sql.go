@@ -130,6 +130,41 @@ func (q *Queries) GetImageTypeForExtension(ctx context.Context, extension string
 	return i, err
 }
 
+const insertImagePlaceholder = `-- name: InsertImagePlaceholder :exec
+WITH i_id AS (
+INSERT INTO image ("path", "type", "description", "credit")
+    VALUES ($2, $3, $4, $5)
+  RETURNING
+    id, path, type, description, credit, is_uploaded, created_at, updated_at, md5, bytes)
+  INSERT INTO image_source (image_id, url)
+  SELECT
+    i_id.id,
+    $1
+  FROM
+    i_id
+  RETURNING
+    id, image_id, url
+`
+
+type InsertImagePlaceholderParams struct {
+	SourceUrl   string `json:"source_url"`
+	Path        string `json:"path"`
+	Type        string `json:"type"`
+	Description string `json:"description"`
+	Credit      string `json:"credit"`
+}
+
+func (q *Queries) InsertImagePlaceholder(ctx context.Context, arg InsertImagePlaceholderParams) error {
+	_, err := q.db.Exec(ctx, insertImagePlaceholder,
+		arg.SourceUrl,
+		arg.Path,
+		arg.Type,
+		arg.Description,
+		arg.Credit,
+	)
+	return err
+}
+
 const listImageWhereNotUploaded = `-- name: ListImageWhereNotUploaded :many
 SELECT
   "path",
@@ -353,7 +388,7 @@ func (q *Queries) UpdateImageMD5Size(ctx context.Context, arg UpdateImageMD5Size
 
 const upsertImage = `-- name: UpsertImage :one
 INSERT INTO image ("path", "type", "description", "credit", "is_uploaded")
-  VALUES ($1, $2, $3, $4, $5)
+  VALUES ($1, $2, $3, $4, TRUE)
 ON CONFLICT (path)
   DO UPDATE SET
     credit = CASE WHEN image.credit = '' THEN
@@ -374,7 +409,6 @@ type UpsertImageParams struct {
 	Type        string `json:"type"`
 	Description string `json:"description"`
 	Credit      string `json:"credit"`
-	IsUploaded  bool   `json:"is_uploaded"`
 }
 
 func (q *Queries) UpsertImage(ctx context.Context, arg UpsertImageParams) (Image, error) {
@@ -383,7 +417,6 @@ func (q *Queries) UpsertImage(ctx context.Context, arg UpsertImageParams) (Image
 		arg.Type,
 		arg.Description,
 		arg.Credit,
-		arg.IsUploaded,
 	)
 	var i Image
 	err := row.Scan(
