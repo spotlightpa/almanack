@@ -1,5 +1,6 @@
 <script>
 import { formatDate, formatTime } from "@/utils/time-format.js";
+import humanSize from "@/utils/human-size.js";
 
 export default {
   props: { files: Array },
@@ -7,6 +8,7 @@ export default {
     return {
       formatDate,
       formatTime,
+      humanSize,
     };
   },
 };
@@ -31,11 +33,17 @@ export default {
                   <span class="has-text-grey">
                     {{ file.description }}
                   </span>
+                  {{ " " }}
                   <span>
                     {{ formatDate(file.created_at) }}
                   </span>
+                  {{ " " }}
                   <span class="has-text-grey">
                     {{ formatTime(file.created_at) }}
+                  </span>
+                  {{ " " }}
+                  <span v-if="file.bytes">
+                    {{ humanSize(file.bytes) }}
                   </span>
                 </div>
               </div>

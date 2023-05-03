@@ -4,6 +4,7 @@ import { reactive, computed, toRefs, watch } from "vue";
 import { useClient, makeState } from "@/api/hooks.js";
 
 import { formatDate } from "@/utils/time-format.js";
+import humanSize from "@/utils/human-size.js";
 
 export default {
   props: { page: { type: String, default: "0" } },
@@ -80,6 +81,7 @@ export default {
       ...actions,
 
       formatDate,
+      humanSize,
     };
   },
 };
@@ -181,6 +183,10 @@ export default {
                   Description:
                 </a>
                 {{ file.description || "&lt;no description&gt;" }}
+              </p>
+              <p v-if="file.bytes">
+                <strong>Size: </strong>
+                {{ humanSize(file.bytes) }}
               </p>
               <p>
                 <CopyWithButton :value="file.url" label="URL" size="is-small" />
