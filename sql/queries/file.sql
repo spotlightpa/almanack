@@ -29,3 +29,26 @@ WHERE
   url = @url
 RETURNING
   *;
+
+-- name: ListFilesWhereNoMD5 :many
+SELECT
+  *
+FROM
+  file
+WHERE
+  md5 = ''
+  AND is_uploaded
+ORDER BY
+  created_at ASC
+LIMIT $1;
+
+-- name: UpdateFileMD5Size :one
+UPDATE
+  file
+SET
+  md5 = @md5,
+  bytes = @bytes
+WHERE
+  id = @id
+RETURNING
+  *;

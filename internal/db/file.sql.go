@@ -32,7 +32,7 @@ func (q *Queries) CreateFilePlaceholder(ctx context.Context, arg CreateFilePlace
 
 const listFiles = `-- name: ListFiles :many
 SELECT
-  id, url, filename, mime_type, description, is_uploaded, created_at, updated_at
+  id, url, filename, mime_type, description, is_uploaded, created_at, updated_at, md5, bytes
 FROM
   file
 WHERE
@@ -65,6 +65,52 @@ func (q *Queries) ListFiles(ctx context.Context, arg ListFilesParams) ([]File, e
 			&i.IsUploaded,
 			&i.CreatedAt,
 			&i.UpdatedAt,
+			&i.Md5,
+			&i.Bytes,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const listFilesWhereNoMD5 = `-- name: ListFilesWhereNoMD5 :many
+SELECT
+  id, url, filename, mime_type, description, is_uploaded, created_at, updated_at, md5, bytes
+FROM
+  file
+WHERE
+  md5 = ''
+  AND is_uploaded
+ORDER BY
+  created_at ASC
+LIMIT $1
+`
+
+func (q *Queries) ListFilesWhereNoMD5(ctx context.Context, limit int32) ([]File, error) {
+	rows, err := q.db.Query(ctx, listFilesWhereNoMD5, limit)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []File
+	for rows.Next() {
+		var i File
+		if err := rows.Scan(
+			&i.ID,
+			&i.URL,
+			&i.Filename,
+			&i.MimeType,
+			&i.Description,
+			&i.IsUploaded,
+			&i.CreatedAt,
+			&i.UpdatedAt,
+			&i.Md5,
+			&i.Bytes,
 		); err != nil {
 			return nil, err
 		}
@@ -89,7 +135,7 @@ SET
 WHERE
   url = $3
 RETURNING
-  id, url, filename, mime_type, description, is_uploaded, created_at, updated_at
+  id, url, filename, mime_type, description, is_uploaded, created_at, updated_at, md5, bytes
 `
 
 type UpdateFileParams struct {
@@ -110,6 +156,44 @@ func (q *Queries) UpdateFile(ctx context.Context, arg UpdateFileParams) (File, e
 		&i.IsUploaded,
 		&i.CreatedAt,
 		&i.UpdatedAt,
+		&i.Md5,
+		&i.Bytes,
+	)
+	return i, err
+}
+
+const updateFileMD5Size = `-- name: UpdateFileMD5Size :one
+UPDATE
+  file
+SET
+  md5 = $1,
+  bytes = $2
+WHERE
+  id = $3
+RETURNING
+  id, url, filename, mime_type, description, is_uploaded, created_at, updated_at, md5, bytes
+`
+
+type UpdateFileMD5SizeParams struct {
+	Md5   []byte `json:"md5"`
+	Bytes int64  `json:"bytes"`
+	ID    int64  `json:"id"`
+}
+
+func (q *Queries) UpdateFileMD5Size(ctx context.Context, arg UpdateFileMD5SizeParams) (File, error) {
+	row := q.db.QueryRow(ctx, updateFileMD5Size, arg.Md5, arg.Bytes, arg.ID)
+	var i File
+	err := row.Scan(
+		&i.ID,
+		&i.URL,
+		&i.Filename,
+		&i.MimeType,
+		&i.Description,
+		&i.IsUploaded,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+		&i.Md5,
+		&i.Bytes,
 	)
 	return i, err
 }

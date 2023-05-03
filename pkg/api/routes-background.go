@@ -1,8 +1,10 @@
 package api
 
 import (
+	"context"
 	"errors"
 	"net/http"
+	"strings"
 	"time"
 
 	"github.com/carlmjohnson/workgroup"
@@ -76,6 +78,41 @@ func (app *appEnv) backgroundCron(w http.ResponseWriter, r *http.Request) {
 		func() error {
 			return app.svc.Queries.DeleteGDocsDocWhereUnunused(r.Context())
 		},
+		func() error {
+			return updateMD5s(
+				r.Context(),
+				app.svc.Queries.ListImagesWhereNoMD5,
+				func(ctx context.Context, image db.Image) ([]byte, int64, error) {
+					return app.svc.ImageStore.ReadMD5(ctx, image.Path)
+				},
+				func(ctx context.Context, hash []byte, size int64, image db.Image) error {
+					_, err := app.svc.Queries.UpdateImageMD5Size(r.Context(), db.UpdateImageMD5SizeParams{
+						ID:    image.ID,
+						Md5:   hash,
+						Bytes: size,
+					})
+					return err
+				},
+			)
+		},
+		func() error {
+			return updateMD5s(
+				r.Context(),
+				app.svc.Queries.ListFilesWhereNoMD5,
+				func(ctx context.Context, file db.File) ([]byte, int64, error) {
+					path := strings.TrimPrefix(file.URL, "https://files.data.spotlightpa.org/")
+					return app.svc.FileStore.ReadMD5(ctx, path)
+				},
+				func(ctx context.Context, hash []byte, size int64, file db.File) error {
+					_, err := app.svc.Queries.UpdateFileMD5Size(r.Context(), db.UpdateFileMD5SizeParams{
+						ID:    file.ID,
+						Md5:   hash,
+						Bytes: size,
+					})
+					return err
+				},
+			)
+		},
 	); err != nil {
 		// reply shows up in dev only
 		app.replyErr(w, r, err)
@@ -142,4 +179,30 @@ func (app *appEnv) backgroundImages(w http.ResponseWriter, r *http.Request) {
 	}
 
 	app.replyJSON(http.StatusAccepted, w, "OK")
+}
+
+func updateMD5s[T any](
+	ctx context.Context,
+	list func(context.Context, int32) ([]T, error),
+	read func(context.Context, T) ([]byte, int64, error),
+	update func(context.Context, []byte, int64, T) error,
+) error {
+	for {
+		items, err := list(ctx, 10)
+		if err != nil {
+			return err
+		}
+		if len(items) == 0 {
+			return nil
+		}
+		if err = workgroup.DoTasks(5, items, func(item T) error {
+			hash, size, err := read(ctx, item)
+			if err != nil {
+				return err
+			}
+			return update(ctx, hash, size, item)
+		}); err != nil {
+			return err
+		}
+	}
 }

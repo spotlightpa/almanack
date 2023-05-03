@@ -99,3 +99,26 @@ FROM
   "image"
 WHERE
   "path" = $1;
+
+-- name: ListImagesWhereNoMD5 :many
+SELECT
+  *
+FROM
+  image
+WHERE
+  md5 = ''
+  AND is_uploaded
+ORDER BY
+  created_at ASC
+LIMIT $1;
+
+-- name: UpdateImageMD5Size :one
+UPDATE
+  image
+SET
+  md5 = @md5,
+  bytes = @bytes
+WHERE
+  id = @id
+RETURNING
+  *;
