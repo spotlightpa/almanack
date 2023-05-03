@@ -14,7 +14,6 @@ import (
 	"github.com/carlmjohnson/resperr"
 	"github.com/carlmjohnson/workgroup"
 	"github.com/gabriel-vasile/mimetype"
-	"github.com/jackc/pgx/v5"
 	"github.com/spotlightpa/almanack/internal/db"
 	"github.com/spotlightpa/almanack/internal/google"
 )
@@ -72,21 +71,12 @@ func (svc Services) ReplaceImageURL(ctx context.Context, srcURL, description, cr
 		return "", err
 	}
 	uploadPath := hashURLpath(srcURL, itype)
-	if err = svc.Tx.Begin(ctx, pgx.TxOptions{}, func(q *db.Queries) (txerr error) {
-		image, err := q.UpsertImage(ctx, db.UpsertImageParams{
-			Path:        uploadPath,
-			Type:        itype,
-			Description: description,
-			Credit:      credit,
-			IsUploaded:  false,
-		})
-		if err != nil {
-			return err
-		}
-		return q.UpsertImageSource(ctx, db.UpsertImageSourceParams{
-			ImageID: image.ID,
-			URL:     srcURL,
-		})
+	if err := svc.Queries.InsertImagePlaceholder(ctx, db.InsertImagePlaceholderParams{
+		SourceUrl:   srcURL,
+		Path:        uploadPath,
+		Type:        itype,
+		Description: description,
+		Credit:      credit,
 	}); err != nil {
 		return "", err
 	}
@@ -134,13 +124,21 @@ func (svc Services) ReplaceAndUploadImageURL(ctx context.Context, srcURL, descri
 	}
 
 	uploadPath := hashURLpath(srcURL, itype)
-	if _, err = svc.uploadAndRecordImage(ctx, uploadAndRecordImageParams{
-		UploadPath:  uploadPath,
-		Body:        body,
-		ContentType: ct,
+	if err := svc.Queries.InsertImagePlaceholder(ctx, db.InsertImagePlaceholderParams{
+		SourceUrl:   srcURL,
+		Path:        uploadPath,
+		Type:        itype,
 		Description: description,
 		Credit:      credit,
-		SourceURL:   srcURL,
+	}); err != nil {
+		return "", err
+	}
+	h := http.Header{"Content-Type": []string{ct}}
+	if err := svc.ImageStore.WriteFile(ctx, uploadPath, h, body); err != nil {
+		return "", err
+	}
+	if _, err = svc.Queries.UpdateImage(ctx, db.UpdateImageParams{
+		Path: uploadPath,
 	}); err != nil {
 		return "", err
 	}
@@ -153,45 +151,6 @@ func hashURLpath(srcPath, ext string) string {
 		crockford.MD5(crockford.Lower, []byte(srcPath)),
 		ext,
 	)
-}
-
-type uploadAndRecordImageParams struct {
-	UploadPath  string
-	Body        []byte
-	ContentType string
-	Description string
-	Credit      string
-	SourceURL   string
-}
-
-func (svc Services) uploadAndRecordImage(ctx context.Context, arg uploadAndRecordImageParams) (*db.Image, error) {
-	itype, err := imageTypeFromMIME(arg.ContentType)
-	if err != nil {
-		return nil, err
-	}
-
-	h := http.Header{"Content-Type": []string{arg.ContentType}}
-	if err := svc.ImageStore.WriteFile(ctx, arg.UploadPath, h, arg.Body); err != nil {
-		return nil, err
-	}
-
-	dbImage, err := svc.Queries.UpsertImage(ctx, db.UpsertImageParams{
-		Path:        arg.UploadPath,
-		Type:        itype,
-		Description: arg.Description,
-		Credit:      arg.Credit,
-		IsUploaded:  true,
-	})
-	if err != nil {
-		return nil, err
-	}
-	if err = svc.Queries.UpsertImageSource(ctx, db.UpsertImageSourceParams{
-		ImageID: dbImage.ID,
-		URL:     arg.SourceURL,
-	}); err != nil {
-		return nil, err
-	}
-	return &dbImage, nil
 }
 
 func (svc Services) UploadPendingImages(ctx context.Context) error {

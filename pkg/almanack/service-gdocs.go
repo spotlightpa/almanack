@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"net/http"
 	"strings"
 
 	"github.com/carlmjohnson/bytemap"
@@ -440,13 +441,19 @@ func (svc Services) UploadGDocsImage(ctx context.Context, arg UploadGDocsImagePa
 	switch {
 	// If it's not found, it needs to be uploaded & saved
 	case db.IsNotFound(err):
-		record, err := svc.uploadAndRecordImage(ctx, uploadAndRecordImageParams{
-			UploadPath:  uploadPath,
-			Body:        body,
-			ContentType: ct,
+		itype, err := imageTypeFromMIME(ct)
+		if err != nil {
+			return err
+		}
+		h := http.Header{"Content-Type": []string{ct}}
+		if err := svc.ImageStore.WriteFile(ctx, uploadPath, h, body); err != nil {
+			return err
+		}
+		record, err := svc.Queries.UpsertImage(ctx, db.UpsertImageParams{
+			Path:        uploadPath,
+			Type:        itype,
 			Description: arg.Embed.Description,
 			Credit:      arg.Embed.Credit,
-			SourceURL:   "",
 		})
 		if err != nil {
 			return err
