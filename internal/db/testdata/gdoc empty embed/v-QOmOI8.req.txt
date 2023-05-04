@@ -1,0 +1,4 @@
+GET /InteractiveLogin?continue=https://lh3.google.com/u/0/d/1QeCripnoiyu6XlRtsN3IkaHO6kBPOkv7%3Dw2048-h1322&hl=en&ifkv=Af_xneGEW7r2o5YuaxTfS05CwPp_g5VQ_ySwz1jYpHdrQY5zStqyOp8GpmfYSDq_P-eBa-rI4qqR HTTP/0.0
+Host: accounts.google.com
+Referer: https://accounts.google.com/ServiceLogin?continue=https://lh3.google.com/u/0/d/1QeCripnoiyu6XlRtsN3IkaHO6kBPOkv7%3Dw2048-h1322&hl=en
+
