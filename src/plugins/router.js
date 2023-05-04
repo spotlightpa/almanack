@@ -74,6 +74,28 @@ let router = createRouter({
       meta: { requiresAuth: isEditor },
     },
     {
+      path: "/admin/article-redirect",
+      name: "shared-article-redirect-from-page",
+      component: load(() => import("@/components/ViewArticleRedirect.vue")),
+      props: (route) => ({
+        id: route.query.id,
+        sourceType: route.query.source_type,
+      }),
+      meta: { requiresAuth: isEditor },
+    },
+    {
+      path: "/admin/article-admin-redirect",
+      name: "shared-article-admin-redirect-from-page",
+      component: load(() =>
+        import("@/components/ViewArticleAdminRedirect.vue")
+      ),
+      props: (route) => ({
+        id: route.query.id,
+        sourceType: route.query.source_type,
+      }),
+      meta: { requiresAuth: isSpotlightPAUser },
+    },
+    {
       path: "/shared-articles/:id",
       name: "shared-article",
       component: load(() => import("@/components/ViewSharedArticle.vue")),
