@@ -9,29 +9,9 @@ import (
 	"context"
 )
 
-const createImagePlaceholder = `-- name: CreateImagePlaceholder :execrows
-INSERT INTO image ("path", "type")
-  VALUES ($1, $2)
-ON CONFLICT (path)
-  DO NOTHING
-`
-
-type CreateImagePlaceholderParams struct {
-	Path string `json:"path"`
-	Type string `json:"type"`
-}
-
-func (q *Queries) CreateImagePlaceholder(ctx context.Context, arg CreateImagePlaceholderParams) (int64, error) {
-	result, err := q.db.Exec(ctx, createImagePlaceholder, arg.Path, arg.Type)
-	if err != nil {
-		return 0, err
-	}
-	return result.RowsAffected(), nil
-}
-
 const getImageByMD5 = `-- name: GetImageByMD5 :one
 SELECT
-  id, path, type, description, credit, is_uploaded, created_at, updated_at, md5, bytes
+  id, path, type, description, credit, src_url, is_uploaded, created_at, updated_at, md5, bytes
 FROM
   image
 WHERE
@@ -50,6 +30,7 @@ func (q *Queries) GetImageByMD5(ctx context.Context, md5 []byte) (Image, error) 
 		&i.Type,
 		&i.Description,
 		&i.Credit,
+		&i.SourceURL,
 		&i.IsUploaded,
 		&i.CreatedAt,
 		&i.UpdatedAt,
@@ -61,7 +42,7 @@ func (q *Queries) GetImageByMD5(ctx context.Context, md5 []byte) (Image, error) 
 
 const getImageByPath = `-- name: GetImageByPath :one
 SELECT
-  id, path, type, description, credit, is_uploaded, created_at, updated_at, md5, bytes
+  id, path, type, description, credit, src_url, is_uploaded, created_at, updated_at, md5, bytes
 FROM
   "image"
 WHERE
@@ -77,6 +58,7 @@ func (q *Queries) GetImageByPath(ctx context.Context, path string) (Image, error
 		&i.Type,
 		&i.Description,
 		&i.Credit,
+		&i.SourceURL,
 		&i.IsUploaded,
 		&i.CreatedAt,
 		&i.UpdatedAt,
@@ -88,16 +70,18 @@ func (q *Queries) GetImageByPath(ctx context.Context, path string) (Image, error
 
 const getImageBySourceURL = `-- name: GetImageBySourceURL :one
 SELECT
-  image.id, image.path, image.type, image.description, image.credit, image.is_uploaded, image.created_at, image.updated_at, image.md5, image.bytes
+  id, path, type, description, credit, src_url, is_uploaded, created_at, updated_at, md5, bytes
 FROM
   image
-  LEFT JOIN image_source ON (image.id = image_source.image_id)
 WHERE
-  image_source.url = $1
+  src_url = $1
+ORDER BY
+  updated_at DESC
+LIMIT 1
 `
 
-func (q *Queries) GetImageBySourceURL(ctx context.Context, url string) (Image, error) {
-	row := q.db.QueryRow(ctx, getImageBySourceURL, url)
+func (q *Queries) GetImageBySourceURL(ctx context.Context, srcUrl string) (Image, error) {
+	row := q.db.QueryRow(ctx, getImageBySourceURL, srcUrl)
 	var i Image
 	err := row.Scan(
 		&i.ID,
@@ -105,6 +89,7 @@ func (q *Queries) GetImageBySourceURL(ctx context.Context, url string) (Image, e
 		&i.Type,
 		&i.Description,
 		&i.Credit,
+		&i.SourceURL,
 		&i.IsUploaded,
 		&i.CreatedAt,
 		&i.UpdatedAt,
@@ -130,71 +115,41 @@ func (q *Queries) GetImageTypeForExtension(ctx context.Context, extension string
 	return i, err
 }
 
-const insertImagePlaceholder = `-- name: InsertImagePlaceholder :exec
-WITH i_id AS (
-INSERT INTO image ("path", "type", "description", "credit")
-    VALUES ($2, $3, $4, $5)
-  RETURNING
-    id, path, type, description, credit, is_uploaded, created_at, updated_at, md5, bytes)
-  INSERT INTO image_source (image_id, url)
-  SELECT
-    i_id.id,
-    $1
-  FROM
-    i_id
-  RETURNING
-    id, image_id, url
-`
-
-type InsertImagePlaceholderParams struct {
-	SourceUrl   string `json:"source_url"`
-	Path        string `json:"path"`
-	Type        string `json:"type"`
-	Description string `json:"description"`
-	Credit      string `json:"credit"`
-}
-
-func (q *Queries) InsertImagePlaceholder(ctx context.Context, arg InsertImagePlaceholderParams) error {
-	_, err := q.db.Exec(ctx, insertImagePlaceholder,
-		arg.SourceUrl,
-		arg.Path,
-		arg.Type,
-		arg.Description,
-		arg.Credit,
-	)
-	return err
-}
-
 const listImageWhereNotUploaded = `-- name: ListImageWhereNotUploaded :many
 SELECT
-  "path",
-  "url"::text
+  id, path, type, description, credit, src_url, is_uploaded, created_at, updated_at, md5, bytes
 FROM
   image
-  LEFT JOIN image_source ON (image.id = image_source.image_id)
 WHERE
   is_uploaded = FALSE
-  AND url IS NOT NULL
+  AND src_url <> ''
 `
-
-type ListImageWhereNotUploadedRow struct {
-	Path string `json:"path"`
-	URL  string `json:"url"`
-}
 
 // ListImageWhereNotUploaded has no limit
 // because we want them all uploaded,
 // but revisit if queue gets too long.
-func (q *Queries) ListImageWhereNotUploaded(ctx context.Context) ([]ListImageWhereNotUploadedRow, error) {
+func (q *Queries) ListImageWhereNotUploaded(ctx context.Context) ([]Image, error) {
 	rows, err := q.db.Query(ctx, listImageWhereNotUploaded)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
-	var items []ListImageWhereNotUploadedRow
+	var items []Image
 	for rows.Next() {
-		var i ListImageWhereNotUploadedRow
-		if err := rows.Scan(&i.Path, &i.URL); err != nil {
+		var i Image
+		if err := rows.Scan(
+			&i.ID,
+			&i.Path,
+			&i.Type,
+			&i.Description,
+			&i.Credit,
+			&i.SourceURL,
+			&i.IsUploaded,
+			&i.CreatedAt,
+			&i.UpdatedAt,
+			&i.Md5,
+			&i.Bytes,
+		); err != nil {
 			return nil, err
 		}
 		items = append(items, i)
@@ -207,7 +162,7 @@ func (q *Queries) ListImageWhereNotUploaded(ctx context.Context) ([]ListImageWhe
 
 const listImages = `-- name: ListImages :many
 SELECT
-  id, path, type, description, credit, is_uploaded, created_at, updated_at, md5, bytes
+  id, path, type, description, credit, src_url, is_uploaded, created_at, updated_at, md5, bytes
 FROM
   image
 WHERE
@@ -237,6 +192,7 @@ func (q *Queries) ListImages(ctx context.Context, arg ListImagesParams) ([]Image
 			&i.Type,
 			&i.Description,
 			&i.Credit,
+			&i.SourceURL,
 			&i.IsUploaded,
 			&i.CreatedAt,
 			&i.UpdatedAt,
@@ -255,7 +211,7 @@ func (q *Queries) ListImages(ctx context.Context, arg ListImagesParams) ([]Image
 
 const listImagesWhereNoMD5 = `-- name: ListImagesWhereNoMD5 :many
 SELECT
-  id, path, type, description, credit, is_uploaded, created_at, updated_at, md5, bytes
+  id, path, type, description, credit, src_url, is_uploaded, created_at, updated_at, md5, bytes
 FROM
   image
 WHERE
@@ -281,6 +237,7 @@ func (q *Queries) ListImagesWhereNoMD5(ctx context.Context, limit int32) ([]Imag
 			&i.Type,
 			&i.Description,
 			&i.Credit,
+			&i.SourceURL,
 			&i.IsUploaded,
 			&i.CreatedAt,
 			&i.UpdatedAt,
@@ -315,7 +272,7 @@ SET
 WHERE
   path = $5
 RETURNING
-  id, path, type, description, credit, is_uploaded, created_at, updated_at, md5, bytes
+  id, path, type, description, credit, src_url, is_uploaded, created_at, updated_at, md5, bytes
 `
 
 type UpdateImageParams struct {
@@ -341,6 +298,7 @@ func (q *Queries) UpdateImage(ctx context.Context, arg UpdateImageParams) (Image
 		&i.Type,
 		&i.Description,
 		&i.Credit,
+		&i.SourceURL,
 		&i.IsUploaded,
 		&i.CreatedAt,
 		&i.UpdatedAt,
@@ -359,7 +317,7 @@ SET
 WHERE
   id = $3
 RETURNING
-  id, path, type, description, credit, is_uploaded, created_at, updated_at, md5, bytes
+  id, path, type, description, credit, src_url, is_uploaded, created_at, updated_at, md5, bytes
 `
 
 type UpdateImageMD5SizeParams struct {
@@ -377,6 +335,7 @@ func (q *Queries) UpdateImageMD5Size(ctx context.Context, arg UpdateImageMD5Size
 		&i.Type,
 		&i.Description,
 		&i.Credit,
+		&i.SourceURL,
 		&i.IsUploaded,
 		&i.CreatedAt,
 		&i.UpdatedAt,
@@ -387,8 +346,8 @@ func (q *Queries) UpdateImageMD5Size(ctx context.Context, arg UpdateImageMD5Size
 }
 
 const upsertImage = `-- name: UpsertImage :one
-INSERT INTO image ("path", "type", "description", "credit", "is_uploaded")
-  VALUES ($1, $2, $3, $4, TRUE)
+INSERT INTO image ("path", "type", "description", "credit", "src_url", "is_uploaded")
+  VALUES ($1, $2, $3, $4, $5, $6)
 ON CONFLICT (path)
   DO UPDATE SET
     credit = CASE WHEN image.credit = '' THEN
@@ -399,9 +358,13 @@ ON CONFLICT (path)
       excluded.description
     ELSE
       image.description
+    END, src_url = CASE WHEN image.src_url = '' THEN
+      excluded.src_url
+    ELSE
+      image.src_url
     END
   RETURNING
-    id, path, type, description, credit, is_uploaded, created_at, updated_at, md5, bytes
+    id, path, type, description, credit, src_url, is_uploaded, created_at, updated_at, md5, bytes
 `
 
 type UpsertImageParams struct {
@@ -409,6 +372,8 @@ type UpsertImageParams struct {
 	Type        string `json:"type"`
 	Description string `json:"description"`
 	Credit      string `json:"credit"`
+	SourceURL   string `json:"src_url"`
+	IsUploaded  bool   `json:"is_uploaded"`
 }
 
 func (q *Queries) UpsertImage(ctx context.Context, arg UpsertImageParams) (Image, error) {
@@ -417,6 +382,8 @@ func (q *Queries) UpsertImage(ctx context.Context, arg UpsertImageParams) (Image
 		arg.Type,
 		arg.Description,
 		arg.Credit,
+		arg.SourceURL,
+		arg.IsUploaded,
 	)
 	var i Image
 	err := row.Scan(
@@ -425,6 +392,7 @@ func (q *Queries) UpsertImage(ctx context.Context, arg UpsertImageParams) (Image
 		&i.Type,
 		&i.Description,
 		&i.Credit,
+		&i.SourceURL,
 		&i.IsUploaded,
 		&i.CreatedAt,
 		&i.UpdatedAt,
@@ -434,19 +402,70 @@ func (q *Queries) UpsertImage(ctx context.Context, arg UpsertImageParams) (Image
 	return i, err
 }
 
-const upsertImageSource = `-- name: UpsertImageSource :exec
-INSERT INTO image_source (image_id, url)
-  VALUES ($1, $2)
-ON CONFLICT (url)
-  DO NOTHING
+const upsertImageWithMD5 = `-- name: UpsertImageWithMD5 :one
+INSERT INTO image ("path", "type", "description", "credit", "src_url", "md5",
+  "bytes", "is_uploaded")
+  VALUES ($1, $2, $3, $4, $5, $6, $7, TRUE)
+ON CONFLICT (path)
+  DO UPDATE SET
+    credit = CASE WHEN image.credit = '' THEN
+      excluded.credit
+    ELSE
+      image.credit
+    END, description = CASE WHEN image.description = '' THEN
+      excluded.description
+    ELSE
+      image.description
+    END, src_url = CASE WHEN image.src_url = '' THEN
+      excluded.src_url
+    ELSE
+      image.src_url
+    END, md5 = CASE WHEN image.md5 = '' THEN
+      excluded.md5
+    ELSE
+      image.md5
+    END, bytes = CASE WHEN image.bytes = 0 THEN
+      excluded.bytes
+    ELSE
+      image.bytes
+    END
+  RETURNING
+    id, path, type, description, credit, src_url, is_uploaded, created_at, updated_at, md5, bytes
 `
 
-type UpsertImageSourceParams struct {
-	ImageID int64  `json:"image_id"`
-	URL     string `json:"url"`
+type UpsertImageWithMD5Params struct {
+	Path        string `json:"path"`
+	Type        string `json:"type"`
+	Description string `json:"description"`
+	Credit      string `json:"credit"`
+	SourceURL   string `json:"src_url"`
+	Md5         []byte `json:"md5"`
+	Bytes       int64  `json:"bytes"`
 }
 
-func (q *Queries) UpsertImageSource(ctx context.Context, arg UpsertImageSourceParams) error {
-	_, err := q.db.Exec(ctx, upsertImageSource, arg.ImageID, arg.URL)
-	return err
+func (q *Queries) UpsertImageWithMD5(ctx context.Context, arg UpsertImageWithMD5Params) (Image, error) {
+	row := q.db.QueryRow(ctx, upsertImageWithMD5,
+		arg.Path,
+		arg.Type,
+		arg.Description,
+		arg.Credit,
+		arg.SourceURL,
+		arg.Md5,
+		arg.Bytes,
+	)
+	var i Image
+	err := row.Scan(
+		&i.ID,
+		&i.Path,
+		&i.Type,
+		&i.Description,
+		&i.Credit,
+		&i.SourceURL,
+		&i.IsUploaded,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+		&i.Md5,
+		&i.Bytes,
+	)
+	return i, err
 }

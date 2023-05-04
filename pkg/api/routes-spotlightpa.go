@@ -82,13 +82,13 @@ func (app *appEnv) postSignedUpload(w http.ResponseWriter, r *http.Request) {
 		app.replyErr(w, r, err)
 		return
 	}
-	if n, err := app.svc.Queries.CreateImagePlaceholder(r.Context(), db.CreateImagePlaceholderParams{
+	if dbImage, err := app.svc.Queries.UpsertImage(r.Context(), db.UpsertImageParams{
 		Path: res.FileName,
 		Type: ext,
 	}); err != nil {
 		app.replyErr(w, r, err)
 		return
-	} else if n != 1 {
+	} else if dbImage.IsUploaded {
 		// Log and continue
 		app.logErr(r.Context(),
 			fmt.Errorf("creating image %q but it already exists", res.FileName))

@@ -3,6 +3,7 @@ package almanack
 import (
 	"bytes"
 	"context"
+	"crypto/md5"
 	"fmt"
 	"net/http"
 	"path"
@@ -71,12 +72,13 @@ func (svc Services) ReplaceImageURL(ctx context.Context, srcURL, description, cr
 		return "", err
 	}
 	uploadPath := hashURLpath(srcURL, itype)
-	if err := svc.Queries.InsertImagePlaceholder(ctx, db.InsertImagePlaceholderParams{
-		SourceUrl:   srcURL,
+	if _, err = svc.Queries.UpsertImage(ctx, db.UpsertImageParams{
 		Path:        uploadPath,
 		Type:        itype,
 		Description: description,
 		Credit:      credit,
+		SourceURL:   srcURL,
+		IsUploaded:  false,
 	}); err != nil {
 		return "", err
 	}
@@ -123,22 +125,30 @@ func (svc Services) ReplaceAndUploadImageURL(ctx context.Context, srcURL, descri
 		return "", err
 	}
 
-	uploadPath := hashURLpath(srcURL, itype)
-	if err := svc.Queries.InsertImagePlaceholder(ctx, db.InsertImagePlaceholderParams{
-		SourceUrl:   srcURL,
-		Path:        uploadPath,
-		Type:        itype,
-		Description: description,
-		Credit:      credit,
-	}); err != nil {
+	// Figure out if it has been uploaded before and use that
+	hash := md5.Sum(body)
+	image, err = svc.Queries.GetImageByMD5(ctx, hash[:])
+	switch {
+	case db.IsNotFound(err):
+		// keep trucking
+	case err != nil:
 		return "", err
+	case err == nil:
+		return image.Path, nil
 	}
+	uploadPath := hashURLpath(srcURL, itype)
 	h := http.Header{"Content-Type": []string{ct}}
 	if err := svc.ImageStore.WriteFile(ctx, uploadPath, h, body); err != nil {
 		return "", err
 	}
-	if _, err = svc.Queries.UpdateImage(ctx, db.UpdateImageParams{
-		Path: uploadPath,
+	if _, err = svc.Queries.UpsertImageWithMD5(ctx, db.UpsertImageWithMD5Params{
+		Path:        uploadPath,
+		Type:        itype,
+		Description: description,
+		Credit:      credit,
+		SourceURL:   srcURL,
+		Md5:         hash[:],
+		Bytes:       int64(len(body)),
 	}); err != nil {
 		return "", err
 	}
@@ -160,8 +170,8 @@ func (svc Services) UploadPendingImages(ctx context.Context) error {
 	}
 
 	return workgroup.DoTasks(5, images,
-		func(image db.ListImageWhereNotUploadedRow) error {
-			return svc.uploadPendingImage(ctx, image.URL, image.Path)
+		func(image db.Image) error {
+			return svc.uploadPendingImage(ctx, image.SourceURL, image.Path)
 		})
 }
 

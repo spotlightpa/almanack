@@ -79,17 +79,12 @@ type Image struct {
 	Type        string    `json:"type"`
 	Description string    `json:"description"`
 	Credit      string    `json:"credit"`
+	SourceURL   string    `json:"src_url"`
 	IsUploaded  bool      `json:"is_uploaded"`
 	CreatedAt   time.Time `json:"created_at"`
 	UpdatedAt   time.Time `json:"updated_at"`
 	Md5         []byte    `json:"md5"`
 	Bytes       int64     `json:"bytes"`
-}
-
-type ImageSource struct {
-	ID      int64  `json:"id"`
-	ImageID int64  `json:"image_id"`
-	URL     string `json:"url"`
 }
 
 type ImageType struct {
