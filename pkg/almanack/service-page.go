@@ -243,6 +243,7 @@ func (svc Services) CreatePageFromGDocsDoc(ctx context.Context, shared *db.Share
 		"title":             shared.Hed,
 		"slug":              stringx.Slugify(shared.Hed),
 		"description":       shared.Description,
+		"blurb":             shared.Description,
 		"image":             shared.LedeImage,
 		"image-credit":      shared.LedeImageCredit,
 		"image-description": shared.LedeImageDescription,
