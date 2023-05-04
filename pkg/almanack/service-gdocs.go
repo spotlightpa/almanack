@@ -94,8 +94,8 @@ func (svc Services) ProcessGDocsDoc(ctx context.Context, dbDoc db.GDocsDoc) (err
 	// First collect the embeds array and metadata
 	var (
 		metadata db.GDocsMetadata
-		embeds   []db.Embed
-		warnings []string
+		embeds   = []db.Embed{} // must not be "null"
+		warnings = []string{}
 		n        = 1
 	)
 
