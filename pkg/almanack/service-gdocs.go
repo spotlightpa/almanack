@@ -2,6 +2,7 @@ package almanack
 
 import (
 	"context"
+	"crypto/md5"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -433,27 +434,36 @@ func (svc Services) UploadGDocsImage(ctx context.Context, arg UploadGDocsImagePa
 	}
 
 	// Hash the file
-	uploadPath := makeCASaddress(body, ct)
+	hash := md5.Sum(body)
 
 	// Look up file hash
-	dbImage, err := svc.Queries.GetImageByPath(ctx, uploadPath)
+	dbImage, err := svc.Queries.GetImageByMD5(ctx, hash[:])
 	var imageID int64
 	switch {
+	// If it is found, return & save the relationship for next refresh
+	case err == nil:
+		arg.Embed.Path = dbImage.Path
+		imageID = dbImage.ID
+
 	// If it's not found, it needs to be uploaded & saved
 	case db.IsNotFound(err):
 		itype, err := imageTypeFromMIME(ct)
 		if err != nil {
 			return err
 		}
+		uploadPath := makeCASaddress(body, ct)
+		arg.Embed.Path = uploadPath
 		h := http.Header{"Content-Type": []string{ct}}
 		if err := svc.ImageStore.WriteFile(ctx, uploadPath, h, body); err != nil {
 			return err
 		}
-		record, err := svc.Queries.UpsertImage(ctx, db.UpsertImageParams{
+		record, err := svc.Queries.UpsertImageWithMD5(ctx, db.UpsertImageWithMD5Params{
 			Path:        uploadPath,
 			Type:        itype,
 			Description: arg.Embed.Description,
 			Credit:      arg.Embed.Credit,
+			Md5:         hash[:],
+			Bytes:       int64(len(hash)),
 		})
 		if err != nil {
 			return err
@@ -462,12 +472,8 @@ func (svc Services) UploadGDocsImage(ctx context.Context, arg UploadGDocsImagePa
 	// Other errors are bad
 	case err != nil:
 		return err
-	// If it is found, return & save the relationship for next refresh
-	case err == nil:
-		imageID = dbImage.ID
 	}
 
-	arg.Embed.Path = uploadPath
 	return svc.Queries.UpsertGDocsImage(ctx, db.UpsertGDocsImageParams{
 		ExternalID:  arg.ExternalID,
 		DocObjectID: arg.DocObjectID,

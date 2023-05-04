@@ -9,36 +9,9 @@ ORDER BY
   updated_at DESC
 LIMIT $1 OFFSET $2;
 
--- name: CreateImagePlaceholder :execrows
-INSERT INTO image ("path", "type")
-  VALUES (@path, @type)
-ON CONFLICT (path)
-  DO NOTHING;
-
--- name: UpsertImageSource :exec
-INSERT INTO image_source (image_id, url)
-  VALUES (@image_id, @url)
-ON CONFLICT (url)
-  DO NOTHING;
-
--- name: InsertImagePlaceholder :exec
-WITH i_id AS (
-INSERT INTO image ("path", "type", "description", "credit")
-    VALUES (@path, @type, @description, @credit)
-  RETURNING
-    *)
-  INSERT INTO image_source (image_id, url)
-  SELECT
-    i_id.id,
-    @source_url
-  FROM
-    i_id
-  RETURNING
-    *;
-
 -- name: UpsertImage :one
-INSERT INTO image ("path", "type", "description", "credit", "is_uploaded")
-  VALUES (@path, @type, @description, @credit, TRUE)
+INSERT INTO image ("path", "type", "description", "credit", "src_url", "is_uploaded")
+  VALUES (@path, @type, @description, @credit, @src_url, @is_uploaded)
 ON CONFLICT (path)
   DO UPDATE SET
     credit = CASE WHEN image.credit = '' THEN
@@ -49,6 +22,40 @@ ON CONFLICT (path)
       excluded.description
     ELSE
       image.description
+    END, src_url = CASE WHEN image.src_url = '' THEN
+      excluded.src_url
+    ELSE
+      image.src_url
+    END
+  RETURNING
+    *;
+
+-- name: UpsertImageWithMD5 :one
+INSERT INTO image ("path", "type", "description", "credit", "src_url", "md5",
+  "bytes", "is_uploaded")
+  VALUES (@path, @type, @description, @credit, @src_url, @md5, @bytes, TRUE)
+ON CONFLICT (path)
+  DO UPDATE SET
+    credit = CASE WHEN image.credit = '' THEN
+      excluded.credit
+    ELSE
+      image.credit
+    END, description = CASE WHEN image.description = '' THEN
+      excluded.description
+    ELSE
+      image.description
+    END, src_url = CASE WHEN image.src_url = '' THEN
+      excluded.src_url
+    ELSE
+      image.src_url
+    END, md5 = CASE WHEN image.md5 = '' THEN
+      excluded.md5
+    ELSE
+      image.md5
+    END, bytes = CASE WHEN image.bytes = 0 THEN
+      excluded.bytes
+    ELSE
+      image.bytes
     END
   RETURNING
     *;
@@ -75,12 +82,14 @@ RETURNING
 
 -- name: GetImageBySourceURL :one
 SELECT
-  image.*
+  *
 FROM
   image
-  LEFT JOIN image_source ON (image.id = image_source.image_id)
 WHERE
-  image_source.url = $1;
+  src_url = $1
+ORDER BY
+  updated_at DESC
+LIMIT 1;
 
 -- name: GetImageByMD5 :one
 SELECT
@@ -98,14 +107,12 @@ LIMIT 1;
 -- but revisit if queue gets too long.
 -- name: ListImageWhereNotUploaded :many
 SELECT
-  "path",
-  "url"::text
+  *
 FROM
   image
-  LEFT JOIN image_source ON (image.id = image_source.image_id)
 WHERE
   is_uploaded = FALSE
-  AND url IS NOT NULL;
+  AND src_url <> '';
 
 -- name: GetImageTypeForExtension :one
 SELECT

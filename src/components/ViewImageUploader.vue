@@ -31,6 +31,7 @@ const toImageObj = (rawImage) => ({
   }),
   description: rawImage.description,
   credit: rawImage.credit,
+  srcURL: rawImage.src_url,
   date: new Date(rawImage.created_at),
   downloadURL: "/ssr/download-image?src=" + encodeURIComponent(rawImage.path),
 });
