@@ -123,10 +123,17 @@ export class Page {
   }
 
   get sharedViewRoute() {
-    if (!this.arcID) {
-      return "";
-    }
-    return { name: "arc-article", params: { id: this.arcID } };
+    return {
+      name: "shared-article-redirect-from-page",
+      query: { id: this.sourceID, source_type: this.sourceType },
+    };
+  }
+
+  get sharedAdminRoute() {
+    return {
+      name: "shared-article-admin-redirect-from-page",
+      query: { id: this.sourceID, source_type: this.sourceType },
+    };
   }
 
   get mainTopic() {

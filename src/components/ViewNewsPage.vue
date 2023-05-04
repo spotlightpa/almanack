@@ -52,14 +52,24 @@ export default {
       <span class="tags">
         <TagStatus v-if="page" :status="page.status" />
         <router-link
+          v-if="page && page.sharedAdminRoute"
+          class="tag is-light has-text-weight-semibold"
+          :to="page.sharedAdminRoute"
+        >
+          <span class="icon is-size-6">
+            <font-awesome-icon :icon="['fas', 'sliders']" />
+          </span>
+          <span>Sharing admin</span>
+        </router-link>
+        <router-link
           v-if="page && page.sharedViewRoute"
           class="tag is-light has-text-weight-semibold"
           :to="page.sharedViewRoute"
         >
           <span class="icon is-size-6">
-            <font-awesome-icon :icon="['fas', 'link']" />
+            <font-awesome-icon :icon="['fas', 'file-invoice']" />
           </span>
-          <span>External Editor view</span>
+          <span>Partner view</span>
         </router-link>
         <a
           v-if="page && page.arcURL"

@@ -7,9 +7,7 @@ import { get, getSharedArticle } from "@/api/client-v2.js";
 const router = useRouter();
 const props = defineProps({
   id: String,
-  sourceType: {
-    default: "arc",
-  },
+  sourceType: String,
 });
 
 const isLoading = ref(false);
@@ -31,7 +29,7 @@ async function load() {
     return;
   }
   router.replace({
-    name: "shared-article",
+    name: "shared-article-admin",
     params: {
       id: "" + article.id,
     },
@@ -42,6 +40,7 @@ load();
 </script>
 
 <template>
+  <div>hello</div>
   <SpinnerProgress :is-loading="isLoading && isLoadingDebounced" />
   <ErrorReloader :error="error" @reload="load" />
 </template>
