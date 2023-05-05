@@ -139,7 +139,7 @@ func (svc Services) ReplaceAndUploadImageURL(ctx context.Context, srcURL, descri
 		Description: description,
 		Credit:      credit,
 		SourceURL:   srcURL,
-		Md5:         hash[:],
+		MD5:         hash[:],
 		Bytes:       int64(len(body)),
 	}); err != nil {
 		return "", err
