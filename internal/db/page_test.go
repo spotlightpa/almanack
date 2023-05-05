@@ -45,7 +45,7 @@ func TestToFromTOML(t *testing.T) {
 }
 
 func TestFromToTOML(t *testing.T) {
-	testfile.GlobRun(t, "testdata/*.md", func(path string, t *testing.T) {
+	testfile.GlobRun(t, "testdata/*.md", func(t *testing.T, path string) {
 		b := testfile.Read(t, path)
 
 		var page db.Page
