@@ -16,10 +16,11 @@
   ],
   "rename": {
     "archive_url": "ArchiveURL",
+    "md5": "MD5",
     "spotlightpa_path": "SpotlightPAPath",
     "src_url": "SourceURL",
-    "url": "URL",
-    "url_path": "URLPath"
+    "url_path": "URLPath",
+    "url": "URL"
   },
   "overrides": [
     {

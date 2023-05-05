@@ -88,7 +88,7 @@ func (app *appEnv) backgroundCron(w http.ResponseWriter, r *http.Request) {
 				func(ctx context.Context, hash []byte, size int64, image db.Image) error {
 					_, err := app.svc.Queries.UpdateImageMD5Size(r.Context(), db.UpdateImageMD5SizeParams{
 						ID:    image.ID,
-						Md5:   hash,
+						MD5:   hash,
 						Bytes: size,
 					})
 					return err
@@ -106,7 +106,7 @@ func (app *appEnv) backgroundCron(w http.ResponseWriter, r *http.Request) {
 				func(ctx context.Context, hash []byte, size int64, file db.File) error {
 					_, err := app.svc.Queries.UpdateFileMD5Size(r.Context(), db.UpdateFileMD5SizeParams{
 						ID:    file.ID,
-						Md5:   hash,
+						MD5:   hash,
 						Bytes: size,
 					})
 					return err

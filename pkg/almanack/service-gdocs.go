@@ -462,7 +462,7 @@ func (svc Services) UploadGDocsImage(ctx context.Context, arg UploadGDocsImagePa
 			Type:        itype,
 			Description: arg.Embed.Description,
 			Credit:      arg.Embed.Credit,
-			Md5:         hash[:],
+			MD5:         hash[:],
 			Bytes:       int64(len(hash)),
 		})
 		if err != nil {

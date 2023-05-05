@@ -34,7 +34,7 @@ func (q *Queries) GetImageByMD5(ctx context.Context, md5 []byte) (Image, error) 
 		&i.IsUploaded,
 		&i.CreatedAt,
 		&i.UpdatedAt,
-		&i.Md5,
+		&i.MD5,
 		&i.Bytes,
 	)
 	return i, err
@@ -62,7 +62,7 @@ func (q *Queries) GetImageByPath(ctx context.Context, path string) (Image, error
 		&i.IsUploaded,
 		&i.CreatedAt,
 		&i.UpdatedAt,
-		&i.Md5,
+		&i.MD5,
 		&i.Bytes,
 	)
 	return i, err
@@ -93,7 +93,7 @@ func (q *Queries) GetImageBySourceURL(ctx context.Context, srcUrl string) (Image
 		&i.IsUploaded,
 		&i.CreatedAt,
 		&i.UpdatedAt,
-		&i.Md5,
+		&i.MD5,
 		&i.Bytes,
 	)
 	return i, err
@@ -147,7 +147,7 @@ func (q *Queries) ListImageWhereNotUploaded(ctx context.Context) ([]Image, error
 			&i.IsUploaded,
 			&i.CreatedAt,
 			&i.UpdatedAt,
-			&i.Md5,
+			&i.MD5,
 			&i.Bytes,
 		); err != nil {
 			return nil, err
@@ -196,7 +196,7 @@ func (q *Queries) ListImages(ctx context.Context, arg ListImagesParams) ([]Image
 			&i.IsUploaded,
 			&i.CreatedAt,
 			&i.UpdatedAt,
-			&i.Md5,
+			&i.MD5,
 			&i.Bytes,
 		); err != nil {
 			return nil, err
@@ -241,7 +241,7 @@ func (q *Queries) ListImagesWhereNoMD5(ctx context.Context, limit int32) ([]Imag
 			&i.IsUploaded,
 			&i.CreatedAt,
 			&i.UpdatedAt,
-			&i.Md5,
+			&i.MD5,
 			&i.Bytes,
 		); err != nil {
 			return nil, err
@@ -302,7 +302,7 @@ func (q *Queries) UpdateImage(ctx context.Context, arg UpdateImageParams) (Image
 		&i.IsUploaded,
 		&i.CreatedAt,
 		&i.UpdatedAt,
-		&i.Md5,
+		&i.MD5,
 		&i.Bytes,
 	)
 	return i, err
@@ -321,13 +321,13 @@ RETURNING
 `
 
 type UpdateImageMD5SizeParams struct {
-	Md5   []byte `json:"md5"`
+	MD5   []byte `json:"md5"`
 	Bytes int64  `json:"bytes"`
 	ID    int64  `json:"id"`
 }
 
 func (q *Queries) UpdateImageMD5Size(ctx context.Context, arg UpdateImageMD5SizeParams) (Image, error) {
-	row := q.db.QueryRow(ctx, updateImageMD5Size, arg.Md5, arg.Bytes, arg.ID)
+	row := q.db.QueryRow(ctx, updateImageMD5Size, arg.MD5, arg.Bytes, arg.ID)
 	var i Image
 	err := row.Scan(
 		&i.ID,
@@ -339,7 +339,7 @@ func (q *Queries) UpdateImageMD5Size(ctx context.Context, arg UpdateImageMD5Size
 		&i.IsUploaded,
 		&i.CreatedAt,
 		&i.UpdatedAt,
-		&i.Md5,
+		&i.MD5,
 		&i.Bytes,
 	)
 	return i, err
@@ -396,7 +396,7 @@ func (q *Queries) UpsertImage(ctx context.Context, arg UpsertImageParams) (Image
 		&i.IsUploaded,
 		&i.CreatedAt,
 		&i.UpdatedAt,
-		&i.Md5,
+		&i.MD5,
 		&i.Bytes,
 	)
 	return i, err
@@ -439,7 +439,7 @@ type UpsertImageWithMD5Params struct {
 	Description string `json:"description"`
 	Credit      string `json:"credit"`
 	SourceURL   string `json:"src_url"`
-	Md5         []byte `json:"md5"`
+	MD5         []byte `json:"md5"`
 	Bytes       int64  `json:"bytes"`
 }
 
@@ -450,7 +450,7 @@ func (q *Queries) UpsertImageWithMD5(ctx context.Context, arg UpsertImageWithMD5
 		arg.Description,
 		arg.Credit,
 		arg.SourceURL,
-		arg.Md5,
+		arg.MD5,
 		arg.Bytes,
 	)
 	var i Image
@@ -464,7 +464,7 @@ func (q *Queries) UpsertImageWithMD5(ctx context.Context, arg UpsertImageWithMD5
 		&i.IsUploaded,
 		&i.CreatedAt,
 		&i.UpdatedAt,
-		&i.Md5,
+		&i.MD5,
 		&i.Bytes,
 	)
 	return i, err

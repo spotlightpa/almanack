@@ -65,7 +65,7 @@ func (q *Queries) ListFiles(ctx context.Context, arg ListFilesParams) ([]File, e
 			&i.IsUploaded,
 			&i.CreatedAt,
 			&i.UpdatedAt,
-			&i.Md5,
+			&i.MD5,
 			&i.Bytes,
 		); err != nil {
 			return nil, err
@@ -109,7 +109,7 @@ func (q *Queries) ListFilesWhereNoMD5(ctx context.Context, limit int32) ([]File,
 			&i.IsUploaded,
 			&i.CreatedAt,
 			&i.UpdatedAt,
-			&i.Md5,
+			&i.MD5,
 			&i.Bytes,
 		); err != nil {
 			return nil, err
@@ -156,7 +156,7 @@ func (q *Queries) UpdateFile(ctx context.Context, arg UpdateFileParams) (File, e
 		&i.IsUploaded,
 		&i.CreatedAt,
 		&i.UpdatedAt,
-		&i.Md5,
+		&i.MD5,
 		&i.Bytes,
 	)
 	return i, err
@@ -175,13 +175,13 @@ RETURNING
 `
 
 type UpdateFileMD5SizeParams struct {
-	Md5   []byte `json:"md5"`
+	MD5   []byte `json:"md5"`
 	Bytes int64  `json:"bytes"`
 	ID    int64  `json:"id"`
 }
 
 func (q *Queries) UpdateFileMD5Size(ctx context.Context, arg UpdateFileMD5SizeParams) (File, error) {
-	row := q.db.QueryRow(ctx, updateFileMD5Size, arg.Md5, arg.Bytes, arg.ID)
+	row := q.db.QueryRow(ctx, updateFileMD5Size, arg.MD5, arg.Bytes, arg.ID)
 	var i File
 	err := row.Scan(
 		&i.ID,
@@ -192,7 +192,7 @@ func (q *Queries) UpdateFileMD5Size(ctx context.Context, arg UpdateFileMD5SizePa
 		&i.IsUploaded,
 		&i.CreatedAt,
 		&i.UpdatedAt,
-		&i.Md5,
+		&i.MD5,
 		&i.Bytes,
 	)
 	return i, err
