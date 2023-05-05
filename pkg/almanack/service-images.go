@@ -125,22 +125,14 @@ func (svc Services) ReplaceAndUploadImageURL(ctx context.Context, srcURL, descri
 		return "", err
 	}
 
-	// Figure out if it has been uploaded before and use that
-	hash := md5.Sum(body)
-	image, err = svc.Queries.GetImageByMD5(ctx, hash[:])
-	switch {
-	case db.IsNotFound(err):
-		// keep trucking
-	case err != nil:
-		return "", err
-	case err == nil:
-		return image.Path, nil
-	}
 	uploadPath := hashURLpath(srcURL, itype)
 	h := http.Header{"Content-Type": []string{ct}}
 	if err := svc.ImageStore.WriteFile(ctx, uploadPath, h, body); err != nil {
 		return "", err
 	}
+	// Get MD5 while we have the body already
+	// Can't look for duplicates because we need to save the SourceURL
+	hash := md5.Sum(body)
 	if _, err = svc.Queries.UpsertImageWithMD5(ctx, db.UpsertImageWithMD5Params{
 		Path:        uploadPath,
 		Type:        itype,
