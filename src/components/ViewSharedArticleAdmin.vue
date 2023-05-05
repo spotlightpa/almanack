@@ -217,29 +217,7 @@ function setImageProps(image) {
         <title>{{ article.internalID }} Admin • Spotlight PA</title>
       </MetaHead>
 
-      <div
-        v-if="article.isGDoc && article.gdocs.warnings.length"
-        class="message is-warning"
-      >
-        <div class="message-header">
-          <span>
-            <font-awesome-icon :icon="['fas', 'circle-exclamation']" />
-
-            <span
-              class="ml-1"
-              v-text="
-                article.gdocs.warnings.length === 1 ? 'Warning' : 'Warnings'
-              "
-            />
-          </span>
-        </div>
-
-        <div class="message-body">
-          <li v-for="(w, i) of article.gdocs.warnings" :key="i">
-            <p v-text="w"></p>
-          </li>
-        </div>
-      </div>
+      <GDocsDocWarnings :article="article" />
 
       <div class="message is-primary">
         <div class="message-header">
@@ -484,6 +462,8 @@ function setImageProps(image) {
             Refresh from Google Docs
           </button>
           <ErrorSimple :error="saveError || gdocsError" class="mt-1" />
+
+          <GDocsDocWarnings class="mt-5" :article="article" />
 
           <div class="mt-5 buttons">
             <button

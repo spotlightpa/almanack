@@ -1,15 +1,12 @@
 <script setup>
 import { ref } from "vue";
 
-import { useAuth } from "@/api/hooks.js";
 import { sendGAEvent } from "@/utils/google-analytics.js";
 import { formatDate, formatDateTime } from "@/utils/time-format.js";
 
 defineProps({
   article: Object,
 });
-
-const { isSpotlightPAUser } = useAuth();
 
 const isShowingHTML = ref(false);
 const richTextArea = ref(null);
@@ -51,27 +48,7 @@ function copyHTML() {
   <h1 class="title has-text-grey">
     <ArticleSlugLine :article="article" />
   </h1>
-  <div
-    v-if="isSpotlightPAUser && article.gdocs.warnings.length"
-    class="message is-warning"
-  >
-    <div class="message-header">
-      <span>
-        <font-awesome-icon :icon="['fas', 'circle-exclamation']" />
-
-        <span
-          class="ml-1"
-          v-text="article.gdocs.warnings.length === 1 ? 'Warning' : 'Warnings'"
-        />
-      </span>
-    </div>
-
-    <div class="message-body">
-      <li v-for="(w, i) of article.gdocs.warnings" :key="i">
-        <p v-text="w"></p>
-      </li>
-    </div>
-  </div>
+  <GDocsDocWarnings :article="article" />
 
   <template v-if="article.budget">
     <h2 class="mb-2 title">Budget details</h2>
