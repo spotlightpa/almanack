@@ -9,6 +9,8 @@ import (
 	"testing"
 )
 
+// Read returns the contents of file.
+// It calls t.Fatalf if there is an error.
 func Read(t testing.TB, name string) string {
 	t.Helper()
 	b, err := os.ReadFile(name)
@@ -18,6 +20,9 @@ func Read(t testing.TB, name string) string {
 	return string(b)
 }
 
+// Write the data to a file with 0644 permission bits.
+// It attempts to create directories as needed.
+// It calls t.Fatalf if there is an error.
 func Write(t testing.TB, name, data string) {
 	t.Helper()
 	dir := filepath.Dir(name)
@@ -28,11 +33,17 @@ func Write(t testing.TB, name, data string) {
 	}
 }
 
+// Equal tests whether gotStr is equal to the contents of wantFile.
+// If they are not equal,
+// it writes gotStr to a file with -bad added to its name
+// and calls t.Fatalf.
 func Equal(t testing.TB, wantFile, gotStr string) {
 	t.Helper()
 	equal(t, wantFile, gotStr, false)
 }
 
+// Equalish is like Equal,
+// but it uses strings.TrimSpace before testing for equality.
 func Equalish(t testing.TB, wantFile, gotStr string) {
 	t.Helper()
 	equal(t, wantFile, gotStr, true)
@@ -55,6 +66,20 @@ func equal(t testing.TB, wantFile, gotStr string, trim bool) {
 	t.Fatalf("contents of %s != %s", wantFile, name)
 }
 
+// ReadJSON attempts to unmarshal the contents of a file into v.
+// If there is an error, it calls t.Fatalf.
+func ReadJSON(t testing.TB, name string, v any) {
+	t.Helper()
+	s := Read(t, name)
+	if err := json.Unmarshal([]byte(s), v); err != nil {
+		t.Fatalf("unmarshal %s: %v", name, err)
+	}
+}
+
+// EqualJSON tests whether v is equal to the contents of wantFile when mashaled as JSON.
+// The JSON must be created with json.MarshalIndent and have two spaces as a prefix.
+// If they are not equal, it writes a file with the contents of v and calls t.Fatalf.
+// If there is an error, it calls t.Fatalf.
 func EqualJSON(t testing.TB, wantFile string, v any) {
 	t.Helper()
 	b, err := json.MarshalIndent(v, "", "  ")
@@ -65,6 +90,7 @@ func EqualJSON(t testing.TB, wantFile string, v any) {
 	Equalish(t, wantFile, string(b))
 }
 
+// GlobRun runs a subtest for each file matching the provided glob pattern.
 func GlobRun(t *testing.T, pat string, f func(path string, t *testing.T)) {
 	t.Helper()
 	matches, err := filepath.Glob(pat)
@@ -77,13 +103,5 @@ func GlobRun(t *testing.T, pat string, f func(path string, t *testing.T)) {
 		t.Run(name, func(t *testing.T) {
 			f(path, t)
 		})
-	}
-}
-
-func ReadJSON(t testing.TB, name string, v any) {
-	t.Helper()
-	s := Read(t, name)
-	if err := json.Unmarshal([]byte(s), v); err != nil {
-		t.Fatalf("unmarshal %s: %v", name, err)
 	}
 }
