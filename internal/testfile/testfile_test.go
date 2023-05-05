@@ -7,7 +7,7 @@ import (
 )
 
 func TestJSON(t *testing.T) {
-	testfile.GlobRun(t, "testdata/*.json", func(path string, t *testing.T) {
+	testfile.GlobRun(t, "testdata/*.json", func(t *testing.T, path string) {
 		testfile.EqualJSON(t, path, struct {
 			Data any `json:"data"`
 		}{
