@@ -2,13 +2,13 @@ package db_test
 
 import (
 	"fmt"
-	"os"
 	"testing"
 	"time"
 
 	"github.com/carlmjohnson/be"
 	"github.com/jackc/pgx/v5/pgtype"
 	"github.com/spotlightpa/almanack/internal/db"
+	"github.com/spotlightpa/almanack/internal/testfile"
 )
 
 func TestToFromTOML(t *testing.T) {
@@ -45,30 +45,18 @@ func TestToFromTOML(t *testing.T) {
 }
 
 func TestFromToTOML(t *testing.T) {
-	cases := []string{
-		"blank.md",
-		"fm.md",
-		"fm+body.md",
-	}
-	for _, name := range cases {
-		t.Run(name, func(t *testing.T) {
-			b, err := os.ReadFile("testdata/" + name)
-			be.NilErr(t, err)
+	testfile.GlobRun(t, "testdata/*.md", func(path string, t *testing.T) {
+		b := testfile.Read(t, path)
 
-			var page db.Page
-			err = page.FromTOML(string(b))
-			be.NilErr(t, err)
+		var page db.Page
+		err := page.FromTOML(string(b))
+		be.NilErr(t, err)
 
-			toml, err := page.ToTOML()
-			be.NilErr(t, err)
+		toml, err := page.ToTOML()
+		be.NilErr(t, err)
 
-			be.Debug(t, func() {
-				t.Errorf("%q did not round trip", name)
-				os.WriteFile("testdata/bad-"+name, []byte(toml), 0644)
-			})
-			be.Equal(t, string(b), toml)
-		})
-	}
+		testfile.Equal(t, path, toml)
+	})
 }
 
 func TestSetURLPath(t *testing.T) {
