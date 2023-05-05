@@ -62,6 +62,8 @@ func (svc Services) ProcessGDocs(ctx context.Context) error {
 	return errors.Join(errs...)
 }
 
+var nonASCII = bytemap.Range(128, 255)
+
 func (svc Services) ProcessGDocsDoc(ctx context.Context, dbDoc db.GDocsDoc) (err error) {
 	defer errorx.Trace(&err)
 
@@ -487,8 +489,6 @@ type SharedArticle struct {
 	*db.SharedArticle
 	GDocs SharedArticleGDoc `json:"gdocs"`
 }
-
-var nonASCII = bytemap.Range(128, 255)
 
 func (svc Services) InflateSharedArticle(ctx context.Context, a *db.SharedArticle) (v any, err error) {
 	defer errorx.Trace(&err)
