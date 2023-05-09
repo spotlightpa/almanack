@@ -86,14 +86,14 @@ type ErrorResponse struct {
 }
 
 type PostCampaignRequest struct {
-	Type       string     `json:"type"`
-	Recipients Recipients `json:"recipients,omitempty"`
-	Settings   Settings   `json:"settings,omitempty"`
-	// VariateSettings VariateSettings `json:"variate_settings,omitempty"`
-	// Tracking Tracking `json:"tracking,omitempty"`
-	// RssOpts     RssOpts    `json:"rss_opts,omitempty"`
-	// SocialCard  SocialCard `json:"social_card,omitempty"`
-	// ContentType string     `json:"content_type,omitempty"`
+	Type            string           `json:"type"`
+	Recipients      Recipients       `json:"recipients,omitempty"`
+	Settings        Settings         `json:"settings,omitempty"`
+	VariateSettings *VariateSettings `json:"variate_settings,omitempty"`
+	Tracking        *Tracking        `json:"tracking,omitempty"`
+	RssOpts         *RssOpts         `json:"rss_opts,omitempty"`
+	SocialCard      *SocialCard      `json:"social_card,omitempty"`
+	ContentType     string           `json:"content_type,omitempty"`
 }
 
 type PostCampaignResponse struct {
