@@ -21,26 +21,37 @@ func AddFlags(fs *flag.FlagSet) func(c *http.Client) V3 {
 }
 
 type V3 struct {
-	listCampaignBuilder *requests.Builder
+	apiKey string
+	listID string
+	cl     *http.Client
 }
 
-func NewV3(apiKey, listID string, c *http.Client) V3 {
-	// API keys end with 123XYZ-us1, where us1 is the datacenter
-	_, datacenter, _ := strings.Cut(apiKey, "-")
+func NewV3(apiKey, listID string, cl *http.Client) V3 {
+	return V3{apiKey, listID, cl}
+}
 
-	return V3{
-		requests.URL("https://dc.api.mailchimp.com/3.0/campaigns?count=10&offset=0&status=sent&fields=campaigns.archive_url,campaigns.send_time,campaigns.settings.subject_line,campaigns.settings.title,campaigns.settings.preview_text&sort_field=send_time&sort_dir=desc").
-			Client(c).
-			BasicAuth("", apiKey).
-			Hostf("%s.api.mailchimp.com", datacenter).
-			Param("list_id", listID),
-	}
+func (v3 V3) config(rb *requests.Builder) {
+	// API keys end with 123XYZ-us1, where us1 is the datacenter
+	_, datacenter, _ := strings.Cut(v3.apiKey, "-")
+	rb.
+		BaseURL("https://dc.api.mailchimp.com/3.0/").
+		Client(v3.cl).
+		BasicAuth("", v3.apiKey).
+		Hostf("%s.api.mailchimp.com", datacenter)
 }
 
 func (v3 V3) ListCampaigns(ctx context.Context) (*ListCampaignsResp, error) {
 	var data ListCampaignsResp
-	if err := v3.listCampaignBuilder.
-		Clone().
+	if err := requests.
+		New(v3.config).
+		Path("campaigns").
+		Param("list_id", v3.listID).
+		Param("count", "10").
+		Param("offset", "0").
+		Param("status", "sent").
+		Param("fields", "campaigns.archive_url,campaigns.send_time,campaigns.settings.subject_line,campaigns.settings.title,campaigns.settings.preview_text").
+		Param("sort_field", "send_time").
+		Param("sort_dir", "desc").
 		ToJSON(&data).
 		Fetch(ctx); err != nil {
 		return nil, fmt.Errorf("could not list MC campaigns: %w", err)
