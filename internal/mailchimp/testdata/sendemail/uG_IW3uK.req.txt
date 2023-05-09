@@ -1,0 +1,6 @@
+POST /3.0/campaigns HTTP/1.1
+Host: .api.mailchimp.com
+Authorization: Basic Og==
+Content-Type: application/json
+
+{"type":"plaintext","recipients":{"segment_opts":{}},"settings":{"subject_line":"Test message","title":"Test message","from_name":"Spotlight PA","reply_to":"press@spotlightpa.org"}}

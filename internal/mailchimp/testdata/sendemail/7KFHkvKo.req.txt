@@ -1,0 +1,4 @@
+POST /3.0/campaigns/65f71f2588/actions/send HTTP/1.1
+Host: .api.mailchimp.com
+Authorization: Basic Og==
+

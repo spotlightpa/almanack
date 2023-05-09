@@ -1,0 +1,6 @@
+PUT /3.0/campaigns/65f71f2588/content HTTP/1.1
+Host: .api.mailchimp.com
+Authorization: Basic Og==
+Content-Type: application/json
+
+{"plain_text":"Hello, World!"}
