@@ -8,9 +8,11 @@ import (
 	"github.com/carlmjohnson/errorx"
 	"github.com/carlmjohnson/requests"
 	"github.com/carlmjohnson/resperr"
+	"github.com/spotlightpa/almanack/pkg/almlog"
 )
 
 func (v3 V3) SendEmail(ctx context.Context, subject, body string) (err error) {
+	l := almlog.FromContext(ctx)
 	var mcErr ErrorResponse
 	defer func() {
 		if err != nil {
@@ -21,6 +23,7 @@ func (v3 V3) SendEmail(ctx context.Context, subject, body string) (err error) {
 		}
 	}()
 	defer errorx.Trace(&err)
+
 	var res PostCampaignResponse
 	if err = requests.
 		New(v3.config).
@@ -40,6 +43,9 @@ func (v3 V3) SendEmail(ctx context.Context, subject, body string) (err error) {
 		Fetch(ctx); err != nil {
 		return err
 	}
+
+	l.InfoCtx(ctx, "mailchimp.SendEmail: created campaign", "campaign_id", res.ID)
+
 	var putRes PutCampaignResponse
 	if err = requests.
 		New(v3.config).
@@ -54,6 +60,8 @@ func (v3 V3) SendEmail(ctx context.Context, subject, body string) (err error) {
 		return err
 	}
 
+	l.InfoCtx(ctx, "mailchimp.SendEmail: configured campaign", "campaign_id", res.ID)
+
 	if err = requests.
 		New(v3.config).
 		Pathf("campaigns/%s/actions/send", res.ID).
@@ -62,6 +70,9 @@ func (v3 V3) SendEmail(ctx context.Context, subject, body string) (err error) {
 		Fetch(ctx); err != nil {
 		return err
 	}
+
+	l.InfoCtx(ctx, "mailchimp.SendEmail: sent campaign", "campaign_id", res.ID)
+
 	return nil
 }
 
