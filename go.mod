@@ -27,7 +27,6 @@ require (
 	github.com/google/go-github/v51 v51.0.0
 	github.com/jackc/pgx/v5 v5.3.1
 	github.com/jackc/tern/v2 v2.1.0
-	github.com/mattbaird/gochimp v0.0.0-20200820164431-f1082bcdf63f
 	github.com/microcosm-cc/bluemonday v1.0.23
 	github.com/tdewolff/minify/v2 v2.12.5
 	gocloud.dev v0.29.0
