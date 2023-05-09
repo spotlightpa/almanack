@@ -8,7 +8,11 @@ import (
 	"golang.org/x/exp/slog"
 )
 
-var Logger *slog.Logger
+var Logger *slog.Logger = slog.New(slog.NewTextHandler(initMe{}))
+
+type initMe struct{}
+
+func (initMe) Write([]byte) (int, error) { panic("wrote to uninitialized almlog.Logger") }
 
 var Level = &slog.LevelVar{}
 
