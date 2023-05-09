@@ -1,0 +1,4 @@
+GET /v3/signin/identifier?dsh=S-1056199824%3A1683302953465451&continue=https%3A%2F%2Flh3.google.com%2Fu%2F0%2Fd%2F1QeCripnoiyu6XlRtsN3IkaHO6kBPOkv7%3Dw2048-h1322&hl=en&ifkv=Af_xneFl1uDOuGE8kFyKJrmJi4ZazrR6CAttAz5Dn44DETF-LbE49Phfw6JDMGQuP9d1smCjM2lNoA&flowName=WebLiteSignIn&flowEntry=ServiceLogin HTTP/0.0
+Host: accounts.google.com
+Referer: https://accounts.google.com/InteractiveLogin?continue=https://lh3.google.com/u/0/d/1QeCripnoiyu6XlRtsN3IkaHO6kBPOkv7%3Dw2048-h1322&hl=en&ifkv=Af_xneGls-BG2uxMs06OxfaHLGuEXg-ofq43KwFayWJXFgN17BJZJN0UbP_AfFIp4818N1rzPlC_Vw
+
