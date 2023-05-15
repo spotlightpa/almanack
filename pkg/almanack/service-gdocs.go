@@ -145,6 +145,9 @@ func (svc Services) ProcessGDocsDoc(ctx context.Context, dbDoc db.GDocsDoc) (err
 			row := xhtml.Closest(rows.At(0, 0), xhtml.WithAtom(atom.Tr))
 			row.Parent.RemoveChild(row)
 			return
+		case "toc", "table of contents":
+			processToc(docHTML, tbl, rows)
+			return
 		default:
 			warnings = append(warnings, fmt.Sprintf(
 				"Unrecognized table type: %q", label,
@@ -483,6 +486,41 @@ func (svc Services) UploadGDocsImage(ctx context.Context, arg UploadGDocsImagePa
 		DocObjectID: arg.DocObjectID,
 		ImageID:     imageID,
 	})
+}
+
+func processToc(doc, tbl *html.Node, rows xhtml.TableNodes) {
+	type header struct {
+		text string
+		id   string
+	}
+	var headers []header
+	xhtml.VisitAll(doc, func(n *html.Node) {
+		switch n.DataAtom {
+		case atom.H1, atom.H2, atom.H3, atom.H4, atom.H5, atom.H6:
+		default:
+			return
+		}
+		id := fmt.Sprintf("spl-heading-%d", len(headers)+1)
+		xhtml.SetAttr(n, "id", id)
+		headers = append(headers, header{xhtml.InnerText(n), id})
+	})
+	h3 := xhtml.New("h3")
+	xhtml.AppendText(h3, stringx.First(
+		xhtml.InnerText(rows.At(0, 1)),
+		xhtml.InnerText(rows.At(1, 0)),
+		"Table of Contents",
+	))
+
+	ol := xhtml.New("ol")
+	for _, h := range headers {
+		li := xhtml.New("li")
+		link := xhtml.New("a", "href", "#"+h.id)
+		xhtml.AppendText(link, h.text)
+		li.AppendChild(link)
+		ol.AppendChild(li)
+	}
+	xhtml.ReplaceWith(tbl, ol)
+	ol.Parent.InsertBefore(h3, ol)
 }
 
 func makeCASaddress(body []byte, ct string) string {

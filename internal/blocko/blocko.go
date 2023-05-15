@@ -61,18 +61,18 @@ func blockToStrings(p *html.Node) []string {
 			}
 		}
 		return blocks
-	case atom.H1:
-		prefix = "# "
-	case atom.H2:
-		prefix = "## "
-	case atom.H3:
-		prefix = "### "
-	case atom.H4:
-		prefix = "#### "
-	case atom.H5:
-		prefix = "##### "
-	case atom.H6:
-		prefix = "###### "
+	case atom.H1, atom.H2, atom.H3, atom.H4, atom.H5, atom.H6:
+		if id := xhtml.Attr(p, "id"); id != "" {
+			contents := xhtml.ContentsToString(p)
+			contents = strings.TrimSpace(contents)
+			contents = replaceSpecial.Replace(contents)
+			contents = fmt.Sprintf(`<%s id="%s">%s</%s>`,
+				p.Data, html.EscapeString(id), contents, p.Data,
+			)
+			return []string{contents}
+		}
+		level := int(p.Data[1] - '0')
+		prefix = strings.Repeat("#", level) + " "
 	}
 	contents := xhtml.ContentsToString(p)
 	contents = strings.TrimSpace(contents)
