@@ -141,6 +141,10 @@ func (svc Services) ProcessGDocsDoc(ctx context.Context, dbDoc db.GDocsDoc) (err
 		case "comment", "ignore", "note":
 			tbl.Parent.RemoveChild(tbl)
 			return
+		case "table":
+			row := xhtml.Closest(rows.At(0, 0), xhtml.WithAtom(atom.Tr))
+			row.Parent.RemoveChild(row)
+			return
 		default:
 			warnings = append(warnings, fmt.Sprintf(
 				"Unrecognized table type: %q", label,
