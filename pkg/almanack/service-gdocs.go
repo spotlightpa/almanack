@@ -20,6 +20,7 @@ import (
 	"github.com/spotlightpa/almanack/internal/stringx"
 	"github.com/spotlightpa/almanack/internal/xhtml"
 	"github.com/spotlightpa/almanack/pkg/almlog"
+	"golang.org/x/exp/slices"
 	"golang.org/x/net/html"
 	"golang.org/x/net/html/atom"
 )
@@ -160,6 +161,27 @@ func (svc Services) ProcessGDocsDoc(ctx context.Context, dbDoc db.GDocsDoc) (err
 		data := xhtml.New("data", "value", string(value))
 		xhtml.ReplaceWith(tbl, data)
 		n++
+	})
+
+	// Warn about fake headings
+	xhtml.VisitAll(docHTML, func(n *html.Node) {
+		// <p> with only b/i/strong/em for a child
+		if n.DataAtom != atom.P {
+			return
+		}
+		if n.FirstChild != nil &&
+			n.FirstChild == n.LastChild &&
+			slices.Contains([]atom.Atom{
+				atom.B, atom.I, atom.Strong, atom.Em,
+			}, n.FirstChild.DataAtom) {
+			text := xhtml.InnerText(n)
+			if len(text) > 17 {
+				text = text[:13] + "..."
+			}
+			warning := fmt.Sprintf(
+				"Paragraph beginning %q looks like a header, but does not use H-tag.", text)
+			warnings = append(warnings, warning)
+		}
 	})
 
 	// Clone and remove turn data atoms into attributes
