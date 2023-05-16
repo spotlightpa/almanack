@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"net/http"
 	"os"
-	"strings"
 	"testing"
 
 	"github.com/carlmjohnson/be"
@@ -67,8 +66,7 @@ func TestProcessGDocsDoc(t *testing.T) {
 			testfile.Equal(rt, path+"/rich.html", dbDoc.RichText)
 			testfile.Equal(rt, path+"/article.md", dbDoc.ArticleMarkdown)
 			testfile.EqualJSON(rt, path+"/metadata.json", dbDoc.Metadata)
-			gotWarnings := strings.Join(dbDoc.Warnings, "\n")
-			testfile.Equalish(rt, path+"/warnings.txt", gotWarnings)
+			testfile.EqualJSON(rt, path+"/warnings.json", dbDoc.Warnings)
 		}
 	})
 }
