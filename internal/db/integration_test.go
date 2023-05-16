@@ -25,7 +25,7 @@ func TestProcessGDocsDoc(t *testing.T) {
 	p := createTestDB(t)
 	q := db.New(p)
 	ctx := context.Background()
-	testfile.GlobRun(t, "testdata/gdoc*", func(t *testing.T, path string) {
+	testfile.Run(t, "testdata/gdoc*", func(t *testing.T, path string) {
 		t.Parallel()
 		svc := almanack.Services{
 			Queries:    q,

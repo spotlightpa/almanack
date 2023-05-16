@@ -10,7 +10,7 @@ import (
 )
 
 func TestGoldenFiles(t *testing.T) {
-	testfile.GlobRun(t, "testdata/*.html", func(t *testing.T, path string) {
+	testfile.Run(t, "testdata/*.html", func(t *testing.T, path string) {
 		bareName := strings.TrimSuffix(path, ".html")
 		in := testfile.Read(t, path)
 
