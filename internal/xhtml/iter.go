@@ -65,12 +65,13 @@ func FindAll(root *html.Node, match func(*html.Node) bool) []*html.Node {
 	return found
 }
 
-// Closest returns the first parent node to match or nil.
+// Closest traverses the node and its parents until it finds a node that matches.
 func Closest(n *html.Node, match func(*html.Node) bool) *html.Node {
-	for p := n.Parent; p != nil; p = p.Parent {
-		if match(p) {
-			return p
+	for n != nil {
+		if match(n) {
+			return n
 		}
+		n = n.Parent
 	}
 	return nil
 }
