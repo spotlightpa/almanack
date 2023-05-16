@@ -1,1 +1,0 @@
-Paragraph beginning "Heading: Lore..." looks like a header, but does not use H-tag.
