@@ -51,7 +51,13 @@ func Equalish(t testing.TB, wantFile, gotStr string) {
 
 func equal(t testing.TB, wantFile, gotStr string, trim bool) {
 	t.Helper()
-	w := Read(t, wantFile)
+	b, err := os.ReadFile(wantFile)
+	switch {
+	case err == nil, os.IsNotExist(err):
+	case err != nil:
+		t.Fatalf("%v", err)
+	}
+	w := string(b)
 	if trim {
 		w = strings.TrimSpace(w)
 		gotStr = strings.TrimSpace(gotStr)
