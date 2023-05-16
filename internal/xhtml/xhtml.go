@@ -195,3 +195,17 @@ func DeleteAttr(n *html.Node, key string) {
 		return a.Key == key
 	})
 }
+
+func SetInnerHTML(n *html.Node, s string) error {
+	children, err := html.ParseFragment(strings.NewReader(s), n)
+	if err != nil {
+		return err
+	}
+	for c := n.FirstChild; c != nil; c = n.FirstChild {
+		n.RemoveChild(c)
+	}
+	for _, c := range children {
+		n.AppendChild(c)
+	}
+	return nil
+}
