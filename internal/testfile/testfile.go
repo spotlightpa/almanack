@@ -90,10 +90,10 @@ func EqualJSON(t testing.TB, wantFile string, v any) {
 	Equalish(t, wantFile, string(b))
 }
 
-// GlobRun runs a subtest for each file matching the provided glob pattern.
-func GlobRun(t *testing.T, pat string, f func(t *testing.T, match string)) {
+// Run a subtest for each file matching the provided glob pattern.
+func Run(t *testing.T, glob string, f func(t *testing.T, match string)) {
 	t.Helper()
-	matches, err := filepath.Glob(pat)
+	matches, err := filepath.Glob(glob)
 	if err != nil {
 		t.Fatalf("%v", err)
 	}

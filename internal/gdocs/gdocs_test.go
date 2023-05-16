@@ -13,7 +13,7 @@ import (
 )
 
 func TestConvert(t *testing.T) {
-	testfile.GlobRun(t, "testdata/*.json", func(t *testing.T, path string) {
+	testfile.Run(t, "testdata/*.json", func(t *testing.T, path string) {
 		var doc docs.Document
 		testfile.ReadJSON(t, path, &doc)
 
@@ -27,7 +27,7 @@ func TestConvert(t *testing.T) {
 
 func TestFullConvert(t *testing.T) {
 	t.Parallel()
-	testfile.GlobRun(t, "testdata/*.json", func(t *testing.T, path string) {
+	testfile.Run(t, "testdata/*.json", func(t *testing.T, path string) {
 		var doc docs.Document
 		testfile.ReadJSON(t, path, &doc)
 

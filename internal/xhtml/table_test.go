@@ -13,7 +13,7 @@ import (
 
 func TestTable(t *testing.T) {
 	t.Parallel()
-	testfile.GlobRun(t, "testdata/*.html", func(t *testing.T, path string) {
+	testfile.Run(t, "testdata/*.html", func(t *testing.T, path string) {
 		in := testfile.Read(t, path)
 		bareName := strings.TrimSuffix(path, ".html")
 
