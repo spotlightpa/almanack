@@ -37,13 +37,6 @@ func LastChildOrNew(p *html.Node, tag string, attrs ...string) *html.Node {
 	return n
 }
 
-func AppendText(n *html.Node, text string) {
-	n.AppendChild(&html.Node{
-		Type: html.TextNode,
-		Data: text,
-	})
-}
-
 // Clone n and all of its children.
 func Clone(n *html.Node) *html.Node {
 	new := &html.Node{
