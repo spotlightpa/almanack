@@ -26,7 +26,8 @@ func AddFlags(fl *flag.FlagSet) func() (svc Services, err error) {
 	getGithub := github.AddFlags(fl)
 	getIndex := index.AddFlags(fl)
 	getNewsletter := mailchimp.AddFlags(fl)
-	getGoogle := google.AddFlags(fl)
+	var gsvc google.Service
+	gsvc.AddFlags(fl)
 	mailServiceAPIKey := fl.String("mc-api-key", "", "API `key` for MailChimp v2")
 	mailServiceListID := fl.String("mc-list-id", "", "List `ID` MailChimp v2 campaign")
 
@@ -54,7 +55,7 @@ func AddFlags(fl *flag.FlagSet) func() (svc Services, err error) {
 			FileStore:            fs,
 			Indexer:              getIndex(),
 			NewletterService:     getNewsletter(&client),
-			Gsvc:                 getGoogle(),
+			Gsvc:                 &gsvc,
 			EmailService:         mc,
 		}, nil
 	}
