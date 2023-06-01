@@ -41,11 +41,7 @@ func PageContent(doc *html.Node) (body string, err error) {
 			n.DataAtom == atom.Script ||
 			xhtml.Attr(n, "id") == "awesomewrap"
 	})
-
-	for _, c := range remove {
-		p := c.Parent
-		p.RemoveChild(c)
-	}
+	xhtml.RemoveAll(remove)
 
 	body = xhtml.ContentsToString(bNode)
 	return

@@ -42,3 +42,14 @@ func SetInnerHTML(n *html.Node, s string) error {
 	}
 	return nil
 }
+
+// RemoveAll orphans the nodes it is passed.
+// It ignores a node if the node is nil or already an orphan.
+func RemoveAll(nodes []*html.Node) {
+	for i := len(nodes) - 1; i >= 0; i-- {
+		n := nodes[i]
+		if n != nil && n.Parent != nil {
+			n.Parent.RemoveChild(n)
+		}
+	}
+}
