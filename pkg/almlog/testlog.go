@@ -12,7 +12,7 @@ func UseTestLogger(t testing.TB) {
 		Level:       Level,
 		ReplaceAttr: removeTime,
 	}
-	Logger = slog.New(opts.NewTextHandler(tWriter{t}))
+	Logger = slog.New(slog.NewTextHandler(tWriter{t}, &opts))
 	slog.SetDefault(Logger)
 }
 

@@ -8,7 +8,7 @@ import (
 	"golang.org/x/exp/slog"
 )
 
-var Logger *slog.Logger = slog.New(slog.NewTextHandler(initMe{}))
+var Logger *slog.Logger = slog.New(slog.NewTextHandler(initMe{}, nil))
 
 type initMe struct{}
 
@@ -34,7 +34,7 @@ func UseLambdaLogger() {
 		Level:       Level,
 		ReplaceAttr: removeTime,
 	}
-	Logger = slog.New(opts.NewTextHandler(os.Stderr))
+	Logger = slog.New(slog.NewTextHandler(os.Stderr, &opts))
 	slog.SetDefault(Logger)
 }
 
@@ -51,7 +51,7 @@ func UseDevLogger() {
 		Level:       Level,
 		ReplaceAttr: shortenTime,
 	}
-	Logger = slog.New(opts.NewTextHandler(colorize{os.Stderr}))
+	Logger = slog.New(slog.NewTextHandler(colorize{os.Stderr}, &opts))
 	slog.SetDefault(Logger)
 }
 
