@@ -642,6 +642,8 @@ github.com/bugsnag/panicwrap v0.0.0-20151223152923-e2c28503fcd0/go.mod h1:D/8v3k
 github.com/bwesterb/go-ristretto v1.2.0/go.mod h1:fUIoIZaG73pV5biE2Blr2xEzDoMj7NFEuV9ekS419A0=
 github.com/carlmjohnson/be v0.22.5 h1:Hpc4qYKatEMFAuTiLdaWQBqYErSKAHhrSCN53gqtJks=
 github.com/carlmjohnson/be v0.22.5/go.mod h1:KAgPUh0HpzWYZZI+IABdo80wTgY43YhbdsiLYAaSI/Q=
+github.com/carlmjohnson/be v0.23.1-alpha h1:QyqiUFbMXC8Pjen5ABorfzDRlf/DS0rLmkzsypFGBwA=
+github.com/carlmjohnson/be v0.23.1-alpha/go.mod h1:KAgPUh0HpzWYZZI+IABdo80wTgY43YhbdsiLYAaSI/Q=
 github.com/carlmjohnson/bytemap v0.23.4 h1:g3vRcKldYSRTaUISeaVHBkY2ugo8GN43dbMByLmpN5I=
 github.com/carlmjohnson/bytemap v0.23.4/go.mod h1:UfhSWXohBAvDpynyOua3ijJlGTx1hHWwjuUL7psdSGw=
 github.com/carlmjohnson/crockford v0.22.2 h1:xvJJfTQBHmD6sbkGKVsVa3kL3+1oxXmyhiv874U1DX8=

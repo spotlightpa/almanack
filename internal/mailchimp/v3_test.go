@@ -8,9 +8,9 @@ import (
 	"testing"
 
 	"github.com/carlmjohnson/be"
+	"github.com/carlmjohnson/be/testfile"
 	"github.com/carlmjohnson/requests"
 	"github.com/spotlightpa/almanack/internal/mailchimp"
-	"github.com/spotlightpa/almanack/internal/testfile"
 )
 
 func TestV3(t *testing.T) {
