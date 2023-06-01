@@ -6,9 +6,9 @@ import (
 	"time"
 
 	"github.com/carlmjohnson/be"
+	"github.com/carlmjohnson/be/testfile"
 	"github.com/jackc/pgx/v5/pgtype"
 	"github.com/spotlightpa/almanack/internal/db"
-	"github.com/spotlightpa/almanack/internal/testfile"
 )
 
 func TestToFromTOML(t *testing.T) {

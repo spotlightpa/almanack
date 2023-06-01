@@ -9,12 +9,12 @@ import (
 	"testing"
 
 	"github.com/carlmjohnson/be"
+	"github.com/carlmjohnson/be/testfile"
 	"github.com/carlmjohnson/requests"
 	"github.com/spotlightpa/almanack/internal/aws"
 	"github.com/spotlightpa/almanack/internal/db"
 	"github.com/spotlightpa/almanack/internal/google"
 	"github.com/spotlightpa/almanack/internal/stringx"
-	"github.com/spotlightpa/almanack/internal/testfile"
 	"github.com/spotlightpa/almanack/pkg/almanack"
 	"github.com/spotlightpa/almanack/pkg/almlog"
 	docs "google.golang.org/api/docs/v1"
