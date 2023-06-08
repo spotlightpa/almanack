@@ -3,6 +3,7 @@ package xhtml
 import (
 	"strings"
 
+	"github.com/spotlightpa/almanack/internal/stringx"
 	"golang.org/x/net/html"
 	"golang.org/x/net/html/atom"
 )
@@ -36,7 +37,7 @@ func (rows TableNodes) At(row, col int) *html.Node {
 }
 
 func slugify(n *html.Node) string {
-	return strings.ToLower(InnerText(n))
+	return strings.TrimSpace(stringx.RemoveParens(strings.ToLower(InnerText(n))))
 }
 
 func (rows TableNodes) Label() string {
