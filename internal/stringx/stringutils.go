@@ -49,3 +49,28 @@ func LastCut(s, sep string) (before, after string, found bool) {
 	}
 	return "", s, false
 }
+
+// RemoveParens removes parentheses and any text that is inside of them.
+func RemoveParens(s string) string {
+	if !strings.Contains(s, "(") {
+		return s
+	}
+
+	var sb strings.Builder
+	sb.Grow(len(s))
+	openCount := 0
+
+	for _, ch := range []byte(s) {
+		if ch == '(' {
+			openCount++
+		} else if ch == ')' {
+			if openCount > 0 {
+				openCount--
+			}
+		} else if openCount == 0 {
+			sb.WriteByte(ch)
+		}
+	}
+
+	return sb.String()
+}

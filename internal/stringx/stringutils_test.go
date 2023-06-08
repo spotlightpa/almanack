@@ -24,3 +24,24 @@ func TestSlugify(t *testing.T) {
 		})
 	}
 }
+
+func TestRemoveParens(t *testing.T) {
+	// Test cases
+	testCases := []struct {
+		input string
+		want  string
+	}{
+		{"", ""},
+		{"No parentheses", "No parentheses"},
+		{"a(b", "a"},
+		{"a(b))c", "ac"},
+		{"0)))1((()))2", "012"},
+		{"(Welcome) to (OpenAI)", " to "},
+		{"(Nested (parentheses) in) the string", " the string"},
+	}
+
+	// Run test cases
+	for _, tc := range testCases {
+		be.Equal(t, tc.want, stringx.RemoveParens(tc.input))
+	}
+}
