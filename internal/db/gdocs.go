@@ -18,6 +18,12 @@ type GDocsMetadata struct {
 	LedeImageCredit      string             `json:"lede_image_credit"`
 	LedeImageDescription string             `json:"lede_image_description"`
 	LedeImageCaption     string             `json:"lede_image_caption"`
+	URLSlug              string             `json:"url_slug"`
+	Blurb                string             `json:"blurb"`
+	LinkTitle            string             `json:"link_title"`
+	SEOTitle             string             `json:"seo_title"`
+	OGTitle              string             `json:"og_title"`
+	TwitterTitle         string             `json:"twitter_title"`
 }
 
 const (

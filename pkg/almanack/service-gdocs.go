@@ -304,6 +304,7 @@ func (svc Services) replaceMetadata(
 		xhtml.InnerText(rows.Value("hedline")),
 	)
 	metadata.Description = stringx.First(
+		xhtml.InnerText(rows.Value("seo description")),
 		xhtml.InnerText(rows.Value("description")),
 		xhtml.InnerText(rows.Value("desc")),
 	)
@@ -323,6 +324,28 @@ func (svc Services) replaceMetadata(
 		xhtml.InnerText(rows.Value("lede image alt")),
 		xhtml.InnerText(rows.Value("lead image alt")),
 		xhtml.InnerText(rows.Value("alt")),
+	)
+	metadata.URLSlug = stringx.First(
+		xhtml.InnerText(rows.Value("url")),
+		xhtml.InnerText(rows.Value("keywords")),
+	)
+	metadata.Blurb = stringx.First(
+		xhtml.InnerText(rows.Value("blurb")),
+		xhtml.InnerText(rows.Value("summary")),
+	)
+	metadata.LinkTitle = stringx.First(
+		xhtml.InnerText(rows.Value("link title")),
+	)
+	metadata.SEOTitle = stringx.First(
+		xhtml.InnerText(rows.Value("seo title")),
+	)
+	metadata.OGTitle = stringx.First(
+		xhtml.InnerText(rows.Value("facebook hed")),
+		xhtml.InnerText(rows.Value("facebook title")),
+	)
+	metadata.TwitterTitle = stringx.First(
+		xhtml.InnerText(rows.Value("twitter hed")),
+		xhtml.InnerText(rows.Value("twitter title")),
 	)
 
 	if path := xhtml.InnerText(rows.Value("lede image path")); path != "" {

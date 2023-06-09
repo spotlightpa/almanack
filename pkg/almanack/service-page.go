@@ -238,16 +238,27 @@ func (svc Services) CreatePageFromGDocsDoc(ctx context.Context, shared *db.Share
 	body := dbDoc.ArticleMarkdown
 	fm := map[string]any{
 		"internal-id":       shared.InternalID,
-		"published":         shared.PublicationDate,
+		"published":         shared.PublicationDate.Time,
 		"byline":            shared.Byline, // TODO: Authors
 		"title":             shared.Hed,
-		"slug":              stringx.Slugify(shared.Hed),
 		"description":       shared.Description,
-		"blurb":             shared.Description,
 		"image":             shared.LedeImage,
 		"image-credit":      shared.LedeImageCredit,
 		"image-description": shared.LedeImageDescription,
 		"image-caption":     shared.LedeImageCaption,
+		// Fields not exposed to Shared Admin
+		"slug": stringx.First(
+			dbDoc.Metadata.URLSlug,
+			stringx.Slugify(shared.Hed),
+		),
+		"blurb": stringx.First(
+			dbDoc.Metadata.Blurb,
+			shared.Description,
+		),
+		"linktitle":     dbDoc.Metadata.LinkTitle,
+		"title-tag":     dbDoc.Metadata.SEOTitle,
+		"og-title":      dbDoc.Metadata.OGTitle,
+		"twitter-title": dbDoc.Metadata.TwitterTitle,
 	}
 
 	filepath := buildFilePath(fm, kind)
