@@ -4,6 +4,7 @@ package stringx
 import (
 	"regexp"
 	"strings"
+	"unicode"
 
 	"github.com/spotlightpa/almanack/internal/syncx"
 )
@@ -73,4 +74,13 @@ func RemoveParens(s string) string {
 	}
 
 	return sb.String()
+}
+
+func RemoveAllWhitespace(s string) string {
+	return strings.Map(func(r rune) rune {
+		if unicode.IsSpace(r) {
+			return -1
+		}
+		return r
+	}, s)
 }

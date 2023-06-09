@@ -49,6 +49,11 @@ func (rows TableNodes) Value(name string) *html.Node {
 		if slugify(rows.At(i, 0)) == name {
 			for _, col := range rows[i][1:] {
 				if s := InnerText(col); s != "" {
+					if stringx.RemoveAllWhitespace(slugify(col)) == "n/a" {
+						return &html.Node{
+							Type: html.CommentNode,
+						}
+					}
 					return col
 				}
 			}
