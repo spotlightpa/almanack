@@ -53,7 +53,7 @@ func TestProcessGDocsDoc(t *testing.T) {
 		// Run twice to test the already uploaded path
 		for i := 0; i < 2; i++ {
 			dbDoc, err := svc.Queries.CreateGDocsDoc(ctx, db.CreateGDocsDocParams{
-				ExternalID: fmt.Sprintf("abc123_%s", stringx.Slugify(path)),
+				ExternalID: fmt.Sprintf("abc123_%s", stringx.SlugifyURL(path)),
 				Document:   doc,
 			})
 			be.NilErr(t, err)

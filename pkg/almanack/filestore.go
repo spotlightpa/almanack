@@ -10,6 +10,7 @@ import (
 	"github.com/carlmjohnson/crockford"
 	"github.com/spotlightpa/almanack/internal/aws"
 	"github.com/spotlightpa/almanack/internal/httpx"
+	"github.com/spotlightpa/almanack/internal/stringx"
 )
 
 func GetSignedFileUpload(ctx context.Context, is aws.BlobStore, filename, mimetype string) (signedURL, fileURL, disposition, cachecontrol string, err error) {
@@ -27,7 +28,7 @@ func GetSignedFileUpload(ctx context.Context, is aws.BlobStore, filename, mimety
 
 func makeFilePath(filename string) string {
 	var sb strings.Builder
-	filename = slugify(filename)
+	filename = stringx.SlugifyFilename(filename)
 	if filename == "" {
 		filename = "-"
 	}
@@ -40,28 +41,6 @@ func makeFilePath(filename string) string {
 	sb.WriteString("/")
 	sb.WriteString(filename)
 	return sb.String()
-}
-
-func slugify(s string) string {
-	hadDash := true
-	f := func(r rune) rune {
-		switch {
-		case r >= 'A' && r <= 'Z':
-			hadDash = false
-			return r - 'A' + 'a'
-		case
-			r >= 'a' && r <= 'z',
-			r >= '0' && r <= '9',
-			r == '.':
-			hadDash = false
-			return r
-		case hadDash:
-			return -1
-		}
-		hadDash = true
-		return '-'
-	}
-	return strings.Map(f, s)
 }
 
 func UploadJSON(ctx context.Context, is aws.BlobStore, filepath, cachecontrol string, data any) error {
