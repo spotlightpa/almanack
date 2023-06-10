@@ -1,0 +1,3 @@
+GET /images/dither-320.png HTTP/1.1
+Host: carlmjohnson.net
+
