@@ -6,7 +6,9 @@ import (
 	"fmt"
 	"net/http"
 	"os"
+	"path/filepath"
 	"testing"
+	"time"
 
 	"github.com/carlmjohnson/be"
 	"github.com/carlmjohnson/be/testfile"
@@ -67,6 +69,30 @@ func TestProcessGDocsDoc(t *testing.T) {
 			testfile.Equal(rt, path+"/article.md", dbDoc.ArticleMarkdown)
 			testfile.EqualJSON(rt, path+"/metadata.json", dbDoc.Metadata)
 			testfile.EqualJSON(rt, path+"/warnings.json", dbDoc.Warnings)
+
+			art, err := svc.CreateSharedArticleForGDoc(ctx, &dbDoc)
+			be.NilErr(t, err)
+			date := time.Date(2020, time.March, 15, 20, 00, 00, 00, time.UTC)
+			art.PublicationDate.Time = date
+			swapInternalID := filepath.Base(path) // Set a unique slug
+			art.InternalID, swapInternalID = swapInternalID, art.InternalID
+			be.NilErr(t, svc.CreatePageFromGDocsDoc(ctx, art, "news"))
+			be.True(t, art.PageID.Valid)
+			page, err := svc.Queries.GetPageByID(ctx, art.PageID.Int64)
+			be.NilErr(t, err)
+			// Swap internal ID back
+			art.InternalID = swapInternalID
+			// Stablize racey fields
+			art.ID = 123
+			art.PageID.Valid = false
+			art.RawData = nil
+			art.CreatedAt = date
+			art.UpdatedAt = date
+			testfile.EqualJSON(rt, path+"/shared-article.json", art)
+			page.ID = 123
+			page.CreatedAt = date
+			page.UpdatedAt = date
+			testfile.EqualJSON(rt, path+"/page.json", page)
 		}
 	})
 }

@@ -608,3 +608,21 @@ func (svc Services) InflateSharedArticle(ctx context.Context, a *db.SharedArticl
 
 	return SharedArticle{a, SharedArticleGDoc{&doc, ""}}, err
 }
+
+func (svc Services) CreateSharedArticleForGDoc(ctx context.Context, dbDoc *db.GDocsDoc) (*db.SharedArticle, error) {
+	idJSON := must.Get(json.Marshal(dbDoc.ID))
+	art, err := svc.Queries.UpsertSharedArticleFromGDocs(ctx, db.UpsertSharedArticleFromGDocsParams{
+		ExternalID:           dbDoc.ExternalID,
+		RawData:              idJSON,
+		InternalID:           dbDoc.Metadata.InternalID,
+		Byline:               dbDoc.Metadata.Byline,
+		Budget:               dbDoc.Metadata.Budget,
+		Hed:                  dbDoc.Metadata.Hed,
+		Description:          dbDoc.Metadata.Description,
+		LedeImage:            dbDoc.Metadata.LedeImage,
+		LedeImageCredit:      dbDoc.Metadata.LedeImageCredit,
+		LedeImageDescription: dbDoc.Metadata.LedeImageDescription,
+		LedeImageCaption:     dbDoc.Metadata.LedeImageCaption,
+	})
+	return &art, err
+}
