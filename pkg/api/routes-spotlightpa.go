@@ -1,7 +1,6 @@
 package api
 
 import (
-	"encoding/json"
 	"errors"
 	"fmt"
 	"net/http"
@@ -11,7 +10,6 @@ import (
 	"github.com/carlmjohnson/resperr"
 	"github.com/spotlightpa/almanack/internal/db"
 	"github.com/spotlightpa/almanack/internal/gdocs"
-	"github.com/spotlightpa/almanack/internal/must"
 	"github.com/spotlightpa/almanack/internal/paginate"
 	"github.com/spotlightpa/almanack/pkg/almanack"
 	"github.com/spotlightpa/almanack/pkg/almlog"
@@ -935,20 +933,7 @@ func (app *appEnv) postSharedArticleFromGDocs(w http.ResponseWriter, r *http.Req
 		}
 	}
 
-	idJSON := must.Get(json.Marshal(dbDoc.ID))
-	art, err := app.svc.Queries.UpsertSharedArticleFromGDocs(r.Context(), db.UpsertSharedArticleFromGDocsParams{
-		ExternalID:           dbDoc.ExternalID,
-		RawData:              idJSON,
-		InternalID:           dbDoc.Metadata.InternalID,
-		Byline:               dbDoc.Metadata.Byline,
-		Budget:               dbDoc.Metadata.Budget,
-		Hed:                  dbDoc.Metadata.Hed,
-		Description:          dbDoc.Metadata.Description,
-		LedeImage:            dbDoc.Metadata.LedeImage,
-		LedeImageCredit:      dbDoc.Metadata.LedeImageCredit,
-		LedeImageDescription: dbDoc.Metadata.LedeImageDescription,
-		LedeImageCaption:     dbDoc.Metadata.LedeImageCaption,
-	})
+	art, err := app.svc.CreateSharedArticleForGDoc(r.Context(), &dbDoc)
 	if err != nil {
 		app.replyErr(w, r, err)
 		return
