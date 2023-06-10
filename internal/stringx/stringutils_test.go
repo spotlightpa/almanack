@@ -7,7 +7,7 @@ import (
 	"github.com/spotlightpa/almanack/internal/stringx"
 )
 
-func TestSlugify(t *testing.T) {
+func TestSlugifyURL(t *testing.T) {
 	cases := []struct {
 		input, want string
 	}{
@@ -20,7 +20,25 @@ func TestSlugify(t *testing.T) {
 	}
 	for _, tc := range cases {
 		t.Run(tc.input, func(t *testing.T) {
-			be.Equal(t, tc.want, stringx.Slugify(tc.input))
+			be.Equal(t, tc.want, stringx.SlugifyURL(tc.input))
+		})
+	}
+}
+
+func TestSlugifyFilename(t *testing.T) {
+	cases := []struct {
+		input, want string
+	}{
+		{"", ""},
+		{"  b  ", "-b-"},
+		{"  ab  ", "-ab-"},
+		{"  a b the c  ", "-a-b-the-c-"},
+		{"Pa.'s favorite", "pa.-s-favorite"},
+		{"the (fort~Nightly)   news  ", "the-fort-nightly-news-"},
+	}
+	for _, tc := range cases {
+		t.Run(tc.input, func(t *testing.T) {
+			be.Equal(t, tc.want, stringx.SlugifyFilename(tc.input))
 		})
 	}
 }

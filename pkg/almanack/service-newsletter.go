@@ -102,7 +102,7 @@ func (svc Services) SaveNewsletterPage(ctx context.Context, nl *db.Newsletter, b
 	}); err != nil {
 		return err
 	}
-	slug := stringx.Slugify(
+	slug := stringx.SlugifyURL(
 		timex.ToEST(nl.PublishedAt).Format("Jan 2 ") + nl.Subject,
 	)
 	kicker := "Newsletter"

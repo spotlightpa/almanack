@@ -249,7 +249,7 @@ func (svc Services) CreatePageFromGDocsDoc(ctx context.Context, shared *db.Share
 		// Fields not exposed to Shared Admin
 		"slug": stringx.First(
 			dbDoc.Metadata.URLSlug,
-			stringx.Slugify(shared.Hed),
+			stringx.SlugifyURL(shared.Hed),
 		),
 		"blurb": stringx.First(
 			dbDoc.Metadata.Blurb,

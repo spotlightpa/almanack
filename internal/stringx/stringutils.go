@@ -33,7 +33,7 @@ var (
 	nonasciiRe  = mustBeLazy(`\W+`)
 )
 
-func Slugify(s string) string {
+func SlugifyURL(s string) string {
 	s = strings.ToLower(s)
 	s = articleRe().ReplaceAllString(s, " ")
 	s = pennRe().ReplaceAllString(s, "pennsylvania")
@@ -42,6 +42,28 @@ func Slugify(s string) string {
 	s = strings.TrimSpace(s)
 	s = nonasciiRe().ReplaceAllString(s, "-")
 	return s
+}
+
+func SlugifyFilename(s string) string {
+	hadDash := false
+	f := func(r rune) rune {
+		switch {
+		case r >= 'A' && r <= 'Z':
+			hadDash = false
+			return r - 'A' + 'a'
+		case
+			r >= 'a' && r <= 'z',
+			r >= '0' && r <= '9',
+			r == '.':
+			hadDash = false
+			return r
+		case hadDash:
+			return -1
+		}
+		hadDash = true
+		return '-'
+	}
+	return strings.Map(f, s)
 }
 
 func LastCut(s, sep string) (before, after string, found bool) {
