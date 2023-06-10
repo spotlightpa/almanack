@@ -490,6 +490,7 @@ function setImageProps(image) {
               <button
                 class="button is-primary has-text-weight-semibold"
                 :class="pageLoading ? 'is-loading' : ''"
+                :disabled="isDirty || null"
                 @click="createPage('news')"
               >
                 As News article
@@ -497,6 +498,7 @@ function setImageProps(image) {
               <button
                 class="button is-primary has-text-weight-semibold"
                 :class="pageLoading ? 'is-loading' : ''"
+                :disabled="isDirty || null"
                 @click="createPage('statecollege')"
               >
                 As State College article
