@@ -85,6 +85,7 @@ type Image struct {
 	UpdatedAt   time.Time `json:"updated_at"`
 	MD5         []byte    `json:"md5"`
 	Bytes       int64     `json:"bytes"`
+	Keywords    string    `json:"keywords"`
 }
 
 type ImageType struct {
