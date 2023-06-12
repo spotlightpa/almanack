@@ -328,9 +328,14 @@ SET
   ELSE
     description
   END,
+  keywords = CASE WHEN $5::boolean THEN
+    $6
+  ELSE
+    keywords
+  END,
   is_uploaded = TRUE
 WHERE
-  path = $5
+  path = $7
 RETURNING
   id, path, type, description, credit, src_url, is_uploaded, created_at, updated_at, md5, bytes, keywords
 `
@@ -340,6 +345,8 @@ type UpdateImageParams struct {
 	Credit         string `json:"credit"`
 	SetDescription bool   `json:"set_description"`
 	Description    string `json:"description"`
+	SetKeywords    bool   `json:"set_keywords"`
+	Keywords       string `json:"keywords"`
 	Path           string `json:"path"`
 }
 
@@ -349,6 +356,8 @@ func (q *Queries) UpdateImage(ctx context.Context, arg UpdateImageParams) (Image
 		arg.Credit,
 		arg.SetDescription,
 		arg.Description,
+		arg.SetKeywords,
+		arg.Keywords,
 		arg.Path,
 	)
 	var i Image
@@ -408,8 +417,9 @@ func (q *Queries) UpdateImageMD5Size(ctx context.Context, arg UpdateImageMD5Size
 }
 
 const upsertImage = `-- name: UpsertImage :one
-INSERT INTO image ("path", "type", "description", "credit", "src_url", "is_uploaded")
-  VALUES ($1, $2, $3, $4, $5, $6)
+INSERT INTO image ("path", "type", "description", "credit", "keywords",
+  "src_url", "is_uploaded")
+  VALUES ($1, $2, $3, $4, $5, $6, $7)
 ON CONFLICT (path)
   DO UPDATE SET
     credit = CASE WHEN image.credit = '' THEN
@@ -420,6 +430,10 @@ ON CONFLICT (path)
       excluded.description
     ELSE
       image.description
+    END, keywords = CASE WHEN image.keywords = '' THEN
+      excluded.keywords
+    ELSE
+      image.keywords
     END, src_url = CASE WHEN image.src_url = '' THEN
       excluded.src_url
     ELSE
@@ -434,6 +448,7 @@ type UpsertImageParams struct {
 	Type        string `json:"type"`
 	Description string `json:"description"`
 	Credit      string `json:"credit"`
+	Keywords    string `json:"keywords"`
 	SourceURL   string `json:"src_url"`
 	IsUploaded  bool   `json:"is_uploaded"`
 }
@@ -444,6 +459,7 @@ func (q *Queries) UpsertImage(ctx context.Context, arg UpsertImageParams) (Image
 		arg.Type,
 		arg.Description,
 		arg.Credit,
+		arg.Keywords,
 		arg.SourceURL,
 		arg.IsUploaded,
 	)
@@ -466,9 +482,9 @@ func (q *Queries) UpsertImage(ctx context.Context, arg UpsertImageParams) (Image
 }
 
 const upsertImageWithMD5 = `-- name: UpsertImageWithMD5 :one
-INSERT INTO image ("path", "type", "description", "credit", "src_url", "md5",
-  "bytes", "is_uploaded")
-  VALUES ($1, $2, $3, $4, $5, $6, $7, TRUE)
+INSERT INTO image ("path", "type", "description", "credit", "keywords",
+  "src_url", "md5", "bytes", "is_uploaded")
+  VALUES ($1, $2, $3, $4, $5, $6, $7, $8, TRUE)
 ON CONFLICT (path)
   DO UPDATE SET
     credit = CASE WHEN image.credit = '' THEN
@@ -479,6 +495,10 @@ ON CONFLICT (path)
       excluded.description
     ELSE
       image.description
+    END, keywords = CASE WHEN image.keywords = '' THEN
+      excluded.keywords
+    ELSE
+      image.keywords
     END, src_url = CASE WHEN image.src_url = '' THEN
       excluded.src_url
     ELSE
@@ -501,6 +521,7 @@ type UpsertImageWithMD5Params struct {
 	Type        string `json:"type"`
 	Description string `json:"description"`
 	Credit      string `json:"credit"`
+	Keywords    string `json:"keywords"`
 	SourceURL   string `json:"src_url"`
 	MD5         []byte `json:"md5"`
 	Bytes       int64  `json:"bytes"`
@@ -512,6 +533,7 @@ func (q *Queries) UpsertImageWithMD5(ctx context.Context, arg UpsertImageWithMD5
 		arg.Type,
 		arg.Description,
 		arg.Credit,
+		arg.Keywords,
 		arg.SourceURL,
 		arg.MD5,
 		arg.Bytes,
