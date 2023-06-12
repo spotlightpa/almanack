@@ -110,6 +110,12 @@ async function createPage(kind) {
   await fetch();
   await window.fetch("/api-background/images");
 }
+const pageCreateDisabled = computed(() => {
+  if (isDirty.value || publicationDate.value === null || !internalID.value) {
+    return true;
+  }
+  return null;
+});
 
 const { exec: arcExec, apiStateRefs: arcState } = makeState();
 const { isLoadingThrottled: arcLoading, error: arcError } = arcState;
@@ -486,11 +492,17 @@ function setImageProps(image) {
 
           <div v-if="!article.pageID" class="mb-5">
             <div class="label">Import to Spotlight PA</div>
+            <p v-if="!publicationDate" class="mb-2 help is-danger">
+              Must set publication date first.
+            </p>
+            <p v-if="!internalID" class="mb-2 help is-danger">
+              Must set slug first.
+            </p>
             <div class="buttons">
               <button
                 class="button is-primary has-text-weight-semibold"
                 :class="pageLoading ? 'is-loading' : ''"
-                :disabled="isDirty || null"
+                :disabled="pageCreateDisabled"
                 @click="createPage('news')"
               >
                 As News article
@@ -498,7 +510,7 @@ function setImageProps(image) {
               <button
                 class="button is-primary has-text-weight-semibold"
                 :class="pageLoading ? 'is-loading' : ''"
-                :disabled="isDirty || null"
+                :disabled="pageCreateDisabled"
                 @click="createPage('statecollege')"
               >
                 As State College article
