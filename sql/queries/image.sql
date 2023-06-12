@@ -24,8 +24,9 @@ ORDER BY
 LIMIT $1 OFFSET $2;
 
 -- name: UpsertImage :one
-INSERT INTO image ("path", "type", "description", "credit", "src_url", "is_uploaded")
-  VALUES (@path, @type, @description, @credit, @src_url, @is_uploaded)
+INSERT INTO image ("path", "type", "description", "credit", "keywords",
+  "src_url", "is_uploaded")
+  VALUES (@path, @type, @description, @credit, @keywords, @src_url, @is_uploaded)
 ON CONFLICT (path)
   DO UPDATE SET
     credit = CASE WHEN image.credit = '' THEN
@@ -36,6 +37,10 @@ ON CONFLICT (path)
       excluded.description
     ELSE
       image.description
+    END, keywords = CASE WHEN image.keywords = '' THEN
+      excluded.keywords
+    ELSE
+      image.keywords
     END, src_url = CASE WHEN image.src_url = '' THEN
       excluded.src_url
     ELSE
@@ -45,9 +50,9 @@ ON CONFLICT (path)
     *;
 
 -- name: UpsertImageWithMD5 :one
-INSERT INTO image ("path", "type", "description", "credit", "src_url", "md5",
-  "bytes", "is_uploaded")
-  VALUES (@path, @type, @description, @credit, @src_url, @md5, @bytes, TRUE)
+INSERT INTO image ("path", "type", "description", "credit", "keywords",
+  "src_url", "md5", "bytes", "is_uploaded")
+  VALUES (@path, @type, @description, @credit, @keywords, @src_url, @md5, @bytes, TRUE)
 ON CONFLICT (path)
   DO UPDATE SET
     credit = CASE WHEN image.credit = '' THEN
@@ -58,6 +63,10 @@ ON CONFLICT (path)
       excluded.description
     ELSE
       image.description
+    END, keywords = CASE WHEN image.keywords = '' THEN
+      excluded.keywords
+    ELSE
+      image.keywords
     END, src_url = CASE WHEN image.src_url = '' THEN
       excluded.src_url
     ELSE
@@ -87,6 +96,11 @@ SET
     @description
   ELSE
     description
+  END,
+  keywords = CASE WHEN @set_keywords::boolean THEN
+    @keywords
+  ELSE
+    keywords
   END,
   is_uploaded = TRUE
 WHERE
