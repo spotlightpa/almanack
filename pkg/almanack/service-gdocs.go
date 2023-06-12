@@ -337,7 +337,10 @@ func (svc Services) replaceMetadata(
 		xhtml.InnerText(rows.Value("link title")),
 	)
 	metadata.SEOTitle = stringx.First(
+		xhtml.InnerText(rows.Value("seo hed")),
 		xhtml.InnerText(rows.Value("seo title")),
+		xhtml.InnerText(rows.Value("seo headline")),
+		xhtml.InnerText(rows.Value("seo hedline")),
 	)
 	metadata.OGTitle = stringx.First(
 		xhtml.InnerText(rows.Value("facebook hed")),
