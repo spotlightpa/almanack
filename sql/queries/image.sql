@@ -9,6 +9,20 @@ ORDER BY
   updated_at DESC
 LIMIT $1 OFFSET $2;
 
+-- name: ListImagesByFTS :many
+SELECT
+  image.*
+FROM
+  image,
+  websearch_to_tsquery('english', @query) tsq
+WHERE
+  fts @@ tsq
+  AND is_uploaded
+ORDER BY
+  ts_rank(fts, tsq) DESC,
+  updated_at DESC
+LIMIT $1 OFFSET $2;
+
 -- name: UpsertImage :one
 INSERT INTO image ("path", "type", "description", "credit", "src_url", "is_uploaded")
   VALUES (@path, @type, @description, @credit, @src_url, @is_uploaded)
