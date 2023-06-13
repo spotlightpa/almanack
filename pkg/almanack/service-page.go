@@ -247,6 +247,7 @@ func (svc Services) CreatePageFromGDocsDoc(ctx context.Context, shared *db.Share
 		"image-description": shared.LedeImageDescription,
 		"image-caption":     shared.LedeImageCaption,
 		// Fields not exposed to Shared Admin
+		"kicker": dbDoc.Metadata.Eyebrow,
 		"slug": stringx.First(
 			dbDoc.Metadata.URLSlug,
 			stringx.SlugifyURL(shared.Hed),

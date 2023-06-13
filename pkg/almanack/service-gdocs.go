@@ -353,6 +353,10 @@ func (svc Services) replaceMetadata(
 		xhtml.InnerText(rows.Value("twitter hed")),
 		xhtml.InnerText(rows.Value("twitter title")),
 	)
+	metadata.Eyebrow = stringx.First(
+		xhtml.InnerText(rows.Value("eyebrow")),
+		xhtml.InnerText(rows.Value("kicker")),
+	)
 
 	path := stringx.First(
 		xhtml.InnerText(rows.Value("lede image path")),

@@ -18,6 +18,7 @@ type GDocsMetadata struct {
 	LedeImageCredit      string             `json:"lede_image_credit"`
 	LedeImageDescription string             `json:"lede_image_description"`
 	LedeImageCaption     string             `json:"lede_image_caption"`
+	Eyebrow              string             `json:"eyebrow"`
 	URLSlug              string             `json:"url_slug"`
 	Blurb                string             `json:"blurb"`
 	LinkTitle            string             `json:"link_title"`
