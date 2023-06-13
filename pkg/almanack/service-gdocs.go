@@ -329,6 +329,9 @@ func (svc Services) replaceMetadata(
 		xhtml.InnerText(rows.Value("url")),
 		xhtml.InnerText(rows.Value("keywords")),
 	)
+	metadata.URLSlug = strings.TrimRight(metadata.URLSlug, "/")
+	_, metadata.URLSlug, _ = stringx.LastCut(metadata.URLSlug, "/")
+
 	metadata.Blurb = stringx.First(
 		xhtml.InnerText(rows.Value("blurb")),
 		xhtml.InnerText(rows.Value("summary")),
@@ -351,7 +354,12 @@ func (svc Services) replaceMetadata(
 		xhtml.InnerText(rows.Value("twitter title")),
 	)
 
-	if path := xhtml.InnerText(rows.Value("lede image path")); path != "" {
+	path := stringx.First(
+		xhtml.InnerText(rows.Value("lede image path")),
+		xhtml.InnerText(rows.Value("lead image path")),
+		xhtml.InnerText(rows.Value("path")),
+	)
+	if path != "" {
 		metadata.LedeImage = path
 		return ""
 	}
