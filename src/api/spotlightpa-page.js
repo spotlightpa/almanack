@@ -122,6 +122,12 @@ export class Page {
     return `https://pmn.arcpublishing.com/composer/edit/${this.arcID}/`;
   }
 
+  get gdocsURL() {
+    return !this.isGDoc
+      ? ""
+      : `https://docs.google.com/document/d/${this.sourceID}/edit`;
+  }
+
   get sharedViewRoute() {
     return {
       name: "shared-article-redirect-from-page",
