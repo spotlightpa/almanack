@@ -455,6 +455,7 @@ export default {
             v-if="page.isGDoc"
             class="block button is-warning is-small has-text-weight-semibold"
             :class="{ 'is-loading': isLoadingThrottled }"
+            type="button"
             @click.prevent="refreshFromSource({ metadata: false })"
           >
             Refresh content from Google Docs
