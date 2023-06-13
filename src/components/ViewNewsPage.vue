@@ -82,6 +82,13 @@ export default {
           </span>
           <span>Arc view</span>
         </a>
+        <TagLink
+          v-if="page && page.isGDoc"
+          :href="page.gdocsURL"
+          :icon="['fas', 'link']"
+        >
+          Google Docs
+        </TagLink>
         <a
           v-if="page && page.status === 'pub' && page.link"
           :href="page.link"
