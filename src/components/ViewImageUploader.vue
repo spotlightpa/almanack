@@ -1,13 +1,18 @@
 <script setup>
+import { ref, watch } from "vue";
+
 import { get, post, listImages, postImageUpdate } from "@/api/client-v2.js";
 import { makeState, watchAPI } from "@/api/service-util.js";
 import imgproxyURL from "@/api/imgproxy-url.js";
 
 import { formatDate } from "@/utils/time-format.js";
+import humanSize from "@/utils/human-size.js";
 
 const props = defineProps({
   page: { type: String, default: "0" },
 });
+
+const query = ref("");
 
 const {
   apiState: listState,
@@ -15,8 +20,8 @@ const {
   computedList,
   computedProp,
 } = watchAPI(
-  () => props.page || 0,
-  (page) => get(listImages, { page })
+  () => [props.page || 0, query.value],
+  ([page, query]) => get(listImages, { page, query })
 );
 
 const { apiStateRefs: saveState, exec } = makeState();
@@ -32,6 +37,7 @@ const toImageObj = (rawImage) => ({
   description: rawImage.description,
   credit: rawImage.credit,
   keywords: rawImage.keywords,
+  size: rawImage.bytes ? humanSize(rawImage.bytes) : "",
   srcURL: rawImage.src_url,
   date: new Date(rawImage.created_at),
   downloadURL: "/ssr/download-image?src=" + encodeURIComponent(rawImage.path),
@@ -95,6 +101,15 @@ function updateKeywords(image) {
     doUpdate(image, { keywords });
   }
 }
+
+const rawQuery = ref("");
+let timeout = null;
+watch(rawQuery, (val) => {
+  window.clearTimeout(timeout);
+  timeout = window.setTimeout(() => {
+    query.value = val;
+  }, 1000);
+});
 </script>
 
 <template>
@@ -121,10 +136,19 @@ function updateKeywords(image) {
       </p>
     </div>
 
+    <h2 class="mt-5 title">Existing Images</h2>
+
+    <BulmaFieldInput
+      v-model="rawQuery"
+      class="mb-5"
+      type="search"
+      label="Filter by search terms"
+      placeholder="Pennsylvania state capitol in Harrisburg"
+    />
+
     <SpinnerProgress :is-loading="listState.isLoadingThrottled.value" />
     <ErrorSimple :error="saveState.error.value" />
     <ErrorReloader :error="listState.error.value" @reload="fetch" />
-    <h2 class="title has-margin-top">Existing Images</h2>
 
     <table class="table is-striped is-fullwidth">
       <tbody>
@@ -147,7 +171,7 @@ function updateKeywords(image) {
             </div>
             <div class="mt-4">
               <LinkHref
-                label="Original"
+                :label="image.size ? `Original (${image.size})` : 'Original'"
                 color="is-success"
                 :icon="['fas', 'file-download']"
                 :href="image.downloadURL"
