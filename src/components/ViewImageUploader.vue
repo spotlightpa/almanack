@@ -31,6 +31,7 @@ const toImageObj = (rawImage) => ({
   }),
   description: rawImage.description,
   credit: rawImage.credit,
+  keywords: rawImage.keywords,
   srcURL: rawImage.src_url,
   date: new Date(rawImage.created_at),
   downloadURL: "/ssr/download-image?src=" + encodeURIComponent(rawImage.path),
@@ -50,13 +51,18 @@ const showReload = computedProp("waiting_for_upload", () => {
   return true;
 });
 
-function updateObj(path, { credit = "", description = "" } = {}) {
+function updateObj(
+  path,
+  { credit = "", description = "", keywords = "" } = {}
+) {
   return {
     path,
     credit,
     set_credit: !!credit,
     description,
     set_description: !!description,
+    keywords,
+    set_keywords: !!keywords,
   };
 }
 
@@ -80,6 +86,13 @@ function updateCredit(image) {
   let credit = window.prompt("Update credit", image.credit);
   if (credit !== null && credit !== image.credit) {
     doUpdate(image, { credit });
+  }
+}
+
+function updateKeywords(image) {
+  let keywords = window.prompt("Update keywords", image.keywords);
+  if (keywords !== null && keywords !== image.keywords) {
+    doUpdate(image, { keywords });
   }
 }
 </script>
@@ -158,6 +171,16 @@ function updateCredit(image) {
                 Credit:
               </a>
               {{ image.credit }}
+            </p>
+
+            <p>
+              <a
+                class="has-text-weight-semibold"
+                @click="updateKeywords(image)"
+              >
+                Keywords:
+              </a>
+              {{ image.keywords }}
             </p>
             <p>
               <strong>Date:</strong>
