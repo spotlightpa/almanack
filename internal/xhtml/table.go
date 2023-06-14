@@ -47,17 +47,16 @@ func (rows TableNodes) Label() string {
 func (rows TableNodes) Value(name string) *html.Node {
 	for i := range rows {
 		if slugify(rows.At(i, 0)) == name {
-			for _, col := range rows[i][1:] {
-				if s := InnerText(col); s != "" {
-					if stringx.RemoveAllWhitespace(slugify(col)) == "n/a" {
-						return &html.Node{
-							Type: html.CommentNode,
-						}
-					}
-					return col
+			cell := rows.At(i, 1)
+			if s := InnerText(cell); s == "" {
+				cell = rows.At(i+1, 0)
+			}
+			if stringx.RemoveAllWhitespace(slugify(cell)) == "n/a" {
+				return &html.Node{
+					Type: html.CommentNode,
 				}
 			}
-			return rows.At(i+1, 0)
+			return cell
 		}
 	}
 	return nil
