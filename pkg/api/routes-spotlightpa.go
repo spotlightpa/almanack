@@ -256,14 +256,33 @@ func (app *appEnv) listImages(w http.ResponseWriter, r *http.Request) {
 
 	pager := paginate.PageNumber(page)
 	pager.PageSize = 100
-	images, err := paginate.List(
-		pager,
-		r.Context(),
-		app.svc.Queries.ListImages,
-		db.ListImagesParams{
-			Offset: pager.Offset(),
-			Limit:  pager.Limit(),
-		})
+	query := r.URL.Query().Get("query")
+
+	var (
+		images []db.Image
+		err    error
+	)
+
+	if query != "" {
+		images, err = paginate.List(
+			pager,
+			r.Context(),
+			app.svc.Queries.ListImagesByFTS,
+			db.ListImagesByFTSParams{
+				Limit:  pager.Limit(),
+				Offset: pager.Offset(),
+				Query:  query,
+			})
+	} else {
+		images, err = paginate.List(
+			pager,
+			r.Context(),
+			app.svc.Queries.ListImages,
+			db.ListImagesParams{
+				Offset: pager.Offset(),
+				Limit:  pager.Limit(),
+			})
+	}
 	if err != nil {
 		app.replyErr(w, r, err)
 		return
