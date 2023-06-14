@@ -1,0 +1,22 @@
+{
+  "id": 123,
+  "status": "U",
+  "embargo_until": null,
+  "note": "",
+  "source_type": "gdocs",
+  "source_id": "abc123_testdata-gdoc-eyebrow",
+  "raw_data": null,
+  "page_id": null,
+  "created_at": "2020-03-15T20:00:00Z",
+  "updated_at": "2020-03-15T20:00:00Z",
+  "publication_date": null,
+  "internal_id": "OP1",
+  "byline": "The Scorpions",
+  "budget": "A CIA op becomes an unexpected smash hit.",
+  "hed": "The Winds of Change",
+  "description": "Something is in the air tonight…",
+  "lede_image": "",
+  "lede_image_credit": "Teenage Engineering",
+  "lede_image_description": "Synthesizer",
+  "lede_image_caption": ""
+}
