@@ -12,8 +12,5 @@ ALTER TABLE page
 ALTER TABLE page
   DROP COLUMN internal_id_fts;
 
-ALTER TABLE shared_article
-  DROP COLUMN lede_image_source;
-
 ALTER TABLE image
   DROP COLUMN fts;
