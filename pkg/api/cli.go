@@ -4,7 +4,6 @@ import (
 	"flag"
 	"fmt"
 	"net/http"
-	"net/url"
 	"os"
 	"strconv"
 	"time"
@@ -17,7 +16,6 @@ import (
 	"golang.org/x/exp/slog"
 
 	"github.com/spotlightpa/almanack/internal/netlifyid"
-	"github.com/spotlightpa/almanack/pkg/almanack"
 	"github.com/spotlightpa/almanack/pkg/almlog"
 )
 
@@ -51,7 +49,7 @@ func (app *appEnv) parseArgs(args []string) error {
 		fmt.Fprintf(fl.Output(), "almanack-api help\n\n")
 		fl.PrintDefaults()
 	}
-	getService := almanack.AddFlags(fl)
+	// getService := almanack.AddFlags(fl)
 
 	if err := fl.Parse(args); err != nil {
 		return err
@@ -68,10 +66,10 @@ func (app *appEnv) parseArgs(args []string) error {
 		return err
 	}
 	app.auth = netlifyid.NewService(app.isLambda)
-	var err error
-	if app.svc, err = getService(); err != nil {
-		return err
-	}
+	// var err error
+	// if app.svc, err = getService(); err != nil {
+	// 	return err
+	// }
 	return nil
 }
 
@@ -79,7 +77,7 @@ type appEnv struct {
 	port     string
 	isLambda bool
 	auth     netlifyid.AuthService
-	svc      almanack.Services
+	// svc      almanack.Services
 }
 
 func (app *appEnv) exec() error {
@@ -92,10 +90,10 @@ func (app *appEnv) exec() error {
 		Handle(app.routes())
 
 	var host string
-	if app.isLambda {
-		u, _ := url.Parse(almanack.DeployURL)
-		host = u.Hostname()
-	}
+	// if app.isLambda {
+	// 	u, _ := url.Parse(almanack.DeployURL)
+	// 	host = u.Hostname()
+	// }
 	almlog.Logger.Info("appEnv.exec",
 		"app", AppName,
 		"version", versioninfo.Short(),
@@ -119,8 +117,8 @@ func (app *appEnv) initSentry(dsn string) error {
 		almlog.Logger.Debug("initSentry", "sync", false, "timeout", false)
 	}
 	return sentry.Init(sentry.ClientOptions{
-		Dsn:       dsn,
-		Release:   almanack.BuildVersion,
+		Dsn: dsn,
+		// Release:   almanack.BuildVersion,
 		Transport: transport,
 	})
 }
