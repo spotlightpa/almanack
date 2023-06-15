@@ -10,7 +10,6 @@ import (
 
 	"github.com/carlmjohnson/flagx"
 	"github.com/carlmjohnson/gateway"
-	"github.com/carlmjohnson/versioninfo"
 	"github.com/getsentry/sentry-go"
 	sentryhttp "github.com/getsentry/sentry-go/http"
 	"golang.org/x/exp/slog"
@@ -94,13 +93,13 @@ func (app *appEnv) exec() error {
 	// 	u, _ := url.Parse(almanack.DeployURL)
 	// 	host = u.Hostname()
 	// }
-	almlog.Logger.Info("appEnv.exec",
-		"app", AppName,
-		"version", versioninfo.Short(),
-		"is-lambda", app.isLambda,
-		"host", host,
-		"port", app.port,
-	)
+	// almlog.Logger.Info("appEnv.exec",
+	// 	"app", AppName,
+	// 	"version", versioninfo.Short(),
+	// 	"is-lambda", app.isLambda,
+	// 	"host", host,
+	// 	"port", app.port,
+	// )
 	if app.isLambda {
 		return gateway.ListenAndServe(host, routes)
 	}
