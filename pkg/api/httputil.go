@@ -153,34 +153,34 @@ func (app *appEnv) versionMiddleware(h http.Handler) http.Handler {
 
 func (app *appEnv) authHeaderMiddleware(h http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		r2, err := app.auth.AuthFromHeader(r)
-		if err != nil {
-			app.replyErr(w, r, err)
-			return
-		}
-		h.ServeHTTP(w, r2)
+		// // r2, err := app.auth.AuthFromHeader(r)
+		// if err != nil {
+		// 	app.replyErr(w, r, err)
+		// 	return
+		// }
+		// h.ServeHTTP(w, r2)
 	})
 }
 
 func (app *appEnv) authCookieMiddleware(h http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		r2, err := app.auth.AuthFromCookie(r)
-		if err != nil {
-			app.replyErr(w, r, err)
-			return
-		}
-		h.ServeHTTP(w, r2)
+		// r2, err := app.auth.AuthFromCookie(r)
+		// if err != nil {
+		// 	app.replyErr(w, r, err)
+		// 	return
+		// }
+		// h.ServeHTTP(w, r2)
 	})
 }
 
 func (app *appEnv) hasRoleMiddleware(role string) func(next http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			if err := app.auth.HasRole(r, role); err != nil {
-				app.replyErr(w, r, err)
-				return
-			}
-			next.ServeHTTP(w, r)
+			// if err := app.auth.HasRole(r, role); err != nil {
+			// 	app.replyErr(w, r, err)
+			// 	return
+			// }
+			// next.ServeHTTP(w, r)
 		})
 	}
 }

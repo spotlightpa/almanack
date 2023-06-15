@@ -4,19 +4,10 @@ import (
 	"net/http"
 
 	"github.com/go-chi/chi/v5"
-	"github.com/go-chi/chi/v5/middleware"
-	"github.com/spotlightpa/almanack/pkg/almlog"
 )
 
 func (app *appEnv) routes() http.Handler {
 	r := chi.NewRouter()
-	r.Use(middleware.RealIP)
-	if !app.isLambda {
-		r.Use(middleware.Recoverer)
-	}
-	r.Use(almlog.Middleware)
-	r.Use(app.versionMiddleware)
-	r.Use(app.maxSizeMiddleware)
 	// r.Get(`/api/bookmarklet/{slug}`, app.getBookmarklet)
 	r.Get(`/api/healthcheck`, app.ping)
 	// r.Get(`/api/healthcheck/{code:\d{3}}`, app.pingErr)
