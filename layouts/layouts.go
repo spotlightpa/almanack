@@ -5,7 +5,6 @@ import (
 	"html/template"
 )
 
-//go:embed *.html
 var FS embed.FS
 
 func makeTemplate(names ...string) *template.Template {
