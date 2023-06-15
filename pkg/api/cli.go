@@ -5,12 +5,9 @@ import (
 	"fmt"
 	"net/http"
 	"os"
-	"time"
 
 	"github.com/carlmjohnson/flagx"
 	"github.com/carlmjohnson/gateway"
-	"github.com/getsentry/sentry-go"
-	sentryhttp "github.com/getsentry/sentry-go/http"
 )
 
 const AppName = "almanack-api"
@@ -38,7 +35,7 @@ func (app *appEnv) parseArgs(args []string) error {
 		// almlog.Level.Set(slog.Level(l))
 		return nil
 	})
-	sentryDSN := fl.String("sentry-dsn", "", "DSN `pseudo-URL` for Sentry")
+	// sentryDSN := fl.String("sentry-dsn", "", "DSN `pseudo-URL` for Sentry")
 	fl.Usage = func() {
 		fmt.Fprintf(fl.Output(), "almanack-api help\n\n")
 		fl.PrintDefaults()
@@ -56,9 +53,9 @@ func (app *appEnv) parseArgs(args []string) error {
 	} else {
 		// almlog.UseDevLogger()
 	}
-	if err := app.initSentry(*sentryDSN); err != nil {
-		return err
-	}
+	// if err := app.initSentry(*sentryDSN); err != nil {
+	// return err
+	// }
 	// app.auth = netlifyid.NewService(app.isLambda)
 	// var err error
 	// if app.svc, err = getService(); err != nil {
@@ -75,13 +72,7 @@ type appEnv struct {
 }
 
 func (app *appEnv) exec() error {
-	routes := sentryhttp.
-		New(sentryhttp.Options{
-			WaitForDelivery: true,
-			Timeout:         5 * time.Second,
-			Repanic:         !app.isLambda,
-		}).
-		Handle(app.routes())
+	routes := app.routes()
 
 	var host string
 	// if app.isLambda {
@@ -100,19 +91,4 @@ func (app *appEnv) exec() error {
 	}
 
 	return http.ListenAndServe(app.port, routes)
-}
-
-func (app *appEnv) initSentry(dsn string) error {
-	var transport sentry.Transport
-	if app.isLambda {
-		// almlog.Logger.Debug("initSentry", "sync", true, "timeout", 5*time.Second)
-		transport = &sentry.HTTPSyncTransport{Timeout: 5 * time.Second}
-	} else {
-		// almlog.Logger.Debug("initSentry", "sync", false, "timeout", false)
-	}
-	return sentry.Init(sentry.ClientOptions{
-		Dsn: dsn,
-		// Release:   almanack.BuildVersion,
-		Transport: transport,
-	})
 }
