@@ -11,19 +11,14 @@ import (
 	"mime"
 	"net/http"
 	"net/url"
-	"path/filepath"
-	"runtime"
 	"strconv"
 	"strings"
 
 	"github.com/carlmjohnson/resperr"
-	"github.com/getsentry/sentry-go"
 	"github.com/go-chi/chi/v5"
 
 	"github.com/spotlightpa/almanack/internal/must"
-	"github.com/spotlightpa/almanack/internal/stringx"
 	"github.com/spotlightpa/almanack/layouts"
-	"github.com/spotlightpa/almanack/pkg/almlog"
 )
 
 func (app *appEnv) replyJSON(statusCode int, w http.ResponseWriter, data any) {
@@ -32,7 +27,7 @@ func (app *appEnv) replyJSON(statusCode int, w http.ResponseWriter, data any) {
 	enc := json.NewEncoder(w)
 	if err := enc.Encode(data); err != nil {
 		// TODO: Log to Sentry
-		almlog.Logger.Error("replyJSON", "err", err)
+		// almlog.Logger.Error("replyJSON", "err", err)
 	}
 }
 
@@ -57,18 +52,6 @@ func (app *appEnv) replyNewErr(code int, w http.ResponseWriter, r *http.Request,
 }
 
 func (app *appEnv) logErr(ctx context.Context, err error) {
-	l := almlog.FromContext(ctx)
-	if hub := sentry.GetHubFromContext(ctx); hub != nil {
-		hub.WithScope(func(scope *sentry.Scope) {
-			// userinfo := netlifyid.FromContext(ctx)
-			// scope.SetTag("username", stringx.First(userinfo.Username(), "anonymous"))
-			// scope.SetTag("email", stringx.First(userinfo.Email(), "not set"))
-			hub.CaptureException(err)
-		})
-	} else {
-		l.Warn("sentry not in context")
-	}
-	l.ErrorCtx(ctx, "logErr", "err", err)
 }
 
 func (app *appEnv) tryReadJSON(w http.ResponseWriter, r *http.Request, dst any) error {
@@ -285,14 +268,14 @@ func (app *appEnv) replyHTMLErr(w http.ResponseWriter, r *http.Request, err erro
 }
 
 func (app *appEnv) logStart(r *http.Request, args ...any) {
-	pc, file, line, ok := runtime.Caller(1)
-	route := "unknown"
-	if ok {
-		f := runtime.FuncForPC(pc)
-		file = filepath.Base(file)
-		_, name, _ := stringx.LastCut(f.Name(), ".")
-		route = fmt.Sprintf("%s(%s:%d)", name, file, line)
-	}
-	l := almlog.FromContext(r.Context())
-	l.With(args...).InfoCtx(r.Context(), "logStart", "route", route)
+	// pc, file, line, ok := runtime.Caller(1)
+	// route := "unknown"
+	// if ok {
+	// 	f := runtime.FuncForPC(pc)
+	// 	file = filepath.Base(file)
+	// 	_, name, _ := stringx.LastCut(f.Name(), ".")
+	// 	route = fmt.Sprintf("%s(%s:%d)", name, file, line)
+	// }
+	// l := almlog.FromContext(r.Context())
+	// l.With(args...).InfoCtx(r.Context(), "logStart", "route", route)
 }
