@@ -1,0 +1,28 @@
+HTTP/2.0 302 Found
+Alt-Svc: h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
+Cache-Control: no-cache, no-store, max-age=0, must-revalidate
+Content-Security-Policy: script-src 'report-sample' 'nonce-3U9R3Vz44cY_penjYsIIMw' 'unsafe-inline' 'unsafe-eval';object-src 'none';base-uri 'self';report-uri /cspreport
+Content-Security-Policy: require-trusted-types-for 'script';report-uri /cspreport
+Content-Type: text/html; charset=UTF-8
+Cross-Origin-Opener-Policy-Report-Only: same-origin; report-to="coop_gse_qebhlk"
+Date: Fri, 05 May 2023 16:09:13 GMT
+Expires: Mon, 01 Jan 1990 00:00:00 GMT
+Location: https://accounts.google.com/v3/signin/identifier?dsh=S-1056199824%3A1683302953465451&continue=https%3A%2F%2Flh3.google.com%2Fu%2F0%2Fd%2F1QeCripnoiyu6XlRtsN3IkaHO6kBPOkv7%3Dw2048-h1322&hl=en&ifkv=Af_xneFl1uDOuGE8kFyKJrmJi4ZazrR6CAttAz5Dn44DETF-LbE49Phfw6JDMGQuP9d1smCjM2lNoA&flowName=WebLiteSignIn&flowEntry=ServiceLogin
+Pragma: no-cache
+Report-To: {"group":"coop_gse_qebhlk","max_age":2592000,"endpoints":[{"url":"https://csp.withgoogle.com/csp/report-to/gse_qebhlk"}]}
+Server: GSE
+Set-Cookie: __Host-GAPS=1:aUl19cWMc2Ucaof9siDWWnntmFgt_w:pqaB35Li2LVmDLN8;Path=/;Expires=Sun, 04-May-2025 16:09:13 GMT;Secure;HttpOnly;Priority=HIGH
+Strict-Transport-Security: max-age=31536000; includeSubDomains
+X-Content-Type-Options: nosniff
+X-Frame-Options: DENY
+X-Xss-Protection: 1; mode=block
+
+<HTML>
+<HEAD>
+<TITLE>Moved Temporarily</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFFFFF" TEXT="#000000">
+<H1>Moved Temporarily</H1>
+The document has moved <A HREF="https://accounts.google.com/v3/signin/identifier?dsh=S-1056199824%3A1683302953465451&amp;continue=https%3A%2F%2Flh3.google.com%2Fu%2F0%2Fd%2F1QeCripnoiyu6XlRtsN3IkaHO6kBPOkv7%3Dw2048-h1322&amp;hl=en&amp;ifkv=Af_xneFl1uDOuGE8kFyKJrmJi4ZazrR6CAttAz5Dn44DETF-LbE49Phfw6JDMGQuP9d1smCjM2lNoA&amp;flowName=WebLiteSignIn&amp;flowEntry=ServiceLogin">here</A>.
+</BODY>
+</HTML>

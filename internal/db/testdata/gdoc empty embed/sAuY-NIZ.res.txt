@@ -1,0 +1,24 @@
+HTTP/2.0 302 Found
+Connection: close
+Accept-Ch: Sec-CH-UA-Arch, Sec-CH-UA-Bitness, Sec-CH-UA-Full-Version, Sec-CH-UA-Full-Version-List, Sec-CH-UA-Model, Sec-CH-UA-WoW64, Sec-CH-UA-Platform, Sec-CH-UA-Platform-Version
+Alt-Svc: h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
+Cache-Control: no-cache, no-store, max-age=0, must-revalidate
+Content-Security-Policy: require-trusted-types-for 'script';report-uri /_/AccountsSigninPassiveLoginHttp/cspreport
+Content-Security-Policy: script-src 'report-sample' 'nonce-TLiZ6qWFLXzvXOyPAePRww' 'unsafe-inline';object-src 'none';base-uri 'self';report-uri /_/AccountsSigninPassiveLoginHttp/cspreport;worker-src 'self'
+Content-Security-Policy: require-trusted-types-for 'script';report-uri /cspreport
+Content-Type: application/binary
+Cross-Origin-Opener-Policy: unsafe-none; report-to="AccountsSigninPassiveLoginHttp"
+Cross-Origin-Resource-Policy: cross-origin
+Date: Thu, 04 May 2023 18:16:20 GMT
+Expires: Mon, 01 Jan 1990 00:00:00 GMT
+Location: https://accounts.google.com/InteractiveLogin?continue=https://lh3.google.com/u/0/d/1QeCripnoiyu6XlRtsN3IkaHO6kBPOkv7%3Dw2048-h1322&hl=en&ifkv=Af_xneGEW7r2o5YuaxTfS05CwPp_g5VQ_ySwz1jYpHdrQY5zStqyOp8GpmfYSDq_P-eBa-rI4qqR
+Permissions-Policy: ch-ua-arch=*, ch-ua-bitness=*, ch-ua-full-version=*, ch-ua-full-version-list=*, ch-ua-model=*, ch-ua-wow64=*, ch-ua-platform=*, ch-ua-platform-version=*
+Pragma: no-cache
+Report-To: {"group":"AccountsSigninPassiveLoginHttp","max_age":2592000,"endpoints":[{"url":"https://csp.withgoogle.com/csp/report-to/AccountsSigninPassiveLoginHttp/external"}]}
+Report-To: {"group":"coop_gse_qebhlk","max_age":2592000,"endpoints":[{"url":"https://csp.withgoogle.com/csp/report-to/gse_qebhlk"}]}
+Server: GSE
+Set-Cookie: __Host-GAPS=1:U15EjA9LEsO4-HyN_sACb7BtBviXJQ:PwQvZVaj4ns_lqvX; Expires=Sat, 03-May-2025 18:16:20 GMT; Path=/; Secure; HttpOnly; Priority=HIGH
+Strict-Transport-Security: max-age=31536000; includeSubDomains
+X-Content-Type-Options: nosniff
+X-Xss-Protection: 1; mode=block
+

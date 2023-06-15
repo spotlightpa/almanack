@@ -1,0 +1,299 @@
+HTTP/2.0 200 OK
+Alt-Svc: h3=":443"; ma=2592000,h3-29=":443"; ma=2592000,h3-Q050=":443"; ma=2592000,h3-Q046=":443"; ma=2592000,h3-Q043=":443"; ma=2592000,quic=":443"; ma=2592000; v="46,43"
+Cache-Control: private
+Content-Type: application/json; charset=UTF-8
+Date: Wed, 29 Jun 2022 00:33:35 GMT
+Server: ESF
+Vary: Origin
+Vary: X-Origin
+Vary: Referer
+X-Content-Type-Options: nosniff
+X-Frame-Options: SAMEORIGIN
+X-Xss-Protection: 0
+
+{
+  "reports": [
+    {
+      "columnHeader": {
+        "dimensions": [
+          "ga:pagePath"
+        ],
+        "metricHeader": {
+          "metricHeaderEntries": [
+            {
+              "name": "ga:uniquePageviews",
+              "type": "INTEGER"
+            }
+          ]
+        }
+      },
+      "data": {
+        "rows": [
+          {
+            "dimensions": [
+              "/news/2022/06/pa-stimulus-money-budget-spending/"
+            ],
+            "metrics": [
+              {
+                "values": [
+                  "1429"
+                ]
+              }
+            ]
+          },
+          {
+            "dimensions": [
+              "/statecollege/2022/06/pfas-chemicals-drinking-water-benner-township-contamination/"
+            ],
+            "metrics": [
+              {
+                "values": [
+                  "381"
+                ]
+              }
+            ]
+          },
+          {
+            "dimensions": [
+              "/news/2022/06/roe-v-wade-supreme-court-overturn-pennsylvania/"
+            ],
+            "metrics": [
+              {
+                "values": [
+                  "363"
+                ]
+              }
+            ]
+          },
+          {
+            "dimensions": [
+              "/news/2022/06/pa-state-police-department-count-discrepancy/"
+            ],
+            "metrics": [
+              {
+                "values": [
+                  "204"
+                ]
+              }
+            ]
+          },
+          {
+            "dimensions": [
+              "/news/2022/06/pennsylvania-doug-mastriano-voter-roll-clean/"
+            ],
+            "metrics": [
+              {
+                "values": [
+                  "150"
+                ]
+              }
+            ]
+          },
+          {
+            "dimensions": [
+              "/news/2021/11/election-results-2021-pennsylvania-supreme-court-candidates/"
+            ],
+            "metrics": [
+              {
+                "values": [
+                  "131"
+                ]
+              }
+            ]
+          },
+          {
+            "dimensions": [
+              "/news/2022/04/pa-primary-governor-election-2022-candidates-guide/"
+            ],
+            "metrics": [
+              {
+                "values": [
+                  "95"
+                ]
+              }
+            ]
+          },
+          {
+            "dimensions": [
+              "/news/2022/06/pa-nursing-home-staffing-proposal-91-million-wolf/"
+            ],
+            "metrics": [
+              {
+                "values": [
+                  "81"
+                ]
+              }
+            ]
+          },
+          {
+            "dimensions": [
+              "/news/2022/05/pa-primary-2022-governor-election-results/"
+            ],
+            "metrics": [
+              {
+                "values": [
+                  "73"
+                ]
+              }
+            ]
+          },
+          {
+            "dimensions": [
+              "/news/2021/12/pennsylvania-redistricting-house-senate-districts-lookup-tool/"
+            ],
+            "metrics": [
+              {
+                "values": [
+                  "55"
+                ]
+              }
+            ]
+          },
+          {
+            "dimensions": [
+              "/news/2022/06/pennsylvania-delta-8-legal-medical-marijuana-cannabis/"
+            ],
+            "metrics": [
+              {
+                "values": [
+                  "53"
+                ]
+              }
+            ]
+          },
+          {
+            "dimensions": [
+              "/news/2021/09/pa-psers-teacher-pension-fund-sec-subpoena-wall-street/"
+            ],
+            "metrics": [
+              {
+                "values": [
+                  "50"
+                ]
+              }
+            ]
+          },
+          {
+            "dimensions": [
+              "/news/2022/01/pennsylvania-mail-voting-unconstitutional-supreme-court-appeal/"
+            ],
+            "metrics": [
+              {
+                "values": [
+                  "46"
+                ]
+              }
+            ]
+          },
+          {
+            "dimensions": [
+              "/news/2022/05/pa-primary-2022-billionaire-donations-jeff-yass/"
+            ],
+            "metrics": [
+              {
+                "values": [
+                  "38"
+                ]
+              }
+            ]
+          },
+          {
+            "dimensions": [
+              "/news/2022/04/pa-election-day-2022-primary-closed-independent-voters/"
+            ],
+            "metrics": [
+              {
+                "values": [
+                  "36"
+                ]
+              }
+            ]
+          },
+          {
+            "dimensions": [
+              "/news/2022/06/pennsylvania-police-hiring-misconduct-database/"
+            ],
+            "metrics": [
+              {
+                "values": [
+                  "34"
+                ]
+              }
+            ]
+          },
+          {
+            "dimensions": [
+              "/news/2022/04/pennsylvania-skill-games-what-are-they/"
+            ],
+            "metrics": [
+              {
+                "values": [
+                  "32"
+                ]
+              }
+            ]
+          },
+          {
+            "dimensions": [
+              "/news/2022/06/uvalde-shooting-pennsylvania-gun-laws/"
+            ],
+            "metrics": [
+              {
+                "values": [
+                  "32"
+                ]
+              }
+            ]
+          },
+          {
+            "dimensions": [
+              "/news/2022/05/pa-primary-2022-last-minute-guide-may-17/"
+            ],
+            "metrics": [
+              {
+                "values": [
+                  "31"
+                ]
+              }
+            ]
+          },
+          {
+            "dimensions": [
+              "/news/2022/05/pa-primary-election-results-budget-impasse/"
+            ],
+            "metrics": [
+              {
+                "values": [
+                  "31"
+                ]
+              }
+            ]
+          }
+        ],
+        "totals": [
+          {
+            "values": [
+              "4076"
+            ]
+          }
+        ],
+        "rowCount": 234,
+        "minimums": [
+          {
+            "values": [
+              "1"
+            ]
+          }
+        ],
+        "maximums": [
+          {
+            "values": [
+              "1429"
+            ]
+          }
+        ]
+      },
+      "nextPageToken": "20"
+    }
+  ]
+}

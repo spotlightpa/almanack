@@ -1,0 +1,20 @@
+HTTP/2.0 302 Found
+Content-Length: 333
+Access-Control-Allow-Origin: *
+Alt-Svc: h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
+Cache-Control: private
+Content-Type: text/html; charset=UTF-8
+Date: Thu, 04 May 2023 18:16:20 GMT
+Location: https://accounts.google.com/ServiceLogin?continue=https://lh3.google.com/u/0/d/1QeCripnoiyu6XlRtsN3IkaHO6kBPOkv7%3Dw2048-h1322&hl=en
+Server: fife
+Timing-Allow-Origin: *
+Vary: Origin
+X-Content-Type-Options: nosniff
+X-Xss-Protection: 0
+
+<HTML><HEAD><meta http-equiv="content-type" content="text/html;charset=utf-8">
+<TITLE>302 Moved</TITLE></HEAD><BODY>
+<H1>302 Moved</H1>
+The document has moved
+<A HREF="https://accounts.google.com/ServiceLogin?continue=https://lh3.google.com/u/0/d/1QeCripnoiyu6XlRtsN3IkaHO6kBPOkv7%3Dw2048-h1322&amp;hl=en">here</A>.
+</BODY></HTML>

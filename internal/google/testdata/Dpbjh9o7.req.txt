@@ -1,0 +1,5 @@
+POST /v4/reports:batchGet HTTP/1.1
+Host: analyticsreporting.googleapis.com
+Content-Type: application/json
+
+{"reportRequests":[{"viewId":"1","dateRanges":[{"endDate":"today","startDate":"today"}],"dimensions":[{"name":"ga:pagePath"}],"metrics":[{"expression":"ga:uniquePageviews"}],"filtersExpression":"ga:pagePath=~^/(news|statecollege)/\\d\\d\\d\\d","orderBys":[{"fieldName":"ga:uniquePageviews","sortOrder":"DESCENDING"}],"pageSize":20,"pageToken":""}]}
