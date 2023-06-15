@@ -1,12 +1,10 @@
 package api
 
 import (
-	"bytes"
 	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
-	"html/template"
 	"io"
 	"mime"
 	"net/http"
@@ -18,7 +16,6 @@ import (
 	"github.com/go-chi/chi/v5"
 
 	"github.com/spotlightpa/almanack/internal/must"
-	"github.com/spotlightpa/almanack/layouts"
 )
 
 func (app *appEnv) replyJSON(statusCode int, w http.ResponseWriter, data any) {
@@ -228,43 +225,6 @@ func boolFromQuery(r *http.Request, param string) (val bool, err error) {
 			"Could not interpret %s=%q", param, s)
 	}
 	return
-}
-
-func (app *appEnv) replyHTML(w http.ResponseWriter, r *http.Request, t *template.Template, data any) {
-	var buf bytes.Buffer
-	if err := t.Execute(&buf, data); err != nil {
-		app.logErr(r.Context(), err)
-		app.replyHTMLErr(w, r, err)
-		return
-	}
-	w.Header().Set("Content-Type", "text/html")
-	if _, err := buf.WriteTo(w); err != nil {
-		app.logErr(r.Context(), err)
-		return
-	}
-}
-
-func (app *appEnv) replyHTMLErr(w http.ResponseWriter, r *http.Request, err error) {
-	code := resperr.StatusCode(err)
-	var buf bytes.Buffer
-	if err := layouts.Error.Execute(&buf, struct {
-		Status     string
-		StatusCode int
-		Message    string
-	}{
-		Status:     http.StatusText(code),
-		StatusCode: code,
-		Message:    resperr.UserMessage(err),
-	}); err != nil {
-		app.logErr(r.Context(), err)
-		return
-	}
-	w.Header().Set("Content-Type", "text/html")
-	w.WriteHeader(code)
-	if _, err := buf.WriteTo(w); err != nil {
-		app.logErr(r.Context(), err)
-		return
-	}
 }
 
 func (app *appEnv) logStart(r *http.Request, args ...any) {
