@@ -1,3 +1,0 @@
-GET /u/0/d/1QeCripnoiyu6XlRtsN3IkaHO6kBPOkv7=w2048-h1322 HTTP/1.1
-Host: lh3.google.com
-

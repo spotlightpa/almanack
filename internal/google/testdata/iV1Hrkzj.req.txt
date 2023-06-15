@@ -1,3 +1,0 @@
-GET /drive/v3/files/1ssiQd8AKXHo99qkZZwYbHxfVJHY3RPnL?alt=media HTTP/1.1
-Host: www.googleapis.com
-

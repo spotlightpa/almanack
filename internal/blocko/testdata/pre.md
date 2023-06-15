@@ -1,8 +1,0 @@
-<pre>    don’t
-    break
-    me
-</pre>
-
-<code>don’t
-break
-me</code>

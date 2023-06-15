@@ -1,4 +1,0 @@
-GET /ServiceLogin?continue=https://lh3.google.com/u/0/d/1QeCripnoiyu6XlRtsN3IkaHO6kBPOkv7%3Dw2048-h1322&hl=en HTTP/0.0
-Host: accounts.google.com
-Referer: https://lh3.google.com/u/0/d/1QeCripnoiyu6XlRtsN3IkaHO6kBPOkv7=w2048-h1322
-

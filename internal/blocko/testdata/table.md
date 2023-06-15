@@ -1,5 +1,0 @@
-one
-
-<table></table>
-
-two

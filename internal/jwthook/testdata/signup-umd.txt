@@ -1,9 +1,0 @@
-POST /hook HTTP/1.1
-Host: 3.131.97.98:50039
-Accept-Encoding: gzip
-Content-Length: 447
-Content-Type: application/json
-User-Agent: Go-http-client/1.1
-X-Webhook-Signature: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpYXQiOjE2NjAyNDkyMTUsImlzcyI6ImdvdHJ1ZSIsInN1YiI6ImQ0Y2NlNmYyLTZiNDYtNGJiYS1iMTI2LWNmYjhmNDY5ZTNjNSIsInNoYTI1NiI6IjM2Yzk3ZWZmOTA2ZDFhYmY5MDllYmVhNjFmMzkwZjA5MGI1NGNmZTdmNmRjZGY0NWEwNDFlYTBjMzk2ODE3ZmMifQ.qLBWQIlL9i05oA8kvD2HNDIvwjbMC5TiB_erwxbNf_4
-
-{"event":"signup","instance_id":"d4cce6f2-6b46-4bba-b126-cfb8f469e3c5","user":{"id":"94adbdd1-710f-4e49-bb20-7fc09be02a73","aud":"","role":"","email":"carlmj@umd.edu","app_metadata":{"provider":"google"},"user_metadata":{"avatar_url":"https://lh3.googleusercontent.com/a-/AFdZucpoZA9xL-jam3fBVzCgDnOqMfkUBiYpV2wNzVGf=s96-c","full_name":"Carl Matthew Johnson"},"created_at":"2022-08-11T20:20:15.056544Z","updated_at":"2022-08-11T20:20:15.060258Z"}}

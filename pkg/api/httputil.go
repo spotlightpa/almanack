@@ -24,7 +24,6 @@ import (
 	"github.com/spotlightpa/almanack/internal/netlifyid"
 	"github.com/spotlightpa/almanack/internal/stringx"
 	"github.com/spotlightpa/almanack/layouts"
-	"github.com/spotlightpa/almanack/pkg/almanack"
 	"github.com/spotlightpa/almanack/pkg/almlog"
 )
 
@@ -148,7 +147,7 @@ func (app *appEnv) readJSON(w http.ResponseWriter, r *http.Request, dst any) boo
 
 func (app *appEnv) versionMiddleware(h http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set("Almanack-App-Version", almanack.BuildVersion)
+		// w.Header().Set("Almanack-App-Version", almanack.BuildVersion)
 		h.ServeHTTP(w, r)
 	})
 }

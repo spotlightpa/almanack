@@ -1,9 +1,0 @@
-HTTP/2.0 200 OK
-Content-Type: application/json; charset=utf-8
-Date: Tue, 09 May 2023 19:23:39 GMT
-Link: <https://us3.api.mailchimp.com/schema/3.0/Campaigns/Content/Collection.json>; rel="describedBy"
-Server: openresty
-Vary: Accept-Encoding
-X-Request-Id: 34ebd203-6031-2190-0a6a-580c25fdd4e7
-
-{"plain_text":"Hello, World!\n==============================================\n\nUnsubscribe *|HTML:EMAIL|* from this list:\n*|UNSUB|*","archive_html":"Hello, World!<br />\n==============================================<br />\n<br />\nUnsubscribe &lt;&lt;Email Address>> from this list:<br />","_links":[{"rel":"parent","href":"https://us3.api.mailchimp.com/3.0/campaigns/5396261","method":"GET","targetSchema":"https://us3.api.mailchimp.com/schema/3.0/Definitions/Campaigns/Response.json"},{"rel":"self","href":"https://us3.api.mailchimp.com/3.0/campaigns/5396261/content","method":"GET","targetSchema":"https://us3.api.mailchimp.com/schema/3.0/Definitions/Campaigns/Content/Response.json"},{"rel":"create","href":"https://us3.api.mailchimp.com/3.0/campaigns/5396261/content","method":"PUT","targetSchema":"https://us3.api.mailchimp.com/schema/3.0/Definitions/Campaigns/Content/PUT.json"}]}
