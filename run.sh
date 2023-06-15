@@ -75,7 +75,8 @@ function build:backend() {
 	go version
 	set -x
 	echo "${DEPLOY_PRIME_URL:-http://local.dev}" >pkg/almanack/deploy-url.txt
-	GOBIN=$THIS_DIR/functions go install -ldflags="-s -w" ./funcs/...
+	GOBIN=$THIS_DIR/functions go install github.com/carlmjohnson/netlify-go-function-demo@latest
+	# GOBIN=$THIS_DIR/functions go install -ldflags="-s -w" ./funcs/...
 	# cp "$THIS_DIR/functions/almanack-api" "$THIS_DIR/functions/almanack-api-background"
 	set +x
 }
