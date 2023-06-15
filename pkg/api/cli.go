@@ -14,7 +14,6 @@ import (
 	sentryhttp "github.com/getsentry/sentry-go/http"
 	"golang.org/x/exp/slog"
 
-	"github.com/spotlightpa/almanack/internal/netlifyid"
 	"github.com/spotlightpa/almanack/pkg/almlog"
 )
 
@@ -64,7 +63,7 @@ func (app *appEnv) parseArgs(args []string) error {
 	if err := app.initSentry(*sentryDSN); err != nil {
 		return err
 	}
-	app.auth = netlifyid.NewService(app.isLambda)
+	// app.auth = netlifyid.NewService(app.isLambda)
 	// var err error
 	// if app.svc, err = getService(); err != nil {
 	// 	return err
@@ -75,7 +74,7 @@ func (app *appEnv) parseArgs(args []string) error {
 type appEnv struct {
 	port     string
 	isLambda bool
-	auth     netlifyid.AuthService
+	// auth     netlifyid.AuthService
 	// svc      almanack.Services
 }
 

@@ -21,7 +21,6 @@ import (
 	"github.com/go-chi/chi/v5"
 
 	"github.com/spotlightpa/almanack/internal/must"
-	"github.com/spotlightpa/almanack/internal/netlifyid"
 	"github.com/spotlightpa/almanack/internal/stringx"
 	"github.com/spotlightpa/almanack/layouts"
 	"github.com/spotlightpa/almanack/pkg/almlog"
@@ -61,9 +60,9 @@ func (app *appEnv) logErr(ctx context.Context, err error) {
 	l := almlog.FromContext(ctx)
 	if hub := sentry.GetHubFromContext(ctx); hub != nil {
 		hub.WithScope(func(scope *sentry.Scope) {
-			userinfo := netlifyid.FromContext(ctx)
-			scope.SetTag("username", stringx.First(userinfo.Username(), "anonymous"))
-			scope.SetTag("email", stringx.First(userinfo.Email(), "not set"))
+			// userinfo := netlifyid.FromContext(ctx)
+			// scope.SetTag("username", stringx.First(userinfo.Username(), "anonymous"))
+			// scope.SetTag("email", stringx.First(userinfo.Email(), "not set"))
 			hub.CaptureException(err)
 		})
 	} else {
