@@ -38,16 +38,17 @@ type DomainRole struct {
 }
 
 type File struct {
-	ID          int64     `json:"id"`
-	URL         string    `json:"url"`
-	Filename    string    `json:"filename"`
-	MimeType    string    `json:"mime_type"`
-	Description string    `json:"description"`
-	IsUploaded  bool      `json:"is_uploaded"`
-	CreatedAt   time.Time `json:"created_at"`
-	UpdatedAt   time.Time `json:"updated_at"`
-	MD5         []byte    `json:"md5"`
-	Bytes       int64     `json:"bytes"`
+	ID          int64              `json:"id"`
+	URL         string             `json:"url"`
+	Filename    string             `json:"filename"`
+	MimeType    string             `json:"mime_type"`
+	Description string             `json:"description"`
+	IsUploaded  bool               `json:"is_uploaded"`
+	CreatedAt   time.Time          `json:"created_at"`
+	UpdatedAt   time.Time          `json:"updated_at"`
+	MD5         []byte             `json:"md5"`
+	Bytes       int64              `json:"bytes"`
+	DeletedAt   pgtype.Timestamptz `json:"deleted_at"`
 }
 
 type GDocsDoc struct {
@@ -74,18 +75,19 @@ type GDocsImage struct {
 }
 
 type Image struct {
-	ID          int64     `json:"id"`
-	Path        string    `json:"path"`
-	Type        string    `json:"type"`
-	Description string    `json:"description"`
-	Credit      string    `json:"credit"`
-	SourceURL   string    `json:"src_url"`
-	IsUploaded  bool      `json:"is_uploaded"`
-	CreatedAt   time.Time `json:"created_at"`
-	UpdatedAt   time.Time `json:"updated_at"`
-	MD5         []byte    `json:"md5"`
-	Bytes       int64     `json:"bytes"`
-	Keywords    string    `json:"keywords"`
+	ID          int64              `json:"id"`
+	Path        string             `json:"path"`
+	Type        string             `json:"type"`
+	Description string             `json:"description"`
+	Credit      string             `json:"credit"`
+	SourceURL   string             `json:"src_url"`
+	IsUploaded  bool               `json:"is_uploaded"`
+	CreatedAt   time.Time          `json:"created_at"`
+	UpdatedAt   time.Time          `json:"updated_at"`
+	MD5         []byte             `json:"md5"`
+	Bytes       int64              `json:"bytes"`
+	Keywords    string             `json:"keywords"`
+	DeletedAt   pgtype.Timestamptz `json:"deleted_at"`
 }
 
 type ImageType struct {
