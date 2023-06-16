@@ -32,11 +32,12 @@ func (q *Queries) CreateFilePlaceholder(ctx context.Context, arg CreateFilePlace
 
 const listFiles = `-- name: ListFiles :many
 SELECT
-  id, url, filename, mime_type, description, is_uploaded, created_at, updated_at, md5, bytes
+  id, url, filename, mime_type, description, is_uploaded, created_at, updated_at, md5, bytes, deleted_at
 FROM
   file
 WHERE
   is_uploaded = TRUE
+  AND deleted_at IS NULL
 ORDER BY
   created_at DESC
 LIMIT $1 OFFSET $2
@@ -67,6 +68,7 @@ func (q *Queries) ListFiles(ctx context.Context, arg ListFilesParams) ([]File, e
 			&i.UpdatedAt,
 			&i.MD5,
 			&i.Bytes,
+			&i.DeletedAt,
 		); err != nil {
 			return nil, err
 		}
@@ -80,12 +82,13 @@ func (q *Queries) ListFiles(ctx context.Context, arg ListFilesParams) ([]File, e
 
 const listFilesWhereNoMD5 = `-- name: ListFilesWhereNoMD5 :many
 SELECT
-  id, url, filename, mime_type, description, is_uploaded, created_at, updated_at, md5, bytes
+  id, url, filename, mime_type, description, is_uploaded, created_at, updated_at, md5, bytes, deleted_at
 FROM
   file
 WHERE
   md5 = ''
   AND is_uploaded
+  AND deleted_at IS NULL
 ORDER BY
   created_at ASC
 LIMIT $1
@@ -111,6 +114,7 @@ func (q *Queries) ListFilesWhereNoMD5(ctx context.Context, limit int32) ([]File,
 			&i.UpdatedAt,
 			&i.MD5,
 			&i.Bytes,
+			&i.DeletedAt,
 		); err != nil {
 			return nil, err
 		}
@@ -135,7 +139,7 @@ SET
 WHERE
   url = $3
 RETURNING
-  id, url, filename, mime_type, description, is_uploaded, created_at, updated_at, md5, bytes
+  id, url, filename, mime_type, description, is_uploaded, created_at, updated_at, md5, bytes, deleted_at
 `
 
 type UpdateFileParams struct {
@@ -158,6 +162,7 @@ func (q *Queries) UpdateFile(ctx context.Context, arg UpdateFileParams) (File, e
 		&i.UpdatedAt,
 		&i.MD5,
 		&i.Bytes,
+		&i.DeletedAt,
 	)
 	return i, err
 }
@@ -171,7 +176,7 @@ SET
 WHERE
   id = $3
 RETURNING
-  id, url, filename, mime_type, description, is_uploaded, created_at, updated_at, md5, bytes
+  id, url, filename, mime_type, description, is_uploaded, created_at, updated_at, md5, bytes, deleted_at
 `
 
 type UpdateFileMD5SizeParams struct {
@@ -194,6 +199,7 @@ func (q *Queries) UpdateFileMD5Size(ctx context.Context, arg UpdateFileMD5SizePa
 		&i.UpdatedAt,
 		&i.MD5,
 		&i.Bytes,
+		&i.DeletedAt,
 	)
 	return i, err
 }

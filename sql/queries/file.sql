@@ -5,6 +5,7 @@ FROM
   file
 WHERE
   is_uploaded = TRUE
+  AND deleted_at IS NULL
 ORDER BY
   created_at DESC
 LIMIT $1 OFFSET $2;
@@ -38,6 +39,7 @@ FROM
 WHERE
   md5 = ''
   AND is_uploaded
+  AND deleted_at IS NULL
 ORDER BY
   created_at ASC
 LIMIT $1;

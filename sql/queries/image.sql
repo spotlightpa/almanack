@@ -5,6 +5,7 @@ FROM
   image
 WHERE
   is_uploaded = TRUE
+  AND deleted_at IS NULL
 ORDER BY
   updated_at DESC
 LIMIT $1 OFFSET $2;
@@ -18,6 +19,7 @@ FROM
 WHERE
   fts @@ tsq
   AND is_uploaded
+  AND deleted_at IS NULL
 ORDER BY
   ts_rank(fts, tsq) DESC,
   updated_at DESC
@@ -140,7 +142,8 @@ FROM
   image
 WHERE
   is_uploaded = FALSE
-  AND src_url <> '';
+  AND src_url <> ''
+  AND deleted_at IS NULL;
 
 -- name: GetImageTypeForExtension :one
 SELECT
@@ -166,6 +169,7 @@ FROM
 WHERE
   md5 = ''
   AND is_uploaded
+  AND deleted_at IS NULL
 ORDER BY
   created_at ASC
 LIMIT $1;
