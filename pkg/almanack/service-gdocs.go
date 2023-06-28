@@ -296,6 +296,10 @@ func (svc Services) replaceMetadata(
 		xhtml.InnerText(rows.Value("author")),
 		xhtml.InnerText(rows.Value("by")),
 	)
+	if strings.HasPrefix(metadata.Byline, "By ") ||
+		strings.HasPrefix(metadata.Byline, "by ") {
+		metadata.Byline = metadata.Byline[3:]
+	}
 	metadata.Budget = xhtml.InnerText(rows.Value("budget"))
 	metadata.Hed = stringx.First(
 		xhtml.InnerText(rows.Value("hed")),
