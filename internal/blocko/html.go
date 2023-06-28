@@ -28,7 +28,6 @@ var inlineElements = map[atom.Atom]bool{
 	atom.Bdi:     true,
 	atom.Bdo:     true,
 	atom.Big:     true,
-	atom.Br:      true,
 	atom.Cite:    true,
 	atom.Code:    true,
 	atom.Del:     true,
