@@ -82,13 +82,6 @@ func (svc Services) ProcessGDocsDoc(ctx context.Context, dbDoc db.GDocsDoc) (err
 	}
 
 	docHTML := gdocs.Convert(&dbDoc.Document)
-	docHTML, err = blocko.Minify(xhtml.ToBuffer(docHTML))
-	if err != nil {
-		return err
-	}
-	blocko.MergeSiblings(docHTML)
-	blocko.RemoveEmptyP(docHTML)
-
 	if n := xhtml.Find(docHTML, xhtml.WithAtom(atom.Data)); n != nil {
 		return fmt.Errorf(
 			"document unexpectedly contains <data> element: %q",
@@ -162,6 +155,13 @@ func (svc Services) ProcessGDocsDoc(ctx context.Context, dbDoc db.GDocsDoc) (err
 		xhtml.ReplaceWith(tbl, data)
 		n++
 	})
+
+	docHTML, err = blocko.Minify(xhtml.ToBuffer(docHTML))
+	if err != nil {
+		return err
+	}
+	blocko.MergeSiblings(docHTML)
+	blocko.RemoveEmptyP(docHTML)
 
 	// Warn about fake headings
 	xhtml.VisitAll(docHTML, func(n *html.Node) {

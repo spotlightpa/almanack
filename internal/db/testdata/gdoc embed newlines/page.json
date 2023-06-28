@@ -1,0 +1,31 @@
+{
+  "id": 123,
+  "file_path": "content/news/2020-03-15-gdoc embed newlines.md",
+  "frontmatter": {
+    "blurb": "Join Spotlight PA for a \"Clink and Think\" quiz bash on Sunday, Aug. 6, from 4:30-7:30 p.m.",
+    "byline": "Spotlight PA Staff",
+    "description": "Join Spotlight PA for a \"Clink and Think\" quiz bash on Sunday, Aug. 6, from 4:30-7:30 p.m.",
+    "image": "2023/06/01j9-kq9m-z11p-e2kj.png",
+    "image-caption": "",
+    "image-credit": "Spotlight PA",
+    "image-description": "Spotlight PA Quizbash Fundraiser",
+    "internal-id": "gdoc embed newlines",
+    "kicker": "Events",
+    "linktitle": "",
+    "og-title": "",
+    "published": "2020-03-15T20:00:00Z",
+    "slug": "pa-state-college-anniversary-event",
+    "title": "You’re invited! Spotlight PA State College hosts quiz bash and anniversary fundraiser",
+    "title-tag": "",
+    "twitter-title": ""
+  },
+  "body": "\u003ca href=\"https://www.spotlightpa.org/\"\u003e\u003cem\u003eSpotlight PA\u003c/em\u003e\u003c/a\u003e\u003cem\u003e is an independent, nonpartisan newsroom powered by The Philadelphia Inquirer in partnership with PennLive/The Patriot-News, TribLIVE/Pittsburgh Tribune-Review, and WITF Public Media. \u003c/em\u003e\u003ca href=\"https://www.spotlightpa.org/newsletters\"\u003e\u003cem\u003eSign up for our free newsletters\u003c/em\u003e\u003c/a\u003e\u003cem\u003e.\u003c/em\u003e\n\nJoin Spotlight PA for a \u0026#34;Clink and Think\u0026#34; quiz bash on Sunday, Aug. 6, from 4:30-7:30 p.m., upstairs at Axemann Brewery in Bellefonte, to celebrate the one-year anniversary of our State College bureau.\n\nTest your Pennsylvania knowledge with a quiz hosted by Penn State play-by-play announcer \u003cstrong\u003eSteve Jones\u003c/strong\u003e. Enjoy hearty food buffets by Marin Eats and Flo Bros., non-alcoholic beverages, and a cash bar. Trivia teams can have 2-6 players, with prizes for the top three teams. There will be plenty of breaks for mingling and enjoying the outdoor deck, so come to play or simply to cheer for your friends and support Spotlight PA!\n\nTickets are $35 per person. All proceeds will support Spotlight PA’s investigative and public-service journalism in State College and north-central Pennsylvania. Buy your ticket today and help us revitalize local news! Sponsorships also are available! Contact Michelle Mertz at \u003ca href=\"mailto:michelle@spotlightpa.org\"\u003emichelle@spotlightpa.org\u003c/a\u003e with questions.\n\nBuy your ticket now:\n\n\u003cnoscript\u003e\u003ca href=\"https://www.eventbrite.com/e/clink-and-think-quiz-bash-with-spotlight-pa-tickets-663145254307\" rel=\"noopener noreferrer\" target=\"_blank\"\u003eBuy Tickets on Eventbrite\u003c/a\u003e\u003c/noscript\u003e\n\u003c!-- You can customize this button any way you like --\u003e\n\u003cbutton id=\"eventbrite-widget-modal-trigger-663145254307\" type=\"button\"\u003eBuy Tickets\u003c/button\u003e\n\n\u003cscript src=\"https://www.eventbrite.com/static/widgets/eb_widgets.js\"\u003e\u003c/script\u003e\n\n\u003cscript type=\"text/javascript\"\u003e\n    var exampleCallback = function() {\n        console.log('Order complete!');\n    };\n\n    window.EBWidgets.createWidget({\n        widgetType: 'checkout',\n        eventId: '663145254307',\n        modal: true,\n        modalTriggerElementId: 'eventbrite-widget-modal-trigger-663145254307',\n        onOrderComplete: exampleCallback\n    });\n\u003c/script\u003e\n\n\u003cstrong\u003e\u003cem\u003eWHILE YOU’RE HERE…\u003c/em\u003e\u003c/strong\u003e\u003cem\u003e If you learned something from this story, pay it forward and become a member of \u003c/em\u003e\u003ca href=\"https://www.spotlightpa.org/\"\u003e\u003cem\u003eSpotlight PA\u003c/em\u003e\u003c/a\u003e\u003cem\u003e so someone else can in the future at \u003c/em\u003e\u003ca href=\"https://www.spotlightpa.org/donate/\"\u003e\u003cem\u003espotlightpa.org/donate\u003c/em\u003e\u003c/a\u003e\u003cem\u003e. Spotlight PA is funded by\u003c/em\u003e\u003ca href=\"https://www.spotlightpa.org/support\"\u003e\u003cem\u003e foundations and readers like you\u003c/em\u003e\u003c/a\u003e\u003cem\u003e who are committed to accountability journalism that gets results.\u003c/em\u003e\n",
+  "schedule_for": null,
+  "last_published": null,
+  "created_at": "2020-03-15T20:00:00Z",
+  "updated_at": "2020-03-15T20:00:00Z",
+  "url_path": null,
+  "source_type": "gdocs",
+  "source_id": "abc123_testdata-gdoc-embed-newlines",
+  "publication_date": "2020-03-15T16:00:00-04:00"
+}
