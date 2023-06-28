@@ -89,7 +89,10 @@ func (svc Services) ProcessGDocsDoc(ctx context.Context, dbDoc db.GDocsDoc) (err
 		)
 	}
 
-	// First collect the embeds array and metadata
+	// First remove everything after a ###
+	removeTail(docHTML)
+
+	// Now collect the embeds array and metadata
 	var (
 		metadata db.GDocsMetadata
 		embeds   = []db.Embed{} // must not be "null"
@@ -209,6 +212,25 @@ func (svc Services) ProcessGDocsDoc(ctx context.Context, dbDoc db.GDocsDoc) (err
 		WordCount:       int32(stringx.WordCount(xhtml.InnerText(richText))),
 	})
 	return err
+}
+
+func removeTail(n *html.Node) {
+	for c := n.FirstChild; c != nil; c = c.NextSibling {
+		if c.DataAtom == atom.Table {
+			continue
+		}
+
+		if text := xhtml.InnerText(c); text != "###" {
+			continue
+		}
+
+		remove := []*html.Node{c}
+		for sibling := c.NextSibling; sibling != nil; sibling = sibling.NextSibling {
+			remove = append(remove, sibling)
+		}
+		xhtml.RemoveAll(remove)
+		return
+	}
 }
 
 func (svc Services) replaceImageEmbed(
