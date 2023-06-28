@@ -46,6 +46,13 @@ func RemoveEmptyP(root *html.Node) {
 	}
 }
 
+func RemoveMarks(root *html.Node) {
+	marks := xhtml.FindAll(root, xhtml.WithAtom(atom.Mark))
+	for _, mark := range marks {
+		xhtml.UnnestChildren(mark)
+	}
+}
+
 var whitespaceReplacer = strings.NewReplacer(
 	"\r", " ",
 	"\n", " ",

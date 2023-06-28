@@ -162,6 +162,7 @@ func (svc Services) ProcessGDocsDoc(ctx context.Context, dbDoc db.GDocsDoc) (err
 	}
 	blocko.MergeSiblings(docHTML)
 	blocko.RemoveEmptyP(docHTML)
+	blocko.RemoveMarks(docHTML)
 
 	// Warn about fake headings
 	xhtml.VisitAll(docHTML, func(n *html.Node) {
