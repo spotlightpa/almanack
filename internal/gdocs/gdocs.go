@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"net/http"
 	"strings"
+	"unicode/utf8"
 
 	"github.com/carlmjohnson/bytemap"
 	"github.com/carlmjohnson/requests"
@@ -235,9 +236,17 @@ func convertEl(n *html.Node, el *docs.StructuralElement, listInfo map[string]str
 				inner = newinner
 			}
 		}
-		// Remove PUA characters
 		content := subel.TextRun.Content
+		// Remove PUA characters
 		content = strings.ReplaceAll(content, "\uE907", "")
+		// Turn vtabs into BRs
+		for i := strings.IndexAny(content, "\v\u2028\u2029"); i >= 0; i = strings.IndexAny(content, "\v\u2028\u2029") {
+			before, after := content[:i], content[i:]
+			xhtml.AppendText(inner, before)
+			inner.AppendChild(xhtml.New("br"))
+			_, charsize := utf8.DecodeRuneInString(after)
+			content = after[charsize:]
+		}
 		xhtml.AppendText(inner, content)
 	}
 }
