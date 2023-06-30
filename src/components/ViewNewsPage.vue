@@ -460,6 +460,15 @@ export default {
           >
             Refresh content from Google Docs
           </button>
+          <button
+            v-if="page.isGDoc"
+            class="block button is-warning is-small has-text-weight-semibold"
+            :class="{ 'is-loading': isLoadingThrottled }"
+            type="button"
+            @click.prevent="refreshFromSource({ metadata: true })"
+          >
+            Refresh content and metadata
+          </button>
         </div>
       </BulmaField>
 
