@@ -70,7 +70,7 @@ func TestProcessGDocsDoc(t *testing.T) {
 			testfile.EqualJSON(rt, path+"/metadata.json", dbDoc.Metadata)
 			testfile.EqualJSON(rt, path+"/warnings.json", dbDoc.Warnings)
 
-			art, err := svc.CreateSharedArticleForGDoc(ctx, &dbDoc)
+			art, err := svc.UpsertSharedArticleForGDoc(ctx, &dbDoc, false)
 			be.NilErr(t, err)
 			date := time.Date(2020, time.March, 15, 20, 00, 00, 00, time.UTC)
 			art.PublicationDate.Time = date

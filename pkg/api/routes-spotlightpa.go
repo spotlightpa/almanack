@@ -912,8 +912,9 @@ func (app *appEnv) postSharedArticleFromGDocs(w http.ResponseWriter, r *http.Req
 	app.logStart(r)
 	l := almlog.FromContext(r.Context())
 	var req struct {
-		ID          string `json:"external_gdocs_id"`
-		ForceUpdate bool   `json:"force_update"`
+		ID              string `json:"external_gdocs_id"`
+		ForceUpdate     bool   `json:"force_update"`
+		RefreshMetadata bool   `json:"refresh_metadata"`
 	}
 	if !app.readJSON(w, r, &req) {
 		return
@@ -952,7 +953,7 @@ func (app *appEnv) postSharedArticleFromGDocs(w http.ResponseWriter, r *http.Req
 		}
 	}
 
-	art, err := app.svc.CreateSharedArticleForGDoc(r.Context(), &dbDoc)
+	art, err := app.svc.UpsertSharedArticleForGDoc(r.Context(), &dbDoc, req.RefreshMetadata)
 	if err != nil {
 		app.replyErr(w, r, err)
 		return
