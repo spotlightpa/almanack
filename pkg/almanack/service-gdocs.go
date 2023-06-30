@@ -176,7 +176,7 @@ func (svc Services) ProcessGDocsDoc(ctx context.Context, dbDoc db.GDocsDoc) (err
 		if n.FirstChild != nil &&
 			n.FirstChild == n.LastChild &&
 			slices.Contains([]atom.Atom{
-				atom.B, atom.I, atom.Strong, atom.Em,
+				atom.B, atom.Strong,
 			}, n.FirstChild.DataAtom) {
 			text := xhtml.InnerText(n)
 			if len(text) > 17 {
