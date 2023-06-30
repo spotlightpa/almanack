@@ -127,7 +127,7 @@ function refreshArc() {
 
 const { apiStateRefs: gdocsState, exec: gdocsExec } = makeState();
 const { isLoadingThrottled: gdocsLoading, error: gdocsError } = gdocsState;
-async function refreshGDocs() {
+async function refreshGDocs({ refreshMetadata = false } = {}) {
   await gdocsExec(async () => {
     if (isDirty.value) {
       return;
@@ -139,6 +139,7 @@ async function refreshGDocs() {
     return await post(postSharedArticleFromGDocs, {
       external_gdocs_id: article.value.sourceID,
       force_update: true,
+      refresh_metadata: refreshMetadata,
     });
   });
   if (gdocsState.error.value) {
@@ -456,17 +457,26 @@ function setImageProps(image) {
             Refresh from Arc
           </button>
           <ErrorSimple :error="saveError || arcError" class="mt-1" />
-
-          <button
-            v-if="article.isGDoc"
-            class="button is-warning has-text-weight-semibold"
-            type="button"
-            :class="gdocsLoading && 'is-loading'"
-            :disabled="isDirty || null"
-            @click="refreshGDocs"
-          >
-            Refresh from Google Docs
-          </button>
+          <div v-if="article.isGDoc" class="buttons">
+            <button
+              class="button is-warning has-text-weight-semibold"
+              type="button"
+              :class="gdocsLoading && 'is-loading'"
+              :disabled="isDirty || null"
+              @click="refreshGDocs({ refreshMetadata: false })"
+            >
+              Refresh content from Google Docs
+            </button>
+            <button
+              class="button is-warning has-text-weight-semibold"
+              type="button"
+              :class="gdocsLoading && 'is-loading'"
+              :disabled="isDirty || null"
+              @click="refreshGDocs({ refreshMetadata: true })"
+            >
+              Refresh content and metadata
+            </button>
+          </div>
           <ErrorSimple :error="saveError || gdocsError" class="mt-1" />
 
           <GDocsDocWarnings class="mt-5" :article="article" />

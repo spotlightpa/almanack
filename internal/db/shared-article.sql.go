@@ -7,6 +7,7 @@ package db
 
 import (
 	"context"
+	"encoding/json"
 
 	"github.com/jackc/pgx/v5/pgtype"
 )
@@ -261,6 +262,81 @@ func (q *Queries) UpdateSharedArticle(ctx context.Context, arg UpdateSharedArtic
 		arg.LedeImageDescription,
 		arg.LedeImageCaption,
 		arg.ID,
+	)
+	var i SharedArticle
+	err := row.Scan(
+		&i.ID,
+		&i.Status,
+		&i.EmbargoUntil,
+		&i.Note,
+		&i.SourceType,
+		&i.SourceID,
+		&i.RawData,
+		&i.PageID,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+		&i.PublicationDate,
+		&i.InternalID,
+		&i.Byline,
+		&i.Budget,
+		&i.Hed,
+		&i.Description,
+		&i.LedeImage,
+		&i.LedeImageCredit,
+		&i.LedeImageDescription,
+		&i.LedeImageCaption,
+	)
+	return i, err
+}
+
+const updateSharedArticleFromGDocs = `-- name: UpdateSharedArticleFromGDocs :one
+UPDATE
+  shared_article
+SET
+  "raw_data" = $1,
+  "internal_id" = $2,
+  "byline" = $3,
+  "budget" = $4,
+  "hed" = $5,
+  "description" = $6,
+  "lede_image" = $7,
+  "lede_image_credit" = $8,
+  "lede_image_description" = $9,
+  "lede_image_caption" = $10
+WHERE
+  source_type = 'gdocs'
+  AND source_id = $11
+RETURNING
+  id, status, embargo_until, note, source_type, source_id, raw_data, page_id, created_at, updated_at, publication_date, internal_id, byline, budget, hed, description, lede_image, lede_image_credit, lede_image_description, lede_image_caption
+`
+
+type UpdateSharedArticleFromGDocsParams struct {
+	RawData              json.RawMessage `json:"raw_data"`
+	InternalID           string          `json:"internal_id"`
+	Byline               string          `json:"byline"`
+	Budget               string          `json:"budget"`
+	Hed                  string          `json:"hed"`
+	Description          string          `json:"description"`
+	LedeImage            string          `json:"lede_image"`
+	LedeImageCredit      string          `json:"lede_image_credit"`
+	LedeImageDescription string          `json:"lede_image_description"`
+	LedeImageCaption     string          `json:"lede_image_caption"`
+	ExternalID           string          `json:"external_id"`
+}
+
+func (q *Queries) UpdateSharedArticleFromGDocs(ctx context.Context, arg UpdateSharedArticleFromGDocsParams) (SharedArticle, error) {
+	row := q.db.QueryRow(ctx, updateSharedArticleFromGDocs,
+		arg.RawData,
+		arg.InternalID,
+		arg.Byline,
+		arg.Budget,
+		arg.Hed,
+		arg.Description,
+		arg.LedeImage,
+		arg.LedeImageCredit,
+		arg.LedeImageDescription,
+		arg.LedeImageCaption,
+		arg.ExternalID,
 	)
 	var i SharedArticle
 	err := row.Scan(

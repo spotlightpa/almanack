@@ -110,3 +110,23 @@ ON CONFLICT (source_type, source_id)
     raw_data = excluded.raw_data
   RETURNING
     *;
+
+-- name: UpdateSharedArticleFromGDocs :one
+UPDATE
+  shared_article
+SET
+  "raw_data" = @raw_data,
+  "internal_id" = @internal_id,
+  "byline" = @byline,
+  "budget" = @budget,
+  "hed" = @hed,
+  "description" = @description,
+  "lede_image" = @lede_image,
+  "lede_image_credit" = @lede_image_credit,
+  "lede_image_description" = @lede_image_description,
+  "lede_image_caption" = @lede_image_caption
+WHERE
+  source_type = 'gdocs'
+  AND source_id = @external_id
+RETURNING
+  *;
