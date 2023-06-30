@@ -11,8 +11,10 @@ import (
 	"github.com/spotlightpa/almanack/internal/db"
 	"github.com/spotlightpa/almanack/internal/gdocs"
 	"github.com/spotlightpa/almanack/internal/paginate"
+	"github.com/spotlightpa/almanack/internal/stringx"
 	"github.com/spotlightpa/almanack/pkg/almanack"
 	"github.com/spotlightpa/almanack/pkg/almlog"
+	"golang.org/x/exp/maps"
 	"golang.org/x/exp/slices"
 )
 
@@ -596,6 +598,38 @@ func (app *appEnv) postPageRefresh(w http.ResponseWriter, r *http.Request) {
 		if err != nil {
 			app.replyErr(w, r, err)
 			return
+		}
+		if req.RefreshMetadata {
+			if page.Frontmatter == nil {
+				page.Frontmatter = make(db.Map)
+			}
+			fm := map[string]any{
+				"byline":            dbDoc.Metadata.Byline, // TODO: Authors
+				"title":             dbDoc.Metadata.Hed,
+				"description":       dbDoc.Metadata.Description,
+				"image":             dbDoc.Metadata.LedeImage,
+				"image-credit":      dbDoc.Metadata.LedeImageCredit,
+				"image-description": dbDoc.Metadata.LedeImageDescription,
+				"image-caption":     dbDoc.Metadata.LedeImageCaption,
+				// Fields not exposed to Shared Admin
+				"kicker": dbDoc.Metadata.Eyebrow,
+				"blurb": stringx.First(
+					dbDoc.Metadata.Blurb,
+					dbDoc.Metadata.Description,
+				),
+				"linktitle":     dbDoc.Metadata.LinkTitle,
+				"title-tag":     dbDoc.Metadata.SEOTitle,
+				"og-title":      dbDoc.Metadata.OGTitle,
+				"twitter-title": dbDoc.Metadata.TwitterTitle,
+			}
+			// Remove blanks
+			maps.DeleteFunc(fm, func(key string, v any) bool {
+				if s, ok := v.(string); ok {
+					return s == ""
+				}
+				return false
+			})
+			maps.Copy(page.Frontmatter, fm)
 		}
 		page.Body = dbDoc.ArticleMarkdown
 		app.replyJSON(http.StatusOK, w, &page)
