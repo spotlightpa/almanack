@@ -54,6 +54,7 @@ function sql:sqlc() {
 		cd sql
 		sqlc generate
 		sqlc compile
+		sqlc vet
 	}
 }
 
