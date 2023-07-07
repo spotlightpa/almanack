@@ -7,7 +7,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/carlmjohnson/workgroup"
+	"github.com/carlmjohnson/flowmatic"
 	"github.com/go-chi/chi/v5"
 	"github.com/spotlightpa/almanack/internal/db"
 	"github.com/spotlightpa/almanack/internal/paginate"
@@ -38,7 +38,7 @@ func (app *appEnv) backgroundSleep(w http.ResponseWriter, r *http.Request) {
 func (app *appEnv) backgroundCron(w http.ResponseWriter, r *http.Request) {
 	app.logStart(r)
 
-	if err := workgroup.DoFuncs(workgroup.MaxProcs,
+	if err := flowmatic.Do(
 		func() error {
 			var errs []error
 			// Publish any scheduled pages before pushing new site config
@@ -147,7 +147,7 @@ func (app *appEnv) backgroundRefreshPages(w http.ResponseWriter, r *http.Request
 				app.replyErr(w, r, err)
 				return
 			}
-			err = workgroup.DoTasks(workgroup.MaxProcs, pageIDs, func(id int64) error {
+			err = flowmatic.Each(flowmatic.MaxProcs, pageIDs, func(id int64) error {
 				return app.svc.RefreshPageContents(r.Context(), id)
 			})
 			if err != nil {
@@ -165,7 +165,7 @@ func (app *appEnv) backgroundRefreshPages(w http.ResponseWriter, r *http.Request
 func (app *appEnv) backgroundImages(w http.ResponseWriter, r *http.Request) {
 	app.logStart(r)
 
-	err := workgroup.DoFuncs(workgroup.MaxProcs,
+	err := flowmatic.Do(
 		func() error {
 			return app.svc.UploadPendingImages(r.Context())
 		},
@@ -195,7 +195,7 @@ func updateMD5s[T any](
 		if len(items) == 0 {
 			return nil
 		}
-		if err = workgroup.DoTasks(5, items, func(item T) error {
+		if err = flowmatic.Each(5, items, func(item T) error {
 			hash, size, err := read(ctx, item)
 			if err != nil {
 				return err
