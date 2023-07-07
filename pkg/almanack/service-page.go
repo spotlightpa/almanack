@@ -8,8 +8,8 @@ import (
 	"net/http"
 
 	"github.com/carlmjohnson/errorx"
+	"github.com/carlmjohnson/flowmatic"
 	"github.com/carlmjohnson/resperr"
-	"github.com/carlmjohnson/workgroup"
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgtype"
 	"github.com/spotlightpa/almanack/internal/arc"
@@ -31,7 +31,7 @@ func (svc Services) PublishPage(ctx context.Context, q *db.Queries, page *db.Pag
 		return
 	}
 
-	err = workgroup.DoFuncs(workgroup.MaxProcs,
+	err = flowmatic.Do(
 		func() error {
 			internalID, _ := page.Frontmatter["internal-id"].(string)
 			title := stringx.First(internalID, page.FilePath)

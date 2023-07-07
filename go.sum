@@ -871,6 +871,8 @@ github.com/carlmjohnson/exitcode v0.20.2 h1:vE6rmkCGNA4kO4m1qwWIa77PKlUBVg46cNjs
 github.com/carlmjohnson/exitcode v0.20.2/go.mod h1:MZ6ThCDx517DQcrpYnnns1pLh8onjFl+B/AsrOrdmpc=
 github.com/carlmjohnson/flagx v0.22.2 h1:UXf7gL4Ffv5RIH/HKp8CGNzDyopgezFLrDO1m4F8jWc=
 github.com/carlmjohnson/flagx v0.22.2/go.mod h1:obobISvBnxgEXPLBITVXhRUOlSlzza1SGt34M64CPJc=
+github.com/carlmjohnson/flowmatic v0.23.2 h1:LL/lprhnpY0YI8ZkeLIPuTxD5RGg5OI3yOGEZytMJD0=
+github.com/carlmjohnson/flowmatic v0.23.2/go.mod h1:A4bYrUo5oG59wPEk/ewwdyV+UkQRFR1KiaFMBKuCVWg=
 github.com/carlmjohnson/gateway v1.22.2 h1:Nr7JVUSruWG3I6PGGxUTaIGLHSEhCcoppFX0zGxha80=
 github.com/carlmjohnson/gateway v1.22.2/go.mod h1:C2xSaIo4kkvdbTQQI5EhmzzWC1wB/+f5COhlpQ4O8fA=
 github.com/carlmjohnson/requests v0.23.4 h1:AxcvapfB9RPXLSyvAHk9YJoodQ43ZjzNHj6Ft3tQGdg=
@@ -881,8 +883,6 @@ github.com/carlmjohnson/slackhook v0.23.1 h1:EYqSZo8kYxnRrOgAW8I0laFRque0mrRgMdh
 github.com/carlmjohnson/slackhook v0.23.1/go.mod h1:mUvUC2ssD5E1lrAhlrE9clJo7pSRuhTmjpf/x0ymyVA=
 github.com/carlmjohnson/versioninfo v0.22.4 h1:AucUHDSKmk6j7Yx3dECGUxaowGHOAN0Zx5/EBtsXn4Y=
 github.com/carlmjohnson/versioninfo v0.22.4/go.mod h1:QT9mph3wcVfISUKd0i9sZfVrPviHuSF+cUtLjm2WSf8=
-github.com/carlmjohnson/workgroup v0.23.1 h1:mlWwtGDeaqPEXZhivbpQHtGnUqQKTA68CiJmxkPVG40=
-github.com/carlmjohnson/workgroup v0.23.1/go.mod h1:mAOZgF/WPlX7lbWl38MRns+Y0W6flCghmNV/CznLb9Y=
 github.com/casbin/casbin/v2 v2.37.0/go.mod h1:vByNa/Fchek0KZUgG5wEsl7iFsiviAYKRtgrQfcJqHg=
 github.com/cenkalti/backoff/v4 v4.1.1/go.mod h1:scbssz8iZGpm3xbr14ovlUdkxfGXNInqkPWOWmG2CLw=
 github.com/cenkalti/backoff/v4 v4.1.2/go.mod h1:scbssz8iZGpm3xbr14ovlUdkxfGXNInqkPWOWmG2CLw=

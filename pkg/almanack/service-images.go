@@ -11,9 +11,9 @@ import (
 
 	"github.com/carlmjohnson/crockford"
 	"github.com/carlmjohnson/errorx"
+	"github.com/carlmjohnson/flowmatic"
 	"github.com/carlmjohnson/requests"
 	"github.com/carlmjohnson/resperr"
-	"github.com/carlmjohnson/workgroup"
 	"github.com/gabriel-vasile/mimetype"
 	"github.com/spotlightpa/almanack/internal/db"
 	"github.com/spotlightpa/almanack/internal/google"
@@ -161,7 +161,7 @@ func (svc Services) UploadPendingImages(ctx context.Context) error {
 		return err
 	}
 
-	return workgroup.DoTasks(5, images,
+	return flowmatic.Each(5, images,
 		func(image db.Image) error {
 			return svc.uploadPendingImage(ctx, image.SourceURL, image.Path)
 		})
