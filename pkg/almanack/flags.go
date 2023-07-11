@@ -11,6 +11,7 @@ import (
 	"github.com/spotlightpa/almanack/internal/google"
 	"github.com/spotlightpa/almanack/internal/index"
 	"github.com/spotlightpa/almanack/internal/mailchimp"
+	"github.com/spotlightpa/almanack/internal/plausible"
 	"github.com/spotlightpa/almanack/internal/slack"
 )
 
@@ -30,6 +31,8 @@ func AddFlags(fl *flag.FlagSet) func() (svc Services, err error) {
 	gsvc.AddFlags(fl)
 	mailServiceAPIKey := fl.String("mc-api-key", "", "API `key` for MailChimp v2")
 	mailServiceListID := fl.String("mc-list-id", "", "List `ID` MailChimp v2 campaign")
+	var pl plausible.API
+	pl.AddFlags(fl)
 
 	return func() (svc Services, err error) {
 		if err = flagx.MustHave(fl, "postgres"); err != nil {
@@ -57,6 +60,7 @@ func AddFlags(fl *flag.FlagSet) func() (svc Services, err error) {
 			NewletterService:     getNewsletter(&client),
 			Gsvc:                 &gsvc,
 			EmailService:         mc,
+			Plausible:            pl,
 		}, nil
 	}
 }

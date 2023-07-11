@@ -25,6 +25,26 @@ import (
 	"golang.org/x/net/html/atom"
 )
 
+func (svc Services) ConfigureGoogleCert(ctx context.Context) (err error) {
+	defer errorx.Trace(&err)
+
+	if svc.Gsvc.HasCert() {
+		return nil
+	}
+
+	opt, err := svc.Queries.GetOption(ctx, "google-json")
+	switch {
+	case db.IsNotFound(err):
+		l := almlog.FromContext(ctx)
+		l.Warn("ConfigureGoogleCert: no certificate in database")
+		return nil
+	case err != nil:
+		return err
+	default:
+		return svc.Gsvc.ConfigureCert(opt)
+	}
+}
+
 func (svc Services) CreateGDocsDoc(ctx context.Context, externalID string) (dbDoc *db.GDocsDoc, err error) {
 	defer errorx.Trace(&err)
 

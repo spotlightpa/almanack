@@ -9,6 +9,7 @@ import (
 	"github.com/spotlightpa/almanack/internal/google"
 	"github.com/spotlightpa/almanack/internal/index"
 	"github.com/spotlightpa/almanack/internal/mailchimp"
+	"github.com/spotlightpa/almanack/internal/plausible"
 	"github.com/spotlightpa/almanack/internal/slack"
 )
 
@@ -28,4 +29,5 @@ type Services struct {
 	NewletterService mailchimp.V3
 	Gsvc             *google.Service
 	mailchimp.EmailService
+	Plausible plausible.API
 }
