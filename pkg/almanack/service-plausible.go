@@ -15,14 +15,7 @@ func (svc Services) UpdateMostPopular(ctx context.Context) (err error) {
 	l := almlog.FromContext(ctx)
 	l.InfoCtx(ctx, "Services.UpdateMostPopular")
 
-	if err = svc.ConfigureGoogleCert(ctx); err != nil {
-		return err
-	}
-	cl, err := svc.Gsvc.GAClient(ctx)
-	if err != nil {
-		return err
-	}
-	pages, err := svc.Gsvc.MostPopularNews(ctx, cl)
+	pages, err := svc.Plausible.MostPopularNews(ctx, svc.Client)
 	if err != nil {
 		return err
 	}
@@ -48,24 +41,4 @@ func (svc Services) UpdateMostPopular(ctx context.Context) (err error) {
 			data,
 		},
 	)
-}
-
-func (svc Services) ConfigureGoogleCert(ctx context.Context) (err error) {
-	defer errorx.Trace(&err)
-
-	if svc.Gsvc.HasCert() {
-		return nil
-	}
-
-	opt, err := svc.Queries.GetOption(ctx, "google-json")
-	switch {
-	case db.IsNotFound(err):
-		l := almlog.FromContext(ctx)
-		l.Warn("ConfigureGoogleCert: no certificate in database")
-		return nil
-	case err != nil:
-		return err
-	default:
-		return svc.Gsvc.ConfigureCert(opt)
-	}
 }
