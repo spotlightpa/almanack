@@ -1,0 +1,4 @@
+GET /api/v1/stats/breakdown?limit=20&period=day&property=event%3Apage&site_id= HTTP/1.1
+Host: plausible.io
+Authorization: Bearer
+

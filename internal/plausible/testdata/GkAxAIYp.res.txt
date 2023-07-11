@@ -1,0 +1,24 @@
+HTTP/2.0 200 OK
+Access-Control-Allow-Credentials: true
+Access-Control-Allow-Origin: *
+Application: 10.0.1.2
+Cache-Control: no-cache
+Cdn-Cache: MISS
+Cdn-Cachedat: 07/11/2023 17:20:53
+Cdn-Edgestorageid: 885
+Cdn-Proxyver: 1.03
+Cdn-Pullzone: 682664
+Cdn-Requestcountrycode: US
+Cdn-Requestid: 91452517055dafedc6cba820b224ea30
+Cdn-Requestpullcode: 200
+Cdn-Requestpullsuccess: True
+Cdn-Status: 200
+Cdn-Uid: 153cb5b1-399a-48ef-b5bf-098c03770254
+Content-Type: application/json; charset=utf-8
+Date: Tue, 11 Jul 2023 17:20:53 GMT
+Permissions-Policy: interest-cohort=()
+Server: BunnyCDN-NY1-885
+Vary: Accept-Encoding
+X-Request-Id: F3Df6WdZFb1LMpMTAMUE
+
+{"results":[{"page":"/embeds/newsletter/","visitors":158},{"page":"/embeds/donate/","visitors":115},{"page":"/news/2023/07/pennsylvania-state-related-university-lincoln-psu-pitt-temple-deadlock/","visitors":21},{"page":"/news/2023/07/pennsylvania-budget-governor-shapiro-education-conflict/","visitors":17},{"page":"/","visitors":16},{"page":"/news/2023/07/pa-probation-law-meek-mill-reform-alliance/","visitors":16},{"page":"/embeds/tips/","visitors":10},{"page":"/news/2023/07/pennsylvania-budget-josh-shapiro-education-school-vouchers-deal/","visitors":8},{"page":"/news/2022/09/pennsylvania-medical-marijuana-job-fired/","visitors":4},{"page":"/news/2023/06/pa-minimum-wage-raise-legislature/","visitors":4},{"page":"/embeds/cta/","visitors":3},{"page":"/news/2023/02/pa-medical-marijuana-card-rules-changes-legalization/","visitors":3},{"page":"/news/2023/04/pa-primary-election-2023-complete-guide-polling-place-mail-ballot/","visitors":3},{"page":"/news/2023/07/late-budget-pennsylvania-impasse-schools-shapiro/","visitors":3},{"page":"/news/2023/07/pennsylvania-budget-pass-house-senate-shapiro-education/","visitors":3},{"page":"/newsletters","visitors":3},{"page":"/authors/wyatt-massey/","visitors":2},{"page":"/embeds","visitors":2},{"page":"/news/2021/04/pa-us-house-seat-congressional-census-announcement-redistricting/","visitors":2},{"page":"/news/2023/02/pa-public-school-funding-lawsuit-state-budget-billions/","visitors":2}]}
