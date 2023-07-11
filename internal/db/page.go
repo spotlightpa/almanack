@@ -95,7 +95,7 @@ func (page *Page) SetURLPath() {
 		return
 	}
 	if u, _ := page.Frontmatter["url"].(string); u != "" {
-		page.URLPath.String = u
+		page.URLPath.String = strings.ToLower(u)
 		page.URLPath.Valid = true
 		return
 	}
@@ -117,7 +117,7 @@ func (page *Page) SetURLPath() {
 	if upath != "" && !strings.HasSuffix(upath, "/") {
 		upath += "/"
 	}
-	page.URLPath.String = upath
+	page.URLPath.String = strings.ToLower(upath)
 	page.URLPath.Valid = upath != ""
 }
 
