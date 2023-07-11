@@ -6,6 +6,7 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+	"strings"
 
 	"github.com/carlmjohnson/errorx"
 	"github.com/carlmjohnson/flowmatic"
@@ -248,10 +249,10 @@ func (svc Services) CreatePageFromGDocsDoc(ctx context.Context, shared *db.Share
 		"image-caption":     shared.LedeImageCaption,
 		// Fields not exposed to Shared Admin
 		"kicker": dbDoc.Metadata.Eyebrow,
-		"slug": stringx.First(
+		"slug": strings.ToLower(stringx.First(
 			dbDoc.Metadata.URLSlug,
 			stringx.SlugifyURL(shared.Hed),
-		),
+		)),
 		"blurb": stringx.First(
 			dbDoc.Metadata.Blurb,
 			shared.Description,

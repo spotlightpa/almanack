@@ -378,6 +378,7 @@ func (svc Services) replaceMetadata(
 	)
 	metadata.URLSlug = strings.TrimRight(metadata.URLSlug, "/")
 	_, metadata.URLSlug, _ = stringx.LastCut(metadata.URLSlug, "/")
+	metadata.URLSlug = stringx.SlugifyURL(metadata.URLSlug)
 
 	metadata.Blurb = stringx.First(
 		xhtml.InnerText(rows.Value("blurb")),
