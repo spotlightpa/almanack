@@ -240,7 +240,8 @@ func (svc Services) CreatePageFromGDocsDoc(ctx context.Context, shared *db.Share
 	fm := map[string]any{
 		"internal-id":       shared.InternalID,
 		"published":         shared.PublicationDate.Time,
-		"byline":            shared.Byline, // TODO: Authors
+		"byline":            shared.Byline,
+		"authors":           stringx.ExtractNames(shared.Byline),
 		"title":             shared.Hed,
 		"description":       shared.Description,
 		"image":             shared.LedeImage,

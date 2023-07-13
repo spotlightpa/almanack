@@ -106,3 +106,29 @@ func RemoveAllWhitespace(s string) string {
 		return r
 	}, s)
 }
+
+var (
+	staffRe        = mustBeLazy(`(?i)\bstaff\b`)
+	extractSplitRe = mustBeLazy(`(?i),|\band\b`)
+	outletRe       = mustBeLazy(`(?i)\b(of|for)\b.*$`)
+)
+
+func ExtractNames(s string) []string {
+	nameParts := extractSplitRe().Split(s, -1)
+
+	var names []string
+	for _, part := range nameParts {
+		part = strings.TrimSpace(part)
+		if part == "" || staffRe().MatchString(part) {
+			continue
+		}
+		part = outletRe().ReplaceAllString(part, "")
+		part = strings.TrimSpace(part)
+		if part == "" {
+			continue
+		}
+		names = append(names, part)
+	}
+
+	return names
+}

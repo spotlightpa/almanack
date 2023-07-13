@@ -1,0 +1,1504 @@
+[
+  {
+    "Input": "Adam Smeltz for Spotlight PA State College",
+    "Want": [
+      "Adam Smeltz"
+    ]
+  },
+  {
+    "Input": "Andy Wallace of The Philadelphia Inquirer and Angela Couloumbis of Spotlight PA",
+    "Want": [
+      "Andy Wallace",
+      "Angela Couloumbis"
+    ]
+  },
+  {
+    "Input": "Aneri Pattani of KHN and Ed Mahon of Spotlight PA",
+    "Want": [
+      "Aneri Pattani",
+      "Ed Mahon"
+    ]
+  },
+  {
+    "Input": "Aneri Pattani of Spotlight PA and Ed Mahon of Spotlight PA",
+    "Want": [
+      "Aneri Pattani",
+      "Ed Mahon"
+    ]
+  },
+  {
+    "Input": "Aneri Pattani of Spotlight PA and Rebecca Moss of Spotlight PA",
+    "Want": [
+      "Aneri Pattani",
+      "Rebecca Moss"
+    ]
+  },
+  {
+    "Input": "Aneri Pattani of Spotlight PA and Sara Simon of Spotlight PA",
+    "Want": [
+      "Aneri Pattani",
+      "Sara Simon"
+    ]
+  },
+  {
+    "Input": "Aneri Pattani of Spotlight PA and Sarah Gantz of The Philadelphia Inquirer",
+    "Want": [
+      "Aneri Pattani",
+      "Sarah Gantz"
+    ]
+  },
+  {
+    "Input": "Aneri Pattani of Spotlight PA",
+    "Want": [
+      "Aneri Pattani"
+    ]
+  },
+  {
+    "Input": "Angela Couloumbis and Danielle Ohl of Spotlight PA",
+    "Want": [
+      "Angela Couloumbis",
+      "Danielle Ohl"
+    ]
+  },
+  {
+    "Input": "Angela Couloumbis and Jamie Martines of Spotlight PA",
+    "Want": [
+      "Angela Couloumbis",
+      "Jamie Martines"
+    ]
+  },
+  {
+    "Input": "Angela Couloumbis and Rebecca Moss of Spotlight PA",
+    "Want": [
+      "Angela Couloumbis",
+      "Rebecca Moss"
+    ]
+  },
+  {
+    "Input": "Angela Couloumbis of Spotlight PA and Alyssa Biederman of The Inquirer",
+    "Want": [
+      "Angela Couloumbis",
+      "Alyssa Biederman"
+    ]
+  },
+  {
+    "Input": "Angela Couloumbis of Spotlight PA and Andrew Seidman of The Philadelphia Inquirer",
+    "Want": [
+      "Angela Couloumbis",
+      "Andrew Seidman"
+    ]
+  },
+  {
+    "Input": "Angela Couloumbis of Spotlight PA and Brad Bumsted and Paula Knudsen of The Caucus",
+    "Want": [
+      "Angela Couloumbis",
+      "Brad Bumsted",
+      "Paula Knudsen"
+    ]
+  },
+  {
+    "Input": "Angela Couloumbis of Spotlight PA and Brad Bumsted and Sam Janesch of The Caucus",
+    "Want": [
+      "Angela Couloumbis",
+      "Brad Bumsted",
+      "Sam Janesch"
+    ]
+  },
+  {
+    "Input": "Angela Couloumbis of Spotlight PA and Brad Bumsted of The Caucus",
+    "Want": [
+      "Angela Couloumbis",
+      "Brad Bumsted"
+    ]
+  },
+  {
+    "Input": "Angela Couloumbis of Spotlight PA and Brad Bumsted, Sam Janesch, and Mike Wereschagin of The Caucus",
+    "Want": [
+      "Angela Couloumbis",
+      "Brad Bumsted",
+      "Sam Janesch",
+      "Mike Wereschagin"
+    ]
+  },
+  {
+    "Input": "Angela Couloumbis of Spotlight PA and Charlotte Keith of Spotlight PA",
+    "Want": [
+      "Angela Couloumbis",
+      "Charlotte Keith"
+    ]
+  },
+  {
+    "Input": "Angela Couloumbis of Spotlight PA and Craig R. McCoy and Joseph N. DiStefano of The Philadelphia Inquirer ",
+    "Want": [
+      "Angela Couloumbis",
+      "Craig R. McCoy",
+      "Joseph N. DiStefano"
+    ]
+  },
+  {
+    "Input": "Angela Couloumbis of Spotlight PA and Craig R. McCoy and Joseph N. DiStefano of The Philadelphia Inquirer",
+    "Want": [
+      "Angela Couloumbis",
+      "Craig R. McCoy",
+      "Joseph N. DiStefano"
+    ]
+  },
+  {
+    "Input": "Angela Couloumbis of Spotlight PA and Craig R. McCoy of The Inquirer",
+    "Want": [
+      "Angela Couloumbis",
+      "Craig R. McCoy"
+    ]
+  },
+  {
+    "Input": "Angela Couloumbis of Spotlight PA and Cynthia Fernandez of Spotlight PA",
+    "Want": [
+      "Angela Couloumbis",
+      "Cynthia Fernandez"
+    ]
+  },
+  {
+    "Input": "Angela Couloumbis of Spotlight PA and Daniel Simmons-Ritchie of Spotlight PA",
+    "Want": [
+      "Angela Couloumbis",
+      "Daniel Simmons-Ritchie"
+    ]
+  },
+  {
+    "Input": "Angela Couloumbis of Spotlight PA and Danielle Ohl of Spotlight PA",
+    "Want": [
+      "Angela Couloumbis",
+      "Danielle Ohl"
+    ]
+  },
+  {
+    "Input": "Angela Couloumbis of Spotlight PA and Ed Mahon of PA Post",
+    "Want": [
+      "Angela Couloumbis",
+      "Ed Mahon"
+    ]
+  },
+  {
+    "Input": "Angela Couloumbis of Spotlight PA and Jamie Martines of Spotlight PA",
+    "Want": [
+      "Angela Couloumbis",
+      "Jamie Martines"
+    ]
+  },
+  {
+    "Input": "Angela Couloumbis of Spotlight PA and Jeremy Roebuck and Maddie Hanna of The Philadelphia Inquirer",
+    "Want": [
+      "Angela Couloumbis",
+      "Jeremy Roebuck",
+      "Maddie Hanna"
+    ]
+  },
+  {
+    "Input": "Angela Couloumbis of Spotlight PA and Jeremy Roebuck of the Philadelphia Inquirer",
+    "Want": [
+      "Angela Couloumbis",
+      "Jeremy Roebuck"
+    ]
+  },
+  {
+    "Input": "Angela Couloumbis of Spotlight PA and Jonathan Lai of The Philadelphia Inquirer",
+    "Want": [
+      "Angela Couloumbis",
+      "Jonathan Lai"
+    ]
+  },
+  {
+    "Input": "Angela Couloumbis of Spotlight PA and Joseph N. DiStefano and Craig R. McCoy of The Inquirer",
+    "Want": [
+      "Angela Couloumbis",
+      "Joseph N. DiStefano",
+      "Craig R. McCoy"
+    ]
+  },
+  {
+    "Input": "Angela Couloumbis of Spotlight PA and Joseph N. DiStefano and Craig R. McCoy of The Philadelphia Inquirer",
+    "Want": [
+      "Angela Couloumbis",
+      "Joseph N. DiStefano",
+      "Craig R. McCoy"
+    ]
+  },
+  {
+    "Input": "Angela Couloumbis of Spotlight PA and Joseph N. DiStefano of The Inquirer",
+    "Want": [
+      "Angela Couloumbis",
+      "Joseph N. DiStefano"
+    ]
+  },
+  {
+    "Input": "Angela Couloumbis of Spotlight PA and Julia Terruso of The Philadelphia Inquirer",
+    "Want": [
+      "Angela Couloumbis",
+      "Julia Terruso"
+    ]
+  },
+  {
+    "Input": "Angela Couloumbis of Spotlight PA and Justine McDaniel of The Philadelphia Inquirer",
+    "Want": [
+      "Angela Couloumbis",
+      "Justine McDaniel"
+    ]
+  },
+  {
+    "Input": "Angela Couloumbis of Spotlight PA and Kate Huangpu of Spotlight PA",
+    "Want": [
+      "Angela Couloumbis",
+      "Kate Huangpu"
+    ]
+  },
+  {
+    "Input": "Angela Couloumbis of Spotlight PA and Katie Meyer of Spotlight PA",
+    "Want": [
+      "Angela Couloumbis",
+      "Katie Meyer"
+    ]
+  },
+  {
+    "Input": "Angela Couloumbis of Spotlight PA and Laura McCrystal and Claudia Vargas of the Philadelphia Inquirer",
+    "Want": [
+      "Angela Couloumbis",
+      "Laura McCrystal",
+      "Claudia Vargas"
+    ]
+  },
+  {
+    "Input": "Angela Couloumbis of Spotlight PA and Marie Albiges for Spotlight PA",
+    "Want": [
+      "Angela Couloumbis",
+      "Marie Albiges"
+    ]
+  },
+  {
+    "Input": "Angela Couloumbis of Spotlight PA and Mike Wereschagin, Brad Bumsted, and Sam Janesch Of The Caucus",
+    "Want": [
+      "Angela Couloumbis",
+      "Mike Wereschagin",
+      "Brad Bumsted",
+      "Sam Janesch"
+    ]
+  },
+  {
+    "Input": "Angela Couloumbis of Spotlight PA and Mike Wereschagin, Brad Bumsted, and Sam Janesch of The Caucus",
+    "Want": [
+      "Angela Couloumbis",
+      "Mike Wereschagin",
+      "Brad Bumsted",
+      "Sam Janesch"
+    ]
+  },
+  {
+    "Input": "Angela Couloumbis of Spotlight PA and Mike Wereschagin, Brad Bumsted, Paula Knudsen, Sam Janesch and Alyssa Biederman of The Caucus",
+    "Want": [
+      "Angela Couloumbis",
+      "Mike Wereschagin",
+      "Brad Bumsted",
+      "Paula Knudsen",
+      "Sam Janesch",
+      "Alyssa Biederman"
+    ]
+  },
+  {
+    "Input": "Angela Couloumbis of Spotlight PA and Min Xian of Spotlight PA State College",
+    "Want": [
+      "Angela Couloumbis",
+      "Min Xian"
+    ]
+  },
+  {
+    "Input": "Angela Couloumbis of Spotlight PA and Sam Janesch of The Caucus",
+    "Want": [
+      "Angela Couloumbis",
+      "Sam Janesch"
+    ]
+  },
+  {
+    "Input": "Angela Couloumbis of Spotlight PA and Sam Janesch, Mike Wereschagin, and Brad Bumsted of The Caucus",
+    "Want": [
+      "Angela Couloumbis",
+      "Sam Janesch",
+      "Mike Wereschagin",
+      "Brad Bumsted"
+    ]
+  },
+  {
+    "Input": "Angela Couloumbis of Spotlight PA and Stephen Caruso of Spotlight PA",
+    "Want": [
+      "Angela Couloumbis",
+      "Stephen Caruso"
+    ]
+  },
+  {
+    "Input": "Angela Couloumbis of Spotlight PA and Vinny Vella of The Philadelphia Inquirer",
+    "Want": [
+      "Angela Couloumbis",
+      "Vinny Vella"
+    ]
+  },
+  {
+    "Input": "Angela Couloumbis of Spotlight PA and Wendy Ruderman and Dylan Purcell of the Philadelphia Inquirer",
+    "Want": [
+      "Angela Couloumbis",
+      "Wendy Ruderman",
+      "Dylan Purcell"
+    ]
+  },
+  {
+    "Input": "Angela Couloumbis of Spotlight PA",
+    "Want": [
+      "Angela Couloumbis"
+    ]
+  },
+  {
+    "Input": "Angela Couloumbis of Spotlight PA, and Brad Bumsted, Sam Janesch and Mike Wereschagin of The Caucus",
+    "Want": [
+      "Angela Couloumbis",
+      "Brad Bumsted",
+      "Sam Janesch",
+      "Mike Wereschagin"
+    ]
+  },
+  {
+    "Input": "Angela Couloumbis of Spotlight PA, and Craig R. McCoy and Joseph N. DiStefano of The Philadelphia Inquirer",
+    "Want": [
+      "Angela Couloumbis",
+      "Craig R. McCoy",
+      "Joseph N. DiStefano"
+    ]
+  },
+  {
+    "Input": "Angela Couloumbis of Spotlight PA, and Joseph N. DiStefano and Craig R. McCoy of The Philadelphia Inquirer",
+    "Want": [
+      "Angela Couloumbis",
+      "Joseph N. DiStefano",
+      "Craig R. McCoy"
+    ]
+  },
+  {
+    "Input": "Angela Couloumbis of Spotlight PA, Ethan Edward Coston of Spotlight PA and Kate Huangpu of Spotlight PA",
+    "Want": [
+      "Angela Couloumbis",
+      "Ethan Edward Coston",
+      "Kate Huangpu"
+    ]
+  },
+  {
+    "Input": "Angela Couloumbis of Spotlight PA, Jeremy Roebuck of The Philadelphia Inquirer and Sarah Anne Hughes of Spotlight PA",
+    "Want": [
+      "Angela Couloumbis",
+      "Jeremy Roebuck",
+      "Sarah Anne Hughes"
+    ]
+  },
+  {
+    "Input": "Angela Couloumbis of Spotlight PA, Joseph N. DiStefano of The Philadelphia Inquirer and Craig R. McCoy of The Philadelphia Inquirer",
+    "Want": [
+      "Angela Couloumbis",
+      "Joseph N. DiStefano",
+      "Craig R. McCoy"
+    ]
+  },
+  {
+    "Input": "Angela Couloumbis of Spotlight PA, Joseph N. DiStefano of The Philadelphia Inquirer, and Craig R. McCoy of The Philadelphia Inquirer",
+    "Want": [
+      "Angela Couloumbis",
+      "Joseph N. DiStefano",
+      "Craig R. McCoy"
+    ]
+  },
+  {
+    "Input": "Anna Orso of the Philadelphia Inquirer and Cynthia Fernandez of Spotlight PA",
+    "Want": [
+      "Anna Orso",
+      "Cynthia Fernandez"
+    ]
+  },
+  {
+    "Input": "Ashad Hajela and Min Xian of Spotlight PA State College",
+    "Want": [
+      "Ashad Hajela",
+      "Min Xian"
+    ]
+  },
+  {
+    "Input": "Ashad Hajela of Spotlight PA State College",
+    "Want": [
+      "Ashad Hajela"
+    ]
+  },
+  {
+    "Input": "Bob Fernandez of The Inquirer and Charlotte Keith of Spotlight PA",
+    "Want": [
+      "Bob Fernandez",
+      "Charlotte Keith"
+    ]
+  },
+  {
+    "Input": "Bob Fernandez of The Philadelphia Inquirer and Charlotte Keith of Spotlight PA",
+    "Want": [
+      "Bob Fernandez",
+      "Charlotte Keith"
+    ]
+  },
+  {
+    "Input": "Brad Bumsted and Sam Janesch of The Caucus and Angela Couloumbis of Spotlight PA",
+    "Want": [
+      "Brad Bumsted",
+      "Sam Janesch",
+      "Angela Couloumbis"
+    ]
+  },
+  {
+    "Input": "Brad Bumsted and Sam Janesch of The Caucus",
+    "Want": [
+      "Brad Bumsted",
+      "Sam Janesch"
+    ]
+  },
+  {
+    "Input": "Brad Bumsted of The Caucus and Angela Couloumbis of Spotlight PA",
+    "Want": [
+      "Brad Bumsted",
+      "Angela Couloumbis"
+    ]
+  },
+  {
+    "Input": "Brett Sholtis of WITF",
+    "Want": [
+      "Brett Sholtis"
+    ]
+  },
+  {
+    "Input": "Carter Walker for Votebeat",
+    "Want": [
+      "Carter Walker"
+    ]
+  },
+  {
+    "Input": "Carter Walker of Votebeat and Laura Benshoff for Votebeat",
+    "Want": [
+      "Carter Walker",
+      "Laura Benshoff"
+    ]
+  },
+  {
+    "Input": "Carter Walker of Votebeat",
+    "Want": [
+      "Carter Walker"
+    ]
+  },
+  {
+    "Input": "Charlotte Keith of Spotlight PA and Angela Couloumbis of Spotlight PA",
+    "Want": [
+      "Charlotte Keith",
+      "Angela Couloumbis"
+    ]
+  },
+  {
+    "Input": "Charlotte Keith of Spotlight PA and Bob Fernandez of The Philadelphia Inquirer",
+    "Want": [
+      "Charlotte Keith",
+      "Bob Fernandez"
+    ]
+  },
+  {
+    "Input": "Charlotte Keith of Spotlight PA and Cynthia Fernandez of Spotlight PA",
+    "Want": [
+      "Charlotte Keith",
+      "Cynthia Fernandez"
+    ]
+  },
+  {
+    "Input": "Charlotte Keith of Spotlight PA and Michaelle Bond of The Philadelphia Inquirer",
+    "Want": [
+      "Charlotte Keith",
+      "Michaelle Bond"
+    ]
+  },
+  {
+    "Input": "Charlotte Keith of Spotlight PA",
+    "Want": [
+      "Charlotte Keith"
+    ]
+  },
+  {
+    "Input": "Charlotte Keith of Spotlight PA, Bob Fernandez of The Philadelphia Inquirer, Beena Raghavendran of ProPublica, and Zipporah Osei of ProPublica",
+    "Want": [
+      "Charlotte Keith",
+      "Bob Fernandez",
+      "Beena Raghavendran",
+      "Zipporah Osei"
+    ]
+  },
+  {
+    "Input": "Christina Baker for Spotlight PA",
+    "Want": [
+      "Christina Baker"
+    ]
+  },
+  {
+    "Input": "Christopher Baxter of Spotlight PA and Sarah Anne Hughes of Spotlight PA",
+    "Want": [
+      "Christopher Baxter",
+      "Sarah Anne Hughes"
+    ]
+  },
+  {
+    "Input": "Christopher Baxter of Spotlight PA",
+    "Want": [
+      "Christopher Baxter"
+    ]
+  },
+  {
+    "Input": "Christopher Baxter",
+    "Want": [
+      "Christopher Baxter"
+    ]
+  },
+  {
+    "Input": "Colin Deppen of Spotlight PA and Juliette Rihl of PublicSource",
+    "Want": [
+      "Colin Deppen",
+      "Juliette Rihl"
+    ]
+  },
+  {
+    "Input": "Colin Deppen of Spotlight PA",
+    "Want": [
+      "Colin Deppen"
+    ]
+  },
+  {
+    "Input": "Cynthia Fernandez of Spotlight PA and Angela Couloumbis of Spotlight PA",
+    "Want": [
+      "Cynthia Fernandez",
+      "Angela Couloumbis"
+    ]
+  },
+  {
+    "Input": "Cynthia Fernandez of Spotlight PA and Gillian McGoldrick of LNP | LancasterOnline",
+    "Want": [
+      "Cynthia Fernandez",
+      "Gillian McGoldrick"
+    ]
+  },
+  {
+    "Input": "Cynthia Fernandez of Spotlight PA and Jamie Martines of Spotlight PA",
+    "Want": [
+      "Cynthia Fernandez",
+      "Jamie Martines"
+    ]
+  },
+  {
+    "Input": "Cynthia Fernandez of Spotlight PA and Jonathan Lai of The Philadelphia Inquirer",
+    "Want": [
+      "Cynthia Fernandez",
+      "Jonathan Lai"
+    ]
+  },
+  {
+    "Input": "Cynthia Fernandez of Spotlight PA and Jordan Wolman for Spotlight PA",
+    "Want": [
+      "Cynthia Fernandez",
+      "Jordan Wolman"
+    ]
+  },
+  {
+    "Input": "Cynthia Fernandez of Spotlight PA and Julia Shanahan for Spotlight PA",
+    "Want": [
+      "Cynthia Fernandez",
+      "Julia Shanahan"
+    ]
+  },
+  {
+    "Input": "Cynthia Fernandez of Spotlight PA and Maddie Hanna of The Philadelphia Inquirer ",
+    "Want": [
+      "Cynthia Fernandez",
+      "Maddie Hanna"
+    ]
+  },
+  {
+    "Input": "Cynthia Fernandez of Spotlight PA and Marie Albiges for Spotlight PA",
+    "Want": [
+      "Cynthia Fernandez",
+      "Marie Albiges"
+    ]
+  },
+  {
+    "Input": "Cynthia Fernandez of Spotlight PA and Matt McKinney of Spotlight PA",
+    "Want": [
+      "Cynthia Fernandez",
+      "Matt McKinney"
+    ]
+  },
+  {
+    "Input": "Cynthia Fernandez of Spotlight PA",
+    "Want": [
+      "Cynthia Fernandez"
+    ]
+  },
+  {
+    "Input": "Cynthia Fernandez of Spotlight PA, and Jan Murphy and Charles Thompson of PennLive | The Patriot-News",
+    "Want": [
+      "Cynthia Fernandez",
+      "Jan Murphy",
+      "Charles Thompson"
+    ]
+  },
+  {
+    "Input": "Cynthia Fernandez of Spotlight PA, Anna Orso of the Philadelphia Inquirer, and Christine Vestal of Stateline",
+    "Want": [
+      "Cynthia Fernandez",
+      "Anna Orso",
+      "Christine Vestal"
+    ]
+  },
+  {
+    "Input": "Dan Simmons-Ritchie and Rebecca Moss of Spotlight PA",
+    "Want": [
+      "Dan Simmons-Ritchie",
+      "Rebecca Moss"
+    ]
+  },
+  {
+    "Input": "Daniel Simmons-Ritchie of Spotlight PA and Christine Vendel of PennLive",
+    "Want": [
+      "Daniel Simmons-Ritchie",
+      "Christine Vendel"
+    ]
+  },
+  {
+    "Input": "Daniel Simmons-Ritchie of Spotlight PA",
+    "Want": [
+      "Daniel Simmons-Ritchie"
+    ]
+  },
+  {
+    "Input": "Danielle Ohl of Spotlight PA and Andrew Seidman of The Philadelphia Inquirer",
+    "Want": [
+      "Danielle Ohl",
+      "Andrew Seidman"
+    ]
+  },
+  {
+    "Input": "Danielle Ohl of Spotlight PA and Angela Couloumbis of Spotlight PA",
+    "Want": [
+      "Danielle Ohl",
+      "Angela Couloumbis"
+    ]
+  },
+  {
+    "Input": "Danielle Ohl of Spotlight PA and Brittany Hailer of the Pittsburgh Institute for Nonprofit Journalism",
+    "Want": [
+      "Danielle Ohl",
+      "Brittany Hailer"
+    ]
+  },
+  {
+    "Input": "Danielle Ohl of Spotlight PA and Brittany Hailer of The Pittsburgh Institute for Nonprofit Journalism",
+    "Want": [
+      "Danielle Ohl",
+      "Brittany Hailer"
+    ]
+  },
+  {
+    "Input": "Danielle Ohl of Spotlight PA and Kate Huangpu of Spotlight PA",
+    "Want": [
+      "Danielle Ohl",
+      "Kate Huangpu"
+    ]
+  },
+  {
+    "Input": "Danielle Ohl of Spotlight PA",
+    "Want": [
+      "Danielle Ohl"
+    ]
+  },
+  {
+    "Input": "Denise Clay-Murray of Votebeat",
+    "Want": [
+      "Denise Clay-Murray"
+    ]
+  },
+  {
+    "Input": "Ed Mahon of Spotlight PA and Andrew Seidman of The Philadelphia Inquirer",
+    "Want": [
+      "Ed Mahon",
+      "Andrew Seidman"
+    ]
+  },
+  {
+    "Input": "Ed Mahon of Spotlight PA and Cynthia Fernandez of Spotlight PA",
+    "Want": [
+      "Ed Mahon",
+      "Cynthia Fernandez"
+    ]
+  },
+  {
+    "Input": "Ed Mahon of Spotlight PA and Ese Olumhense of Spotlight PA",
+    "Want": [
+      "Ed Mahon",
+      "Ese Olumhense"
+    ]
+  },
+  {
+    "Input": "Ed Mahon of Spotlight PA and Kate Giammarise of WESA",
+    "Want": [
+      "Ed Mahon",
+      "Kate Giammarise"
+    ]
+  },
+  {
+    "Input": "Ed Mahon of Spotlight PA",
+    "Want": [
+      "Ed Mahon"
+    ]
+  },
+  {
+    "Input": "Emma Dooling and Danielle Ohl of Spotlight PA",
+    "Want": [
+      "Emma Dooling",
+      "Danielle Ohl"
+    ]
+  },
+  {
+    "Input": "Emma Dooling of Spotlight PA",
+    "Want": [
+      "Emma Dooling"
+    ]
+  },
+  {
+    "Input": "Ese Olumhense of Spotlight PA and Jamie Martines of Spotlight PA",
+    "Want": [
+      "Ese Olumhense",
+      "Jamie Martines"
+    ]
+  },
+  {
+    "Input": "Ese Olumhense of Spotlight PA",
+    "Want": [
+      "Ese Olumhense"
+    ]
+  },
+  {
+    "Input": "Ethan Edward Coston of Spotlight PA and Kate Huangpu of Spotlight PA",
+    "Want": [
+      "Ethan Edward Coston",
+      "Kate Huangpu"
+    ]
+  },
+  {
+    "Input": "Ethan Edward Coston of Spotlight PA and Matt Vasilogambros of Stateline",
+    "Want": [
+      "Ethan Edward Coston",
+      "Matt Vasilogambros"
+    ]
+  },
+  {
+    "Input": "Ethan Edward Coston of Spotlight PA",
+    "Want": [
+      "Ethan Edward Coston"
+    ]
+  },
+  {
+    "Input": "Gary Harki of Spotlight PA and Danielle Ohl of Spotlight PA",
+    "Want": [
+      "Gary Harki",
+      "Danielle Ohl"
+    ]
+  },
+  {
+    "Input": "Gary Harki of Spotlight PA",
+    "Want": [
+      "Gary Harki"
+    ]
+  },
+  {
+    "Input": "Gillian McGoldrick of LNP | LancasterOnline and Cynthia Fernandez of Spotlight PA",
+    "Want": [
+      "Gillian McGoldrick",
+      "Cynthia Fernandez"
+    ]
+  },
+  {
+    "Input": "Gillian McGoldrick of LNP | LancasterOnline",
+    "Want": [
+      "Gillian McGoldrick"
+    ]
+  },
+  {
+    "Input": "Jaime Martines of Spotlight PA and Sarah Anne Hughes of Spotlight PA",
+    "Want": [
+      "Jaime Martines",
+      "Sarah Anne Hughes"
+    ]
+  },
+  {
+    "Input": "Jamie Martines and Angela Couloumbis of Spotlight PA",
+    "Want": [
+      "Jamie Martines",
+      "Angela Couloumbis"
+    ]
+  },
+  {
+    "Input": "Jamie Martines of Spotlight PA and Angela Couloumbis of Spotlight PA",
+    "Want": [
+      "Jamie Martines",
+      "Angela Couloumbis"
+    ]
+  },
+  {
+    "Input": "Jamie Martines of Spotlight PA and Cynthia Fernandez of Spotlight PA",
+    "Want": [
+      "Jamie Martines",
+      "Cynthia Fernandez"
+    ]
+  },
+  {
+    "Input": "Jamie Martines of Spotlight PA and Ed Mahon of Spotlight PA",
+    "Want": [
+      "Jamie Martines",
+      "Ed Mahon"
+    ]
+  },
+  {
+    "Input": "Jamie Martines of Spotlight PA and Ese Olumhense of Spotlight PA",
+    "Want": [
+      "Jamie Martines",
+      "Ese Olumhense"
+    ]
+  },
+  {
+    "Input": "Jamie Martines of Spotlight PA and Paula Reed Ward of the Tribune-Review",
+    "Want": [
+      "Jamie Martines",
+      "Paula Reed Ward"
+    ]
+  },
+  {
+    "Input": "Jamie Martines of Spotlight PA",
+    "Want": [
+      "Jamie Martines"
+    ]
+  },
+  {
+    "Input": "Jane Doe",
+    "Want": [
+      "Jane Doe"
+    ]
+  },
+  {
+    "Input": "Jason Nark of the Philadelphia Inquirer and Cynthia Fernandez of Spotlight PA",
+    "Want": [
+      "Jason Nark",
+      "Cynthia Fernandez"
+    ]
+  },
+  {
+    "Input": "Jaxon White for Spotlight PA",
+    "Want": [
+      "Jaxon White"
+    ]
+  },
+  {
+    "Input": "Jaxon White of Spotlight PA",
+    "Want": [
+      "Jaxon White"
+    ]
+  },
+  {
+    "Input": "Jeremy Roebuck and Sean Collins Walsh of The Philadelphia Inquirer and Angela Couloumbis of Spotlight PA",
+    "Want": [
+      "Jeremy Roebuck",
+      "Sean Collins Walsh",
+      "Angela Couloumbis"
+    ]
+  },
+  {
+    "Input": "Jessica McAllister of Centre Daily Times and Sarah Rafacz of Spotlight PA State College",
+    "Want": [
+      "Jessica McAllister",
+      "Sarah Rafacz"
+    ]
+  },
+  {
+    "Input": "Jordan Wolman for Spotlight PA",
+    "Want": [
+      "Jordan Wolman"
+    ]
+  },
+  {
+    "Input": "Joseph Darius Jaafari of PA Post and Cynthia Fernandez of Spotlight PA",
+    "Want": [
+      "Joseph Darius Jaafari",
+      "Cynthia Fernandez"
+    ]
+  },
+  {
+    "Input": "Joseph Darius Jaafari of Spotlight PA and Cynthia Fernandez of Spotlight PA",
+    "Want": [
+      "Joseph Darius Jaafari",
+      "Cynthia Fernandez"
+    ]
+  },
+  {
+    "Input": "Joseph Darius Jaafari of Spotlight PA and David Hurst of The Tribune-Democrat",
+    "Want": [
+      "Joseph Darius Jaafari",
+      "David Hurst"
+    ]
+  },
+  {
+    "Input": "Joseph Darius Jaafari of Spotlight PA and Emily Previti of WITF",
+    "Want": [
+      "Joseph Darius Jaafari",
+      "Emily Previti"
+    ]
+  },
+  {
+    "Input": "Joseph Darius Jaafari of Spotlight PA and Jamie Martines of Spotlight PA",
+    "Want": [
+      "Joseph Darius Jaafari",
+      "Jamie Martines"
+    ]
+  },
+  {
+    "Input": "Joseph Darius Jaafari of Spotlight PA and Joshua Vaughn of The Appeal",
+    "Want": [
+      "Joseph Darius Jaafari",
+      "Joshua Vaughn"
+    ]
+  },
+  {
+    "Input": "Joseph Darius Jaafari of Spotlight PA and Ryan Deto of Pittsburgh City Paper",
+    "Want": [
+      "Joseph Darius Jaafari",
+      "Ryan Deto"
+    ]
+  },
+  {
+    "Input": "Joseph Darius Jaafari of Spotlight PA",
+    "Want": [
+      "Joseph Darius Jaafari"
+    ]
+  },
+  {
+    "Input": "Joseph Darius Jaafari of Spotlight PA, Emily Previti of WITF, and Ramesh Santanam of Postindustrial",
+    "Want": [
+      "Joseph Darius Jaafari",
+      "Emily Previti",
+      "Ramesh Santanam"
+    ]
+  },
+  {
+    "Input": "Joseph N. DiStefano, Craig R. McCoy and Angela Couloumbis of Spotlight PA",
+    "Want": [
+      "Joseph N. DiStefano",
+      "Craig R. McCoy",
+      "Angela Couloumbis"
+    ]
+  },
+  {
+    "Input": "Julia Shanahan for Spotlight PA",
+    "Want": [
+      "Julia Shanahan"
+    ]
+  },
+  {
+    "Input": "Julia Terruso of The Philadelphia Inquirer and Angela Couloumbis of Spotlight PA",
+    "Want": [
+      "Julia Terruso",
+      "Angela Couloumbis"
+    ]
+  },
+  {
+    "Input": "Juliette Rihl for PublicSource and Colin Deppen of Spotlight PA ",
+    "Want": [
+      "Juliette Rihl",
+      "Colin Deppen"
+    ]
+  },
+  {
+    "Input": "Kate Huangpu and Angela Couloumbis of Spotlight PA",
+    "Want": [
+      "Kate Huangpu",
+      "Angela Couloumbis"
+    ]
+  },
+  {
+    "Input": "Kate Huangpu de Spotlight PA",
+    "Want": [
+      "Kate Huangpu de Spotlight PA"
+    ]
+  },
+  {
+    "Input": "Kate Huangpu of Spotlight PA and Carl Johnson of Spotlight PA",
+    "Want": [
+      "Kate Huangpu",
+      "Carl Johnson"
+    ]
+  },
+  {
+    "Input": "Kate Huangpu of Spotlight PA and Carter Walker of Votebeat",
+    "Want": [
+      "Kate Huangpu",
+      "Carter Walker"
+    ]
+  },
+  {
+    "Input": "Kate Huangpu of Spotlight PA and Ethan Edward Coston of Spotlight PA",
+    "Want": [
+      "Kate Huangpu",
+      "Ethan Edward Coston"
+    ]
+  },
+  {
+    "Input": "Kate Huangpu of Spotlight PA and Katie Meyer of Spotlight PA",
+    "Want": [
+      "Kate Huangpu",
+      "Katie Meyer"
+    ]
+  },
+  {
+    "Input": "Kate Huangpu of Spotlight PA and Stephen Caruso of Spotlight PA",
+    "Want": [
+      "Kate Huangpu",
+      "Stephen Caruso"
+    ]
+  },
+  {
+    "Input": "Kate Huangpu of Spotlight PA",
+    "Want": [
+      "Kate Huangpu"
+    ]
+  },
+  {
+    "Input": "Katie Meyer of Spotlight PA and Kate Huangpu of Spotlight PA",
+    "Want": [
+      "Katie Meyer",
+      "Kate Huangpu"
+    ]
+  },
+  {
+    "Input": "Katie Meyer of Spotlight PA and Stephen Caruso of Spotlight PA",
+    "Want": [
+      "Katie Meyer",
+      "Stephen Caruso"
+    ]
+  },
+  {
+    "Input": "Katie Meyer of Spotlight PA",
+    "Want": [
+      "Katie Meyer"
+    ]
+  },
+  {
+    "Input": "Lilly Riddle for the News Lab at Penn State and Spotlight PA State College",
+    "Want": [
+      "Lilly Riddle",
+      "Spotlight PA State College"
+    ]
+  },
+  {
+    "Input": "Lindsay Weber for Spotlight PA",
+    "Want": [
+      "Lindsay Weber"
+    ]
+  },
+  {
+    "Input": "Logan Hullinger of The York Dispatch and Angela Couloumbis of Spotlight PA",
+    "Want": [
+      "Logan Hullinger",
+      "Angela Couloumbis"
+    ]
+  },
+  {
+    "Input": "Marie Albiges and Tom Lisi for Spotlight PA and Angela Couloumbis of Spotlight PA",
+    "Want": [
+      "Marie Albiges",
+      "Tom Lisi",
+      "Angela Couloumbis"
+    ]
+  },
+  {
+    "Input": "Marie Albiges for Spotlight PA and Angela Couloumbis of Spotlight PA",
+    "Want": [
+      "Marie Albiges",
+      "Angela Couloumbis"
+    ]
+  },
+  {
+    "Input": "Marie Albiges for Spotlight PA and Cynthia Fernandez of Spotlight PA",
+    "Want": [
+      "Marie Albiges",
+      "Cynthia Fernandez"
+    ]
+  },
+  {
+    "Input": "Marie Albiges for Spotlight PA and Tom Lisi for Spotlight PA",
+    "Want": [
+      "Marie Albiges",
+      "Tom Lisi"
+    ]
+  },
+  {
+    "Input": "Marie Albiges for Spotlight PA",
+    "Want": [
+      "Marie Albiges"
+    ]
+  },
+  {
+    "Input": "Marie Albiges of Spotlight PA and Jonathan Lai of The Philadelphia Inquirer",
+    "Want": [
+      "Marie Albiges",
+      "Jonathan Lai"
+    ]
+  },
+  {
+    "Input": "Marie Albiges of Spotlight PA",
+    "Want": [
+      "Marie Albiges"
+    ]
+  },
+  {
+    "Input": "Matt McKinney of Spotlight PA and Joseph Darius Jaafari of PA Post",
+    "Want": [
+      "Matt McKinney",
+      "Joseph Darius Jaafari"
+    ]
+  },
+  {
+    "Input": "Matt McKinney of Spotlight PA",
+    "Want": [
+      "Matt McKinney"
+    ]
+  },
+  {
+    "Input": "Mike Wereschagin of The Caucus and Ed Mahon of Spotlight PA",
+    "Want": [
+      "Mike Wereschagin",
+      "Ed Mahon"
+    ]
+  },
+  {
+    "Input": "Mike Wereschagin of The Caucus",
+    "Want": [
+      "Mike Wereschagin"
+    ]
+  },
+  {
+    "Input": "Min Xian of Spotlight PA State College and Angela Couloumbis of Spotlight PA",
+    "Want": [
+      "Min Xian",
+      "Angela Couloumbis"
+    ]
+  },
+  {
+    "Input": "Min Xian of Spotlight PA State College",
+    "Want": [
+      "Min Xian"
+    ]
+  },
+  {
+    "Input": "Nathaniel Lash of the Philadelphia Inquirer and Brett Sholtis of WITF",
+    "Want": [
+      "Nathaniel Lash",
+      "Brett Sholtis"
+    ]
+  },
+  {
+    "Input": "Pranshu Verma of the Philadelphia Inquirer and Cynthia Fernandez of Spotlight PA",
+    "Want": [
+      "Pranshu Verma",
+      "Cynthia Fernandez"
+    ]
+  },
+  {
+    "Input": "Rebecca Moss of Spotlight PA and Christian Hetrick of The Philadelphia Inquirer",
+    "Want": [
+      "Rebecca Moss",
+      "Christian Hetrick"
+    ]
+  },
+  {
+    "Input": "Rebecca Moss of Spotlight PA and Jordan Wolman for Spotlight PA",
+    "Want": [
+      "Rebecca Moss",
+      "Jordan Wolman"
+    ]
+  },
+  {
+    "Input": "Rebecca Moss of Spotlight PA",
+    "Want": [
+      "Rebecca Moss"
+    ]
+  },
+  {
+    "Input": "Sam Janesch of The Caucus and Angela Couloumbis of Spotlight PA",
+    "Want": [
+      "Sam Janesch",
+      "Angela Couloumbis"
+    ]
+  },
+  {
+    "Input": "Sam Janesch of The Caucus",
+    "Want": [
+      "Sam Janesch"
+    ]
+  },
+  {
+    "Input": "Sam Janesch, The Caucus and Angela Couloumbis, Spotlight PA",
+    "Want": [
+      "Sam Janesch",
+      "The Caucus",
+      "Angela Couloumbis",
+      "Spotlight PA"
+    ]
+  },
+  {
+    "Input": "Samuel O’Neal for Spotlight PA",
+    "Want": [
+      "Samuel O’Neal"
+    ]
+  },
+  {
+    "Input": "Sara Simon of Spotlight PA and Ryan Briggs and Nina Feldman of WHYY News",
+    "Want": [
+      "Sara Simon",
+      "Ryan Briggs",
+      "Nina Feldman"
+    ]
+  },
+  {
+    "Input": "Sara Simon of Spotlight PA and Sarah Gantz of The Philadelphia Inquirer",
+    "Want": [
+      "Sara Simon",
+      "Sarah Gantz"
+    ]
+  },
+  {
+    "Input": "Sara Simon of Spotlight PA",
+    "Want": [
+      "Sara Simon"
+    ]
+  },
+  {
+    "Input": "Sara Simon, Yaasmeen Piper and Kent Wilhelm of Spotlight PA",
+    "Want": [
+      "Sara Simon",
+      "Yaasmeen Piper",
+      "Kent Wilhelm"
+    ]
+  },
+  {
+    "Input": "Sarah Anne Hughes of Spotlight PA and Angela Couloumbis of Spotlight PA",
+    "Want": [
+      "Sarah Anne Hughes",
+      "Angela Couloumbis"
+    ]
+  },
+  {
+    "Input": "Sarah Anne Hughes of Spotlight PA and Colin Deppen of Spotlight PA",
+    "Want": [
+      "Sarah Anne Hughes",
+      "Colin Deppen"
+    ]
+  },
+  {
+    "Input": "Sarah Anne Hughes of Spotlight PA and Marie Albiges of Spotlight PA",
+    "Want": [
+      "Sarah Anne Hughes",
+      "Marie Albiges"
+    ]
+  },
+  {
+    "Input": "Sarah Anne Hughes of Spotlight PA",
+    "Want": [
+      "Sarah Anne Hughes"
+    ]
+  },
+  {
+    "Input": "Sarah Anne Hughes",
+    "Want": [
+      "Sarah Anne Hughes"
+    ]
+  },
+  {
+    "Input": "Sarah Rafacz of Spotlight PA State College",
+    "Want": [
+      "Sarah Rafacz"
+    ]
+  },
+  {
+    "Input": "Shaniece Holmes Brown for Spotlight PA",
+    "Want": [
+      "Shaniece Holmes Brown"
+    ]
+  },
+  {
+    "Input": "Spotlight PA Staff",
+    "Want": null
+  },
+  {
+    "Input": "Spotlight PA State College Staff",
+    "Want": null
+  },
+  {
+    "Input": "Staff of Spotlight PA",
+    "Want": null
+  },
+  {
+    "Input": "Staff Report",
+    "Want": null
+  },
+  {
+    "Input": "Stephen Caruso of Spotlight PA and Angela Couloumbis of Spotlight PA",
+    "Want": [
+      "Stephen Caruso",
+      "Angela Couloumbis"
+    ]
+  },
+  {
+    "Input": "Stephen Caruso of Spotlight PA and Carter Walker of Votebeat",
+    "Want": [
+      "Stephen Caruso",
+      "Carter Walker"
+    ]
+  },
+  {
+    "Input": "Stephen Caruso of Spotlight PA and Danielle Ohl of Spotlight PA",
+    "Want": [
+      "Stephen Caruso",
+      "Danielle Ohl"
+    ]
+  },
+  {
+    "Input": "Stephen Caruso of Spotlight PA and Ethan Edward Coston of Spotlight PA",
+    "Want": [
+      "Stephen Caruso",
+      "Ethan Edward Coston"
+    ]
+  },
+  {
+    "Input": "Stephen Caruso of Spotlight PA and Jonathan Lai of The Inquirer",
+    "Want": [
+      "Stephen Caruso",
+      "Jonathan Lai"
+    ]
+  },
+  {
+    "Input": "Stephen Caruso of Spotlight PA and Kate Huangpu of Spotlight PA",
+    "Want": [
+      "Stephen Caruso",
+      "Kate Huangpu"
+    ]
+  },
+  {
+    "Input": "Stephen Caruso of Spotlight PA and Katie Meyer of Spotlight PA",
+    "Want": [
+      "Stephen Caruso",
+      "Katie Meyer"
+    ]
+  },
+  {
+    "Input": "Stephen Caruso of Spotlight PA",
+    "Want": [
+      "Stephen Caruso"
+    ]
+  },
+  {
+    "Input": "Stephen Caruso of Spotlight PA, Angela Couloumbis of Spotlight PA and Katie Meyer of Spotlight PA",
+    "Want": [
+      "Stephen Caruso",
+      "Angela Couloumbis",
+      "Katie Meyer"
+    ]
+  },
+  {
+    "Input": "Stephen Caruso of Spotlight PA, Ethan Edward Coston of Spotlight PA and Angela Couloumbis of Spotlight PA",
+    "Want": [
+      "Stephen Caruso",
+      "Ethan Edward Coston",
+      "Angela Couloumbis"
+    ]
+  },
+  {
+    "Input": "Stephen Caruso of Spotlight PA, Kate Huangpu of Spotlight PA and Katie Meyer of Spotlight PA",
+    "Want": [
+      "Stephen Caruso",
+      "Kate Huangpu",
+      "Katie Meyer"
+    ]
+  },
+  {
+    "Input": "Stephen Caruso of Spotlight PA, Kate Huangpu of Spotlight PA, and Katie Meyer of Spotlight PA",
+    "Want": [
+      "Stephen Caruso",
+      "Kate Huangpu",
+      "Katie Meyer"
+    ]
+  },
+  {
+    "Input": "Stephen Caruso, Angela Couloumbis, Kate Huangpu and Katie Meyer of Spotlight PA",
+    "Want": [
+      "Stephen Caruso",
+      "Angela Couloumbis",
+      "Kate Huangpu",
+      "Katie Meyer"
+    ]
+  },
+  {
+    "Input": "Tanisha Thomas for PA Local",
+    "Want": [
+      "Tanisha Thomas"
+    ]
+  },
+  {
+    "Input": "Tom Lisi for Spotlight PA",
+    "Want": [
+      "Tom Lisi"
+    ]
+  },
+  {
+    "Input": "Wallace McKelvey of PennLive | The Patriot-News",
+    "Want": [
+      "Wallace McKelvey"
+    ]
+  },
+  {
+    "Input": "William Bender of the Philadelphia Inquirer and Angela Couloumbis of Spotlight PA",
+    "Want": [
+      "William Bender",
+      "Angela Couloumbis"
+    ]
+  },
+  {
+    "Input": "William Bender of The Philadelphia Inquirer and Angela Couloumbis of Spotlight PA",
+    "Want": [
+      "William Bender",
+      "Angela Couloumbis"
+    ]
+  },
+  {
+    "Input": "Wyatt Massey of Spotlight PA State College",
+    "Want": [
+      "Wyatt Massey"
+    ]
+  },
+  {
+    "Input": "Wyatt Massey of Spotlight PA",
+    "Want": [
+      "Wyatt Massey"
+    ]
+  },
+  {
+    "Input": "Yaasmeen Piper of Spotlight PA",
+    "Want": [
+      "Yaasmeen Piper"
+    ]
+  }
+]
