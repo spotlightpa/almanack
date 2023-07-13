@@ -604,7 +604,8 @@ func (app *appEnv) postPageRefresh(w http.ResponseWriter, r *http.Request) {
 				page.Frontmatter = make(db.Map)
 			}
 			fm := map[string]any{
-				"byline":            dbDoc.Metadata.Byline, // TODO: Authors
+				"byline":            dbDoc.Metadata.Byline,
+				"authors":           stringx.ExtractNames(dbDoc.Metadata.Byline),
 				"title":             dbDoc.Metadata.Hed,
 				"description":       dbDoc.Metadata.Description,
 				"image":             dbDoc.Metadata.LedeImage,

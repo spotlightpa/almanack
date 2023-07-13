@@ -4,6 +4,7 @@ import (
 	"testing"
 
 	"github.com/carlmjohnson/be"
+	"github.com/carlmjohnson/be/testfile"
 	"github.com/spotlightpa/almanack/internal/stringx"
 )
 
@@ -61,5 +62,46 @@ func TestRemoveParens(t *testing.T) {
 	// Run test cases
 	for _, tc := range testCases {
 		be.Equal(t, tc.want, stringx.RemoveParens(tc.input))
+	}
+}
+
+func TestExtractName(t *testing.T) {
+	rt := be.Relaxed(t)
+
+	type testcase struct {
+		Input string
+		Want  []string
+	}
+	// Manual cases
+	cases := []testcase{
+		{"", []string{}},
+		{"Spotlight PA Staff", []string{}},
+		{"John Stafford", []string{"John Stafford"}},
+		{
+			"Stephen Caruso of Spotlight PA, Kate Huangpu of Spotlight PA, and Katie Meyer of Spotlight PA",
+			[]string{"Stephen Caruso", "Kate Huangpu", "Katie Meyer"},
+		},
+		{
+			"STEPHEN CARUSO OF SPOTLIGHT PA, KATE HUANGPU OF SPOTLIGHT PA, AND KATIE MEYER OF SPOTLIGHT PA",
+			[]string{"STEPHEN CARUSO", "KATE HUANGPU", "KATIE MEYER"},
+		},
+		{"Jane Often", []string{"Jane Often"}},
+		{"Susana González-Lopez", []string{"Susana González-Lopez"}},
+		{"Andy Fortune", []string{"Andy Fortune"}},
+		{"Samuel O’Neal for Spotlight PA", []string{"Samuel O’Neal"}},
+		{
+			"Carter Walker of Votebeat and Laura Benshoff for Votebeat",
+			[]string{"Carter Walker", "Laura Benshoff"},
+		},
+		{"Wyatt Massey of Spotlight PA State College", []string{"Wyatt Massey"}},
+	}
+	for _, tc := range cases {
+		be.AllEqual(rt, tc.Want, stringx.ExtractNames(tc.Input))
+	}
+
+	// Bulk cases
+	testfile.ReadJSON(t, "testdata/extract-name-cases.json", &cases)
+	for _, tc := range cases {
+		be.AllEqual(rt, tc.Want, stringx.ExtractNames(tc.Input))
 	}
 }
