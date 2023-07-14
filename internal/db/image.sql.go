@@ -11,7 +11,7 @@ import (
 
 const getImageByMD5 = `-- name: GetImageByMD5 :one
 SELECT
-  id, path, type, description, credit, src_url, is_uploaded, created_at, updated_at, md5, bytes, keywords, deleted_at
+  id, path, type, description, credit, src_url, is_uploaded, created_at, updated_at, md5, bytes, keywords, deleted_at, is_licensed
 FROM
   image
 WHERE
@@ -38,13 +38,14 @@ func (q *Queries) GetImageByMD5(ctx context.Context, md5 []byte) (Image, error) 
 		&i.Bytes,
 		&i.Keywords,
 		&i.DeletedAt,
+		&i.IsLicensed,
 	)
 	return i, err
 }
 
 const getImageByPath = `-- name: GetImageByPath :one
 SELECT
-  id, path, type, description, credit, src_url, is_uploaded, created_at, updated_at, md5, bytes, keywords, deleted_at
+  id, path, type, description, credit, src_url, is_uploaded, created_at, updated_at, md5, bytes, keywords, deleted_at, is_licensed
 FROM
   "image"
 WHERE
@@ -68,13 +69,14 @@ func (q *Queries) GetImageByPath(ctx context.Context, path string) (Image, error
 		&i.Bytes,
 		&i.Keywords,
 		&i.DeletedAt,
+		&i.IsLicensed,
 	)
 	return i, err
 }
 
 const getImageBySourceURL = `-- name: GetImageBySourceURL :one
 SELECT
-  id, path, type, description, credit, src_url, is_uploaded, created_at, updated_at, md5, bytes, keywords, deleted_at
+  id, path, type, description, credit, src_url, is_uploaded, created_at, updated_at, md5, bytes, keywords, deleted_at, is_licensed
 FROM
   image
 WHERE
@@ -101,6 +103,7 @@ func (q *Queries) GetImageBySourceURL(ctx context.Context, srcUrl string) (Image
 		&i.Bytes,
 		&i.Keywords,
 		&i.DeletedAt,
+		&i.IsLicensed,
 	)
 	return i, err
 }
@@ -123,7 +126,7 @@ func (q *Queries) GetImageTypeForExtension(ctx context.Context, extension string
 
 const listImageWhereNotUploaded = `-- name: ListImageWhereNotUploaded :many
 SELECT
-  id, path, type, description, credit, src_url, is_uploaded, created_at, updated_at, md5, bytes, keywords, deleted_at
+  id, path, type, description, credit, src_url, is_uploaded, created_at, updated_at, md5, bytes, keywords, deleted_at, is_licensed
 FROM
   image
 WHERE
@@ -158,6 +161,7 @@ func (q *Queries) ListImageWhereNotUploaded(ctx context.Context) ([]Image, error
 			&i.Bytes,
 			&i.Keywords,
 			&i.DeletedAt,
+			&i.IsLicensed,
 		); err != nil {
 			return nil, err
 		}
@@ -171,7 +175,7 @@ func (q *Queries) ListImageWhereNotUploaded(ctx context.Context) ([]Image, error
 
 const listImages = `-- name: ListImages :many
 SELECT
-  id, path, type, description, credit, src_url, is_uploaded, created_at, updated_at, md5, bytes, keywords, deleted_at
+  id, path, type, description, credit, src_url, is_uploaded, created_at, updated_at, md5, bytes, keywords, deleted_at, is_licensed
 FROM
   image
 WHERE
@@ -210,6 +214,7 @@ func (q *Queries) ListImages(ctx context.Context, arg ListImagesParams) ([]Image
 			&i.Bytes,
 			&i.Keywords,
 			&i.DeletedAt,
+			&i.IsLicensed,
 		); err != nil {
 			return nil, err
 		}
@@ -223,13 +228,14 @@ func (q *Queries) ListImages(ctx context.Context, arg ListImagesParams) ([]Image
 
 const listImagesByFTS = `-- name: ListImagesByFTS :many
 SELECT
-  image.id, image.path, image.type, image.description, image.credit, image.src_url, image.is_uploaded, image.created_at, image.updated_at, image.md5, image.bytes, image.keywords, image.deleted_at
+  image.id, image.path, image.type, image.description, image.credit, image.src_url, image.is_uploaded, image.created_at, image.updated_at, image.md5, image.bytes, image.keywords, image.deleted_at, image.is_licensed
 FROM
   image,
   websearch_to_tsquery('english', $3) tsq
 WHERE
   fts @@ tsq
   AND is_uploaded
+  AND is_licensed
   AND deleted_at IS NULL
 ORDER BY
   ts_rank(fts, tsq) DESC,
@@ -266,6 +272,7 @@ func (q *Queries) ListImagesByFTS(ctx context.Context, arg ListImagesByFTSParams
 			&i.Bytes,
 			&i.Keywords,
 			&i.DeletedAt,
+			&i.IsLicensed,
 		); err != nil {
 			return nil, err
 		}
@@ -279,7 +286,7 @@ func (q *Queries) ListImagesByFTS(ctx context.Context, arg ListImagesByFTSParams
 
 const listImagesWhereNoMD5 = `-- name: ListImagesWhereNoMD5 :many
 SELECT
-  id, path, type, description, credit, src_url, is_uploaded, created_at, updated_at, md5, bytes, keywords, deleted_at
+  id, path, type, description, credit, src_url, is_uploaded, created_at, updated_at, md5, bytes, keywords, deleted_at, is_licensed
 FROM
   image
 WHERE
@@ -314,6 +321,7 @@ func (q *Queries) ListImagesWhereNoMD5(ctx context.Context, limit int32) ([]Imag
 			&i.Bytes,
 			&i.Keywords,
 			&i.DeletedAt,
+			&i.IsLicensed,
 		); err != nil {
 			return nil, err
 		}
@@ -344,11 +352,16 @@ SET
   ELSE
     keywords
   END,
+  is_licensed = CASE WHEN $7::boolean THEN
+    $8
+  ELSE
+    is_licensed
+  END,
   is_uploaded = TRUE
 WHERE
-  path = $7
+  path = $9
 RETURNING
-  id, path, type, description, credit, src_url, is_uploaded, created_at, updated_at, md5, bytes, keywords, deleted_at
+  id, path, type, description, credit, src_url, is_uploaded, created_at, updated_at, md5, bytes, keywords, deleted_at, is_licensed
 `
 
 type UpdateImageParams struct {
@@ -358,6 +371,8 @@ type UpdateImageParams struct {
 	Description    string `json:"description"`
 	SetKeywords    bool   `json:"set_keywords"`
 	Keywords       string `json:"keywords"`
+	SetIsLicensed  bool   `json:"set_is_licensed"`
+	IsLicensed     bool   `json:"is_licensed"`
 	Path           string `json:"path"`
 }
 
@@ -369,6 +384,8 @@ func (q *Queries) UpdateImage(ctx context.Context, arg UpdateImageParams) (Image
 		arg.Description,
 		arg.SetKeywords,
 		arg.Keywords,
+		arg.SetIsLicensed,
+		arg.IsLicensed,
 		arg.Path,
 	)
 	var i Image
@@ -386,6 +403,7 @@ func (q *Queries) UpdateImage(ctx context.Context, arg UpdateImageParams) (Image
 		&i.Bytes,
 		&i.Keywords,
 		&i.DeletedAt,
+		&i.IsLicensed,
 	)
 	return i, err
 }
@@ -399,7 +417,7 @@ SET
 WHERE
   id = $3
 RETURNING
-  id, path, type, description, credit, src_url, is_uploaded, created_at, updated_at, md5, bytes, keywords, deleted_at
+  id, path, type, description, credit, src_url, is_uploaded, created_at, updated_at, md5, bytes, keywords, deleted_at, is_licensed
 `
 
 type UpdateImageMD5SizeParams struct {
@@ -425,6 +443,7 @@ func (q *Queries) UpdateImageMD5Size(ctx context.Context, arg UpdateImageMD5Size
 		&i.Bytes,
 		&i.Keywords,
 		&i.DeletedAt,
+		&i.IsLicensed,
 	)
 	return i, err
 }
@@ -453,7 +472,7 @@ ON CONFLICT (path)
       image.src_url
     END
   RETURNING
-    id, path, type, description, credit, src_url, is_uploaded, created_at, updated_at, md5, bytes, keywords, deleted_at
+    id, path, type, description, credit, src_url, is_uploaded, created_at, updated_at, md5, bytes, keywords, deleted_at, is_licensed
 `
 
 type UpsertImageParams struct {
@@ -491,6 +510,7 @@ func (q *Queries) UpsertImage(ctx context.Context, arg UpsertImageParams) (Image
 		&i.Bytes,
 		&i.Keywords,
 		&i.DeletedAt,
+		&i.IsLicensed,
 	)
 	return i, err
 }
@@ -527,7 +547,7 @@ ON CONFLICT (path)
       image.bytes
     END
   RETURNING
-    id, path, type, description, credit, src_url, is_uploaded, created_at, updated_at, md5, bytes, keywords, deleted_at
+    id, path, type, description, credit, src_url, is_uploaded, created_at, updated_at, md5, bytes, keywords, deleted_at, is_licensed
 `
 
 type UpsertImageWithMD5Params struct {
@@ -567,6 +587,7 @@ func (q *Queries) UpsertImageWithMD5(ctx context.Context, arg UpsertImageWithMD5
 		&i.Bytes,
 		&i.Keywords,
 		&i.DeletedAt,
+		&i.IsLicensed,
 	)
 	return i, err
 }
