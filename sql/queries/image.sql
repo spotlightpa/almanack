@@ -19,6 +19,7 @@ FROM
 WHERE
   fts @@ tsq
   AND is_uploaded
+  AND is_licensed
   AND deleted_at IS NULL
 ORDER BY
   ts_rank(fts, tsq) DESC,
@@ -103,6 +104,11 @@ SET
     @keywords
   ELSE
     keywords
+  END,
+  is_licensed = CASE WHEN @set_is_licensed::boolean THEN
+    @is_licensed
+  ELSE
+    is_licensed
   END,
   is_uploaded = TRUE
 WHERE

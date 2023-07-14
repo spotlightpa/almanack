@@ -6,7 +6,7 @@ ALTER TABLE file
 
 ---- create above / drop below ----
 ALTER TABLE image
-  DROP COLUMN deleted_at timestamptz;
+  DROP COLUMN deleted_at;
 
 ALTER TABLE file
-  DROP COLUMN deleted_at timestamptz;
+  DROP COLUMN deleted_at;

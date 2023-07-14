@@ -39,6 +39,7 @@ const toImageObj = (rawImage) => ({
   keywords: rawImage.keywords,
   size: rawImage.bytes ? humanSize(rawImage.bytes) : "",
   srcURL: rawImage.src_url,
+  isLicensed: rawImage.is_licensed,
   date: new Date(rawImage.created_at),
   downloadURL: "/ssr/download-image?src=" + encodeURIComponent(rawImage.path),
 });
@@ -59,7 +60,13 @@ const showReload = computedProp("waiting_for_upload", () => {
 
 function updateObj(
   path,
-  { credit = "", description = "", keywords = "" } = {}
+  {
+    credit = "",
+    description = "",
+    keywords = "",
+    set_is_licensed = false,
+    is_licensed = false,
+  } = {}
 ) {
   return {
     path,
@@ -69,6 +76,8 @@ function updateObj(
     set_description: !!description,
     keywords,
     set_keywords: !!keywords,
+    set_is_licensed,
+    is_licensed,
   };
 }
 
@@ -100,6 +109,15 @@ function updateKeywords(image) {
   if (keywords !== null && keywords !== image.keywords) {
     doUpdate(image, { keywords });
   }
+}
+
+function updateIsLicensed(image) {
+  if (
+    !window.confirm(`Set to ${image.isLicensed ? "unlicensed" : "licensed"}?`)
+  ) {
+    return;
+  }
+  doUpdate(image, { set_is_licensed: true, is_licensed: !image.isLicensed });
 }
 
 const rawQuery = ref("");
@@ -205,6 +223,23 @@ watch(rawQuery, (val) => {
                 Keywords:
               </a>
               {{ image.keywords }}
+            </p>
+            <p>
+              <a @click="updateIsLicensed(image)">
+                <span class="has-text-weight-semibold">License: </span>
+                <span v-if="image.isLicensed">
+                  <span class="has-text-black">Reuse permitted</span>
+                  <span class="icon is-size-6 has-text-success">
+                    <font-awesome-icon :icon="['fas', 'check-circle']" />
+                  </span>
+                </span>
+                <span v-else>
+                  <span class="has-text-black">Reuse not permitted</span>
+                  <span class="icon is-size-6 has-text-danger">
+                    <font-awesome-icon :icon="['fas', 'circle-exclamation']" />
+                  </span>
+                </span>
+              </a>
             </p>
             <p>
               <strong>Date:</strong>

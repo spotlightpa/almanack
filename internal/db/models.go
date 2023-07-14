@@ -88,6 +88,7 @@ type Image struct {
 	Bytes       int64              `json:"bytes"`
 	Keywords    string             `json:"keywords"`
 	DeletedAt   pgtype.Timestamptz `json:"deleted_at"`
+	IsLicensed  bool               `json:"is_licensed"`
 }
 
 type ImageType struct {
