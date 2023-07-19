@@ -2,6 +2,7 @@
   "id": 123,
   "file_path": "content/news/2020-03-15-gdoc warning.md",
   "frontmatter": {
+    "authors": null,
     "blurb": "Showing off how to do a demo document.",
     "byline": "",
     "description": "Showing off how to do a demo document.",

@@ -2,6 +2,9 @@
   "id": 123,
   "file_path": "content/news/2020-03-15-gdoc paren na.md",
   "frontmatter": {
+    "authors": [
+      "The Scorpions"
+    ],
     "blurb": "Blurb",
     "byline": "The Scorpions",
     "description": "Something is in the air tonight…",
