@@ -2,6 +2,9 @@
   "id": 123,
   "file_path": "content/news/2020-03-15-gdoc simple.md",
   "frontmatter": {
+    "authors": [
+      "The Scorpions"
+    ],
     "blurb": "Something is in the air tonight…",
     "byline": "The Scorpions",
     "description": "Something is in the air tonight…",

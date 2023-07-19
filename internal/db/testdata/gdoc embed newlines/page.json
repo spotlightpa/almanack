@@ -2,6 +2,7 @@
   "id": 123,
   "file_path": "content/news/2020-03-15-gdoc embed newlines.md",
   "frontmatter": {
+    "authors": null,
     "blurb": "Join Spotlight PA for a \"Clink and Think\" quiz bash on Sunday, Aug. 6, from 4:30-7:30 p.m.",
     "byline": "Spotlight PA Staff",
     "description": "Join Spotlight PA for a \"Clink and Think\" quiz bash on Sunday, Aug. 6, from 4:30-7:30 p.m.",
@@ -14,7 +15,7 @@
     "linktitle": "",
     "og-title": "",
     "published": "2020-03-15T20:00:00Z",
-    "slug": "pa-state-college-anniversary-event",
+    "slug": "pennsylvania-state-college-anniversary-event",
     "title": "You’re invited! Spotlight PA State College hosts quiz bash and anniversary fundraiser",
     "title-tag": "",
     "twitter-title": ""

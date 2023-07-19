@@ -2,6 +2,9 @@
   "id": 123,
   "file_path": "content/news/2020-03-15-gdoc byby.md",
   "frontmatter": {
+    "authors": [
+      "Jane Doe"
+    ],
     "blurb": "How creating documents is making us all crazy; and how to quit",
     "byline": "Jane Doe",
     "description": "How creating documents is making us all crazy; and how to quit",

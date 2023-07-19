@@ -2,6 +2,10 @@
   "id": 123,
   "file_path": "content/news/2020-03-15-gdoc mark.md",
   "frontmatter": {
+    "authors": [
+      "Carter Walker",
+      "Laura Benshoff"
+    ],
     "blurb": "Data shows that communities of color and older Philadelphians are more likely to have their mail ballot rejected due to simple mistakes.",
     "byline": "Carter Walker of Votebeat and Laura Benshoff for Votebeat",
     "description": "Data shows that communities of color and older Philadelphians are more likely to have their mail ballot rejected due to simple mistakes.",
@@ -14,7 +18,7 @@
     "linktitle": "",
     "og-title": "",
     "published": "2020-03-15T20:00:00Z",
-    "slug": "pa-philadelphia-mail-ballot-rejection-black-latino",
+    "slug": "pennsylvania-philadelphia-mail-ballot-rejection-black-latino",
     "title": "Philadelphia’s communities of color disproportionately affected when mail ballots are rejected over small errors",
     "title-tag": "",
     "twitter-title": ""
