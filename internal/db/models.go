@@ -158,6 +158,7 @@ type SharedArticle struct {
 	LedeImageCredit      string             `json:"lede_image_credit"`
 	LedeImageDescription string             `json:"lede_image_description"`
 	LedeImageCaption     string             `json:"lede_image_caption"`
+	Blurb                string             `json:"blurb"`
 }
 
 type SharedStatus struct {
