@@ -244,6 +244,7 @@ func (svc Services) CreatePageFromGDocsDoc(ctx context.Context, shared *db.Share
 		"authors":           stringx.ExtractNames(shared.Byline),
 		"title":             shared.Hed,
 		"description":       shared.Description,
+		"blurb":             shared.Blurb,
 		"image":             shared.LedeImage,
 		"image-credit":      shared.LedeImageCredit,
 		"image-description": shared.LedeImageDescription,
@@ -254,10 +255,6 @@ func (svc Services) CreatePageFromGDocsDoc(ctx context.Context, shared *db.Share
 			dbDoc.Metadata.URLSlug,
 			stringx.SlugifyURL(shared.Hed),
 		)),
-		"blurb": stringx.First(
-			dbDoc.Metadata.Blurb,
-			shared.Description,
-		),
 		"linktitle":     dbDoc.Metadata.LinkTitle,
 		"title-tag":     dbDoc.Metadata.SEOTitle,
 		"og-title":      dbDoc.Metadata.OGTitle,

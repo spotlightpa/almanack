@@ -11,6 +11,7 @@ SET
   "budget" = @budget,
   "hed" = @hed,
   "description" = @description,
+  "blurb" = @blurb,
   "lede_image" = @lede_image,
   "lede_image_credit" = @lede_image_credit,
   "lede_image_description" = @lede_image_description,
@@ -100,10 +101,10 @@ ON CONFLICT (source_type,
 
 -- name: UpsertSharedArticleFromGDocs :one
 INSERT INTO shared_article (status, source_type, source_id, raw_data,
-  internal_id, byline, budget, hed, description, lede_image, lede_image_credit,
-  lede_image_description, lede_image_caption)
+  internal_id, byline, budget, hed, description, blurb, lede_image,
+  lede_image_credit, lede_image_description, lede_image_caption)
   VALUES ('U', 'gdocs', @external_id, @raw_data::jsonb,
-    @internal_id, @byline, @budget, @hed, @description, @lede_image,
+    @internal_id, @byline, @budget, @hed, @description, @blurb, @lede_image,
     @lede_image_credit, @lede_image_description, @lede_image_caption)
 ON CONFLICT (source_type, source_id)
   DO UPDATE SET
@@ -121,6 +122,7 @@ SET
   "budget" = @budget,
   "hed" = @hed,
   "description" = @description,
+  "blurb" = @blurb,
   "lede_image" = @lede_image,
   "lede_image_credit" = @lede_image_credit,
   "lede_image_description" = @lede_image_description,
