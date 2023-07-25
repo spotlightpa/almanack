@@ -14,7 +14,7 @@ import (
 
 const getSharedArticleByID = `-- name: GetSharedArticleByID :one
 SELECT
-  id, status, embargo_until, note, source_type, source_id, raw_data, page_id, created_at, updated_at, publication_date, internal_id, byline, budget, hed, description, lede_image, lede_image_credit, lede_image_description, lede_image_caption
+  id, status, embargo_until, note, source_type, source_id, raw_data, page_id, created_at, updated_at, publication_date, internal_id, byline, budget, hed, description, lede_image, lede_image_credit, lede_image_description, lede_image_caption, blurb
 FROM
   shared_article
 WHERE
@@ -45,13 +45,14 @@ func (q *Queries) GetSharedArticleByID(ctx context.Context, id int64) (SharedArt
 		&i.LedeImageCredit,
 		&i.LedeImageDescription,
 		&i.LedeImageCaption,
+		&i.Blurb,
 	)
 	return i, err
 }
 
 const getSharedArticleBySource = `-- name: GetSharedArticleBySource :one
 SELECT
-  id, status, embargo_until, note, source_type, source_id, raw_data, page_id, created_at, updated_at, publication_date, internal_id, byline, budget, hed, description, lede_image, lede_image_credit, lede_image_description, lede_image_caption
+  id, status, embargo_until, note, source_type, source_id, raw_data, page_id, created_at, updated_at, publication_date, internal_id, byline, budget, hed, description, lede_image, lede_image_credit, lede_image_description, lede_image_caption, blurb
 FROM
   shared_article
 WHERE
@@ -88,13 +89,14 @@ func (q *Queries) GetSharedArticleBySource(ctx context.Context, arg GetSharedArt
 		&i.LedeImageCredit,
 		&i.LedeImageDescription,
 		&i.LedeImageCaption,
+		&i.Blurb,
 	)
 	return i, err
 }
 
 const listSharedArticles = `-- name: ListSharedArticles :many
 SELECT
-  id, status, embargo_until, note, source_type, source_id, raw_data, page_id, created_at, updated_at, publication_date, internal_id, byline, budget, hed, description, lede_image, lede_image_credit, lede_image_description, lede_image_caption
+  id, status, embargo_until, note, source_type, source_id, raw_data, page_id, created_at, updated_at, publication_date, internal_id, byline, budget, hed, description, lede_image, lede_image_credit, lede_image_description, lede_image_caption, blurb
 FROM
   shared_article
 ORDER BY
@@ -137,6 +139,7 @@ func (q *Queries) ListSharedArticles(ctx context.Context, arg ListSharedArticles
 			&i.LedeImageCredit,
 			&i.LedeImageDescription,
 			&i.LedeImageCaption,
+			&i.Blurb,
 		); err != nil {
 			return nil, err
 		}
@@ -150,7 +153,7 @@ func (q *Queries) ListSharedArticles(ctx context.Context, arg ListSharedArticles
 
 const listSharedArticlesWhereActive = `-- name: ListSharedArticlesWhereActive :many
 SELECT
-  id, status, embargo_until, note, source_type, source_id, raw_data, page_id, created_at, updated_at, publication_date, internal_id, byline, budget, hed, description, lede_image, lede_image_credit, lede_image_description, lede_image_caption
+  id, status, embargo_until, note, source_type, source_id, raw_data, page_id, created_at, updated_at, publication_date, internal_id, byline, budget, hed, description, lede_image, lede_image_credit, lede_image_description, lede_image_caption, blurb
 FROM
   shared_article
 WHERE
@@ -195,6 +198,7 @@ func (q *Queries) ListSharedArticlesWhereActive(ctx context.Context, arg ListSha
 			&i.LedeImageCredit,
 			&i.LedeImageDescription,
 			&i.LedeImageCaption,
+			&i.Blurb,
 		); err != nil {
 			return nil, err
 		}
@@ -226,7 +230,7 @@ SET
 WHERE
   id = $14
 RETURNING
-  id, status, embargo_until, note, source_type, source_id, raw_data, page_id, created_at, updated_at, publication_date, internal_id, byline, budget, hed, description, lede_image, lede_image_credit, lede_image_description, lede_image_caption
+  id, status, embargo_until, note, source_type, source_id, raw_data, page_id, created_at, updated_at, publication_date, internal_id, byline, budget, hed, description, lede_image, lede_image_credit, lede_image_description, lede_image_caption, blurb
 `
 
 type UpdateSharedArticleParams struct {
@@ -285,6 +289,7 @@ func (q *Queries) UpdateSharedArticle(ctx context.Context, arg UpdateSharedArtic
 		&i.LedeImageCredit,
 		&i.LedeImageDescription,
 		&i.LedeImageCaption,
+		&i.Blurb,
 	)
 	return i, err
 }
@@ -307,7 +312,7 @@ WHERE
   source_type = 'gdocs'
   AND source_id = $11
 RETURNING
-  id, status, embargo_until, note, source_type, source_id, raw_data, page_id, created_at, updated_at, publication_date, internal_id, byline, budget, hed, description, lede_image, lede_image_credit, lede_image_description, lede_image_caption
+  id, status, embargo_until, note, source_type, source_id, raw_data, page_id, created_at, updated_at, publication_date, internal_id, byline, budget, hed, description, lede_image, lede_image_credit, lede_image_description, lede_image_caption, blurb
 `
 
 type UpdateSharedArticleFromGDocsParams struct {
@@ -360,6 +365,7 @@ func (q *Queries) UpdateSharedArticleFromGDocs(ctx context.Context, arg UpdateSh
 		&i.LedeImageCredit,
 		&i.LedeImageDescription,
 		&i.LedeImageCaption,
+		&i.Blurb,
 	)
 	return i, err
 }
@@ -372,7 +378,7 @@ SET
 WHERE
   id = $2
 RETURNING
-  id, status, embargo_until, note, source_type, source_id, raw_data, page_id, created_at, updated_at, publication_date, internal_id, byline, budget, hed, description, lede_image, lede_image_credit, lede_image_description, lede_image_caption
+  id, status, embargo_until, note, source_type, source_id, raw_data, page_id, created_at, updated_at, publication_date, internal_id, byline, budget, hed, description, lede_image, lede_image_credit, lede_image_description, lede_image_caption, blurb
 `
 
 type UpdateSharedArticlePageParams struct {
@@ -404,6 +410,7 @@ func (q *Queries) UpdateSharedArticlePage(ctx context.Context, arg UpdateSharedA
 		&i.LedeImageCredit,
 		&i.LedeImageDescription,
 		&i.LedeImageCaption,
+		&i.Blurb,
 	)
 	return i, err
 }
@@ -437,7 +444,7 @@ ON CONFLICT (source_type,
     "hed" = excluded.raw_data -> 'headlines' ->> 'basic',
     "internal_id" = excluded.raw_data ->> 'slug'
   RETURNING
-    id, status, embargo_until, note, source_type, source_id, raw_data, page_id, created_at, updated_at, publication_date, internal_id, byline, budget, hed, description, lede_image, lede_image_credit, lede_image_description, lede_image_caption
+    id, status, embargo_until, note, source_type, source_id, raw_data, page_id, created_at, updated_at, publication_date, internal_id, byline, budget, hed, description, lede_image, lede_image_credit, lede_image_description, lede_image_caption, blurb
 `
 
 func (q *Queries) UpsertSharedArticleFromArc(ctx context.Context, arcID string) (SharedArticle, error) {
@@ -464,6 +471,7 @@ func (q *Queries) UpsertSharedArticleFromArc(ctx context.Context, arcID string) 
 		&i.LedeImageCredit,
 		&i.LedeImageDescription,
 		&i.LedeImageCaption,
+		&i.Blurb,
 	)
 	return i, err
 }
@@ -479,7 +487,7 @@ ON CONFLICT (source_type, source_id)
   DO UPDATE SET
     raw_data = excluded.raw_data
   RETURNING
-    id, status, embargo_until, note, source_type, source_id, raw_data, page_id, created_at, updated_at, publication_date, internal_id, byline, budget, hed, description, lede_image, lede_image_credit, lede_image_description, lede_image_caption
+    id, status, embargo_until, note, source_type, source_id, raw_data, page_id, created_at, updated_at, publication_date, internal_id, byline, budget, hed, description, lede_image, lede_image_credit, lede_image_description, lede_image_caption, blurb
 `
 
 type UpsertSharedArticleFromGDocsParams struct {
@@ -532,6 +540,7 @@ func (q *Queries) UpsertSharedArticleFromGDocs(ctx context.Context, arg UpsertSh
 		&i.LedeImageCredit,
 		&i.LedeImageDescription,
 		&i.LedeImageCaption,
+		&i.Blurb,
 	)
 	return i, err
 }
