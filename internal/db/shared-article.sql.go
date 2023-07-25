@@ -223,12 +223,13 @@ SET
   "budget" = $7,
   "hed" = $8,
   "description" = $9,
-  "lede_image" = $10,
-  "lede_image_credit" = $11,
-  "lede_image_description" = $12,
-  "lede_image_caption" = $13
+  "blurb" = $10,
+  "lede_image" = $11,
+  "lede_image_credit" = $12,
+  "lede_image_description" = $13,
+  "lede_image_caption" = $14
 WHERE
-  id = $14
+  id = $15
 RETURNING
   id, status, embargo_until, note, source_type, source_id, raw_data, page_id, created_at, updated_at, publication_date, internal_id, byline, budget, hed, description, lede_image, lede_image_credit, lede_image_description, lede_image_caption, blurb
 `
@@ -243,6 +244,7 @@ type UpdateSharedArticleParams struct {
 	Budget               string             `json:"budget"`
 	Hed                  string             `json:"hed"`
 	Description          string             `json:"description"`
+	Blurb                string             `json:"blurb"`
 	LedeImage            string             `json:"lede_image"`
 	LedeImageCredit      string             `json:"lede_image_credit"`
 	LedeImageDescription string             `json:"lede_image_description"`
@@ -261,6 +263,7 @@ func (q *Queries) UpdateSharedArticle(ctx context.Context, arg UpdateSharedArtic
 		arg.Budget,
 		arg.Hed,
 		arg.Description,
+		arg.Blurb,
 		arg.LedeImage,
 		arg.LedeImageCredit,
 		arg.LedeImageDescription,
@@ -304,13 +307,14 @@ SET
   "budget" = $4,
   "hed" = $5,
   "description" = $6,
-  "lede_image" = $7,
-  "lede_image_credit" = $8,
-  "lede_image_description" = $9,
-  "lede_image_caption" = $10
+  "blurb" = $7,
+  "lede_image" = $8,
+  "lede_image_credit" = $9,
+  "lede_image_description" = $10,
+  "lede_image_caption" = $11
 WHERE
   source_type = 'gdocs'
-  AND source_id = $11
+  AND source_id = $12
 RETURNING
   id, status, embargo_until, note, source_type, source_id, raw_data, page_id, created_at, updated_at, publication_date, internal_id, byline, budget, hed, description, lede_image, lede_image_credit, lede_image_description, lede_image_caption, blurb
 `
@@ -322,6 +326,7 @@ type UpdateSharedArticleFromGDocsParams struct {
 	Budget               string          `json:"budget"`
 	Hed                  string          `json:"hed"`
 	Description          string          `json:"description"`
+	Blurb                string          `json:"blurb"`
 	LedeImage            string          `json:"lede_image"`
 	LedeImageCredit      string          `json:"lede_image_credit"`
 	LedeImageDescription string          `json:"lede_image_description"`
@@ -337,6 +342,7 @@ func (q *Queries) UpdateSharedArticleFromGDocs(ctx context.Context, arg UpdateSh
 		arg.Budget,
 		arg.Hed,
 		arg.Description,
+		arg.Blurb,
 		arg.LedeImage,
 		arg.LedeImageCredit,
 		arg.LedeImageDescription,
@@ -478,11 +484,11 @@ func (q *Queries) UpsertSharedArticleFromArc(ctx context.Context, arcID string) 
 
 const upsertSharedArticleFromGDocs = `-- name: UpsertSharedArticleFromGDocs :one
 INSERT INTO shared_article (status, source_type, source_id, raw_data,
-  internal_id, byline, budget, hed, description, lede_image, lede_image_credit,
-  lede_image_description, lede_image_caption)
+  internal_id, byline, budget, hed, description, blurb, lede_image,
+  lede_image_credit, lede_image_description, lede_image_caption)
   VALUES ('U', 'gdocs', $1, $2::jsonb,
-    $3, $4, $5, $6, $7, $8,
-    $9, $10, $11)
+    $3, $4, $5, $6, $7, $8, $9,
+    $10, $11, $12)
 ON CONFLICT (source_type, source_id)
   DO UPDATE SET
     raw_data = excluded.raw_data
@@ -498,6 +504,7 @@ type UpsertSharedArticleFromGDocsParams struct {
 	Budget               string `json:"budget"`
 	Hed                  string `json:"hed"`
 	Description          string `json:"description"`
+	Blurb                string `json:"blurb"`
 	LedeImage            string `json:"lede_image"`
 	LedeImageCredit      string `json:"lede_image_credit"`
 	LedeImageDescription string `json:"lede_image_description"`
@@ -513,6 +520,7 @@ func (q *Queries) UpsertSharedArticleFromGDocs(ctx context.Context, arg UpsertSh
 		arg.Budget,
 		arg.Hed,
 		arg.Description,
+		arg.Blurb,
 		arg.LedeImage,
 		arg.LedeImageCredit,
 		arg.LedeImageDescription,
