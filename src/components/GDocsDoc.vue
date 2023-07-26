@@ -84,9 +84,9 @@ function copyHTML() {
   <h2 class="title">Suggested Hed</h2>
   <CopyWithButton :value="article.hed" label="hed" />
 
-  <template v-if="article.description">
+  <template v-if="article.blurb">
     <h2 class="title">Suggested Description</h2>
-    <CopyWithButton :value="article.description" label="description" />
+    <CopyWithButton :value="article.blurb" label="description" />
   </template>
 
   <template v-if="article.byline">

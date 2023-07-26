@@ -27,6 +27,7 @@ export default class SharedArticle {
     this["budget"] = data["budget"] ?? "";
     this["hed"] = data["hed"] ?? "";
     this["description"] = data["description"] ?? "";
+    this["blurb"] = data["blurb"] ?? "";
     this["publicationDate"] = maybeDate(data, "publication_date");
     this["embargoUntil"] = maybeDate(data, "embargo_until");
     this["createdAt"] = maybeDate(data, "created_at");

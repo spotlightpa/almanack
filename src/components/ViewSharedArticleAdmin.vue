@@ -40,6 +40,7 @@ const byline = ref("");
 const budget = ref("");
 const hed = ref("");
 const description = ref("");
+const blurb = ref("");
 const ledeImage = ref("");
 const ledeImageCredit = ref("");
 const ledeImageDescription = ref("");
@@ -57,6 +58,7 @@ const article = computedObj((rawData) => {
   budget.value = a.budget;
   hed.value = a.hed;
   description.value = a.description;
+  blurb.value = a.blurb;
   ledeImage.value = a.ledeImage;
   ledeImageCredit.value = a.ledeImageCredit;
   ledeImageDescription.value = a.ledeImageDescription;
@@ -162,6 +164,7 @@ async function save() {
     budget: budget.value,
     hed: hed.value,
     description: description.value,
+    blurb: blurb.value,
     lede_image: ledeImage.value,
     lede_image_credit: ledeImageCredit.value,
     lede_image_description: ledeImageDescription.value,
@@ -314,7 +317,28 @@ function setImageProps(image) {
                 hed = $event;
               "
             />
+            <template v-if="article.isGDoc">
+              <BulmaTextarea
+                label="SEO description"
+                :model-value="description"
+                help="Only used for Spotlight PA Pages. Not shown to partners."
+                @update:modelValue="
+                  isDirty = true;
+                  description = $event;
+                "
+              />
+              <BulmaTextarea
+                label="Suggested blurb"
+                :model-value="blurb"
+                help="Short description shown to partners."
+                @update:modelValue="
+                  isDirty = true;
+                  blurb = $event;
+                "
+              />
+            </template>
             <BulmaFieldInput
+              v-else
               label="Suggested description"
               :model-value="description"
               help=""
@@ -578,7 +602,7 @@ function setImageProps(image) {
         <h2 class="title is-5">Article Preview</h2>
         <div class="textarea" rows="whatever">
           <h1 class="title">{{ hed }}</h1>
-          <h2 class="subtitle is-3">{{ description }}</h2>
+          <h2 class="subtitle is-3">{{ blurb }}</h2>
           <h2 v-if="byline" class="subtitle is-5">By {{ byline }}</h2>
           <div class="content" v-html="article.gdocs.rich_text" />
         </div>
