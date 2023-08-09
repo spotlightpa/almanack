@@ -1,4 +1,4 @@
-// Package slicex has slice helpers that aren't in x/exp/slices.
+// Package slicex has slice helpers that aren't in std slices.
 package slicex
 
 func DeleteFunc[T any, S ~[]T](sp *S, del func(T) bool) {

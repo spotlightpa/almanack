@@ -5,6 +5,7 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
+	"log/slog"
 	"net/http"
 	"strings"
 
@@ -12,7 +13,6 @@ import (
 	"github.com/carlmjohnson/errorx"
 	"github.com/carlmjohnson/resperr"
 	"github.com/spotlightpa/almanack/pkg/almlog"
-	"golang.org/x/exp/slog"
 )
 
 func NewService(isLambda bool) AuthService {
@@ -37,7 +37,7 @@ func (as NetlifyAuth) AuthFromHeader(r *http.Request) (*http.Request, error) {
 	netID, err := FromLambdaContext(r.Context())
 	if err != nil {
 		l := almlog.FromContext(r.Context())
-		l.ErrorCtx(r.Context(), "netlify.AuthFromHeader", "err", err)
+		l.ErrorContext(r.Context(), "netlify.AuthFromHeader", "err", err)
 		return nil, err
 	}
 	return addJWTToRequest(netID, r), nil
@@ -47,7 +47,7 @@ func (as NetlifyAuth) AuthFromCookie(r *http.Request) (*http.Request, error) {
 	netID, err := FromCookie(r)
 	if err != nil {
 		l := almlog.FromContext(r.Context())
-		l.ErrorCtx(r.Context(), "netlify.AuthFromCookie", "err", err)
+		l.ErrorContext(r.Context(), "netlify.AuthFromCookie", "err", err)
 		return nil, err
 	}
 	return addJWTToRequest(netID, r), nil
@@ -81,7 +81,7 @@ func (as NetlifyAuth) HasRole(r *http.Request, role string) error {
 		fmt.Errorf("no user info provided: is this localhost?"),
 		"no user info provided",
 	)
-	l.ErrorCtx(r.Context(),
+	l.ErrorContext(r.Context(),
 		"netlify.HasRole: no identity found: running on AWS?",
 		"err", err)
 

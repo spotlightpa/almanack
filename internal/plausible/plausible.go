@@ -48,7 +48,7 @@ func (api *API) MostPopularNews(ctx context.Context, cl *http.Client) (pages []s
 		}
 	}
 	l := almlog.FromContext(ctx)
-	l.InfoCtx(ctx, "plausible.MostPopularNews", "count", len(pages))
+	l.InfoContext(ctx, "plausible.MostPopularNews", "count", len(pages))
 	return pages, nil
 }
 

@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"maps"
 	"net/http"
 	"strings"
 
@@ -20,7 +21,6 @@ import (
 	"github.com/spotlightpa/almanack/internal/stringx"
 	"github.com/spotlightpa/almanack/internal/timex"
 	"github.com/spotlightpa/almanack/pkg/almlog"
-	"golang.org/x/exp/maps"
 )
 
 func (svc Services) PublishPage(ctx context.Context, q *db.Queries, page *db.Page) (err, warning error) {
@@ -137,7 +137,7 @@ func (svc Services) RefreshPageContents(ctx context.Context, id int64) (err erro
 	}
 
 	l := almlog.FromContext(ctx)
-	l.InfoCtx(ctx, "Services.RefreshPageContents: page changed",
+	l.InfoContext(ctx, "Services.RefreshPageContents: page changed",
 		"filepath", page.FilePath)
 
 	_, err = svc.Queries.UpdatePage(ctx, db.UpdatePageParams{

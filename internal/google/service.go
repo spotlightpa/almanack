@@ -76,7 +76,7 @@ func (gsvc *Service) client(ctx context.Context, scopes ...string) (cl *http.Cli
 
 	if len(gsvc.cert) == 0 {
 		l := almlog.FromContext(ctx)
-		l.WarnCtx(ctx, "using default Google credentials")
+		l.WarnContext(ctx, "using default Google credentials")
 		cl, err = google.DefaultClient(ctx, scopes...)
 		return
 	}

@@ -27,11 +27,11 @@ func New(hookURL string) Client {
 func (sc Client) Post(ctx context.Context, msg Message) error {
 	l := almlog.FromContext(ctx)
 	if sc.c == nil {
-		l.InfoCtx(ctx, "slack.Post: mocking; debug output")
+		l.InfoContext(ctx, "slack.Post: mocking; debug output")
 		b, _ := json.MarshalIndent(&msg, "", "  ")
 		fmt.Fprintf(os.Stderr, "\n%s\n", b)
 		return nil
 	}
-	l.InfoCtx(ctx, "slack.Post")
+	l.InfoContext(ctx, "slack.Post")
 	return sc.c.PostCtx(ctx, msg)
 }

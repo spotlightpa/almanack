@@ -13,7 +13,7 @@ func (svc Services) UpdateMostPopular(ctx context.Context) (err error) {
 	defer errorx.Trace(&err)
 
 	l := almlog.FromContext(ctx)
-	l.InfoCtx(ctx, "Services.UpdateMostPopular")
+	l.InfoContext(ctx, "Services.UpdateMostPopular")
 
 	pages, err := svc.Plausible.MostPopularNews(ctx, svc.Client)
 	if err != nil {

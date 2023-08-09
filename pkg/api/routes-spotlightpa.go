@@ -3,7 +3,9 @@ package api
 import (
 	"errors"
 	"fmt"
+	"maps"
 	"net/http"
+	"slices"
 	"strings"
 
 	"github.com/carlmjohnson/emailx"
@@ -14,8 +16,6 @@ import (
 	"github.com/spotlightpa/almanack/internal/stringx"
 	"github.com/spotlightpa/almanack/pkg/almanack"
 	"github.com/spotlightpa/almanack/pkg/almlog"
-	"golang.org/x/exp/maps"
-	"golang.org/x/exp/slices"
 )
 
 func (app *appEnv) postMessage(w http.ResponseWriter, r *http.Request) {

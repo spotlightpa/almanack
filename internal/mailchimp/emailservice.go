@@ -25,7 +25,7 @@ type MockEmailService struct {
 
 func (mock MockEmailService) SendEmail(ctx context.Context, subject, body string) error {
 	l := almlog.FromContext(ctx)
-	l.InfoCtx(ctx, "mocking campaign, debug output")
+	l.InfoContext(ctx, "mocking campaign, debug output")
 	fmt.Println()
 	fmt.Println(subject)
 	fmt.Println("----")

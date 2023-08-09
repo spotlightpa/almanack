@@ -40,6 +40,6 @@ func (mi MockIndexer) SaveObject(object any, opts ...any) (res search.SaveObject
 			l = almlog.FromContext(ctx)
 		}
 	}
-	l.InfoCtx(ctx, "index.Mock.SaveObject")
+	l.InfoContext(ctx, "index.Mock.SaveObject")
 	return
 }

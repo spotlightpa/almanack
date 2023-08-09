@@ -82,17 +82,17 @@ func (app *appEnv) getArcImage(w http.ResponseWriter, r *http.Request) {
 	dbImage, err := app.svc.Queries.GetImageBySourceURL(r.Context(), srcURL)
 	switch {
 	case db.IsNotFound(err):
-		l.InfoCtx(r.Context(), "getProxyImage: image not found", "src", srcURL)
+		l.InfoContext(r.Context(), "getProxyImage: image not found", "src", srcURL)
 
 	case err != nil:
 		app.replyHTMLErr(w, r, err)
 		return
 
 	case err == nil && !dbImage.IsUploaded:
-		l.InfoCtx(r.Context(), "getProxyImage: image found but awaiting upload", "src", srcURL)
+		l.InfoContext(r.Context(), "getProxyImage: image found but awaiting upload", "src", srcURL)
 
 	case err == nil && dbImage.IsUploaded:
-		l.InfoCtx(r.Context(), "getProxyImage: redirecting", "src", srcURL)
+		l.InfoContext(r.Context(), "getProxyImage: redirecting", "src", srcURL)
 		redirect, err := app.svc.ImageStore.SignGetURL(r.Context(), dbImage.Path)
 		if err != nil {
 			app.logErr(r.Context(), err)
@@ -103,7 +103,7 @@ func (app *appEnv) getArcImage(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	l.InfoCtx(r.Context(), "getProxyImage: proxying", "src", srcURL)
+	l.InfoContext(r.Context(), "getProxyImage: proxying", "src", srcURL)
 
 	body, ctype, err := almanack.FetchImageURL(r.Context(), app.svc.Client, u.String())
 	if err != nil {
