@@ -56,7 +56,7 @@ func NewClient(token, owner, repo, branch string) *Client {
 
 func (cl *Client) CreateFile(ctx context.Context, msg, path string, content []byte) error {
 	l := almlog.FromContext(ctx)
-	l.InfoCtx(ctx, "github.CreateFile",
+	l.InfoContext(ctx, "github.CreateFile",
 		"org", cl.owner,
 		"repo", cl.repo,
 		"branch", cl.branch,
@@ -77,7 +77,7 @@ func (cl *Client) CreateFile(ctx context.Context, msg, path string, content []by
 
 func (cl *Client) GetFile(ctx context.Context, path string) (contents string, err error) {
 	l := almlog.FromContext(ctx)
-	l.InfoCtx(ctx, "github.GetFile",
+	l.InfoContext(ctx, "github.GetFile",
 		"org", cl.owner,
 		"repo", cl.repo,
 		"branch", cl.branch,
@@ -99,7 +99,7 @@ func (cl *Client) GetFile(ctx context.Context, path string) (contents string, er
 
 func (cl *Client) UpdateFile(ctx context.Context, msg, path string, content []byte) error {
 	l := almlog.FromContext(ctx)
-	l.InfoCtx(ctx, "github.UpdateFile",
+	l.InfoContext(ctx, "github.UpdateFile",
 		"org", cl.owner,
 		"repo", cl.repo,
 		"branch", cl.branch,
@@ -116,7 +116,7 @@ func (cl *Client) UpdateFile(ctx context.Context, msg, path string, content []by
 	if err == nil {
 		sha = fileInfo.SHA
 		if oldcontent, err2 := fileInfo.GetContent(); err2 == nil && string(content) == oldcontent {
-			l.InfoCtx(ctx, "github.UpdateFile skipping; already updated",
+			l.InfoContext(ctx, "github.UpdateFile skipping; already updated",
 				"org", cl.owner,
 				"repo", cl.repo,
 				"branch", cl.branch,
@@ -146,7 +146,7 @@ func (cl *Client) UpdateFile(ctx context.Context, msg, path string, content []by
 
 func (cl *Client) Ping(ctx context.Context) error {
 	l := almlog.FromContext(ctx)
-	l.InfoCtx(ctx, "github.Ping",
+	l.InfoContext(ctx, "github.Ping",
 		"org", cl.owner,
 		"repo", cl.repo,
 		"branch", cl.branch,

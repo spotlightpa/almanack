@@ -7,6 +7,7 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+	"slices"
 	"strings"
 
 	"github.com/carlmjohnson/bytemap"
@@ -20,7 +21,6 @@ import (
 	"github.com/spotlightpa/almanack/internal/stringx"
 	"github.com/spotlightpa/almanack/internal/xhtml"
 	"github.com/spotlightpa/almanack/pkg/almlog"
-	"golang.org/x/exp/slices"
 	"golang.org/x/net/html"
 	"golang.org/x/net/html/atom"
 )
@@ -286,7 +286,7 @@ func (svc Services) replaceImageEmbed(
 			// Try looking up the image
 		case err != nil:
 			l := almlog.FromContext(ctx)
-			l.ErrorCtx(ctx, "ProcessGDocsDoc: ReplaceAndUploadImageURL", "err", err)
+			l.ErrorContext(ctx, "ProcessGDocsDoc: ReplaceAndUploadImageURL", "err", err)
 			return nil, fmt.Sprintf(
 				"An error occurred when processing images in table %d: %v.",
 				n, err)
@@ -311,7 +311,7 @@ func (svc Services) replaceImageEmbed(
 			Embed:       imageEmbed,
 		}); uploadErr != nil {
 			l := almlog.FromContext(ctx)
-			l.ErrorCtx(ctx, "ProcessGDocsDoc: UploadGDocsImage", "err", uploadErr)
+			l.ErrorContext(ctx, "ProcessGDocsDoc: UploadGDocsImage", "err", uploadErr)
 			return nil, fmt.Sprintf(
 				"An error occurred when processing images in table %d: %v.",
 				n, uploadErr)
@@ -434,7 +434,7 @@ func (svc Services) replaceMetadata(
 			// Try image URL next
 		case err != nil:
 			l := almlog.FromContext(ctx)
-			l.ErrorCtx(ctx, "ProcessGDocsDoc: replaceMetadata: ReplaceAndUploadImageURL",
+			l.ErrorContext(ctx, "ProcessGDocsDoc: replaceMetadata: ReplaceAndUploadImageURL",
 				"err", err)
 			return fmt.Sprintf("An error occurred when processing the lede image: %v.", err)
 		}
@@ -461,7 +461,7 @@ func (svc Services) replaceMetadata(
 			Embed:       &imageEmbed,
 		}); uploadErr != nil {
 			l := almlog.FromContext(ctx)
-			l.ErrorCtx(ctx, "ProcessGDocsDoc: replaceMetadata: UploadGDocsImage",
+			l.ErrorContext(ctx, "ProcessGDocsDoc: replaceMetadata: UploadGDocsImage",
 				"err", uploadErr)
 			return fmt.Sprintf("An error occurred when processing the lede image: %v.", uploadErr)
 		}

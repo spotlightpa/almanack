@@ -54,7 +54,7 @@ func NewBlobStore(s string) BlobStore {
 
 func (bs BlobStore) SignPutURL(ctx context.Context, srcPath string, h http.Header) (signedURL string, err error) {
 	l := almlog.FromContext(ctx)
-	l.InfoCtx(ctx, "aws.SignPutURL", "url", srcPath)
+	l.InfoContext(ctx, "aws.SignPutURL", "url", srcPath)
 	b, err := blob.OpenBucket(ctx, bs.bucket)
 	if err != nil {
 		return "", err
@@ -82,7 +82,7 @@ func (bs BlobStore) SignPutURL(ctx context.Context, srcPath string, h http.Heade
 
 func (bs BlobStore) SignGetURL(ctx context.Context, srcPath string) (signedURL string, err error) {
 	l := almlog.FromContext(ctx)
-	l.InfoCtx(ctx, "aws.SignGetURL", "url", srcPath)
+	l.InfoContext(ctx, "aws.SignGetURL", "url", srcPath)
 	b, err := blob.OpenBucket(ctx, bs.bucket)
 	if err != nil {
 		return "", err
@@ -130,13 +130,13 @@ func (bs BlobStore) WriteFile(ctx context.Context, path string, h http.Header, d
 		a := md5.Sum(data)
 		checksum = a[:]
 		if string(checksum) == string(attrs.MD5) {
-			l.InfoCtx(ctx, "aws.WriteFile: skipping; already uploaded",
+			l.InfoContext(ctx, "aws.WriteFile: skipping; already uploaded",
 				"bucket", bs.bucket, "path", path)
 			return nil
 		}
 	}
 
-	l.InfoCtx(ctx, "aws.WriteFile: writing", "bucket", bs.bucket, "path", path)
+	l.InfoContext(ctx, "aws.WriteFile: writing", "bucket", bs.bucket, "path", path)
 	return b.WriteAll(ctx, path, data, &blob.WriterOptions{
 		CacheControl:       h.Get("Cache-Control"),
 		ContentType:        h.Get("Content-Type"),
@@ -160,7 +160,7 @@ func (bs BlobStore) ReadMD5(ctx context.Context, path string) (hash []byte, size
 	if attrs.MD5 != nil {
 		return attrs.MD5, attrs.Size, nil
 	}
-	l.InfoCtx(ctx, "ReadMD5: missing MD5 attribute")
+	l.InfoContext(ctx, "ReadMD5: missing MD5 attribute")
 	r, err := b.NewReader(ctx, path, nil)
 	if err != nil {
 		return nil, 0, err

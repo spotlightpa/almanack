@@ -19,9 +19,9 @@ func (app *appEnv) backgroundSleep(w http.ResponseWriter, r *http.Request) {
 	app.logStart(r)
 	l := almlog.FromContext(r.Context())
 	if deadline, ok := r.Context().Deadline(); ok {
-		l.InfoCtx(r.Context(), "backgroundSleep", "deadline", deadline)
+		l.InfoContext(r.Context(), "backgroundSleep", "deadline", deadline)
 	} else {
-		l.InfoCtx(r.Context(), "backgroundSleep", "deadline", false)
+		l.InfoContext(r.Context(), "backgroundSleep", "deadline", false)
 	}
 	durationStr := chi.URLParam(r, "duration")
 	duration, err := time.ParseDuration(durationStr)

@@ -1,6 +1,6 @@
 name: Go deps
 env:
-  GO_VERSION: 1.20.3
+  GO_VERSION: '1.21'
 
 on:
   workflow_dispatch:

@@ -2,9 +2,8 @@ package almlog
 
 import (
 	"bytes"
+	"log/slog"
 	"testing"
-
-	"golang.org/x/exp/slog"
 )
 
 func UseTestLogger(t testing.TB) {

@@ -3,6 +3,7 @@ package db
 import (
 	"context"
 	"fmt"
+	"log/slog"
 	"path/filepath"
 	"runtime"
 	"time"
@@ -11,7 +12,6 @@ import (
 	"github.com/jackc/pgx/v5/pgconn"
 	"github.com/spotlightpa/almanack/internal/stringx"
 	"github.com/spotlightpa/almanack/pkg/almlog"
-	"golang.org/x/exp/slog"
 )
 
 type logger struct {

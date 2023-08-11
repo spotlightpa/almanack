@@ -44,7 +44,7 @@ func (v3 V3) SendEmail(ctx context.Context, subject, body string) (err error) {
 		return err
 	}
 
-	l.InfoCtx(ctx, "mailchimp.SendEmail: created campaign", "campaign_id", res.ID)
+	l.InfoContext(ctx, "mailchimp.SendEmail: created campaign", "campaign_id", res.ID)
 
 	var putRes PutCampaignResponse
 	if err = requests.
@@ -60,7 +60,7 @@ func (v3 V3) SendEmail(ctx context.Context, subject, body string) (err error) {
 		return err
 	}
 
-	l.InfoCtx(ctx, "mailchimp.SendEmail: configured campaign", "campaign_id", res.ID)
+	l.InfoContext(ctx, "mailchimp.SendEmail: configured campaign", "campaign_id", res.ID)
 
 	if err = requests.
 		New(v3.config).
@@ -71,7 +71,7 @@ func (v3 V3) SendEmail(ctx context.Context, subject, body string) (err error) {
 		return err
 	}
 
-	l.InfoCtx(ctx, "mailchimp.SendEmail: sent campaign", "campaign_id", res.ID)
+	l.InfoContext(ctx, "mailchimp.SendEmail: sent campaign", "campaign_id", res.ID)
 
 	return nil
 }

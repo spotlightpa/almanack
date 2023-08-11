@@ -1,12 +1,12 @@
 package slicex_test
 
 import (
+	"slices"
 	"strings"
 	"testing"
 
 	"github.com/carlmjohnson/be"
 	"github.com/spotlightpa/almanack/internal/slicex"
-	"golang.org/x/exp/slices"
 )
 
 func TestDeleteFunc(t *testing.T) {

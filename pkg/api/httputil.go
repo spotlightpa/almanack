@@ -70,7 +70,7 @@ func (app *appEnv) logErr(ctx context.Context, err error) {
 	} else {
 		l.Warn("sentry not in context")
 	}
-	l.ErrorCtx(ctx, "logErr", "err", err)
+	l.ErrorContext(ctx, "logErr", "err", err)
 }
 
 func (app *appEnv) tryReadJSON(w http.ResponseWriter, r *http.Request, dst any) error {
@@ -296,5 +296,5 @@ func (app *appEnv) logStart(r *http.Request, args ...any) {
 		route = fmt.Sprintf("%s(%s:%d)", name, file, line)
 	}
 	l := almlog.FromContext(r.Context())
-	l.With(args...).InfoCtx(r.Context(), "logStart", "route", route)
+	l.With(args...).InfoContext(r.Context(), "logStart", "route", route)
 }

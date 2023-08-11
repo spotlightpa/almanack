@@ -29,10 +29,10 @@ func (svc Services) PopScheduledSiteChanges(ctx context.Context, loc string) err
 			}
 		}
 		if currentConfig == nil {
-			l.InfoCtx(ctx, "Services.PopScheduledSiteChanges: no changes", "location", loc)
+			l.InfoContext(ctx, "Services.PopScheduledSiteChanges: no changes", "location", loc)
 			return nil
 		}
-		l.InfoCtx(ctx, "Services.PopScheduledSiteChanges: updating", "location", loc)
+		l.InfoContext(ctx, "Services.PopScheduledSiteChanges: updating", "location", loc)
 
 		return svc.PublishSiteConfig(ctx, currentConfig)
 	})

@@ -2,8 +2,7 @@ package almlog
 
 import (
 	"context"
-
-	"golang.org/x/exp/slog"
+	"log/slog"
 )
 
 type contextKey struct{}

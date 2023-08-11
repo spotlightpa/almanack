@@ -1,7 +1,8 @@
 package xhtml
 
 import (
-	"golang.org/x/exp/slices"
+	"slices"
+
 	"golang.org/x/net/html"
 	"golang.org/x/net/html/atom"
 )

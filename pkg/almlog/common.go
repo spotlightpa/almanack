@@ -2,10 +2,9 @@
 package almlog
 
 import (
+	"log/slog"
 	"os"
 	"time"
-
-	"golang.org/x/exp/slog"
 )
 
 var Logger *slog.Logger = slog.New(slog.NewTextHandler(initMe{}, nil))

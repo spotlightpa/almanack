@@ -78,7 +78,7 @@ func (gsvc *Service) MostPopularNews(ctx context.Context, cl *http.Client) (page
 		}
 	}
 	l := almlog.FromContext(ctx)
-	l.InfoCtx(ctx, "google.MostPopularNews", "count", len(pages))
+	l.InfoContext(ctx, "google.MostPopularNews", "count", len(pages))
 	return pages, nil
 }
 

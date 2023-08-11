@@ -1,10 +1,10 @@
 package blocko
 
 import (
+	"slices"
 	"strings"
 
 	"github.com/spotlightpa/almanack/internal/xhtml"
-	"golang.org/x/exp/slices"
 	"golang.org/x/net/html"
 	"golang.org/x/net/html/atom"
 )
