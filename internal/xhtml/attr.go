@@ -1,7 +1,8 @@
 package xhtml
 
 import (
-	"github.com/spotlightpa/almanack/internal/slicex"
+	"slices"
+
 	"golang.org/x/net/html"
 )
 
@@ -32,7 +33,7 @@ func SetAttr(n *html.Node, key, value string) {
 }
 
 func DeleteAttr(n *html.Node, key string) {
-	slicex.DeleteFunc(&n.Attr, func(a html.Attribute) bool {
+	n.Attr = slices.DeleteFunc(n.Attr, func(a html.Attribute) bool {
 		return a.Key == key
 	})
 }

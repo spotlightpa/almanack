@@ -1,6 +1,7 @@
 package api
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"maps"
@@ -30,8 +31,9 @@ func (app *appEnv) postMessage(w http.ResponseWriter, r *http.Request) {
 	if !app.readJSON(w, r, &req) {
 		return
 	}
+	ctx := context.WithoutCancel(r.Context())
 	if err := app.svc.EmailService.SendEmail(
-		r.Context(),
+		ctx,
 		req.Subject,
 		req.Body,
 	); err != nil {
@@ -537,8 +539,8 @@ func (app *appEnv) postPage(w http.ResponseWriter, r *http.Request) {
 		app.replyErr(w, r, err)
 		return
 	}
-
-	res, err := app.svc.Queries.UpdatePage(r.Context(), userUpdate)
+	ctx := context.WithoutCancel(r.Context())
+	res, err := app.svc.Queries.UpdatePage(ctx, userUpdate)
 	if err != nil {
 		err = fmt.Errorf("postPage update problem: %w", err)
 		app.replyErr(w, r, err)
@@ -547,12 +549,12 @@ func (app *appEnv) postPage(w http.ResponseWriter, r *http.Request) {
 	shouldPublish := res.ShouldPublish()
 	shouldNotify := res.ShouldNotify(&oldPage)
 	if shouldNotify {
-		if err = app.svc.Notify(r.Context(), &res, shouldPublish); err != nil {
-			app.logErr(r.Context(), err)
+		if err = app.svc.Notify(ctx, &res, shouldPublish); err != nil {
+			app.logErr(ctx, err)
 		}
 	}
 	if shouldPublish {
-		err, warning := app.svc.PublishPage(r.Context(), app.svc.Queries, &res)
+		err, warning := app.svc.PublishPage(ctx, app.svc.Queries, &res)
 		if warning != nil {
 			app.logErr(r.Context(), warning)
 		}

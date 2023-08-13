@@ -8,11 +8,11 @@ import (
 	"net/url"
 	"regexp"
 	"strconv"
+	"slices"
 	"strings"
 
 	"github.com/spotlightpa/almanack/internal/arc"
 	"github.com/spotlightpa/almanack/internal/must"
-	"github.com/spotlightpa/almanack/internal/slicex"
 	"github.com/spotlightpa/almanack/internal/stringx"
 	"github.com/spotlightpa/almanack/pkg/almlog"
 )
@@ -46,7 +46,7 @@ func ArcFeedItemToFrontmatter(ctx context.Context, svc Services, arcStory *arc.F
 	}
 
 	// Drop "Spotlight PA Staff" as an author
-	slicex.DeleteFunc(&authors, func(author string) bool {
+	authors = slices.DeleteFunc(authors, func(author string) bool {
 		return strings.EqualFold(author, "Spotlight PA Staff") ||
 			strings.EqualFold(author, "Spotlight PA State College Staff")
 	})

@@ -9,6 +9,7 @@ import (
 	"regexp"
 	"strconv"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/carlmjohnson/resperr"
@@ -19,7 +20,6 @@ import (
 	"github.com/spotlightpa/almanack/internal/must"
 	"github.com/spotlightpa/almanack/internal/netlifyid"
 	"github.com/spotlightpa/almanack/internal/slack"
-	"github.com/spotlightpa/almanack/internal/syncx"
 	"github.com/spotlightpa/almanack/pkg/almanack"
 	"github.com/spotlightpa/almanack/pkg/almlog"
 )
@@ -52,7 +52,7 @@ func (app *appEnv) pingErr(w http.ResponseWriter, r *http.Request) {
 
 var inkyURL = must.Get(url.Parse("https://www.inquirer.com"))
 
-var imageWhitelist = syncx.Once(func() *regexp.Regexp {
+var imageWhitelist = sync.OnceValue(func() *regexp.Regexp {
 	return regexp.MustCompile(`^https://[^/]*(\.inquirer\.com|\.arcpublishing\.com|arc-anglerfish-arc2-prod-pmn\.s3\.amazonaws\.com)/`)
 })
 
