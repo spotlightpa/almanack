@@ -2,13 +2,13 @@ package timex
 
 import (
 	"time"
+	"sync"
 
 	"github.com/jackc/pgx/v5/pgtype"
 	"github.com/spotlightpa/almanack/internal/must"
-	"github.com/spotlightpa/almanack/internal/syncx"
 )
 
-var getNewYork = syncx.Once(func() *time.Location {
+var getNewYork = sync.OnceValue(func() *time.Location {
 	return must.Get(time.LoadLocation("America/New_York"))
 })
 

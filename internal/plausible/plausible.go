@@ -6,10 +6,10 @@ import (
 	"flag"
 	"net/http"
 	"regexp"
+	"sync"
 
 	"github.com/carlmjohnson/errorx"
 	"github.com/carlmjohnson/requests"
-	"github.com/spotlightpa/almanack/internal/syncx"
 	"github.com/spotlightpa/almanack/pkg/almlog"
 )
 
@@ -22,7 +22,7 @@ func (api *API) AddFlags(fl *flag.FlagSet) {
 	fl.StringVar(&api.Token, "plausible-token", "", "API `token` for Plausible.io")
 }
 
-var lazyRe = syncx.Once(func() *regexp.Regexp {
+var lazyRe = sync.OnceValue(func() *regexp.Regexp {
 	return regexp.MustCompile(`/(news|statecollege)/\d{4}/\d\d/[\w-]+/`)
 })
 

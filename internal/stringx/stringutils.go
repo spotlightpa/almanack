@@ -4,9 +4,8 @@ package stringx
 import (
 	"regexp"
 	"strings"
+	"sync"
 	"unicode"
-
-	"github.com/spotlightpa/almanack/internal/syncx"
 )
 
 // First non-blank string
@@ -20,7 +19,7 @@ func First(ss ...string) string {
 }
 
 func mustBeLazy(s string) func() *regexp.Regexp {
-	return syncx.Once(
+	return sync.OnceValue(
 		func() *regexp.Regexp {
 			return regexp.MustCompile(s)
 		})
