@@ -171,7 +171,7 @@ function db:load-dump() {
 function api() {
 	# shellcheck disable=SC1091
 	[[ -f .env ]] && echo "Using .env file" && source .env
-	go run ./funcs/almanack-api "$@"
+	${GO_EXEC:-go} run ./funcs/almanack-api "$@"
 }
 
 function frontend() {
