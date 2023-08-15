@@ -1,8 +1,8 @@
 package timex
 
 import (
-	"time"
 	"sync"
+	"time"
 
 	"github.com/jackc/pgx/v5/pgtype"
 	"github.com/spotlightpa/almanack/internal/must"
