@@ -12,6 +12,7 @@ import (
 )
 
 func (app *appEnv) routes() http.Handler {
+	// TODO: replace with stdlib after https://github.com/golang/go/issues/61410
 	mux := muxpatterns.NewServeMux()
 
 	var baseMW httpx.Stack
