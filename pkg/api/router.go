@@ -48,8 +48,6 @@ func (app *appEnv) routes() http.Handler {
 	partnerMW.Push(app.hasRoleMiddleware("editor"))
 
 	// Start partner endpoints
-	mux.Handle(`GET /api/mailchimp-signup-url`,
-		partnerMW.HandlerFunc(app.getSignupURL)) // TODO: move to SSR
 	mux.Handle(`GET /api/shared-article`,
 		partnerMW.Controller(app.getSharedArticle))
 	mux.Handle(`GET /api/shared-articles`,
@@ -150,6 +148,8 @@ func (app *appEnv) routes() http.Handler {
 
 	mux.Handle(`GET /ssr/download-image`,
 		partnerSSRMW.Controller(app.redirectImageURL))
+	mux.Handle(`GET /ssr/mailchimp-signup-url`,
+		partnerSSRMW.HandlerFunc(app.redirectSignupURL))
 
 	spotlightSSRMW := ssrMW.Clone()
 	spotlightSSRMW.Push(app.hasRoleMiddleware("Spotlight PA"))

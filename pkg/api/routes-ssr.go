@@ -9,6 +9,11 @@ import (
 	"github.com/spotlightpa/almanack/layouts"
 )
 
+func (app *appEnv) redirectSignupURL(w http.ResponseWriter, r *http.Request) {
+	app.logStart(r)
+	http.Redirect(w, r, app.svc.MailchimpSignupURL, http.StatusFound)
+}
+
 func (app *appEnv) renderNotFound(w http.ResponseWriter, r *http.Request) {
 	app.logStart(r)
 	app.replyHTMLErr(w, r, resperr.NotFound(r))

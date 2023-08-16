@@ -14,11 +14,6 @@ func (app *appEnv) userInfo(w http.ResponseWriter, r *http.Request) http.Handler
 	return app.jsonOK(userinfo)
 }
 
-func (app *appEnv) getSignupURL(w http.ResponseWriter, r *http.Request) {
-	app.logStart(r)
-	app.replyJSON(http.StatusOK, w, app.svc.MailchimpSignupURL)
-}
-
 func (app *appEnv) listSharedArticles(w http.ResponseWriter, r *http.Request) http.Handler {
 	app.logStart(r)
 
