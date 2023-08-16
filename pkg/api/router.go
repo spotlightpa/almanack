@@ -41,7 +41,7 @@ func (app *appEnv) routes() http.Handler {
 	authMW.Push(app.authHeaderMiddleware)
 
 	mux.Handle(`GET /api/user-info`,
-		authMW.HandlerFunc(app.userInfo))
+		authMW.Controller(app.userInfo))
 
 	partnerMW := authMW.Clone()
 	partnerMW.Push(app.hasRoleMiddleware("editor"))
@@ -140,7 +140,7 @@ func (app *appEnv) routes() http.Handler {
 	ssrMW.Push(app.authCookieMiddleware)
 
 	mux.Handle(`GET /ssr/user-info`,
-		ssrMW.HandlerFunc(app.userInfo))
+		ssrMW.Controller(app.userInfo))
 	mux.Handle(`/ssr/`,
 		ssrMW.HandlerFunc(app.renderNotFound))
 
@@ -148,13 +148,13 @@ func (app *appEnv) routes() http.Handler {
 	partnerSSRMW.Push(app.hasRoleMiddleware("editor"))
 
 	mux.Handle(`GET /ssr/download-image`,
-		partnerSSRMW.HandlerFunc(app.redirectImageURL))
+		partnerSSRMW.Controller(app.redirectImageURL))
 
 	spotlightSSRMW := ssrMW.Clone()
 	spotlightSSRMW.Push(app.hasRoleMiddleware("Spotlight PA"))
 
 	mux.Handle(`GET /ssr/page/{id}`,
-		spotlightSSRMW.HandlerFunc(app.renderPage))
+		spotlightSSRMW.Controller(app.renderPage))
 
 	// Start background API endpoints
 	mux.Handle(`GET /api-background/cron`,

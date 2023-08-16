@@ -9,10 +9,10 @@ import (
 	"github.com/spotlightpa/almanack/internal/paginate"
 )
 
-func (app *appEnv) userInfo(w http.ResponseWriter, r *http.Request) {
+func (app *appEnv) userInfo(w http.ResponseWriter, r *http.Request) http.Handler {
 	app.logStart(r)
 	userinfo := netlifyid.FromContext(r.Context())
-	app.replyJSON(http.StatusOK, w, userinfo)
+	return app.jsonOK(userinfo)
 }
 
 func (app *appEnv) getSignupURL(w http.ResponseWriter, r *http.Request) {
