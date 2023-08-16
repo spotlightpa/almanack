@@ -158,13 +158,13 @@ func (app *appEnv) routes() http.Handler {
 
 	// Start background API endpoints
 	mux.Handle(`GET /api-background/cron`,
-		baseMW.HandlerFunc(app.backgroundCron))
+		baseMW.Controller(app.backgroundCron))
 	mux.Handle(`GET /api-background/images`,
-		baseMW.HandlerFunc(app.backgroundImages))
+		baseMW.Controller(app.backgroundImages))
 	mux.Handle(`GET /api-background/refresh-pages`,
-		baseMW.HandlerFunc(app.backgroundRefreshPages))
+		baseMW.Controller(app.backgroundRefreshPages))
 	mux.Handle(`GET /api-background/sleep/{duration}`,
-		baseMW.HandlerFunc(app.backgroundSleep))
+		baseMW.Controller(app.backgroundSleep))
 	// End background API endpoints
 
 	mux.Handle("/", baseMW.HandlerFunc(app.notFound))
