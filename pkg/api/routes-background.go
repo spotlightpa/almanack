@@ -8,8 +8,8 @@ import (
 	"time"
 
 	"github.com/carlmjohnson/flowmatic"
-	"github.com/go-chi/chi/v5"
 	"github.com/spotlightpa/almanack/internal/db"
+	"github.com/spotlightpa/almanack/internal/httpx"
 	"github.com/spotlightpa/almanack/internal/paginate"
 	"github.com/spotlightpa/almanack/pkg/almanack"
 	"github.com/spotlightpa/almanack/pkg/almlog"
@@ -23,7 +23,7 @@ func (app *appEnv) backgroundSleep(w http.ResponseWriter, r *http.Request) {
 	} else {
 		l.InfoContext(r.Context(), "backgroundSleep", "deadline", false)
 	}
-	durationStr := chi.URLParam(r, "duration")
+	durationStr := httpx.PathValue(r, "duration")
 	duration, err := time.ParseDuration(durationStr)
 	if err != nil {
 		app.replyErr(w, r, err)

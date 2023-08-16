@@ -27,6 +27,7 @@ require (
 	github.com/google/go-github/v53 v53.2.0
 	github.com/jackc/pgx/v5 v5.4.3
 	github.com/jackc/tern/v2 v2.1.1
+	github.com/jba/muxpatterns v0.2.0
 	github.com/microcosm-cc/bluemonday v1.0.25
 	github.com/tdewolff/minify/v2 v2.12.8
 	gocloud.dev v0.33.0
@@ -86,6 +87,7 @@ require (
 	github.com/tdewolff/parse/v2 v2.6.7 // indirect
 	go.opencensus.io v0.24.0 // indirect
 	golang.org/x/crypto v0.12.0 // indirect
+	golang.org/x/exp v0.0.0-20230519143937-03e91628a987 // indirect
 	golang.org/x/sync v0.3.0 // indirect
 	golang.org/x/sys v0.11.0 // indirect
 	golang.org/x/text v0.12.0 // indirect
