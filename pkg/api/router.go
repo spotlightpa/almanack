@@ -24,16 +24,18 @@ func (app *appEnv) routes() http.Handler {
 		app.maxSizeMiddleware,
 	)
 
+	// Start public endpoints
+	mux.Handle(`GET /api/arc-image`,
+		baseMW.HandlerFunc(app.getArcImage))
 	mux.Handle(`GET /api/bookmarklet/{slug}`,
 		baseMW.HandlerFunc(app.getBookmarklet))
 	mux.Handle(`GET /api/healthcheck`,
 		baseMW.HandlerFunc(app.ping))
 	mux.Handle(`GET /api/healthcheck/{code}`,
 		baseMW.HandlerFunc(app.pingErr))
-	mux.Handle(`GET /api/arc-image`,
-		baseMW.HandlerFunc(app.getArcImage))
 	mux.Handle(`POST /api/identity-hook`,
 		baseMW.HandlerFunc(app.postIdentityHook))
+	// End public endpoints
 
 	authMW := baseMW.Clone()
 	authMW.Push(app.authHeaderMiddleware)
@@ -44,24 +46,27 @@ func (app *appEnv) routes() http.Handler {
 	partnerMW := authMW.Clone()
 	partnerMW.Push(app.hasRoleMiddleware("editor"))
 
+	// Start partner endpoints
+	mux.Handle(`GET /api/mailchimp-signup-url`,
+		partnerMW.HandlerFunc(app.getSignupURL))
 	mux.Handle(`GET /api/shared-article`,
 		partnerMW.HandlerFunc(app.getSharedArticle))
 	mux.Handle(`GET /api/shared-articles`,
 		partnerMW.HandlerFunc(app.listSharedArticles))
-	mux.Handle(`GET /api/mailchimp-signup-url`,
-		partnerMW.HandlerFunc(app.getSignupURL))
+	// End partner endpoints
 
 	spotlightMW := authMW.Clone()
 	spotlightMW.Push(app.hasRoleMiddleware("Spotlight PA"))
 
-	mux.Handle(`GET /api/arc-by-last-updated`,
-		spotlightMW.HandlerFunc(app.listArcByLastUpdated))
+	// Start Spotlight endpoints
 	mux.Handle(`GET /api/all-pages`,
 		spotlightMW.HandlerFunc(app.listAllPages))
 	mux.Handle(`GET /api/all-series`,
 		spotlightMW.HandlerFunc(app.listAllSeries))
 	mux.Handle(`GET /api/all-topics`,
 		spotlightMW.HandlerFunc(app.listAllTopics))
+	mux.Handle(`GET /api/arc-by-last-updated`,
+		spotlightMW.HandlerFunc(app.listArcByLastUpdated))
 	mux.Handle(`GET /api/authorized-addresses`,
 		spotlightMW.HandlerFunc(app.listAddresses))
 	mux.Handle(`POST /api/authorized-addresses`,
@@ -76,6 +81,10 @@ func (app *appEnv) routes() http.Handler {
 		spotlightMW.HandlerFunc(app.getSiteData(almanack.HomepageLoc)))
 	mux.Handle(`POST /api/editors-picks`,
 		spotlightMW.HandlerFunc(app.setSiteData((almanack.HomepageLoc))))
+	mux.Handle(`GET /api/election-feature`,
+		spotlightMW.HandlerFunc(app.getSiteData(almanack.ElectionFeatLoc)))
+	mux.Handle(`POST /api/election-feature`,
+		spotlightMW.HandlerFunc(app.setSiteData((almanack.ElectionFeatLoc))))
 	mux.Handle(`POST /api/files-create`,
 		spotlightMW.HandlerFunc(app.postFileCreate))
 	mux.Handle(`GET /api/files-list`,
@@ -114,10 +123,6 @@ func (app *appEnv) routes() http.Handler {
 		spotlightMW.HandlerFunc(app.getSiteData(almanack.SidebarLoc)))
 	mux.Handle(`POST /api/sidebar`,
 		spotlightMW.HandlerFunc(app.setSiteData((almanack.SidebarLoc))))
-	mux.Handle(`GET /api/election-feature`,
-		spotlightMW.HandlerFunc(app.getSiteData(almanack.ElectionFeatLoc)))
-	mux.Handle(`POST /api/election-feature`,
-		spotlightMW.HandlerFunc(app.setSiteData((almanack.ElectionFeatLoc))))
 	mux.Handle(`GET /api/site-params`,
 		spotlightMW.HandlerFunc(app.getSiteData(almanack.SiteParamsLoc)))
 	mux.Handle(`POST /api/site-params`,
@@ -126,6 +131,7 @@ func (app *appEnv) routes() http.Handler {
 		spotlightMW.HandlerFunc(app.getSiteData(almanack.StateCollegeLoc)))
 	mux.Handle(`POST /api/state-college-editor`,
 		spotlightMW.HandlerFunc(app.setSiteData((almanack.StateCollegeLoc))))
+	// End spotlight endpoints
 
 	ssrMW := baseMW.Clone()
 	// Don't trust this middleware!
@@ -133,14 +139,14 @@ func (app *appEnv) routes() http.Handler {
 	// This is just a fallback.
 	ssrMW.Push(app.authCookieMiddleware)
 
+	mux.Handle(`GET /ssr/user-info`,
+		ssrMW.HandlerFunc(app.userInfo))
 	mux.Handle(`/ssr/`,
 		ssrMW.HandlerFunc(app.renderNotFound))
 
 	partnerSSRMW := ssrMW.Clone()
 	partnerSSRMW.Push(app.hasRoleMiddleware("editor"))
 
-	mux.Handle(`GET /ssr/user-info`,
-		partnerSSRMW.HandlerFunc(app.userInfo))
 	mux.Handle(`GET /ssr/download-image`,
 		partnerSSRMW.HandlerFunc(app.redirectImageURL))
 
@@ -150,6 +156,7 @@ func (app *appEnv) routes() http.Handler {
 	mux.Handle(`GET /ssr/page/{id}`,
 		spotlightSSRMW.HandlerFunc(app.renderPage))
 
+	// Start background API endpoints
 	mux.Handle(`GET /api-background/cron`,
 		baseMW.HandlerFunc(app.backgroundCron))
 	mux.Handle(`GET /api-background/images`,
@@ -158,6 +165,7 @@ func (app *appEnv) routes() http.Handler {
 		baseMW.HandlerFunc(app.backgroundRefreshPages))
 	mux.Handle(`GET /api-background/sleep/{duration}`,
 		baseMW.HandlerFunc(app.backgroundSleep))
+	// End background API endpoints
 
 	mux.Handle("/", baseMW.HandlerFunc(app.notFound))
 	return mux
