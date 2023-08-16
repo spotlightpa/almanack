@@ -55,25 +55,20 @@ var imageWhitelist = sync.OnceValue(func() *regexp.Regexp {
 	return regexp.MustCompile(`^https://[^/]*(\.inquirer\.com|\.arcpublishing\.com|arc-anglerfish-arc2-prod-pmn\.s3\.amazonaws\.com)/`)
 })
 
-func (app *appEnv) getArcImage(w http.ResponseWriter, r *http.Request) {
+func (app *appEnv) getArcImage(w http.ResponseWriter, r *http.Request) http.Handler {
 	srcURL := r.URL.Query().Get("src_url")
 	app.logStart(r, "src_url", srcURL)
 
 	u, err := inkyURL.Parse(srcURL)
 	if err != nil {
-		app.replyErr(w, r, resperr.WithUserMessagef(
-			nil, "Bad image URL: %q", srcURL,
-		))
-		return
+		return app.jsonBadRequest(err, "Bad image URL: %q", srcURL)
 	}
 
 	srcURL = u.String()
 
 	if !imageWhitelist().MatchString(srcURL) {
-		app.replyErr(w, r, resperr.WithUserMessagef(
-			nil, "Bad image URL: %q", srcURL,
-		))
-		return
+		err = fmt.Errorf("srcURL not in imageWhitelist")
+		return app.jsonBadRequest(err, "Bad image URL: %q", srcURL)
 	}
 
 	l := almlog.FromContext(r.Context())
@@ -84,8 +79,7 @@ func (app *appEnv) getArcImage(w http.ResponseWriter, r *http.Request) {
 		l.InfoContext(r.Context(), "getProxyImage: image not found", "src", srcURL)
 
 	case err != nil:
-		app.replyHTMLErr(w, r, err)
-		return
+		return app.htmlErr(err)
 
 	case err == nil && !dbImage.IsUploaded:
 		l.InfoContext(r.Context(), "getProxyImage: image found but awaiting upload", "src", srcURL)
@@ -95,19 +89,17 @@ func (app *appEnv) getArcImage(w http.ResponseWriter, r *http.Request) {
 		redirect, err := app.svc.ImageStore.SignGetURL(r.Context(), dbImage.Path)
 		if err != nil {
 			app.logErr(r.Context(), err)
-			app.replyHTMLErr(w, r, err)
-			return
+			return app.htmlErr(err)
 		}
 		http.Redirect(w, r, redirect, http.StatusFound)
-		return
+		return nil
 	}
 
 	l.InfoContext(r.Context(), "getProxyImage: proxying", "src", srcURL)
 
 	body, ctype, err := almanack.FetchImageURL(r.Context(), app.svc.Client, u.String())
 	if err != nil {
-		app.replyHTMLErr(w, r, err)
-		return
+		return app.htmlErr(err)
 	}
 	w.Header().Set("Content-Type", ctype)
 	ext := strings.TrimPrefix(ctype, "image/")
@@ -116,6 +108,7 @@ func (app *appEnv) getArcImage(w http.ResponseWriter, r *http.Request) {
 	if _, err = w.Write(body); err != nil {
 		app.logErr(r.Context(), err)
 	}
+	return nil
 }
 
 func (app *appEnv) getBookmarklet(w http.ResponseWriter, r *http.Request) {

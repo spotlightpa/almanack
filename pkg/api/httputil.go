@@ -298,3 +298,39 @@ func (app *appEnv) logStart(r *http.Request, args ...any) {
 	l := almlog.FromContext(r.Context())
 	l.With(args...).InfoContext(r.Context(), "logStart", "route", route)
 }
+
+func (app *appEnv) jsonErr(err error) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		app.replyErr(w, r, err)
+	})
+}
+
+func (app *appEnv) jsonNewErr(code int, format string, args ...any) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		app.replyErr(w, r, resperr.New(code, format, args...))
+	})
+}
+
+func (app *appEnv) jsonBadRequest(err error, format string, args ...any) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		app.replyErr(w, r, resperr.WithUserMessagef(err, format, args...))
+	})
+}
+
+func (app *appEnv) jsonOK(v any) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		app.replyJSON(http.StatusOK, w, v)
+	})
+}
+
+func (app *appEnv) jsonAccepted(v any) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		app.replyJSON(http.StatusAccepted, w, v)
+	})
+}
+
+func (app *appEnv) htmlErr(err error) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		app.replyHTMLErr(w, r, err)
+	})
+}

@@ -26,7 +26,7 @@ func (app *appEnv) routes() http.Handler {
 
 	// Start public endpoints
 	mux.Handle(`GET /api/arc-image`,
-		baseMW.HandlerFunc(app.getArcImage))
+		baseMW.Controller(app.getArcImage))
 	mux.Handle(`GET /api/bookmarklet/{slug}`,
 		baseMW.HandlerFunc(app.getBookmarklet))
 	mux.Handle(`GET /api/healthcheck`,
