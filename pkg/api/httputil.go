@@ -20,7 +20,6 @@ import (
 	"github.com/getsentry/sentry-go"
 
 	"github.com/spotlightpa/almanack/internal/httpx"
-	"github.com/spotlightpa/almanack/internal/must"
 	"github.com/spotlightpa/almanack/internal/netlifyid"
 	"github.com/spotlightpa/almanack/internal/stringx"
 	"github.com/spotlightpa/almanack/layouts"
@@ -195,10 +194,6 @@ func (app *appEnv) maxSizeMiddleware(next http.Handler) http.Handler {
 	return http.MaxBytesHandler(next, maxSize)
 }
 
-func mustIntParam[Int int | int32 | int64](r *http.Request, param string, p *Int) {
-	must.Do(intParam(r, param, p))
-}
-
 func intParam[Int int | int32 | int64](r *http.Request, param string, p *Int) error {
 	pstr := httpx.PathValue(r, param)
 	if pstr == "" {
@@ -264,6 +259,7 @@ func (app *appEnv) replyHTML(w http.ResponseWriter, r *http.Request, t *template
 }
 
 func (app *appEnv) replyHTMLErr(w http.ResponseWriter, r *http.Request, err error) {
+	app.logErr(r.Context(), err)
 	code := resperr.StatusCode(err)
 	var buf bytes.Buffer
 	if err := layouts.Error.Execute(&buf, struct {
@@ -329,8 +325,20 @@ func (app *appEnv) jsonAccepted(v any) http.Handler {
 	})
 }
 
+func (app *appEnv) htmlOK(t *template.Template, data any) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		app.replyHTML(w, r, t, data)
+	})
+}
+
 func (app *appEnv) htmlErr(err error) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		app.replyHTMLErr(w, r, err)
+	})
+}
+
+func (app *appEnv) htmlBadRequest(err error, format string, args ...any) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		app.replyHTMLErr(w, r, resperr.WithUserMessagef(err, format, args...))
 	})
 }
