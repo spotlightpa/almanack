@@ -6,16 +6,15 @@ import (
 	"net/http"
 	"net/http/httputil"
 	"net/url"
-	"regexp"
 	"strconv"
 	"strings"
-	"sync"
 	"time"
 
 	"github.com/carlmjohnson/resperr"
 	"github.com/spotlightpa/almanack/internal/db"
 	"github.com/spotlightpa/almanack/internal/httpx"
 	"github.com/spotlightpa/almanack/internal/jwthook"
+	"github.com/spotlightpa/almanack/internal/lazy"
 	"github.com/spotlightpa/almanack/internal/must"
 	"github.com/spotlightpa/almanack/internal/netlifyid"
 	"github.com/spotlightpa/almanack/internal/slack"
@@ -51,9 +50,7 @@ func (app *appEnv) pingErr(w http.ResponseWriter, r *http.Request) {
 
 var inkyURL = must.Get(url.Parse("https://www.inquirer.com"))
 
-var imageWhitelist = sync.OnceValue(func() *regexp.Regexp {
-	return regexp.MustCompile(`^https://[^/]*(\.inquirer\.com|\.arcpublishing\.com|arc-anglerfish-arc2-prod-pmn\.s3\.amazonaws\.com)/`)
-})
+var imageWhitelist = lazy.RE(`^https://[^/]*(\.inquirer\.com|\.arcpublishing\.com|arc-anglerfish-arc2-prod-pmn\.s3\.amazonaws\.com)/`)
 
 func (app *appEnv) getArcImage(w http.ResponseWriter, r *http.Request) http.Handler {
 	srcURL := r.URL.Query().Get("src_url")

@@ -5,11 +5,10 @@ import (
 	"context"
 	"flag"
 	"net/http"
-	"regexp"
-	"sync"
 
 	"github.com/carlmjohnson/errorx"
 	"github.com/carlmjohnson/requests"
+	"github.com/spotlightpa/almanack/internal/lazy"
 	"github.com/spotlightpa/almanack/pkg/almlog"
 )
 
@@ -22,9 +21,7 @@ func (api *API) AddFlags(fl *flag.FlagSet) {
 	fl.StringVar(&api.Token, "plausible-token", "", "API `token` for Plausible.io")
 }
 
-var lazyRe = sync.OnceValue(func() *regexp.Regexp {
-	return regexp.MustCompile(`/(news|statecollege)/\d{4}/\d\d/[\w-]+/`)
-})
+var articleURLRE = lazy.RE(`/(news|statecollege)/\d{4}/\d\d/[\w-]+/`)
 
 func (api *API) MostPopularNews(ctx context.Context, cl *http.Client) (pages []string, err error) {
 	defer errorx.Trace(&err)
@@ -41,7 +38,7 @@ func (api *API) MostPopularNews(ctx context.Context, cl *http.Client) (pages []s
 		return nil, err
 	}
 
-	re := lazyRe()
+	re := articleURLRE()
 	for _, result := range res.Results {
 		if re.MatchString(result.Page) {
 			pages = append(pages, result.Page)
