@@ -3,104 +3,162 @@ package api
 import (
 	"net/http"
 
-	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
+	"github.com/jba/muxpatterns"
+
+	"github.com/spotlightpa/almanack/internal/httpx"
 	"github.com/spotlightpa/almanack/pkg/almanack"
 	"github.com/spotlightpa/almanack/pkg/almlog"
 )
 
 func (app *appEnv) routes() http.Handler {
-	r := chi.NewRouter()
-	r.Use(middleware.RealIP)
-	if !app.isLambda {
-		r.Use(middleware.Recoverer)
-	}
-	r.Use(almlog.Middleware)
-	r.Use(app.versionMiddleware)
-	r.Use(app.maxSizeMiddleware)
-	r.Get(`/api/bookmarklet/{slug}`, app.getBookmarklet)
-	r.Get(`/api/healthcheck`, app.ping)
-	r.Get(`/api/healthcheck/{code:\d{3}}`, app.pingErr)
-	r.Get(`/api/arc-image`, app.getArcImage)
-	r.Post(`/api/identity-hook`, app.postIdentityHook)
-	r.Route("/api", func(r chi.Router) {
-		r.Use(app.authHeaderMiddleware)
-		r.Get(`/user-info`, app.userInfo)
-		r.With(
-			app.hasRoleMiddleware("editor"),
-		).Group(func(r chi.Router) {
-			r.Get(`/shared-article`, app.getSharedArticle)
-			r.Get(`/shared-articles`, app.listSharedArticles)
-			r.Get(`/mailchimp-signup-url`, app.getSignupURL)
-		})
-		r.With(
-			app.hasRoleMiddleware("Spotlight PA"),
-		).Group(func(r chi.Router) {
-			r.Get(`/arc-by-last-updated`, app.listArcByLastUpdated)
-			r.Get(`/all-pages`, app.listAllPages)
-			r.Get(`/all-series`, app.listAllSeries)
-			r.Get(`/all-topics`, app.listAllTopics)
-			r.Get(`/authorized-addresses`, app.listAddresses)
-			r.Post(`/authorized-addresses`, app.postAddress)
-			r.Get(`/authorized-domains`, app.listDomains)
-			r.Post(`/authorized-domains`, app.postDomain)
-			r.Post(`/create-signed-upload`, app.postSignedUpload)
-			r.Get(`/editors-picks`, app.getSiteData(almanack.HomepageLoc))
-			r.Post(`/editors-picks`, app.setSiteData((almanack.HomepageLoc)))
-			r.Post(`/files-create`, app.postFileCreate)
-			r.Get(`/files-list`, app.listFiles)
-			r.Post(`/files-update`, app.postFileUpdate)
-			r.Get(`/gdocs-doc`, app.getGDocsDoc)
-			r.Post(`/gdocs-doc`, app.postGDocsDoc)
-			r.Post(`/image-update`, app.postImageUpdate)
-			r.Get(`/images`, app.listImages)
-			r.Post(`/message`, app.postMessage)
-			r.Get(`/page`, app.getPage)
-			r.Post(`/page`, app.postPage)
-			r.Post(`/page-create`, app.postPageCreate)
-			r.Get(`/pages`, app.listPages)
-			r.Get(`/pages-by-fts`, app.listPagesByFTS)
-			r.Post(`/page-refresh`, app.postPageRefresh)
-			r.Post(`/shared-article`, app.postSharedArticle)
-			r.Post(`/shared-article-from-arc`, app.postSharedArticleFromArc)
-			r.Post(`/shared-article-from-gdocs`, app.postSharedArticleFromGDocs)
-			r.Get(`/sidebar`, app.getSiteData(almanack.SidebarLoc))
-			r.Post(`/sidebar`, app.setSiteData((almanack.SidebarLoc)))
-			r.Get(`/election-feature`, app.getSiteData(almanack.ElectionFeatLoc))
-			r.Post(`/election-feature`, app.setSiteData((almanack.ElectionFeatLoc)))
-			r.Get(`/site-params`, app.getSiteData(almanack.SiteParamsLoc))
-			r.Post(`/site-params`, app.setSiteData((almanack.SiteParamsLoc)))
-			r.Get(`/state-college-editor`, app.getSiteData(almanack.StateCollegeLoc))
-			r.Post(`/state-college-editor`, app.setSiteData((almanack.StateCollegeLoc)))
-		})
-	})
-	r.Route("/ssr", func(r chi.Router) {
-		r.Use(app.authCookieMiddleware)
-		// Don't trust this middleware!
-		// Netlify should be verifying the role at the CDN level.
-		// This is just a fallback.
-		r.With(
-			app.hasRoleMiddleware("editor"),
-		).Group(func(r chi.Router) {
-			r.Get(`/user-info`, app.userInfo)
-			r.Get(`/download-image`, app.redirectImageURL)
-		})
-		r.With(
-			app.hasRoleMiddleware("Spotlight PA"),
-		).Group(func(r chi.Router) {
-			r.Get(`/page/{id:\d+}`, app.renderPage)
-		})
-		r.NotFound(app.renderNotFound)
-	})
+	mux := muxpatterns.NewServeMux()
 
-	r.Route("/api-background", func(r chi.Router) {
-		r.Get(`/cron`, app.backgroundCron)
-		r.Get(`/images`, app.backgroundImages)
-		r.Get(`/refresh-pages`, app.backgroundRefreshPages)
-		r.Get(`/sleep/{duration}`, app.backgroundSleep)
-	})
+	var baseMW httpx.Stack
+	baseMW.Push(httpx.WithPathValue(mux))
+	baseMW.Push(middleware.RealIP)
+	baseMW.PushIf(!app.isLambda, middleware.Recoverer)
+	baseMW.Push(
+		almlog.Middleware,
+		app.versionMiddleware,
+		app.maxSizeMiddleware,
+	)
 
-	r.NotFound(app.notFound)
+	mux.Handle(`GET /api/bookmarklet/{slug}`,
+		baseMW.HandlerFunc(app.getBookmarklet))
+	mux.Handle(`GET /api/healthcheck`,
+		baseMW.HandlerFunc(app.ping))
+	mux.Handle(`GET /api/healthcheck/{code}`,
+		baseMW.HandlerFunc(app.pingErr))
+	mux.Handle(`GET /api/arc-image`,
+		baseMW.HandlerFunc(app.getArcImage))
+	mux.Handle(`POST /api/identity-hook`,
+		baseMW.HandlerFunc(app.postIdentityHook))
 
-	return r
+	authMW := baseMW.Clone()
+	authMW.Push(app.authHeaderMiddleware)
+
+	mux.Handle(`GET /api/user-info`,
+		authMW.HandlerFunc(app.userInfo))
+
+	partnerMW := authMW.Clone()
+	partnerMW.Push(app.hasRoleMiddleware("editor"))
+
+	mux.Handle(`GET /api/shared-article`,
+		partnerMW.HandlerFunc(app.getSharedArticle))
+	mux.Handle(`GET /api/shared-articles`,
+		partnerMW.HandlerFunc(app.listSharedArticles))
+	mux.Handle(`GET /api/mailchimp-signup-url`,
+		partnerMW.HandlerFunc(app.getSignupURL))
+
+	spotlightMW := authMW.Clone()
+	spotlightMW.Push(app.hasRoleMiddleware("Spotlight PA"))
+
+	mux.Handle(`GET /api/arc-by-last-updated`,
+		spotlightMW.HandlerFunc(app.listArcByLastUpdated))
+	mux.Handle(`GET /api/all-pages`,
+		spotlightMW.HandlerFunc(app.listAllPages))
+	mux.Handle(`GET /api/all-series`,
+		spotlightMW.HandlerFunc(app.listAllSeries))
+	mux.Handle(`GET /api/all-topics`,
+		spotlightMW.HandlerFunc(app.listAllTopics))
+	mux.Handle(`GET /api/authorized-addresses`,
+		spotlightMW.HandlerFunc(app.listAddresses))
+	mux.Handle(`POST /api/authorized-addresses`,
+		spotlightMW.HandlerFunc(app.postAddress))
+	mux.Handle(`GET /api/authorized-domains`,
+		spotlightMW.HandlerFunc(app.listDomains))
+	mux.Handle(`POST /api/authorized-domains`,
+		spotlightMW.HandlerFunc(app.postDomain))
+	mux.Handle(`POST /api/create-signed-upload`,
+		spotlightMW.HandlerFunc(app.postSignedUpload))
+	mux.Handle(`GET /api/editors-picks`,
+		spotlightMW.HandlerFunc(app.getSiteData(almanack.HomepageLoc)))
+	mux.Handle(`POST /api/editors-picks`,
+		spotlightMW.HandlerFunc(app.setSiteData((almanack.HomepageLoc))))
+	mux.Handle(`POST /api/files-create`,
+		spotlightMW.HandlerFunc(app.postFileCreate))
+	mux.Handle(`GET /api/files-list`,
+		spotlightMW.HandlerFunc(app.listFiles))
+	mux.Handle(`POST /api/files-update`,
+		spotlightMW.HandlerFunc(app.postFileUpdate))
+	mux.Handle(`GET /api/gdocs-doc`,
+		spotlightMW.HandlerFunc(app.getGDocsDoc))
+	mux.Handle(`POST /api/gdocs-doc`,
+		spotlightMW.HandlerFunc(app.postGDocsDoc))
+	mux.Handle(`POST /api/image-update`,
+		spotlightMW.HandlerFunc(app.postImageUpdate))
+	mux.Handle(`GET /api/images`,
+		spotlightMW.HandlerFunc(app.listImages))
+	mux.Handle(`POST /api/message`,
+		spotlightMW.HandlerFunc(app.postMessage))
+	mux.Handle(`GET /api/page`,
+		spotlightMW.HandlerFunc(app.getPage))
+	mux.Handle(`POST /api/page`,
+		spotlightMW.HandlerFunc(app.postPage))
+	mux.Handle(`POST /api/page-create`,
+		spotlightMW.HandlerFunc(app.postPageCreate))
+	mux.Handle(`GET /api/pages`,
+		spotlightMW.HandlerFunc(app.listPages))
+	mux.Handle(`GET /api/pages-by-fts`,
+		spotlightMW.HandlerFunc(app.listPagesByFTS))
+	mux.Handle(`POST /api/page-refresh`,
+		spotlightMW.HandlerFunc(app.postPageRefresh))
+	mux.Handle(`POST /api/shared-article`,
+		spotlightMW.HandlerFunc(app.postSharedArticle))
+	mux.Handle(`POST /api/shared-article-from-arc`,
+		spotlightMW.HandlerFunc(app.postSharedArticleFromArc))
+	mux.Handle(`POST /api/shared-article-from-gdocs`,
+		spotlightMW.HandlerFunc(app.postSharedArticleFromGDocs))
+	mux.Handle(`GET /api/sidebar`,
+		spotlightMW.HandlerFunc(app.getSiteData(almanack.SidebarLoc)))
+	mux.Handle(`POST /api/sidebar`,
+		spotlightMW.HandlerFunc(app.setSiteData((almanack.SidebarLoc))))
+	mux.Handle(`GET /api/election-feature`,
+		spotlightMW.HandlerFunc(app.getSiteData(almanack.ElectionFeatLoc)))
+	mux.Handle(`POST /api/election-feature`,
+		spotlightMW.HandlerFunc(app.setSiteData((almanack.ElectionFeatLoc))))
+	mux.Handle(`GET /api/site-params`,
+		spotlightMW.HandlerFunc(app.getSiteData(almanack.SiteParamsLoc)))
+	mux.Handle(`POST /api/site-params`,
+		spotlightMW.HandlerFunc(app.setSiteData((almanack.SiteParamsLoc))))
+	mux.Handle(`GET /api/state-college-editor`,
+		spotlightMW.HandlerFunc(app.getSiteData(almanack.StateCollegeLoc)))
+	mux.Handle(`POST /api/state-college-editor`,
+		spotlightMW.HandlerFunc(app.setSiteData((almanack.StateCollegeLoc))))
+
+	ssrMW := baseMW.Clone()
+	// Don't trust this middleware!
+	// Netlify should be verifying the role at the CDN level.
+	// This is just a fallback.
+	ssrMW.Push(app.authCookieMiddleware)
+
+	mux.Handle(`/ssr/`,
+		ssrMW.HandlerFunc(app.renderNotFound))
+
+	partnerSSRMW := ssrMW.Clone()
+	partnerSSRMW.Push(app.hasRoleMiddleware("editor"))
+
+	mux.Handle(`GET /ssr/user-info`,
+		partnerSSRMW.HandlerFunc(app.userInfo))
+	mux.Handle(`GET /ssr/download-image`,
+		partnerSSRMW.HandlerFunc(app.redirectImageURL))
+
+	spotlightSSRMW := ssrMW.Clone()
+	spotlightSSRMW.Push(app.hasRoleMiddleware("Spotlight PA"))
+
+	mux.Handle(`GET /ssr/page/{id}`,
+		spotlightSSRMW.HandlerFunc(app.renderPage))
+
+	mux.Handle(`GET /api-background/cron`,
+		baseMW.HandlerFunc(app.backgroundCron))
+	mux.Handle(`GET /api-background/images`,
+		baseMW.HandlerFunc(app.backgroundImages))
+	mux.Handle(`GET /api-background/refresh-pages`,
+		baseMW.HandlerFunc(app.backgroundRefreshPages))
+	mux.Handle(`GET /api-background/sleep/{duration}`,
+		baseMW.HandlerFunc(app.backgroundSleep))
+
+	mux.Handle("/", baseMW.HandlerFunc(app.notFound))
+	return mux
 }

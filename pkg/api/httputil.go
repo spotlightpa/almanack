@@ -18,8 +18,8 @@ import (
 
 	"github.com/carlmjohnson/resperr"
 	"github.com/getsentry/sentry-go"
-	"github.com/go-chi/chi/v5"
 
+	"github.com/spotlightpa/almanack/internal/httpx"
 	"github.com/spotlightpa/almanack/internal/must"
 	"github.com/spotlightpa/almanack/internal/netlifyid"
 	"github.com/spotlightpa/almanack/internal/stringx"
@@ -200,7 +200,7 @@ func mustIntParam[Int int | int32 | int64](r *http.Request, param string, p *Int
 }
 
 func intParam[Int int | int32 | int64](r *http.Request, param string, p *Int) error {
-	pstr := chi.URLParam(r, param)
+	pstr := httpx.PathValue(r, param)
 	if pstr == "" {
 		return fmt.Errorf("parameter %q not set", param)
 	}

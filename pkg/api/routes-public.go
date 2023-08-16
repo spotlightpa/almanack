@@ -13,7 +13,6 @@ import (
 	"time"
 
 	"github.com/carlmjohnson/resperr"
-	"github.com/go-chi/chi/v5"
 	"github.com/spotlightpa/almanack/internal/db"
 	"github.com/spotlightpa/almanack/internal/httpx"
 	"github.com/spotlightpa/almanack/internal/jwthook"
@@ -43,7 +42,7 @@ func (app *appEnv) ping(w http.ResponseWriter, r *http.Request) {
 }
 
 func (app *appEnv) pingErr(w http.ResponseWriter, r *http.Request) {
-	code := chi.URLParam(r, "code")
+	code := httpx.PathValue(r, "code")
 	statusCode, _ := strconv.Atoi(code)
 	app.logStart(r, "code", code)
 
@@ -120,7 +119,7 @@ func (app *appEnv) getArcImage(w http.ResponseWriter, r *http.Request) {
 }
 
 func (app *appEnv) getBookmarklet(w http.ResponseWriter, r *http.Request) {
-	slug := chi.URLParam(r, "slug")
+	slug := httpx.PathValue(r, "slug")
 	app.logStart(r, "slug", slug)
 
 	page, err := app.svc.Queries.GetPageByURLPath(r.Context(), "%"+slug+"%")
