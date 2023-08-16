@@ -2,10 +2,10 @@
 package stringx
 
 import (
-	"regexp"
 	"strings"
-	"sync"
 	"unicode"
+
+	"github.com/spotlightpa/almanack/internal/lazy"
 )
 
 // First non-blank string
@@ -18,18 +18,11 @@ func First(ss ...string) string {
 	return ""
 }
 
-func mustBeLazy(s string) func() *regexp.Regexp {
-	return sync.OnceValue(
-		func() *regexp.Regexp {
-			return regexp.MustCompile(s)
-		})
-}
-
 var (
-	articleRe   = mustBeLazy(`\b(the|an?)\b`)
-	pennRe      = mustBeLazy(`\bpa\b`)
-	possesiveRe = mustBeLazy(`\.?[’']s`)
-	nonasciiRe  = mustBeLazy(`\W+`)
+	articleRe   = lazy.RE(`\b(the|an?)\b`)
+	pennRe      = lazy.RE(`\bpa\b`)
+	possesiveRe = lazy.RE(`\.?[’']s`)
+	nonasciiRe  = lazy.RE(`\W+`)
 )
 
 func SlugifyURL(s string) string {
@@ -107,9 +100,9 @@ func RemoveAllWhitespace(s string) string {
 }
 
 var (
-	staffRe        = mustBeLazy(`(?i)\bstaff\b`)
-	extractSplitRe = mustBeLazy(`(?i),|\band\b`)
-	outletRe       = mustBeLazy(`(?i)\b(of|for)\b.*$`)
+	staffRe        = lazy.RE(`(?i)\bstaff\b`)
+	extractSplitRe = lazy.RE(`(?i),|\band\b`)
+	outletRe       = lazy.RE(`(?i)\b(of|for)\b.*$`)
 )
 
 func ExtractNames(s string) []string {
