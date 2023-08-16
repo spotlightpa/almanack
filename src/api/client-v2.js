@@ -92,7 +92,6 @@ export const getGDocsDoc = `/api/gdocs-doc`;
 export const postGDocsDoc = `/api/gdocs-doc`;
 export const postImageUpdate = `/api/image-update`;
 export const listImages = `/api/images`;
-export const getSignupURL = `/api/mailchimp-signup-url`;
 export const sendMessage = `/api/message`;
 export const getPage = `/api/page`;
 export const postPage = `/api/page`;

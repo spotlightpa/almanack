@@ -1,6 +1,6 @@
 <script setup>
 import { useAuth } from "@/api/hooks.js";
-import { get, getSignupURL, listSharedArticles } from "@/api/client-v2.js";
+import { get, listSharedArticles } from "@/api/client-v2.js";
 import { watchAPI } from "@/api/service-util.js";
 import SharedArticle from "@/api/shared-article.js";
 
@@ -20,15 +20,6 @@ const nextPage = computedProp("next_page", (page) => ({
   name: "shared-articles",
   query: { page },
 }));
-
-async function redirectToSignup() {
-  let [url, err] = await get(getSignupURL);
-  if (err) {
-    alert(`Something went wrong: ${err}`);
-    return;
-  }
-  window.location = url;
-}
 </script>
 
 <template>
@@ -54,7 +45,7 @@ async function redirectToSignup() {
       press@spotlightpa.org. Please add this address to your contacts to ensure
       that messages are not sent to spam. You can unsubscribe by following the
       unsubscribe link in the footer of an email, and you can
-      <a href="#" @click.prevent="redirectToSignup">resubscribe here</a>.
+      <a href="/ssr/mailchimp-signup-url">resubscribe here</a>.
     </p>
 
     <SpinnerProgress :is-loading="apiState.isLoading.value" />
