@@ -48,11 +48,11 @@ func (app *appEnv) routes() http.Handler {
 
 	// Start partner endpoints
 	mux.Handle(`GET /api/mailchimp-signup-url`,
-		partnerMW.HandlerFunc(app.getSignupURL))
+		partnerMW.HandlerFunc(app.getSignupURL)) // TODO: move to SSR
 	mux.Handle(`GET /api/shared-article`,
-		partnerMW.HandlerFunc(app.getSharedArticle))
+		partnerMW.Controller(app.getSharedArticle))
 	mux.Handle(`GET /api/shared-articles`,
-		partnerMW.HandlerFunc(app.listSharedArticles))
+		partnerMW.Controller(app.listSharedArticles))
 	// End partner endpoints
 
 	spotlightMW := authMW.Clone()

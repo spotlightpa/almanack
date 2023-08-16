@@ -3,7 +3,6 @@ package api
 import (
 	"net/http"
 
-	"github.com/carlmjohnson/resperr"
 	"github.com/spotlightpa/almanack/internal/db"
 	"github.com/spotlightpa/almanack/internal/netlifyid"
 	"github.com/spotlightpa/almanack/internal/paginate"
@@ -20,21 +19,19 @@ func (app *appEnv) getSignupURL(w http.ResponseWriter, r *http.Request) {
 	app.replyJSON(http.StatusOK, w, app.svc.MailchimpSignupURL)
 }
 
-func (app *appEnv) listSharedArticles(w http.ResponseWriter, r *http.Request) {
+func (app *appEnv) listSharedArticles(w http.ResponseWriter, r *http.Request) http.Handler {
 	app.logStart(r)
 
 	var page int32
 	_ = intFromQuery(r, "page", &page)
 	if page < 0 {
-		app.replyErr(w, r, resperr.WithUserMessage(nil, "Invalid page"))
-		return
+		return app.jsonBadRequest(nil, "Invalid page")
 	}
 
 	// Spotlight PA users can add ?show=all
 	if r.URL.Query().Get("show") == "all" {
 		if err := app.auth.HasRole(r, "Spotlight PA"); err != nil {
-			app.replyErr(w, r, err)
-			return
+			return app.jsonErr(err)
 		}
 
 		pager := paginate.PageNumber(page)
@@ -46,18 +43,16 @@ func (app *appEnv) listSharedArticles(w http.ResponseWriter, r *http.Request) {
 				Limit:  pager.Limit(),
 			})
 		if err != nil {
-			app.replyErr(w, r, err)
-			return
+			return app.jsonErr(err)
 		}
 
-		app.replyJSON(http.StatusOK, w, struct {
+		return app.jsonOK(struct {
 			Stories  []db.SharedArticle `json:"stories"`
 			NextPage int32              `json:"next_page,string,omitempty"`
 		}{
 			Stories:  stories,
 			NextPage: pager.NextPage,
 		})
-		return
 	}
 
 	pager := paginate.PageNumber(page)
@@ -69,11 +64,10 @@ func (app *appEnv) listSharedArticles(w http.ResponseWriter, r *http.Request) {
 			Limit:  pager.Limit(),
 		})
 	if err != nil {
-		app.replyErr(w, r, err)
-		return
+		return app.jsonErr(err)
 	}
 
-	app.replyJSON(http.StatusOK, w, struct {
+	return app.jsonOK(struct {
 		Stories  []db.SharedArticle `json:"stories"`
 		NextPage int32              `json:"next_page,string,omitempty"`
 	}{
@@ -82,7 +76,7 @@ func (app *appEnv) listSharedArticles(w http.ResponseWriter, r *http.Request) {
 	})
 }
 
-func (app *appEnv) getSharedArticle(w http.ResponseWriter, r *http.Request) {
+func (app *appEnv) getSharedArticle(w http.ResponseWriter, r *http.Request) http.Handler {
 	app.logStart(r)
 
 	var (
@@ -99,33 +93,28 @@ func (app *appEnv) getSharedArticle(w http.ResponseWriter, r *http.Request) {
 	} else {
 		var id int64
 		if !intFromQuery(r, "id", &id) {
-			app.replyErr(w, r, resperr.WithUserMessage(nil,
-				"Must provide article ID"))
-			return
+			return app.jsonBadRequest(nil, "Must provide article ID")
 		}
 		article, err = app.svc.Queries.GetSharedArticleByID(r.Context(), id)
 	}
 	if err != nil {
 		err = db.NoRowsAs404(err,
 			"missing shared_article %v", q)
-		app.replyErr(w, r, err)
-		return
+		return app.jsonErr(err)
 	}
 
 	if article.Status != "S" &&
 		article.Status != "P" {
 		// Let Spotlight PA users get article regardless of its status
 		if err := app.auth.HasRole(r, "Spotlight PA"); err != nil {
-			app.replyNewErr(http.StatusNotFound, w, r,
+			return app.jsonNewErr(http.StatusNotFound,
 				"user unauthorized to view article: %w", err)
-			return
 		}
 	}
 
 	val, err := app.svc.InflateSharedArticle(r.Context(), &article)
 	if err != nil {
-		app.replyErr(w, r, err)
-		return
+		return app.jsonErr(err)
 	}
-	app.replyJSON(http.StatusOK, w, val)
+	return app.jsonOK(val)
 }
