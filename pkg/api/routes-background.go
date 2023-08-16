@@ -15,7 +15,7 @@ import (
 	"github.com/spotlightpa/almanack/pkg/almlog"
 )
 
-func (app *appEnv) backgroundSleep(w http.ResponseWriter, r *http.Request) {
+func (app *appEnv) backgroundSleep(w http.ResponseWriter, r *http.Request) http.Handler {
 	app.logStart(r)
 	l := almlog.FromContext(r.Context())
 	if deadline, ok := r.Context().Deadline(); ok {
@@ -26,16 +26,15 @@ func (app *appEnv) backgroundSleep(w http.ResponseWriter, r *http.Request) {
 	durationStr := httpx.PathValue(r, "duration")
 	duration, err := time.ParseDuration(durationStr)
 	if err != nil {
-		app.replyErr(w, r, err)
-		return
+		return app.jsonErr(err)
 	}
 	time.Sleep(duration)
-	app.replyJSON(http.StatusOK, w, struct {
+	return app.jsonAccepted(struct {
 		SleptFor time.Duration `json:"slept-for"`
 	}{duration})
 }
 
-func (app *appEnv) backgroundCron(w http.ResponseWriter, r *http.Request) {
+func (app *appEnv) backgroundCron(w http.ResponseWriter, r *http.Request) http.Handler {
 	app.logStart(r)
 
 	if err := flowmatic.Do(
@@ -115,14 +114,13 @@ func (app *appEnv) backgroundCron(w http.ResponseWriter, r *http.Request) {
 		},
 	); err != nil {
 		// reply shows up in dev only
-		app.replyErr(w, r, err)
-		return
+		return app.jsonErr(err)
 	}
 
-	app.replyJSON(http.StatusAccepted, w, "OK")
+	return app.jsonAccepted("OK")
 }
 
-func (app *appEnv) backgroundRefreshPages(w http.ResponseWriter, r *http.Request) {
+func (app *appEnv) backgroundRefreshPages(w http.ResponseWriter, r *http.Request) http.Handler {
 	app.logStart(r)
 	l := almlog.FromContext(r.Context())
 	count := 0
@@ -144,25 +142,23 @@ func (app *appEnv) backgroundRefreshPages(w http.ResponseWriter, r *http.Request
 					Limit:    pager.Limit(),
 				})
 			if err != nil {
-				app.replyErr(w, r, err)
-				return
+				return app.jsonErr(err)
 			}
 			err = flowmatic.Each(flowmatic.MaxProcs, pageIDs, func(id int64) error {
 				return app.svc.RefreshPageContents(r.Context(), id)
 			})
 			if err != nil {
-				app.replyErr(w, r, err)
-				return
+				return app.jsonErr(err)
 			}
 			count += len(pageIDs)
 			l.Info("backgroundRefreshPages", "processed", count)
 		}
 	}
 
-	app.replyJSON(http.StatusAccepted, w, "OK")
+	return app.jsonAccepted("OK")
 }
 
-func (app *appEnv) backgroundImages(w http.ResponseWriter, r *http.Request) {
+func (app *appEnv) backgroundImages(w http.ResponseWriter, r *http.Request) http.Handler {
 	app.logStart(r)
 
 	err := flowmatic.Do(
@@ -174,11 +170,10 @@ func (app *appEnv) backgroundImages(w http.ResponseWriter, r *http.Request) {
 		},
 	)
 	if err != nil {
-		app.replyErr(w, r, err)
-		return
+		return app.jsonErr(err)
 	}
 
-	app.replyJSON(http.StatusAccepted, w, "OK")
+	return app.jsonAccepted("OK")
 }
 
 func updateMD5s[T any](
