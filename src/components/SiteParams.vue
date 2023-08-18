@@ -10,6 +10,7 @@ export default {
     <SiteParamsTopper :file-props="fileProps" :params="params" />
     <SiteParamsTop :file-props="fileProps" :params="params" />
     <SiteParamsSticky :file-props="fileProps" :params="params" />
+    <SiteParamsTakeover :file-props="fileProps" :params="params" />
     <SiteParamsSidebar :file-props="fileProps" :params="params" />
     <SiteParamsSupport :file-props="fileProps" :params="params" />
     <SiteParamsFeatured :file-props="fileProps" :params="params" />
