@@ -427,6 +427,13 @@ export default {
           </span>
           <span> Open live URL </span>
         </a>
+        <button
+          class="button is-light has-text-weight-semibold"
+          type="button"
+          @click="page.changeURL()"
+        >
+          Change URL
+        </button>
       </div>
 
       <BulmaTextarea v-model="page.body" label="Content" :rows="8" />

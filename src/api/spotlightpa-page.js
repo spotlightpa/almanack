@@ -64,6 +64,7 @@ export class Page {
     if (!this.lastPublished) {
       this.status = this.scheduleFor ? "sked" : "none";
     }
+    this.shouldUpdateURLPath = false;
   }
 
   get isPublished() {
@@ -102,6 +103,20 @@ export class Page {
       dir = `${dir}/${year}/${month}`;
     }
     return new URL(`/${dir}/${slug}/`, "https://www.spotlightpa.org").href;
+  }
+
+  changeURL() {
+    if (!this.isPublished) return;
+    let oldURLPath = new URL(this.link).pathname;
+    let message = `Are you sure you want to change the URL? Current URL is ${oldURLPath}. Changing the URL will automatically add a redirect from the old URL to a new one. Please enter new URL below.`;
+    let newURLPath = window.prompt(message, oldURLPath);
+    if (!newURLPath || newURLPath === oldURLPath) return;
+    let newURL = new URL(newURLPath, "https://www.spotlightpa.org");
+    newURLPath = newURL.pathname;
+    this.aliases.push(oldURLPath);
+    this.overrideURL = newURLPath;
+    this.urlPath = newURLPath;
+    this.shouldUpdateURLPath = true;
   }
 
   getImagePreviewURL(options) {
@@ -201,7 +216,8 @@ export class Page {
       body: this.body,
       set_schedule_for: true,
       schedule_for: this.scheduleFor,
-      url_path: "", // leave blank to prevent changes
+      // leave blank to prevent changes by default
+      url_path: this.shouldUpdateURLPath ? this.urlPath : "",
       set_last_published: false,
     };
   }
