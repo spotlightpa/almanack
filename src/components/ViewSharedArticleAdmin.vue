@@ -106,6 +106,14 @@ Column inches: ${intcomma(a.arc.actualInchCount)}`
 const { exec: pageExec, apiStateRefs: pageState } = makeState();
 const { isLoadingThrottled: pageLoading, error: pageError } = pageState;
 async function createPage(kind) {
+  let prompt = "Create Spotlight PA page?";
+  if (kind === "news") {
+    prompt = "Create Spotlight PA /news/ page?";
+  }
+  if (kind === "statecollege") {
+    prompt = "Create Spotlight PA State College page?";
+  }
+  if (!window.confirm(prompt)) return;
   await pageExec(() =>
     post(postPageCreate, { shared_article_id: props.id, page_kind: kind })
   );
