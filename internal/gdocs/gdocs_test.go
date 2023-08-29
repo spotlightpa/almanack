@@ -18,7 +18,7 @@ func TestConvert(t *testing.T) {
 		testfile.ReadJSON(t, path, &doc)
 
 		n := Convert(&doc)
-		got := xhtml.ToString(n)
+		got := xhtml.OuterHTML(n)
 
 		bareName := strings.TrimSuffix(path, ".json")
 		testfile.Equal(be.Relaxed(t), bareName+".html", got)
@@ -32,7 +32,7 @@ func TestFullConvert(t *testing.T) {
 		testfile.ReadJSON(t, path, &doc)
 
 		n := Convert(&doc)
-		got, err := blocko.MinifyAndBlockize(xhtml.ToString(n))
+		got, err := blocko.MinifyAndBlockize(xhtml.OuterHTML(n))
 		be.NilErr(t, err)
 
 		bareName := strings.TrimSuffix(path, ".json")
@@ -51,7 +51,7 @@ func BenchmarkConvert(b *testing.B) {
 	for i := 0; i < b.N; i++ {
 		got = Convert(&doc)
 	}
-	be.Equal(b, want, xhtml.ToString(got))
+	be.Equal(b, want, xhtml.OuterHTML(got))
 }
 
 func BenchmarkFullConvert(b *testing.B) {
@@ -65,7 +65,7 @@ func BenchmarkFullConvert(b *testing.B) {
 	for i := 0; i < b.N; i++ {
 		n := Convert(&doc)
 		var err error
-		got, err = blocko.MinifyAndBlockize(xhtml.ToString(n))
+		got, err = blocko.MinifyAndBlockize(xhtml.OuterHTML(n))
 		be.NilErr(b, err)
 	}
 	be.Equal(b, want, got)
