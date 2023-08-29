@@ -6,20 +6,25 @@ import (
 	"golang.org/x/net/html/atom"
 )
 
+const (
+	_continue = true
+	_break    = false
+)
+
 func all(n *html.Node, yield func(*html.Node) bool) bool {
 	if n == nil {
-		return true
+		return _continue
 	}
 	if !yield(n) {
-		return false
+		return _break
 	}
 
 	for c := n.FirstChild; c != nil; c = c.NextSibling {
 		if !all(c, yield) {
-			return false
+			return _break
 		}
 	}
-	return true
+	return _continue
 }
 
 // Find returns the first matching child node or nil.
@@ -28,9 +33,9 @@ func Find(n *html.Node, match func(*html.Node) bool) *html.Node {
 	all(n, func(n *html.Node) bool {
 		if match(n) {
 			found = n
-			return false // break
+			return _break
 		}
-		return true // continue
+		return _continue
 	})
 	return found
 }
@@ -39,7 +44,7 @@ func Find(n *html.Node, match func(*html.Node) bool) *html.Node {
 func VisitAll(n *html.Node, callback func(*html.Node)) {
 	all(n, func(n *html.Node) bool {
 		callback(n)
-		return true
+		return _continue
 	})
 }
 
