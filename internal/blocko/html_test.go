@@ -35,7 +35,7 @@ func TestIsEmpty(t *testing.T) {
 			for _, c := range children {
 				p.AppendChild(c)
 			}
-			be.DebugLog(t, "got: %q", xhtml.ToString(p))
+			be.DebugLog(t, "got: %q", xhtml.OuterHTML(p))
 			be.Equal(t, isEmpty(p), tc.empty)
 		})
 	}

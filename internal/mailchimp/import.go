@@ -43,6 +43,6 @@ func PageContent(doc *html.Node) (body string, err error) {
 	})
 	xhtml.RemoveAll(remove)
 
-	body = xhtml.ContentsToString(bNode)
+	body = xhtml.InnerHTML(bNode)
 	return
 }

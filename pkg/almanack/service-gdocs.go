@@ -105,7 +105,7 @@ func (svc Services) ProcessGDocsDoc(ctx context.Context, dbDoc db.GDocsDoc) (err
 	if n := xhtml.Find(docHTML, xhtml.WithAtom(atom.Data)); n != nil {
 		return fmt.Errorf(
 			"document unexpectedly contains <data> element: %q",
-			xhtml.ToString(n),
+			xhtml.OuterHTML(n),
 		)
 	}
 
@@ -225,8 +225,8 @@ func (svc Services) ProcessGDocsDoc(ctx context.Context, dbDoc db.GDocsDoc) (err
 		ID:              dbDoc.ID,
 		Metadata:        metadata,
 		Embeds:          embeds,
-		RichText:        xhtml.InnerBlocksToString(richText),
-		RawHtml:         xhtml.InnerBlocksToString(rawHTML),
+		RichText:        xhtml.InnerHTMLBlocks(richText),
+		RawHtml:         xhtml.InnerHTMLBlocks(rawHTML),
 		ArticleMarkdown: md,
 		Warnings:        warnings,
 		WordCount:       int32(stringx.WordCount(xhtml.InnerText(richText))),

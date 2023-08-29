@@ -22,7 +22,7 @@ func TestTable(t *testing.T) {
 		i := 0
 		xhtml.Tables(root, func(_ *html.Node, tbl xhtml.TableNodes) {
 			i++
-			rows := xhtml.Map(tbl, xhtml.ContentsToString)
+			rows := xhtml.Map(tbl, xhtml.InnerHTML)
 			testfile.EqualJSON(t, fmt.Sprintf("%s-%d.json", bareName, i), &rows)
 		})
 	})

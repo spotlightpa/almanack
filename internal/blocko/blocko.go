@@ -32,7 +32,7 @@ func Blockize(root *html.Node) string {
 
 func blockToStrings(p *html.Node) []string {
 	if !markdownBlockElements[p.DataAtom] {
-		return []string{xhtml.ToString(p)}
+		return []string{xhtml.OuterHTML(p)}
 	}
 	prefix := ""
 	switch p.DataAtom {
@@ -63,7 +63,7 @@ func blockToStrings(p *html.Node) []string {
 		return blocks
 	case atom.H1, atom.H2, atom.H3, atom.H4, atom.H5, atom.H6:
 		if id := xhtml.Attr(p, "id"); id != "" {
-			contents := xhtml.ContentsToString(p)
+			contents := xhtml.InnerHTML(p)
 			contents = strings.TrimSpace(contents)
 			contents = replaceSpecial.Replace(contents)
 			contents = fmt.Sprintf(`<%s id="%s">%s</%s>`,
@@ -74,7 +74,7 @@ func blockToStrings(p *html.Node) []string {
 		level := int(p.Data[1] - '0')
 		prefix = strings.Repeat("#", level) + " "
 	}
-	contents := xhtml.ContentsToString(p)
+	contents := xhtml.InnerHTML(p)
 	contents = strings.TrimSpace(contents)
 	contents = replaceSpecial.Replace(contents)
 	return []string{prefix + contents}

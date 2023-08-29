@@ -23,7 +23,7 @@ func TestClone(t *testing.T) {
 		body := n.FirstChild.FirstChild.NextSibling
 		be.Equal(t, xhtml.Find(n, xhtml.WithAtom(atom.Body)), body)
 
-		s := xhtml.ContentsToString(body)
+		s := xhtml.InnerHTML(body)
 		be.Equal(be.Relaxed(t), tc, s)
 
 		n2 := xhtml.Clone(n)
@@ -31,7 +31,7 @@ func TestClone(t *testing.T) {
 		be.Equal(t, xhtml.Find(n2, xhtml.WithAtom(atom.Body)), body2)
 		be.Unequal(t, body, body2)
 
-		s = xhtml.ContentsToString(body2)
+		s = xhtml.InnerHTML(body2)
 		be.Equal(be.Relaxed(t), tc, s)
 
 		m := map[*html.Node]bool{}

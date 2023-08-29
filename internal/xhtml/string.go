@@ -7,6 +7,7 @@ import (
 	"golang.org/x/net/html"
 )
 
+// ToBuffer returns a *bytes.Buffer containing the outerHTML of n.
 func ToBuffer(n *html.Node) *bytes.Buffer {
 	var buf bytes.Buffer
 	buf.Grow(4 * 1 >> 10)
@@ -16,7 +17,8 @@ func ToBuffer(n *html.Node) *bytes.Buffer {
 	return &buf
 }
 
-func ToString(n *html.Node) string {
+// OuterHTML returns a serialized node.
+func OuterHTML(n *html.Node) string {
 	var buf strings.Builder
 	buf.Grow(256)
 	if err := html.Render(&buf, n); err != nil {
@@ -25,7 +27,8 @@ func ToString(n *html.Node) string {
 	return buf.String()
 }
 
-func ContentsToString(n *html.Node) string {
+// InnerHTML returns the serialized markup contained within n.
+func InnerHTML(n *html.Node) string {
 	var buf strings.Builder
 	buf.Grow(256)
 
@@ -37,9 +40,9 @@ func ContentsToString(n *html.Node) string {
 	return buf.String()
 }
 
-// InnerBlocksToString is the same as ContentsToString,
+// InnerHTMLBlocks is the same as InnerHTML,
 // but it separates top level nodes with a line break.
-func InnerBlocksToString(n *html.Node) string {
+func InnerHTMLBlocks(n *html.Node) string {
 	var buf strings.Builder
 	buf.Grow(256)
 
