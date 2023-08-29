@@ -40,7 +40,7 @@ func Find(n *html.Node, match func(*html.Node) bool) *html.Node {
 	return found
 }
 
-// VisitAll vists child nodes in breadth first order.
+// VisitAll vists child nodes in depth-first pre-order.
 func VisitAll(n *html.Node, callback func(*html.Node)) {
 	all(n, func(n *html.Node) bool {
 		callback(n)
