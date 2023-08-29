@@ -6,51 +6,40 @@ import (
 	"golang.org/x/net/html/atom"
 )
 
-const (
-	done = iota
-	continue_
-)
-
-func breadthFirst(n *html.Node, yield func(*html.Node) int8) {
+func all(n *html.Node, yield func(*html.Node) bool) bool {
 	if n == nil {
-		return
+		return true
 	}
-	stack := make([]*html.Node, 1, 10)
-	stack[0] = n
-	for len(stack) > 0 {
-		// Pop head of the stack
-		var head *html.Node
-		head, stack = stack[0], stack[1:]
+	if !yield(n) {
+		return false
+	}
 
-		if yield(head) == done {
-			return
-		}
-
-		// Add the head node's children to the stack then loop
-		for c := head.FirstChild; c != nil; c = c.NextSibling {
-			stack = append(stack, c)
+	for c := n.FirstChild; c != nil; c = c.NextSibling {
+		if !all(c, yield) {
+			return false
 		}
 	}
+	return true
 }
 
 // Find returns the first matching child node or nil.
 func Find(n *html.Node, match func(*html.Node) bool) *html.Node {
 	var found *html.Node
-	breadthFirst(n, func(n *html.Node) int8 {
+	all(n, func(n *html.Node) bool {
 		if match(n) {
 			found = n
-			return done
+			return false // break
 		}
-		return continue_
+		return true // continue
 	})
 	return found
 }
 
 // VisitAll vists child nodes in breadth first order.
 func VisitAll(n *html.Node, callback func(*html.Node)) {
-	breadthFirst(n, func(n *html.Node) int8 {
+	all(n, func(n *html.Node) bool {
 		callback(n)
-		return continue_
+		return true
 	})
 }
 
