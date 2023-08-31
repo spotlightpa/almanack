@@ -11,8 +11,7 @@ import (
 )
 
 func TestMiddleware(t *testing.T) {
-	var mws httpx.Stack
-	mws.Push(
+	mws := httpx.NewStack(
 		func(h http.Handler) http.Handler {
 			return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 				w.Write([]byte("1"))
