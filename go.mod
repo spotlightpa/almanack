@@ -4,9 +4,9 @@ go 1.21
 
 require (
 	github.com/BurntSushi/toml v1.3.2
-	github.com/algolia/algoliasearch-client-go/v3 v3.30.1
+	github.com/algolia/algoliasearch-client-go/v3 v3.31.0
 	github.com/aws/aws-lambda-go v1.41.0
-	github.com/aws/aws-sdk-go v1.44.319
+	github.com/aws/aws-sdk-go v1.45.1
 	github.com/carlmjohnson/be v0.23.1
 	github.com/carlmjohnson/bytemap v0.23.5
 	github.com/carlmjohnson/crockford v0.22.2
@@ -30,10 +30,10 @@ require (
 	github.com/jba/muxpatterns v0.2.0
 	github.com/microcosm-cc/bluemonday v1.0.25
 	github.com/tdewolff/minify/v2 v2.12.8
-	gocloud.dev v0.33.0
+	gocloud.dev v0.34.0
 	golang.org/x/net v0.14.0
 	golang.org/x/oauth2 v0.11.0
-	google.golang.org/api v0.136.0
+	google.golang.org/api v0.138.0
 )
 
 require (
@@ -68,7 +68,7 @@ require (
 	github.com/golang/groupcache v0.0.0-20210331224755-41bb18bfe9da // indirect
 	github.com/golang/protobuf v1.5.3 // indirect
 	github.com/google/go-querystring v1.1.0 // indirect
-	github.com/google/s2a-go v0.1.4 // indirect
+	github.com/google/s2a-go v0.1.5 // indirect
 	github.com/google/uuid v1.3.0 // indirect
 	github.com/google/wire v0.5.0 // indirect
 	github.com/googleapis/enterprise-certificate-proxy v0.2.5 // indirect
