@@ -1,6 +1,7 @@
 package api
 
 import (
+	"fmt"
 	"html/template"
 	"net/http"
 
@@ -54,5 +55,16 @@ func (app *appEnv) redirectImageURL(w http.ResponseWriter, r *http.Request) http
 		return app.htmlErr(err)
 	}
 	http.Redirect(w, r, redirect, http.StatusFound)
+	return nil
+}
+
+func (app *appEnv) redirectDonorWall(w http.ResponseWriter, r *http.Request) http.Handler {
+	app.logStart(r)
+	id, err := app.svc.Queries.GetOption(r.Context(), "donor-wall")
+	if err != nil {
+		return app.htmlErr(err)
+	}
+	sheetURL := fmt.Sprintf("https://docs.google.com/spreadsheets/d/%s/edit", id)
+	http.Redirect(w, r, sheetURL, http.StatusFound)
 	return nil
 }

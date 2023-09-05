@@ -2,10 +2,12 @@ package api
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"maps"
 	"net/http"
+	"path"
 	"slices"
 	"strings"
 
@@ -13,6 +15,7 @@ import (
 	"github.com/carlmjohnson/resperr"
 	"github.com/spotlightpa/almanack/internal/db"
 	"github.com/spotlightpa/almanack/internal/gdocs"
+	"github.com/spotlightpa/almanack/internal/google"
 	"github.com/spotlightpa/almanack/internal/paginate"
 	"github.com/spotlightpa/almanack/internal/stringx"
 	"github.com/spotlightpa/almanack/pkg/almanack"
@@ -1039,4 +1042,40 @@ func (app *appEnv) getGDocsDoc(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	app.replyJSON(http.StatusOK, w, dbDoc)
+}
+
+func (app *appEnv) postDonorWall(w http.ResponseWriter, r *http.Request) http.Handler {
+	app.logStart(r)
+	sheetID, err := app.svc.Queries.GetOption(r.Context(), "donor-wall")
+	if err != nil {
+		return app.jsonErr(err)
+	}
+	if err := app.svc.ConfigureGoogleCert(r.Context()); err != nil {
+		return app.jsonErr(err)
+	}
+	cl, err := app.svc.Gsvc.SheetsClient(r.Context())
+	if err != nil {
+		return app.jsonErr(err)
+	}
+	files, err := google.SheetToDonorWall(r.Context(), cl, sheetID)
+	if err != nil {
+		return app.jsonErr(err)
+	}
+	var errs []error
+	for fpath, obj := range files {
+		msg := fmt.Sprintf("%s: updating donor wall", path.Base(fpath))
+		content, err := json.MarshalIndent(obj, "", "  ")
+		if err != nil {
+			errs = append(errs, err)
+			continue
+		}
+		err = app.svc.ContentStore.UpdateFile(r.Context(), msg, fpath, content)
+		if err != nil {
+			errs = append(errs, err)
+		}
+	}
+	if len(errs) > 0 {
+		return app.jsonErr(errors.Join(errs...))
+	}
+	return nil
 }

@@ -76,6 +76,8 @@ func (app *appEnv) routes() http.Handler {
 		spotlightMW.HandlerFunc(app.postDomain))
 	mux.Handle(`POST /api/create-signed-upload`,
 		spotlightMW.HandlerFunc(app.postSignedUpload))
+	mux.Handle(`POST /api/donor-wall`,
+		spotlightMW.Controller(app.postDonorWall))
 	mux.Handle(`GET /api/editors-picks`,
 		spotlightMW.HandlerFunc(app.getSiteData(almanack.HomepageLoc)))
 	mux.Handle(`POST /api/editors-picks`,
@@ -154,6 +156,8 @@ func (app *appEnv) routes() http.Handler {
 	spotlightSSRMW := ssrMW.Clone()
 	spotlightSSRMW.Push(app.hasRoleMiddleware("Spotlight PA"))
 
+	mux.Handle(`GET /ssr/donor-wall`,
+		spotlightSSRMW.Controller(app.redirectDonorWall))
 	mux.Handle(`GET /ssr/page/{id}`,
 		spotlightSSRMW.Controller(app.renderPage))
 
