@@ -12,6 +12,10 @@ export default {
       type: String,
       default: "is-light",
     },
+    target: {
+      type: String,
+      default: null,
+    },
   },
 };
 </script>
@@ -21,6 +25,7 @@ export default {
     :href="href"
     class="button has-text-weight-semibold"
     :class="[size, color]"
+    :target="target"
   >
     <span v-if="icon" class="icon">
       <font-awesome-icon :icon="icon" />
