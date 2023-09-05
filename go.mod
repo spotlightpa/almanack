@@ -34,6 +34,7 @@ require (
 	golang.org/x/net v0.14.0
 	golang.org/x/oauth2 v0.11.0
 	google.golang.org/api v0.138.0
+	gopkg.in/Iwark/spreadsheet.v2 v2.0.0-20220412131121-41eea1483964
 )
 
 require (
