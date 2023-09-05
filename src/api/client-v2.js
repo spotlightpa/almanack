@@ -81,6 +81,7 @@ export const listAuthorizedDomains = `/api/authorized-domains`;
 export const postAuthorizedEmailAddress = `/api/authorized-addresses`;
 export const listAuthorizedEmailAddresses = `/api/authorized-addresses`;
 export const createSignedUpload = `/api/create-signed-upload`;
+export const postDonorWall = `/api/donor-wall`;
 export const getEditorsPicks = `/api/editors-picks`;
 export const saveEditorsPicks = `/api/editors-picks`;
 export const getElectionFeature = `/api/election-feature`;
