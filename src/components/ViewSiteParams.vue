@@ -3,7 +3,6 @@ import { reactive, toRefs, watch } from "vue";
 
 import { useClient, makeState } from "@/api/hooks.js";
 import { useFileList } from "@/api/file-list.js";
-import { post, postDonorWall } from "@/api/client-v2.js";
 
 import { formatDateTime, today, tomorrow } from "@/utils/time-format.js";
 import useScrollTo from "@/utils/use-scroll-to.js";
@@ -82,8 +81,6 @@ export default {
 
     actions.fetch();
 
-    const { exec: donorExec, apiStateRefs: donorState } = makeState();
-
     return {
       container,
       today,
@@ -93,11 +90,6 @@ export default {
 
       formatDateTime,
       files: useFileList(),
-
-      donorLoading: donorState.isLoadingThrottled,
-      updateDonorWall() {
-        return donorExec(() => post(postDonorWall, ""));
-      },
     };
   },
 };
@@ -196,35 +188,6 @@ export default {
 
     <SpinnerProgress :is-loading="isLoadingThrottled" />
     <ErrorReloader :error="error" @reload="fetch" />
-  </div>
-
-  <div>
-    <h2 class="mt-5 title">Donor Walls</h2>
-    <div class="mb-0 buttons">
-      <button
-        class="button has-text-weight-semibold is-success is-small"
-        :class="{ 'is-loading': donorLoading }"
-        type="button"
-        @click="updateDonorWall"
-      >
-        Update donor walls from Google Sheet
-      </button>
-      <LinkHref
-        :icon="['fas', 'table-list']"
-        target="_blank"
-        label="Google Sheet"
-        href="/ssr/donor-wall"
-      />
-      <LinkHref
-        :icon="['fas', 'receipt']"
-        target="_blank"
-        label="Supporters page"
-        href="https://www.spotlightpa.org/support/"
-      />
-    </div>
-    <p class="help">
-      Allow five minutes for the live site to refresh with changes.
-    </p>
   </div>
 </template>
 

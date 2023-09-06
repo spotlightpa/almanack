@@ -115,6 +115,11 @@ const nextPage = computedProp("next_page", (page) => ({
         to="election-features"
         :icon="['fas', 'check-circle']"
       />
+      <LinkRoute
+        label="Donor Walls"
+        to="donor-wall"
+        :icon="['fas', 'receipt']"
+      />
     </LinkButtons>
 
     <LinkButtons label="Uploads">
