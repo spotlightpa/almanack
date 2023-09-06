@@ -199,23 +199,32 @@ export default {
   </div>
 
   <div>
-    <h2 class="mt-5 title">Donor walls</h2>
-    <div class="buttons">
+    <h2 class="mt-5 title">Donor Walls</h2>
+    <div class="mb-0 buttons">
       <button
         class="button has-text-weight-semibold is-success is-small"
         :class="{ 'is-loading': donorLoading }"
         type="button"
         @click="updateDonorWall"
       >
-        Update Donor Walls from Google Sheet
+        Update donor walls from Google Sheet
       </button>
       <LinkHref
-        :icon="['fas', 'file-invoice']"
+        :icon="['fas', 'table-list']"
         target="_blank"
-        label="Go to Google Sheet"
+        label="Google Sheet"
         href="/ssr/donor-wall"
       />
+      <LinkHref
+        :icon="['fas', 'receipt']"
+        target="_blank"
+        label="Supporters page"
+        href="https://www.spotlightpa.org/support/"
+      />
     </div>
+    <p class="help">
+      Allow five minutes for the live site to refresh with changes.
+    </p>
   </div>
 </template>
 
