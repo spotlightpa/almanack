@@ -1077,5 +1077,5 @@ func (app *appEnv) postDonorWall(w http.ResponseWriter, r *http.Request) http.Ha
 	if len(errs) > 0 {
 		return app.jsonErr(errors.Join(errs...))
 	}
-	return nil
+	return app.jsonOK("OK")
 }
