@@ -129,6 +129,12 @@ let router = createRouter({
       },
     },
     {
+      path: "/admin/donor-wall",
+      name: "donor-wall",
+      component: load(() => import("@/components/ViewDonorWall.vue")),
+      meta: { requiresAuth: isSpotlightPAUser },
+    },
+    {
       path: "/admin/editors-picks",
       name: "homepage-editor",
       component: load(() => import("@/components/ViewHomepageEditor.vue")),
