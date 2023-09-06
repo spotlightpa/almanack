@@ -12,6 +12,7 @@ import (
 	"strings"
 
 	"github.com/carlmjohnson/emailx"
+	"github.com/carlmjohnson/flowmatic"
 	"github.com/carlmjohnson/resperr"
 	"github.com/spotlightpa/almanack/internal/db"
 	"github.com/spotlightpa/almanack/internal/gdocs"
@@ -1061,21 +1062,21 @@ func (app *appEnv) postDonorWall(w http.ResponseWriter, r *http.Request) http.Ha
 	if err != nil {
 		return app.jsonErr(err)
 	}
-	var errs []error
-	for fpath, obj := range files {
+	paths := make([]string, 0, len(files))
+	for fpath := range files {
+		paths = append(paths, fpath)
+	}
+	err = flowmatic.Each(5, paths, func(fpath string) error {
 		msg := fmt.Sprintf("%s: updating donor wall", path.Base(fpath))
+		obj := files[fpath]
 		content, err := json.MarshalIndent(obj, "", "  ")
 		if err != nil {
-			errs = append(errs, err)
-			continue
+			return err
 		}
-		err = app.svc.ContentStore.UpdateFile(r.Context(), msg, fpath, content)
-		if err != nil {
-			errs = append(errs, err)
-		}
-	}
-	if len(errs) > 0 {
-		return app.jsonErr(errors.Join(errs...))
+		return app.svc.ContentStore.UpdateFile(r.Context(), msg, fpath, content)
+	})
+	if err != nil {
+		return app.jsonErr(err)
 	}
 	return app.jsonOK("OK")
 }
