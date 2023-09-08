@@ -16,7 +16,6 @@ func (app *appEnv) routes() http.Handler {
 	mux := muxpatterns.NewServeMux()
 
 	var baseMW httpx.Stack
-	baseMW.Push(httpx.WithPathValue(mux))
 	baseMW.Push(middleware.RealIP)
 	baseMW.PushIf(!app.isLambda, middleware.Recoverer)
 	baseMW.Push(
