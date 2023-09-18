@@ -26,8 +26,8 @@ const isDev = !isProd && !isStage;
           <p>
             © <span v-text="new Date().getFullYear()"></span> <br />
             Spotlight PA <br />
-            225 Market St Suite 502A <br />
-            Harrisburg PA 17101
+            PO Box 11728 <br />
+            Harrisburg, PA 17108
           </p>
           <p>
             <em>
