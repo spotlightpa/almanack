@@ -46,6 +46,12 @@ function updateDonorWall() {
     />
     <LinkHref
       :icon="['fas', 'receipt']"
+      label="Members since launch"
+      href="https://www.spotlightpa.org/support/funders-and-members#all-donors"
+      target="_blank"
+    />
+    <LinkHref
+      :icon="['fas', 'receipt']"
       label="Leaders in Action"
       href="https://www.spotlightpa.org/support/leaders-in-action/#our-current-leaders"
       target="_blank"
