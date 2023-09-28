@@ -5,6 +5,8 @@ import (
 	"net/http"
 
 	"github.com/carlmjohnson/flagx"
+	"github.com/carlmjohnson/slackhook"
+
 	"github.com/spotlightpa/almanack/internal/aws"
 	"github.com/spotlightpa/almanack/internal/db"
 	"github.com/spotlightpa/almanack/internal/github"
@@ -12,7 +14,6 @@ import (
 	"github.com/spotlightpa/almanack/internal/index"
 	"github.com/spotlightpa/almanack/internal/mailchimp"
 	"github.com/spotlightpa/almanack/internal/plausible"
-	"github.com/spotlightpa/almanack/internal/slack"
 )
 
 func AddFlags(fl *flag.FlagSet) func() (svc Services, err error) {
@@ -21,8 +22,10 @@ func AddFlags(fl *flag.FlagSet) func() (svc Services, err error) {
 	netlifyHookSecret := fl.String("netlify-webhook-secret", "", "`shared secret` to authorize Netlify identity webhook")
 
 	pg, tx := db.AddFlags(fl, "postgres", "PostgreSQL database `URL`")
-	slackSocialURL := fl.String("slack-social-url", "", "Slack hook endpoint `URL` for social")
-	slackTechURL := fl.String("slack-hook-url", "", "Slack tech channel endpoint `URL`")
+	slackSocial := slackhook.New(slackhook.MockClient)
+	fl.Var(slackSocial, "slack-social-url", "Slack hook endpoint `URL` for social")
+	slackTech := slackhook.New(slackhook.MockClient)
+	fl.Var(slackTech, "slack-hook-url", "Slack tech channel endpoint `URL`")
 	getS3Store := aws.AddFlags(fl)
 	getGithub := github.AddFlags(fl)
 	getIndex := index.AddFlags(fl)
@@ -52,8 +55,8 @@ func AddFlags(fl *flag.FlagSet) func() (svc Services, err error) {
 			Queries:              pg,
 			Tx:                   tx,
 			ContentStore:         getGithub(),
-			SlackSocial:          slack.New(*slackSocialURL),
-			SlackTech:            slack.New(*slackTechURL),
+			SlackSocial:          slackSocial,
+			SlackTech:            slackTech,
 			ImageStore:           is,
 			FileStore:            fs,
 			Indexer:              getIndex(),

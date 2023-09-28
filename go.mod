@@ -18,7 +18,7 @@ require (
 	github.com/carlmjohnson/gateway v1.22.2
 	github.com/carlmjohnson/requests v0.23.4
 	github.com/carlmjohnson/resperr v0.22.0
-	github.com/carlmjohnson/slackhook v0.23.1
+	github.com/carlmjohnson/slackhook v0.23.2
 	github.com/carlmjohnson/versioninfo v0.22.5
 	github.com/gabriel-vasile/mimetype v1.4.2
 	github.com/getsentry/sentry-go v0.24.0

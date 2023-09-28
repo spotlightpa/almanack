@@ -92,8 +92,8 @@ github.com/carlmjohnson/requests v0.23.4 h1:AxcvapfB9RPXLSyvAHk9YJoodQ43ZjzNHj6F
 github.com/carlmjohnson/requests v0.23.4/go.mod h1:Qzp6tW4DQyainPP+tGwiJTzwxvElTIKm0B191TgTtOA=
 github.com/carlmjohnson/resperr v0.22.0 h1:oSliyZLmyncmPLEZXydy6gNhJgQ/9AaVpaGQLDRQ/NM=
 github.com/carlmjohnson/resperr v0.22.0/go.mod h1:iEKmv4gBlxjy4iLy7ExxLjdCBJ5wSaRlDZDnqGfBtls=
-github.com/carlmjohnson/slackhook v0.23.1 h1:EYqSZo8kYxnRrOgAW8I0laFRque0mrRgMdhuH5Efwsk=
-github.com/carlmjohnson/slackhook v0.23.1/go.mod h1:mUvUC2ssD5E1lrAhlrE9clJo7pSRuhTmjpf/x0ymyVA=
+github.com/carlmjohnson/slackhook v0.23.2 h1:CdPIxx3oYV7VKGW+d/cXE2SXsY6V/P3ggiLNY5yBCF8=
+github.com/carlmjohnson/slackhook v0.23.2/go.mod h1:/xsrT0OnsHPORX4CnbZq/HvJTPovOkfU+iOlORZPlII=
 github.com/carlmjohnson/versioninfo v0.22.5 h1:O00sjOLUAFxYQjlN/bzYTuZiS0y6fWDQjMRvwtKgwwc=
 github.com/carlmjohnson/versioninfo v0.22.5/go.mod h1:QT9mph3wcVfISUKd0i9sZfVrPviHuSF+cUtLjm2WSf8=
 github.com/census-instrumentation/opencensus-proto v0.2.1/go.mod h1:f6KPmirojxKA12rnyqOA5BBL4O983OfeGPqjHWSTneU=

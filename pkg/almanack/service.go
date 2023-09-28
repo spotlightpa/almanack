@@ -3,6 +3,7 @@ package almanack
 import (
 	"net/http"
 
+	"github.com/carlmjohnson/slackhook"
 	"github.com/spotlightpa/almanack/internal/aws"
 	"github.com/spotlightpa/almanack/internal/db"
 	"github.com/spotlightpa/almanack/internal/github"
@@ -10,7 +11,6 @@ import (
 	"github.com/spotlightpa/almanack/internal/index"
 	"github.com/spotlightpa/almanack/internal/mailchimp"
 	"github.com/spotlightpa/almanack/internal/plausible"
-	"github.com/spotlightpa/almanack/internal/slack"
 )
 
 type Services struct {
@@ -23,8 +23,8 @@ type Services struct {
 	github.ContentStore
 	ImageStore       aws.BlobStore
 	FileStore        aws.BlobStore
-	SlackSocial      slack.Client
-	SlackTech        slack.Client
+	SlackSocial      *slackhook.Client
+	SlackTech        *slackhook.Client
 	Indexer          index.Indexer
 	NewletterService mailchimp.V3
 	Gsvc             *google.Service
