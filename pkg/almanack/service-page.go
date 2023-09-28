@@ -12,12 +12,12 @@ import (
 	"github.com/carlmjohnson/errorx"
 	"github.com/carlmjohnson/flowmatic"
 	"github.com/carlmjohnson/resperr"
+	"github.com/carlmjohnson/slackhook"
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgtype"
 	"github.com/spotlightpa/almanack/internal/arc"
 	"github.com/spotlightpa/almanack/internal/db"
 	"github.com/spotlightpa/almanack/internal/mailchimp"
-	"github.com/spotlightpa/almanack/internal/slack"
 	"github.com/spotlightpa/almanack/internal/stringx"
 	"github.com/spotlightpa/almanack/internal/timex"
 	"github.com/spotlightpa/almanack/pkg/almlog"
@@ -335,9 +335,10 @@ func (svc Services) Notify(ctx context.Context, page *db.Page, publishingNow boo
 	hed, _ := page.Frontmatter["title"].(string)
 	summary := page.Frontmatter["description"].(string)
 	url := page.FullURL()
-	return svc.SlackSocial.Post(ctx, slack.Message{
+	l := almlog.FromContext(ctx)
+	return svc.SlackSocial.Post(ctx, l.InfoContext, svc.Client, slackhook.Message{
 		Text: text,
-		Attachments: []slack.Attachment{
+		Attachments: []slackhook.Attachment{
 			{
 				Color: color,
 				Fallback: fmt.Sprintf("%s\n%s\n%s",

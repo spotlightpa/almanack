@@ -11,13 +11,13 @@ import (
 	"time"
 
 	"github.com/carlmjohnson/resperr"
+	"github.com/carlmjohnson/slackhook"
 	"github.com/spotlightpa/almanack/internal/db"
 	"github.com/spotlightpa/almanack/internal/httpx"
 	"github.com/spotlightpa/almanack/internal/jwthook"
 	"github.com/spotlightpa/almanack/internal/lazy"
 	"github.com/spotlightpa/almanack/internal/must"
 	"github.com/spotlightpa/almanack/internal/netlifyid"
-	"github.com/spotlightpa/almanack/internal/slack"
 	"github.com/spotlightpa/almanack/pkg/almanack"
 	"github.com/spotlightpa/almanack/pkg/almlog"
 )
@@ -167,14 +167,15 @@ func (app *appEnv) postIdentityHook(w http.ResponseWriter, r *http.Request) {
 	if len(req.User.AppMetadata.Roles) < 1 {
 		color = colorRed
 	}
-	app.svc.SlackTech.Post(context.Background(),
-		slack.Message{
-			Attachments: []slack.Attachment{
+	l := almlog.FromContext(r.Context())
+	app.svc.SlackTech.Post(context.Background(), l.InfoContext, app.svc.Client,
+		slackhook.Message{
+			Attachments: []slackhook.Attachment{
 				{
 					Title: "New Almanack Registration",
 					Text:  msg,
 					Color: color,
-					Fields: []slack.Field{
+					Fields: []slackhook.Field{
 						{
 							Title: "Roles",
 							Value: strings.Join(req.User.AppMetadata.Roles, ", "),
