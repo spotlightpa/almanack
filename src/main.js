@@ -10,9 +10,10 @@ if (import.meta.env.MODE === "production") {
   Sentry.init({ app, dsn });
 }
 
-import { Head, createHead } from "@vueuse/head";
+import { createHead } from "@unhead/vue";
 const head = createHead();
 app.use(head);
+import { Head } from "@unhead/vue/components";
 app.component("MetaHead", Head);
 
 import fontAwesome from "./plugins/font-awesome.js";
