@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"maps"
 	"net/http"
+	"net/url"
 	"path"
 	"slices"
 	"strings"
@@ -841,7 +842,27 @@ func (app *appEnv) listPagesByFTS(w http.ResponseWriter, r *http.Request) {
 			app.replyErr(w, r, err)
 			return
 		}
-		if !strings.Contains(query, " ") {
+		switch {
+		case strings.HasPrefix(query, "http"):
+			u, err := url.Parse(query)
+			if err != nil {
+				l := almlog.FromContext(r.Context())
+				l.DebugContext(r.Context(), "listPagesByFTS: bad URL", "query", query)
+				break
+			}
+			pathPage, err := app.svc.Queries.GetPageByURLPath(r.Context(), u.Path)
+			if db.IsNotFound(err) {
+				break
+			}
+			if err != nil {
+				app.replyErr(w, r, err)
+				return
+			}
+			pathPages := []db.Page{pathPage}
+			pages = append(pathPages, pages...)
+			pages = pages[:min(20, len(pages))]
+
+		case !strings.ContainsAny(query, " /:*"):
 			idpages, err := app.svc.Queries.ListPagesByInternalID(r.Context(), db.ListPagesByInternalIDParams{
 				Query: fmt.Sprintf("%s:*", query),
 				Limit: 5,
