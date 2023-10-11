@@ -15,6 +15,7 @@ import (
 	"github.com/carlmjohnson/errorx"
 	"github.com/carlmjohnson/requests"
 	"github.com/spotlightpa/almanack/internal/blocko"
+	"github.com/spotlightpa/almanack/internal/cmpx"
 	"github.com/spotlightpa/almanack/internal/db"
 	"github.com/spotlightpa/almanack/internal/gdocs"
 	"github.com/spotlightpa/almanack/internal/must"
@@ -598,8 +599,9 @@ func (svc Services) UploadGDocsImage(ctx context.Context, arg UploadGDocsImagePa
 
 func processToc(doc, tbl *html.Node, rows xhtml.TableNodes) {
 	type header struct {
-		text string
-		id   string
+		text  string
+		id    string
+		depth int
 	}
 	var headers []header
 	xhtml.VisitAll(doc, func(n *html.Node) {
@@ -610,7 +612,8 @@ func processToc(doc, tbl *html.Node, rows xhtml.TableNodes) {
 		}
 		id := fmt.Sprintf("spl-heading-%d", len(headers)+1)
 		xhtml.SetAttr(n, "id", id)
-		headers = append(headers, header{xhtml.InnerText(n), id})
+		depth := int(n.Data[1] - '0')
+		headers = append(headers, header{xhtml.InnerText(n), id, depth})
 	})
 	h3 := xhtml.New("h3")
 	xhtml.AppendText(h3, stringx.First(
@@ -619,16 +622,42 @@ func processToc(doc, tbl *html.Node, rows xhtml.TableNodes) {
 		"Table of Contents",
 	))
 
-	ol := xhtml.New("ol")
+	ul := xhtml.New("ul")
+	currentUl := ul
+	var lastDepth int
+	if len(headers) > 0 {
+		lastDepth = headers[0].depth
+	}
 	for _, h := range headers {
+		// If this one is deeper or less deep than its predecessor,
+		// add and remove ULs as needed
+		d := h.depth
+		for lastDepth > d {
+			// If its out of order, just try to cope
+			currentUl = cmpx.Or(
+				xhtml.Closest(currentUl.Parent, xhtml.WithAtom(atom.Ul)),
+				currentUl,
+			)
+			d++
+		}
+		for lastDepth < d {
+			newUl := xhtml.New("ul")
+			lastLi := xhtml.LastChildOrNew(currentUl, "li")
+			lastLi.AppendChild(newUl)
+			currentUl = newUl
+			d--
+		}
 		li := xhtml.New("li")
+		p := xhtml.New("p")
 		link := xhtml.New("a", "href", "#"+h.id)
 		xhtml.AppendText(link, h.text)
-		li.AppendChild(link)
-		ol.AppendChild(li)
+		p.AppendChild(link)
+		li.AppendChild(p)
+		currentUl.AppendChild(li)
+		lastDepth = h.depth
 	}
-	xhtml.ReplaceWith(tbl, ol)
-	ol.Parent.InsertBefore(h3, ol)
+	xhtml.ReplaceWith(tbl, ul)
+	currentUl.Parent.InsertBefore(h3, ul)
 }
 
 func makeCASaddress(body []byte, ct string) string {

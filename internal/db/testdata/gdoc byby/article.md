@@ -2,9 +2,9 @@
 
 ### Blah blah
 
-1. <a href="#spl-heading-1">Heading 1</a>
+- <a href="#spl-heading-1">Heading 1</a>
 
-2. <a href="#spl-heading-2">Heading 2</a>
+  - <a href="#spl-heading-2">Heading 2</a>
 
 <em>Praesent vitae facilisis neque</em>. Phasellus arcu magna, euismod et porttitor sit amet, suscipit quis turpis. Donec lacinia, nisl vel dignissim suscipit, massa lorem tempus purus, ut feugiat purus nisi id orci. Duis vestibulum, arcu in lobortis volutpat, neque tellus mollis turpis, semper
 
