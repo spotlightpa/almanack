@@ -2,23 +2,23 @@ Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor i
 
 ### Article contents
 
-1. <a href="#spl-heading-1">Heading 1</a>
+- <a href="#spl-heading-1">Heading 1</a>
 
-2. <a href="#spl-heading-2">Heading 1.1</a>
+  - <a href="#spl-heading-2">Heading 1.1</a>
 
-3. <a href="#spl-heading-3">Heading 1.2: Headings with sub-formatting</a>
+  - <a href="#spl-heading-3">Heading 1.2: Headings with sub-formatting</a>
 
-4. <a href="#spl-heading-4">Heading 2</a>
+- <a href="#spl-heading-4">Heading 2</a>
 
-5. <a href="#spl-heading-5">Heading 3</a>
+- <a href="#spl-heading-5">Heading 3</a>
 
-6. <a href="#spl-heading-6">Heading 3.1</a>
+  - <a href="#spl-heading-6">Heading 3.1</a>
 
-7. <a href="#spl-heading-7">Heading 3.1.1</a>
+    - <a href="#spl-heading-7">Heading 3.1.1</a>
 
-8. <a href="#spl-heading-8">Heading 3.1.2</a>
+    - <a href="#spl-heading-8">Heading 3.1.2</a>
 
-9. <a href="#spl-heading-9">Heading 4</a>
+- <a href="#spl-heading-9">Heading 4</a>
 
 <h2 id="spl-heading-1">Heading 1</h2>
 
