@@ -624,10 +624,7 @@ func processToc(doc, tbl *html.Node, rows xhtml.TableNodes) {
 
 	ul := xhtml.New("ul")
 	currentUl := ul
-	var lastDepth int
-	if len(headers) > 0 {
-		lastDepth = headers[0].depth
-	}
+	lastDepth := 7 // Past H6, the maximum possible depth
 	for _, h := range headers {
 		// If this one is deeper or less deep than its predecessor,
 		// add and remove ULs as needed
