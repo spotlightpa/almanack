@@ -1,7 +1,8 @@
 <script>
 import { reactive, computed, toRefs, watch } from "vue";
 
-import { useClient, makeState } from "@/api/hooks.js";
+import { useClient } from "@/api/client.js";
+import { makeState } from "@/api/service-util.js";
 
 import { formatDate } from "@/utils/time-format.js";
 import humanSize from "@/utils/human-size.js";
