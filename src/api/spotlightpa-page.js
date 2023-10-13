@@ -1,11 +1,14 @@
 import { computed, reactive, ref, toRefs, watch } from "vue";
 
 import { makeState } from "@/api/service-util.js";
-import { useClient } from "@/api/client.js";
 import {
   get as clientGet,
   post as clientPost,
   getPage,
+  listAllTopics,
+  listAllSeries,
+  listImages,
+  postPage,
   postPageRefresh,
 } from "@/api/client-v2.js";
 import { processGDocsDoc } from "@/api/gdocs.js";
@@ -224,13 +227,11 @@ export class Page {
 }
 
 function useAutocompletions() {
-  let { listAllTopics, listAllSeries } = useClient();
   const autocomplete = reactive({
     topics: [],
     series: [],
   });
-
-  listAllTopics().then(([data, err]) => {
+  clientGet(listAllTopics).then(([data, err]) => {
     if (!err) {
       autocomplete.topics = data.topics || [];
     } else {
@@ -238,7 +239,7 @@ function useAutocompletions() {
       console.warn(err);
     }
   });
-  listAllSeries().then(([data, err]) => {
+  clientGet(listAllSeries).then(([data, err]) => {
     if (!err) {
       autocomplete.series = data.series || [];
     } else {
@@ -250,14 +251,13 @@ function useAutocompletions() {
 }
 
 export function usePage(id) {
-  const { postPage, listImages } = useClient();
   const { apiState, exec } = makeState();
 
   const fetch = (id) =>
     exec(() =>
       clientGet(getPage, { by: "id", value: id, refresh_content_store: true })
     );
-  const post = (page) => exec(() => postPage(page));
+  const post = (page) => exec(() => clientPost(postPage, page));
 
   const page = computed(() =>
     apiState.rawData ? reactive(new Page(apiState.rawData)) : null
@@ -268,7 +268,7 @@ export function usePage(id) {
   });
 
   const { apiState: imageState, exec: execImage } = makeState();
-  execImage(() => listImages());
+  execImage(() => clientGet(listImages));
 
   return {
     showScheduler: ref(false),
