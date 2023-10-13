@@ -1,6 +1,6 @@
 <script>
 import { computed, reactive, toRefs } from "vue";
-import { useClient } from "@/api/hooks.js";
+import { useClient } from "@/api/client.js";
 
 export default {
   name: "EmailComposer",

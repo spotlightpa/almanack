@@ -1,6 +1,6 @@
 <script setup>
 import { post, postDonorWall } from "@/api/client-v2.js";
-import { makeState } from "@/api/hooks.js";
+import { makeState } from "@/api/service-util.js";
 
 const { exec, apiStateRefs } = makeState();
 const isLoading = apiStateRefs.isLoadingThrottled;

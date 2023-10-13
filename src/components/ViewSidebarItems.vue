@@ -1,7 +1,8 @@
 <script>
 import { reactive, computed, toRefs, watch } from "vue";
 
-import { useClient, makeState } from "@/api/hooks.js";
+import { useClient } from "@/api/client.js";
+import { makeState } from "@/api/service-util.js";
 import { formatDateTime, today, tomorrow } from "@/utils/time-format.js";
 import useScrollTo from "@/utils/use-scroll-to.js";
 import maybeDate from "@/utils/maybe-date.js";

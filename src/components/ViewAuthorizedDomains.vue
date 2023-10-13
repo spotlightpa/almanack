@@ -1,7 +1,8 @@
 <script>
 import { computed, reactive, ref, toRefs } from "vue";
 
-import { useClient, makeState } from "@/api/hooks.js";
+import { useClient } from "@/api/client.js";
+import { makeState } from "@/api/service-util.js";
 
 function domainState() {
   let { listAuthorizedDomains, postAuthorizedDomain } = useClient();
