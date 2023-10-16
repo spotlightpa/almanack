@@ -37,14 +37,12 @@ func (app *appEnv) routes() http.Handler {
 		baseMW.HandlerFunc(app.postIdentityHook))
 	// End public endpoints
 
-	authMW := baseMW.Clone()
-	authMW.Push(app.authHeaderMiddleware)
+	authMW := baseMW.With(app.authHeaderMiddleware)
 
 	mux.Handle(`GET /api/user-info`,
 		authMW.Controller(app.userInfo))
 
-	partnerMW := authMW.Clone()
-	partnerMW.Push(app.hasRoleMiddleware("editor"))
+	partnerMW := authMW.With(app.hasRoleMiddleware("editor"))
 
 	// Start partner endpoints
 	mux.Handle(`GET /api/shared-article`,
@@ -53,8 +51,7 @@ func (app *appEnv) routes() http.Handler {
 		partnerMW.Controller(app.listSharedArticles))
 	// End partner endpoints
 
-	spotlightMW := authMW.Clone()
-	spotlightMW.Push(app.hasRoleMiddleware("Spotlight PA"))
+	spotlightMW := authMW.With(app.hasRoleMiddleware("Spotlight PA"))
 
 	// Start Spotlight endpoints
 	mux.Handle(`GET /api/all-pages`,
@@ -133,27 +130,24 @@ func (app *appEnv) routes() http.Handler {
 		spotlightMW.HandlerFunc(app.setSiteData((almanack.StateCollegeLoc))))
 	// End spotlight endpoints
 
-	ssrMW := baseMW.Clone()
 	// Don't trust this middleware!
 	// Netlify should be verifying the role at the CDN level.
 	// This is just a fallback.
-	ssrMW.Push(app.authCookieMiddleware)
+	ssrMW := baseMW.With(app.authCookieMiddleware)
 
 	mux.Handle(`GET /ssr/user-info`,
 		ssrMW.Controller(app.userInfo))
 	mux.Handle(`/ssr/`,
 		ssrMW.HandlerFunc(app.renderNotFound))
 
-	partnerSSRMW := ssrMW.Clone()
-	partnerSSRMW.Push(app.hasRoleMiddleware("editor"))
+	partnerSSRMW := ssrMW.With(app.hasRoleMiddleware("editor"))
 
 	mux.Handle(`GET /ssr/download-image`,
 		partnerSSRMW.Controller(app.redirectImageURL))
 	mux.Handle(`GET /ssr/mailchimp-signup-url`,
 		partnerSSRMW.HandlerFunc(app.redirectSignupURL))
 
-	spotlightSSRMW := ssrMW.Clone()
-	spotlightSSRMW.Push(app.hasRoleMiddleware("Spotlight PA"))
+	spotlightSSRMW := ssrMW.With(app.hasRoleMiddleware("Spotlight PA"))
 
 	mux.Handle(`GET /ssr/donor-wall`,
 		spotlightSSRMW.Controller(app.redirectDonorWall))

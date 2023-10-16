@@ -18,7 +18,7 @@ func (c Controller) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 // Middleware is any function that wraps an http.Handler returning a new http.Handler.
 type Middleware = func(h http.Handler) http.Handler
 
-// Stack is a slice of Middleware for use with Router.
+// Stack is a slice of Middleware.
 type Stack []Middleware
 
 func NewStack(mw ...Middleware) Stack {
@@ -41,6 +41,11 @@ func (stack *Stack) PushIf(cond bool, mw ...Middleware) {
 	if cond {
 		*stack = append(*stack, mw...)
 	}
+}
+
+// With clones the stack and pushes to the cloned stack.
+func (stack *Stack) With(mw ...Middleware) Stack {
+	return append(slices.Clip(*stack), mw...)
 }
 
 // Handler builds an http.Handler
