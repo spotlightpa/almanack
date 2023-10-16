@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"net/http"
 	"slices"
+	"strconv"
 	"strings"
 
 	"github.com/carlmjohnson/bytemap"
@@ -262,6 +263,13 @@ func (svc Services) replaceImageEmbed(
 	externalID string,
 	objID2Path map[string]string,
 ) (imageEmbed *db.EmbedImage, warning string) {
+	var width, height int
+	if w := xhtml.InnerText(rows.Value("width")); w != "" {
+		width, _ = strconv.Atoi(w)
+	}
+	if h := xhtml.InnerText(rows.Value("height")); h != "" {
+		height, _ = strconv.Atoi(h)
+	}
 	imageEmbed = &db.EmbedImage{
 		Credit:  xhtml.InnerText(rows.Value("credit")),
 		Caption: xhtml.InnerText(rows.Value("caption")),
@@ -269,6 +277,8 @@ func (svc Services) replaceImageEmbed(
 			xhtml.InnerText(rows.Value("description")),
 			xhtml.InnerText(rows.Value("alt")),
 		),
+		Width:  width,
+		Height: height,
 	}
 
 	if path := xhtml.InnerText(rows.Value("path")); path != "" {
@@ -516,11 +526,17 @@ func fixMarkdownPlaceholders(rawHTML *html.Node) {
 				Data: embed.Value.(string),
 			})
 		case db.ImageEmbedTag:
-			// TODO: distinguish image types
 			image := embed.Value.(db.EmbedImage)
+			var widthHeight string
+			if image.Width != 0 {
+				widthHeight = fmt.Sprintf(`width-ratio="%d" height-ratio="%d" `,
+					image.Width, image.Height,
+				)
+			}
 			data := fmt.Sprintf(
-				`{{<picture src="%s" description="%s" caption="%s" credit="%s">}}`,
+				`{{<picture src="%s" %sdescription="%s" caption="%s" credit="%s">}}`,
 				image.Path,
+				widthHeight,
 				strings.TrimSpace(image.Description),
 				strings.TrimSpace(image.Caption),
 				strings.TrimSpace(image.Credit),

@@ -71,4 +71,6 @@ type EmbedImage struct {
 	Credit      string `json:"credit"`
 	Caption     string `json:"caption"`
 	Description string `json:"description"`
+	Width       int    `json:"width"`
+	Height      int    `json:"height"`
 }
