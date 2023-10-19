@@ -68,8 +68,8 @@ github.com/aws/smithy-go v1.14.2/go.mod h1:Tg+OJXh4MB2R/uN61Ko2f6hTZwB/ZYGOtib8J
 github.com/aymerick/douceur v0.2.0 h1:Mv+mAeH1Q+n9Fr+oyamOlAkUNPWPlA8PPGR0QAaYuPk=
 github.com/aymerick/douceur v0.2.0/go.mod h1:wlT5vV2O3h55X9m7iVYN0TBM0NH/MmbLnd30/FjWUq4=
 github.com/bwesterb/go-ristretto v1.2.3/go.mod h1:fUIoIZaG73pV5biE2Blr2xEzDoMj7NFEuV9ekS419A0=
-github.com/carlmjohnson/be v0.23.1 h1:lmzkNRv25/mptDQ1ywXMvgQ6u6IZMYna/KHWAquM1II=
-github.com/carlmjohnson/be v0.23.1/go.mod h1:KAgPUh0HpzWYZZI+IABdo80wTgY43YhbdsiLYAaSI/Q=
+github.com/carlmjohnson/be v0.23.2 h1:1QjPnPJhwGUjsD9+7h98EQlKsxnG5TV+nnEvk0wnkls=
+github.com/carlmjohnson/be v0.23.2/go.mod h1:KAgPUh0HpzWYZZI+IABdo80wTgY43YhbdsiLYAaSI/Q=
 github.com/carlmjohnson/bytemap v0.23.5 h1:TFjPrPfPN2eG3j3APlx71bkq5hzY1yqFR6QuCtz07SQ=
 github.com/carlmjohnson/bytemap v0.23.5/go.mod h1:gf5DpJDZebWrIaw9QBVewmlInMe3Dk9RtyYUcB3LKAA=
 github.com/carlmjohnson/crockford v0.22.2 h1:xvJJfTQBHmD6sbkGKVsVa3kL3+1oxXmyhiv874U1DX8=
