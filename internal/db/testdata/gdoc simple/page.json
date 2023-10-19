@@ -22,7 +22,7 @@
     "title-tag": "",
     "twitter-title": ""
   },
-  "body": "My name is \u003ca href=\"mailto:cjohnson@spotlightpa.org\"\u003eCarl Johnson\u003c/a\u003e.\n\nThis is my \u003ca href=\"https://docs.google.com/document/d/103kCeBG2OQS_ZHkHUyKpT9Z_ajs4tuQ-WtCvlj79Vqs/edit\"\u003etest document\u003c/a\u003e.\n\n# Some blocks\n\n\u003cscript src=\"http://example.com/\"\u003e\u003c/script\u003e\n\n{{\u003cpicture src=\"cas/9kr9-56c7-tnss-rspy.jpeg\" description=\"Blah blah blah.\" caption=\"Here is a caption\" credit=\"CarlCo\"\u003e}}\n",
+  "body": "My name is <a href=\"mailto:cjohnson@spotlightpa.org\">Carl Johnson</a>.\n\nThis is my <a href=\"https://docs.google.com/document/d/103kCeBG2OQS_ZHkHUyKpT9Z_ajs4tuQ-WtCvlj79Vqs/edit\">test document</a>.\n\n# Some blocks\n\n<script src=\"http://example.com/\"></script>\n\n{{<picture src=\"cas/9kr9-56c7-tnss-rspy.jpeg\" description=\"Blah blah blah.\" caption=\"Here is a caption\" credit=\"CarlCo\">}}\n",
   "schedule_for": null,
   "last_published": null,
   "created_at": "2020-03-15T20:00:00Z",
