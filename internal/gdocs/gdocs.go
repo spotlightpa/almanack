@@ -96,9 +96,10 @@ func buildListInfo(lists map[string]docs.List) map[string]string {
 		if list.ListProperties == nil {
 			continue
 		}
-		listType := "ul"
-		if list.ListProperties.NestingLevels[0].GlyphType != "" {
-			listType = "ol"
+		listType := "ol"
+		if list.ListProperties.NestingLevels[0].GlyphType == "" ||
+			list.ListProperties.NestingLevels[0].GlyphType == "GLYPH_TYPE_UNSPECIFIED" {
+			listType = "ul"
 		}
 		m[id] = listType
 	}
