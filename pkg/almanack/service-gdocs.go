@@ -201,8 +201,9 @@ func (svc Services) ProcessGDocsDoc(ctx context.Context, dbDoc db.GDocsDoc) (err
 				atom.B, atom.Strong,
 			}, n.FirstChild.DataAtom) {
 			text := xhtml.InnerText(n)
-			if len(text) > 17 {
-				text = text[:13] + "..."
+			if len([]rune(text)) > 17 {
+				runes := []rune(text)[:13]
+				text = string(runes) + "..."
 			}
 			warning := fmt.Sprintf(
 				"Paragraph beginning %q looks like a header, but does not use H-tag.", text)
