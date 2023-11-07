@@ -40,7 +40,6 @@ load();
 </script>
 
 <template>
-  <div>hello</div>
   <SpinnerProgress :is-loading="isLoading && isLoadingDebounced" />
   <ErrorReloader :error="error" @reload="load" />
 </template>
