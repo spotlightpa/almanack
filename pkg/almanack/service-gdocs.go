@@ -528,7 +528,7 @@ func fixMarkdownPlaceholders(rawHTML *html.Node) {
 			})
 		case db.ToCEmbedTag:
 			container := xhtml.New("div")
-			xhtml.SetInnerHTML(container, embed.Value.(string))
+			must.Do(xhtml.SetInnerHTML(container, embed.Value.(string)))
 			xhtml.ReplaceWith(dataEl, container)
 			xhtml.UnnestChildren(container)
 		case db.ImageEmbedTag:
