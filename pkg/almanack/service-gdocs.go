@@ -165,8 +165,8 @@ func (svc Services) ProcessGDocsDoc(ctx context.Context, dbDoc db.GDocsDoc) (err
 			row.Parent.RemoveChild(row)
 			return
 		case "toc", "table of contents":
-			processToc(docHTML, tbl, rows)
-			return
+			embed.Type = db.ToCEmbedTag
+			embed.Value = processToc(docHTML, tbl, rows)
 		default:
 			warnings = append(warnings, fmt.Sprintf(
 				"Unrecognized table type: %q", label,
@@ -503,7 +503,7 @@ func fixRawHTMLPlaceholders(rawHTML *html.Node) {
 	for _, dataEl := range embeds {
 		embed := extractEmbed(dataEl)
 		switch embed.Type {
-		case db.RawEmbedTag:
+		case db.RawEmbedTag, db.ToCEmbedTag:
 			xhtml.ReplaceWith(dataEl, &html.Node{
 				Type: html.RawNode,
 				Data: embed.Value.(string),
@@ -526,6 +526,11 @@ func fixMarkdownPlaceholders(rawHTML *html.Node) {
 				Type: html.RawNode,
 				Data: embed.Value.(string),
 			})
+		case db.ToCEmbedTag:
+			container := xhtml.New("div")
+			must.Do(xhtml.SetInnerHTML(container, embed.Value.(string)))
+			xhtml.ReplaceWith(dataEl, container)
+			xhtml.UnnestChildren(container)
 		case db.ImageEmbedTag:
 			image := embed.Value.(db.EmbedImage)
 			var widthHeight string
@@ -614,7 +619,7 @@ func (svc Services) UploadGDocsImage(ctx context.Context, arg UploadGDocsImagePa
 	})
 }
 
-func processToc(doc, tbl *html.Node, rows xhtml.TableNodes) {
+func processToc(doc, tbl *html.Node, rows xhtml.TableNodes) string {
 	type header struct {
 		text  string
 		id    string
@@ -632,14 +637,16 @@ func processToc(doc, tbl *html.Node, rows xhtml.TableNodes) {
 		depth := int(n.Data[1] - '0')
 		headers = append(headers, header{xhtml.InnerText(n), id, depth})
 	})
+	container := xhtml.New("div")
 	h3 := xhtml.New("h3")
 	xhtml.AppendText(h3, stringx.First(
 		xhtml.InnerText(rows.At(0, 1)),
 		xhtml.InnerText(rows.At(1, 0)),
 		"Table of Contents",
 	))
-
+	container.AppendChild(h3)
 	ul := xhtml.New("ul")
+	container.AppendChild(ul)
 	currentUl := ul
 	lastDepth := 7 // Past H6, the maximum possible depth
 	for _, h := range headers {
@@ -670,8 +677,8 @@ func processToc(doc, tbl *html.Node, rows xhtml.TableNodes) {
 		currentUl.AppendChild(li)
 		lastDepth = h.depth
 	}
-	xhtml.ReplaceWith(tbl, ul)
-	currentUl.Parent.InsertBefore(h3, ul)
+
+	return xhtml.InnerHTML(container)
 }
 
 func makeCASaddress(body []byte, ct string) string {

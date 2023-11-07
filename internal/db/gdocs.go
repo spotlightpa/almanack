@@ -30,6 +30,7 @@ type GDocsMetadata struct {
 const (
 	ImageEmbedTag = "image"
 	RawEmbedTag   = "raw"
+	ToCEmbedTag   = "toc"
 )
 
 type Embed struct {
@@ -54,7 +55,7 @@ func (em *Embed) UnmarshalJSON(data []byte) error {
 			return err
 		}
 		em.Value = img
-	case RawEmbedTag:
+	case RawEmbedTag, ToCEmbedTag:
 		var s string
 		if err := json.Unmarshal(temp.Value, &s); err != nil {
 			return err
