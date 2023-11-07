@@ -111,7 +111,7 @@ function copyHTML() {
   </h2>
 
   <div v-for="(e, i) of article.gdocs.embeds" :key="i">
-    <figure v-if="e.type === 'raw'" class="block">
+    <div v-if="e.type === 'raw'" class="block">
       <h2 class="subtitle is-4 has-text-weight-semibold">
         Embed #{{ e.n }}: Raw HTML
       </h2>
@@ -121,7 +121,17 @@ function copyHTML() {
         size="is-small is-clipped"
         label="Code"
       />
-    </figure>
+    </div>
+    <div v-else-if="e.type === 'toc'" class="block">
+      <h2 class="subtitle is-4 has-text-weight-semibold">
+        Embed #{{ e.n }}: Table of Contents
+      </h2>
+
+      <p class="mb-5">
+        <strong>Note:</strong> You must use <strong>Copy HTML</strong>, not Copy
+        Rich Text, if you wish to include the table of contents.
+      </p>
+    </div>
     <div v-else-if="e.type === 'image'" class="block">
       <h2 class="subtitle is-4 has-text-weight-semibold">
         Embed #{{ e.n }}: Inline Image
