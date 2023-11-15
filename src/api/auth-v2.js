@@ -60,4 +60,21 @@ export async function logout() {
   lastModified.value++;
 }
 
+export async function headers() {
+  let user = auth.currentUser();
+  if (!user) {
+    return null;
+  }
+  let token;
+  try {
+    token = await user.jwt();
+  } catch (e) {
+    await logout();
+    return null;
+  }
+  return {
+    Authorization: `Bearer ${token}`,
+  };
+}
+
 init();
