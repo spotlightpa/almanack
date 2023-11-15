@@ -17,7 +17,6 @@ func TestClone(t *testing.T) {
 		`<h1><a href="http://example.com">link</a></h1><div>boo</div>`,
 	}
 	for _, tc := range cases {
-		_ = tc
 		n, err := html.Parse(strings.NewReader(tc))
 		be.NilErr(t, err)
 		body := n.FirstChild.FirstChild.NextSibling
