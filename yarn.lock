@@ -1346,6 +1346,13 @@ globals@^13.19.0:
   dependencies:
     type-fest "^0.20.2"
 
+gotrue-js@^0.9.29:
+  version "0.9.29"
+  resolved "https://registry.yarnpkg.com/gotrue-js/-/gotrue-js-0.9.29.tgz#08e62184d4eaadcd87f95cb6e49e3c4a9742a052"
+  integrity sha512-NSFwJlFfWxHd1zHDitysbh+amFPHBAyQG1YmecZJTaSe8TlC7Wja1ewdUBikfJBblN3SqghS6aViMd+Q/pPzGQ==
+  dependencies:
+    micro-api-client "^3.2.1"
+
 graphemer@^1.4.0:
   version "1.4.0"
   resolved "https://registry.yarnpkg.com/graphemer/-/graphemer-1.4.0.tgz#fb2f1d55e0e3a1849aeffc90c4fa0dd53a0e66c6"
@@ -1610,6 +1617,11 @@ merge2@^1.3.0:
   version "1.4.1"
   resolved "https://registry.yarnpkg.com/merge2/-/merge2-1.4.1.tgz#4368892f885e907455a6fd7dc55c0c9d404990ae"
   integrity sha512-8q7VEgMJW4J8tcfVPy8g09NcQwZdbwFEqhe/WZkoIzjn/3TGDwtOCYtXGxA3O8tPzpczCCDgv+P2P5y00ZJOOg==
+
+micro-api-client@^3.2.1:
+  version "3.3.0"
+  resolved "https://registry.yarnpkg.com/micro-api-client/-/micro-api-client-3.3.0.tgz#52dd567d322f10faffe63d19d4feeac4e4ffd215"
+  integrity sha512-y0y6CUB9RLVsy3kfgayU28746QrNMpSm9O/AYGNsBgOkJr/X/Jk0VLGoO8Ude7Bpa8adywzF+MzXNZRFRsNPhg==
 
 micromatch@^4.0.4:
   version "4.0.5"

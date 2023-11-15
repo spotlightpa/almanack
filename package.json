@@ -21,6 +21,7 @@
     "@unhead/vue": "^1.7.4",
     "bulma": "^0.9.4",
     "core-js": "^3.24.1",
+    "gotrue-js": "^0.9.29",
     "journalize": "^2.5.1",
     "netlify-identity-widget": "^1.9.2",
     "vue": "^3.2.37",
