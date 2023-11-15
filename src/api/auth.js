@@ -12,7 +12,7 @@ function makeAuth() {
     try {
       await user.jwt();
     } catch (err) {
-      methods.logout();
+      await methods.logout();
     }
   });
   netlifyIdentity.on("login", (user) => {
@@ -47,10 +47,10 @@ function makeAuth() {
     login() {
       netlifyIdentity.open("login");
     },
-    logout() {
+    async logout() {
       authState.user = null;
       try {
-        netlifyIdentity.logout();
+        await netlifyIdentity.logout();
       } catch (e) {
         // eslint-disable-next-line no-console
         console.warn(e);
@@ -65,7 +65,7 @@ function makeAuth() {
       try {
         token = await authState.user.jwt();
       } catch (e) {
-        methods.logout();
+        await methods.logout();
         return null;
       }
       return {
