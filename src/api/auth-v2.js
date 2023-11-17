@@ -63,6 +63,10 @@ export const fullName = computed(
     lastModified.value && (auth.currentUser()?.user_metadata?.full_name ?? "")
 );
 
+export function googleAuth() {
+  return auth.loginExternalUrl("Google");
+}
+
 export async function signup({ fullName, email, password }) {
   loginError.value = null;
   try {
