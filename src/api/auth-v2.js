@@ -14,10 +14,37 @@ effect(() => {
   if (loginError.value) console.log("loginError", loginError.value);
 });
 
-function init() {
-  let hash = window.location.hash.slice(1); // remove # at start
-  if (/access_token/.test(hash)) {
-    console.log("have hash");
+async function init() {
+  const errorRoute = /error=access_denied&error_description=403/;
+  const typeTokenRoutes =
+    /(confirmation|invite|recovery|email_change)_token=([^&]+)/;
+  const accessTokenRoute = /access_token=/;
+
+  let hash = document.location.hash.slice(1); // remove # at start
+  if (!hash) {
+    return;
+  }
+
+  let match = hash.match(errorRoute);
+  if (match) {
+    loginError.value = "Access denied";
+    document.location.hash = "";
+    return;
+  }
+
+  match = hash.match(typeTokenRoutes);
+  if (match) {
+    loginError.value = null;
+    let [, type, token] = match;
+    await auth.verify(type, token, true);
+    lastModified.value++;
+    document.location.hash = "";
+    return;
+  }
+
+  match = hash.match(accessTokenRoute);
+  if (match) {
+    loginError.value = null;
     let searchParams = new URLSearchParams(hash);
     let params = {
       access_token: searchParams.get("access_token"),
@@ -25,16 +52,9 @@ function init() {
       refresh_token: searchParams.get("refresh_token"),
       token_type: searchParams.get("token_type"),
     };
-    auth
-      .createUser(params, true)
-      .then(() => {
-        loginError.value = null;
-        lastModified.value++;
-      })
-      .catch((err) => {
-        loginError.value = err;
-        lastModified.value++;
-      });
+    await auth.createUser(params, true);
+    lastModified.value++;
+    document.location.hash = "";
   }
 }
 
@@ -43,12 +63,22 @@ export const fullName = computed(
     lastModified.value && (auth.currentUser()?.user_metadata?.full_name ?? "")
 );
 
-export async function signup() {}
+export async function signup({ fullName, email, password }) {
+  loginError.value = null;
+  try {
+    await auth.signup(email, password, { full_name: fullName });
+  } catch (err) {
+    lastModified.value++;
+    loginError.value = err;
+    return;
+  }
+  await login(email, password);
+}
 
 export async function login(email, password) {
+  loginError.value = null;
   try {
     await auth.login(email, password, true);
-    loginError.value = null;
   } catch (err) {
     loginError.value = err;
   }
@@ -56,6 +86,7 @@ export async function login(email, password) {
 }
 
 export async function logout() {
+  loginError.value = null;
   await auth.currentUser().logout();
   lastModified.value++;
 }
@@ -77,4 +108,7 @@ export async function headers() {
   };
 }
 
-init();
+init().catch((err) => {
+  loginError.value = err;
+  lastModified.value++;
+});
