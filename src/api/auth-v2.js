@@ -58,10 +58,21 @@ async function init() {
   }
 }
 
+const user = computed(() => lastModified.value && auth.currentUser());
+const token = computed(() => user.value?.token?.access_token ?? null);
+const roles = computed(() => user.value?.app_metadata?.roles ?? []);
+
+export const isSignedIn = computed(() => !!token.value);
+export const email = computed(() => user.value?.email ?? "");
 export const fullName = computed(
-  () =>
-    lastModified.value && (auth.currentUser()?.user_metadata?.full_name ?? "")
+  () => user.value?.user_metadata?.full_name ?? ""
 );
+
+export function hasRole(name) {
+  return computed(() => {
+    return roles.value.some((role) => role === name || role === "admin");
+  });
+}
 
 export function googleAuth() {
   return auth.loginExternalUrl("Google");
