@@ -1,23 +1,35 @@
-<script>
+<script setup>
+import { ref } from "vue";
+
 import { useAuth } from "@/api/auth.js";
 
-export default {
-  setup() {
-    let { login, signup, isSignedIn } = useAuth();
-    return {
-      login,
-      signup,
-      isSignedIn,
-    };
-  },
-  beforeRouteEnter(to, from, next) {
-    next((vm) => {
-      if (vm.isSignedIn) {
-        next({ name: "home", replace: true });
-      }
-    });
-  },
-};
+import { fullName, login, logout, googleAuth, roles } from "@/api/auth-v2.js";
+
+let { signup /*, isSignedIn*/ } = useAuth();
+
+async function doButton() {
+  await logout();
+  console.log("logged out");
+}
+
+const email = ref("");
+const password = ref("");
+
+// TODO: loader button for login
+
+// export  {
+//       login,
+//       signup,
+//       isSignedIn,
+//     };
+
+// function beforeRouteEnter(to, from, next) {
+//   next((vm) => {
+//     if (vm.isSignedIn) {
+//       next({ name: "home", replace: true });
+//     }
+//   });
+// }
 </script>
 
 <template>
@@ -25,6 +37,19 @@ export default {
     <title>Log In • Spotlight PA</title>
   </MetaHead>
   <div class="content">
+    <button type="button" @click="doButton()">button</button>
+    name: "{{ fullName }}"
+
+    <input v-model="email" class="input" inputmode="email" />
+
+    <input v-model="password" class="input" />
+    <button class="button" type="button" @click="login(email, password)">
+      login
+    </button>
+
+    roles: {{ roles }}
+    <a :href="googleAuth">Google</a>
+
     <h2>Predicting future sports scores.</h2>
     <p class="has-text-centered">
       <a href="https://en.wikipedia.org/wiki/Benjamin_Franklin">

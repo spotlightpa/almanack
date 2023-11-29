@@ -46,6 +46,12 @@ let router = createRouter({
       meta: {},
     },
     {
+      path: "/login2",
+      name: "login2",
+      component: load(() => import("@/components/ViewLogin.vue")),
+      meta: {},
+    },
+    {
       path: "/unauthorized",
       name: "unauthorized",
       component: load(() => import("@/components/ViewUnauthorized.vue")),
