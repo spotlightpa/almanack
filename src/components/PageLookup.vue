@@ -32,8 +32,8 @@ const invisible = computedObj((page) => {
   let name = page.file_path.match(/content\/(news|statecollege)\//)
     ? "news-page"
     : page.file_path.match(/content\/newsletters/)
-    ? "newsletter-page"
-    : null;
+      ? "newsletter-page"
+      : null;
   if (!name) {
     apiState.error.value = { message: "No admin associate with page." };
     return;
