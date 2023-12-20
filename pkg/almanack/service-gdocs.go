@@ -87,7 +87,7 @@ func (svc Services) ProcessGDocs(ctx context.Context) error {
 	return errors.Join(errs...)
 }
 
-var nonASCII = bytemap.Range(128, 255)
+var ascii = bytemap.Range(0, 127)
 
 func (svc Services) ProcessGDocsDoc(ctx context.Context, dbDoc db.GDocsDoc) (err error) {
 	defer errorx.Trace(&err)
@@ -133,7 +133,7 @@ func (svc Services) ProcessGDocsDoc(ctx context.Context, dbDoc db.GDocsDoc) (err
 			embed.Type = db.RawEmbedTag
 			embedHTML := xhtml.InnerText(rows.At(1, 0))
 			embed.Value = embedHTML
-			if nonASCII.Contains(embedHTML) {
+			if !ascii.Contains(embedHTML) {
 				warnings = append(warnings, fmt.Sprintf(
 					"Embed #%d contains unusual characters.", n,
 				))
