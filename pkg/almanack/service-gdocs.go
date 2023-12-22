@@ -543,9 +543,9 @@ func fixMarkdownPlaceholders(rawHTML *html.Node) {
 				`{{<picture src="%s" %sdescription="%s" caption="%s" credit="%s">}}`,
 				image.Path,
 				widthHeight,
-				strings.TrimSpace(image.Description),
-				strings.TrimSpace(image.Caption),
-				strings.TrimSpace(image.Credit),
+				html.EscapeString(strings.TrimSpace(image.Description)),
+				html.EscapeString(strings.TrimSpace(image.Caption)),
+				html.EscapeString(strings.TrimSpace(image.Credit)),
 			)
 			xhtml.ReplaceWith(dataEl, &html.Node{
 				Type: html.RawNode,

@@ -18,4 +18,4 @@ Here is <em>some</em> <strong>text</strong>. Lorem ipsum.
 
 And here’s another image:
 
-{{<picture src="external/08v6tmkadg07fyknwy3pb8sm3m.jpeg" description="The House floor in the Pa. Capitol. The chamber is controlled by Democrats for the first session in more than a "decade."" caption="" credit="Amanda Berg / For Spotlight PA">}}
+{{<picture src="external/08v6tmkadg07fyknwy3pb8sm3m.jpeg" description="The House floor in the Pa. Capitol. The chamber is controlled by Democrats for the first session in more than a &#34;decade.&#34;" caption="" credit="Amanda Berg / For Spotlight PA">}}
