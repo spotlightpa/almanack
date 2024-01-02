@@ -30,7 +30,7 @@
   "devDependencies": {
     "@babel/core": "^7.18.10",
     "@babel/eslint-parser": "^7.12.16",
-    "@vitejs/plugin-vue": "^4.0.0",
+    "@vitejs/plugin-vue": "^5.0.2",
     "autoprefixer": "^10.4.8",
     "eslint": "^8.55.0",
     "eslint-config-prettier": "^9.0.0",
@@ -39,7 +39,7 @@
     "prettier": "^3.0.1",
     "sass": "^1.54.3",
     "unplugin-vue-components": "0.26.0",
-    "vite": "^4.5.1",
+    "vite": "^5.0.10",
     "vite-plugin-eslint": "^1.7.0"
   },
   "prettier": {
