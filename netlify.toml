@@ -6,7 +6,7 @@
 [build.environment]
   GO_IMPORT_PATH = "github.com/spotlightpa/almanack"
   GO111MODULE = "on"
-  NODE_VERSION = "16"
+  NODE_VERSION = "20"
 
 [[redirects]]
   from = "/api/*"
