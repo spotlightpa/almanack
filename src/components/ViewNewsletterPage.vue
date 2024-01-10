@@ -395,31 +395,22 @@ export default {
           </div>
         </BulmaField>
 
-        <BulmaField label="Evergreen content">
-          <div>
-            <label class="checkbox">
-              <input v-model="page.suppressDate" type="checkbox" />
-              Don't show date on page
-            </label>
-          </div>
-        </BulmaField>
+        <BulmaFieldCheckbox
+          v-model="page.suppressDate"
+          label="Evergreen content"
+        >
+          Don't show date on page
+        </BulmaFieldCheckbox>
 
-        <BulmaField label="Hide newsletters pop-up">
-          <div>
-            <label class="checkbox">
-              <input v-model="page.modalExclude" type="checkbox" />
-              Don't show newsletters modal screen on this page
-            </label>
-          </div>
-        </BulmaField>
+        <BulmaFieldCheckbox
+          v-model="page.modalExclude"
+          label="Hide newsletters pop-up"
+        >
+          Don't show newsletters modal screen on this page
+        </BulmaFieldCheckbox>
 
-        <BulmaField label="No index">
-          <div>
-            <label class="checkbox">
-              <input v-model="page.noIndex" type="checkbox" />
-              Hide page from Google search results
-            </label>
-          </div>
+        <BulmaField v-model="page.noIndex" label="No index">
+          Hide page from Google search results
         </BulmaField>
 
         <BulmaFieldInput v-model="page.overrideURL" label="Override URL" />
