@@ -386,6 +386,10 @@ export default {
           help="Series are limited-time collections, e.g. “Legislative privilege 2020”"
         />
 
+        <BulmaFieldCheckbox v-model="page.isPinned" label="Pin article">
+          Pin article to the top of topic and series landing pages
+        </BulmaFieldCheckbox>
+
         <BulmaField v-slot="{ idForLabel }" label="Language">
           <div class="select is-fullwidth">
             <select :id="idForLabel" v-model="page.languageCode" class="select">

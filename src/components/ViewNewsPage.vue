@@ -188,6 +188,10 @@ export default {
         class="mt-1 mb-4"
       />
 
+      <BulmaFieldCheckbox v-model="page.isPinned" label="Pin article">
+        Pin article to the top of topic and series landing pages
+      </BulmaFieldCheckbox>
+
       <BulmaFieldInput
         id="hed"
         v-model="page.title"
