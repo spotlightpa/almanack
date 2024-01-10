@@ -1,6 +1,5 @@
 <script>
 export default {
-  name: "BulmaFieldInput",
   props: {
     label: String,
     labelClass: {
