@@ -36,6 +36,24 @@ export default {
         If populated, a topper will appear on the homepage with the first story
         as its featured item and the other stories as bulleted items underneath
       </BulmaField>
+      <BulmaField
+        v-if="editorsPicks.edCallout"
+        label="Editor's Picks Homepage Callout"
+      >
+        <HomepageEditorDraggable v-model="editorsPicks.edCallout" />
+        New section for homepage redesign
+      </BulmaField>
+      <BulmaField
+        v-if="editorsPicks.edInvestigations"
+        label="Featured Investigations"
+      >
+        <HomepageEditorDraggable v-model="editorsPicks.edInvestigations" />
+        New section for homepage redesign
+      </BulmaField>
+      <BulmaField v-if="editorsPicks.edImpact" label="Featured Impact">
+        <HomepageEditorDraggable v-model="editorsPicks.edImpact" />
+        New section for homepage redesign
+      </BulmaField>
     </div>
   </div>
 </template>

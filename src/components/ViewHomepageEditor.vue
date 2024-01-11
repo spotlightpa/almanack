@@ -16,7 +16,15 @@ class EditorsPicksData {
   }
 
   reset(siteConfig) {
-    for (let prop of ["featuredStories", "subfeatures", "topSlots", "topper"]) {
+    for (let prop of [
+      "featuredStories",
+      "subfeatures",
+      "topSlots",
+      "topper",
+      "edCallout",
+      "edInvestigations",
+      "edImpact",
+    ]) {
       let a = siteConfig.data?.[prop] ?? [];
       this[prop] = a.map((s) => this.pagesByPath.get(s)).filter((a) => !!a);
     }
@@ -47,6 +55,9 @@ class EditorsPicksData {
         subfeatures: this.subfeatures.map(getPath),
         topSlots: this.topSlots.map(getPath),
         topper: this.topper.map(getPath),
+        edCallout: this.edCallout.map(getPath),
+        edInvestigations: this.edInvestigations.map(getPath),
+        edImpact: this.edImpact.map(getPath),
       },
     };
   }
