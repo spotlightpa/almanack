@@ -93,7 +93,7 @@ export default {
         <div v-else-if="rawPages.length === 0" class="dropdown-item">
           No results found
         </div>
-        <div v-else-if="rawPages.length > 19" class="dropdown-item">
+        <div v-else-if="rawPages.length > 15" class="dropdown-item">
           More results hidden…
         </div>
       </template>

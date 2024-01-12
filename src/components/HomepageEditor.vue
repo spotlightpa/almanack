@@ -15,7 +15,7 @@ export default {
 <template>
   <div class="columns">
     <div class="column is-half">
-      <PageFinder @select-page="push($event)" />
+      <PageFinder class="is-sticky" @select-page="push($event)" />
     </div>
     <div class="column is-half">
       <BulmaField label="Homepage featured article">
@@ -59,6 +59,10 @@ export default {
 </template>
 
 <style scoped>
+.is-sticky {
+  position: sticky;
+  top: 0px;
+}
 .overflow {
   text-overflow: ellipsis;
   overflow-x: hidden;
