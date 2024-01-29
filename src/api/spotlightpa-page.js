@@ -58,7 +58,7 @@ export class Page {
     this.modalExclude = this.frontmatter["modal-exclude"] ?? false;
     this.suppressDate = this.frontmatter["suppress-date"] ?? false;
     this.isPinned = this.frontmatter["pinned"] ?? false;
-    this.noIndex = this.frontmatter["no-index"] ?? "";
+    this.noIndex = this.frontmatter["no-index"] ?? null;
     this.overrideURL = this.frontmatter["url"] ?? "";
     this.aliases = this.frontmatter["aliases"] ?? [];
     this.layout = this.frontmatter["layout"] ?? "";

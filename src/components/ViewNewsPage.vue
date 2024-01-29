@@ -509,9 +509,9 @@ export default {
           Don't show newsletters modal screen on this page
         </BulmaFieldCheckbox>
 
-        <BulmaField v-model="page.noIndex" label="No index">
+        <BulmaFieldCheckbox v-model="page.noIndex" label="No index">
           Hide page from Google search results
-        </BulmaField>
+        </BulmaFieldCheckbox>
 
         <BulmaFieldInput v-model="page.overrideURL" label="Override URL" />
 
