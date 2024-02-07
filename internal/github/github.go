@@ -2,6 +2,7 @@
 package github
 
 import (
+	"cmp"
 	"context"
 	"errors"
 	"flag"
@@ -9,7 +10,6 @@ import (
 
 	"github.com/google/go-github/v53/github"
 	"github.com/spotlightpa/almanack/internal/netlifyid"
-	"github.com/spotlightpa/almanack/internal/stringx"
 	"github.com/spotlightpa/almanack/pkg/almlog"
 	"golang.org/x/oauth2"
 )
@@ -157,8 +157,8 @@ func (cl *Client) Ping(ctx context.Context) error {
 
 func makeAuthor(ctx context.Context) *github.CommitAuthor {
 	jwt := netlifyid.FromContext(ctx)
-	name := stringx.First(jwt.Username(), "Almanack")
-	email := stringx.First(jwt.Email(), "webmaster@spotlightpa.org")
+	name := cmp.Or(jwt.Username(), "Almanack")
+	email := cmp.Or(jwt.Email(), "webmaster@spotlightpa.org")
 
 	return &github.CommitAuthor{
 		Name:  github.String(name),

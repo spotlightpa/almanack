@@ -1,6 +1,7 @@
 package almanack
 
 import (
+	"cmp"
 	"context"
 	"crypto/md5"
 	"encoding/json"
@@ -274,7 +275,7 @@ func (svc Services) replaceImageEmbed(
 	imageEmbed = &db.EmbedImage{
 		Credit:  xhtml.InnerText(rows.Value("credit")),
 		Caption: xhtml.InnerText(rows.Value("caption")),
-		Description: stringx.First(
+		Description: cmp.Or(
 			xhtml.InnerText(rows.Value("description")),
 			xhtml.InnerText(rows.Value("alt")),
 		),
@@ -340,12 +341,12 @@ func (svc Services) replaceMetadata(
 	objID2Path map[string]string,
 	metadata *db.GDocsMetadata,
 ) string {
-	metadata.InternalID = stringx.First(
+	metadata.InternalID = cmp.Or(
 		xhtml.InnerText(rows.Value("slug")),
 		xhtml.InnerText(rows.Value("internal id")),
 		metadata.InternalID,
 	)
-	metadata.Byline = stringx.First(
+	metadata.Byline = cmp.Or(
 		xhtml.InnerText(rows.Value("byline")),
 		xhtml.InnerText(rows.Value("authors")),
 		xhtml.InnerText(rows.Value("author")),
@@ -356,35 +357,35 @@ func (svc Services) replaceMetadata(
 		metadata.Byline = metadata.Byline[3:]
 	}
 	metadata.Budget = xhtml.InnerText(rows.Value("budget"))
-	metadata.Hed = stringx.First(
+	metadata.Hed = cmp.Or(
 		xhtml.InnerText(rows.Value("hed")),
 		xhtml.InnerText(rows.Value("title")),
 		xhtml.InnerText(rows.Value("headline")),
 		xhtml.InnerText(rows.Value("hedline")),
 	)
-	metadata.Description = stringx.First(
+	metadata.Description = cmp.Or(
 		xhtml.InnerText(rows.Value("seo description")),
 		xhtml.InnerText(rows.Value("description")),
 		xhtml.InnerText(rows.Value("desc")),
 	)
-	metadata.LedeImageCredit = stringx.First(
+	metadata.LedeImageCredit = cmp.Or(
 		xhtml.InnerText(rows.Value("lede image credit")),
 		xhtml.InnerText(rows.Value("lead image credit")),
 		xhtml.InnerText(rows.Value("credit")),
 	)
-	metadata.LedeImageCaption = stringx.First(
+	metadata.LedeImageCaption = cmp.Or(
 		xhtml.InnerText(rows.Value("lede image caption")),
 		xhtml.InnerText(rows.Value("lead image caption")),
 		xhtml.InnerText(rows.Value("caption")),
 	)
-	metadata.LedeImageDescription = stringx.First(
+	metadata.LedeImageDescription = cmp.Or(
 		xhtml.InnerText(rows.Value("lede image description")),
 		xhtml.InnerText(rows.Value("lead image description")),
 		xhtml.InnerText(rows.Value("lede image alt")),
 		xhtml.InnerText(rows.Value("lead image alt")),
 		xhtml.InnerText(rows.Value("alt")),
 	)
-	metadata.URLSlug = stringx.First(
+	metadata.URLSlug = cmp.Or(
 		xhtml.InnerText(rows.Value("url")),
 		xhtml.InnerText(rows.Value("keywords")),
 	)
@@ -392,33 +393,33 @@ func (svc Services) replaceMetadata(
 	_, metadata.URLSlug, _ = stringx.LastCut(metadata.URLSlug, "/")
 	metadata.URLSlug = stringx.SlugifyURL(metadata.URLSlug)
 
-	metadata.Blurb = stringx.First(
+	metadata.Blurb = cmp.Or(
 		xhtml.InnerText(rows.Value("blurb")),
 		xhtml.InnerText(rows.Value("summary")),
 	)
-	metadata.LinkTitle = stringx.First(
+	metadata.LinkTitle = cmp.Or(
 		xhtml.InnerText(rows.Value("link title")),
 	)
-	metadata.SEOTitle = stringx.First(
+	metadata.SEOTitle = cmp.Or(
 		xhtml.InnerText(rows.Value("seo hed")),
 		xhtml.InnerText(rows.Value("seo title")),
 		xhtml.InnerText(rows.Value("seo headline")),
 		xhtml.InnerText(rows.Value("seo hedline")),
 	)
-	metadata.OGTitle = stringx.First(
+	metadata.OGTitle = cmp.Or(
 		xhtml.InnerText(rows.Value("facebook hed")),
 		xhtml.InnerText(rows.Value("facebook title")),
 	)
-	metadata.TwitterTitle = stringx.First(
+	metadata.TwitterTitle = cmp.Or(
 		xhtml.InnerText(rows.Value("twitter hed")),
 		xhtml.InnerText(rows.Value("twitter title")),
 	)
-	metadata.Eyebrow = stringx.First(
+	metadata.Eyebrow = cmp.Or(
 		xhtml.InnerText(rows.Value("eyebrow")),
 		xhtml.InnerText(rows.Value("kicker")),
 	)
 
-	path := stringx.First(
+	path := cmp.Or(
 		xhtml.InnerText(rows.Value("lede image path")),
 		xhtml.InnerText(rows.Value("lead image path")),
 		xhtml.InnerText(rows.Value("path")),
@@ -639,7 +640,7 @@ func processToc(doc, tbl *html.Node, rows xhtml.TableNodes) string {
 	})
 	container := xhtml.New("div")
 	h3 := xhtml.New("h3")
-	xhtml.AppendText(h3, stringx.First(
+	xhtml.AppendText(h3, cmp.Or(
 		xhtml.InnerText(rows.At(0, 1)),
 		xhtml.InnerText(rows.At(1, 0)),
 		"Table of Contents",

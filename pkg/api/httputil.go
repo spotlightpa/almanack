@@ -2,6 +2,7 @@ package api
 
 import (
 	"bytes"
+	"cmp"
 	"context"
 	"encoding/json"
 	"errors"
@@ -19,7 +20,6 @@ import (
 	"github.com/carlmjohnson/resperr"
 	"github.com/getsentry/sentry-go"
 
-	"github.com/spotlightpa/almanack/internal/httpx"
 	"github.com/spotlightpa/almanack/internal/netlifyid"
 	"github.com/spotlightpa/almanack/internal/stringx"
 	"github.com/spotlightpa/almanack/layouts"
@@ -62,8 +62,8 @@ func (app *appEnv) logErr(ctx context.Context, err error) {
 	if hub := sentry.GetHubFromContext(ctx); hub != nil {
 		hub.WithScope(func(scope *sentry.Scope) {
 			userinfo := netlifyid.FromContext(ctx)
-			scope.SetTag("username", stringx.First(userinfo.Username(), "anonymous"))
-			scope.SetTag("email", stringx.First(userinfo.Email(), "not set"))
+			scope.SetTag("username", cmp.Or(userinfo.Username(), "anonymous"))
+			scope.SetTag("email", cmp.Or(userinfo.Email(), "not set"))
 			hub.CaptureException(err)
 		})
 	} else {
@@ -195,7 +195,7 @@ func (app *appEnv) maxSizeMiddleware(next http.Handler) http.Handler {
 }
 
 func intParam[Int int | int32 | int64](r *http.Request, param string, p *Int) error {
-	pstr := httpx.PathValue(r, param)
+	pstr := r.PathValue(param)
 	if pstr == "" {
 		return fmt.Errorf("parameter %q not set", param)
 	}

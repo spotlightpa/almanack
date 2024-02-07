@@ -1,6 +1,7 @@
 package google
 
 import (
+	"cmp"
 	"context"
 	"net/http"
 	"os"
@@ -8,12 +9,11 @@ import (
 
 	"github.com/carlmjohnson/be"
 	"github.com/carlmjohnson/requests"
-	"github.com/spotlightpa/almanack/internal/stringx"
 )
 
 func TestListDriveFiles(t *testing.T) {
 	svc := Service{}
-	svc.driveID = stringx.First(os.Getenv("ALMANACK_GOOGLE_TEST_DRIVE"), "1")
+	svc.driveID = cmp.Or(os.Getenv("ALMANACK_GOOGLE_TEST_DRIVE"), "1")
 	ctx := context.Background()
 	cl := *http.DefaultClient
 	cl.Transport = requests.Replay("testdata")

@@ -1,6 +1,7 @@
 package api
 
 import (
+	"cmp"
 	"context"
 	"encoding/json"
 	"errors"
@@ -621,7 +622,7 @@ func (app *appEnv) postPageRefresh(w http.ResponseWriter, r *http.Request) {
 				"image-caption":     dbDoc.Metadata.LedeImageCaption,
 				// Fields not exposed to Shared Admin
 				"kicker": dbDoc.Metadata.Eyebrow,
-				"blurb": stringx.First(
+				"blurb": cmp.Or(
 					dbDoc.Metadata.Blurb,
 					dbDoc.Metadata.Description,
 				),
