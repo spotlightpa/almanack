@@ -41,7 +41,7 @@ func (app *appEnv) ping(w http.ResponseWriter, r *http.Request) {
 }
 
 func (app *appEnv) pingErr(w http.ResponseWriter, r *http.Request) {
-	code := httpx.PathValue(r, "code")
+	code := r.PathValue("code")
 	statusCode, _ := strconv.Atoi(code)
 	app.logStart(r, "code", code)
 
@@ -109,7 +109,7 @@ func (app *appEnv) getArcImage(w http.ResponseWriter, r *http.Request) http.Hand
 }
 
 func (app *appEnv) getBookmarklet(w http.ResponseWriter, r *http.Request) {
-	slug := httpx.PathValue(r, "slug")
+	slug := r.PathValue("slug")
 	app.logStart(r, "slug", slug)
 
 	page, err := app.svc.Queries.GetPageByURLPath(r.Context(), "%"+slug+"%")

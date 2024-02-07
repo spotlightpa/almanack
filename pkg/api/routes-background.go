@@ -9,7 +9,6 @@ import (
 
 	"github.com/carlmjohnson/flowmatic"
 	"github.com/spotlightpa/almanack/internal/db"
-	"github.com/spotlightpa/almanack/internal/httpx"
 	"github.com/spotlightpa/almanack/internal/paginate"
 	"github.com/spotlightpa/almanack/pkg/almanack"
 	"github.com/spotlightpa/almanack/pkg/almlog"
@@ -23,7 +22,7 @@ func (app *appEnv) backgroundSleep(w http.ResponseWriter, r *http.Request) http.
 	} else {
 		l.InfoContext(r.Context(), "backgroundSleep", "deadline", false)
 	}
-	durationStr := httpx.PathValue(r, "duration")
+	durationStr := r.PathValue("duration")
 	duration, err := time.ParseDuration(durationStr)
 	if err != nil {
 		return app.jsonErr(err)

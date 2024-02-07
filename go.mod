@@ -1,6 +1,8 @@
 module github.com/spotlightpa/almanack
 
-go 1.21
+go 1.22
+
+toolchain go1.22.0
 
 require (
 	github.com/BurntSushi/toml v1.3.2
@@ -27,7 +29,6 @@ require (
 	github.com/google/go-github/v53 v53.2.0
 	github.com/jackc/pgx/v5 v5.5.2
 	github.com/jackc/tern/v2 v2.1.1
-	github.com/jba/muxpatterns v0.3.0
 	github.com/microcosm-cc/bluemonday v1.0.26
 	github.com/tdewolff/minify/v2 v2.20.16
 	gocloud.dev v0.36.0
@@ -96,7 +97,6 @@ require (
 	go.opentelemetry.io/otel/metric v1.22.0 // indirect
 	go.opentelemetry.io/otel/trace v1.22.0 // indirect
 	golang.org/x/crypto v0.18.0 // indirect
-	golang.org/x/exp v0.0.0-20240119083558-1b970713d09a // indirect
 	golang.org/x/sync v0.6.0 // indirect
 	golang.org/x/sys v0.16.0 // indirect
 	golang.org/x/text v0.14.0 // indirect

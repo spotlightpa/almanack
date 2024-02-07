@@ -1,6 +1,7 @@
 package almanack
 
 import (
+	"cmp"
 	"context"
 	"encoding/json"
 	"errors"
@@ -35,7 +36,7 @@ func (svc Services) PublishPage(ctx context.Context, q *db.Queries, page *db.Pag
 	err = flowmatic.Do(
 		func() error {
 			internalID, _ := page.Frontmatter["internal-id"].(string)
-			title := stringx.First(internalID, page.FilePath)
+			title := cmp.Or(internalID, page.FilePath)
 			msg := fmt.Sprintf("Content: publishing %q", title)
 			return svc.ContentStore.UpdateFile(ctx, msg, page.FilePath, []byte(data))
 		}, func() error {
@@ -251,7 +252,7 @@ func (svc Services) CreatePageFromGDocsDoc(ctx context.Context, shared *db.Share
 		"image-caption":     shared.LedeImageCaption,
 		// Fields not exposed to Shared Admin
 		"kicker": dbDoc.Metadata.Eyebrow,
-		"slug": strings.ToLower(stringx.First(
+		"slug": strings.ToLower(cmp.Or(
 			dbDoc.Metadata.URLSlug,
 			stringx.SlugifyURL(shared.Hed),
 		)),
@@ -311,7 +312,7 @@ func buildFilePath(fm map[string]any, kind string) string {
 		date = timex.ToEST(t).Format("2006-01-02")
 	}
 	slug, _ := fm["internal-id"].(string)
-	slug = stringx.First(slug, "SPLXXX")
+	slug = cmp.Or(slug, "SPLXXX")
 	filepath := fmt.Sprintf("content/%s/%s-%s.md", kind, date, slug)
 	return filepath
 }

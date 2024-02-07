@@ -1,6 +1,7 @@
 package google
 
 import (
+	"cmp"
 	"context"
 	"net/http"
 	"os"
@@ -8,14 +9,13 @@ import (
 
 	"github.com/carlmjohnson/be"
 	"github.com/carlmjohnson/requests"
-	"github.com/spotlightpa/almanack/internal/stringx"
 	"github.com/spotlightpa/almanack/pkg/almlog"
 )
 
 func TestMostPopularNews(t *testing.T) {
 	almlog.UseTestLogger(t)
 	svc := Service{}
-	svc.viewID = stringx.First(os.Getenv("ALMANACK_GOOGLE_TEST_VIEW"), "1")
+	svc.viewID = cmp.Or(os.Getenv("ALMANACK_GOOGLE_TEST_VIEW"), "1")
 	ctx := context.Background()
 	cl := *http.DefaultClient
 	cl.Transport = requests.Replay("testdata")

@@ -1,6 +1,7 @@
 package db
 
 import (
+	"cmp"
 	"encoding/json"
 	"fmt"
 	"path"
@@ -11,7 +12,6 @@ import (
 	"github.com/BurntSushi/toml"
 	"github.com/carlmjohnson/errorx"
 	"github.com/microcosm-cc/bluemonday"
-	"github.com/spotlightpa/almanack/internal/stringx"
 	"github.com/spotlightpa/almanack/internal/timex"
 )
 
@@ -152,7 +152,7 @@ func (page *Page) ToIndex() any {
 	aliases, _ := page.Frontmatter["aliases"].([]string)
 	rawContent, _ := page.Frontmatter["raw-content"].(string)
 
-	body := stringx.First(page.Body, rawContent)
+	body := cmp.Or(page.Body, rawContent)
 	// Strip any unorthodox HTML
 	sanitizer := bluemonday.UGCPolicy()
 	body = sanitizer.Sanitize(body)

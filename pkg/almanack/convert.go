@@ -1,6 +1,7 @@
 package almanack
 
 import (
+	"cmp"
 	"context"
 	"encoding/json"
 	"fmt"
@@ -73,7 +74,7 @@ func ArcFeedItemToFrontmatter(ctx context.Context, svc Services, arcStory *arc.F
 	}
 	var credits []string
 	for _, credit := range p.Basic.Credits.By {
-		credits = append(credits, stringx.First(credit.Name, credit.Byline))
+		credits = append(credits, cmp.Or(credit.Name, credit.Byline))
 	}
 	imageCredit := fixCredit(strings.Join(credits, " / "))
 	imageDescription := p.Basic.Caption

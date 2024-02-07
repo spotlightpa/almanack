@@ -4,7 +4,6 @@ import (
 	"net/http"
 
 	"github.com/go-chi/chi/v5/middleware"
-	"github.com/jba/muxpatterns"
 
 	"github.com/spotlightpa/almanack/internal/httpx"
 	"github.com/spotlightpa/almanack/pkg/almanack"
@@ -12,8 +11,7 @@ import (
 )
 
 func (app *appEnv) routes() http.Handler {
-	// TODO: replace with stdlib after https://github.com/golang/go/issues/61410
-	mux := muxpatterns.NewServeMux()
+	mux := http.NewServeMux()
 
 	var baseMW httpx.Stack
 	baseMW.Push(middleware.RealIP)
