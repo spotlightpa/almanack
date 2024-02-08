@@ -26,6 +26,7 @@ class SiteParamsModel {
 }
 
 const scheduledConfigs = ref([]);
+const siteParamsComps = ref([]);
 const nextSchedule = ref(null);
 
 const { exec, apiStateRefs } = makeState();
@@ -53,8 +54,7 @@ function removeScheduledConfig(i) {
 }
 
 async function save() {
-  let configs = scheduledConfigs.value;
-  scheduledConfigs.value = [];
+  let configs = siteParamsComps.value.map((comp) => comp.saveParams());
   return exec(() => post(postSiteParams, { configs }));
 }
 
@@ -100,7 +100,11 @@ fetch();
           }}
         </h2>
 
-        <SiteParams :params="params" :file-props="files" />
+        <SiteParams
+          ref="siteParamsComps"
+          :params="params"
+          :file-props="files"
+        />
 
         <button
           v-if="!params.isCurrent"

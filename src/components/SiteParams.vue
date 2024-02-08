@@ -1,13 +1,31 @@
-<script>
-export default {
-  props: { params: Object, fileProps: Object },
-};
+<script setup>
+import { ref } from "vue";
+
+const props = defineProps({ params: Object, fileProps: Object });
+
+const banner = ref();
+
+function saveParams() {
+  let r = {
+    schedule_for: props.params.scheduleFor,
+    data: {
+      ...props.params.data,
+      ...banner.value.saveParams(),
+    },
+  };
+  console.log("by", r);
+  return r;
+}
+
+defineExpose({
+  saveParams,
+});
 </script>
 
 <template>
   <div>
-    <SiteParamsBanner :file-props="fileProps" :params="params" />
-    <SiteParamsTopper :file-props="fileProps" :params="params" />
+    <SiteParamsBanner ref="banner" :file-props="fileProps" :params="params" />
+    <!-- <SiteParamsTopper :file-props="fileProps" :params="params" />
     <SiteParamsTop :file-props="fileProps" :params="params" />
     <SiteParamsSticky :file-props="fileProps" :params="params" />
     <SiteParamsTakeover :file-props="fileProps" :params="params" />
@@ -19,6 +37,6 @@ export default {
     <SiteParamsAdRail :file-props="fileProps" :params="params" />
     <SiteParamsRiver :file-props="fileProps" :params="params" />
     <SiteParamsFeatured :file-props="fileProps" :params="params" />
-    <SiteParamsFooter :file-props="fileProps" :params="params" />
+    <SiteParamsFooter :file-props="fileProps" :params="params" /> -->
   </div>
 </template>
