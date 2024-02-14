@@ -6,15 +6,13 @@ const props = defineProps({ params: Object, fileProps: Object });
 const banner = ref();
 
 function saveParams() {
-  let r = {
+  return {
     schedule_for: props.params.scheduleFor,
     data: {
       ...props.params.data,
       ...banner.value.saveParams(),
     },
   };
-  console.log("by", r);
-  return r;
 }
 
 defineExpose({
