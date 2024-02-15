@@ -30,6 +30,10 @@ function pushImage() {
   });
 }
 
+function removeImage(n) {
+  imageSet.value.splice(n, 1);
+}
+
 defineExpose({
   saveData,
 });
@@ -37,7 +41,7 @@ defineExpose({
 
 <template>
   <ul>
-    <li v-for="image of imageSet" :key="image.id" class="zebra-row">
+    <li v-for="(image, n) of imageSet" :key="image.id" class="zebra-row">
       <BulmaFieldInput
         v-model="image.link"
         label="Link URL"
@@ -60,6 +64,14 @@ defineExpose({
           @remove="image.sources.splice($event, 1)"
         />
       </BulmaField>
+
+      <button
+        type="button"
+        class="button is-danger has-text-weight-semibold"
+        @click="removeImage(n)"
+      >
+        Remove promo
+      </button>
     </li>
   </ul>
   <div class="buttons">
@@ -68,7 +80,7 @@ defineExpose({
       class="button is-primary has-text-weight-semibold"
       @click="pushImage"
     >
-      Add Image
+      Add promo
     </button>
   </div>
 </template>
