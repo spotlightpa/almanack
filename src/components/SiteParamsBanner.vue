@@ -19,11 +19,6 @@ export default {
       sanitizeText,
     };
   },
-  methods: {
-    saveParams() {
-      return this.saveData();
-    },
-  },
 };
 </script>
 

@@ -1,24 +1,26 @@
 <script>
-import useData from "@/utils/use-data.js";
+import useProps from "@/utils/use-props.js";
 import { toRel, toAbs } from "@/utils/link.js";
 
 export default {
   props: { params: Object, fileProps: Object },
   setup(props) {
+    let [data, saveData] = useProps(props.params.data, {
+      topperActive: ["topper-active"],
+      topperBgColor: ["topper-bg-color"],
+      topperDividerColor: ["topper-divider-color"],
+      topperLink: ["topper-link", toAbs, toRel],
+      topperImageDescription: ["topper-image-description"],
+      topperDesktopHeight: ["topper-desktop-height"],
+      topperDesktopWidth: ["topper-desktop-width"],
+      topperDesktopImages: ["topper-desktop-images"],
+      topperMobileHeight: ["topper-mobile-height"],
+      topperMobileWidth: ["topper-mobile-width"],
+      topperMobileImages: ["topper-mobile-images"],
+    });
     return {
-      ...useData(() => props.params.data, {
-        topperActive: ["topper-active"],
-        topperBgColor: ["topper-bg-color"],
-        topperDividerColor: ["topper-divider-color"],
-        topperLink: ["topper-link", toAbs, toRel],
-        topperImageDescription: ["topper-image-description"],
-        topperDesktopHeight: ["topper-desktop-height"],
-        topperDesktopWidth: ["topper-desktop-width"],
-        topperDesktopImages: ["topper-desktop-images"],
-        topperMobileHeight: ["topper-mobile-height"],
-        topperMobileWidth: ["topper-mobile-width"],
-        topperMobileImages: ["topper-mobile-images"],
-      }),
+      ...data,
+      saveData,
     };
   },
 };
