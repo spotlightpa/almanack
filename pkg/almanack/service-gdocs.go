@@ -212,6 +212,12 @@ func (svc Services) ProcessGDocsDoc(ctx context.Context, dbDoc db.GDocsDoc) (err
 		}
 	})
 
+	// Warn about <br>
+	if n := xhtml.Find(docHTML, xhtml.WithAtom(atom.Br)); n != nil {
+		warnings = append(warnings,
+			"Document contains <br> line breaks. Are you sure you want to use a line break? In Google Docs, select View > Show non-printing characters to see them.")
+	}
+
 	// Clone and remove turn data atoms into attributes
 	richText := xhtml.Clone(docHTML)
 	fixRichTextPlaceholders(richText)
