@@ -1,4 +1,6 @@
 <script>
+import { computed } from "vue";
+
 import useProps from "@/utils/use-props.js";
 import { toRel, toAbs } from "@/utils/link.js";
 import sanitizeText from "@/utils/sanitize-text.js";
@@ -28,6 +30,9 @@ export default {
     return {
       ...data,
       saveData,
+      paragraphs: computed(() => {
+        return data.supportText.value.split("\n");
+      }),
     };
   },
 };
@@ -98,7 +103,7 @@ export default {
                 v-text="supportHed"
               ></h2>
               <p
-                v-for="(p, i) of params.data['support-text'].split('\n')"
+                v-for="(p, i) of paragraphs"
                 :key="i"
                 class="support-p"
                 :style="{ color: supportTextColor }"
