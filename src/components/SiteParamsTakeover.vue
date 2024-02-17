@@ -1,18 +1,20 @@
 <script>
-import useData from "@/utils/use-data.js";
+import useProps from "@/utils/use-props.js";
 import { toRel, toAbs } from "@/utils/link.js";
 
 export default {
   props: { params: Object, fileProps: Object },
   setup(props) {
+    let [data, saveData] = useProps(props.params.data, {
+      takeoverActive: ["takeover-active"],
+      takeoverHed: ["takeover-hed"],
+      takeoverDek: ["takeover-dek"],
+      takeoverImage: ["takeover-image"],
+      takeoverLink: ["takeover-link", toAbs, toRel],
+    });
     return {
-      ...useData(() => props.params.data, {
-        takeoverActive: ["takeover-active"],
-        takeoverHed: ["takeover-hed"],
-        takeoverDek: ["takeover-dek"],
-        takeoverImage: ["takeover-image"],
-        takeoverLink: ["takeover-link", toAbs, toRel],
-      }),
+      ...data,
+      saveData,
     };
   },
 };

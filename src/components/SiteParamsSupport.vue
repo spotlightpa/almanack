@@ -1,5 +1,5 @@
 <script>
-import useData from "@/utils/use-data.js";
+import useProps from "@/utils/use-props.js";
 import { toRel, toAbs } from "@/utils/link.js";
 import sanitizeText from "@/utils/sanitize-text.js";
 
@@ -13,19 +13,21 @@ function cleanText(text) {
 export default {
   props: { params: Object, fileProps: Object },
   setup(props) {
+    let [data, saveData] = useProps(props.params.data, {
+      supportActive: ["support-active"],
+      supportLink: ["support-link", toAbs, toRel],
+      supportHed: ["support-hed"],
+      supportText: ["support-text", undefined, cleanText],
+      supportCTA: ["support-cta"],
+      supportHedColor: ["support-hed-color"],
+      supportTextColor: ["support-text-color"],
+      supportBgColor: ["support-bg-color"],
+      supportButtonBgColor: ["support-button-bg-color"],
+      supportButtonTextColor: ["support-button-text-color"],
+    });
     return {
-      ...useData(() => props.params.data, {
-        supportActive: ["support-active"],
-        supportLink: ["support-link", toAbs, toRel],
-        supportHed: ["support-hed"],
-        supportText: ["support-text", undefined, cleanText],
-        supportCTA: ["support-cta"],
-        supportHedColor: ["support-hed-color"],
-        supportTextColor: ["support-text-color"],
-        supportBgColor: ["support-bg-color"],
-        supportButtonBgColor: ["support-button-bg-color"],
-        supportButtonTextColor: ["support-button-text-color"],
-      }),
+      ...data,
+      saveData,
     };
   },
 };

@@ -1,24 +1,26 @@
 <script>
-import useData from "@/utils/use-data.js";
+import useProps from "@/utils/use-props.js";
 import { toRel, toAbs } from "@/utils/link.js";
 
 export default {
   props: { params: Object, fileProps: Object },
   setup(props) {
-    return {
-      ...useData(() => props.params.data, {
-        sidebarTopDescription: ["sidebar-top-description"],
-        sidebarTopLink: ["sidebar-top-link", toAbs, toRel],
-        sidebarTopImages: ["sidebar-top-images"],
-        sidebarTopWidth: ["sidebar-top-width"],
-        sidebarTopHeight: ["sidebar-top-height"],
+    let [data, saveData] = useProps(props.params.data, {
+      sidebarTopDescription: ["sidebar-top-description"],
+      sidebarTopLink: ["sidebar-top-link", toAbs, toRel],
+      sidebarTopImages: ["sidebar-top-images"],
+      sidebarTopWidth: ["sidebar-top-width"],
+      sidebarTopHeight: ["sidebar-top-height"],
 
-        sidebarStickyDescription: ["sidebar-sticky-description"],
-        sidebarStickyLink: ["sidebar-sticky-link", toAbs, toRel],
-        sidebarStickyImages: ["sidebar-sticky-images"],
-        sidebarStickyWidth: ["sidebar-sticky-width"],
-        sidebarStickyHeight: ["sidebar-sticky-height"],
-      }),
+      sidebarStickyDescription: ["sidebar-sticky-description"],
+      sidebarStickyLink: ["sidebar-sticky-link", toAbs, toRel],
+      sidebarStickyImages: ["sidebar-sticky-images"],
+      sidebarStickyWidth: ["sidebar-sticky-width"],
+      sidebarStickyHeight: ["sidebar-sticky-height"],
+    });
+    return {
+      ...data,
+      saveData,
     };
   },
 };

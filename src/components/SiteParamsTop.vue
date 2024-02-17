@@ -1,24 +1,26 @@
 <script>
-import useData from "@/utils/use-data.js";
+import useProps from "@/utils/use-props.js";
 import { toRel, toAbs } from "@/utils/link.js";
 
 export default {
   props: { params: Object, fileProps: Object },
   setup(props) {
+    let [data, saveData] = useProps(props.params.data, {
+      promoActive: ["promo-active"],
+      promoType: ["promo-type"],
+      promoImageDescription: ["promo-image-description"],
+      promoDesktopImages: ["promo-desktop-images"],
+      promoDesktopWidth: ["promo-desktop-width"],
+      promoDesktopHeight: ["promo-desktop-height"],
+      promoMobileImages: ["promo-mobile-images"],
+      promoMobileWidth: ["promo-mobile-width"],
+      promoMobileHeight: ["promo-mobile-height"],
+      promoLink: ["promo-link", toAbs, toRel],
+      promoText: ["promo-text"],
+    });
     return {
-      ...useData(() => props.params.data, {
-        promoActive: ["promo-active"],
-        promoType: ["promo-type"],
-        promoImageDescription: ["promo-image-description"],
-        promoDesktopImages: ["promo-desktop-images"],
-        promoDesktopWidth: ["promo-desktop-width"],
-        promoDesktopHeight: ["promo-desktop-height"],
-        promoMobileImages: ["promo-mobile-images"],
-        promoMobileWidth: ["promo-mobile-width"],
-        promoMobileHeight: ["promo-mobile-height"],
-        promoLink: ["promo-link", toAbs, toRel],
-        promoText: ["promo-text"],
-      }),
+      ...data,
+      saveData,
     };
   },
 };

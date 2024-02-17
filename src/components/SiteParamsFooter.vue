@@ -1,21 +1,23 @@
 <script>
-import useData from "@/utils/use-data.js";
+import useProps from "@/utils/use-props.js";
 import { toRel, toAbs } from "@/utils/link.js";
 
 export default {
   props: { params: Object, fileProps: Object },
   setup(props) {
+    let [data, saveData] = useProps(props.params.data, {
+      footerDescription: ["footer-promo-description"],
+      footerLink: ["footer-promo-link", toAbs, toRel],
+      footerDesktopImages: ["footer-promo-desktop-images"],
+      footerDesktopWidth: ["footer-promo-desktop-width"],
+      footerDesktopHeight: ["footer-promo-desktop-height"],
+      footerMobileImages: ["footer-promo-mobile-images"],
+      footerMobileWidth: ["footer-promo-mobile-width"],
+      footerMobileHeight: ["footer-promo-mobile-height"],
+    });
     return {
-      ...useData(() => props.params.data, {
-        footerDescription: ["footer-promo-description"],
-        footerLink: ["footer-promo-link", toAbs, toRel],
-        footerDesktopImages: ["footer-promo-desktop-images"],
-        footerDesktopWidth: ["footer-promo-desktop-width"],
-        footerDesktopHeight: ["footer-promo-desktop-height"],
-        footerMobileImages: ["footer-promo-mobile-images"],
-        footerMobileWidth: ["footer-promo-mobile-width"],
-        footerMobileHeight: ["footer-promo-mobile-height"],
-      }),
+      ...data,
+      saveData,
     };
   },
 };

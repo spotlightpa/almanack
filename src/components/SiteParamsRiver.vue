@@ -1,21 +1,23 @@
 <script>
-import useData from "@/utils/use-data.js";
+import useProps from "@/utils/use-props.js";
 import { toRel, toAbs } from "@/utils/link.js";
 
 export default {
   props: { params: Object, fileProps: Object },
   setup(props) {
+    let [data, saveData] = useProps(props.params.data, {
+      riverDescription: ["river-promo-description"],
+      riverLink: ["river-promo-link", toAbs, toRel],
+      riverDesktopImages: ["river-promo-desktop-images"],
+      riverDesktopWidth: ["river-promo-desktop-width"],
+      riverDesktopHeight: ["river-promo-desktop-height"],
+      riverMobileImages: ["river-promo-mobile-images"],
+      riverMobileWidth: ["river-promo-mobile-width"],
+      riverMobileHeight: ["river-promo-mobile-height"],
+    });
     return {
-      ...useData(() => props.params.data, {
-        riverDescription: ["river-promo-description"],
-        riverLink: ["river-promo-link", toAbs, toRel],
-        riverDesktopImages: ["river-promo-desktop-images"],
-        riverDesktopWidth: ["river-promo-desktop-width"],
-        riverDesktopHeight: ["river-promo-desktop-height"],
-        riverMobileImages: ["river-promo-mobile-images"],
-        riverMobileWidth: ["river-promo-mobile-width"],
-        riverMobileHeight: ["river-promo-mobile-height"],
-      }),
+      ...data,
+      saveData,
     };
   },
 };

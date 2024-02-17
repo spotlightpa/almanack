@@ -1,18 +1,20 @@
 <script>
-import useData from "@/utils/use-data.js";
+import useProps from "@/utils/use-props.js";
 import { toRel, toAbs } from "@/utils/link.js";
 
 export default {
   props: { params: Object, fileProps: Object },
   setup(props) {
+    let [data, saveData] = useProps(props.params.data, {
+      stickyActive: ["sticky-active"],
+      stickyImageDescription: ["sticky-image-description"],
+      stickyImages: ["sticky-images"],
+      stickyLink: ["sticky-link", toAbs, toRel],
+      newsletterActive: ["newsletter-active"],
+    });
     return {
-      ...useData(() => props.params.data, {
-        stickyActive: ["sticky-active"],
-        stickyImageDescription: ["sticky-image-description"],
-        stickyImages: ["sticky-images"],
-        stickyLink: ["sticky-link", toAbs, toRel],
-        newsletterActive: ["newsletter-active"],
-      }),
+      ...data,
+      saveData,
     };
   },
 };
