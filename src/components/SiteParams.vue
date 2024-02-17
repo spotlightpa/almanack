@@ -47,40 +47,30 @@ defineExpose({
 </script>
 
 <template>
-  <div>
-    <SiteParamsBanner ref="banner" :file-props="fileProps" :params="params" />
-    <SiteParamsTopper ref="topper" :file-props="fileProps" :params="params" />
-    <SiteParamsTop ref="top" :file-props="fileProps" :params="params" />
-    <SiteParamsSticky ref="sticky" :file-props="fileProps" :params="params" />
-    <SiteParamsTakeover
-      ref="takeover"
-      :file-props="fileProps"
-      :params="params"
-    />
-    <SiteParamsSidebar ref="sidebar" :file-props="fileProps" :params="params" />
-    <SiteParamsSupport ref="support" :file-props="fileProps" :params="params" />
-    <SiteParamsAdFeatured
-      ref="adFeatured"
-      :file-props="fileProps"
-      :params="params"
-    />
-    <SiteParamsAdBreaker
-      ref="adBreaker"
-      :file-props="fileProps"
-      :params="params"
-    />
-    <SiteParamsAdHeadwater
-      ref="adHeadwater"
-      :file-props="fileProps"
-      :params="params"
-    />
-    <SiteParamsAdRail ref="adRail" :file-props="fileProps" :params="params" />
-    <SiteParamsRiver ref="river" :file-props="fileProps" :params="params" />
-    <SiteParamsFeatured
-      ref="featured"
-      :file-props="fileProps"
-      :params="params"
-    />
-    <SiteParamsFooter ref="footer" :file-props="fileProps" :params="params" />
-  </div>
+  <SiteParamsBanner ref="banner" :file-props="fileProps" :params="params" />
+  <SiteParamsTopper ref="topper" :file-props="fileProps" :params="params" />
+  <SiteParamsTop ref="top" :file-props="fileProps" :params="params" />
+  <SiteParamsSticky ref="sticky" :file-props="fileProps" :params="params" />
+  <SiteParamsTakeover ref="takeover" :file-props="fileProps" :params="params" />
+  <SiteParamsSidebar ref="sidebar" :file-props="fileProps" :params="params" />
+  <SiteParamsSupport ref="support" :file-props="fileProps" :params="params" />
+  <SiteParamsAdFeatured
+    ref="adFeatured"
+    :file-props="fileProps"
+    :params="params"
+  />
+  <SiteParamsAdBreaker
+    ref="adBreaker"
+    :file-props="fileProps"
+    :params="params"
+  />
+  <SiteParamsAdHeadwater
+    ref="adHeadwater"
+    :file-props="fileProps"
+    :params="params"
+  />
+  <SiteParamsAdRail ref="adRail" :file-props="fileProps" :params="params" />
+  <SiteParamsRiver ref="river" :file-props="fileProps" :params="params" />
+  <SiteParamsFeatured ref="featured" :file-props="fileProps" :params="params" />
+  <SiteParamsFooter ref="footer" :file-props="fileProps" :params="params" />
 </template>
