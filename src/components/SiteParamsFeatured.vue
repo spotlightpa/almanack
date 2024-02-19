@@ -1,5 +1,5 @@
 <script setup>
-import useData from "@/utils/use-data.js";
+import useProps from "@/utils/use-props.js";
 import { toRel, toAbs } from "@/utils/link.js";
 
 const props = defineProps({
@@ -7,7 +7,7 @@ const props = defineProps({
   fileProps: Object,
 });
 
-const data = useData(() => props.params.data, {
+const [data, saveData] = useProps(props.params.data, {
   featuredPromoLink: ["featured-promo-link", toAbs, toRel],
   featuredPromoImageDescription: ["featured-promo-image-description"],
   featuredPromoBgColor: ["featured-promo-bg-color"],
@@ -15,6 +15,8 @@ const data = useData(() => props.params.data, {
   featuredPromoHeight: ["featured-promo-height"],
   featuredPromoImages: ["featured-promo-images"],
 });
+
+defineExpose({ saveData });
 </script>
 
 <template>

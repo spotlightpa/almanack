@@ -1,5 +1,7 @@
 <script>
-import useData from "@/utils/use-data.js";
+import { computed } from "vue";
+
+import useProps from "@/utils/use-props.js";
 import { toRel, toAbs } from "@/utils/link.js";
 import sanitizeText from "@/utils/sanitize-text.js";
 
@@ -13,18 +15,23 @@ function cleanText(text) {
 export default {
   props: { params: Object, fileProps: Object },
   setup(props) {
+    let [data, saveData] = useProps(props.params.data, {
+      supportActive: ["support-active"],
+      supportLink: ["support-link", toAbs, toRel],
+      supportHed: ["support-hed"],
+      supportText: ["support-text", undefined, cleanText],
+      supportCTA: ["support-cta"],
+      supportHedColor: ["support-hed-color"],
+      supportTextColor: ["support-text-color"],
+      supportBgColor: ["support-bg-color"],
+      supportButtonBgColor: ["support-button-bg-color"],
+      supportButtonTextColor: ["support-button-text-color"],
+    });
     return {
-      ...useData(() => props.params.data, {
-        supportActive: ["support-active"],
-        supportLink: ["support-link", toAbs, toRel],
-        supportHed: ["support-hed"],
-        supportText: ["support-text", undefined, cleanText],
-        supportCTA: ["support-cta"],
-        supportHedColor: ["support-hed-color"],
-        supportTextColor: ["support-text-color"],
-        supportBgColor: ["support-bg-color"],
-        supportButtonBgColor: ["support-button-bg-color"],
-        supportButtonTextColor: ["support-button-text-color"],
+      ...data,
+      saveData,
+      paragraphs: computed(() => {
+        return data.supportText.value.split("\n");
       }),
     };
   },
@@ -32,94 +39,89 @@ export default {
 </script>
 
 <template>
-  <div>
-    <details class="mt-4">
-      <summary class="title is-4">Support us box</summary>
-      <BulmaField label="Support Us Box">
-        <div>
-          <label class="checkbox">
-            <input v-model="supportActive" type="checkbox" />
-            Show support box in footer of articles
-          </label>
-        </div>
-      </BulmaField>
-      <template v-if="supportActive">
-        <BulmaFieldInput
-          v-model="supportLink"
-          label="Support box link"
-          type="url"
-        />
-        <BulmaFieldInput v-model="supportHed" label="Support Us Box hed" />
-        <BulmaTextarea
-          v-model="supportText"
-          label="Support Us Box text"
-          help="Supports bold and italics tags"
-        />
-        <BulmaFieldInput
-          v-model="supportCTA"
-          label="Support Us Box call to action"
-        />
-        <p class="label">Some common colors</p>
-        <p class="content">
-          White is #ffffff. Black is #000000. Our blue is #009edb. Our light
-          blue is #99d9f1. Our periwinkle is #e5f6ff. Our dark blue is #22416e.
-          Our CTA orange is #ff6c36. Our green is #78bc20. Our yellow is
-          #ffcb05. Our goldenrod is #fff1bd. Our beige is #f4f1ee.
-        </p>
-        <BulmaFieldColor v-model="supportHedColor" label="Support Hed Color" />
-        <BulmaFieldColor
-          v-model="supportTextColor"
-          label="Support Text Color"
-        />
-        <BulmaFieldColor
-          v-model="supportBgColor"
-          label="Support Background Color"
-        />
-        <BulmaFieldColor
-          v-model="supportButtonBgColor"
-          label="Support Button Background Color"
-        />
-        <BulmaFieldColor
-          v-model="supportButtonTextColor"
-          label="Support Button Text Color"
-        />
+  <details class="mt-4">
+    <summary class="title is-4">Support us box</summary>
+    <BulmaField label="Support Us Box">
+      <div>
+        <label class="checkbox">
+          <input v-model="supportActive" type="checkbox" />
+          Show support box in footer of articles
+        </label>
+      </div>
+    </BulmaField>
+    <template v-if="supportActive">
+      <BulmaFieldInput
+        v-model="supportLink"
+        label="Support box link"
+        type="url"
+      />
+      <BulmaFieldInput v-model="supportHed" label="Support Us Box hed" />
+      <BulmaTextarea
+        v-model="supportText"
+        label="Support Us Box text"
+        help="Supports bold and italics tags"
+      />
+      <BulmaFieldInput
+        v-model="supportCTA"
+        label="Support Us Box call to action"
+      />
+      <p class="label">Some common colors</p>
+      <p class="content">
+        White is #ffffff. Black is #000000. Our blue is #009edb. Our light blue
+        is #99d9f1. Our periwinkle is #e5f6ff. Our dark blue is #22416e. Our CTA
+        orange is #ff6c36. Our green is #78bc20. Our yellow is #ffcb05. Our
+        goldenrod is #fff1bd. Our beige is #f4f1ee.
+      </p>
+      <BulmaFieldColor v-model="supportHedColor" label="Support Hed Color" />
+      <BulmaFieldColor v-model="supportTextColor" label="Support Text Color" />
+      <BulmaFieldColor
+        v-model="supportBgColor"
+        label="Support Background Color"
+      />
+      <BulmaFieldColor
+        v-model="supportButtonBgColor"
+        label="Support Button Background Color"
+      />
+      <BulmaFieldColor
+        v-model="supportButtonTextColor"
+        label="Support Button Text Color"
+      />
 
-        <BulmaField label="Support Box Preview">
-          <div class="support-wrapper">
-            <div
-              class="support-content"
-              :style="{ 'background-color': supportBgColor }"
-            >
-              <h2
-                class="support-header"
-                :style="{ color: supportHedColor }"
-                v-text="supportHed"
-              ></h2>
-              <p
-                v-for="(p, i) of params.data['support-text'].split('\n')"
-                :key="i"
-                class="support-p"
-                :style="{ color: supportTextColor }"
-                v-html="p"
-              ></p>
-              <div class="mt-6 has-text-centered">
-                <span
-                  class="button has-text-weight-semibold is-uppercase"
-                  :style="{
-                    color: supportButtonTextColor,
-                    backgroundColor: supportButtonBgColor,
-                    borderColor: supportButtonBgColor,
-                  }"
-                  v-text="supportCTA"
-                >
-                </span>
-              </div>
+      <BulmaField label="Support Box Preview">
+        <div class="support-wrapper">
+          <div
+            class="support-content"
+            :style="{ 'background-color': supportBgColor }"
+          >
+            <h2
+              class="support-header"
+              :style="{ color: supportHedColor }"
+              v-text="supportHed"
+            ></h2>
+            <p
+              v-for="(p, i) of paragraphs"
+              :key="i"
+              class="support-p"
+              :style="{ color: supportTextColor }"
+              v-html="p"
+            ></p>
+            <div class="mt-6 has-text-centered">
+              <span
+                class="button has-text-weight-semibold is-uppercase"
+                :style="{
+                  color: supportButtonTextColor,
+                  backgroundColor: supportButtonBgColor,
+                  borderColor: supportButtonBgColor,
+                }"
+                v-text="supportCTA"
+              >
+              </span>
             </div>
           </div>
-        </BulmaField>
-      </template>
-    </details>
-  </div>
+        </div>
+      </BulmaField>
+    </template>
+  </details>
 </template>
 
 <style>

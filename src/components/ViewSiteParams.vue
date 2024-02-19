@@ -1,7 +1,7 @@
-<script>
-import { reactive, toRefs, watch } from "vue";
+<script setup>
+import { ref, watch } from "vue";
 
-import { useClient } from "@/api/client.js";
+import { get, post, getSiteParams, postSiteParams } from "@/api/client-v2.js";
 import { makeState } from "@/api/service-util.js";
 import { useFileList } from "@/api/file-list.js";
 
@@ -9,7 +9,7 @@ import { formatDateTime, today, tomorrow } from "@/utils/time-format.js";
 import useScrollTo from "@/utils/use-scroll-to.js";
 import maybeDate from "@/utils/maybe-date.js";
 
-class SiteParams {
+class SiteParamsModel {
   constructor(config) {
     this.scheduleFor = maybeDate(config, "schedule_for");
     this.publishedAt = maybeDate(config, "published_at");
@@ -25,75 +25,51 @@ class SiteParams {
   }
 }
 
-export default {
-  setup() {
-    const [container, scrollTo] = useScrollTo();
+const scheduledConfigs = ref([]);
+const siteParamsComps = ref([]);
+const nextSchedule = ref(null);
 
-    let { getSiteParams, postSiteParams } = useClient();
-    const { apiState, exec } = makeState();
+const { exec, apiStateRefs } = makeState();
 
-    const state = reactive({
-      ...toRefs(apiState),
+function fetch() {
+  return exec(() => get(getSiteParams));
+}
 
-      configs: [],
-      nextSchedule: null,
-    });
+const [container, scrollTo] = useScrollTo();
 
-    let actions = {
-      fetch() {
-        state.configs = [];
-        return exec(() => getSiteParams());
-      },
-      save() {
-        let { configs } = state;
-        state.configs = [];
-        return exec(() => postSiteParams({ configs }));
-      },
-      init() {
-        if (!apiState.rawData) {
-          return;
-        }
-        state.configs = apiState.rawData.configs.map((data) =>
-          reactive(new SiteParams(data))
-        );
-      },
-      async addScheduledConfig() {
-        let lastParams = state.configs[state.configs.length - 1];
-        state.configs.push(
-          reactive(
-            new SiteParams({
-              ...JSON.parse(JSON.stringify(lastParams)),
-              schedule_for: state.nextSchedule,
-            })
-          )
-        );
-        state.nextSchedule = null;
-        await scrollTo();
-      },
-      removeScheduledConfig(i) {
-        state.configs.splice(i, 1);
-      },
-    };
+async function addScheduledConfig() {
+  let lastParams = scheduledConfigs.value[scheduledConfigs.value.length - 1];
+  scheduledConfigs.value.push(
+    new SiteParamsModel({
+      ...JSON.parse(JSON.stringify(lastParams)),
+      schedule_for: nextSchedule.value,
+    })
+  );
+  nextSchedule.value = null;
+  await scrollTo();
+}
 
-    watch(
-      () => apiState.rawData,
-      () => actions.init()
-    );
+function removeScheduledConfig(i) {
+  scheduledConfigs.value.splice(i, 1);
+}
 
-    actions.fetch();
+async function save() {
+  let configs = siteParamsComps.value.map((comp) => comp.saveParams());
+  return exec(() => post(postSiteParams, { configs }));
+}
 
-    return {
-      container,
-      today,
-      tomorrow,
-      ...toRefs(state),
-      ...actions,
+watch(apiStateRefs.rawData, (data) => {
+  if (!data.configs) {
+    return;
+  }
+  scheduledConfigs.value = data.configs.map((cfg) => new SiteParamsModel(cfg));
+});
 
-      formatDateTime,
-      files: useFileList(),
-    };
-  },
-};
+const { isLoading, isLoadingThrottled, error } = apiStateRefs;
+
+const files = useFileList();
+
+fetch();
 </script>
 
 <template>
@@ -110,9 +86,12 @@ export default {
       />
       <h1 class="title">Sitewide Settings</h1>
     </div>
-
-    <div v-if="configs.length" ref="container">
-      <div v-for="(params, i) of configs" :key="i" class="px-2 py-4 zebra-row">
+    <div v-if="scheduledConfigs.length" ref="container">
+      <div
+        v-for="(params, i) of scheduledConfigs"
+        :key="i"
+        class="px-2 py-4 zebra-row"
+      >
         <h2 data-scroll-to class="title is-3">
           {{
             params.isCurrent
@@ -120,7 +99,13 @@ export default {
               : `Scheduled for ${formatDateTime(params.scheduleFor)}`
           }}
         </h2>
-        <SiteParams :params="params" :file-props="files" />
+
+        <SiteParams
+          ref="siteParamsComps"
+          :params="params"
+          :file-props="files"
+        />
+
         <button
           v-if="!params.isCurrent"
           type="button"
@@ -165,7 +150,6 @@ export default {
         </p>
       </BulmaDateTime>
     </div>
-
     <div class="mt-5 buttons">
       <button
         type="button"

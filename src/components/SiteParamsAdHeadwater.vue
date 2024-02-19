@@ -1,15 +1,17 @@
 <script setup>
-import useData from "@/utils/use-data.js";
+import useProps from "@/utils/use-props.js";
 import { toRel, toAbs } from "@/utils/link.js";
 
 const props = defineProps({ params: Object, fileProps: Object });
 
-const d = useData(() => props.params.data, {
+const [d, saveData] = useProps(props.params.data, {
   active: ["ad-headwater-active"],
   imageDescription: ["ad-headwater-image-description"],
   images: ["ad-headwater-images"],
   link: ["ad-headwater-link", toAbs, toRel],
 });
+
+defineExpose({ saveData });
 </script>
 
 <template>
