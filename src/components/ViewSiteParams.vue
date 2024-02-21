@@ -181,7 +181,7 @@ fetch();
   background-color: #fff;
 }
 
-.zebra-row:nth-child(odd) {
+.zebra-row:nth-child(even) {
   background-color: #fafafa;
 }
 
