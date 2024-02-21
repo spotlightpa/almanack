@@ -47,6 +47,7 @@ defineExpose({
 </script>
 
 <template>
+  <h2 class="title is-5">General ad slots</h2>
   <SiteParamsBanner
     ref="banner"
     :file-props="fileProps"
@@ -62,6 +63,30 @@ defineExpose({
     :file-props="fileProps"
     :params="params"
   ></SiteParamsTop>
+  <SiteParamsSidebar
+    ref="sidebar"
+    :file-props="fileProps"
+    :params="params"
+  ></SiteParamsSidebar>
+  <SiteParamsFooter
+    ref="footer"
+    :file-props="fileProps"
+    :params="params"
+  ></SiteParamsFooter>
+
+  <h2 class="title is-5">Article page ad slots</h2>
+  <SiteParamsSupport
+    ref="support"
+    :file-props="fileProps"
+    :params="params"
+  ></SiteParamsSupport>
+  <SiteParamsFeatured
+    ref="featured"
+    :file-props="fileProps"
+    :params="params"
+  ></SiteParamsFeatured>
+
+  <h2 class="title is-5">Takeover and sticky ad slots</h2>
   <SiteParamsSticky
     ref="sticky"
     :file-props="fileProps"
@@ -72,16 +97,7 @@ defineExpose({
     :file-props="fileProps"
     :params="params"
   ></SiteParamsTakeover>
-  <SiteParamsSidebar
-    ref="sidebar"
-    :file-props="fileProps"
-    :params="params"
-  ></SiteParamsSidebar>
-  <SiteParamsSupport
-    ref="support"
-    :file-props="fileProps"
-    :params="params"
-  ></SiteParamsSupport>
+  <h2 class="title is-5">Homepage ad slots</h2>
   <SiteParamsAdFeatured
     ref="adFeatured"
     :file-props="fileProps"
@@ -107,14 +123,4 @@ defineExpose({
     :file-props="fileProps"
     :params="params"
   ></SiteParamsRiver>
-  <SiteParamsFeatured
-    ref="featured"
-    :file-props="fileProps"
-    :params="params"
-  ></SiteParamsFeatured>
-  <SiteParamsFooter
-    ref="footer"
-    :file-props="fileProps"
-    :params="params"
-  ></SiteParamsFooter>
 </template>
