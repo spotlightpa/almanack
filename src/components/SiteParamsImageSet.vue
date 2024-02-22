@@ -4,6 +4,9 @@ import useProps from "@/utils/use-props.js";
 const props = defineProps({
   params: Object,
   propName: String,
+  label: String,
+  text: String,
+  help: String,
   fileProps: Object,
 });
 let n = 0;
@@ -17,8 +20,9 @@ function serialize(v) {
   return v.map((o) => ({ ...o, id: undefined }));
 }
 
-let [{ imageSet }, saveData] = useProps(props.params.data, {
+let [{ imageSet, active }, saveData] = useProps(props.params.data, {
   imageSet: [props.propName, deserialize, serialize],
+  active: [props.propName + "-active", (v) => v ?? false],
 });
 
 function pushImage() {
@@ -40,6 +44,9 @@ defineExpose({
 </script>
 
 <template>
+  <BulmaFieldCheckbox v-model="active" :label="label" :help="help">
+    {{ text }}
+  </BulmaFieldCheckbox>
   <ul>
     <li v-for="(image, n) of imageSet" :key="image.id" class="zebra-row">
       <BulmaFieldInput
