@@ -13,7 +13,7 @@ defineExpose({
 </script>
 
 <template>
-  <details class="mt-4" open>
+  <details class="mt-4">
     <summary class="title is-4">Featured ad</summary>
     <SiteParamsImageSet
       ref="imageSet"

@@ -45,54 +45,65 @@ defineExpose({
 
 <template>
   <BulmaFieldCheckbox v-model="active" :label="label" :help="help">
-    {{ text }}
+    {{ " " + text }}
   </BulmaFieldCheckbox>
-  <ul>
-    <li v-for="(image, n) of imageSet" :key="image.id" class="zebra-row">
-      <BulmaFieldInput
-        v-model="image.link"
-        label="Link URL"
-        type="url"
-        placeholder="https://www.spotlightpa.org/donate/"
-      />
-      <BulmaTextarea
-        v-model="image.description"
-        label="Image description (alt text)"
-        help="For blind readers and search engines"
-      />
-      <BulmaField
-        label="Images"
-        help="If multiple images are provided, each page load will select one randomly"
-      >
-        <SiteParamsFiles
-          :files="image.sources"
-          :file-props="fileProps"
-          @add="image.sources.push($event)"
-          @remove="image.sources.splice($event, 1)"
+  <template v-if="active">
+    <h4 class="title is-5">
+      {{ imageSet.length }} promotion{{ imageSet.length !== 1 ? "s" : "" }}
+      active
+    </h4>
+    <h5 class="subtitle">
+      If multiple promotions are active, one will be chosen randomly on page
+      load.
+    </h5>
+    <ul>
+      <li v-for="(image, n) of imageSet" :key="image.id" class="zebra-row">
+        <BulmaFieldInput
+          v-model="image.link"
+          label="Link URL"
+          type="url"
+          placeholder="https://www.spotlightpa.org/donate/"
         />
-      </BulmaField>
-
+        <BulmaTextarea
+          v-model="image.description"
+          label="Image description (alt text)"
+          help="For blind readers and search engines"
+        />
+        <BulmaField
+          label="Images"
+          help="If multiple images are provided, each page load will select one randomly"
+        >
+          <SiteParamsFiles
+            :files="image.sources"
+            :file-props="fileProps"
+            @add="image.sources.push($event)"
+            @remove="image.sources.splice($event, 1)"
+          />
+        </BulmaField>
+        <div class="mt-1 mb-2 buttons">
+          <button
+            type="button"
+            class="button is-danger has-text-weight-semibold is-small"
+            @click="removeImage(n)"
+          >
+            Remove promotion from set
+          </button>
+        </div>
+      </li>
+    </ul>
+    <div class="mt-5 buttons">
       <button
         type="button"
-        class="button is-danger has-text-weight-semibold"
-        @click="removeImage(n)"
+        class="button is-success has-text-weight-semibold"
+        @click="pushImage"
       >
-        Remove promo
+        Add promotion to set
       </button>
-    </li>
-  </ul>
-  <div class="buttons">
-    <button
-      type="button"
-      class="button is-primary has-text-weight-semibold"
-      @click="pushImage"
-    >
-      Add promo
-    </button>
-  </div>
+    </div>
+  </template>
 </template>
 
-<style scoped>
+<style>
 .zebra-row {
   background-color: #fff;
 }
@@ -103,5 +114,9 @@ defineExpose({
 
 .zebra-row + .zebra-row {
   border-top: 1px solid #dbdbdb;
+}
+
+div {
+  box-sizing: border-box;
 }
 </style>
