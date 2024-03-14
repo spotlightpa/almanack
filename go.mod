@@ -27,7 +27,7 @@ require (
 	github.com/go-chi/chi/v5 v5.0.12
 	github.com/go-logfmt/logfmt v0.6.0
 	github.com/google/go-github/v53 v53.2.0
-	github.com/jackc/pgx/v5 v5.5.3
+	github.com/jackc/pgx/v5 v5.5.4
 	github.com/jackc/tern/v2 v2.1.1
 	github.com/microcosm-cc/bluemonday v1.0.26
 	github.com/tdewolff/minify/v2 v2.20.18
