@@ -480,6 +480,14 @@ export default {
           >
             Refresh content and metadata
           </button>
+          <a
+            v-if="page.isGDoc"
+            class="block button is-primary is-small has-text-weight-semibold"
+            :href="page.gdocsURL"
+            target="_blank"
+          >
+            Open Google Doc
+          </a>
         </div>
       </BulmaField>
 
