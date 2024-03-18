@@ -1,0 +1,23 @@
+{
+  "id": 123,
+  "status": "U",
+  "embargo_until": null,
+  "note": "",
+  "source_type": "gdocs",
+  "source_id": "abc123_testdata-gdoc-spl",
+  "raw_data": null,
+  "page_id": null,
+  "created_at": "2020-03-15T20:00:00Z",
+  "updated_at": "2020-03-15T20:00:00Z",
+  "publication_date": null,
+  "internal_id": "Shortcode",
+  "byline": "",
+  "budget": "",
+  "hed": "",
+  "description": "",
+  "lede_image": "",
+  "lede_image_credit": "",
+  "lede_image_description": "",
+  "lede_image_caption": "",
+  "blurb": ""
+}
