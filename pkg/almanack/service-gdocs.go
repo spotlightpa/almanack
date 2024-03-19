@@ -139,6 +139,10 @@ func (svc Services) ProcessGDocsDoc(ctx context.Context, dbDoc db.GDocsDoc) (err
 					"Embed #%d contains unusual characters.", n,
 				))
 			}
+		case "spl":
+			embed.Type = db.SpotlightEmbedTag
+			embedHTML := xhtml.InnerText(rows.At(1, 0))
+			embed.Value = embedHTML
 		case "photo", "image", "photograph", "illustration", "illo":
 			embed.Type = db.ImageEmbedTag
 			if imageEmbed, warning := svc.replaceImageEmbed(
@@ -493,6 +497,10 @@ func fixRichTextPlaceholders(richText *html.Node) {
 	embeds := xhtml.FindAll(richText, xhtml.WithAtom(atom.Data))
 	for _, dataEl := range embeds {
 		embed := extractEmbed(dataEl)
+		if embed.Type == db.SpotlightEmbedTag {
+			dataEl.Parent.RemoveChild(dataEl)
+			continue
+		}
 		placeholder := xhtml.New("h2", "style", "color: red;")
 		xhtml.AppendText(placeholder, fmt.Sprintf("Embed #%d", embed.N))
 		xhtml.ReplaceWith(dataEl, placeholder)
@@ -510,6 +518,8 @@ func fixRawHTMLPlaceholders(rawHTML *html.Node) {
 	for _, dataEl := range embeds {
 		embed := extractEmbed(dataEl)
 		switch embed.Type {
+		case db.SpotlightEmbedTag:
+			dataEl.Parent.RemoveChild(dataEl)
 		case db.RawEmbedTag, db.ToCEmbedTag:
 			xhtml.ReplaceWith(dataEl, &html.Node{
 				Type: html.RawNode,
@@ -528,7 +538,7 @@ func fixMarkdownPlaceholders(rawHTML *html.Node) {
 	for _, dataEl := range embeds {
 		embed := extractEmbed(dataEl)
 		switch embed.Type {
-		case db.RawEmbedTag:
+		case db.RawEmbedTag, db.SpotlightEmbedTag:
 			xhtml.ReplaceWith(dataEl, &html.Node{
 				Type: html.RawNode,
 				Data: embed.Value.(string),
