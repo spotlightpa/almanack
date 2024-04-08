@@ -17,7 +17,6 @@ import (
 	"github.com/carlmjohnson/errorx"
 	"github.com/carlmjohnson/requests"
 	"github.com/spotlightpa/almanack/internal/blocko"
-	"github.com/spotlightpa/almanack/internal/cmpx"
 	"github.com/spotlightpa/almanack/internal/db"
 	"github.com/spotlightpa/almanack/internal/gdocs"
 	"github.com/spotlightpa/almanack/internal/must"
@@ -672,7 +671,7 @@ func processToc(doc, tbl *html.Node, rows xhtml.TableNodes) string {
 		d := h.depth
 		for lastDepth > d {
 			// If its out of order, just try to cope
-			currentUl = cmpx.Or(
+			currentUl = cmp.Or(
 				xhtml.Closest(currentUl.Parent, xhtml.WithAtom(atom.Ul)),
 				currentUl,
 			)
