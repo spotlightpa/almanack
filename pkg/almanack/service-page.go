@@ -32,30 +32,41 @@ func (svc Services) PublishPage(ctx context.Context, q *db.Queries, page *db.Pag
 	if err != nil {
 		return
 	}
-
+	// Start two goroutines.
+	// In one, try the update while holding a lock.
+	// If the update succeeds, also do the GitHub publish.
+	// If it publishes, commit the locked update. If not, rollback.
+	// In the background, do the index and issue a warning if it fails.
+	// If all this goes well, swap in the db.Page to the pointer
+	var p2 db.Page
 	err = flowmatic.Do(
 		func() error {
-			internalID, _ := page.Frontmatter["internal-id"].(string)
-			title := cmp.Or(internalID, page.FilePath)
-			msg := fmt.Sprintf("Content: publishing %q", title)
-			return svc.ContentStore.UpdateFile(ctx, msg, page.FilePath, []byte(data))
-		}, func() error {
+			return svc.Tx.Begin(ctx, pgx.TxOptions{}, func(txq *db.Queries) (txerr error) {
+				defer errorx.Trace(&txerr)
+
+				p2, txerr = txq.UpdatePage(ctx, db.UpdatePageParams{
+					FilePath:         page.FilePath,
+					URLPath:          page.URLPath.String,
+					SetLastPublished: true,
+					SetFrontmatter:   false,
+					SetBody:          false,
+					SetScheduleFor:   false,
+					ScheduleFor:      db.NullTime,
+				})
+				if txerr != nil {
+					return txerr
+				}
+
+				internalID, _ := page.Frontmatter["internal-id"].(string)
+				title := cmp.Or(internalID, page.FilePath)
+				msg := fmt.Sprintf("Content: publishing %q", title)
+				return svc.ContentStore.UpdateFile(ctx, msg, page.FilePath, []byte(data))
+			})
+		},
+		func() error {
 			_, warning = svc.Indexer.SaveObject(page.ToIndex(), ctx)
 			return nil
 		})
-	if err != nil {
-		return
-	}
-
-	p2, err := q.UpdatePage(ctx, db.UpdatePageParams{
-		FilePath:         page.FilePath,
-		URLPath:          page.URLPath.String,
-		SetLastPublished: true,
-		SetFrontmatter:   false,
-		SetBody:          false,
-		SetScheduleFor:   false,
-		ScheduleFor:      db.NullTime,
-	})
 	if err != nil {
 		return
 	}
