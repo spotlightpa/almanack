@@ -1,7 +1,11 @@
 package db_test
 
 import (
+	"context"
+	"errors"
 	"fmt"
+	"os"
+	"path/filepath"
 	"testing"
 	"time"
 
@@ -9,6 +13,10 @@ import (
 	"github.com/carlmjohnson/be/testfile"
 	"github.com/jackc/pgx/v5/pgtype"
 	"github.com/spotlightpa/almanack/internal/db"
+	"github.com/spotlightpa/almanack/internal/github"
+	"github.com/spotlightpa/almanack/internal/index"
+	"github.com/spotlightpa/almanack/pkg/almanack"
+	"github.com/spotlightpa/almanack/pkg/almlog"
 )
 
 func TestToFromTOML(t *testing.T) {
@@ -260,5 +268,159 @@ func TestShouldPublishShouldNotify(t *testing.T) {
 			be.Equal(t, tc.pub, pub)
 			be.Equal(t, tc.notify, notify)
 		})
+	}
+}
+
+func TestServicePublish(t *testing.T) {
+	ctx := context.Background()
+	almlog.UseTestLogger(t)
+
+	p := createTestDB(t)
+	tmp := t.TempDir()
+	svc := almanack.Services{
+		Queries:      db.New(p),
+		Tx:           db.NewTxable(p),
+		ContentStore: github.NewMockClient(tmp),
+		Indexer:      index.MockIndexer{},
+	}
+
+	// Success case
+	{
+		const path1 = "content/news/1.md"
+
+		be.NilErr(t, svc.Queries.CreatePage(ctx, db.CreatePageParams{
+			FilePath:   path1,
+			SourceType: "manual",
+			SourceID:   "n/a",
+		}))
+
+		p, err := svc.Queries.GetPageByFilePath(ctx, path1)
+		be.NilErr(t, err)
+		be.False(t, p.LastPublished.Valid)
+
+		_, err = os.Stat(filepath.Join(tmp, path1))
+		be.Nonzero(t, err)
+
+		p1 := &db.Page{
+			ID:            1,
+			FilePath:      path1,
+			Frontmatter:   map[string]any{},
+			Body:          "hello",
+			ScheduleFor:   pgtype.Timestamptz{},
+			LastPublished: pgtype.Timestamptz{},
+			CreatedAt:     time.Time{},
+			UpdatedAt:     time.Time{},
+			URLPath: pgtype.Text{
+				String: "/hello", Valid: true,
+			},
+			SourceType:      "",
+			SourceID:        "",
+			PublicationDate: pgtype.Timestamptz{},
+		}
+		err, warning := svc.PublishPage(ctx, p1)
+		be.NilErr(t, err)
+		be.NilErr(t, warning)
+
+		p, err = svc.Queries.GetPageByFilePath(ctx, path1)
+		be.NilErr(t, err)
+		be.True(t, p.LastPublished.Valid)
+	}
+	{
+		const path2 = "content/news/2.md"
+
+		be.NilErr(t, svc.Queries.CreatePage(ctx, db.CreatePageParams{
+			FilePath:   path2,
+			SourceType: "manual",
+			SourceID:   "n/a",
+		}))
+
+		_, err := os.Stat(filepath.Join(tmp, path2))
+		be.Nonzero(t, err)
+
+		// Can't create another page with the same URLPath
+		p2 := &db.Page{
+			ID:            1,
+			FilePath:      path2,
+			Frontmatter:   map[string]any{},
+			Body:          "hello",
+			ScheduleFor:   pgtype.Timestamptz{},
+			LastPublished: pgtype.Timestamptz{},
+			CreatedAt:     time.Time{},
+			UpdatedAt:     time.Time{},
+			URLPath: pgtype.Text{
+				String: "/hello", Valid: true,
+			},
+			SourceType:      "",
+			SourceID:        "",
+			PublicationDate: pgtype.Timestamptz{},
+		}
+		err, warning := svc.PublishPage(ctx, p2)
+		be.Nonzero(t, err)
+		be.NilErr(t, warning)
+		_, err = os.Stat(filepath.Join(tmp, path2))
+		be.Nonzero(t, err)
+
+		// Can create if the URL changes
+		p3 := &db.Page{
+			ID:            1,
+			FilePath:      path2,
+			Frontmatter:   map[string]any{},
+			Body:          "hello",
+			ScheduleFor:   pgtype.Timestamptz{},
+			LastPublished: pgtype.Timestamptz{},
+			CreatedAt:     time.Time{},
+			UpdatedAt:     time.Time{},
+			URLPath: pgtype.Text{
+				String: "/hello2", Valid: true,
+			},
+			SourceType:      "",
+			SourceID:        "",
+			PublicationDate: pgtype.Timestamptz{},
+		}
+		err, warning = svc.PublishPage(ctx, p3)
+		be.NilErr(t, err)
+		be.NilErr(t, warning)
+		_, err = os.Stat(filepath.Join(tmp, path2))
+		be.NilErr(t, err)
+	}
+	// Test Github failure
+	{
+		const path3 = "content/news/3.md"
+		be.NilErr(t, svc.Queries.CreatePage(ctx, db.CreatePageParams{
+			FilePath:   path3,
+			SourceType: "manual",
+			SourceID:   "n/a",
+		}))
+
+		_, err := os.Stat(filepath.Join(tmp, path3))
+		be.Nonzero(t, err)
+
+		p4 := &db.Page{
+			ID:            1,
+			FilePath:      path3,
+			Frontmatter:   map[string]any{},
+			Body:          "hello",
+			ScheduleFor:   pgtype.Timestamptz{},
+			LastPublished: pgtype.Timestamptz{},
+			CreatedAt:     time.Time{},
+			UpdatedAt:     time.Time{},
+			URLPath: pgtype.Text{
+				String: "/hello3", Valid: true,
+			},
+			SourceType:      "",
+			SourceID:        "",
+			PublicationDate: pgtype.Timestamptz{},
+		}
+		// Github returns an error
+		svc.ContentStore = github.ErrorClient{
+			Error: errors.New("bad client"),
+		}
+		err, warning := svc.PublishPage(ctx, p4)
+		be.Nonzero(t, err)
+		be.NilErr(t, warning)
+
+		p, err := svc.Queries.GetPageByFilePath(ctx, path3)
+		be.NilErr(t, err)
+		be.False(t, p.LastPublished.Valid)
 	}
 }
