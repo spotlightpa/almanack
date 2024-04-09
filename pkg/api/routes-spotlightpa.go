@@ -554,11 +554,6 @@ func (app *appEnv) postPage(w http.ResponseWriter, r *http.Request) {
 	}
 	shouldPublish := res.ShouldPublish()
 	shouldNotify := res.ShouldNotify(&oldPage)
-	if shouldNotify {
-		if err = app.svc.Notify(ctx, &res, shouldPublish); err != nil {
-			app.logErr(ctx, err)
-		}
-	}
 	if shouldPublish {
 		err, warning := app.svc.PublishPage(ctx, app.svc.Queries, &res)
 		if warning != nil {
@@ -568,6 +563,11 @@ func (app *appEnv) postPage(w http.ResponseWriter, r *http.Request) {
 			err = fmt.Errorf("postPage publish problem: %w", err)
 			app.replyErr(w, r, err)
 			return
+		}
+	}
+	if shouldNotify {
+		if err = app.svc.Notify(ctx, &res, shouldPublish); err != nil {
+			app.logErr(ctx, err)
 		}
 	}
 	app.replyJSON(http.StatusOK, w, &res)
