@@ -67,3 +67,20 @@ func (mc *MockClient) UpdateFile(ctx context.Context, msg, path string, content 
 	mc.ensureParent(tmpfn)
 	return os.WriteFile(tmpfn, content, 0644)
 }
+
+// ErrorClient is a test client that just always returns an error.
+type ErrorClient struct {
+	Error error
+}
+
+func (ec ErrorClient) CreateFile(ctx context.Context, msg, path string, content []byte) error {
+	return ec.Error
+}
+
+func (ec ErrorClient) GetFile(ctx context.Context, path string) (contents string, err error) {
+	return "", ec.Error
+}
+
+func (ec ErrorClient) UpdateFile(ctx context.Context, msg, path string, content []byte) error {
+	return ec.Error
+}
