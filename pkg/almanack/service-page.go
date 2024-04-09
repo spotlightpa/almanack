@@ -24,7 +24,7 @@ import (
 	"github.com/spotlightpa/almanack/pkg/almlog"
 )
 
-func (svc Services) PublishPage(ctx context.Context, q *db.Queries, page *db.Page) (err, warning error) {
+func (svc Services) PublishPage(ctx context.Context, page *db.Page) (err, warning error) {
 	defer errorx.Trace(&err)
 
 	page.SetURLPath()
@@ -101,7 +101,7 @@ func (svc Services) PopScheduledPages(ctx context.Context) (err, warning error) 
 		}
 		var errs []error
 		for _, page := range pages {
-			txerr, warning = svc.PublishPage(ctx, q, &page)
+			txerr, warning = svc.PublishPage(ctx, &page)
 			errs = append(errs, txerr)
 			warnings = append(warnings, warning)
 		}

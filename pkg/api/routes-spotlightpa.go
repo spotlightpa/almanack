@@ -555,7 +555,7 @@ func (app *appEnv) postPage(w http.ResponseWriter, r *http.Request) {
 	shouldPublish := res.ShouldPublish()
 	shouldNotify := res.ShouldNotify(&oldPage)
 	if shouldPublish {
-		err, warning := app.svc.PublishPage(ctx, app.svc.Queries, &res)
+		err, warning := app.svc.PublishPage(ctx, &res)
 		if warning != nil {
 			app.logErr(r.Context(), warning)
 		}
