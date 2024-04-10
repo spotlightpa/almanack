@@ -41,7 +41,9 @@ func (svc Services) PublishPage(ctx context.Context, page *db.Page) (err, warnin
 	var p2 db.Page
 	err = flowmatic.Do(
 		func() error {
-			return svc.Tx.Begin(ctx, pgx.TxOptions{}, func(txq *db.Queries) (txerr error) {
+			return svc.Tx.Begin(ctx, pgx.TxOptions{
+				IsoLevel: pgx.Serializable,
+			}, func(txq *db.Queries) (txerr error) {
 				defer errorx.Trace(&txerr)
 
 				p2, txerr = txq.UpdatePage(ctx, db.UpdatePageParams{
