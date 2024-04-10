@@ -2,10 +2,12 @@ package api
 
 import (
 	"net/http"
+	"time"
 
 	"github.com/earthboundkid/mid"
 	"github.com/go-chi/chi/v5/middleware"
 
+	"github.com/spotlightpa/almanack/internal/httpx"
 	"github.com/spotlightpa/almanack/pkg/almanack"
 	"github.com/spotlightpa/almanack/pkg/almlog"
 )
@@ -13,29 +15,24 @@ import (
 func (app *appEnv) routes() http.Handler {
 	mux := http.NewServeMux()
 
-	var baseMW mid.Stack
-	baseMW.Push(middleware.RealIP)
-	baseMW.PushIf(!app.isLambda, middleware.Recoverer)
-	baseMW.Push(
-		almlog.Middleware,
-		app.versionMiddleware,
-		app.maxSizeMiddleware,
-	)
+	standardMW := mid.Stack{
+		httpx.WithTimeout(9 * time.Second),
+	}
 
 	// Start public endpoints
 	mux.Handle(`GET /api/arc-image`,
-		baseMW.Controller(app.getArcImage))
+		standardMW.Controller(app.getArcImage))
 	mux.Handle(`GET /api/bookmarklet/{slug}`,
-		baseMW.HandlerFunc(app.getBookmarklet))
+		standardMW.HandlerFunc(app.getBookmarklet))
 	mux.Handle(`GET /api/healthcheck`,
-		baseMW.HandlerFunc(app.ping))
+		standardMW.HandlerFunc(app.ping))
 	mux.Handle(`GET /api/healthcheck/{code}`,
-		baseMW.HandlerFunc(app.pingErr))
+		standardMW.HandlerFunc(app.pingErr))
 	mux.Handle(`POST /api/identity-hook`,
-		baseMW.HandlerFunc(app.postIdentityHook))
+		standardMW.HandlerFunc(app.postIdentityHook))
 	// End public endpoints
 
-	authMW := baseMW.With(app.authHeaderMiddleware)
+	authMW := standardMW.With(app.authHeaderMiddleware)
 
 	mux.Handle(`GET /api/user-info`,
 		authMW.Controller(app.userInfo))
@@ -131,7 +128,7 @@ func (app *appEnv) routes() http.Handler {
 	// Don't trust this middleware!
 	// Netlify should be verifying the role at the CDN level.
 	// This is just a fallback.
-	ssrMW := baseMW.With(app.authCookieMiddleware)
+	ssrMW := standardMW.With(app.authCookieMiddleware)
 
 	mux.Handle(`GET /ssr/user-info`,
 		ssrMW.Controller(app.userInfo))
@@ -153,16 +150,28 @@ func (app *appEnv) routes() http.Handler {
 		spotlightSSRMW.Controller(app.renderPage))
 
 	// Start background API endpoints
+	backgroundMW := mid.Stack{
+		httpx.WithTimeout(14 * time.Minute),
+	}
 	mux.Handle(`GET /api-background/cron`,
-		baseMW.Controller(app.backgroundCron))
+		backgroundMW.Controller(app.backgroundCron))
 	mux.Handle(`GET /api-background/images`,
-		baseMW.Controller(app.backgroundImages))
+		backgroundMW.Controller(app.backgroundImages))
 	mux.Handle(`GET /api-background/refresh-pages`,
-		baseMW.Controller(app.backgroundRefreshPages))
+		backgroundMW.Controller(app.backgroundRefreshPages))
 	mux.Handle(`GET /api-background/sleep/{duration}`,
-		baseMW.Controller(app.backgroundSleep))
+		backgroundMW.Controller(app.backgroundSleep))
 	// End background API endpoints
 
-	mux.Handle("/", baseMW.HandlerFunc(app.notFound))
-	return mux
+	mux.Handle("/", standardMW.HandlerFunc(app.notFound))
+
+	var baseMW mid.Stack
+	baseMW.Push(middleware.RealIP)
+	baseMW.PushIf(!app.isLambda, middleware.Recoverer)
+	baseMW.Push(
+		almlog.Middleware,
+		app.versionMiddleware,
+		app.maxSizeMiddleware,
+	)
+	return baseMW.Handler(mux)
 }
