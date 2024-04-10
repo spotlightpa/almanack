@@ -3,9 +3,9 @@ package api
 import (
 	"net/http"
 
+	"github.com/earthboundkid/mid"
 	"github.com/go-chi/chi/v5/middleware"
 
-	"github.com/spotlightpa/almanack/internal/httpx"
 	"github.com/spotlightpa/almanack/pkg/almanack"
 	"github.com/spotlightpa/almanack/pkg/almlog"
 )
@@ -13,7 +13,7 @@ import (
 func (app *appEnv) routes() http.Handler {
 	mux := http.NewServeMux()
 
-	var baseMW httpx.Stack
+	var baseMW mid.Stack
 	baseMW.Push(middleware.RealIP)
 	baseMW.PushIf(!app.isLambda, middleware.Recoverer)
 	baseMW.Push(
