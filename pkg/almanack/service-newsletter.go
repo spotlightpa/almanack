@@ -5,10 +5,12 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"math/rand/v2"
 	"strconv"
 	"strings"
 
 	"github.com/carlmjohnson/errorx"
+	"github.com/jackc/pgx/v5"
 	"github.com/spotlightpa/almanack/internal/db"
 	"github.com/spotlightpa/almanack/internal/mailchimp"
 	"github.com/spotlightpa/almanack/internal/stringx"
@@ -78,86 +80,85 @@ func (svc Services) ImportNewsletterPages(ctx context.Context, types []db.Newsle
 }
 
 func (svc Services) SaveNewsletterPage(ctx context.Context, nl *db.Newsletter, body string, types []db.NewsletterType) (err error) {
-	defer errorx.Trace(&err)
+	if nl.SpotlightPAPath.String != "" && nl.SpotlightPAPath.Valid {
+		return
+	}
 
-	needsUpdate := false
-	if nl.SpotlightPAPath.String == "" {
+	return svc.Tx.Begin(ctx, pgx.TxOptions{IsoLevel: pgx.ReadUncommitted}, func(txq *db.Queries) error {
+		defer errorx.Trace(&err)
+
+		rando := rand.N(255) // In case there are multiple pages on the same day
 		nl.PublishedAt = timex.ToEST(nl.PublishedAt)
 		nl.SpotlightPAPath.Valid = true
-		nl.SpotlightPAPath.String = fmt.Sprintf("content/newsletters/%s/%s.md",
-			nl.Type, nl.PublishedAt.Format("2006-01-02-1504"),
+		nl.SpotlightPAPath.String = fmt.Sprintf("content/newsletters/%s/%s-%02x.md",
+			nl.Type, nl.PublishedAt.Format("2006-01-02-1504"), rando,
 		)
-		needsUpdate = true
-	}
 
-	// create or update the page
-	if !needsUpdate {
-		return nil
-	}
-	path := nl.SpotlightPAPath.String
-	if err := svc.Queries.CreatePage(ctx, db.CreatePageParams{
-		FilePath:   path,
-		SourceType: "mailchimp",
-		SourceID:   strconv.FormatInt(nl.ID, 10),
-	}); err != nil {
-		return err
-	}
-	slug := stringx.SlugifyURL(
-		timex.ToEST(nl.PublishedAt).Format("Jan 2 ") + nl.Subject,
-	)
-	kicker := "Newsletter"
-	for _, nltype := range types {
-		if nltype.Shortname == nl.Type {
-			kicker = nltype.Name
+		path := nl.SpotlightPAPath.String
+		if err := txq.CreatePage(ctx, db.CreatePageParams{
+			FilePath:   path,
+			SourceType: "mailchimp",
+			SourceID:   strconv.FormatInt(nl.ID, 10),
+		}); err != nil {
+			return err
 		}
-	}
-	if _, err := svc.Queries.UpdatePage(ctx, db.UpdatePageParams{
-		SetFrontmatter: true,
-		Frontmatter: map[string]any{
-			"aliases":           []string{},
-			"authors":           []string{},
-			"blurb":             nl.Blurb,
-			"byline":            "",
-			"description":       nl.Description,
-			"draft":             false,
-			"extended-kicker":   "",
-			"image":             "",
-			"image-caption":     "",
-			"image-credit":      "",
-			"image-description": "",
-			"image-size":        "",
-			"internal-id": fmt.Sprintf("%s-%s",
-				strings.ToUpper(nl.Type),
-				nl.PublishedAt.Format("01-02-06")),
-			"kicker":      kicker,
-			"layout":      "mailchimp-page",
-			"linktitle":   "",
-			"no-index":    false,
-			"published":   nl.PublishedAt,
-			"raw-content": body,
-			"series":      []string{},
-			"slug":        slug,
-			"title":       nl.Subject,
-			"title-tag":   "",
-			"topics":      []string{},
-			"url":         "",
-		},
-		SetBody:     true,
-		Body:        "",
-		FilePath:    path,
-		ScheduleFor: db.NullTime,
-	}); err != nil {
-		return err
-	}
+		slug := stringx.SlugifyURL(
+			timex.ToEST(nl.PublishedAt).Format("Jan 2 ") + nl.Subject,
+		)
+		kicker := "Newsletter"
+		for _, nltype := range types {
+			if nltype.Shortname == nl.Type {
+				kicker = nltype.Name
+			}
+		}
+		if _, err := txq.UpdatePage(ctx, db.UpdatePageParams{
+			SetFrontmatter: true,
+			Frontmatter: map[string]any{
+				"aliases":           []string{},
+				"authors":           []string{},
+				"blurb":             nl.Blurb,
+				"byline":            "",
+				"description":       nl.Description,
+				"draft":             false,
+				"extended-kicker":   "",
+				"image":             "",
+				"image-caption":     "",
+				"image-credit":      "",
+				"image-description": "",
+				"image-size":        "",
+				"internal-id": fmt.Sprintf("%s-%s",
+					strings.ToUpper(nl.Type),
+					nl.PublishedAt.Format("01-02-06")),
+				"kicker":      kicker,
+				"layout":      "mailchimp-page",
+				"linktitle":   "",
+				"no-index":    false,
+				"published":   nl.PublishedAt,
+				"raw-content": body,
+				"series":      []string{},
+				"slug":        slug,
+				"title":       nl.Subject,
+				"title-tag":   "",
+				"topics":      []string{},
+				"url":         "",
+			},
+			SetBody:     true,
+			Body:        "",
+			FilePath:    path,
+			ScheduleFor: db.NullTime,
+		}); err != nil {
+			return err
+		}
 
-	if nl2, err := svc.Queries.SetNewsletterPage(ctx, db.SetNewsletterPageParams{
-		ID:              nl.ID,
-		SpotlightPAPath: nl.SpotlightPAPath,
-	}); err != nil {
-		return err
-	} else {
-		*nl = nl2
-	}
+		if nl2, err := txq.SetNewsletterPage(ctx, db.SetNewsletterPageParams{
+			ID:              nl.ID,
+			SpotlightPAPath: nl.SpotlightPAPath,
+		}); err != nil {
+			return err
+		} else {
+			*nl = nl2
+		}
 
-	return nil
+		return nil
+	})
 }
