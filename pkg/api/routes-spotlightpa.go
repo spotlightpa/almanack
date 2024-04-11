@@ -16,6 +16,7 @@ import (
 	"github.com/carlmjohnson/emailx"
 	"github.com/carlmjohnson/flowmatic"
 	"github.com/carlmjohnson/resperr"
+	"github.com/jackc/pgx/v5"
 	"github.com/spotlightpa/almanack/internal/db"
 	"github.com/spotlightpa/almanack/internal/gdocs"
 	"github.com/spotlightpa/almanack/internal/google"
@@ -555,10 +556,13 @@ func (app *appEnv) postPage(w http.ResponseWriter, r *http.Request) {
 	shouldPublish := res.ShouldPublish()
 	shouldNotify := res.ShouldNotify(&oldPage)
 	if shouldPublish {
-		err, warning := app.svc.PublishPage(ctx, &res)
-		if warning != nil {
-			app.logErr(r.Context(), warning)
-		}
+		err = app.svc.Tx.Begin(ctx, pgx.TxOptions{}, func(txq *db.Queries) (txerr error) {
+			err, warning := app.svc.PublishPage(ctx, txq, &res)
+			if warning != nil {
+				app.logErr(r.Context(), warning)
+			}
+			return err
+		})
 		if err != nil {
 			err = fmt.Errorf("postPage publish problem: %w", err)
 			app.replyErr(w, r, err)

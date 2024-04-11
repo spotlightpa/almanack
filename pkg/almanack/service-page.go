@@ -24,7 +24,7 @@ import (
 	"github.com/spotlightpa/almanack/pkg/almlog"
 )
 
-func (svc Services) PublishPage(ctx context.Context, page *db.Page) (err, warning error) {
+func (svc Services) PublishPage(ctx context.Context, txq *db.Queries, page *db.Page) (err, warning error) {
 	defer errorx.Trace(&err)
 
 	page.SetURLPath()
@@ -40,30 +40,26 @@ func (svc Services) PublishPage(ctx context.Context, page *db.Page) (err, warnin
 	// If all this goes well, swap in the db.Page to the pointer
 	var p2 db.Page
 	err = flowmatic.Do(
-		func() error {
-			return svc.Tx.Begin(ctx, pgx.TxOptions{
-				IsoLevel: pgx.ReadUncommitted,
-			}, func(txq *db.Queries) (txerr error) {
-				defer errorx.Trace(&txerr)
+		func() (txerr error) {
+			defer errorx.Trace(&txerr)
 
-				p2, txerr = txq.UpdatePage(ctx, db.UpdatePageParams{
-					FilePath:         page.FilePath,
-					URLPath:          page.URLPath.String,
-					SetLastPublished: true,
-					SetFrontmatter:   false,
-					SetBody:          false,
-					SetScheduleFor:   false,
-					ScheduleFor:      db.NullTime,
-				})
-				if txerr != nil {
-					return txerr
-				}
-
-				internalID, _ := page.Frontmatter["internal-id"].(string)
-				title := cmp.Or(internalID, page.FilePath)
-				msg := fmt.Sprintf("Content: publishing %q", title)
-				return svc.ContentStore.UpdateFile(ctx, msg, page.FilePath, []byte(data))
+			p2, txerr = txq.UpdatePage(ctx, db.UpdatePageParams{
+				FilePath:         page.FilePath,
+				URLPath:          page.URLPath.String,
+				SetLastPublished: true,
+				SetFrontmatter:   false,
+				SetBody:          false,
+				SetScheduleFor:   false,
+				ScheduleFor:      db.NullTime,
 			})
+			if txerr != nil {
+				return txerr
+			}
+
+			internalID, _ := page.Frontmatter["internal-id"].(string)
+			title := cmp.Or(internalID, page.FilePath)
+			msg := fmt.Sprintf("Content: publishing %q", title)
+			return svc.ContentStore.UpdateFile(ctx, msg, page.FilePath, []byte(data))
 		},
 		func() error {
 			_, warning = svc.Indexer.SaveObject(page.ToIndex(), ctx)
@@ -94,16 +90,16 @@ func (svc Services) RefreshPageFromContentStore(ctx context.Context, page *db.Pa
 
 func (svc Services) PopScheduledPages(ctx context.Context) (err, warning error) {
 	var warnings []error
-	err = svc.Tx.Begin(ctx, pgx.TxOptions{}, func(q *db.Queries) (txerr error) {
+	err = svc.Tx.Begin(ctx, pgx.TxOptions{}, func(txq *db.Queries) (txerr error) {
 		defer errorx.Trace(&txerr)
 
-		pages, txerr := q.PopScheduledPages(ctx)
+		pages, txerr := txq.PopScheduledPages(ctx)
 		if txerr != nil {
 			return
 		}
 		var errs []error
 		for _, page := range pages {
-			txerr, warning = svc.PublishPage(ctx, &page)
+			txerr, warning = svc.PublishPage(ctx, txq, &page)
 			errs = append(errs, txerr)
 			warnings = append(warnings, warning)
 		}
