@@ -11,6 +11,7 @@ import (
 
 	"github.com/carlmjohnson/be"
 	"github.com/carlmjohnson/be/testfile"
+	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgtype"
 	"github.com/spotlightpa/almanack/internal/db"
 	"github.com/spotlightpa/almanack/internal/github"
@@ -317,9 +318,12 @@ func TestServicePublish(t *testing.T) {
 			SourceID:        "",
 			PublicationDate: pgtype.Timestamptz{},
 		}
-		err, warning := svc.PublishPage(ctx, p1)
+		err = svc.Tx.Begin(ctx, pgx.TxOptions{}, func(txq *db.Queries) (txerr error) {
+			err, warning := svc.PublishPage(ctx, txq, p1)
+			be.NilErr(t, warning)
+			return err
+		})
 		be.NilErr(t, err)
-		be.NilErr(t, warning)
 
 		p, err = svc.Queries.GetPageByFilePath(ctx, path1)
 		be.NilErr(t, err)
@@ -354,9 +358,12 @@ func TestServicePublish(t *testing.T) {
 			SourceID:        "",
 			PublicationDate: pgtype.Timestamptz{},
 		}
-		err, warning := svc.PublishPage(ctx, p2)
+		err = svc.Tx.Begin(ctx, pgx.TxOptions{}, func(txq *db.Queries) (txerr error) {
+			err, warning := svc.PublishPage(ctx, txq, p2)
+			be.NilErr(t, warning)
+			return err
+		})
 		be.Nonzero(t, err)
-		be.NilErr(t, warning)
 		_, err = os.Stat(filepath.Join(tmp, path2))
 		be.Nonzero(t, err)
 
@@ -377,9 +384,12 @@ func TestServicePublish(t *testing.T) {
 			SourceID:        "",
 			PublicationDate: pgtype.Timestamptz{},
 		}
-		err, warning = svc.PublishPage(ctx, p3)
+		err = svc.Tx.Begin(ctx, pgx.TxOptions{}, func(txq *db.Queries) (txerr error) {
+			err, warning := svc.PublishPage(ctx, txq, p3)
+			be.NilErr(t, warning)
+			return err
+		})
 		be.NilErr(t, err)
-		be.NilErr(t, warning)
 		_, err = os.Stat(filepath.Join(tmp, path2))
 		be.NilErr(t, err)
 	}
@@ -415,9 +425,12 @@ func TestServicePublish(t *testing.T) {
 		svc.ContentStore = github.ErrorClient{
 			Error: errors.New("bad client"),
 		}
-		err, warning := svc.PublishPage(ctx, p4)
+		err = svc.Tx.Begin(ctx, pgx.TxOptions{}, func(txq *db.Queries) (txerr error) {
+			err, warning := svc.PublishPage(ctx, txq, p4)
+			be.NilErr(t, warning)
+			return err
+		})
 		be.Nonzero(t, err)
-		be.NilErr(t, warning)
 
 		p, err := svc.Queries.GetPageByFilePath(ctx, path3)
 		be.NilErr(t, err)
