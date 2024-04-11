@@ -437,3 +437,62 @@ func TestServicePublish(t *testing.T) {
 		be.False(t, p.LastPublished.Valid)
 	}
 }
+
+func TestServicePopScheduledPages(t *testing.T) {
+	ctx := context.Background()
+	almlog.UseTestLogger(t)
+
+	p := createTestDB(t)
+	tmp := t.TempDir()
+	svc := almanack.Services{
+		Queries:      db.New(p),
+		Tx:           db.NewTxable(p),
+		ContentStore: github.NewMockClient(tmp),
+		Indexer:      index.MockIndexer{},
+	}
+
+	{
+		const path = "content/news/test-pop.md"
+
+		be.NilErr(t, svc.Queries.CreatePage(ctx, db.CreatePageParams{
+			FilePath:   path,
+			SourceType: "manual",
+			SourceID:   "n/a",
+		}))
+
+		p, err := svc.Queries.GetPageByFilePath(ctx, path)
+		be.NilErr(t, err)
+		be.False(t, p.LastPublished.Valid)
+
+		_, err = os.Stat(filepath.Join(tmp, path))
+		be.Nonzero(t, err)
+
+		p, err = svc.Queries.UpdatePage(ctx, db.UpdatePageParams{
+			SetFrontmatter: false,
+			Frontmatter:    map[string]any{},
+			SetBody:        false,
+			Body:           "",
+			SetScheduleFor: true,
+			ScheduleFor: pgtype.Timestamptz{
+				Time:  time.Now().AddDate(0, 0, -1),
+				Valid: true,
+			},
+			URLPath:          "",
+			SetLastPublished: false,
+			FilePath:         path,
+		})
+		be.NilErr(t, err)
+		be.False(t, p.LastPublished.Valid)
+
+		err, warning := svc.PopScheduledPages(ctx)
+		be.NilErr(t, warning)
+		be.NilErr(t, err)
+
+		p, err = svc.Queries.GetPageByFilePath(ctx, path)
+		be.NilErr(t, err)
+		be.True(t, p.LastPublished.Valid)
+
+		_, err = os.Stat(filepath.Join(tmp, path))
+		be.NilErr(t, err)
+	}
+}
