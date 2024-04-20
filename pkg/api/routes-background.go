@@ -10,6 +10,7 @@ import (
 	"github.com/carlmjohnson/flowmatic"
 	"github.com/spotlightpa/almanack/internal/db"
 	"github.com/spotlightpa/almanack/internal/paginate"
+	"github.com/spotlightpa/almanack/internal/timex"
 	"github.com/spotlightpa/almanack/pkg/almanack"
 	"github.com/spotlightpa/almanack/pkg/almlog"
 )
@@ -27,10 +28,11 @@ func (app *appEnv) backgroundSleep(w http.ResponseWriter, r *http.Request) http.
 	if err != nil {
 		return app.jsonErr(err)
 	}
-	time.Sleep(duration)
+	ok := timex.Sleep(r.Context(), duration)
 	return app.jsonAccepted(struct {
 		SleptFor time.Duration `json:"slept-for"`
-	}{duration})
+		OK       bool          `json:"ok"`
+	}{duration, ok})
 }
 
 func (app *appEnv) backgroundCron(w http.ResponseWriter, r *http.Request) http.Handler {
