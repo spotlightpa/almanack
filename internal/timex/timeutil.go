@@ -1,6 +1,7 @@
 package timex
 
 import (
+	"context"
 	"sync"
 	"time"
 
@@ -40,4 +41,18 @@ func Equalish(old, new pgtype.Timestamptz) bool {
 	}
 	diff := old.Time.Sub(new.Time).Abs()
 	return diff < timeWindow
+}
+
+// Sleep is like time.Sleep, but it takes a context.
+// The return value is false
+// if the context cancelled before it could return.
+func Sleep(ctx context.Context, d time.Duration) bool {
+	timer := time.NewTimer(d)
+	defer timer.Stop()
+	select {
+	case <-timer.C:
+		return true
+	case <-ctx.Done():
+		return false
+	}
 }
