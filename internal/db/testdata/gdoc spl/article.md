@@ -14,3 +14,6 @@ Only on *dot* org:
   cta="Visit the Election Center →"
   limit="12"
 >}}
+
+Some <strong>bold</strong> and <em>italic</em> text. Spotlight PA is blah blah.
+
