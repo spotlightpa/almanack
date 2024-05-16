@@ -138,10 +138,18 @@ func (svc Services) ProcessGDocsDoc(ctx context.Context, dbDoc db.GDocsDoc) (err
 					"Embed #%d contains unusual characters.", n,
 				))
 			}
-		case "spl":
-			embed.Type = db.SpotlightEmbedTag
+		case "spl", "spl-embed":
 			embedHTML := xhtml.InnerText(rows.At(1, 0))
+			embed.Type = db.SpotlightRawEmbedTag
 			embed.Value = embedHTML
+		case "spl-text":
+			embed.Type = db.SpotlightRawEmbedTag
+			n := rows.At(1, 0)
+			blocko.MergeSiblings(n)
+			blocko.RemoveEmptyP(n)
+			blocko.RemoveMarks(n)
+			s := blocko.Blockize(n)
+			embed.Value = s
 		case "photo", "image", "photograph", "illustration", "illo":
 			embed.Type = db.ImageEmbedTag
 			if imageEmbed, warning := svc.replaceImageEmbed(
@@ -170,7 +178,7 @@ func (svc Services) ProcessGDocsDoc(ctx context.Context, dbDoc db.GDocsDoc) (err
 			return
 		case "toc", "table of contents":
 			embed.Type = db.ToCEmbedTag
-			embed.Value = processToc(docHTML, tbl, rows)
+			embed.Value = processToc(docHTML, rows)
 		default:
 			warnings = append(warnings, fmt.Sprintf(
 				"Unrecognized table type: %q", label,
@@ -496,7 +504,7 @@ func fixRichTextPlaceholders(richText *html.Node) {
 	embeds := xhtml.FindAll(richText, xhtml.WithAtom(atom.Data))
 	for _, dataEl := range embeds {
 		embed := extractEmbed(dataEl)
-		if embed.Type == db.SpotlightEmbedTag {
+		if embed.Type == db.SpotlightRawEmbedTag {
 			dataEl.Parent.RemoveChild(dataEl)
 			continue
 		}
@@ -517,7 +525,7 @@ func fixRawHTMLPlaceholders(rawHTML *html.Node) {
 	for _, dataEl := range embeds {
 		embed := extractEmbed(dataEl)
 		switch embed.Type {
-		case db.SpotlightEmbedTag:
+		case db.SpotlightRawEmbedTag:
 			dataEl.Parent.RemoveChild(dataEl)
 		case db.RawEmbedTag, db.ToCEmbedTag:
 			xhtml.ReplaceWith(dataEl, &html.Node{
@@ -537,7 +545,7 @@ func fixMarkdownPlaceholders(rawHTML *html.Node) {
 	for _, dataEl := range embeds {
 		embed := extractEmbed(dataEl)
 		switch embed.Type {
-		case db.RawEmbedTag, db.SpotlightEmbedTag:
+		case db.RawEmbedTag, db.SpotlightRawEmbedTag:
 			xhtml.ReplaceWith(dataEl, &html.Node{
 				Type: html.RawNode,
 				Data: embed.Value.(string),
@@ -635,7 +643,7 @@ func (svc Services) UploadGDocsImage(ctx context.Context, arg UploadGDocsImagePa
 	})
 }
 
-func processToc(doc, tbl *html.Node, rows xhtml.TableNodes) string {
+func processToc(doc *html.Node, rows xhtml.TableNodes) string {
 	type header struct {
 		text  string
 		id    string
