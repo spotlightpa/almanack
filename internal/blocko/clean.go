@@ -19,7 +19,7 @@ func Clean(root *html.Node) {
 
 func MergeSiblings(root *html.Node) {
 	// find all matches first
-	inlineSiblings := xhtml.FindAll(root, func(n *html.Node) bool {
+	inlineSiblings := xhtml.SelectSlice(root, func(n *html.Node) bool {
 		brother := n.NextSibling
 		return brother != nil &&
 			inlineElements[n.DataAtom] &&
@@ -38,7 +38,7 @@ func MergeSiblings(root *html.Node) {
 }
 
 func RemoveEmptyP(root *html.Node) {
-	emptyP := xhtml.FindAll(root, func(n *html.Node) bool {
+	emptyP := xhtml.SelectSlice(root, func(n *html.Node) bool {
 		return n.DataAtom == atom.P && isEmpty(n)
 	})
 	for _, n := range emptyP {
@@ -47,7 +47,7 @@ func RemoveEmptyP(root *html.Node) {
 }
 
 func RemoveMarks(root *html.Node) {
-	marks := xhtml.FindAll(root, xhtml.WithAtom(atom.Mark))
+	marks := xhtml.SelectSlice(root, xhtml.WithAtom(atom.Mark))
 	for _, mark := range marks {
 		xhtml.UnnestChildren(mark)
 	}
@@ -62,9 +62,9 @@ var whitespaceReplacer = strings.NewReplacer(
 )
 
 func replaceWhitespace(root *html.Node) {
-	xhtml.VisitAll(root, func(n *html.Node) {
+	for n := range xhtml.All(root) {
 		if n.Type != html.TextNode {
-			return
+			continue
 		}
 		// Ignore children of pre/code
 		codeblock := xhtml.Closest(n, func(n *html.Node) bool {
@@ -75,7 +75,7 @@ func replaceWhitespace(root *html.Node) {
 		if codeblock == nil {
 			n.Data = whitespaceReplacer.Replace(n.Data)
 		}
-	})
+	}
 }
 
 var specialReplacer = strings.NewReplacer(
@@ -92,21 +92,21 @@ var specialReplacer = strings.NewReplacer(
 )
 
 func replaceSpecials(root *html.Node) {
-	xhtml.VisitAll(root, func(n *html.Node) {
+	for n := range xhtml.All(root) {
 		if n.Type != html.TextNode {
-			return
+			continue
 		}
 		// Ignore children not of p
 		codeblock := xhtml.Closest(n, xhtml.WithAtom(atom.P))
 		if codeblock == nil {
-			return
+			continue
 		}
 		n.Data = specialReplacer.Replace(n.Data)
-	})
+	}
 }
 
 func fixBareLI(root *html.Node) {
-	bareLIs := xhtml.FindAll(root, func(n *html.Node) bool {
+	bareLIs := xhtml.SelectSlice(root, func(n *html.Node) bool {
 		child := n.FirstChild
 		return n.DataAtom == atom.Li && child != nil &&
 			(child.Type == html.TextNode ||

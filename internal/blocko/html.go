@@ -57,23 +57,23 @@ var inlineElements = map[atom.Atom]bool{
 
 func isEmpty(n *html.Node) bool {
 	root := n
-	n = xhtml.Find(n, func(n *html.Node) bool {
+	for n := range xhtml.All(n) {
 		if n == root {
-			return false
+			continue
 		}
 		switch n.Type {
 		case html.TextNode:
 			s := strings.ReplaceAll(n.Data, "\n", " ")
 			s = strings.TrimSpace(s)
 			if s == "" {
-				return false
+				continue
 			}
 		case html.ElementNode:
 			if inlineElements[n.DataAtom] {
-				return false
+				continue
 			}
 		}
-		return true
-	})
-	return n == nil
+		return false
+	}
+	return true
 }

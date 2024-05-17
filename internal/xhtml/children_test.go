@@ -32,37 +32,36 @@ func TestUnnestChildren(t *testing.T) {
 
 	{
 		clone := xhtml.Clone(n)
-		i := xhtml.Find(clone, xhtml.WithAtom(atom.I))
+		i := xhtml.Select(clone, xhtml.WithAtom(atom.I))
 		xhtml.UnnestChildren(i)
 		be.Equal(t, `<a><b>test <i>one</i> <em><i>two</i></em> </b></a>`,
 			xhtml.InnerHTML(clone))
 	}
 	{
 		clone := xhtml.Clone(n)
-		em := xhtml.Find(clone, xhtml.WithAtom(atom.Em))
+		em := xhtml.Select(clone, xhtml.WithAtom(atom.Em))
 		xhtml.UnnestChildren(em)
 		be.Equal(t, `<a><b><i>test</i> <i>one</i> <i>two</i> </b></a>`,
 			xhtml.InnerHTML(clone))
 	}
 	{
 		clone := xhtml.Clone(n)
-		a := xhtml.Find(clone, xhtml.WithAtom(atom.A))
+		a := xhtml.Select(clone, xhtml.WithAtom(atom.A))
 		xhtml.UnnestChildren(a)
 		be.Equal(t, `<b><i>test</i> <i>one</i> <em><i>two</i></em> </b>`,
 			xhtml.InnerHTML(clone))
 	}
 	{
 		clone := xhtml.Clone(n)
-		b := xhtml.Find(clone, xhtml.WithAtom(atom.B))
+		b := xhtml.Select(clone, xhtml.WithAtom(atom.B))
 		xhtml.UnnestChildren(b)
 		be.Equal(t, `<a><i>test</i> <i>one</i> <em><i>two</i></em> </a>`,
 			xhtml.InnerHTML(clone))
 	}
 	{
 		clone := xhtml.Clone(n)
-		is := xhtml.FindAll(clone, xhtml.WithAtom(atom.I))
-		for _, n := range is {
-			xhtml.UnnestChildren(n)
+		for _, c := range xhtml.SelectSlice(clone, xhtml.WithAtom(atom.I)) {
+			xhtml.UnnestChildren(c)
 		}
 		be.Equal(t, `<a><b>test one <em>two</em> </b></a>`,
 			xhtml.InnerHTML(clone))

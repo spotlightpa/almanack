@@ -1,25 +1,25 @@
 package xhtml
 
 import (
+	"iter"
 	"strings"
 
+	"github.com/spotlightpa/almanack/internal/iterx"
 	"golang.org/x/net/html"
 )
 
-// Children returns a slice containing the children of n.
-func Children(n *html.Node) []*html.Node {
-	if n == nil {
-		return nil
+// Children returns a seq of the children of n.
+func Children(n *html.Node) iter.Seq[*html.Node] {
+	return func(yield func(*html.Node) bool) {
+		if n == nil {
+			return
+		}
+		for c := n.FirstChild; c != nil; c = c.NextSibling {
+			if !yield(c) {
+				return
+			}
+		}
 	}
-	count := 0
-	for c := n.FirstChild; c != nil; c = c.NextSibling {
-		count++
-	}
-	s := make([]*html.Node, 0, count)
-	for c := n.FirstChild; c != nil; c = c.NextSibling {
-		s = append(s, c)
-	}
-	return s
 }
 
 func ReplaceWith(old, new *html.Node) {
@@ -79,7 +79,7 @@ func UnnestChildren(n *html.Node) {
 	if n.Parent == nil {
 		return
 	}
-	children := Children(n)
+	children := iterx.Collect(Children(n))
 	RemoveAll(children)
 	for _, c := range children {
 		n.Parent.InsertBefore(c, n)

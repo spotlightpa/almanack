@@ -60,10 +60,11 @@ func InnerText(n *html.Node) string {
 	var buf strings.Builder
 	buf.Grow(256)
 
-	VisitAll(n, func(n *html.Node) {
+	for n := range All(n) {
 		if n.Type == html.TextNode {
 			buf.WriteString(n.Data)
 		}
-	})
+	}
+
 	return strings.TrimSpace(buf.String())
 }

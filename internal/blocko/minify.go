@@ -25,7 +25,7 @@ func Minify(r io.Reader) (*nethtml.Node, error) {
 	if err != nil {
 		return nil, err
 	}
-	body := xhtml.Find(doc, xhtml.WithBody)
+	body := xhtml.Select(doc, xhtml.WithBody)
 	if body == nil {
 		return nil, fmt.Errorf("could not find body")
 	}

@@ -9,12 +9,12 @@ import (
 )
 
 func Tables(root *html.Node, f func(tbl *html.Node, rows TableNodes)) {
-	tables := FindAll(root, WithAtom(atom.Table))
+	tables := SelectSlice(root, WithAtom(atom.Table))
 	for _, tblNode := range tables {
 		var tbl TableNodes
-		rows := FindAll(tblNode, WithAtom(atom.Tr))
+		rows := SelectSlice(tblNode, WithAtom(atom.Tr))
 		for _, row := range rows {
-			tds := FindAll(row, func(n *html.Node) bool {
+			tds := SelectSlice(row, func(n *html.Node) bool {
 				return n.DataAtom == atom.Td || n.DataAtom == atom.Th
 			})
 			tbl = append(tbl, tds)
