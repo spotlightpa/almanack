@@ -1,6 +1,7 @@
 package xhtml
 
 import (
+	"iter"
 	"strings"
 
 	"github.com/spotlightpa/almanack/internal/stringx"
@@ -8,18 +9,22 @@ import (
 	"golang.org/x/net/html/atom"
 )
 
-func Tables(root *html.Node, f func(tbl *html.Node, rows TableNodes)) {
-	tables := SelectSlice(root, WithAtom(atom.Table))
-	for _, tblNode := range tables {
-		var tbl TableNodes
-		rows := SelectSlice(tblNode, WithAtom(atom.Tr))
-		for _, row := range rows {
-			tds := SelectSlice(row, func(n *html.Node) bool {
-				return n.DataAtom == atom.Td || n.DataAtom == atom.Th
-			})
-			tbl = append(tbl, tds)
+func Tables(root *html.Node) iter.Seq2[*html.Node, TableNodes] {
+	return func(yield func(*html.Node, TableNodes) bool) {
+		tables := SelectSlice(root, WithAtom(atom.Table))
+		for _, tblNode := range tables {
+			var tbl TableNodes
+			rows := SelectSlice(tblNode, WithAtom(atom.Tr))
+			for _, row := range rows {
+				tds := SelectSlice(row, func(n *html.Node) bool {
+					return n.DataAtom == atom.Td || n.DataAtom == atom.Th
+				})
+				tbl = append(tbl, tds)
+			}
+			if !yield(tblNode, tbl) {
+				return
+			}
 		}
-		f(tblNode, tbl)
 	}
 }
 
