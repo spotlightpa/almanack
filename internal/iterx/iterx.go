@@ -1,3 +1,5 @@
+//go:build goexperiment.rangefunc
+
 // Package iterx has iteration utilities.
 package iterx
 
