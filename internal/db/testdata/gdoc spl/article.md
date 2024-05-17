@@ -15,5 +15,5 @@ Only on *dot* org:
   limit="12"
 >}}
 
-Some <strong>bold</strong> and <em>italic</em> text. Spotlight PA is blah blah.
+Some <strong>bold</strong> and <em>italic</em> Spotlight PA text. Spotlight PA is blah blah.
 
