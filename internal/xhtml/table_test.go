@@ -20,10 +20,10 @@ func TestTable(t *testing.T) {
 		root, err := html.Parse(strings.NewReader(in))
 		be.NilErr(t, err)
 		i := 0
-		xhtml.Tables(root, func(_ *html.Node, tbl xhtml.TableNodes) {
+		for _, tbl := range xhtml.Tables(root) {
 			i++
 			rows := xhtml.Map(tbl, xhtml.InnerHTML)
 			testfile.EqualJSON(t, fmt.Sprintf("%s-%d.json", bareName, i), &rows)
-		})
+		}
 	})
 }
