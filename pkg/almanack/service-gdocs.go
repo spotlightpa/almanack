@@ -127,10 +127,9 @@ func (svc Services) ProcessGDocsDoc(ctx context.Context, dbDoc db.GDocsDoc) (err
 	// Default slug is article title
 	metadata.InternalID = dbDoc.Document.Title
 
-	xhtml.Tables(docHTML, func(tbl *html.Node, rows xhtml.TableNodes) {
-		label := rows.Label()
+	for tbl, rows := range xhtml.Tables(docHTML) {
 		embed := db.Embed{N: n}
-		switch label {
+		switch label := rows.Label(); label {
 		case "html", "embed", "raw", "script":
 			embed.Type = db.RawEmbedTag
 			embedHTML := xhtml.InnerText(rows.At(1, 0))
@@ -140,6 +139,11 @@ func (svc Services) ProcessGDocsDoc(ctx context.Context, dbDoc db.GDocsDoc) (err
 					"Embed #%d contains unusual characters.", n,
 				))
 			}
+			embeds = append(embeds, embed)
+			value := must.Get(json.Marshal(embed))
+			data := xhtml.New("data", "value", string(value))
+			xhtml.ReplaceWith(tbl, data)
+			n++
 		case "spl", "spl-embed":
 			embedHTML := xhtml.InnerText(rows.At(1, 0))
 			embed.Type = db.SpotlightRawEmbedTag
@@ -147,7 +151,6 @@ func (svc Services) ProcessGDocsDoc(ctx context.Context, dbDoc db.GDocsDoc) (err
 			value := must.Get(json.Marshal(embed))
 			data := xhtml.New("data", "value", string(value))
 			xhtml.ReplaceWith(tbl, data)
-			return
 		case "spl-text":
 			embed.Type = db.SpotlightRawEmbedTag
 			n := xhtml.Clone(rows.At(1, 0))
@@ -159,18 +162,25 @@ func (svc Services) ProcessGDocsDoc(ctx context.Context, dbDoc db.GDocsDoc) (err
 			value := must.Get(json.Marshal(embed))
 			data := xhtml.New("data", "value", string(value))
 			xhtml.ReplaceWith(tbl, data)
-			return
-		// case "partner-embed":
-		// 	embedHTML := xhtml.InnerText(rows.At(1, 0))
-		// 	embed.Type = db.PartnerRawEmbedTag
-		// 	embed.Value = embedHTML
-		// case "partner-text":
-		// 	embed.Type = db.PartnerRawEmbedTag
-		// 	n := xhtml.Clone(rows.At(1, 0))
-		// 	blocko.MergeSiblings(n)
-		// 	blocko.RemoveEmptyP(n)
-		// 	blocko.RemoveMarks(n)
-		// 	embed.Value = n.FirstChild
+		case "partner-embed":
+			embedHTML := xhtml.InnerText(rows.At(1, 0))
+			embed.Type = db.PartnerRawEmbedTag
+			embed.Value = embedHTML
+			embeds = append(embeds, embed)
+			value := must.Get(json.Marshal(embed))
+			data := xhtml.New("data", "value", string(value))
+			xhtml.ReplaceWith(tbl, data)
+			n++
+		case "partner-text":
+			embed.Type = db.PartnerTextTag
+			n := xhtml.Clone(rows.At(1, 0))
+			blocko.MergeSiblings(n)
+			blocko.RemoveEmptyP(n)
+			blocko.RemoveMarks(n)
+			embed.Value = xhtml.InnerHTMLBlocks(n)
+			value := must.Get(json.Marshal(embed))
+			data := xhtml.New("data", "value", string(value))
+			xhtml.ReplaceWith(tbl, data)
 		case "photo", "image", "photograph", "illustration", "illo":
 			embed.Type = db.ImageEmbedTag
 			if imageEmbed, warning := svc.replaceImageEmbed(
@@ -178,9 +188,13 @@ func (svc Services) ProcessGDocsDoc(ctx context.Context, dbDoc db.GDocsDoc) (err
 			); warning != "" {
 				tbl.Parent.RemoveChild(tbl)
 				warnings = append(warnings, warning)
-				return
 			} else {
 				embed.Value = *imageEmbed
+				embeds = append(embeds, embed)
+				value := must.Get(json.Marshal(embed))
+				data := xhtml.New("data", "value", string(value))
+				xhtml.ReplaceWith(tbl, data)
+				n++
 			}
 		case "metadata", "info":
 			if warning := svc.replaceMetadata(
@@ -189,30 +203,29 @@ func (svc Services) ProcessGDocsDoc(ctx context.Context, dbDoc db.GDocsDoc) (err
 				warnings = append(warnings, warning)
 			}
 			tbl.Parent.RemoveChild(tbl)
-			return
+
 		case "comment", "ignore", "note":
 			tbl.Parent.RemoveChild(tbl)
-			return
+
 		case "table":
 			row := xhtml.Closest(rows.At(0, 0), xhtml.WithAtom(atom.Tr))
 			row.Parent.RemoveChild(row)
-			return
+
 		case "toc", "table of contents":
 			embed.Type = db.ToCEmbedTag
 			embed.Value = processToc(docHTML, rows)
+			embeds = append(embeds, embed)
+			value := must.Get(json.Marshal(embed))
+			data := xhtml.New("data", "value", string(value))
+			xhtml.ReplaceWith(tbl, data)
+			n++
 		default:
 			warnings = append(warnings, fmt.Sprintf(
 				"Unrecognized table type: %q", label,
 			))
 			tbl.Parent.RemoveChild(tbl)
-			return
 		}
-		embeds = append(embeds, embed)
-		value := must.Get(json.Marshal(embed))
-		data := xhtml.New("data", "value", string(value))
-		xhtml.ReplaceWith(tbl, data)
-		n++
-	})
+	}
 
 	docHTML, err = blocko.Minify(xhtml.ToBuffer(docHTML))
 	if err != nil {
@@ -525,13 +538,23 @@ func fixRichTextPlaceholders(richText *html.Node) {
 	embeds := xhtml.SelectSlice(richText, xhtml.WithAtom(atom.Data))
 	for _, dataEl := range embeds {
 		embed := extractEmbed(dataEl)
-		if embed.Type == db.SpotlightRawEmbedTag {
+		switch embed.Type {
+		case db.SpotlightRawEmbedTag:
 			dataEl.Parent.RemoveChild(dataEl)
 			continue
+		case db.PartnerTextTag:
+			xhtml.ReplaceWith(dataEl, &html.Node{
+				Type: html.RawNode,
+				Data: embed.Value.(string),
+			})
+			continue
+		case db.ImageEmbedTag, db.RawEmbedTag, db.ToCEmbedTag, db.PartnerRawEmbedTag:
+			placeholder := xhtml.New("h2", "style", "color: red;")
+			xhtml.AppendText(placeholder, fmt.Sprintf("Embed #%d", embed.N))
+			xhtml.ReplaceWith(dataEl, placeholder)
+		default:
+			panic("unknown embed type: " + embed.Type)
 		}
-		placeholder := xhtml.New("h2", "style", "color: red;")
-		xhtml.AppendText(placeholder, fmt.Sprintf("Embed #%d", embed.N))
-		xhtml.ReplaceWith(dataEl, placeholder)
 	}
 }
 
@@ -548,7 +571,7 @@ func fixRawHTMLPlaceholders(rawHTML *html.Node) {
 		switch embed.Type {
 		case db.SpotlightRawEmbedTag:
 			dataEl.Parent.RemoveChild(dataEl)
-		case db.RawEmbedTag, db.ToCEmbedTag:
+		case db.RawEmbedTag, db.ToCEmbedTag, db.PartnerRawEmbedTag, db.PartnerTextTag:
 			xhtml.ReplaceWith(dataEl, &html.Node{
 				Type: html.RawNode,
 				Data: embed.Value.(string),
@@ -557,6 +580,8 @@ func fixRawHTMLPlaceholders(rawHTML *html.Node) {
 			placeholder := xhtml.New("h2", "style", "color: red;")
 			xhtml.AppendText(placeholder, fmt.Sprintf("Embed #%d", embed.N))
 			xhtml.ReplaceWith(dataEl, placeholder)
+		default:
+			panic("unknown embed type: " + embed.Type)
 		}
 	}
 }
@@ -566,6 +591,8 @@ func fixMarkdownPlaceholders(rawHTML *html.Node) {
 	for _, dataEl := range embeds {
 		embed := extractEmbed(dataEl)
 		switch embed.Type {
+		case db.PartnerRawEmbedTag, db.PartnerTextTag:
+			dataEl.Parent.RemoveChild(dataEl)
 		case db.RawEmbedTag, db.SpotlightRawEmbedTag:
 			xhtml.ReplaceWith(dataEl, &html.Node{
 				Type: html.RawNode,
@@ -596,6 +623,8 @@ func fixMarkdownPlaceholders(rawHTML *html.Node) {
 				Type: html.RawNode,
 				Data: data,
 			})
+		default:
+			panic("unknown embed type: " + embed.Type)
 		}
 	}
 }
