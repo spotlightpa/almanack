@@ -142,14 +142,33 @@ func (svc Services) ProcessGDocsDoc(ctx context.Context, dbDoc db.GDocsDoc) (err
 			embedHTML := xhtml.InnerText(rows.At(1, 0))
 			embed.Type = db.SpotlightRawEmbedTag
 			embed.Value = embedHTML
+			value := must.Get(json.Marshal(embed))
+			data := xhtml.New("data", "value", string(value))
+			xhtml.ReplaceWith(tbl, data)
+			return
 		case "spl-text":
 			embed.Type = db.SpotlightRawEmbedTag
-			n := rows.At(1, 0)
+			n := xhtml.Clone(rows.At(1, 0))
 			blocko.MergeSiblings(n)
 			blocko.RemoveEmptyP(n)
 			blocko.RemoveMarks(n)
 			s := blocko.Blockize(n)
 			embed.Value = s
+			value := must.Get(json.Marshal(embed))
+			data := xhtml.New("data", "value", string(value))
+			xhtml.ReplaceWith(tbl, data)
+			return
+		// case "partner-embed":
+		// 	embedHTML := xhtml.InnerText(rows.At(1, 0))
+		// 	embed.Type = db.PartnerRawEmbedTag
+		// 	embed.Value = embedHTML
+		// case "partner-text":
+		// 	embed.Type = db.PartnerRawEmbedTag
+		// 	n := xhtml.Clone(rows.At(1, 0))
+		// 	blocko.MergeSiblings(n)
+		// 	blocko.RemoveEmptyP(n)
+		// 	blocko.RemoveMarks(n)
+		// 	embed.Value = n.FirstChild
 		case "photo", "image", "photograph", "illustration", "illo":
 			embed.Type = db.ImageEmbedTag
 			if imageEmbed, warning := svc.replaceImageEmbed(
