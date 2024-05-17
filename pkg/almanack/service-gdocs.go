@@ -104,7 +104,7 @@ func (svc Services) ProcessGDocsDoc(ctx context.Context, dbDoc db.GDocsDoc) (err
 	}
 
 	docHTML := gdocs.Convert(&dbDoc.Document)
-	if n := xhtml.Find(docHTML, xhtml.WithAtom(atom.Data)); n != nil {
+	if n := xhtml.Select(docHTML, xhtml.WithAtom(atom.Data)); n != nil {
 		return fmt.Errorf(
 			"document unexpectedly contains <data> element: %q",
 			xhtml.OuterHTML(n),
@@ -202,10 +202,10 @@ func (svc Services) ProcessGDocsDoc(ctx context.Context, dbDoc db.GDocsDoc) (err
 	blocko.RemoveMarks(docHTML)
 
 	// Warn about fake headings
-	xhtml.VisitAll(docHTML, func(n *html.Node) {
+	for n := range xhtml.All(docHTML) {
 		// <p> with only b/i/strong/em for a child
 		if n.DataAtom != atom.P {
-			return
+			continue
 		}
 		if n.FirstChild != nil &&
 			n.FirstChild == n.LastChild &&
@@ -221,10 +221,10 @@ func (svc Services) ProcessGDocsDoc(ctx context.Context, dbDoc db.GDocsDoc) (err
 				"Paragraph beginning %q looks like a header, but does not use H-tag.", text)
 			warnings = append(warnings, warning)
 		}
-	})
+	}
 
 	// Warn about <br>
-	if n := xhtml.Find(docHTML, xhtml.WithAtom(atom.Br)); n != nil {
+	if n := xhtml.Select(docHTML, xhtml.WithAtom(atom.Br)); n != nil {
 		warnings = append(warnings,
 			"Document contains <br> line breaks. Are you sure you want to use a line break? In Google Docs, select View > Show non-printing characters to see them.")
 	}
@@ -305,7 +305,7 @@ func (svc Services) replaceImageEmbed(
 		return imageEmbed, ""
 	}
 
-	linkTag := xhtml.Find(tbl, xhtml.WithAtom(atom.A))
+	linkTag := xhtml.Select(tbl, xhtml.WithAtom(atom.A))
 	if href := xhtml.Attr(linkTag, "href"); href != "" {
 		path, err := svc.ReplaceAndUploadImageURL(ctx, href, imageEmbed.Description, imageEmbed.Credit)
 		switch {
@@ -323,7 +323,7 @@ func (svc Services) replaceImageEmbed(
 		}
 	}
 
-	image := xhtml.Find(tbl, xhtml.WithAtom(atom.Img))
+	image := xhtml.Select(tbl, xhtml.WithAtom(atom.Img))
 	if image == nil {
 		return nil, fmt.Sprintf(
 			"Table %d missing image", n,
@@ -453,7 +453,7 @@ func (svc Services) replaceMetadata(
 		return ""
 	}
 
-	linkTag := xhtml.Find(cell, xhtml.WithAtom(atom.A))
+	linkTag := xhtml.Select(cell, xhtml.WithAtom(atom.A))
 	if href := xhtml.Attr(linkTag, "href"); href != "" {
 		path, err := svc.ReplaceAndUploadImageURL(ctx, href, metadata.LedeImageDescription, metadata.LedeImageCredit)
 		switch {
@@ -470,7 +470,7 @@ func (svc Services) replaceMetadata(
 		}
 	}
 
-	image := xhtml.Find(tbl, xhtml.WithAtom(atom.Img))
+	image := xhtml.Select(tbl, xhtml.WithAtom(atom.Img))
 	if image == nil {
 		return ""
 	}
@@ -501,7 +501,7 @@ func (svc Services) replaceMetadata(
 }
 
 func fixRichTextPlaceholders(richText *html.Node) {
-	embeds := xhtml.FindAll(richText, xhtml.WithAtom(atom.Data))
+	embeds := xhtml.SelectSlice(richText, xhtml.WithAtom(atom.Data))
 	for _, dataEl := range embeds {
 		embed := extractEmbed(dataEl)
 		if embed.Type == db.SpotlightRawEmbedTag {
@@ -521,7 +521,7 @@ func extractEmbed(n *html.Node) db.Embed {
 }
 
 func fixRawHTMLPlaceholders(rawHTML *html.Node) {
-	embeds := xhtml.FindAll(rawHTML, xhtml.WithAtom(atom.Data))
+	embeds := xhtml.SelectSlice(rawHTML, xhtml.WithAtom(atom.Data))
 	for _, dataEl := range embeds {
 		embed := extractEmbed(dataEl)
 		switch embed.Type {
@@ -541,7 +541,7 @@ func fixRawHTMLPlaceholders(rawHTML *html.Node) {
 }
 
 func fixMarkdownPlaceholders(rawHTML *html.Node) {
-	embeds := xhtml.FindAll(rawHTML, xhtml.WithAtom(atom.Data))
+	embeds := xhtml.SelectSlice(rawHTML, xhtml.WithAtom(atom.Data))
 	for _, dataEl := range embeds {
 		embed := extractEmbed(dataEl)
 		switch embed.Type {
@@ -650,17 +650,17 @@ func processToc(doc *html.Node, rows xhtml.TableNodes) string {
 		depth int
 	}
 	var headers []header
-	xhtml.VisitAll(doc, func(n *html.Node) {
+	for n := range xhtml.All(doc) {
 		switch n.DataAtom {
 		case atom.H1, atom.H2, atom.H3, atom.H4, atom.H5, atom.H6:
 		default:
-			return
+			continue
 		}
 		id := fmt.Sprintf("spl-heading-%d", len(headers)+1)
 		xhtml.SetAttr(n, "id", id)
 		depth := int(n.Data[1] - '0')
 		headers = append(headers, header{xhtml.InnerText(n), id, depth})
-	})
+	}
 	container := xhtml.New("div")
 	h3 := xhtml.New("h3")
 	xhtml.AppendText(h3, cmp.Or(

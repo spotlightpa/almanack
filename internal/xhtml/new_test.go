@@ -20,28 +20,28 @@ func TestClone(t *testing.T) {
 		n, err := html.Parse(strings.NewReader(tc))
 		be.NilErr(t, err)
 		body := n.FirstChild.FirstChild.NextSibling
-		be.Equal(t, xhtml.Find(n, xhtml.WithAtom(atom.Body)), body)
+		be.Equal(t, xhtml.Select(n, xhtml.WithAtom(atom.Body)), body)
 
 		s := xhtml.InnerHTML(body)
 		be.Equal(be.Relaxed(t), tc, s)
 
 		n2 := xhtml.Clone(n)
 		body2 := n2.FirstChild.FirstChild.NextSibling
-		be.Equal(t, xhtml.Find(n2, xhtml.WithAtom(atom.Body)), body2)
+		be.Equal(t, xhtml.Select(n2, xhtml.WithAtom(atom.Body)), body2)
 		be.Unequal(t, body, body2)
 
 		s = xhtml.InnerHTML(body2)
 		be.Equal(be.Relaxed(t), tc, s)
 
 		m := map[*html.Node]bool{}
-		xhtml.VisitAll(n, func(n *html.Node) {
-			m[n] = true
-		})
+		for c := range xhtml.All(n) {
+			m[c] = true
+		}
 
-		xhtml.VisitAll(n2, func(n *html.Node) {
-			if m[n] {
+		for c := range xhtml.All(n2) {
+			if m[c] {
 				t.Error("duplicate node:", n)
 			}
-		})
+		}
 	}
 }

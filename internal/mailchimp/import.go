@@ -29,13 +29,13 @@ func ImportPage(ctx context.Context, cl *http.Client, page string) (body string,
 }
 
 func PageContent(doc *html.Node) (body string, err error) {
-	bNode := xhtml.Find(doc, xhtml.WithBody)
+	bNode := xhtml.Select(doc, xhtml.WithBody)
 	if bNode == nil {
 		err = fmt.Errorf("could not find body element")
 		return
 	}
 
-	remove := xhtml.FindAll(bNode, func(n *html.Node) bool {
+	remove := xhtml.SelectSlice(bNode, func(n *html.Node) bool {
 		return n.Type == html.CommentNode ||
 			n.DataAtom == atom.Style ||
 			n.DataAtom == atom.Script ||

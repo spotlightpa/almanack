@@ -22,7 +22,7 @@ func TestInnerText(t *testing.T) {
 	} {
 		doc, err := html.Parse(strings.NewReader(tc.input))
 		be.NilErr(t, err)
-		p := xhtml.Find(doc, xhtml.WithAtom(atom.P))
+		p := xhtml.Select(doc, xhtml.WithAtom(atom.P))
 		got := xhtml.InnerText(p)
 		be.Equal(t, tc.want, got)
 	}
