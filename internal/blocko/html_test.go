@@ -22,6 +22,8 @@ func TestIsEmpty(t *testing.T) {
 		"text-blank": {"<span>\n</span> ", true},
 		"text":       {"x", false},
 		"span-text":  {"<span></span>x", false},
+		"nested":     {"<a><b>\n</b></a> ", true},
+		"nested-x":   {"<a><b>x</b></a> ", false},
 	}
 	for name, tc := range tcases {
 		t.Run(name, func(t *testing.T) {
