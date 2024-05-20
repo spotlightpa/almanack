@@ -8,7 +8,7 @@ import (
 	"golang.org/x/net/html"
 )
 
-// Children returns a seq of the children of n.
+// Children returns a seq of the immediate children of n.
 func Children(n *html.Node) iter.Seq[*html.Node] {
 	return func(yield func(*html.Node) bool) {
 		if n == nil {
