@@ -139,11 +139,8 @@ func (svc Services) ProcessGDocsDoc(ctx context.Context, dbDoc db.GDocsDoc) (err
 					"Embed #%d contains unusual characters.", n,
 				))
 			}
-			embeds = append(embeds, embed)
-			value := must.Get(json.Marshal(embed))
-			data := xhtml.New("data", "value", string(value))
-			xhtml.ReplaceWith(tbl, data)
-			n++
+			goto append
+
 		case "spl", "spl-embed":
 			embedHTML := xhtml.InnerText(rows.At(1, 0))
 			embed.Type = db.SpotlightRawEmbedOrTextTag
@@ -151,6 +148,7 @@ func (svc Services) ProcessGDocsDoc(ctx context.Context, dbDoc db.GDocsDoc) (err
 			value := must.Get(json.Marshal(embed))
 			data := xhtml.New("data", "value", string(value))
 			xhtml.ReplaceWith(tbl, data)
+
 		case "spl-text":
 			embed.Type = db.SpotlightRawEmbedOrTextTag
 			n := xhtml.Clone(rows.At(1, 0))
@@ -162,15 +160,13 @@ func (svc Services) ProcessGDocsDoc(ctx context.Context, dbDoc db.GDocsDoc) (err
 			value := must.Get(json.Marshal(embed))
 			data := xhtml.New("data", "value", string(value))
 			xhtml.ReplaceWith(tbl, data)
+
 		case "partner-embed":
 			embedHTML := xhtml.InnerText(rows.At(1, 0))
 			embed.Type = db.PartnerRawEmbedTag
 			embed.Value = embedHTML
-			embeds = append(embeds, embed)
-			value := must.Get(json.Marshal(embed))
-			data := xhtml.New("data", "value", string(value))
-			xhtml.ReplaceWith(tbl, data)
-			n++
+			goto append
+
 		case "partner-text":
 			embed.Type = db.PartnerTextTag
 			n := xhtml.Clone(rows.At(1, 0))
@@ -181,6 +177,7 @@ func (svc Services) ProcessGDocsDoc(ctx context.Context, dbDoc db.GDocsDoc) (err
 			value := must.Get(json.Marshal(embed))
 			data := xhtml.New("data", "value", string(value))
 			xhtml.ReplaceWith(tbl, data)
+
 		case "photo", "image", "photograph", "illustration", "illo":
 			embed.Type = db.ImageEmbedTag
 			if imageEmbed, warning := svc.replaceImageEmbed(
@@ -190,12 +187,9 @@ func (svc Services) ProcessGDocsDoc(ctx context.Context, dbDoc db.GDocsDoc) (err
 				warnings = append(warnings, warning)
 			} else {
 				embed.Value = *imageEmbed
-				embeds = append(embeds, embed)
-				value := must.Get(json.Marshal(embed))
-				data := xhtml.New("data", "value", string(value))
-				xhtml.ReplaceWith(tbl, data)
-				n++
+				goto append
 			}
+
 		case "metadata", "info":
 			if warning := svc.replaceMetadata(
 				ctx, tbl, rows, dbDoc.ExternalID, objID2Path, &metadata,
@@ -214,17 +208,21 @@ func (svc Services) ProcessGDocsDoc(ctx context.Context, dbDoc db.GDocsDoc) (err
 		case "toc", "table of contents":
 			embed.Type = db.ToCEmbedTag
 			embed.Value = processToc(docHTML, rows)
-			embeds = append(embeds, embed)
-			value := must.Get(json.Marshal(embed))
-			data := xhtml.New("data", "value", string(value))
-			xhtml.ReplaceWith(tbl, data)
-			n++
+			goto append
+
 		default:
 			warnings = append(warnings, fmt.Sprintf(
 				"Unrecognized table type: %q", label,
 			))
 			tbl.Parent.RemoveChild(tbl)
 		}
+		continue
+	append:
+		embeds = append(embeds, embed)
+		value := must.Get(json.Marshal(embed))
+		data := xhtml.New("data", "value", string(value))
+		xhtml.ReplaceWith(tbl, data)
+		n++
 	}
 
 	docHTML, err = blocko.Minify(xhtml.ToBuffer(docHTML))
