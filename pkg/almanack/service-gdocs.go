@@ -146,13 +146,13 @@ func (svc Services) ProcessGDocsDoc(ctx context.Context, dbDoc db.GDocsDoc) (err
 			n++
 		case "spl", "spl-embed":
 			embedHTML := xhtml.InnerText(rows.At(1, 0))
-			embed.Type = db.SpotlightRawEmbedTag
+			embed.Type = db.SpotlightRawEmbedOrTextTag
 			embed.Value = embedHTML
 			value := must.Get(json.Marshal(embed))
 			data := xhtml.New("data", "value", string(value))
 			xhtml.ReplaceWith(tbl, data)
 		case "spl-text":
-			embed.Type = db.SpotlightRawEmbedTag
+			embed.Type = db.SpotlightRawEmbedOrTextTag
 			n := xhtml.Clone(rows.At(1, 0))
 			blocko.MergeSiblings(n)
 			blocko.RemoveEmptyP(n)
@@ -539,7 +539,7 @@ func fixRichTextPlaceholders(richText *html.Node) {
 	for _, dataEl := range embeds {
 		embed := extractEmbed(dataEl)
 		switch embed.Type {
-		case db.SpotlightRawEmbedTag:
+		case db.SpotlightRawEmbedOrTextTag:
 			dataEl.Parent.RemoveChild(dataEl)
 			continue
 		case db.PartnerTextTag:
@@ -569,7 +569,7 @@ func fixRawHTMLPlaceholders(rawHTML *html.Node) {
 	for _, dataEl := range embeds {
 		embed := extractEmbed(dataEl)
 		switch embed.Type {
-		case db.SpotlightRawEmbedTag:
+		case db.SpotlightRawEmbedOrTextTag:
 			dataEl.Parent.RemoveChild(dataEl)
 		case db.RawEmbedTag, db.ToCEmbedTag, db.PartnerRawEmbedTag, db.PartnerTextTag:
 			xhtml.ReplaceWith(dataEl, &html.Node{
@@ -593,7 +593,7 @@ func fixMarkdownPlaceholders(rawHTML *html.Node) {
 		switch embed.Type {
 		case db.PartnerRawEmbedTag, db.PartnerTextTag:
 			dataEl.Parent.RemoveChild(dataEl)
-		case db.RawEmbedTag, db.SpotlightRawEmbedTag:
+		case db.RawEmbedTag, db.SpotlightRawEmbedOrTextTag:
 			xhtml.ReplaceWith(dataEl, &html.Node{
 				Type: html.RawNode,
 				Data: embed.Value.(string),
