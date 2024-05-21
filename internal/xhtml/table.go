@@ -14,8 +14,7 @@ func Tables(root *html.Node) iter.Seq2[*html.Node, TableNodes] {
 		tables := SelectSlice(root, WithAtom(atom.Table))
 		for _, tblNode := range tables {
 			var tbl TableNodes
-			rows := SelectSlice(tblNode, WithAtom(atom.Tr))
-			for _, row := range rows {
+			for row := range SelectAll(tblNode, WithAtom(atom.Tr)) {
 				tds := SelectSlice(row, func(n *html.Node) bool {
 					return n.DataAtom == atom.Td || n.DataAtom == atom.Th
 				})
