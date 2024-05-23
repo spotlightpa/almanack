@@ -10,6 +10,7 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+	"net/url"
 	"slices"
 	"strconv"
 	"strings"
@@ -21,6 +22,7 @@ import (
 	"github.com/spotlightpa/almanack/internal/blocko"
 	"github.com/spotlightpa/almanack/internal/db"
 	"github.com/spotlightpa/almanack/internal/gdocs"
+	"github.com/spotlightpa/almanack/internal/iterx"
 	"github.com/spotlightpa/almanack/internal/must"
 	"github.com/spotlightpa/almanack/internal/stringx"
 	"github.com/spotlightpa/almanack/internal/xhtml"
@@ -234,7 +236,7 @@ func (svc Services) ProcessGDocsDoc(ctx context.Context, dbDoc db.GDocsDoc) (err
 	blocko.RemoveMarks(docHTML)
 
 	// Warn about fake headings
-	for n := range xhtml.All(docHTML) {
+	for n := range xhtml.Children(docHTML) {
 		// <p> with only b/i/strong/em for a child
 		if n.DataAtom != atom.P {
 			continue
@@ -304,6 +306,46 @@ func removeTail(n *html.Node) {
 		xhtml.RemoveAll(remove)
 		return
 	}
+}
+
+func replaceSpotlightEmbeds(s string) string {
+	n, err := html.Parse(strings.NewReader(s))
+	if err != nil {
+		// l := almlog.FromContext(ctx)
+		// l.WarnContext(ctx, "invalid HTML in embed", "html", s)
+		return s
+	}
+	// data-spl-embed-version="1"
+	div := xhtml.Select(n, func(n *html.Node) bool {
+		return n.DataAtom == atom.Div && xhtml.Attr(n, "data-spl-embed-version") == "1"
+	})
+	if div == nil {
+		return s
+	}
+	netloc := xhtml.Attr(div, "data-spl-src")
+	u, err := url.Parse(netloc)
+	if err != nil {
+		// l := almlog.FromContext(ctx)
+		// l.WarnContext(ctx, "invalid URL in embed", "html", s, "url", netloc)
+		return s
+	}
+	tag := strings.Trim(u.Path, "/")
+	q := u.Query()
+	var buf strings.Builder
+	buf.WriteString("{{<")
+	buf.WriteString(tag)
+	for _, k := range iterx.Sorted(iterx.Keys(q)) {
+		vv := q[k]
+		for _, v := range vv {
+			buf.WriteString(" ")
+			buf.WriteString(k)
+			buf.WriteString("=\"")
+			buf.WriteString(html.EscapeString(v))
+			buf.WriteString("\"")
+		}
+	}
+	buf.WriteString(">}}\n")
+	return buf.String()
 }
 
 func (svc Services) replaceImageEmbed(
@@ -592,9 +634,10 @@ func fixMarkdownPlaceholders(rawHTML *html.Node) {
 		case db.PartnerRawEmbedTag, db.PartnerTextTag:
 			dataEl.Parent.RemoveChild(dataEl)
 		case db.RawEmbedTag, db.SpotlightRawEmbedOrTextTag:
+			data := replaceSpotlightEmbeds(embed.Value.(string))
 			xhtml.ReplaceWith(dataEl, &html.Node{
 				Type: html.RawNode,
-				Data: embed.Value.(string),
+				Data: data,
 			})
 		case db.ToCEmbedTag:
 			container := xhtml.New("div")
