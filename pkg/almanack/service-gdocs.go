@@ -236,7 +236,7 @@ func (svc Services) ProcessGDocsDoc(ctx context.Context, dbDoc db.GDocsDoc) (err
 	blocko.RemoveMarks(docHTML)
 
 	// Warn about fake headings
-	for n := range xhtml.Children(docHTML) {
+	for n := range xhtml.ChildNodes(docHTML) {
 		// <p> with only b/i/strong/em for a child
 		if n.DataAtom != atom.P {
 			continue
@@ -308,43 +308,52 @@ func removeTail(n *html.Node) {
 	}
 }
 
-func replaceSpotlightEmbeds(s string) string {
+func replaceSpotlightShortcodes(s string) string {
 	n, err := html.Parse(strings.NewReader(s))
 	if err != nil {
-		// l := almlog.FromContext(ctx)
-		// l.WarnContext(ctx, "invalid HTML in embed", "html", s)
 		return s
 	}
-	// data-spl-embed-version="1"
-	div := xhtml.Select(n, func(n *html.Node) bool {
+	// $("[data-spl-embed-version=1]")
+	divs := xhtml.SelectSlice(n, func(n *html.Node) bool {
 		return n.DataAtom == atom.Div && xhtml.Attr(n, "data-spl-embed-version") == "1"
 	})
-	if div == nil {
+	if len(divs) < 1 {
 		return s
 	}
-	netloc := xhtml.Attr(div, "data-spl-src")
-	u, err := url.Parse(netloc)
-	if err != nil {
-		// l := almlog.FromContext(ctx)
-		// l.WarnContext(ctx, "invalid URL in embed", "html", s, "url", netloc)
-		return s
-	}
-	tag := strings.Trim(u.Path, "/")
-	q := u.Query()
 	var buf strings.Builder
-	buf.WriteString("{{<")
-	buf.WriteString(tag)
-	for _, k := range iterx.Sorted(iterx.Keys(q)) {
-		vv := q[k]
-		for _, v := range vv {
-			buf.WriteString(" ")
-			buf.WriteString(k)
-			buf.WriteString("=\"")
-			buf.WriteString(html.EscapeString(v))
-			buf.WriteString("\"")
+	for i, div := range divs {
+		if i != 0 {
+			buf.WriteString("\n")
 		}
+		netloc := xhtml.Attr(div, "data-spl-src")
+		u, err := url.Parse(netloc)
+		if err != nil {
+			return s
+		}
+		tag := strings.Trim(u.Path, "/")
+		if !slices.Contains([]string{
+			"embeds/cta",
+			"embeds/donate",
+			"embeds/newsletter",
+			"embeds/tips",
+		}, tag) {
+			return s
+		}
+		q := u.Query()
+		buf.WriteString("{{<")
+		buf.WriteString(tag)
+		for _, k := range iterx.Sorted(iterx.Keys(q)) {
+			vv := q[k]
+			for _, v := range vv {
+				buf.WriteString(" ")
+				buf.WriteString(k)
+				buf.WriteString("=\"")
+				buf.WriteString(html.EscapeString(v))
+				buf.WriteString("\"")
+			}
+		}
+		buf.WriteString(">}}")
 	}
-	buf.WriteString(">}}\n")
 	return buf.String()
 }
 
@@ -634,7 +643,7 @@ func fixMarkdownPlaceholders(rawHTML *html.Node) {
 		case db.PartnerRawEmbedTag, db.PartnerTextTag:
 			dataEl.Parent.RemoveChild(dataEl)
 		case db.RawEmbedTag, db.SpotlightRawEmbedOrTextTag:
-			data := replaceSpotlightEmbeds(embed.Value.(string))
+			data := replaceSpotlightShortcodes(embed.Value.(string))
 			xhtml.ReplaceWith(dataEl, &html.Node{
 				Type: html.RawNode,
 				Data: data,
