@@ -1,11 +1,9 @@
 package almanack
 
 import (
-	"context"
 	"testing"
 
 	"github.com/carlmjohnson/be"
-	"github.com/spotlightpa/almanack/pkg/almlog"
 )
 
 func TestImageCAS(t *testing.T) {
@@ -32,28 +30,35 @@ func TestImageCAS(t *testing.T) {
 	}
 }
 
-func TestReplaceSpotlightEmbeds(t *testing.T) {
+func TestReplaceSpotlightShortcodes(t *testing.T) {
 	cases := []struct {
 		in, want string
 	}{
 		{"", ""},
 		{"Hello, World!", "Hello, World!"},
 		{
-			`<script src="https://www.spotlightpa.org/embed.js" async></script><div data-spl-embed-version="1" data-spl-src="https://www.spotlightpa.org/embeds/cta/"></div>`,
-			"",
+			`<div data-spl-embed-version="2" data-spl-src="https://www.spotlightpa.org/embeds/cta/"></div>`,
+			`<div data-spl-embed-version="2" data-spl-src="https://www.spotlightpa.org/embeds/cta/"></div>`,
 		},
-		{`
-		<script src="https://www.spotlightpa.org/embed.js" async></script>
-
-		<div data-spl-embed-version="1" data-spl-src="https://www.spotlightpa.org/embeds/cta/"></div>
-		`,
+		{
 			`
-		`},
+<script src="https://www.spotlightpa.org/embed.js" async></script>
+
+<div data-spl-embed-version="1" data-spl-src="https://www.spotlightpa.org/embeds/cta/"></div>`,
+			`{{<embeds/cta>}}`,
+		},
+		{
+			`
+<script src="https://www.spotlightpa.org/embed.js" async></script>
+<div data-spl-embed-version="1" data-spl-src="https://www.spotlightpa.org/embeds/cta/"></div>
+
+<script src="https://www.spotlightpa.org/embed.js" async></script><div data-spl-embed-version="1" data-spl-src="https://www.spotlightpa.org/embeds/donate/?teaser_text=a%20a&cta_text=b%20b&eyebrow_text=%22c%22"></div>`,
+			`{{<embeds/cta>}}
+{{<embeds/donate cta_text="b b" eyebrow_text="&#34;c&#34;" teaser_text="a a">}}`,
+		},
 	}
-	ctx := context.Background()
-	almlog.UseDevLogger()
 	for _, tc := range cases {
 		t := be.Relaxed(t)
-		be.Equal(t, tc.want, replaceSpotlightEmbeds(ctx, tc.in))
+		be.Equal(t, tc.want, replaceSpotlightShortcodes(tc.in))
 	}
 }

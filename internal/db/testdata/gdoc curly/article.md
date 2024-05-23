@@ -6,7 +6,7 @@ Then, the county realized some mail ballots <a href="https://www.observer-report
 
 And just days before the election, officials in Greene County <a href="https://www.observer-reporter.com/news/2023/oct/31/another-ballot-error-in-greene-county-jeopardizes-commissioners-race/">found yet another error.</a> Mail ballots said “vote for not more than three” candidates in the county commissioner race — potentially disenfranchising voters, since in reality, they were only supposed to choose two candidates.
 
-<script src="https://www.spotlightpa.org/embed.js" async></script><div data-spl-embed-version="1" data-spl-src="https://www.spotlightpa.org/embeds/newsletter/"></div>
+{{<embeds/newsletter>}}
 
 Greene County’s string of errors was the most for a single county this year, but it had plenty of company. On or before Election Day for the November municipal election, 12 counties reported 16 errors, more than double the number of errors from any other election since 2019.
 
@@ -92,7 +92,7 @@ Coulter, of the Open Source Election Technology Institute, said that jurisdictio
 
 Greene County <a href="https://www.observer-reporter.com/news/2023/oct/20/corrected-greene-county-ballots-sent-out/">canceled and reissued ballots</a> upon discovering the errors, as did <a href="https://pottercountypa.net/post/_docs/PotterCountyVoterNotice11072023.pdf">Potter County</a>. Lancaster County <a href="https://lancasteronline.com/news/politics/pa-elections-chief-urges-counties-to-send-replacement-ballots-to-fix-errors-lancaster-county-officials/article_9e90f59a-6eb4-11ee-9c35-c3abee01b9d6.html">resisted doing so</a> and settled on <a href="https://oneunitedlancaster.com/government/election-board-will-allow-mail-in-voters-who-goofed-due-to-instruction-error-to-receive-replacement-ballots/">allowing voters to come into the office</a> to have their ballot reissued.
 
-<script src="https://www.spotlightpa.org/embed.js" async></script><div data-spl-embed-version="1" data-spl-src="https://www.spotlightpa.org/embeds/donate/"></div>
+{{<embeds/donate>}}
 
 Greenburg said the best strategy from his election administrator days was to take the ballot from the last comparable election, which in this case would have been the 2019 municipal election, and begin building the ballot from that. He would advise new directors to start there.
 

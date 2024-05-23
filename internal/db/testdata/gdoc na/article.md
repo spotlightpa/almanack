@@ -20,7 +20,7 @@ USE REAL HEADINGS, NOT JUST BOLD TEXT:
 
 TO EMBED HTML
 
-<script src="https://www.spotlightpa.org/embed.js" async></script><div data-spl-embed-version="1" data-spl-src="https://www.spotlightpa.org/embeds/newsletter/"></div>
+{{<embeds/newsletter>}}
 
 TO ADD ADDITIONAL IMAGE
 
