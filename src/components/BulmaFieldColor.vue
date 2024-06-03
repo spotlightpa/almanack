@@ -60,7 +60,7 @@ export default {
       <BulmaPaste
         button-class="ml-2 button is-primary is-small has-text-weight-semibold"
         @paste="$emit('update:modelValue', $event)"
-      />
+      ></BulmaPaste>
     </div>
   </BulmaField>
 </template>

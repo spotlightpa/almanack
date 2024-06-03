@@ -54,17 +54,20 @@ export default {
         v-model="supportLink"
         label="Support box link"
         type="url"
-      />
-      <BulmaFieldInput v-model="supportHed" label="Support Us Box hed" />
+      ></BulmaFieldInput>
+      <BulmaFieldInput
+        v-model="supportHed"
+        label="Support Us Box hed"
+      ></BulmaFieldInput>
       <BulmaTextarea
         v-model="supportText"
         label="Support Us Box text"
         help="Supports bold and italics tags"
-      />
+      ></BulmaTextarea>
       <BulmaFieldInput
         v-model="supportCTA"
         label="Support Us Box call to action"
-      />
+      ></BulmaFieldInput>
       <p class="label">Some common colors</p>
       <p class="content">
         White is #ffffff. Black is #000000. Our blue is #009edb. Our light blue
@@ -72,20 +75,26 @@ export default {
         orange is #ff6c36. Our green is #78bc20. Our yellow is #ffcb05. Our
         goldenrod is #fff1bd. Our beige is #f4f1ee.
       </p>
-      <BulmaFieldColor v-model="supportHedColor" label="Support Hed Color" />
-      <BulmaFieldColor v-model="supportTextColor" label="Support Text Color" />
+      <BulmaFieldColor
+        v-model="supportHedColor"
+        label="Support Hed Color"
+      ></BulmaFieldColor>
+      <BulmaFieldColor
+        v-model="supportTextColor"
+        label="Support Text Color"
+      ></BulmaFieldColor>
       <BulmaFieldColor
         v-model="supportBgColor"
         label="Support Background Color"
-      />
+      ></BulmaFieldColor>
       <BulmaFieldColor
         v-model="supportButtonBgColor"
         label="Support Button Background Color"
-      />
+      ></BulmaFieldColor>
       <BulmaFieldColor
         v-model="supportButtonTextColor"
         label="Support Button Text Color"
-      />
+      ></BulmaFieldColor>
 
       <BulmaField label="Support Box Preview">
         <div class="support-wrapper">

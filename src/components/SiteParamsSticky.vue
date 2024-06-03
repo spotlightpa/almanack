@@ -32,12 +32,16 @@ export default {
       </div>
     </BulmaField>
     <template v-if="stickyActive">
-      <BulmaFieldInput v-model="stickyLink" label="Sticky link" type="url" />
+      <BulmaFieldInput
+        v-model="stickyLink"
+        label="Sticky link"
+        type="url"
+      ></BulmaFieldInput>
       <BulmaTextarea
         v-model="stickyImageDescription"
         label="Sticky image description"
         help="For blind readers and search engines"
-      />
+      ></BulmaTextarea>
       <BulmaField
         label="Sticky images"
         help="If multiple images are provided, each page load will select one randomly"
@@ -47,7 +51,7 @@ export default {
           :file-props="fileProps"
           @add="stickyImages.push($event)"
           @remove="stickyImages.splice($event, 1)"
-        />
+        ></SiteParamsFiles>
       </BulmaField>
     </template>
 

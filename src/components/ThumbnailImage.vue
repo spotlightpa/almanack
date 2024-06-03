@@ -29,7 +29,9 @@ defineProps({
           download
         >
           <span class="icon">
-            <font-awesome-icon :icon="['fas', 'file-download']" />
+            <font-awesome-icon
+              :icon="['fas', 'file-download']"
+            ></font-awesome-icon>
           </span>
           <span>Download image</span>
         </a>
@@ -38,19 +40,22 @@ defineProps({
         <p class="has-margin-bottom-thin">
           <strong>Description (“alt” text):</strong>
         </p>
-        <CopyWithButton :value="description" label="description" />
+        <CopyWithButton
+          :value="description"
+          label="description"
+        ></CopyWithButton>
       </template>
       <template v-if="credit">
         <p class="has-margin-bottom-thin">
           <strong>Credit:</strong>
         </p>
-        <CopyWithButton :value="credit" label="credit" />
+        <CopyWithButton :value="credit" label="credit"></CopyWithButton>
       </template>
       <template v-if="caption">
         <p class="has-margin-bottom-thin">
           <strong>Caption:</strong>
         </p>
-        <CopyWithButton :value="caption" label="caption" />
+        <CopyWithButton :value="caption" label="caption"></CopyWithButton>
       </template>
     </figcaption>
   </figure>

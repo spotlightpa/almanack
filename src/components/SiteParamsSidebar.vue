@@ -33,12 +33,12 @@ export default {
       v-model="sidebarTopLink"
       label="Sidebar top promo link"
       type="url"
-    />
+    ></BulmaFieldInput>
     <BulmaTextarea
       v-model="sidebarTopDescription"
       label="Sidebar top promo image description"
       help="For blind readers and search engines"
-    />
+    ></BulmaTextarea>
     <div class="is-flex mb-2">
       <BulmaField v-slot="{ idForLabel }" label="Image Width">
         <input
@@ -66,7 +66,7 @@ export default {
         :file-props="fileProps"
         @add="sidebarTopImages.push($event)"
         @remove="sidebarTopImages.splice($event, 1)"
-      />
+      ></SiteParamsFiles>
     </BulmaField>
   </details>
   <details class="mt-4">
@@ -75,12 +75,12 @@ export default {
       v-model="sidebarStickyLink"
       label="Sidebar sticky bottom promo link"
       type="url"
-    />
+    ></BulmaFieldInput>
     <BulmaTextarea
       v-model="sidebarStickyDescription"
       label="Sidebar sticky bottom promo image description"
       help="For blind readers and search engines"
-    />
+    ></BulmaTextarea>
     <div class="is-flex mb-2">
       <BulmaField v-slot="{ idForLabel }" label="Image Width">
         <input
@@ -108,7 +108,7 @@ export default {
         :file-props="fileProps"
         @add="sidebarStickyImages.push($event)"
         @remove="sidebarStickyImages.splice($event, 1)"
-      />
+      ></SiteParamsFiles>
     </BulmaField>
   </details>
 </template>

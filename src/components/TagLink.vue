@@ -14,9 +14,9 @@ defineProps({
     target="_blank"
   >
     <span v-if="icon" class="icon is-size-6">
-      <font-awesome-icon :icon="icon" />
+      <font-awesome-icon :icon="icon"></font-awesome-icon>
     </span>
-    <span><slot /></span>
+    <span><slot></slot></span>
   </a>
   <router-link
     v-else-if="to"
@@ -24,14 +24,14 @@ defineProps({
     :to="to"
   >
     <span v-if="icon" class="icon is-size-6">
-      <font-awesome-icon :icon="icon" />
+      <font-awesome-icon :icon="icon"></font-awesome-icon>
     </span>
-    <span><slot /></span>
+    <span><slot></slot></span>
   </router-link>
   <span v-else class="tag is-light has-text-weight-semibold">
     <span v-if="icon" class="icon is-size-6">
-      <font-awesome-icon :icon="icon" />
+      <font-awesome-icon :icon="icon"></font-awesome-icon>
     </span>
-    <span><slot /></span>
+    <span><slot></slot></span>
   </span>
 </template>

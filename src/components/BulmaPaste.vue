@@ -32,7 +32,7 @@ export default {
       :class="buttonClass"
       @click="pasteText"
     >
-      <font-awesome-icon :icon="['fas', 'paste']" />
+      <font-awesome-icon :icon="['fas', 'paste']"></font-awesome-icon>
       <span class="ml-1">Paste</span>
     </button>
   </div>

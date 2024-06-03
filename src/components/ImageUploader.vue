@@ -101,7 +101,7 @@ export default {
                     <font-awesome-icon
                       :icon="['fas', 'sync-alt']"
                       :spin="isUploading"
-                    />
+                    ></font-awesome-icon>
                   </span>
                   <span
                     v-if="isUploading"
@@ -127,8 +127,12 @@ export default {
         </div>
       </div>
     </div>
-    <ErrorSimple :error="error" />
-    <CopyWithButton v-if="filename" :value="filename" label="image path" />
+    <ErrorSimple :error="error"></ErrorSimple>
+    <CopyWithButton
+      v-if="filename"
+      :value="filename"
+      label="image path"
+    ></CopyWithButton>
     <picture v-if="imageURL && !isUploading" class="has-ratio">
       <img :src="imageURL" class="is-3x4" width="200" />
     </picture>

@@ -41,24 +41,28 @@ export default {
       </div>
     </BulmaField>
     <template v-if="topperActive">
-      <BulmaFieldInput v-model="topperLink" label="Topper link" type="url" />
+      <BulmaFieldInput
+        v-model="topperLink"
+        label="Topper link"
+        type="url"
+      ></BulmaFieldInput>
 
       <BulmaFieldColor
         v-model="topperBgColor"
         label="Topper Background Color"
-      />
+      ></BulmaFieldColor>
 
       <BulmaFieldColor
         v-model="topperDividerColor"
         label="Navbar Divider Color"
         help="If banner is turned off, this will separate the topper from the navbar. Our orange is #ff6c36. Our yellow is #ffcb05. Our dark blue is #009edb. Our light blue is #99d9f1."
-      />
+      ></BulmaFieldColor>
 
       <BulmaTextarea
         v-model="topperImageDescription"
         label="Topper image description"
         help="For blind readers and search engines"
-      />
+      ></BulmaTextarea>
       <div class="is-flex mb-2">
         <BulmaField v-slot="{ idForLabel }" label="Desktop Image Width">
           <input
@@ -90,7 +94,7 @@ export default {
           :file-props="fileProps"
           @add="topperDesktopImages.push($event)"
           @remove="topperDesktopImages.splice($event, 1)"
-        />
+        ></SiteParamsFiles>
       </BulmaField>
 
       <div class="is-flex mb-2">
@@ -125,7 +129,7 @@ export default {
           :file-props="fileProps"
           @add="topperMobileImages.push($event)"
           @remove="topperMobileImages.splice($event, 1)"
-        />
+        ></SiteParamsFiles>
       </BulmaField>
     </template>
   </details>

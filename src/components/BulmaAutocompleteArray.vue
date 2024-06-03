@@ -127,12 +127,12 @@ export default {
             }"
             class="tag is-small"
             v-text="v"
-          />
+          ></span>
           <a
             :class="{ 'is-link': dragoverIndex === i && dragoverFrom !== i }"
             class="tag is-delete"
             @click="remove(i)"
-          />
+          ></a>
         </div>
       </div>
     </div>
@@ -156,7 +156,7 @@ export default {
       "
     />
     <datalist v-show="hasFocus" :id="idForDatalist">
-      <option v-for="opt of options" :key="opt" :value="opt" />
+      <option v-for="opt of options" :key="opt" :value="opt"></option>
     </datalist>
   </BulmaField>
 </template>

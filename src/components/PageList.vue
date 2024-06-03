@@ -39,12 +39,12 @@ export default {
         { name: 'Admin', to: { name: 'admin' } },
         { name: title, to: {} },
       ]"
-    />
+    ></BulmaBreadcrumbs>
     <h1 class="title">
       {{ title }}
       <template v-if="page">(overflow page {{ page }})</template>
     </h1>
-    <PageLookup />
+    <PageLookup></PageLookup>
     <APILoader :is-loading="isLoading" :reload="reload" :error="error">
       <table class="table is-striped is-narrow is-fullwidth">
         <tbody>
@@ -59,7 +59,7 @@ export default {
             :dek="page.blurb"
             :image="page.image"
             :image-alt="page.image"
-          />
+          ></PageListRow>
         </tbody>
       </table>
 

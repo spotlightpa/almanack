@@ -11,8 +11,8 @@ export default {
 
 <template>
   <div>
-    <SpinnerProgress :is-loading="isLoading" />
-    <ErrorReloader :error="error" @reload="reload" />
+    <SpinnerProgress :is-loading="isLoading"></SpinnerProgress>
+    <ErrorReloader :error="error" @reload="reload"></ErrorReloader>
     <div v-if="!isLoading && !error">
       <slot></slot>
     </div>

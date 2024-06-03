@@ -46,9 +46,9 @@ function copyHTML() {
 
 <template>
   <h1 class="title has-text-grey">
-    <ArticleSlugLine :article="article" />
+    <ArticleSlugLine :article="article"></ArticleSlugLine>
   </h1>
-  <GDocsDocWarnings :article="article" />
+  <GDocsDocWarnings :article="article"></GDocsDocWarnings>
 
   <template v-if="article.budget">
     <h2 class="mb-2 title">Budget details</h2>
@@ -56,7 +56,7 @@ function copyHTML() {
       {{ article.budget }}
     </p>
   </template>
-  <ArticleWordCount :article="article" />
+  <ArticleWordCount :article="article"></ArticleWordCount>
 
   <h2 v-if="article.isUnderEmbargo" class="title" style="color: red">
     Embargoed until {{ formatDateTime(article.embargoUntil) }}
@@ -82,16 +82,16 @@ function copyHTML() {
   </template>
 
   <h2 class="title">Suggested Hed</h2>
-  <CopyWithButton :value="article.hed" label="hed" />
+  <CopyWithButton :value="article.hed" label="hed"></CopyWithButton>
 
   <template v-if="article.blurb">
     <h2 class="title">Suggested Description</h2>
-    <CopyWithButton :value="article.blurb" label="description" />
+    <CopyWithButton :value="article.blurb" label="description"></CopyWithButton>
   </template>
 
   <template v-if="article.byline">
     <h2 class="title">Byline</h2>
-    <CopyWithButton :value="article.byline" label="byline" />
+    <CopyWithButton :value="article.byline" label="byline"></CopyWithButton>
   </template>
 
   <template v-if="article.ledeImage">
@@ -102,7 +102,7 @@ function copyHTML() {
       :credit="article.ledeImageCredit"
       :description="article.ledeImageDescription"
       class="block"
-    />
+    ></ThumbnailS3>
   </template>
 
   <h2 v-if="article.gdocs.embeds.length === 1" class="title">Embed</h2>
@@ -120,7 +120,7 @@ function copyHTML() {
         :rows="4"
         size="is-small is-clipped"
         label="Code"
-      />
+      ></CopyWithButton>
     </div>
     <div v-else-if="e.type === 'toc'" class="block">
       <h2 class="subtitle is-4 has-text-weight-semibold">
@@ -141,10 +141,9 @@ function copyHTML() {
         :caption="e.value.caption"
         :credit="e.value.credit"
         :description="e.value.description"
-      />
+      ></ThumbnailS3>
     </div>
   </div>
-  <!-- Loop through embeds -->
 
   <div class="level">
     <div class="level-left">
@@ -156,7 +155,9 @@ function copyHTML() {
             @click="showRichText()"
           >
             <span class="icon">
-              <font-awesome-icon :icon="['far', 'file-word']" />
+              <font-awesome-icon
+                :icon="['far', 'file-word']"
+              ></font-awesome-icon>
             </span>
             <span> View Rich Text </span>
           </button>
@@ -166,7 +167,7 @@ function copyHTML() {
             @click="copyRichText()"
           >
             <span class="icon">
-              <font-awesome-icon :icon="['far', 'copy']" />
+              <font-awesome-icon :icon="['far', 'copy']"></font-awesome-icon>
             </span>
             <span> Copy Rich Text </span>
           </button>
@@ -180,7 +181,9 @@ function copyHTML() {
             @click="showHTML()"
           >
             <span class="icon">
-              <font-awesome-icon :icon="['far', 'file-code']" />
+              <font-awesome-icon
+                :icon="['far', 'file-code']"
+              ></font-awesome-icon>
             </span>
             <span> View HTML </span>
           </button>
@@ -190,7 +193,7 @@ function copyHTML() {
             @click="copyHTML()"
           >
             <span class="icon">
-              <font-awesome-icon :icon="['far', 'copy']" />
+              <font-awesome-icon :icon="['far', 'copy']"></font-awesome-icon>
             </span>
             <span> Copy HTML </span>
           </button>
@@ -200,7 +203,7 @@ function copyHTML() {
   </div>
 
   <CopyTextarea v-show="!isShowingHTML" ref="richTextArea" size="height-50vh">
-    <div class="content" v-html="article.gdocs.rich_text" />
+    <div class="content" v-html="article.gdocs.rich_text"></div>
   </CopyTextarea>
   <CopyTextarea
     v-show="isShowingHTML"

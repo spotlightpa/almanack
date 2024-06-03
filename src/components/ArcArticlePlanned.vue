@@ -17,7 +17,7 @@ export default {
 <template>
   <div>
     <h1 class="title has-text-grey">
-      <ArticleSlugLine :article="article" />
+      <ArticleSlugLine :article="article"></ArticleSlugLine>
     </h1>
     <h2 class="title">Planned time</h2>
     <p class="content has-margin-top-negative">
@@ -34,7 +34,7 @@ export default {
     <p class="content">
       {{ article.budgetLine }}
     </p>
-    <ArticleWordCount :article="article" />
+    <ArticleWordCount :article="article"></ArticleWordCount>
 
     <h2 class="title">Working Hed</h2>
     <NoCopyTextArea>{{ article.headline }}</NoCopyTextArea>

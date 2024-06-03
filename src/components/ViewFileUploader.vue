@@ -124,7 +124,7 @@ export default {
                     <font-awesome-icon
                       :icon="['fas', 'sync-alt']"
                       :spin="isUploading"
-                    />
+                    ></font-awesome-icon>
                   </span>
                   <span
                     v-if="isUploading"
@@ -150,7 +150,7 @@ export default {
         </div>
       </div>
     </div>
-    <ErrorSimple :error="uploadError" />
+    <ErrorSimple :error="uploadError"></ErrorSimple>
 
     <h2 class="title has-margin-top">Existing files</h2>
     <APILoader :is-loading="isLoading" :reload="fetch" :error="error">
@@ -164,7 +164,10 @@ export default {
                 target="_blank"
                 :title="`Download ${file.filename}`"
               >
-                <font-awesome-icon :icon="['fas', 'file-download']" size="2x" />
+                <font-awesome-icon
+                  :icon="['fas', 'file-download']"
+                  size="2x"
+                ></font-awesome-icon>
               </a>
             </td>
             <td>
@@ -190,7 +193,11 @@ export default {
                 {{ humanSize(file.bytes) }}
               </p>
               <p>
-                <CopyWithButton :value="file.url" label="URL" size="is-small" />
+                <CopyWithButton
+                  :value="file.url"
+                  label="URL"
+                  size="is-small"
+                ></CopyWithButton>
               </p>
             </td>
           </tr>

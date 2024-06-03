@@ -10,7 +10,7 @@ export default {
   <div>
     <p class="mt-1 label" v-text="label"></p>
     <nav class="mb-0 buttons">
-      <slot />
+      <slot></slot>
     </nav>
   </div>
 </template>

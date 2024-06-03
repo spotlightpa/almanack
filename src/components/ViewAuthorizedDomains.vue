@@ -106,19 +106,19 @@ export default {
   <div>
     <div>
       <h2 class="title">Preauthorized domains</h2>
-      <SpinnerProgress :is-loading="domain.isLoading.value" />
+      <SpinnerProgress :is-loading="domain.isLoading.value"></SpinnerProgress>
 
       <div class="field is-grouped is-grouped-multiline">
         <div v-for="d of domain.domains.value" :key="d" class="control">
           <div class="tags has-addons">
-            <span class="tag is-small" v-text="d" />
-            <a class="tag is-delete" @click="domain.removeDomain(d)" />
+            <span class="tag is-small" v-text="d"></span>
+            <a class="tag is-delete" @click="domain.removeDomain(d)"></a>
           </div>
         </div>
       </div>
 
       <div v-for="error of domain.errors.value" :key="error.name">
-        <ErrorReloader :error="error" @reload="domain.list()" />
+        <ErrorReloader :error="error" @reload="domain.list()"></ErrorReloader>
       </div>
 
       <form
@@ -144,7 +144,7 @@ export default {
     </div>
     <div class="mt-6">
       <h2 class="title">Preauthorized email adddresses</h2>
-      <SpinnerProgress :is-loading="address.isLoading.value" />
+      <SpinnerProgress :is-loading="address.isLoading.value"></SpinnerProgress>
 
       <div class="field is-grouped is-grouped-multiline">
         <div
@@ -153,14 +153,14 @@ export default {
           class="control"
         >
           <div class="tags has-addons">
-            <span class="tag is-small" v-text="email" />
-            <a class="tag is-delete" @click="address.removeAddress(email)" />
+            <span class="tag is-small" v-text="email"></span>
+            <a class="tag is-delete" @click="address.removeAddress(email)"></a>
           </div>
         </div>
       </div>
 
       <div v-for="error of address.errors.value" :key="error.name">
-        <ErrorReloader :error="error" @reload="address.list()" />
+        <ErrorReloader :error="error" @reload="address.list()"></ErrorReloader>
       </div>
 
       <form

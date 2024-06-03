@@ -51,12 +51,12 @@ export default {
       >
         Add
       </button>
-      <BulmaPaste @paste="$emit('add', $event)" />
+      <BulmaPaste @paste="$emit('add', $event)"></BulmaPaste>
     </div>
     <PickerFiles
       :files="fileProps.files.value"
       @select-file="$emit('add', $event.url)"
-    />
+    ></PickerFiles>
   </div>
 </template>
 

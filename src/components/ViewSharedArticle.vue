@@ -29,10 +29,13 @@ const article = computedObj((data) => new SharedArticle(data));
       </MetaHead>
 
       <template v-if="article.isArc">
-        <ArcArticleAvailable v-if="!article.isPreview" :article="article" />
-        <ArcArticlePlanned v-else :article="article" />
+        <ArcArticleAvailable
+          v-if="!article.isPreview"
+          :article="article"
+        ></ArcArticleAvailable>
+        <ArcArticlePlanned v-else :article="article"></ArcArticlePlanned>
       </template>
-      <GDocsDoc v-else :article="article" />
+      <GDocsDoc v-else :article="article"></GDocsDoc>
     </template>
   </APILoader>
 </template>

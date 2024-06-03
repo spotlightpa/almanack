@@ -66,10 +66,10 @@ export default {
 <template>
   <div class="box">
     <div class="field">
-      <BulmaFieldInput v-model="subject" label="Subject" />
-      <BulmaTextarea v-model="body" label="Body" :rows="rows" />
+      <BulmaFieldInput v-model="subject" label="Subject"></BulmaFieldInput>
+      <BulmaTextarea v-model="body" label="Body" :rows="rows"></BulmaTextarea>
     </div>
-    <ErrorSimple :error="error" />
+    <ErrorSimple :error="error"></ErrorSimple>
     <div class="buttons">
       <button
         class="button has-text-weight-semibold is-primary"
@@ -77,7 +77,7 @@ export default {
         @click="send"
       >
         <span class="icon">
-          <font-awesome-icon :icon="['fas', 'paper-plane']" />
+          <font-awesome-icon :icon="['fas', 'paper-plane']"></font-awesome-icon>
         </span>
         <span> Send Message </span>
       </button>
@@ -87,7 +87,7 @@ export default {
         @click="discard"
       >
         <span class="icon">
-          <font-awesome-icon :icon="['fas', 'trash-alt']" />
+          <font-awesome-icon :icon="['fas', 'trash-alt']"></font-awesome-icon>
         </span>
         <span> Discard Changes </span>
       </button>

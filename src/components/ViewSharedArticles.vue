@@ -48,14 +48,17 @@ const nextPage = computedProp("next_page", (page) => ({
       <a href="/ssr/mailchimp-signup-url">resubscribe here</a>.
     </p>
 
-    <SpinnerProgress :is-loading="apiState.isLoading.value" />
-    <ErrorReloader :error="apiState.error.value" @reload="fetch" />
+    <SpinnerProgress :is-loading="apiState.isLoading.value"></SpinnerProgress>
+    <ErrorReloader
+      :error="apiState.error.value"
+      @reload="fetch"
+    ></ErrorReloader>
 
     <ArticleList
       v-if="articles.length"
       :articles="articles"
       title="Spotlight PA Articles"
-    />
+    ></ArticleList>
 
     <div class="buttons mt-5">
       <router-link

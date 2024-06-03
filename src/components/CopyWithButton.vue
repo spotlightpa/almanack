@@ -42,7 +42,7 @@ export default {
           @click="$refs.copier.copy()"
         >
           <span class="icon">
-            <font-awesome-icon :icon="['far', 'copy']" />
+            <font-awesome-icon :icon="['far', 'copy']"></font-awesome-icon>
           </span>
           <span> Copy {{ label }} </span>
         </button>

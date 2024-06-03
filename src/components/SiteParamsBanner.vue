@@ -38,15 +38,22 @@ export default {
         v-model="bannerText"
         label="Banner Text"
         help="Supports bold and italics tags"
-      />
+      ></BulmaTextarea>
 
-      <BulmaFieldInput v-model="bannerLink" label="Banner link" type="url" />
-      <BulmaFieldColor v-model="bannerTextColor" label="Banner Text Color" />
+      <BulmaFieldInput
+        v-model="bannerLink"
+        label="Banner link"
+        type="url"
+      ></BulmaFieldInput>
+      <BulmaFieldColor
+        v-model="bannerTextColor"
+        label="Banner Text Color"
+      ></BulmaFieldColor>
       <BulmaFieldColor
         v-model="bannerBgColor"
         label="Banner Background Color"
         help="Our orange is #ff6c36. Our yellow is #ffcb05. Our dark blue is #009edb. Our light blue is #99d9f1."
-      />
+      ></BulmaFieldColor>
       <BulmaField label="Banner Preview">
         <div
           class="has-radius-padding"

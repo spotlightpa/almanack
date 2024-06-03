@@ -158,7 +158,7 @@ export default {
         { name: 'Admin', to: { name: 'admin' } },
         { name: 'Election Features', to: { name: 'election-features' } },
       ]"
-    />
+    ></BulmaBreadcrumbs>
 
     <h1 class="title">Election Features</h1>
 
@@ -182,13 +182,18 @@ export default {
               :length="sidebar.items.length"
               @swap="sidebar.swap($event)"
               @remove="sidebar.remove($event)"
-            />
+            ></ElectionFeaturesItem>
           </div>
           <div class="column is-full">
             <h2 class="mb-1 title is-size-3">Add new item</h2>
-            <PageFinder @select-page="sidebar.add($event)" />
-            <SpinnerProgress :is-loading="pagesState.isLoading" />
-            <ErrorReloader :error="pagesState.error" @reload="reloadPages" />
+            <PageFinder @select-page="sidebar.add($event)"></PageFinder>
+            <SpinnerProgress
+              :is-loading="pagesState.isLoading"
+            ></SpinnerProgress>
+            <ErrorReloader
+              :error="pagesState.error"
+              @reload="reloadPages"
+            ></ErrorReloader>
           </div>
         </div>
         <button
@@ -216,7 +221,7 @@ export default {
             @click="addScheduledPicks"
           >
             <span class="icon is-size-6">
-              <font-awesome-icon :icon="['fas', 'plus']" />
+              <font-awesome-icon :icon="['fas', 'plus']"></font-awesome-icon>
             </span>
             <span>Add</span>
           </button>
@@ -259,8 +264,11 @@ export default {
       </button>
     </div>
 
-    <SpinnerProgress :is-loading="sidebarState.isLoading" />
-    <ErrorReloader :error="sidebarState.error" @reload="reloadSidebars" />
+    <SpinnerProgress :is-loading="sidebarState.isLoading"></SpinnerProgress>
+    <ErrorReloader
+      :error="sidebarState.error"
+      @reload="reloadSidebars"
+    ></ErrorReloader>
   </div>
 </template>
 

@@ -73,12 +73,12 @@ const nextPage = computedProp("next_page", (page) => ({
         label="External Editor View"
         to="shared-articles"
         :icon="['fas', 'file-invoice']"
-      />
+      ></LinkRoute>
       <LinkRoute
         label="Preauthorization"
         to="domains"
         :icon="['fas', 'user-circle']"
-      />
+      ></LinkRoute>
     </LinkButtons>
 
     <LinkButtons label="Spotlight PA promotions">
@@ -86,17 +86,17 @@ const nextPage = computedProp("next_page", (page) => ({
         label="Homepage Editor"
         to="homepage-editor"
         :icon="['fas', 'newspaper']"
-      />
+      ></LinkRoute>
       <LinkRoute
         label="Sidebar Items"
         to="sidebar-items"
         :icon="['fas', 'check-circle']"
-      />
+      ></LinkRoute>
       <LinkRoute
         label="Sitewide Settings"
         to="site-params"
         :icon="['fas', 'sliders-h']"
-      />
+      ></LinkRoute>
     </LinkButtons>
 
     <LinkButtons label="Spotlight PA pages">
@@ -104,22 +104,22 @@ const nextPage = computedProp("next_page", (page) => ({
         label="Spotlight PA Articles"
         to="news-pages"
         :icon="['fas', 'file-signature']"
-      />
+      ></LinkRoute>
       <LinkRoute
         label="Newsletter pages"
         to="newsletters"
         :icon="['fas', 'mail-bulk']"
-      />
+      ></LinkRoute>
       <LinkRoute
         label="Election Features"
         to="election-features"
         :icon="['fas', 'check-circle']"
-      />
+      ></LinkRoute>
       <LinkRoute
         label="Donor Walls"
         to="donor-wall"
         :icon="['fas', 'receipt']"
-      />
+      ></LinkRoute>
     </LinkButtons>
 
     <LinkButtons label="Uploads">
@@ -127,24 +127,24 @@ const nextPage = computedProp("next_page", (page) => ({
         label="Photo manager"
         to="image-uploader"
         :icon="['fa', 'file-image']"
-      />
+      ></LinkRoute>
       <LinkRoute
         label="File manager"
         to="file-uploader"
         :icon="['fa', 'file-upload']"
-      />
+      ></LinkRoute>
     </LinkButtons>
     <LinkButtons label="State College">
       <LinkRoute
         label="Articles"
         to="statecollege-pages"
         :icon="['fas', 'file-signature']"
-      />
+      ></LinkRoute>
       <LinkRoute
         label="Frontpage Editor"
         to="state-college-editor"
         :icon="['fas', 'newspaper']"
-      />
+      ></LinkRoute>
     </LinkButtons>
 
     <LinkButtons label="Tools">
@@ -154,15 +154,20 @@ const nextPage = computedProp("next_page", (page) => ({
         @click="showComposer = !showComposer"
       >
         <span class="icon">
-          <font-awesome-icon :icon="['fas', 'paper-plane']" />
+          <font-awesome-icon :icon="['fas', 'paper-plane']"></font-awesome-icon>
         </span>
-        <span v-text="!showComposer ? 'Compose Message' : 'Hide Message'" />
+        <span
+          v-text="!showComposer ? 'Compose Message' : 'Hide Message'"
+        ></span>
       </button>
-      <LinkHref label="Embeds" href="https://www.spotlightpa.org/embeds/" />
+      <LinkHref
+        label="Embeds"
+        href="https://www.spotlightpa.org/embeds/"
+      ></LinkHref>
       <LinkHref
         label="Legacy admin"
         href="https://www.spotlightpa.org/admin/"
-      />
+      ></LinkHref>
       <button
         type="button"
         class="button is-light is-small has-text-weight-semibold"
@@ -206,10 +211,14 @@ const nextPage = computedProp("next_page", (page) => ({
         initial-subject="Subject"
         initial-body="Email body"
         @hide="showComposer = false"
-      />
+      ></EmailComposer>
     </keep-alive>
 
-    <ErrorReloader class="mt-5" :error="apiState.error.value" @reload="fetch" />
+    <ErrorReloader
+      class="mt-5"
+      :error="apiState.error.value"
+      @reload="fetch"
+    ></ErrorReloader>
 
     <h2 class="mt-5 title">Import Articles</h2>
     <LinkButtons>
@@ -217,7 +226,7 @@ const nextPage = computedProp("next_page", (page) => ({
         label="Import from Arc"
         to="arc-import"
         :icon="['fas', 'pen-nib']"
-      />
+      ></LinkRoute>
     </LinkButtons>
 
     <label for="gdocs-importer" class="mt-4 label">
@@ -241,7 +250,7 @@ const nextPage = computedProp("next_page", (page) => ({
             gdocsImportURL = $event;
             importGDocsURL(gdocsImportURL);
           "
-        />
+        ></BulmaPaste>
       </div>
       <div class="control">
         <button
@@ -257,7 +266,7 @@ const nextPage = computedProp("next_page", (page) => ({
       <p class="help">Document must be shared with Spotlight PA.</p>
     </div>
     <div v-if="gdocsState.error.value" class="field">
-      <ErrorSimple :error="gdocsState.error.value" />
+      <ErrorSimple :error="gdocsState.error.value"></ErrorSimple>
     </div>
 
     <h2 class="mt-5 title">Shareable Articles</h2>
@@ -270,13 +279,15 @@ const nextPage = computedProp("next_page", (page) => ({
               <td>
                 <h3 class="mt-1 mb-1 title is-3">
                   <router-link class="mr-2 middle" :to="article.adminRoute">
-                    <font-awesome-icon :icon="['far', 'newspaper']" />
+                    <font-awesome-icon
+                      :icon="['far', 'newspaper']"
+                    ></font-awesome-icon>
                     {{ article.internalID }}
                   </router-link>
                   <TagDate
                     v-if="article.publicationDate"
                     :date="article.publicationDate"
-                  />
+                  ></TagDate>
                 </h3>
                 <div class="mb-1 tags">
                   <span
@@ -290,7 +301,7 @@ const nextPage = computedProp("next_page", (page) => ({
                             ? ['fas', 'check-circle']
                             : ['fas', 'pen-nib']
                         "
-                      />
+                      ></font-awesome-icon>
                     </span>
                     <span v-text="article.statusVerbose"></span>
                   </span>
@@ -342,6 +353,8 @@ const nextPage = computedProp("next_page", (page) => ({
       </router-link>
     </div>
 
-    <SpinnerProgress :is-loading="apiState.isLoadingThrottled.value" />
+    <SpinnerProgress
+      :is-loading="apiState.isLoadingThrottled.value"
+    ></SpinnerProgress>
   </div>
 </template>

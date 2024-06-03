@@ -225,22 +225,25 @@ function setImageProps(image) {
           to: { name: 'shared-article-admin', params: { id } },
         },
       ]"
-    />
+    ></BulmaBreadcrumbs>
 
-    <SpinnerProgress :is-loading="apiState.isLoading.value" />
-    <ErrorReloader :error="apiState.error.value" @reload="fetch" />
+    <SpinnerProgress :is-loading="apiState.isLoading.value"></SpinnerProgress>
+    <ErrorReloader
+      :error="apiState.error.value"
+      @reload="fetch"
+    ></ErrorReloader>
 
     <article v-if="article">
       <MetaHead>
         <title>{{ article.internalID }} Admin • Spotlight PA</title>
       </MetaHead>
 
-      <GDocsDocWarnings :article="article" />
+      <GDocsDocWarnings :article="article"></GDocsDocWarnings>
 
       <div class="message is-primary">
         <div class="message-header">
           <p>
-            <font-awesome-icon :icon="['far', 'newspaper']" />
+            <font-awesome-icon :icon="['far', 'newspaper']"></font-awesome-icon>
             {{ article.internalID }}
           </p>
           <span class="tags">
@@ -280,7 +283,7 @@ function setImageProps(image) {
                 isDirty = true;
                 internalID = $event;
               "
-            />
+            ></BulmaFieldInput>
 
             <BulmaDateTime
               :model-value="publicationDate"
@@ -314,7 +317,7 @@ function setImageProps(image) {
                 isDirty = true;
                 budget = $event;
               "
-            />
+            ></BulmaTextarea>
 
             <BulmaFieldInput
               label="Suggested hed"
@@ -324,7 +327,7 @@ function setImageProps(image) {
                 isDirty = true;
                 hed = $event;
               "
-            />
+            ></BulmaFieldInput>
             <template v-if="article.isGDoc">
               <BulmaTextarea
                 label="SEO description"
@@ -334,7 +337,7 @@ function setImageProps(image) {
                   isDirty = true;
                   description = $event;
                 "
-              />
+              ></BulmaTextarea>
               <BulmaTextarea
                 label="Suggested blurb"
                 :model-value="blurb"
@@ -343,7 +346,7 @@ function setImageProps(image) {
                   isDirty = true;
                   blurb = $event;
                 "
-              />
+              ></BulmaTextarea>
             </template>
             <BulmaFieldInput
               v-else
@@ -354,7 +357,7 @@ function setImageProps(image) {
                 isDirty = true;
                 description = $event;
               "
-            />
+            ></BulmaFieldInput>
             <BulmaFieldInput
               label="Byline"
               :model-value="byline"
@@ -363,7 +366,7 @@ function setImageProps(image) {
                 isDirty = true;
                 byline = $event;
               "
-            />
+            ></BulmaFieldInput>
 
             <BulmaField label="Lede Image" v-slot="{ idForLabel }">
               <div class="is-flex">
@@ -381,14 +384,14 @@ function setImageProps(image) {
                     isDirty = true;
                     ledeImage = $event;
                   "
-                />
+                ></BulmaPaste>
               </div>
             </BulmaField>
 
             <PickerImages
               :images="images"
               @select-image="setImageProps($event)"
-            />
+            ></PickerImages>
 
             <BulmaTextarea
               :model-value="ledeImageDescription"
@@ -398,7 +401,7 @@ function setImageProps(image) {
                 isDirty = true;
                 ledeImageDescription = $event;
               "
-            />
+            ></BulmaTextarea>
 
             <BulmaFieldInput
               :model-value="ledeImageCredit"
@@ -407,7 +410,7 @@ function setImageProps(image) {
                 isDirty = true;
                 ledeImageCredit = $event;
               "
-            />
+            ></BulmaFieldInput>
 
             <BulmaTextarea
               :model-value="ledeImageCaption"
@@ -417,7 +420,7 @@ function setImageProps(image) {
                 isDirty = true;
                 ledeImageCaption = $event;
               "
-            />
+            ></BulmaTextarea>
           </template>
 
           <p v-if="article.isArc" class="label">Budget</p>
@@ -458,7 +461,7 @@ function setImageProps(image) {
                 embargo = $event;
                 isDirty = true;
               "
-            />
+            ></BulmaDateTime>
             <a
               @click="
                 embargo = tomorrow();
@@ -477,7 +480,7 @@ function setImageProps(image) {
               isDirty = true;
               note = $event;
             "
-          />
+          ></BulmaTextarea>
 
           <button
             v-if="article.isArc"
@@ -488,7 +491,10 @@ function setImageProps(image) {
           >
             Refresh from Arc
           </button>
-          <ErrorSimple :error="saveError || arcError" class="mt-1" />
+          <ErrorSimple
+            :error="saveError || arcError"
+            class="mt-1"
+          ></ErrorSimple>
           <div v-if="article.isGDoc" class="buttons">
             <button
               class="button is-warning has-text-weight-semibold"
@@ -509,9 +515,12 @@ function setImageProps(image) {
               Refresh content and metadata
             </button>
           </div>
-          <ErrorSimple :error="saveError || gdocsError" class="mt-1" />
+          <ErrorSimple
+            :error="saveError || gdocsError"
+            class="mt-1"
+          ></ErrorSimple>
 
-          <GDocsDocWarnings class="mt-5" :article="article" />
+          <GDocsDocWarnings class="mt-5" :article="article"></GDocsDocWarnings>
 
           <div class="mt-5 buttons">
             <button
@@ -565,12 +574,14 @@ function setImageProps(image) {
               class="button is-primary has-text-weight-semibold"
             >
               <span class="icon">
-                <font-awesome-icon :icon="['fas', 'user-clock']" />
+                <font-awesome-icon
+                  :icon="['fas', 'user-clock']"
+                ></font-awesome-icon>
               </span>
               <span>Spotlight PA Page Admin</span>
             </router-link>
           </div>
-          <ErrorSimple :error="pageError" />
+          <ErrorSimple :error="pageError"></ErrorSimple>
 
           <button
             type="button"
@@ -579,11 +590,13 @@ function setImageProps(image) {
             @click="toggleComposer()"
           >
             <span class="icon">
-              <font-awesome-icon :icon="['fas', 'paper-plane']" />
+              <font-awesome-icon
+                :icon="['fas', 'paper-plane']"
+              ></font-awesome-icon>
             </span>
             <span
               v-text="!showComposer ? 'Compose Message' : 'Discard Message'"
-            />
+            ></span>
           </button>
 
           <EmailComposer
@@ -593,7 +606,7 @@ function setImageProps(image) {
             :initial-subject="`New Spotlight PA story ${article.internalID}`"
             :initial-body="emailBody"
             @hide="showComposer = false"
-          />
+          ></EmailComposer>
 
           <div
             v-if="showComposer && article._status !== 'S'"
@@ -612,7 +625,7 @@ function setImageProps(image) {
           <h1 class="title">{{ hed }}</h1>
           <h2 class="subtitle is-3">{{ blurb }}</h2>
           <h2 v-if="byline" class="subtitle is-5">By {{ byline }}</h2>
-          <div class="content" v-html="article.gdocs.rich_text" />
+          <div class="content" v-html="article.gdocs.rich_text"></div>
         </div>
       </div>
     </article>

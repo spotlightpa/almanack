@@ -28,12 +28,16 @@ defineExpose({ saveData });
       </div>
     </BulmaField>
     <template v-if="d.active.value">
-      <BulmaFieldInput v-model="d.link.value" label="Ad link URL" type="url" />
+      <BulmaFieldInput
+        v-model="d.link.value"
+        label="Ad link URL"
+        type="url"
+      ></BulmaFieldInput>
       <BulmaTextarea
         v-model="d.imageDescription.value"
         label="Image description (alt text)"
         help="For blind readers and search engines"
-      />
+      ></BulmaTextarea>
       <BulmaField
         label="Images"
         help="If multiple images are provided, each page load will select one randomly"
@@ -43,7 +47,7 @@ defineExpose({ saveData });
           :file-props="fileProps"
           @add="d.images.value.push($event)"
           @remove="d.images.value.splice($event, 1)"
-        />
+        ></SiteParamsFiles>
       </BulmaField>
     </template>
   </details>

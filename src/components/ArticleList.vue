@@ -16,7 +16,7 @@ export default {
     <article v-for="article of articles" :key="article.id" class="panel-block">
       <div class="control">
         <h2 class="title is-spaced is-3">
-          <ArticleSlugLine :article="article" />
+          <ArticleSlugLine :article="article"></ArticleSlugLine>
         </h2>
 
         <p class="has-margin-top-negative">
@@ -31,7 +31,7 @@ export default {
           {{ article.budget }}
         </p>
 
-        <ArticleWordCount :article="article" />
+        <ArticleWordCount :article="article"></ArticleWordCount>
       </div>
     </article>
   </nav>
