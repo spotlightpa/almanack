@@ -16,7 +16,7 @@ export default {
       Source:
       <a :href="block.raw_oembed.url" target="_blank">
         <span class="is-size-6">
-          <font-awesome-icon :icon="['fas', 'link']" />
+          <font-awesome-icon :icon="['fas', 'link']"></font-awesome-icon>
         </span>
         {{ block.raw_oembed.url }}</a
       >
@@ -26,6 +26,6 @@ export default {
       :rows="4"
       size="is-small"
       label="Code"
-    />
+    ></CopyWithButton>
   </figure>
 </template>

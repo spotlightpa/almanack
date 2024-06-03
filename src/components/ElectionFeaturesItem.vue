@@ -73,7 +73,7 @@ const page = computedObj((obj) => new Page(obj));
         @click="$emit('swap', { pos, dir: -1 })"
       >
         <span class="icon">
-          <font-awesome-icon :icon="['fas', 'arrow-up']" />
+          <font-awesome-icon :icon="['fas', 'arrow-up']"></font-awesome-icon>
         </span>
         <span>Move up</span>
       </button>
@@ -84,7 +84,7 @@ const page = computedObj((obj) => new Page(obj));
         @click="$emit('swap', { pos, dir: 1 })"
       >
         <span class="icon">
-          <font-awesome-icon :icon="['fas', 'arrow-down']" />
+          <font-awesome-icon :icon="['fas', 'arrow-down']"></font-awesome-icon>
         </span>
         <span>Move down</span>
       </button>
@@ -94,7 +94,7 @@ const page = computedObj((obj) => new Page(obj));
         @click="$emit('remove', pos)"
       >
         <span class="icon">
-          <font-awesome-icon :icon="['fas', 'trash-alt']" />
+          <font-awesome-icon :icon="['fas', 'trash-alt']"></font-awesome-icon>
         </span>
         <span>Remove</span>
       </button>

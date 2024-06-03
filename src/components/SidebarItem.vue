@@ -34,20 +34,23 @@ const data = useData(() => props.item, {
     <details open>
       <summary>Settings</summary>
 
-      <BulmaFieldInput v-model="data.label.value" label="Label for item" />
+      <BulmaFieldInput
+        v-model="data.label.value"
+        label="Label for item"
+      ></BulmaFieldInput>
       <BulmaFieldColor
         v-model="data.bgColor.value"
         label="Item Background Color"
-      />
+      ></BulmaFieldColor>
       <BulmaFieldColor
         v-model="data.labelColor.value"
         label="Item Label Color"
-      />
+      ></BulmaFieldColor>
       <BulmaFieldColor
         v-model="data.linkColor.value"
         label="Item Link Color"
         help="Our orange is #ff6c36. Our yellow is #ffcb05. Our dark blue is #009edb. Our light blue is #99d9f1."
-      />
+      ></BulmaFieldColor>
     </details>
     <details open>
       <summary>Preview</summary>
@@ -120,7 +123,7 @@ const data = useData(() => props.item, {
         @click="$emit('swap', { pos, dir: -1 })"
       >
         <span class="icon">
-          <font-awesome-icon :icon="['fas', 'arrow-up']" />
+          <font-awesome-icon :icon="['fas', 'arrow-up']"></font-awesome-icon>
         </span>
         <span>Move up</span>
       </button>
@@ -131,7 +134,7 @@ const data = useData(() => props.item, {
         @click="$emit('swap', { pos, dir: 1 })"
       >
         <span class="icon">
-          <font-awesome-icon :icon="['fas', 'arrow-down']" />
+          <font-awesome-icon :icon="['fas', 'arrow-down']"></font-awesome-icon>
         </span>
         <span>Move down</span>
       </button>
@@ -141,7 +144,7 @@ const data = useData(() => props.item, {
         @click="$emit('remove', pos)"
       >
         <span class="icon">
-          <font-awesome-icon :icon="['fas', 'trash-alt']" />
+          <font-awesome-icon :icon="['fas', 'trash-alt']"></font-awesome-icon>
         </span>
         <span>Remove</span>
       </button>

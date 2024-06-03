@@ -15,7 +15,7 @@ const open = computed({
     <div v-if="open" class="modal is-active">
       <div class="modal-background" @click="open = false"></div>
       <div class="modal-content" tabindex="-1" @keyup.esc="open = false">
-        <slot />
+        <slot></slot>
       </div>
       <button
         class="modal-close is-large"

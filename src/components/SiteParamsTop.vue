@@ -38,7 +38,11 @@ export default {
       </div>
     </BulmaField>
     <template v-if="promoActive">
-      <BulmaFieldInput v-model="promoLink" label="Top promo link" type="url" />
+      <BulmaFieldInput
+        v-model="promoLink"
+        label="Top promo link"
+        type="url"
+      ></BulmaFieldInput>
       <BulmaField v-slot="{ idForLabel }" label="Top promo kind">
         <div class="select is-fullwidth">
           <select :id="idForLabel" v-model="promoType" class="select">
@@ -53,14 +57,14 @@ export default {
         v-model="promoText"
         label="Top promo text"
         help="Text will appear between navbar and page content"
-      />
+      ></BulmaTextarea>
 
       <template v-if="promoType === 'image'">
         <BulmaTextarea
           v-model="promoImageDescription"
           label="Top promo image description"
           help="For blind readers and search engines"
-        />
+        ></BulmaTextarea>
         <div class="is-flex mb-2">
           <BulmaField v-slot="{ idForLabel }" label="Desktop Image Width">
             <input
@@ -92,7 +96,7 @@ export default {
             :file-props="fileProps"
             @add="promoDesktopImages.push($event)"
             @remove="promoDesktopImages.splice($event, 1)"
-          />
+          ></SiteParamsFiles>
         </BulmaField>
 
         <div class="is-flex mb-2">
@@ -127,7 +131,7 @@ export default {
             :file-props="fileProps"
             @add="promoMobileImages.push($event)"
             @remove="promoMobileImages.splice($event, 1)"
-          />
+          ></SiteParamsFiles>
         </BulmaField>
       </template>
     </template>

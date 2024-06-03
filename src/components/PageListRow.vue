@@ -24,12 +24,12 @@ export default {
         <div class="is-flex-grow-1">
           <span class="is-inline-flex middle">
             <span class="tags mb-0">
-              <TagStatus :status="status" />
+              <TagStatus :status="status"></TagStatus>
               <span
                 class="tag is-primary has-text-weight-semibold"
                 v-text="label"
               ></span>
-              <TagDate :date="date" />
+              <TagDate :date="date"></TagDate>
             </span>
           </span>
           <p class="mt-0 has-text-weight-semibold has-text-black">

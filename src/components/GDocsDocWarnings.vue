@@ -15,12 +15,14 @@ const { isSpotlightPAUser } = useAuth();
   >
     <div class="message-header">
       <span>
-        <font-awesome-icon :icon="['fas', 'circle-exclamation']" />
+        <font-awesome-icon
+          :icon="['fas', 'circle-exclamation']"
+        ></font-awesome-icon>
 
         <span
           class="ml-1"
           v-text="article.gdocs.warnings.length === 1 ? 'Warning' : 'Warnings'"
-        />
+        ></span>
       </span>
     </div>
 

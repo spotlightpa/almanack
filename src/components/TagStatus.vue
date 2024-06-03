@@ -26,7 +26,7 @@ export default {
     <span class="icon is-size-6">
       <font-awesome-icon
         :icon="status === 'pub' ? ['fas', 'check-circle'] : ['fas', 'pen-nib']"
-      />
+      ></font-awesome-icon>
     </span>
     <span>
       {{ verbose }}

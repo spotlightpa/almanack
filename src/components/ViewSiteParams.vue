@@ -83,7 +83,7 @@ fetch();
           { name: 'Admin', to: { name: 'admin' } },
           { name: 'Sitewide Settings', to: { name: 'site-params' } },
         ]"
-      />
+      ></BulmaBreadcrumbs>
       <h1 class="title">Sitewide Settings</h1>
     </div>
     <div v-if="scheduledConfigs.length" ref="container">
@@ -104,7 +104,7 @@ fetch();
           ref="siteParamsComps"
           :params="params"
           :file-props="files"
-        />
+        ></SiteParams>
 
         <button
           v-if="!params.isCurrent"
@@ -129,7 +129,7 @@ fetch();
             @click="addScheduledConfig"
           >
             <span class="icon is-size-6">
-              <font-awesome-icon :icon="['fas', 'plus']" />
+              <font-awesome-icon :icon="['fas', 'plus']"></font-awesome-icon>
             </span>
             <span>Add</span>
           </button>
@@ -171,8 +171,8 @@ fetch();
       </button>
     </div>
 
-    <SpinnerProgress :is-loading="isLoadingThrottled" />
-    <ErrorReloader :error="error" @reload="fetch" />
+    <SpinnerProgress :is-loading="isLoadingThrottled"></SpinnerProgress>
+    <ErrorReloader :error="error" @reload="fetch"></ErrorReloader>
   </div>
 </template>
 

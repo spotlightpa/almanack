@@ -23,8 +23,8 @@ export default {
     :class="[size, color]"
   >
     <span v-if="icon" class="icon">
-      <font-awesome-icon :icon="icon" />
+      <font-awesome-icon :icon="icon"></font-awesome-icon>
     </span>
-    <span v-text="label" />
+    <span v-text="label"></span>
   </router-link>
 </template>

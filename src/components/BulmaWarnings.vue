@@ -28,12 +28,14 @@ export default {
   <div v-if="active.length" class="message is-warning">
     <div class="message-header">
       <span>
-        <font-awesome-icon :icon="['fas', 'circle-exclamation']" />
+        <font-awesome-icon
+          :icon="['fas', 'circle-exclamation']"
+        ></font-awesome-icon>
 
         <span
           class="ml-1"
           v-text="active.length === 1 ? 'Warning' : 'Warnings'"
-        />
+        ></span>
       </span>
     </div>
     <div class="message-body">

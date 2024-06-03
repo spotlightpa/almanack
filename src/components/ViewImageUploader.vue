@@ -140,7 +140,7 @@ watch(rawQuery, (val) => {
       <template v-if="page !== '0'">(overflow page {{ page }})</template>
     </h1>
 
-    <ImageUploader @update-image-list="fetch" />
+    <ImageUploader @update-image-list="fetch"></ImageUploader>
 
     <div v-if="showReload" class="mt-5 message is-warning">
       <p class="message-header">Waiting for background uploads</p>
@@ -162,11 +162,16 @@ watch(rawQuery, (val) => {
       type="search"
       label="Filter by search terms"
       placeholder="Pennsylvania state capitol in Harrisburg"
-    />
+    ></BulmaFieldInput>
 
-    <SpinnerProgress :is-loading="listState.isLoadingThrottled.value" />
-    <ErrorSimple :error="saveState.error.value" />
-    <ErrorReloader :error="listState.error.value" @reload="fetch" />
+    <SpinnerProgress
+      :is-loading="listState.isLoadingThrottled.value"
+    ></SpinnerProgress>
+    <ErrorSimple :error="saveState.error.value"></ErrorSimple>
+    <ErrorReloader
+      :error="listState.error.value"
+      @reload="fetch"
+    ></ErrorReloader>
 
     <table class="table is-striped is-fullwidth">
       <tbody>
@@ -193,8 +198,8 @@ watch(rawQuery, (val) => {
                 color="is-success"
                 :icon="['fas', 'file-download']"
                 :href="image.downloadURL"
-              />
-              <ImageSize class="mt-1" :path="image.path" />
+              ></LinkHref>
+              <ImageSize class="mt-1" :path="image.path"></ImageSize>
             </div>
           </td>
           <td>
@@ -230,13 +235,17 @@ watch(rawQuery, (val) => {
                 <span v-if="image.isLicensed">
                   <span class="has-text-black">Reuse permitted</span>
                   <span class="icon is-size-6 has-text-success">
-                    <font-awesome-icon :icon="['fas', 'check-circle']" />
+                    <font-awesome-icon
+                      :icon="['fas', 'check-circle']"
+                    ></font-awesome-icon>
                   </span>
                 </span>
                 <span v-else>
                   <span class="has-text-black">Reuse not permitted</span>
                   <span class="icon is-size-6 has-text-danger">
-                    <font-awesome-icon :icon="['fas', 'circle-exclamation']" />
+                    <font-awesome-icon
+                      :icon="['fas', 'circle-exclamation']"
+                    ></font-awesome-icon>
                   </span>
                 </span>
               </a>
@@ -250,7 +259,7 @@ watch(rawQuery, (val) => {
                 :value="image.path"
                 label="path"
                 size="is-small"
-              />
+              ></CopyWithButton>
             </p>
           </td>
           <td></td>

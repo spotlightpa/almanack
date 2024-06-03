@@ -43,21 +43,21 @@ export default {
         parentPage,
         { name: title, to: { name: 'news-page', params: { id } } },
       ]"
-    />
+    ></BulmaBreadcrumbs>
 
     <h1 class="mb-2 is-spaced title">
       {{ title }}
     </h1>
     <h2 class="subtitle">
       <span class="tags">
-        <TagStatus v-if="page" :status="page.status" />
+        <TagStatus v-if="page" :status="page.status"></TagStatus>
         <router-link
           v-if="page && page.sharedAdminRoute"
           class="tag is-light has-text-weight-semibold"
           :to="page.sharedAdminRoute"
         >
           <span class="icon is-size-6">
-            <font-awesome-icon :icon="['fas', 'sliders']" />
+            <font-awesome-icon :icon="['fas', 'sliders']"></font-awesome-icon>
           </span>
           <span>Sharing admin</span>
         </router-link>
@@ -67,7 +67,9 @@ export default {
           :to="page.sharedViewRoute"
         >
           <span class="icon is-size-6">
-            <font-awesome-icon :icon="['fas', 'file-invoice']" />
+            <font-awesome-icon
+              :icon="['fas', 'file-invoice']"
+            ></font-awesome-icon>
           </span>
           <span>Partner view</span>
         </router-link>
@@ -78,7 +80,7 @@ export default {
           target="_blank"
         >
           <span class="icon is-size-6">
-            <font-awesome-icon :icon="['fas', 'link']" />
+            <font-awesome-icon :icon="['fas', 'link']"></font-awesome-icon>
           </span>
           <span>Arc view</span>
         </a>
@@ -96,7 +98,7 @@ export default {
           target="_blank"
         >
           <span class="icon is-size-6">
-            <font-awesome-icon :icon="['fas', 'link']" />
+            <font-awesome-icon :icon="['fas', 'link']"></font-awesome-icon>
           </span>
           <span>Live URL</span>
         </a>
@@ -133,7 +135,7 @@ export default {
         label="Topics"
         :options="topics"
         help="Topics are open-ended collections, e.g. “Events”, “Coronavirus”"
-      />
+      ></BulmaAutocompleteArray>
 
       <div v-show="page.topics.includes('Events')">
         <BulmaDateTime
@@ -141,18 +143,18 @@ export default {
           label="Event Date"
           help="If present, the events landing page will show this date for the event"
           icon="user-clock"
-        />
+        ></BulmaDateTime>
         <BulmaFieldInput
           v-model="page.eventTitle"
           label="Name of Event"
           help="Shown in search results"
-        />
+        ></BulmaFieldInput>
         <BulmaFieldInput
           v-model="page.eventURL"
           label="Registration link"
           type="url"
           help="Shown in search results"
-        />
+        ></BulmaFieldInput>
       </div>
 
       <BulmaAutocompleteArray
@@ -160,13 +162,13 @@ export default {
         label="Series"
         :options="series"
         help="Series are limited-time collections, e.g. “Legislative privilege 2020”"
-      />
+      ></BulmaAutocompleteArray>
 
       <BulmaFieldInput
         v-model="page.extendedKicker"
         placeholder="Top News"
         label="Homepage extended eyebrow (e.g. “Top News” if blank)"
-      />
+      ></BulmaFieldInput>
 
       <BulmaFieldInput
         id="eyebrow"
@@ -180,13 +182,13 @@ export default {
             page.kicker = page.mainTopic;
           }
         "
-      />
+      ></BulmaFieldInput>
       <BulmaCharLimit
         :warn="15"
         :max="20"
         :value="page.kicker"
         class="mt-1 mb-4"
-      />
+      ></BulmaCharLimit>
 
       <BulmaFieldCheckbox v-model="page.isPinned" label="Pin article">
         Pin article to the top of topic and series landing pages
@@ -198,99 +200,102 @@ export default {
         label="Hed"
         help="Hed on the page and the default value for link title, SEO title, and share titles"
         :required="true"
-      />
+      ></BulmaFieldInput>
       <BulmaCharLimit
         :warn="90"
         :max="100"
         :value="page.title"
         class="mt-1 mb-4"
-      />
+      ></BulmaCharLimit>
 
       <BulmaFieldInput
         v-model="page.linkTitle"
         label="Link to as"
         help="When linking to this page from the homepage or an article list, use this as the link title instead of the hed"
-      />
+      ></BulmaFieldInput>
 
       <BulmaFieldInput
         id="seo"
         v-model="page.titleTag"
         label="SEO Hed"
         help="If set, this is the title seen by search engines"
-      />
+      ></BulmaFieldInput>
       <BulmaCharLimit
         :warn="40"
         :max="55"
         :value="page.titleTag"
         class="mt-1 mb-4"
-      />
+      ></BulmaCharLimit>
 
       <BulmaFieldInput
         id="facebook"
         v-model="page.ogTitle"
         label="FaceBook Hed"
         help="If set, this overrides the SEO hed on Facebook"
-      />
+      ></BulmaFieldInput>
       <BulmaCharLimit
         :warn="60"
         :max="80"
         :value="page.ogTitle"
         class="mt-1 mb-4"
-      />
+      ></BulmaCharLimit>
 
       <BulmaFieldInput
         id="twitter"
         v-model="page.twitterTitle"
         label="Twitter Hed"
         help="If set, this overrides the SEO hed on Twitter"
-      />
+      ></BulmaFieldInput>
       <BulmaCharLimit
         :warn="60"
         :max="70"
         :value="page.twitterTitle"
         class="mt-1 mb-4"
-      />
+      ></BulmaCharLimit>
 
       <BulmaAutocompleteArray
         v-model="page.authors"
         label="Authors"
         help="Adds links to and from each listed author page"
         :options="[]"
-      />
+      ></BulmaAutocompleteArray>
 
       <BulmaFieldInput
         v-model="page.byline"
         label="Byline"
         help="If present, overrides the byline created from authors list"
-      />
+      ></BulmaFieldInput>
 
       <BulmaTextarea
         id="description"
         v-model="page.summary"
         label="SEO Description"
         help="Shown in social share previews and search results"
-      />
+      ></BulmaTextarea>
       <BulmaCharLimit
         :warn="135"
         :max="150"
         :value="page.summary"
         class="mt-1 mb-4"
-      />
+      ></BulmaCharLimit>
 
       <BulmaTextarea
         id="blurb"
         v-model="page.blurb"
         label="Blurb"
         help="Short summary to appear in article rivers"
-      />
+      ></BulmaTextarea>
       <BulmaCharLimit
         :warn="190"
         :max="200"
         :value="page.blurb"
         class="mt-1 mb-4"
-      />
+      ></BulmaCharLimit>
 
-      <PickerImages :images="images" @select-image="setImageProps($event)" />
+      <PickerImages
+        :images="images"
+        @select-image="setImageProps($event)"
+      ></PickerImages>
 
       <BulmaField
         label="Photo ID"
@@ -299,7 +304,7 @@ export default {
       >
         <div class="is-flex">
           <input :id="idForLabel" v-model="page.image" class="input" />
-          <BulmaPaste @paste="page.image = $event" />
+          <BulmaPaste @paste="page.image = $event"></BulmaPaste>
         </div>
       </BulmaField>
 
@@ -365,22 +370,25 @@ export default {
         id="alt"
         v-model="page.imageDescription"
         label="SEO Image Alt Text"
-      />
+      ></BulmaTextarea>
       <BulmaCharLimit
         :warn="100"
         :max="120"
         :value="page.imageDescription"
         class="mt-1 mb-4"
-      />
+      ></BulmaCharLimit>
 
-      <BulmaFieldInput v-model="page.imageCredit" label="Image credit" />
+      <BulmaFieldInput
+        v-model="page.imageCredit"
+        label="Image credit"
+      ></BulmaFieldInput>
 
       <BulmaTextarea
         id="caption"
         v-model="page.imageCaption"
         label="Image Caption"
         help="If set, captions appear as an overlay on top of the image on the article page"
-      />
+      ></BulmaTextarea>
 
       <BulmaField label="Image size">
         <div class="control is-expanded">
@@ -408,7 +416,7 @@ export default {
         :disabled="page.isPublished || null"
         :readonly="page.isPublished || null"
         :required="true"
-      />
+      ></BulmaFieldInput>
       <button
         class="block button is-small is-light has-text-weight-semibold"
         type="button"
@@ -418,7 +426,11 @@ export default {
         Derive keywords from title
       </button>
 
-      <CopyWithButton v-if="page.link" :value="page.link" label="Page URL" />
+      <CopyWithButton
+        v-if="page.link"
+        :value="page.link"
+        label="Page URL"
+      ></CopyWithButton>
 
       <div v-if="page.isPublished && page.link" class="buttons">
         <a
@@ -427,7 +439,7 @@ export default {
           target="_blank"
         >
           <span class="icon is-size-6">
-            <font-awesome-icon :icon="['fas', 'link']" />
+            <font-awesome-icon :icon="['fas', 'link']"></font-awesome-icon>
           </span>
           <span> Open live URL </span>
         </a>
@@ -440,7 +452,11 @@ export default {
         </button>
       </div>
 
-      <BulmaTextarea v-model="page.body" label="Content" :rows="8" />
+      <BulmaTextarea
+        v-model="page.body"
+        label="Content"
+        :rows="8"
+      ></BulmaTextarea>
 
       <BulmaField help="Remember to save pages after refreshing">
         <div class="buttons">
@@ -521,20 +537,23 @@ export default {
           Hide page from Google search results
         </BulmaFieldCheckbox>
 
-        <BulmaFieldInput v-model="page.overrideURL" label="Override URL" />
+        <BulmaFieldInput
+          v-model="page.overrideURL"
+          label="Override URL"
+        ></BulmaFieldInput>
 
         <BulmaAutocompleteArray
           v-model="page.aliases"
           label="URL Aliases"
           help="Redirect these URLs to the story"
           :options="[]"
-        />
+        ></BulmaAutocompleteArray>
 
         <BulmaField v-slot="{ idForLabel }" label="Layout override">
           <input v-model="page.layout" class="input" :list="idForLabel" />
           <datalist :id="idForLabel">
-            <option value="blank" />
-            <option value="featured" />
+            <option value="blank"></option>
+            <option value="featured"></option>
           </datalist>
         </BulmaField>
       </details>
@@ -567,7 +586,7 @@ export default {
             'Image description is long',
           ],
         ]"
-      />
+      ></BulmaWarnings>
 
       <p class="my-4 has-text-weight-semibold">
         Page is {{ page.statusVerbose
@@ -654,9 +673,9 @@ export default {
       </div>
     </form>
 
-    <SpinnerProgress :is-loading="isLoadingThrottled" />
+    <SpinnerProgress :is-loading="isLoadingThrottled"></SpinnerProgress>
     <div class="my-5">
-      <ErrorReloader :error="error" @reload="fetch(id)" />
+      <ErrorReloader :error="error" @reload="fetch(id)"></ErrorReloader>
     </div>
   </div>
 </template>

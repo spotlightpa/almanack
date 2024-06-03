@@ -38,7 +38,7 @@ async function onclick() {
       color="is-success"
       :icon="['fas', 'file-image']"
       @click.prevent="onclick"
-    />
+    ></LinkButton>
     <BulmaModal v-model="open">
       <div class="box">
         <h3 class="title is-4">{{ path }}</h3>
@@ -48,9 +48,9 @@ async function onclick() {
         </div>
         <template v-else>
           <span class="label">Image width</span>
-          <CopyWithButton :value="'' + width" label="Width" />
+          <CopyWithButton :value="'' + width" label="Width"></CopyWithButton>
           <span class="label">Image height</span>
-          <CopyWithButton :value="'' + height" label="Height" />
+          <CopyWithButton :value="'' + height" label="Height"></CopyWithButton>
         </template>
       </div>
     </BulmaModal>

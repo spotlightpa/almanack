@@ -76,7 +76,7 @@ const invisible = computedObj((page) => {
             url = $event;
             lookup();
           "
-        />
+        ></BulmaPaste>
       </p>
     </div>
     <p

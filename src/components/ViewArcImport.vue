@@ -44,12 +44,14 @@ async function doImport(article) {
         to: { name: 'arc-import', query: { page: 0 } },
       },
     ]"
-  />
+  ></BulmaBreadcrumbs>
 
   <h2 class="title">Import from Arc</h2>
 
-  <SpinnerProgress :is-loading="importState.isLoadingThrottled.value" />
-  <ErrorSimple :error="importState.error.value" />
+  <SpinnerProgress
+    :is-loading="importState.isLoadingThrottled.value"
+  ></SpinnerProgress>
+  <ErrorSimple :error="importState.error.value"></ErrorSimple>
 
   <div class="table-container">
     <table class="table is-bordered is-striped is-narrow is-fullwidth">
@@ -63,14 +65,18 @@ async function doImport(article) {
                   class="mr-2 middle"
                   :to="article.adminRoute"
                 >
-                  <font-awesome-icon :icon="['far', 'newspaper']" />
+                  <font-awesome-icon
+                    :icon="['far', 'newspaper']"
+                  ></font-awesome-icon>
                   {{ article.arc.slug }}
                 </router-link>
                 <span v-else class="mr-2 middle">
-                  <font-awesome-icon :icon="['far', 'newspaper']" />
+                  <font-awesome-icon
+                    :icon="['far', 'newspaper']"
+                  ></font-awesome-icon>
                   {{ article.arc.slug }}
                 </span>
-                <TagDate :date="article.arc.plannedDate" />
+                <TagDate :date="article.arc.plannedDate"></TagDate>
               </h3>
 
               <div class="mb-1 tags">
@@ -82,7 +88,7 @@ async function doImport(article) {
                           ? ['fas', 'check-circle']
                           : ['fas', 'pen-nib']
                       "
-                    />
+                    ></font-awesome-icon>
                   </span>
                   <span v-text="article.statusVerbose"></span>
                 </span>
@@ -93,7 +99,9 @@ async function doImport(article) {
                   target="_blank"
                 >
                   <span class="icon is-size-6">
-                    <font-awesome-icon :icon="['fas', 'link']" />
+                    <font-awesome-icon
+                      :icon="['fas', 'link']"
+                    ></font-awesome-icon>
                   </span>
                   <span>Arc</span>
                 </a>
@@ -103,7 +111,9 @@ async function doImport(article) {
                   :to="article.detailsRoute"
                 >
                   <span class="icon">
-                    <font-awesome-icon :icon="['fas', 'file-invoice']" />
+                    <font-awesome-icon
+                      :icon="['fas', 'file-invoice']"
+                    ></font-awesome-icon>
                   </span>
                   <span>Partner view</span>
                 </router-link>
@@ -127,8 +137,8 @@ async function doImport(article) {
     </table>
   </div>
 
-  <SpinnerProgress :is-loading="apiState.isLoading.value" />
-  <ErrorReloader :error="apiState.error.value" @reload="fetch" />
+  <SpinnerProgress :is-loading="apiState.isLoading.value"></SpinnerProgress>
+  <ErrorReloader :error="apiState.error.value" @reload="fetch"></ErrorReloader>
 
   <div class="buttons mt-5">
     <router-link

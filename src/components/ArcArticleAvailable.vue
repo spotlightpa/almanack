@@ -66,13 +66,13 @@ export default {
 <template>
   <div>
     <h1 class="title has-text-grey">
-      <ArticleSlugLine :article="article" />
+      <ArticleSlugLine :article="article"></ArticleSlugLine>
     </h1>
     <h2 class="mb-2 title">Budget details</h2>
     <p class="mb-2 content">
       {{ article.arc.budgetLine }}
     </p>
-    <ArticleWordCount :article="article" />
+    <ArticleWordCount :article="article"></ArticleWordCount>
 
     <h2 v-if="article.isUnderEmbargo" class="title" style="color: red">
       Embargoed until {{ formatDateTime(article.embargoUntil) }}
@@ -98,13 +98,16 @@ export default {
     </template>
 
     <h2 class="title">Suggested Hed</h2>
-    <CopyWithButton :value="article.arc.headline" label="hed" />
+    <CopyWithButton :value="article.arc.headline" label="hed"></CopyWithButton>
 
     <h2 class="title">Suggested Description</h2>
-    <CopyWithButton :value="article.arc.description" label="description" />
+    <CopyWithButton
+      :value="article.arc.description"
+      label="description"
+    ></CopyWithButton>
 
     <h2 class="title">Byline</h2>
-    <CopyWithButton :value="article.arc.byline" label="byline" />
+    <CopyWithButton :value="article.arc.byline" label="byline"></CopyWithButton>
 
     <template v-if="article.arc.featuredImage">
       <h2 class="title is-spaced">Featured Image</h2>
@@ -113,7 +116,7 @@ export default {
         :caption="article.arc.featuredImageCaption"
         :credits="article.arc.featuredImageCredits"
         class="block"
-      />
+      ></ThumbnailArc>
     </template>
 
     <h2 v-if="embeds.length === 1" class="title">Embed</h2>
@@ -137,7 +140,9 @@ export default {
               @click="showRichText"
             >
               <span class="icon">
-                <font-awesome-icon :icon="['far', 'file-word']" />
+                <font-awesome-icon
+                  :icon="['far', 'file-word']"
+                ></font-awesome-icon>
               </span>
               <span> View Rich Text </span>
             </button>
@@ -147,7 +152,7 @@ export default {
               @click="copyRichText"
             >
               <span class="icon">
-                <font-awesome-icon :icon="['far', 'copy']" />
+                <font-awesome-icon :icon="['far', 'copy']"></font-awesome-icon>
               </span>
               <span> Copy Rich Text </span>
             </button>
@@ -161,7 +166,9 @@ export default {
               @click="showHTML"
             >
               <span class="icon">
-                <font-awesome-icon :icon="['far', 'file-code']" />
+                <font-awesome-icon
+                  :icon="['far', 'file-code']"
+                ></font-awesome-icon>
               </span>
               <span> View HTML </span>
             </button>
@@ -171,7 +178,7 @@ export default {
               @click="copyHTML"
             >
               <span class="icon">
-                <font-awesome-icon :icon="['far', 'copy']" />
+                <font-awesome-icon :icon="['far', 'copy']"></font-awesome-icon>
               </span>
               <span> Copy HTML </span>
             </button>

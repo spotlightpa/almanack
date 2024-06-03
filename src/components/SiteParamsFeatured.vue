@@ -31,18 +31,18 @@ defineExpose({ saveData });
       label="Featured promo link"
       type="url"
       help="Defaults to https://www.spotlightpa.org/donate/"
-    />
+    ></BulmaFieldInput>
 
     <BulmaTextarea
       v-model="data.featuredPromoImageDescription.value"
       label="Featured layout promo image description"
       help="For blind readers and search engines"
-    />
+    ></BulmaTextarea>
 
     <BulmaFieldColor
       v-model="data.featuredPromoBgColor.value"
       label="Featured layout promo background color"
-    />
+    ></BulmaFieldColor>
     <div class="is-flex mb-2">
       <BulmaField v-slot="{ idForLabel }" label="Image width">
         <input
@@ -71,7 +71,7 @@ defineExpose({ saveData });
         :file-props="fileProps"
         @add="data.featuredPromoImages.value.push($event)"
         @remove="data.featuredPromoImages.value.splice($event, 1)"
-      />
+      ></SiteParamsFiles>
     </BulmaField>
   </details>
 </template>

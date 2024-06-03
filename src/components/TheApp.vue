@@ -6,7 +6,7 @@ const isDev = !isProd && !isStage;
 
 <template>
   <div class="body">
-    <AppNav id="top-nav" />
+    <AppNav id="top-nav"></AppNav>
     <div>
       <main
         class="section"
@@ -16,7 +16,7 @@ const isDev = !isProd && !isStage;
         }"
       >
         <div class="mx-auto content-width">
-          <router-view />
+          <router-view></router-view>
         </div>
       </main>
     </div>

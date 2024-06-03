@@ -28,8 +28,8 @@ export default {
     :target="target"
   >
     <span v-if="icon" class="icon">
-      <font-awesome-icon :icon="icon" />
+      <font-awesome-icon :icon="icon"></font-awesome-icon>
     </span>
-    <span v-text="label" />
+    <span v-text="label"></span>
   </a>
 </template>

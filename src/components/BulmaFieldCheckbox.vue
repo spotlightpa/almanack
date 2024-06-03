@@ -36,7 +36,7 @@ export default {
     <div>
       <label class="checkbox">
         <input :id="idForLabel" v-model="checkboxValue" type="checkbox" />
-        <slot />
+        <slot></slot>
       </label>
     </div>
   </BulmaField>

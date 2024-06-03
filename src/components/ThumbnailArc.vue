@@ -28,5 +28,5 @@ export default {
     :download-url="url"
     :caption="caption"
     :credit="correctedCredits"
-  />
+  ></ThumbnailImage>
 </template>

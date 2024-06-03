@@ -67,7 +67,7 @@ export default {
       v-model="query"
       placeholder="Filter pages"
       label="Spotlight PA Pages"
-    />
+    ></BulmaFieldInput>
     <draggable
       class="dropdown-content"
       :model-value="pages"
@@ -98,7 +98,7 @@ export default {
         </div>
       </template>
     </draggable>
-    <ErrorSimple class="mt-4" :error="error" />
+    <ErrorSimple class="mt-4" :error="error"></ErrorSimple>
   </div>
 </template>
 

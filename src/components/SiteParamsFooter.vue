@@ -30,13 +30,13 @@ export default {
       v-model="footerLink"
       label="Footer promo link"
       type="url"
-    />
+    ></BulmaFieldInput>
 
     <BulmaTextarea
       v-model="footerDescription"
       label="Footer promo image description"
       help="For blind readers and search engines"
-    />
+    ></BulmaTextarea>
     <div class="is-flex mb-2">
       <BulmaField v-slot="{ idForLabel }" label="Desktop Image Width">
         <input
@@ -68,7 +68,7 @@ export default {
         :file-props="fileProps"
         @add="footerDesktopImages.push($event)"
         @remove="footerDesktopImages.splice($event, 1)"
-      />
+      ></SiteParamsFiles>
     </BulmaField>
 
     <div class="is-flex mb-2">
@@ -103,7 +103,7 @@ export default {
         :file-props="fileProps"
         @add="footerMobileImages.push($event)"
         @remove="footerMobileImages.splice($event, 1)"
-      />
+      ></SiteParamsFiles>
     </BulmaField>
   </details>
 </template>

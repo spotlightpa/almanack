@@ -39,5 +39,5 @@ export default {
     :api-state="apiState"
     :reload="fetch"
     :pages="pages"
-  />
+  ></PageList>
 </template>

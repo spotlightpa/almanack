@@ -22,7 +22,7 @@ function updateDonorWall() {
         { name: 'Admin', to: { name: 'admin' } },
         { name: 'Donor Walls', to: { name: 'donor-wall' } },
       ]"
-    />
+    ></BulmaBreadcrumbs>
     <h1 class="title">Donor Walls</h1>
   </div>
 
@@ -32,36 +32,36 @@ function updateDonorWall() {
       target="_blank"
       label="Google Sheet"
       href="/ssr/donor-wall"
-    />
+    ></LinkHref>
     <LinkHref
       target="_blank"
       label="Support Spotlight PA"
       href="https://www.spotlightpa.org/support/"
-    />
+    ></LinkHref>
     <LinkHref
       :icon="['fas', 'receipt']"
       label="Major Donors"
       href="https://www.spotlightpa.org/support/funders-and-members#major-donors-and-funders-since-launch"
       target="_blank"
-    />
+    ></LinkHref>
     <LinkHref
       :icon="['fas', 'receipt']"
       label="Members since launch"
       href="https://www.spotlightpa.org/support/funders-and-members#all-donors"
       target="_blank"
-    />
+    ></LinkHref>
     <LinkHref
       :icon="['fas', 'receipt']"
       label="Leaders in Action"
       href="https://www.spotlightpa.org/support/leaders-in-action/#our-current-leaders"
       target="_blank"
-    />
+    ></LinkHref>
     <LinkHref
       :icon="['fas', 'receipt']"
       label="State College"
       href="https://www.spotlightpa.org/support/state-college/#state-college-bureau-donors"
       target="_blank"
-    />
+    ></LinkHref>
   </LinkButtons>
 
   <div class="mt-5 mb-0 buttons">
@@ -75,7 +75,7 @@ function updateDonorWall() {
     </button>
   </div>
 
-  <ErrorSimple :error="error" />
+  <ErrorSimple :error="error"></ErrorSimple>
 
   <p class="help">
     Allow five minutes for the live site to refresh with changes.

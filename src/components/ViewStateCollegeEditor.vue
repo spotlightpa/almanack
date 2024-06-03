@@ -138,7 +138,7 @@ export default {
           to: { name: 'state-college-editor' },
         },
       ]"
-    />
+    ></BulmaBreadcrumbs>
 
     <h1 class="title">State College Frontpage Editor</h1>
 
@@ -151,7 +151,7 @@ export default {
               : `Scheduled for ${formatDateTime(edpick.scheduleFor)}`
           }}
         </h2>
-        <HomepageEditor :editors-picks="edpick" />
+        <HomepageEditor :editors-picks="edpick"></HomepageEditor>
         <button
           v-if="!edpick.isCurrent"
           type="button"
@@ -175,7 +175,7 @@ export default {
             @click="addScheduledPicks"
           >
             <span class="icon is-size-6">
-              <font-awesome-icon :icon="['fas', 'plus']" />
+              <font-awesome-icon :icon="['fas', 'plus']"></font-awesome-icon>
             </span>
             <span>Add</span>
           </button>
@@ -218,8 +218,8 @@ export default {
       </button>
     </div>
 
-    <SpinnerProgress :is-loading="isLoading" />
-    <ErrorReloader :error="error" @reload="reload" />
+    <SpinnerProgress :is-loading="isLoading"></SpinnerProgress>
+    <ErrorReloader :error="error" @reload="reload"></ErrorReloader>
   </div>
 </template>
 

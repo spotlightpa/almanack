@@ -82,7 +82,7 @@ function emitTime(value) {
           @input="emitDay($event.target.value)"
         />
         <span v-if="icon" class="icon is-left">
-          <font-awesome-icon :icon="icon" />
+          <font-awesome-icon :icon="icon"></font-awesome-icon>
         </span>
       </p>
       <p class="control is-expanded">
@@ -101,6 +101,6 @@ function emitTime(value) {
         </span>
       </p>
     </div>
-    <slot />
+    <slot></slot>
   </BulmaField>
 </template>

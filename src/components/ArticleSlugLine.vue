@@ -22,7 +22,7 @@ export default {
 <template>
   <span>
     <router-link :to="article.detailsRoute" class="mr-2 middle">
-      <font-awesome-icon :icon="['far', 'newspaper']" />
+      <font-awesome-icon :icon="['far', 'newspaper']"></font-awesome-icon>
       {{ article.internalID }}
     </router-link>
     <span class="is-inline-flex middle">
@@ -33,7 +33,7 @@ export default {
               :icon="
                 article.isShared ? ['fas', 'check-circle'] : ['fas', 'pen-nib']
               "
-            />
+            ></font-awesome-icon>
           </span>
           <span v-text="article.statusVerbose"></span>
         </span>

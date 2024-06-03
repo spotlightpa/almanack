@@ -3,7 +3,7 @@
     class="textarea pre-wrap no-select has-margin-bottom"
     rows="bulmaoverride"
   >
-    <slot />
+    <slot></slot>
   </div>
 </template>
 

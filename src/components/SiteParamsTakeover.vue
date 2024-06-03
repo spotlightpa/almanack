@@ -33,13 +33,19 @@ export default {
       </div>
     </BulmaField>
     <template v-if="takeoverActive">
-      <BulmaFieldInput v-model="takeoverHed" label="Hed for takeover" />
-      <BulmaTextarea v-model="takeoverDek" label="Dek for takeover" />
+      <BulmaFieldInput
+        v-model="takeoverHed"
+        label="Hed for takeover"
+      ></BulmaFieldInput>
+      <BulmaTextarea
+        v-model="takeoverDek"
+        label="Dek for takeover"
+      ></BulmaTextarea>
       <BulmaFieldInput
         v-model="takeoverLink"
         label="Takeover link"
         type="url"
-      />
+      ></BulmaFieldInput>
       <BulmaField
         label="Takeover image"
         help="Must be an Almanack Photo ID"
@@ -47,7 +53,7 @@ export default {
       >
         <div class="is-flex">
           <input :id="idForLabel" v-model="takeoverImage" class="input" />
-          <BulmaPaste @paste="takeoverImage = $event" />
+          <BulmaPaste @paste="takeoverImage = $event"></BulmaPaste>
         </div>
       </BulmaField>
     </template>

@@ -30,5 +30,5 @@ const downloadURL = computed(
     :description="description"
     :caption="caption"
     :credit="credit"
-  />
+  ></ThumbnailImage>
 </template>
