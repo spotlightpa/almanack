@@ -111,7 +111,7 @@ export class Page {
 
   changeURL() {
     if (!this.isPublished) return;
-    let oldURLPath = new URL(this.link).pathname;
+    let oldURLPath = this.link.pathname;
     let message = `Are you sure you want to change the URL? Current URL is ${oldURLPath}. Changing the URL will automatically add a redirect from the old URL to a new one. Please enter new URL below.`;
     let newURLPath = window.prompt(message, oldURLPath);
     if (!newURLPath || newURLPath === oldURLPath) return;
