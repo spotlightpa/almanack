@@ -24,7 +24,7 @@ func all(n *html.Node, yield func(*html.Node) bool) bool {
 		return _break
 	}
 
-	for c := n.FirstChild; c != nil; c = c.NextSibling {
+	for c := range ChildNodes(n) {
 		if !all(c, yield) {
 			return _break
 		}

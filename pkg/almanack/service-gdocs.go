@@ -288,7 +288,7 @@ func (svc Services) ProcessGDocsDoc(ctx context.Context, dbDoc db.GDocsDoc) (err
 }
 
 func removeTail(n *html.Node) {
-	for c := range xhtml.Children(n) {
+	for c := range xhtml.ChildNodes(n) {
 		if c.DataAtom == atom.Table {
 			continue
 		}

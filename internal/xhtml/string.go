@@ -34,7 +34,7 @@ func InnerHTML(n *html.Node) string {
 	var buf strings.Builder
 	buf.Grow(256)
 
-	for c := range Children(n) {
+	for c := range ChildNodes(n) {
 		if err := html.Render(&buf, c); err != nil {
 			panic(err)
 		}
@@ -48,7 +48,7 @@ func InnerHTMLBlocks(n *html.Node) string {
 	var buf strings.Builder
 	buf.Grow(256)
 
-	for c := range Children(n) {
+	for c := range ChildNodes(n) {
 		if err := html.Render(&buf, c); err != nil {
 			panic(err)
 		}
