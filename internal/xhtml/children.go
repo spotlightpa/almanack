@@ -8,8 +8,8 @@ import (
 	"golang.org/x/net/html"
 )
 
-// Children returns a seq of the immediate children of n.
-func Children(n *html.Node) iter.Seq[*html.Node] {
+// ChildNodes returns a seq of the immediate children of n.
+func ChildNodes(n *html.Node) iter.Seq[*html.Node] {
 	return func(yield func(*html.Node) bool) {
 		if n == nil {
 			return
@@ -79,7 +79,7 @@ func UnnestChildren(n *html.Node) {
 	if n.Parent == nil {
 		return
 	}
-	children := iterx.Collect(Children(n))
+	children := iterx.Collect(ChildNodes(n))
 	RemoveAll(children)
 	for _, c := range children {
 		n.Parent.InsertBefore(c, n)
