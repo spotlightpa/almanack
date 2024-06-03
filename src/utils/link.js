@@ -1,6 +1,6 @@
 export function toAbs(relurl) {
-  if (!relurl) {
-    return "";
+  if (!relurl || !URL.canParse(relurl, "https://www.spotlightpa.org")) {
+    return relurl;
   }
   return new URL(relurl, "https://www.spotlightpa.org").href;
 }
