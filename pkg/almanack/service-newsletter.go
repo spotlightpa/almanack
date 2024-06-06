@@ -130,7 +130,7 @@ func (svc Services) SaveNewsletterPage(ctx context.Context, nl *db.Newsletter, b
 					strings.ToUpper(nl.Type),
 					nl.PublishedAt.Format("01-02-06")),
 				"kicker":      kicker,
-				"layout":      "mailchimp-page",
+				"layout":      "mailchimp-page2",
 				"linktitle":   "",
 				"no-index":    false,
 				"published":   nl.PublishedAt,
