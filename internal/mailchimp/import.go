@@ -29,6 +29,17 @@ func ImportPage(ctx context.Context, cl *http.Client, page string) (body string,
 }
 
 func PageContent(doc *html.Node) (body string, err error) {
+	// Move <style> tags into <body>. Shove content into @scope rules.
+	styleEls := xhtml.SelectSlice(doc, xhtml.WithAtom(atom.Style))
+	for _, styleEl := range styleEls {
+		styleEl.Parent.RemoveChild(styleEl)
+		styleEl.InsertBefore(&html.Node{
+			Type: html.TextNode,
+			Data: "\n@scope {\n",
+		}, styleEl.FirstChild)
+		xhtml.AppendText(styleEl, "\n}\n")
+	}
+
 	bNode := xhtml.Select(doc, xhtml.WithBody)
 	if bNode == nil {
 		err = fmt.Errorf("could not find body element")
@@ -42,7 +53,9 @@ func PageContent(doc *html.Node) (body string, err error) {
 			xhtml.Attr(n, "id") == "awesomewrap"
 	})
 	xhtml.RemoveAll(remove)
-
+	for _, styleEl := range styleEls {
+		bNode.InsertBefore(styleEl, bNode.FirstChild)
+	}
 	body = xhtml.InnerHTML(bNode)
 	return
 }
