@@ -57,8 +57,8 @@ func InnerHTMLBlocks(n *html.Node) string {
 	return buf.String()
 }
 
-// InnerText joins and trims the text node children of n.
-func InnerText(n *html.Node) string {
+// TextContent joins and trims the text node children of n.
+func TextContent(n *html.Node) string {
 	var buf strings.Builder
 	buf.Grow(256)
 

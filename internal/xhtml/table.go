@@ -41,7 +41,7 @@ func (rows TableNodes) At(row, col int) *html.Node {
 }
 
 func slugify(n *html.Node) string {
-	return strings.TrimSpace(stringx.RemoveParens(strings.ToLower(InnerText(n))))
+	return strings.TrimSpace(stringx.RemoveParens(strings.ToLower(TextContent(n))))
 }
 
 func (rows TableNodes) Label() string {
@@ -52,7 +52,7 @@ func (rows TableNodes) Value(name string) *html.Node {
 	for i := range rows {
 		if slugify(rows.At(i, 0)) == name {
 			cell := rows.At(i, 1)
-			if s := InnerText(cell); s == "" {
+			if s := TextContent(cell); s == "" {
 				cell = rows.At(i+1, 0)
 			}
 			if stringx.RemoveAllWhitespace(slugify(cell)) == "n/a" {
