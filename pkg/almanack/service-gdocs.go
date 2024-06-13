@@ -132,7 +132,7 @@ func (svc Services) ProcessGDocsDoc(ctx context.Context, dbDoc db.GDocsDoc) (err
 		switch label := rows.Label(); label {
 		case "html", "embed", "raw", "script":
 			embed.Type = db.RawEmbedTag
-			embedHTML := xhtml.InnerText(rows.At(1, 0))
+			embedHTML := xhtml.TextContent(rows.At(1, 0))
 			embed.Value = embedHTML
 			if !ascii.Contains(embedHTML) {
 				warnings = append(warnings, fmt.Sprintf(
@@ -142,7 +142,7 @@ func (svc Services) ProcessGDocsDoc(ctx context.Context, dbDoc db.GDocsDoc) (err
 			goto append
 
 		case "spl", "spl-embed":
-			embedHTML := xhtml.InnerText(rows.At(1, 0))
+			embedHTML := xhtml.TextContent(rows.At(1, 0))
 			embed.Type = db.SpotlightRawEmbedOrTextTag
 			embed.Value = embedHTML
 			value := must.Get(json.Marshal(embed))
@@ -162,7 +162,7 @@ func (svc Services) ProcessGDocsDoc(ctx context.Context, dbDoc db.GDocsDoc) (err
 			xhtml.ReplaceWith(tbl, data)
 
 		case "partner-embed":
-			embedHTML := xhtml.InnerText(rows.At(1, 0))
+			embedHTML := xhtml.TextContent(rows.At(1, 0))
 			embed.Type = db.PartnerRawEmbedTag
 			embed.Value = embedHTML
 			goto append
@@ -244,7 +244,7 @@ func (svc Services) ProcessGDocsDoc(ctx context.Context, dbDoc db.GDocsDoc) (err
 			slices.Contains([]atom.Atom{
 				atom.B, atom.Strong,
 			}, n.FirstChild.DataAtom) {
-			text := xhtml.InnerText(n)
+			text := xhtml.TextContent(n)
 			if len([]rune(text)) > 17 {
 				runes := []rune(text)[:13]
 				text = string(runes) + "..."
@@ -282,7 +282,7 @@ func (svc Services) ProcessGDocsDoc(ctx context.Context, dbDoc db.GDocsDoc) (err
 		RawHtml:         xhtml.InnerHTMLBlocks(rawHTML),
 		ArticleMarkdown: md,
 		Warnings:        warnings,
-		WordCount:       int32(stringx.WordCount(xhtml.InnerText(richText))),
+		WordCount:       int32(stringx.WordCount(xhtml.TextContent(richText))),
 	})
 	return err
 }
@@ -293,7 +293,7 @@ func removeTail(n *html.Node) {
 			continue
 		}
 
-		if text := xhtml.InnerText(c); text != "###" {
+		if text := xhtml.TextContent(c); text != "###" {
 			continue
 		}
 
@@ -315,24 +315,24 @@ func (svc Services) replaceImageEmbed(
 	objID2Path map[string]string,
 ) (imageEmbed *db.EmbedImage, warning string) {
 	var width, height int
-	if w := xhtml.InnerText(rows.Value("width")); w != "" {
+	if w := xhtml.TextContent(rows.Value("width")); w != "" {
 		width, _ = strconv.Atoi(w)
 	}
-	if h := xhtml.InnerText(rows.Value("height")); h != "" {
+	if h := xhtml.TextContent(rows.Value("height")); h != "" {
 		height, _ = strconv.Atoi(h)
 	}
 	imageEmbed = &db.EmbedImage{
-		Credit:  xhtml.InnerText(rows.Value("credit")),
-		Caption: xhtml.InnerText(rows.Value("caption")),
+		Credit:  xhtml.TextContent(rows.Value("credit")),
+		Caption: xhtml.TextContent(rows.Value("caption")),
 		Description: cmp.Or(
-			xhtml.InnerText(rows.Value("description")),
-			xhtml.InnerText(rows.Value("alt")),
+			xhtml.TextContent(rows.Value("description")),
+			xhtml.TextContent(rows.Value("alt")),
 		),
 		Width:  width,
 		Height: height,
 	}
 
-	if path := xhtml.InnerText(rows.Value("path")); path != "" {
+	if path := xhtml.TextContent(rows.Value("path")); path != "" {
 		imageEmbed.Path = path
 		return imageEmbed, ""
 	}
@@ -391,87 +391,87 @@ func (svc Services) replaceMetadata(
 	metadata *db.GDocsMetadata,
 ) string {
 	metadata.InternalID = cmp.Or(
-		xhtml.InnerText(rows.Value("slug")),
-		xhtml.InnerText(rows.Value("internal id")),
+		xhtml.TextContent(rows.Value("slug")),
+		xhtml.TextContent(rows.Value("internal id")),
 		metadata.InternalID,
 	)
 	metadata.Byline = cmp.Or(
-		xhtml.InnerText(rows.Value("byline")),
-		xhtml.InnerText(rows.Value("authors")),
-		xhtml.InnerText(rows.Value("author")),
-		xhtml.InnerText(rows.Value("by")),
+		xhtml.TextContent(rows.Value("byline")),
+		xhtml.TextContent(rows.Value("authors")),
+		xhtml.TextContent(rows.Value("author")),
+		xhtml.TextContent(rows.Value("by")),
 	)
 	if strings.HasPrefix(metadata.Byline, "By ") ||
 		strings.HasPrefix(metadata.Byline, "by ") {
 		metadata.Byline = metadata.Byline[3:]
 	}
-	metadata.Budget = xhtml.InnerText(rows.Value("budget"))
+	metadata.Budget = xhtml.TextContent(rows.Value("budget"))
 	metadata.Hed = cmp.Or(
-		xhtml.InnerText(rows.Value("hed")),
-		xhtml.InnerText(rows.Value("title")),
-		xhtml.InnerText(rows.Value("headline")),
-		xhtml.InnerText(rows.Value("hedline")),
+		xhtml.TextContent(rows.Value("hed")),
+		xhtml.TextContent(rows.Value("title")),
+		xhtml.TextContent(rows.Value("headline")),
+		xhtml.TextContent(rows.Value("hedline")),
 	)
 	metadata.Description = cmp.Or(
-		xhtml.InnerText(rows.Value("seo description")),
-		xhtml.InnerText(rows.Value("description")),
-		xhtml.InnerText(rows.Value("desc")),
+		xhtml.TextContent(rows.Value("seo description")),
+		xhtml.TextContent(rows.Value("description")),
+		xhtml.TextContent(rows.Value("desc")),
 	)
 	metadata.LedeImageCredit = cmp.Or(
-		xhtml.InnerText(rows.Value("lede image credit")),
-		xhtml.InnerText(rows.Value("lead image credit")),
-		xhtml.InnerText(rows.Value("credit")),
+		xhtml.TextContent(rows.Value("lede image credit")),
+		xhtml.TextContent(rows.Value("lead image credit")),
+		xhtml.TextContent(rows.Value("credit")),
 	)
 	metadata.LedeImageCaption = cmp.Or(
-		xhtml.InnerText(rows.Value("lede image caption")),
-		xhtml.InnerText(rows.Value("lead image caption")),
-		xhtml.InnerText(rows.Value("caption")),
+		xhtml.TextContent(rows.Value("lede image caption")),
+		xhtml.TextContent(rows.Value("lead image caption")),
+		xhtml.TextContent(rows.Value("caption")),
 	)
 	metadata.LedeImageDescription = cmp.Or(
-		xhtml.InnerText(rows.Value("lede image description")),
-		xhtml.InnerText(rows.Value("lead image description")),
-		xhtml.InnerText(rows.Value("lede image alt")),
-		xhtml.InnerText(rows.Value("lead image alt")),
-		xhtml.InnerText(rows.Value("alt")),
+		xhtml.TextContent(rows.Value("lede image description")),
+		xhtml.TextContent(rows.Value("lead image description")),
+		xhtml.TextContent(rows.Value("lede image alt")),
+		xhtml.TextContent(rows.Value("lead image alt")),
+		xhtml.TextContent(rows.Value("alt")),
 	)
 	metadata.URLSlug = cmp.Or(
-		xhtml.InnerText(rows.Value("url")),
-		xhtml.InnerText(rows.Value("keywords")),
+		xhtml.TextContent(rows.Value("url")),
+		xhtml.TextContent(rows.Value("keywords")),
 	)
 	metadata.URLSlug = strings.TrimRight(metadata.URLSlug, "/")
 	_, metadata.URLSlug, _ = stringx.LastCut(metadata.URLSlug, "/")
 	metadata.URLSlug = stringx.SlugifyURL(metadata.URLSlug)
 
 	metadata.Blurb = cmp.Or(
-		xhtml.InnerText(rows.Value("blurb")),
-		xhtml.InnerText(rows.Value("summary")),
+		xhtml.TextContent(rows.Value("blurb")),
+		xhtml.TextContent(rows.Value("summary")),
 	)
 	metadata.LinkTitle = cmp.Or(
-		xhtml.InnerText(rows.Value("link title")),
+		xhtml.TextContent(rows.Value("link title")),
 	)
 	metadata.SEOTitle = cmp.Or(
-		xhtml.InnerText(rows.Value("seo hed")),
-		xhtml.InnerText(rows.Value("seo title")),
-		xhtml.InnerText(rows.Value("seo headline")),
-		xhtml.InnerText(rows.Value("seo hedline")),
+		xhtml.TextContent(rows.Value("seo hed")),
+		xhtml.TextContent(rows.Value("seo title")),
+		xhtml.TextContent(rows.Value("seo headline")),
+		xhtml.TextContent(rows.Value("seo hedline")),
 	)
 	metadata.OGTitle = cmp.Or(
-		xhtml.InnerText(rows.Value("facebook hed")),
-		xhtml.InnerText(rows.Value("facebook title")),
+		xhtml.TextContent(rows.Value("facebook hed")),
+		xhtml.TextContent(rows.Value("facebook title")),
 	)
 	metadata.TwitterTitle = cmp.Or(
-		xhtml.InnerText(rows.Value("twitter hed")),
-		xhtml.InnerText(rows.Value("twitter title")),
+		xhtml.TextContent(rows.Value("twitter hed")),
+		xhtml.TextContent(rows.Value("twitter title")),
 	)
 	metadata.Eyebrow = cmp.Or(
-		xhtml.InnerText(rows.Value("eyebrow")),
-		xhtml.InnerText(rows.Value("kicker")),
+		xhtml.TextContent(rows.Value("eyebrow")),
+		xhtml.TextContent(rows.Value("kicker")),
 	)
 
 	path := cmp.Or(
-		xhtml.InnerText(rows.Value("lede image path")),
-		xhtml.InnerText(rows.Value("lead image path")),
-		xhtml.InnerText(rows.Value("path")),
+		xhtml.TextContent(rows.Value("lede image path")),
+		xhtml.TextContent(rows.Value("lead image path")),
+		xhtml.TextContent(rows.Value("path")),
 	)
 	if path != "" {
 		metadata.LedeImage = path
@@ -707,13 +707,13 @@ func processToc(doc *html.Node, rows xhtml.TableNodes) string {
 		id := fmt.Sprintf("spl-heading-%d", len(headers)+1)
 		xhtml.SetAttr(n, "id", id)
 		depth := int(n.Data[1] - '0')
-		headers = append(headers, header{xhtml.InnerText(n), id, depth})
+		headers = append(headers, header{xhtml.TextContent(n), id, depth})
 	}
 	container := xhtml.New("div")
 	h3 := xhtml.New("h3")
 	xhtml.AppendText(h3, cmp.Or(
-		xhtml.InnerText(rows.At(0, 1)),
-		xhtml.InnerText(rows.At(1, 0)),
+		xhtml.TextContent(rows.At(0, 1)),
+		xhtml.TextContent(rows.At(1, 0)),
 		"Table of Contents",
 	))
 	container.AppendChild(h3)
