@@ -341,6 +341,22 @@ export default {
           </picture>
           <p class="has-text-centered">16 x 9</p>
         </div>
+        <div class="ml-5">
+          <picture class="has-ratio" style="aspect-ratio: 5/4">
+            <img
+              :src="
+                page.getImagePreviewURL({
+                  width: 400,
+                  height: 500,
+                  gravity: page.imageGravity,
+                })
+              "
+              class="border-thick"
+              width="200"
+            />
+          </picture>
+          <p class="has-text-centered">4 x 5</p>
+        </div>
       </div>
 
       <BulmaField label="Image focus">
