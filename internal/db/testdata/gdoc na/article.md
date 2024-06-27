@@ -20,7 +20,7 @@ USE REAL HEADINGS, NOT JUST BOLD TEXT:
 
 TO EMBED HTML
 
-{{<embeds/newsletter>}}
+{{<embed/newsletter>}}
 
 TO ADD ADDITIONAL IMAGE
 

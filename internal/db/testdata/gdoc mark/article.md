@@ -6,7 +6,7 @@ Mail ballot voters from heavily nonwhite and lower-income communities in Philade
 
 By law, elections officials in Pennsylvania cannot accept mail ballots from voters who do not properly date and sign the outer return envelopes of their mail ballots. Whether to accept those undated and improperly dated ballots — such as those mistakenly using dates of birth or dates with the wrong year — is currently the subject of ongoing federal litigation.
 
-{{<embeds/newsletter>}}
+{{<embed/newsletter>}}
 
 By analyzing Philadelphia’s list of more than 1,800 voters who returned undated or improperly dated ballots for the May 16 primary and sorting them by their home ZIP code, Votebeat and Spotlight PA were able to determine how many of them live in areas where the nonwhite population or population living in poverty was above the city’s average.
 
@@ -63,7 +63,7 @@ Then, with a week to go before the election, the Pennsylvania Supreme Court rule
 
 New litigation began almost immediately, with the American Civil Liberties Union of Pennsylvania representing the NAACP and several organizations who are <a href="https://www.aclupa.org/en/cases/pennsylvania-state-conference-naacp-et-al-v-schmidt-et-al">suing in federal court under the same civil rights argument as the 2021 case</a>.
 
-{{<embeds/donate>}}
+{{<embed/donate>}}
 
 That case is still pending in the Western District of Pennsylvania. As evidence of the outcome’s potentially far-reaching consequences, groups including the state GOP, National Republican Congressional Committee, and Republican National Convention have all <a href="https://www.lwv.org/legal-center/pennsylvania-state-conference-naacp-v-chapman">intervened as defendants</a>, while the U.S. Department of Justice has released a statement of interest in the case.
 
