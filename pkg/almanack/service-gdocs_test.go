@@ -61,6 +61,26 @@ func TestReplaceSpotlightShortcodes(t *testing.T) {
 		`,
 			`{{<embed/donate cta_text="CONTRIBUTE NOW" eyebrow_text="BERKS BUREAU" teaser_text="Make a gift and become a founding member of Spotlight PA&#39;s Berks County bureau. ">}}`,
 		},
+		{
+			`
+			<script src="https://www.spotlightpa.org/embed.js" async></script><div data-spl-embed-version="1" data-spl-src="https://www.spotlightpa.org/embeds/cta/?url=https%3A%2F%2Fcentregives.org%2Forganizations%2F273-spotlight-pa&eyebrow=Centre%20Gives&cta=Contribute%20Now&body=Give%20to%20Spotlight%20PA%20to%20help%20us%20hold%20Penn%20State%20accountable.%20Your%20gift%20goes%20further%20with%20Centre%20Gives%2C%20but%20there's%20only%20one%20day%20left%20to%20donate."></div>
+			`,
+			`{{<embed/cta body="Give to Spotlight PA to help us hold Penn State accountable. Your gift goes further with Centre Gives, but there&#39;s only one day left to donate." cta="Contribute Now" eyebrow="Centre Gives" url="https://centregives.org/organizations/273-spotlight-pa">}}`,
+		},
+		{
+			`<script src="https://www.spotlightpa.org/embed.js" async></script><div data-spl-embed-version="1" data-spl-src="https://www.spotlightpa.org/embeds/newsletter/?cta=Get%20all%20of%20the%20latest%20stories%20from%20Spotlight%20PA%20and%20top%20headlines%20from%20across%20Pennsylvania%2C%20all%20in%20one%20email%20newsletter."></div>
+			`,
+			`{{<embed/newsletter cta="Get all of the latest stories from Spotlight PA and top headlines from across Pennsylvania, all in one email newsletter.">}}`,
+		},
+		{
+			`<script src="https://www.spotlightpa.org/embed.js" async></script><div data-spl-embed-version="1" data-spl-src="https://www.spotlightpa.org/embeds/tips/?tip_text=Have%20a%20tip%20about%20Penn%20State%20Health%3F%20We%20want%20to%20hear%20from%20you.%20Write%20to%20us%20via%20the%20form%20below%2C%20or%20mail%20information%20to%20Spotlight%20PA%20State%20College%2C%20210%20W.%20Hamilton%20Ave.%2C%20%23331%2C%20State%20College%2C%20PA%2016801."></div>
+			`,
+			`{{<embed/tips tip_text="Have a tip about Penn State Health? We want to hear from you. Write to us via the form below, or mail information to Spotlight PA State College, 210 W. Hamilton Ave., #331, State College, PA 16801.">}}`,
+		},
+		{
+			`<script src="https://www.spotlightpa.org/embed.js" async></script><div data-spl-embed-version="1" data-spl-src="https://www.spotlightpa.org/embeds/cta/?body=It's%20%3Cb%3Ecool%3C%2Fb%3E."></div>`,
+			`{{<embed/cta body="It&#39;s &lt;b&gt;cool&lt;/b&gt;.">}}`,
+		},
 	}
 	for _, tc := range cases {
 		t := be.Relaxed(t)
