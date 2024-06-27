@@ -339,8 +339,9 @@ func replaceSpotlightShortcodes(s string) string {
 		}, tag) {
 			return s
 		}
+		tag = strings.TrimPrefix(tag, "embeds/")
 		q := u.Query()
-		buf.WriteString("{{<")
+		buf.WriteString("{{<embed/")
 		buf.WriteString(tag)
 		for _, k := range iterx.Sorted(iterx.Keys(q)) {
 			vv := q[k]

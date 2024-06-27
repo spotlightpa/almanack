@@ -14,6 +14,6 @@
 
 porttitor turpis ligula eget magna. Proin ligula ipsum, iaculis sit amet urna ultrices, bibendum pharetra felis. Quisque gravida sit amet lectus suscipit mattis. In pretium viverra est, quis sodales orci accumsan at. Quisque porta orci nec pretium iaculis. Duis congue porta velit non dapibus. Nam at pellentesque mauris. Cras porta velit suscipit purus commodo, sed ullamcorper est elementum. Suspendisse pellentesque arcu quis ipsum tempor scelerisque. Vivamus varius dolor sed nibh pulvinar iaculis. Phasellus iaculis, massa eget ornare pretium, ex nisi aliquam libero, eget ullamcorper nisi quam nec erat.
 
-{{<embeds/cta>}}
+{{<embed/cta>}}
 
 Maecenas sollicitudin lorem lectus, a dignissim quam auctor dictum. Integer eu tempus metus. Etiam ultricies, justo aliquet rutrum vehicula, nunc odio hendrerit turpis, non ullamcorper velit eros luctus turpis. Phasellus non venenatis ipsum. Aenean mi quam, porttitor nec sapien a, posuere pharetra ante. Aenean ac tristique enim. Phasellus interdum ex sed nisl semper, tempor tincidunt augue rutrum. Pellentesque nec lorem eleifend, dictum lorem ac, luctus lacus. Aliquam congue mattis nulla vitae sodales. Vivamus sed molestie elit. Donec sit amet risus enim. Etiam id ultrices nisi, at hendrerit diam. Vestibulum at quam lorem. Nunc consequat rutrum orci, ac laoreet enim.

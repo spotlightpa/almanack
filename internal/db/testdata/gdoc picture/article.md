@@ -4,7 +4,7 @@ MILLVALE — Don&#39;t call <a href="https://www.maudespaperwinggallery.com/haro
 
 “We talked about being a lesbian bar, because there are none in Pittsburgh,” owner Athena Flint told PA Local. “But that didn’t quite fit. I’m queer, not a lesbian, and my sibling is trans nonbinary. It’s important to me that the trans nonbinary community has lots of safe spaces, especially during this weird, chaotic time.”<br/><br/>With its lavender walls, vegan-friendly bar food, witchy entertainment on TV screens, and a cocktail menu that includes sober offerings, Harold’s is carving out a distinct and welcoming niche in the Pittsburgh area and beyond. So far, Flint hasn’t heard of another they bar. “So maybe it will be the beginning of something,” she said. “Who knows?”
 
-{{<embeds/newsletter preselect="palocal">}}
+{{<embed/newsletter preselect="palocal">}}
 
 <br/><br/>It may only be a year old, but Harold&#39;s already feels like a cozy classic neighborhood spot. With its pop culture-themed menu items (this season&#39;s mocktails include the &#34;Yippee-Ki-Yay Minty Frother,&#34; a <em>Die Hard</em> hat tip), faux-bookshelf bathroom doors, and weekly watch parties and trivia nights, it&#39;s got major cool-librarian vibes. The bar’s name channels Millvale’s eerie history and Flint’s love of Hal Ashby’s 1971 cult classic <em>Harold and Maude</em>.
 
