@@ -30,8 +30,7 @@ func MergeSiblings(root *html.Node) {
 	// no mutating while iterating!
 	// go in reverse order
 	// in case there are several siblings to merge
-	for i := len(inlineSiblings) - 1; i >= 0; i-- {
-		n := inlineSiblings[i]
+	for _, n := range slices.Backward(inlineSiblings) {
 		xhtml.AdoptChildren(n, n.NextSibling)
 		n.Parent.RemoveChild(n.NextSibling)
 	}

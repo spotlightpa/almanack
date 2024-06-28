@@ -1,7 +1,7 @@
 package stringx
 
 import (
-	"github.com/carlmjohnson/bytemap"
+	"github.com/earthboundkid/bytemap/v2"
 )
 
 var whitespace = bytemap.Make(" \t\n\r\v\f")
