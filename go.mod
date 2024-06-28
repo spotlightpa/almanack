@@ -1,16 +1,15 @@
 module github.com/spotlightpa/almanack
 
-go 1.22
+go 1.23
 
-toolchain go1.22.3
+toolchain go1.23rc1
 
 require (
 	github.com/BurntSushi/toml v1.4.0
 	github.com/algolia/algoliasearch-client-go/v3 v3.31.2
 	github.com/aws/aws-lambda-go v1.47.0
-	github.com/aws/aws-sdk-go v1.54.11
+	github.com/aws/aws-sdk-go v1.54.12
 	github.com/carlmjohnson/be v0.23.2
-	github.com/carlmjohnson/bytemap v0.23.5
 	github.com/carlmjohnson/crockford v0.23.1
 	github.com/carlmjohnson/emailx v0.23.1
 	github.com/carlmjohnson/errorx v0.23.2
@@ -22,6 +21,7 @@ require (
 	github.com/carlmjohnson/resperr v0.22.0
 	github.com/carlmjohnson/slackhook v0.23.2
 	github.com/carlmjohnson/versioninfo v0.22.5
+	github.com/earthboundkid/bytemap/v2 v2.24.1
 	github.com/earthboundkid/mid v0.24.1
 	github.com/gabriel-vasile/mimetype v1.4.4
 	github.com/getsentry/sentry-go v0.28.1
@@ -35,14 +35,15 @@ require (
 	gocloud.dev v0.37.0
 	golang.org/x/net v0.26.0
 	golang.org/x/oauth2 v0.21.0
-	google.golang.org/api v0.186.0
+	google.golang.org/api v0.187.0
 	gopkg.in/Iwark/spreadsheet.v2 v2.0.0-20230915040305-7677e8164883
 )
 
 require (
 	cloud.google.com/go/auth v0.6.1 // indirect
 	cloud.google.com/go/auth/oauth2adapt v0.2.2 // indirect
-	cloud.google.com/go/compute/metadata v0.3.0 // indirect
+	cloud.google.com/go/compute/metadata v0.4.0 // indirect
+	cloud.google.com/go/storage v1.41.0 // indirect
 	github.com/Masterminds/goutils v1.1.1 // indirect
 	github.com/Masterminds/semver/v3 v3.2.1 // indirect
 	github.com/Masterminds/sprig/v3 v3.2.3 // indirect
@@ -67,6 +68,7 @@ require (
 	github.com/aws/aws-sdk-go-v2/service/sts v1.30.1 // indirect
 	github.com/aws/smithy-go v1.20.3 // indirect
 	github.com/aymerick/douceur v0.2.0 // indirect
+	github.com/carlmjohnson/bytemap v0.23.5 // indirect
 	github.com/carlmjohnson/deque v0.23.1 // indirect
 	github.com/cloudflare/circl v1.3.9 // indirect
 	github.com/felixge/httpsnoop v1.0.4 // indirect
@@ -102,6 +104,7 @@ require (
 	golang.org/x/sys v0.21.0 // indirect
 	golang.org/x/text v0.16.0 // indirect
 	golang.org/x/xerrors v0.0.0-20231012003039-104605ab7028 // indirect
+	google.golang.org/genproto/googleapis/api v0.0.0-20240617180043-68d350f18fd4 // indirect
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20240701130421-f6361c86f094 // indirect
 	google.golang.org/grpc v1.64.0 // indirect
 	google.golang.org/protobuf v1.34.2 // indirect

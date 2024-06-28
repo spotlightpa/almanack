@@ -8,9 +8,9 @@ import (
 	"strings"
 	"unicode/utf8"
 
-	"github.com/carlmjohnson/bytemap"
 	"github.com/carlmjohnson/requests"
 	"github.com/carlmjohnson/resperr"
+	"github.com/earthboundkid/bytemap/v2"
 	"github.com/spotlightpa/almanack/internal/xhtml"
 	"golang.org/x/net/html"
 	"google.golang.org/api/docs/v1"
