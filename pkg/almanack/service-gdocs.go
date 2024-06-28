@@ -1,5 +1,3 @@
-//go:build goexperiment.rangefunc
-
 package almanack
 
 import (
@@ -9,20 +7,20 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"maps"
 	"net/http"
 	"net/url"
 	"slices"
 	"strconv"
 	"strings"
 
-	"github.com/carlmjohnson/bytemap"
 	"github.com/carlmjohnson/crockford"
 	"github.com/carlmjohnson/errorx"
 	"github.com/carlmjohnson/requests"
+	"github.com/earthboundkid/bytemap/v2"
 	"github.com/spotlightpa/almanack/internal/blocko"
 	"github.com/spotlightpa/almanack/internal/db"
 	"github.com/spotlightpa/almanack/internal/gdocs"
-	"github.com/spotlightpa/almanack/internal/iterx"
 	"github.com/spotlightpa/almanack/internal/must"
 	"github.com/spotlightpa/almanack/internal/stringx"
 	"github.com/spotlightpa/almanack/internal/xhtml"
@@ -313,7 +311,7 @@ func replaceSpotlightShortcodes(s string) string {
 	if err != nil {
 		return s
 	}
-	// $("[data-spl-embed-version=1]")
+	// $("div[data-spl-embed-version=1]")
 	divs := xhtml.SelectSlice(n, func(n *html.Node) bool {
 		return n.DataAtom == atom.Div && xhtml.Attr(n, "data-spl-embed-version") == "1"
 	})
@@ -343,7 +341,7 @@ func replaceSpotlightShortcodes(s string) string {
 		q := u.Query()
 		buf.WriteString("{{<embed/")
 		buf.WriteString(tag)
-		for _, k := range iterx.Sorted(iterx.Keys(q)) {
+		for _, k := range slices.Sorted(maps.Keys(q)) {
 			vv := q[k]
 			for _, v := range vv {
 				buf.WriteString(" ")

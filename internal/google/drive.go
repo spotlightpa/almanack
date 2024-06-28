@@ -6,9 +6,9 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/carlmjohnson/bytemap"
 	"github.com/carlmjohnson/requests"
 	"github.com/carlmjohnson/resperr"
+	"github.com/earthboundkid/bytemap/v2"
 )
 
 func (gsvc *Service) DriveClient(ctx context.Context) (cl *http.Client, err error) {
