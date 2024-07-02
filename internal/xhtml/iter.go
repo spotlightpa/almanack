@@ -1,10 +1,9 @@
-//go:build goexperiment.rangefunc
-
 // Package xhtml makes x/net/html easier
 package xhtml
 
 import (
 	"iter"
+	"slices"
 
 	"github.com/spotlightpa/almanack/internal/iterx"
 	"golang.org/x/net/html"
@@ -46,7 +45,7 @@ func SelectAll(n *html.Node, match func(*html.Node) bool) iter.Seq[*html.Node] {
 
 // SelectSlice returns a slice of child nodes matched by the selector.
 func SelectSlice(n *html.Node, match func(*html.Node) bool) []*html.Node {
-	return iterx.Collect(SelectAll(n, match))
+	return slices.Collect(SelectAll(n, match))
 }
 
 // SelectSlice returns the first child node matched by the selector or nil.

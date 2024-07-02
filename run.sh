@@ -7,8 +7,6 @@ THIS_DIR=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
 
 cd "$THIS_DIR"
 
-export GOEXPERIMENT=rangefunc
-
 function _default() {
 	# shellcheck disable=SC2119
 	api

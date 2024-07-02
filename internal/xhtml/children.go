@@ -2,9 +2,9 @@ package xhtml
 
 import (
 	"iter"
+	"slices"
 	"strings"
 
-	"github.com/spotlightpa/almanack/internal/iterx"
 	"golang.org/x/net/html"
 )
 
@@ -79,7 +79,7 @@ func UnnestChildren(n *html.Node) {
 	if n.Parent == nil {
 		return
 	}
-	children := iterx.Collect(ChildNodes(n))
+	children := slices.Collect(ChildNodes(n))
 	RemoveAll(children)
 	for _, c := range children {
 		n.Parent.InsertBefore(c, n)
