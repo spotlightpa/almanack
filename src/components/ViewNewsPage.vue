@@ -526,6 +526,24 @@ export default {
       <details class="field">
         <summary class="has-text-weight-semibold">Advanced options</summary>
 
+        <BulmaField label="Content Source">
+          <div class="control is-expanded">
+            <span class="select is-fullwidth">
+              <select v-model="page.contentSource">
+                <option value="">Spotlight PA</option>
+                <option value="Associated Press">Associated Press</option>
+                <option value="Inside Climate News">Inside Climate News</option>
+              </select>
+            </span>
+          </div>
+        </BulmaField>
+        <BulmaFieldCheckbox
+          v-model="page.feedExclude"
+          label="Exclude from mobile app feed"
+        >
+          Don't show article in mobile app list of articles
+        </BulmaFieldCheckbox>
+
         <BulmaField v-slot="{ idForLabel }" label="Language">
           <div class="select is-fullwidth">
             <select :id="idForLabel" v-model="page.languageCode" class="select">
