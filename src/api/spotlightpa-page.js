@@ -62,6 +62,8 @@ export class Page {
     this.overrideURL = this.frontmatter["url"] ?? "";
     this.aliases = this.frontmatter["aliases"] ?? [];
     this.layout = this.frontmatter["layout"] ?? "";
+    this.feedExclude = this.frontmatter["feed-exclude"] ?? false;
+    this.contentSource = this.frontmatter["content-source"] ?? "";
 
     // not a getter so it won't react to changes
     this.status = "pub";
@@ -216,6 +218,8 @@ export class Page {
         url: this.overrideURL,
         aliases: this.aliases,
         layout: this.layout,
+        "feed-exclude": this.feedExclude,
+        "content-source": this.contentSource,
       },
       set_body: true,
       body: this.body,
