@@ -1,8 +1,6 @@
 <strong>Lorem ipsum dolor sit amet</strong>, &lt;consectetur&gt; adipiscing elit. Aenean ullamcorper augue nec commodo egestas. Vivamus cursus lectus magna, aliquet cursus metus interdum in. Quisque imperdiet gravida commodo. Vestibulum lobortis lobortis rutrum. Suspendisse tristique tristique placerat. Maecenas aliquet consectetur dolor vitae ornare. Nunc sodales placerat bibendum. Vivamus purus leo, finibus vitae felis nec, rutrum rutrum metus. In vehicula scelerisque rhoncus.
 
-Blah blah
-
-###
+{{<embed/raw srcdoc="Blah blah&#10;&#10;###">}}
 
 <em>Praesent vitae facilisis neque</em>. Phasellus arcu magna, euismod et porttitor sit amet, suscipit quis turpis. Donec lacinia, nisl vel dignissim suscipit, massa lorem tempus purus, ut feugiat purus nisi id orci. Duis vestibulum, arcu in lobortis volutpat, neque tellus mollis turpis, semper
 

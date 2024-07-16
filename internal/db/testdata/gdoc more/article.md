@@ -8,7 +8,7 @@ This is my \_<a href="https://docs.google.com/document/d/103kCeBG2OQS_ZHkHUyKpT9
 
 # Some blocks
 
-<script src="http://example.com/"></script>
+{{<embed/raw srcdoc="&lt;script src=&#34;http://example.com/&#34;&gt;&lt;/script&gt;">}}
 
 {{<picture src="external/cwp3y3z5x8svbtsfv7t68hggc0.png" description="Blah blah blah." caption="Here is a caption" credit="CarlCo">}}
 

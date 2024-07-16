@@ -8,24 +8,6 @@ Tickets are $35 per person. All proceeds will support Spotlight PA’s investiga
 
 Buy your ticket now:
 
-<noscript><a href="https://www.eventbrite.com/e/clink-and-think-quiz-bash-with-spotlight-pa-tickets-663145254307" rel="noopener noreferrer" target="_blank">Buy Tickets on Eventbrite</a></noscript>
-<!-- You can customize this button any way you like -->
-<button id="eventbrite-widget-modal-trigger-663145254307" type="button">Buy Tickets</button>
-
-<script src="https://www.eventbrite.com/static/widgets/eb_widgets.js"></script>
-
-<script type="text/javascript">
-    var exampleCallback = function() {
-        console.log('Order complete!');
-    };
-
-    window.EBWidgets.createWidget({
-        widgetType: 'checkout',
-        eventId: '663145254307',
-        modal: true,
-        modalTriggerElementId: 'eventbrite-widget-modal-trigger-663145254307',
-        onOrderComplete: exampleCallback
-    });
-</script>
+{{<embed/raw srcdoc="&lt;noscript&gt;&lt;a href=&#34;https://www.eventbrite.com/e/clink-and-think-quiz-bash-with-spotlight-pa-tickets-663145254307&#34; rel=&#34;noopener noreferrer&#34; target=&#34;_blank&#34;&gt;Buy Tickets on Eventbrite&lt;/a&gt;&lt;/noscript&gt;&#10;&lt;!-- You can customize this button any way you like --&gt;&#10;&lt;button id=&#34;eventbrite-widget-modal-trigger-663145254307&#34; type=&#34;button&#34;&gt;Buy Tickets&lt;/button&gt;&#10;&#10;&lt;script src=&#34;https://www.eventbrite.com/static/widgets/eb_widgets.js&#34;&gt;&lt;/script&gt;&#10;&#10;&lt;script type=&#34;text/javascript&#34;&gt;&#10;    var exampleCallback = function() {&#10;        console.log(&#39;Order complete!&#39;);&#10;    };&#10;&#10;    window.EBWidgets.createWidget({&#10;        widgetType: &#39;checkout&#39;,&#10;        eventId: &#39;663145254307&#39;,&#10;        modal: true,&#10;        modalTriggerElementId: &#39;eventbrite-widget-modal-trigger-663145254307&#39;,&#10;        onOrderComplete: exampleCallback&#10;    });&#10;&lt;/script&gt;">}}
 
 <strong><em>WHILE YOU’RE HERE…</em></strong><em> If you learned something from this story, pay it forward and become a member of </em><a href="https://www.spotlightpa.org/"><em>Spotlight PA</em></a><em> so someone else can in the future at </em><a href="https://www.spotlightpa.org/donate/"><em>spotlightpa.org/donate</em></a><em>. Spotlight PA is funded by</em><a href="https://www.spotlightpa.org/support"><em> foundations and readers like you</em></a><em> who are committed to accountability journalism that gets results.</em>
