@@ -2,11 +2,7 @@ Blah blah blah
 
 Lorem <em>ipsum</em> dolor
 
-Only on *dot* org:
-
-{{thing 
-   blah="hello"
-/}}
+{{<embed/raw srcdoc="Only on *dot* org:&#10;&#10;{{thing &#10;   blah=&#34;hello&#34;&#10;/}}">}}
 
 {{<featured/related-stories
   title="More Stories from the 2024 Election"

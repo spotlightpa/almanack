@@ -20,7 +20,7 @@
     "title-tag": "",
     "twitter-title": ""
   },
-  "body": "Blah blah blah\n\nLorem <em>ipsum</em> dolor\n\nOnly on *dot* org:\n\n{{thing \n   blah=\"hello\"\n/}}\n\n{{<featured/related-stories\n  title=\"More Stories from the 2024 Election\"\n  link=\"/election\"\n  cta=\"Visit the Election Center →\"\n  limit=\"12\"\n>}}\n\nSome <strong>bold</strong> and <em>italic</em> Spotlight PA text. Spotlight PA is blah blah.\n\n",
+  "body": "Blah blah blah\n\nLorem <em>ipsum</em> dolor\n\n{{<embed/raw srcdoc=\"Only on *dot* org:&#10;&#10;{{thing &#10;   blah=&#34;hello&#34;&#10;/}}\">}}\n\n{{<featured/related-stories\n  title=\"More Stories from the 2024 Election\"\n  link=\"/election\"\n  cta=\"Visit the Election Center →\"\n  limit=\"12\"\n>}}\n\nSome <strong>bold</strong> and <em>italic</em> Spotlight PA text. Spotlight PA is blah blah.\n\n",
   "schedule_for": null,
   "last_published": null,
   "created_at": "2020-03-15T20:00:00Z",
