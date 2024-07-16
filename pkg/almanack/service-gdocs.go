@@ -91,6 +91,19 @@ func (svc Services) ProcessGDocs(ctx context.Context) error {
 
 var ascii = bytemap.Range(0, 127)
 
+type DataTagValue struct {
+	Type  DataTagValueType `json:"type"`
+	Value string           `json:"value"`
+}
+type DataTagValueType string
+
+const (
+	dtSpotlightRaw  DataTagValueType = "spl"
+	dtSpotlightText DataTagValueType = "spl-text"
+	dtPartnerText   DataTagValueType = "partner-text"
+	dtDBEmbed       DataTagValueType = "db-embed"
+)
+
 func (svc Services) ProcessGDocsDoc(ctx context.Context, dbDoc db.GDocsDoc) (err error) {
 	defer errorx.Trace(&err)
 
@@ -143,22 +156,22 @@ func (svc Services) ProcessGDocsDoc(ctx context.Context, dbDoc db.GDocsDoc) (err
 
 		case "spl", "spl-embed":
 			embedHTML := xhtml.TextContent(rows.At(1, 0))
-			embed.Type = db.SpotlightRawEmbedTag
-			embed.Value = embedHTML
-			value := must.Get(json.Marshal(embed))
-			data := xhtml.New("data", "value", string(value))
+			data := newDataTag(DataTagValue{
+				Type:  dtSpotlightRaw,
+				Value: embedHTML,
+			})
 			xhtml.ReplaceWith(tbl, data)
 
 		case "spl-text":
-			embed.Type = db.SpotlightTextTag
 			n := xhtml.Clone(rows.At(1, 0))
 			blocko.MergeSiblings(n)
 			blocko.RemoveEmptyP(n)
 			blocko.RemoveMarks(n)
 			s := blocko.Blockize(n)
-			embed.Value = s
-			value := must.Get(json.Marshal(embed))
-			data := xhtml.New("data", "value", string(value))
+			data := newDataTag(DataTagValue{
+				Type:  dtSpotlightText,
+				Value: s,
+			})
 			xhtml.ReplaceWith(tbl, data)
 
 		case "partner-embed":
@@ -168,14 +181,14 @@ func (svc Services) ProcessGDocsDoc(ctx context.Context, dbDoc db.GDocsDoc) (err
 			goto append
 
 		case "partner-text":
-			embed.Type = db.PartnerTextTag
 			n := xhtml.Clone(rows.At(1, 0))
 			blocko.MergeSiblings(n)
 			blocko.RemoveEmptyP(n)
 			blocko.RemoveMarks(n)
-			embed.Value = xhtml.InnerHTMLBlocks(n)
-			value := must.Get(json.Marshal(embed))
-			data := xhtml.New("data", "value", string(value))
+			data := newDataTag(DataTagValue{
+				Type:  dtPartnerText,
+				Value: xhtml.InnerHTMLBlocks(n),
+			})
 			xhtml.ReplaceWith(tbl, data)
 
 		case "photo", "image", "photograph", "illustration", "illo":
@@ -220,7 +233,10 @@ func (svc Services) ProcessGDocsDoc(ctx context.Context, dbDoc db.GDocsDoc) (err
 	append:
 		embeds = append(embeds, embed)
 		value := must.Get(json.Marshal(embed))
-		data := xhtml.New("data", "value", string(value))
+		data := newDataTag(DataTagValue{
+			Type:  dtDBEmbed,
+			Value: string(value),
+		})
 		xhtml.ReplaceWith(tbl, data)
 		n++
 	}
@@ -285,6 +301,12 @@ func (svc Services) ProcessGDocsDoc(ctx context.Context, dbDoc db.GDocsDoc) (err
 		WordCount:       int32(stringx.WordCount(xhtml.TextContent(richText))),
 	})
 	return err
+}
+
+func newDataTag(tag DataTagValue) *html.Node {
+	value := must.Get(json.Marshal(tag))
+	data := xhtml.New("data", "value", string(value))
+	return data
 }
 
 func removeTail(n *html.Node) {
@@ -599,51 +621,69 @@ func (svc Services) replaceMetadata(
 func fixRichTextPlaceholders(richText *html.Node) {
 	embeds := xhtml.SelectSlice(richText, xhtml.WithAtom(atom.Data))
 	for _, dataEl := range embeds {
-		embed := extractEmbed(dataEl)
+		embed := extractDataTag(dataEl)
 		switch embed.Type {
-		case db.SpotlightRawEmbedTag, db.SpotlightTextTag:
-			dataEl.Parent.RemoveChild(dataEl)
-			continue
-		case db.PartnerTextTag:
-			xhtml.ReplaceWith(dataEl, &html.Node{
-				Type: html.RawNode,
-				Data: embed.Value.(string),
-			})
-			continue
-		case db.ImageEmbedTag, db.RawEmbedTag, db.ToCEmbedTag, db.PartnerRawEmbedTag:
-			placeholder := xhtml.New("h2", "style", "color: red;")
-			xhtml.AppendText(placeholder, fmt.Sprintf("Embed #%d", embed.N))
-			xhtml.ReplaceWith(dataEl, placeholder)
 		default:
 			panic("unknown embed type: " + embed.Type)
+		case dtSpotlightRaw, dtSpotlightText:
+			dataEl.Parent.RemoveChild(dataEl)
+			continue
+		case dtPartnerText:
+			xhtml.ReplaceWith(dataEl, &html.Node{
+				Type: html.RawNode,
+				Data: embed.Value,
+			})
+			continue
+		case dtDBEmbed:
+			dbembed := extractDBEmbed(embed)
+			placeholder := xhtml.New("h2", "style", "color: red;")
+			xhtml.AppendText(placeholder, fmt.Sprintf("Embed #%d", dbembed.N))
+			xhtml.ReplaceWith(dataEl, placeholder)
 		}
 	}
 }
 
-func extractEmbed(n *html.Node) db.Embed {
-	var embed db.Embed
+func extractDataTag(n *html.Node) DataTagValue {
+	var embed DataTagValue
 	must.Do(json.Unmarshal([]byte(xhtml.Attr(n, "value")), &embed))
 	return embed
+}
+
+func extractDBEmbed(embed DataTagValue) db.Embed {
+	var dbembed db.Embed
+	must.Do(json.Unmarshal([]byte(embed.Value), &dbembed))
+	return dbembed
 }
 
 func fixRawHTMLPlaceholders(rawHTML *html.Node) {
 	embeds := xhtml.SelectSlice(rawHTML, xhtml.WithAtom(atom.Data))
 	for _, dataEl := range embeds {
-		embed := extractEmbed(dataEl)
+		embed := extractDataTag(dataEl)
 		switch embed.Type {
-		case db.SpotlightRawEmbedTag, db.SpotlightTextTag:
-			dataEl.Parent.RemoveChild(dataEl)
-		case db.RawEmbedTag, db.ToCEmbedTag, db.PartnerRawEmbedTag, db.PartnerTextTag:
-			xhtml.ReplaceWith(dataEl, &html.Node{
-				Type: html.RawNode,
-				Data: embed.Value.(string),
-			})
-		case db.ImageEmbedTag:
-			placeholder := xhtml.New("h2", "style", "color: red;")
-			xhtml.AppendText(placeholder, fmt.Sprintf("Embed #%d", embed.N))
-			xhtml.ReplaceWith(dataEl, placeholder)
 		default:
 			panic("unknown embed type: " + embed.Type)
+		case dtSpotlightRaw, dtSpotlightText:
+			dataEl.Parent.RemoveChild(dataEl)
+		case dtPartnerText:
+			xhtml.ReplaceWith(dataEl, &html.Node{
+				Type: html.RawNode,
+				Data: embed.Value,
+			})
+		case dtDBEmbed:
+			dbembed := extractDBEmbed(embed)
+			switch dbembed.Type {
+			case db.RawEmbedTag, db.ToCEmbedTag, db.PartnerRawEmbedTag:
+				xhtml.ReplaceWith(dataEl, &html.Node{
+					Type: html.RawNode,
+					Data: dbembed.Value.(string),
+				})
+			case db.ImageEmbedTag:
+				placeholder := xhtml.New("h2", "style", "color: red;")
+				xhtml.AppendText(placeholder, fmt.Sprintf("Embed #%d", dbembed.N))
+				xhtml.ReplaceWith(dataEl, placeholder)
+			default:
+				panic("unknown embed type: " + dbembed.Type)
+			}
 		}
 	}
 }
@@ -651,48 +691,62 @@ func fixRawHTMLPlaceholders(rawHTML *html.Node) {
 func fixMarkdownPlaceholders(rawHTML *html.Node) {
 	embeds := xhtml.SelectSlice(rawHTML, xhtml.WithAtom(atom.Data))
 	for _, dataEl := range embeds {
-		embed := extractEmbed(dataEl)
+		embed := extractDataTag(dataEl)
 		switch embed.Type {
-		case db.PartnerRawEmbedTag, db.PartnerTextTag:
-			dataEl.Parent.RemoveChild(dataEl)
-		case db.SpotlightTextTag:
-			xhtml.ReplaceWith(dataEl, &html.Node{
-				Type: html.RawNode,
-				Data: embed.Value.(string),
-			})
-		case db.RawEmbedTag, db.SpotlightRawEmbedTag:
-			data := replaceSpotlightShortcodes(embed.Value.(string))
-			xhtml.ReplaceWith(dataEl, &html.Node{
-				Type: html.RawNode,
-				Data: data,
-			})
-		case db.ToCEmbedTag:
-			container := xhtml.New("div")
-			must.Do(xhtml.SetInnerHTML(container, embed.Value.(string)))
-			xhtml.ReplaceWith(dataEl, container)
-			xhtml.UnnestChildren(container)
-		case db.ImageEmbedTag:
-			image := embed.Value.(db.EmbedImage)
-			var widthHeight string
-			if image.Width != 0 {
-				widthHeight = fmt.Sprintf(`width-ratio="%d" height-ratio="%d" `,
-					image.Width, image.Height,
-				)
-			}
-			data := fmt.Sprintf(
-				`{{<picture src="%s" %sdescription="%s" caption="%s" credit="%s">}}`,
-				image.Path,
-				widthHeight,
-				html.EscapeString(strings.TrimSpace(image.Description)),
-				html.EscapeString(strings.TrimSpace(image.Caption)),
-				html.EscapeString(strings.TrimSpace(image.Credit)),
-			)
-			xhtml.ReplaceWith(dataEl, &html.Node{
-				Type: html.RawNode,
-				Data: data,
-			})
 		default:
 			panic("unknown embed type: " + embed.Type)
+		case dtPartnerText:
+			dataEl.Parent.RemoveChild(dataEl)
+		case dtSpotlightText:
+			xhtml.ReplaceWith(dataEl, &html.Node{
+				Type: html.RawNode,
+				Data: embed.Value,
+			})
+		case dtSpotlightRaw:
+			data := replaceSpotlightShortcodes(embed.Value)
+			xhtml.ReplaceWith(dataEl, &html.Node{
+				Type: html.RawNode,
+				Data: data,
+			})
+		case dtDBEmbed:
+			dbembed := extractDBEmbed(embed)
+			switch dbembed.Type {
+			case db.RawEmbedTag:
+				data := replaceSpotlightShortcodes(dbembed.Value.(string))
+				xhtml.ReplaceWith(dataEl, &html.Node{
+					Type: html.RawNode,
+					Data: data,
+				})
+			case db.PartnerRawEmbedTag:
+				dataEl.Parent.RemoveChild(dataEl)
+			case db.ToCEmbedTag:
+				container := xhtml.New("div")
+				must.Do(xhtml.SetInnerHTML(container, dbembed.Value.(string)))
+				xhtml.ReplaceWith(dataEl, container)
+				xhtml.UnnestChildren(container)
+			case db.ImageEmbedTag:
+				image := dbembed.Value.(db.EmbedImage)
+				var widthHeight string
+				if image.Width != 0 {
+					widthHeight = fmt.Sprintf(`width-ratio="%d" height-ratio="%d" `,
+						image.Width, image.Height,
+					)
+				}
+				data := fmt.Sprintf(
+					`{{<picture src="%s" %sdescription="%s" caption="%s" credit="%s">}}`,
+					image.Path,
+					widthHeight,
+					html.EscapeString(strings.TrimSpace(image.Description)),
+					html.EscapeString(strings.TrimSpace(image.Caption)),
+					html.EscapeString(strings.TrimSpace(image.Credit)),
+				)
+				xhtml.ReplaceWith(dataEl, &html.Node{
+					Type: html.RawNode,
+					Data: data,
+				})
+			default:
+				panic("unknown embed type: " + dbembed.Type)
+			}
 		}
 	}
 }

@@ -28,19 +28,18 @@ type GDocsMetadata struct {
 }
 
 const (
-	ImageEmbedTag        = "image"
-	RawEmbedTag          = "raw"
-	ToCEmbedTag          = "toc"
-	SpotlightRawEmbedTag = "spl"
-	SpotlightTextTag     = "spl-text"
-	PartnerRawEmbedTag   = "partner-embed"
-	PartnerTextTag       = "partner-text"
+	ImageEmbedTag      EmbedType = "image"
+	RawEmbedTag        EmbedType = "raw"
+	ToCEmbedTag        EmbedType = "toc"
+	PartnerRawEmbedTag EmbedType = "partner-embed"
 )
 
+type EmbedType string
+
 type Embed struct {
-	N     int    `json:"n"`
-	Type  string `json:"type"`
-	Value any    `json:"value"`
+	N     int       `json:"n"`
+	Type  EmbedType `json:"type"`
+	Value any       `json:"value"`
 }
 
 func (em *Embed) UnmarshalJSON(data []byte) error {
@@ -59,7 +58,7 @@ func (em *Embed) UnmarshalJSON(data []byte) error {
 			return err
 		}
 		em.Value = img
-	case RawEmbedTag, ToCEmbedTag, SpotlightRawEmbedTag, SpotlightTextTag, PartnerRawEmbedTag, PartnerTextTag:
+	case RawEmbedTag, ToCEmbedTag, PartnerRawEmbedTag:
 		var s string
 		if err := json.Unmarshal(temp.Value, &s); err != nil {
 			return err
