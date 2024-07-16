@@ -44,8 +44,7 @@ But Dennis Wright, a Black resident of West Oak Lane, said he takes responsibili
 
 “I’ve been voting my whole life and I’m 79 years old. And I did miss something on my ballot. So I chalk it up to that,” he said.
 
-<iframe title="The disparate impact of mail ballot errors in Philadelphia" aria-label="Bar Chart" id="datawrapper-chart-auiXw" src="https://datawrapper.dwcdn.net/auiXw/6/" scrolling="no" frameborder="0" style="width: 0; min-width: 100% !important; border: none;" height="380" data-external="1"></iframe><script type="text/javascript">!function(){"use strict";window.addEventListener("message",(function(a){if(void 0!==a.data["datawrapper-height"]){var e=document.querySelectorAll("iframe");for(var t in a.data["datawrapper-height"])for(var r=0;r<e.length;r++)if(e[r].contentWindow===a.source){var i=a.data["datawrapper-height"][t]+"px";e[r].style.height=i}}}))}();
-</script>
+{{<embed/raw srcdoc="&lt;iframe title=&#34;The disparate impact of mail ballot errors in Philadelphia&#34; aria-label=&#34;Bar Chart&#34; id=&#34;datawrapper-chart-auiXw&#34; src=&#34;https://datawrapper.dwcdn.net/auiXw/6/&#34; scrolling=&#34;no&#34; frameborder=&#34;0&#34; style=&#34;width: 0; min-width: 100% !important; border: none;&#34; height=&#34;380&#34; data-external=&#34;1&#34;&gt;&lt;/iframe&gt;&lt;script type=&#34;text/javascript&#34;&gt;!function(){&#34;use strict&#34;;window.addEventListener(&#34;message&#34;,(function(a){if(void 0!==a.data[&#34;datawrapper-height&#34;]){var e=document.querySelectorAll(&#34;iframe&#34;);for(var t in a.data[&#34;datawrapper-height&#34;])for(var r=0;r&lt;e.length;r++)if(e[r].contentWindow===a.source){var i=a.data[&#34;datawrapper-height&#34;][t]+&#34;px&#34;;e[r].style.height=i}}}))}();&#10;&lt;/script&gt;">}}
 
 ## Legal saga continues
 

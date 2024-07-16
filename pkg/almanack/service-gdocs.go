@@ -307,6 +307,12 @@ func removeTail(n *html.Node) {
 }
 
 func replaceSpotlightShortcodes(s string) string {
+	if s == "" {
+		return s
+	}
+	if strings.Contains(s, "{{<") && strings.Contains(s, ">}}") {
+		return s
+	}
 	n, err := html.Parse(strings.NewReader(s))
 	if err != nil {
 		return s
@@ -315,8 +321,10 @@ func replaceSpotlightShortcodes(s string) string {
 	divs := xhtml.SelectSlice(n, func(n *html.Node) bool {
 		return n.DataAtom == atom.Div && xhtml.Attr(n, "data-spl-embed-version") == "1"
 	})
+	// Unknown embed type
 	if len(divs) < 1 {
-		return s
+		attr := escapeAttr(s)
+		return fmt.Sprintf(`{{<embed/raw srcdoc="%s">}}`, attr)
 	}
 	var buf strings.Builder
 	for i, div := range divs {
@@ -347,13 +355,19 @@ func replaceSpotlightShortcodes(s string) string {
 				buf.WriteString(" ")
 				buf.WriteString(k)
 				buf.WriteString("=\"")
-				buf.WriteString(html.EscapeString(v))
+				buf.WriteString(escapeAttr(v))
 				buf.WriteString("\"")
 			}
 		}
 		buf.WriteString(">}}")
 	}
 	return buf.String()
+}
+
+func escapeAttr(s string) string {
+	attr := html.EscapeString(s)
+	attr = strings.ReplaceAll(attr, "\n", "&#10;")
+	return attr
 }
 
 func (svc Services) replaceImageEmbed(

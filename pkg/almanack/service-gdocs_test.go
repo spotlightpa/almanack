@@ -35,10 +35,11 @@ func TestReplaceSpotlightShortcodes(t *testing.T) {
 		in, want string
 	}{
 		{"", ""},
-		{"Hello, World!", "Hello, World!"},
+		{"Hello, World!", `{{<embed/raw srcdoc="Hello, World!">}}`},
+		{"<div data-whatever>Hello, World!</div>", `{{<embed/raw srcdoc="&lt;div data-whatever&gt;Hello, World!&lt;/div&gt;">}}`},
 		{
 			`<div data-spl-embed-version="2" data-spl-src="https://www.spotlightpa.org/embeds/cta/"></div>`,
-			`<div data-spl-embed-version="2" data-spl-src="https://www.spotlightpa.org/embeds/cta/"></div>`,
+			`{{<embed/raw srcdoc="&lt;div data-spl-embed-version=&#34;2&#34; data-spl-src=&#34;https://www.spotlightpa.org/embeds/cta/&#34;&gt;&lt;/div&gt;">}}`,
 		},
 		{
 			`
