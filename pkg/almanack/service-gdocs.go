@@ -127,16 +127,7 @@ func (svc Services) ProcessGDocsDoc(ctx context.Context, dbDoc db.GDocsDoc) (err
 	// First remove everything after a ###
 	removeTail(docHTML)
 
-	// Now collect the embeds array and metadata
-	var (
-		metadata db.GDocsMetadata
-		embeds   = []db.Embed{} // must not be "null"
-		warnings = []string{}
-		n        = 1
-	)
-
-	// Default slug is article title
-	metadata.InternalID = dbDoc.Document.Title
+	var warnings []string
 
 	// Handle image uploads/database lookups
 	for tbl, rows := range xhtml.Tables(docHTML) {
@@ -157,6 +148,43 @@ func (svc Services) ProcessGDocsDoc(ctx context.Context, dbDoc db.GDocsDoc) (err
 		}
 	}
 
+	metadata, embeds, richText, rawHTML, md, warnings2 := processDocHTML(docHTML)
+	warnings = append(warnings, warnings2...)
+
+	// Default slug is article title
+	metadata.InternalID = cmp.Or(metadata.InternalID, dbDoc.Document.Title)
+
+	// database slices must not be "null"
+	if embeds == nil {
+		embeds = []db.Embed{}
+	}
+	if warnings == nil {
+		warnings = []string{}
+	}
+
+	// Save to database
+	_, err = svc.Queries.UpdateGDocsDoc(ctx, db.UpdateGDocsDocParams{
+		ID:              dbDoc.ID,
+		Metadata:        metadata,
+		Embeds:          embeds,
+		RichText:        xhtml.InnerHTMLBlocks(richText),
+		RawHtml:         xhtml.InnerHTMLBlocks(rawHTML),
+		ArticleMarkdown: md,
+		Warnings:        warnings,
+		WordCount:       int32(stringx.WordCount(xhtml.TextContent(richText))),
+	})
+	return err
+}
+
+func processDocHTML(docHTML *html.Node) (
+	metadata db.GDocsMetadata,
+	embeds []db.Embed,
+	richText *html.Node, rawHTML *html.Node,
+	markdown string,
+	warnings []string,
+) {
+	// Now collect the embeds array and metadata
+	n := 1
 	for tbl, rows := range xhtml.Tables(docHTML) {
 		embed := db.Embed{N: n}
 		switch label := rows.Label(); label {
@@ -210,7 +238,7 @@ func (svc Services) ProcessGDocsDoc(ctx context.Context, dbDoc db.GDocsDoc) (err
 
 		case "photo", "image", "photograph", "illustration", "illo":
 			embed.Type = db.ImageEmbedTag
-			if imageEmbed, warning := svc.replaceImageEmbed(rows, n); warning != "" {
+			if imageEmbed, warning := replaceImageEmbed(rows, n); warning != "" {
 				tbl.Parent.RemoveChild(tbl)
 				warnings = append(warnings, warning)
 			} else {
@@ -219,7 +247,7 @@ func (svc Services) ProcessGDocsDoc(ctx context.Context, dbDoc db.GDocsDoc) (err
 			}
 
 		case "metadata", "info":
-			svc.replaceMetadata(rows, &metadata)
+			replaceMetadata(rows, &metadata)
 			tbl.Parent.RemoveChild(tbl)
 
 		case "comment", "ignore", "note":
@@ -252,10 +280,8 @@ func (svc Services) ProcessGDocsDoc(ctx context.Context, dbDoc db.GDocsDoc) (err
 		n++
 	}
 
-	docHTML, err = blocko.Minify(xhtml.ToBuffer(docHTML))
-	if err != nil {
-		return err
-	}
+	docHTML = must.Get(blocko.Minify(xhtml.ToBuffer(docHTML)))
+
 	blocko.MergeSiblings(docHTML)
 	blocko.RemoveEmptyP(docHTML)
 	blocko.RemoveMarks(docHTML)
@@ -289,29 +315,18 @@ func (svc Services) ProcessGDocsDoc(ctx context.Context, dbDoc db.GDocsDoc) (err
 	}
 
 	// Clone and remove turn data atoms into attributes
-	richText := xhtml.Clone(docHTML)
+	richText = xhtml.Clone(docHTML)
 	fixRichTextPlaceholders(richText)
 
 	// For rawHTML, convert to raw nodes
-	rawHTML := xhtml.Clone(docHTML)
+	rawHTML = xhtml.Clone(docHTML)
 	fixRawHTMLPlaceholders(rawHTML)
 
 	// Markdown data conversion
 	fixMarkdownPlaceholders(docHTML)
-	md := blocko.Blockize(docHTML)
+	markdown = blocko.Blockize(docHTML)
 
-	// Save to database
-	_, err = svc.Queries.UpdateGDocsDoc(ctx, db.UpdateGDocsDocParams{
-		ID:              dbDoc.ID,
-		Metadata:        metadata,
-		Embeds:          embeds,
-		RichText:        xhtml.InnerHTMLBlocks(richText),
-		RawHtml:         xhtml.InnerHTMLBlocks(rawHTML),
-		ArticleMarkdown: md,
-		Warnings:        warnings,
-		WordCount:       int32(stringx.WordCount(xhtml.TextContent(richText))),
-	})
-	return err
+	return
 }
 
 func newDataTag(tag DataTagValue) *html.Node {
@@ -417,33 +432,6 @@ func setRowValue(tbl *html.Node, key, value string) {
 	tbl.AppendChild(tr)
 }
 
-func (svc Services) replaceImageEmbed(rows xhtml.TableNodes, n int) (imageEmbed *db.EmbedImage, warning string) {
-	var width, height int
-	if w := xhtml.TextContent(rows.Value("width")); w != "" {
-		width, _ = strconv.Atoi(w)
-	}
-	if h := xhtml.TextContent(rows.Value("height")); h != "" {
-		height, _ = strconv.Atoi(h)
-	}
-	imageEmbed = &db.EmbedImage{
-		Credit:  xhtml.TextContent(rows.Value("credit")),
-		Caption: xhtml.TextContent(rows.Value("caption")),
-		Description: cmp.Or(
-			xhtml.TextContent(rows.Value("description")),
-			xhtml.TextContent(rows.Value("alt")),
-		),
-		Width:  width,
-		Height: height,
-	}
-
-	if path := xhtml.TextContent(rows.Value("path")); path != "" {
-		imageEmbed.Path = path
-		return imageEmbed, ""
-	}
-	return nil, fmt.Sprintf(
-		"Table %d missing image", n,
-	)
-}
 func (svc Services) replaceMetadataImagePath(
 	ctx context.Context,
 	tbl *html.Node,
@@ -525,7 +513,35 @@ func (svc Services) replaceMetadataImagePath(
 	return ""
 }
 
-func (svc Services) replaceMetadata(rows xhtml.TableNodes, metadata *db.GDocsMetadata) {
+func replaceImageEmbed(rows xhtml.TableNodes, n int) (imageEmbed *db.EmbedImage, warning string) {
+	var width, height int
+	if w := xhtml.TextContent(rows.Value("width")); w != "" {
+		width, _ = strconv.Atoi(w)
+	}
+	if h := xhtml.TextContent(rows.Value("height")); h != "" {
+		height, _ = strconv.Atoi(h)
+	}
+	imageEmbed = &db.EmbedImage{
+		Credit:  xhtml.TextContent(rows.Value("credit")),
+		Caption: xhtml.TextContent(rows.Value("caption")),
+		Description: cmp.Or(
+			xhtml.TextContent(rows.Value("description")),
+			xhtml.TextContent(rows.Value("alt")),
+		),
+		Width:  width,
+		Height: height,
+	}
+
+	if path := xhtml.TextContent(rows.Value("path")); path != "" {
+		imageEmbed.Path = path
+		return imageEmbed, ""
+	}
+	return nil, fmt.Sprintf(
+		"Table %d missing image", n,
+	)
+}
+
+func replaceMetadata(rows xhtml.TableNodes, metadata *db.GDocsMetadata) {
 	metadata.InternalID = cmp.Or(
 		xhtml.TextContent(rows.Value("slug")),
 		xhtml.TextContent(rows.Value("internal id")),
