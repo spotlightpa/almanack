@@ -138,6 +138,7 @@ func (svc Services) ProcessGDocsDoc(ctx context.Context, dbDoc db.GDocsDoc) (err
 	// Default slug is article title
 	metadata.InternalID = dbDoc.Document.Title
 
+	// Handle image uploads/database lookups
 	for tbl, rows := range xhtml.Tables(docHTML) {
 		switch label := rows.Label(); label {
 		case "photo", "image", "photograph", "illustration", "illo":
@@ -147,13 +148,12 @@ func (svc Services) ProcessGDocsDoc(ctx context.Context, dbDoc db.GDocsDoc) (err
 				warnings = append(warnings, warning)
 			}
 
-			// case "metadata", "info":
-			// 	if warning := svc.replaceMetadata(
-			// 		ctx, tbl, rows, dbDoc.ExternalID, objID2Path, &metadata,
-			// 	); warning != "" {
-			// 		warnings = append(warnings, warning)
-			// 	}
-			// 	tbl.Parent.RemoveChild(tbl)
+		case "metadata", "info":
+			if warning := svc.replaceMetadataImagePath(
+				ctx, tbl, rows, dbDoc.ExternalID, objID2Path,
+			); warning != "" {
+				warnings = append(warnings, warning)
+			}
 		}
 	}
 
@@ -219,11 +219,7 @@ func (svc Services) ProcessGDocsDoc(ctx context.Context, dbDoc db.GDocsDoc) (err
 			}
 
 		case "metadata", "info":
-			if warning := svc.replaceMetadata(
-				ctx, tbl, rows, dbDoc.ExternalID, objID2Path, &metadata,
-			); warning != "" {
-				warnings = append(warnings, warning)
-			}
+			svc.replaceMetadata(rows, &metadata)
 			tbl.Parent.RemoveChild(tbl)
 
 		case "comment", "ignore", "note":
@@ -448,15 +444,88 @@ func (svc Services) replaceImageEmbed(rows xhtml.TableNodes, n int) (imageEmbed 
 		"Table %d missing image", n,
 	)
 }
-
-func (svc Services) replaceMetadata(
+func (svc Services) replaceMetadataImagePath(
 	ctx context.Context,
 	tbl *html.Node,
 	rows xhtml.TableNodes,
 	externalID string,
 	objID2Path map[string]string,
-	metadata *db.GDocsMetadata,
 ) string {
+	if path := cmp.Or(
+		xhtml.TextContent(rows.Value("lede image path")),
+		xhtml.TextContent(rows.Value("lead image path")),
+		xhtml.TextContent(rows.Value("path")),
+	); path != "" {
+		return ""
+	}
+	cell := rows.Value("lede image")
+	if cell == nil {
+		cell = rows.Value("lead image")
+	}
+	if cell == nil {
+		return ""
+	}
+	credit := cmp.Or(
+		xhtml.TextContent(rows.Value("lede image credit")),
+		xhtml.TextContent(rows.Value("lead image credit")),
+		xhtml.TextContent(rows.Value("credit")),
+	)
+	description := cmp.Or(
+		xhtml.TextContent(rows.Value("lede image description")),
+		xhtml.TextContent(rows.Value("lead image description")),
+		xhtml.TextContent(rows.Value("lede image alt")),
+		xhtml.TextContent(rows.Value("lead image alt")),
+		xhtml.TextContent(rows.Value("alt")),
+	)
+
+	linkTag := xhtml.Select(cell, xhtml.WithAtom(atom.A))
+	if href := xhtml.Attr(linkTag, "href"); href != "" {
+		path, err := svc.ReplaceAndUploadImageURL(ctx, href, description, credit)
+		switch {
+		case err == nil:
+			setRowValue(tbl, "path", path)
+			return ""
+		case errors.Is(err, requests.ErrValidator):
+			// Try image URL next
+		case err != nil:
+			l := almlog.FromContext(ctx)
+			l.ErrorContext(ctx, "ProcessGDocsDoc: replaceMetadata: ReplaceAndUploadImageURL",
+				"err", err)
+			return fmt.Sprintf("An error occurred when processing the lede image: %v.", err)
+		}
+	}
+
+	image := xhtml.Select(tbl, xhtml.WithAtom(atom.Img))
+	if image == nil {
+		return ""
+	}
+	objID := xhtml.Attr(image, "data-oid")
+	if path := objID2Path[objID]; path != "" {
+		setRowValue(tbl, "path", path)
+		return ""
+	}
+
+	src := xhtml.Attr(image, "src")
+	imageEmbed := db.EmbedImage{
+		Credit:      credit,
+		Description: description,
+	}
+	if uploadErr := svc.UploadGDocsImage(ctx, UploadGDocsImageParams{
+		ExternalID:  externalID,
+		DocObjectID: objID,
+		ImageURL:    src,
+		Embed:       &imageEmbed,
+	}); uploadErr != nil {
+		l := almlog.FromContext(ctx)
+		l.ErrorContext(ctx, "ProcessGDocsDoc: replaceMetadata: UploadGDocsImage",
+			"err", uploadErr)
+		return fmt.Sprintf("An error occurred when processing the lede image: %v.", uploadErr)
+	}
+	setRowValue(tbl, "path", imageEmbed.Path)
+	return ""
+}
+
+func (svc Services) replaceMetadata(rows xhtml.TableNodes, metadata *db.GDocsMetadata) {
 	metadata.InternalID = cmp.Or(
 		xhtml.TextContent(rows.Value("slug")),
 		xhtml.TextContent(rows.Value("internal id")),
@@ -535,68 +604,11 @@ func (svc Services) replaceMetadata(
 		xhtml.TextContent(rows.Value("kicker")),
 	)
 
-	path := cmp.Or(
+	metadata.LedeImage = cmp.Or(
 		xhtml.TextContent(rows.Value("lede image path")),
 		xhtml.TextContent(rows.Value("lead image path")),
 		xhtml.TextContent(rows.Value("path")),
 	)
-	if path != "" {
-		metadata.LedeImage = path
-		return ""
-	}
-	cell := rows.Value("lede image")
-	if cell == nil {
-		cell = rows.Value("lead image")
-	}
-	if cell == nil {
-		return ""
-	}
-
-	linkTag := xhtml.Select(cell, xhtml.WithAtom(atom.A))
-	if href := xhtml.Attr(linkTag, "href"); href != "" {
-		path, err := svc.ReplaceAndUploadImageURL(ctx, href, metadata.LedeImageDescription, metadata.LedeImageCredit)
-		switch {
-		case err == nil:
-			metadata.LedeImage = path
-			return ""
-		case errors.Is(err, requests.ErrValidator):
-			// Try image URL next
-		case err != nil:
-			l := almlog.FromContext(ctx)
-			l.ErrorContext(ctx, "ProcessGDocsDoc: replaceMetadata: ReplaceAndUploadImageURL",
-				"err", err)
-			return fmt.Sprintf("An error occurred when processing the lede image: %v.", err)
-		}
-	}
-
-	image := xhtml.Select(tbl, xhtml.WithAtom(atom.Img))
-	if image == nil {
-		return ""
-	}
-	objID := xhtml.Attr(image, "data-oid")
-	if path := objID2Path[objID]; path != "" {
-		metadata.LedeImage = path
-	} else {
-		src := xhtml.Attr(image, "src")
-		imageEmbed := db.EmbedImage{
-			Credit:      metadata.LedeImageCredit,
-			Caption:     metadata.LedeImageCaption,
-			Description: metadata.LedeImageDescription,
-		}
-		if uploadErr := svc.UploadGDocsImage(ctx, UploadGDocsImageParams{
-			ExternalID:  externalID,
-			DocObjectID: objID,
-			ImageURL:    src,
-			Embed:       &imageEmbed,
-		}); uploadErr != nil {
-			l := almlog.FromContext(ctx)
-			l.ErrorContext(ctx, "ProcessGDocsDoc: replaceMetadata: UploadGDocsImage",
-				"err", uploadErr)
-			return fmt.Sprintf("An error occurred when processing the lede image: %v.", uploadErr)
-		}
-		metadata.LedeImage = imageEmbed.Path
-	}
-	return ""
 }
 
 func extractDataTag(n *html.Node) DataTagValue {
