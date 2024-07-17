@@ -139,6 +139,25 @@ func (svc Services) ProcessGDocsDoc(ctx context.Context, dbDoc db.GDocsDoc) (err
 	metadata.InternalID = dbDoc.Document.Title
 
 	for tbl, rows := range xhtml.Tables(docHTML) {
+		switch label := rows.Label(); label {
+		case "photo", "image", "photograph", "illustration", "illo":
+			if warning := svc.replaceImagePath(
+				ctx, tbl, rows, dbDoc.ExternalID, objID2Path,
+			); warning != "" {
+				warnings = append(warnings, warning)
+			}
+
+			// case "metadata", "info":
+			// 	if warning := svc.replaceMetadata(
+			// 		ctx, tbl, rows, dbDoc.ExternalID, objID2Path, &metadata,
+			// 	); warning != "" {
+			// 		warnings = append(warnings, warning)
+			// 	}
+			// 	tbl.Parent.RemoveChild(tbl)
+		}
+	}
+
+	for tbl, rows := range xhtml.Tables(docHTML) {
 		embed := db.Embed{N: n}
 		switch label := rows.Label(); label {
 		case "html", "embed", "raw", "script":
@@ -191,9 +210,7 @@ func (svc Services) ProcessGDocsDoc(ctx context.Context, dbDoc db.GDocsDoc) (err
 
 		case "photo", "image", "photograph", "illustration", "illo":
 			embed.Type = db.ImageEmbedTag
-			if imageEmbed, warning := svc.replaceImageEmbed(
-				ctx, tbl, rows, n, dbDoc.ExternalID, objID2Path,
-			); warning != "" {
+			if imageEmbed, warning := svc.replaceImageEmbed(rows, n); warning != "" {
 				tbl.Parent.RemoveChild(tbl)
 				warnings = append(warnings, warning)
 			} else {
@@ -326,14 +343,85 @@ func removeTail(n *html.Node) {
 	}
 }
 
-func (svc Services) replaceImageEmbed(
+func (svc Services) replaceImagePath(
 	ctx context.Context,
 	tbl *html.Node,
 	rows xhtml.TableNodes,
-	n int,
 	externalID string,
 	objID2Path map[string]string,
-) (imageEmbed *db.EmbedImage, warning string) {
+) (warning string) {
+	if path := xhtml.TextContent(rows.Value("path")); path != "" {
+		return ""
+	}
+
+	imageEmbed := &db.EmbedImage{
+		Credit:  xhtml.TextContent(rows.Value("credit")),
+		Caption: xhtml.TextContent(rows.Value("caption")),
+		Description: cmp.Or(
+			xhtml.TextContent(rows.Value("description")),
+			xhtml.TextContent(rows.Value("alt")),
+		),
+	}
+
+	linkTag := xhtml.Select(tbl, xhtml.WithAtom(atom.A))
+	if href := xhtml.Attr(linkTag, "href"); href != "" {
+		path, err := svc.ReplaceAndUploadImageURL(ctx, href, imageEmbed.Description, imageEmbed.Credit)
+		switch {
+		case err == nil:
+			setRowValue(tbl, "path", path)
+			return ""
+
+		case errors.Is(err, requests.ErrValidator):
+			// Try looking up the image
+			break
+		case err != nil:
+			l := almlog.FromContext(ctx)
+			l.ErrorContext(ctx, "ProcessGDocsDoc: ReplaceAndUploadImageURL", "err", err)
+			return fmt.Sprintf(
+				"An error occurred when processing images in table: %v.", err)
+		}
+	}
+
+	image := xhtml.Select(tbl, xhtml.WithAtom(atom.Img))
+	if image == nil {
+		return ""
+	}
+	objID := xhtml.Attr(image, "data-oid")
+	if path := objID2Path[objID]; path != "" {
+		setRowValue(tbl, "path", path)
+		return ""
+	}
+	src := xhtml.Attr(image, "src")
+	if uploadErr := svc.UploadGDocsImage(ctx, UploadGDocsImageParams{
+		ExternalID:  externalID,
+		DocObjectID: objID,
+		ImageURL:    src,
+		Embed:       imageEmbed,
+	}); uploadErr != nil {
+		l := almlog.FromContext(ctx)
+		l.ErrorContext(ctx, "ProcessGDocsDoc: UploadGDocsImage", "err", uploadErr)
+		return fmt.Sprintf(
+			"An error occurred when processing images in table: %v.", uploadErr)
+	}
+
+	setRowValue(tbl, "path", imageEmbed.Path)
+	return ""
+}
+
+func setRowValue(tbl *html.Node, key, value string) {
+	tr := xhtml.New("tr")
+	keyNode := xhtml.New("td")
+	xhtml.AppendText(keyNode, key)
+	tr.AppendChild(keyNode)
+
+	valueNode := xhtml.New("td")
+	xhtml.AppendText(valueNode, value)
+	tr.AppendChild(valueNode)
+
+	tbl.AppendChild(tr)
+}
+
+func (svc Services) replaceImageEmbed(rows xhtml.TableNodes, n int) (imageEmbed *db.EmbedImage, warning string) {
 	var width, height int
 	if w := xhtml.TextContent(rows.Value("width")); w != "" {
 		width, _ = strconv.Atoi(w)
@@ -356,50 +444,9 @@ func (svc Services) replaceImageEmbed(
 		imageEmbed.Path = path
 		return imageEmbed, ""
 	}
-
-	linkTag := xhtml.Select(tbl, xhtml.WithAtom(atom.A))
-	if href := xhtml.Attr(linkTag, "href"); href != "" {
-		path, err := svc.ReplaceAndUploadImageURL(ctx, href, imageEmbed.Description, imageEmbed.Credit)
-		switch {
-		case err == nil:
-			imageEmbed.Path = path
-			return imageEmbed, ""
-		case errors.Is(err, requests.ErrValidator):
-			// Try looking up the image
-		case err != nil:
-			l := almlog.FromContext(ctx)
-			l.ErrorContext(ctx, "ProcessGDocsDoc: ReplaceAndUploadImageURL", "err", err)
-			return nil, fmt.Sprintf(
-				"An error occurred when processing images in table %d: %v.",
-				n, err)
-		}
-	}
-
-	image := xhtml.Select(tbl, xhtml.WithAtom(atom.Img))
-	if image == nil {
-		return nil, fmt.Sprintf(
-			"Table %d missing image", n,
-		)
-	}
-	objID := xhtml.Attr(image, "data-oid")
-	if path := objID2Path[objID]; path != "" {
-		imageEmbed.Path = path
-	} else {
-		src := xhtml.Attr(image, "src")
-		if uploadErr := svc.UploadGDocsImage(ctx, UploadGDocsImageParams{
-			ExternalID:  externalID,
-			DocObjectID: objID,
-			ImageURL:    src,
-			Embed:       imageEmbed,
-		}); uploadErr != nil {
-			l := almlog.FromContext(ctx)
-			l.ErrorContext(ctx, "ProcessGDocsDoc: UploadGDocsImage", "err", uploadErr)
-			return nil, fmt.Sprintf(
-				"An error occurred when processing images in table %d: %v.",
-				n, uploadErr)
-		}
-	}
-	return imageEmbed, ""
+	return nil, fmt.Sprintf(
+		"Table %d missing image", n,
+	)
 }
 
 func (svc Services) replaceMetadata(
