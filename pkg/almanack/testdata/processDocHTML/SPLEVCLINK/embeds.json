@@ -1,0 +1,7 @@
+[
+  {
+    "n": 1,
+    "type": "raw",
+    "value": "<noscript><a href=\"https://www.eventbrite.com/e/clink-and-think-quiz-bash-with-spotlight-pa-tickets-663145254307\" rel=\"noopener noreferrer\" target=\"_blank\">Buy Tickets on Eventbrite</a></noscript>\n<!-- You can customize this button any way you like -->\n<button id=\"eventbrite-widget-modal-trigger-663145254307\" type=\"button\">Buy Tickets</button>\n\n<script src=\"https://www.eventbrite.com/static/widgets/eb_widgets.js\"></script>\n\n<script type=\"text/javascript\">\n    var exampleCallback = function() {\n        console.log('Order complete!');\n    };\n\n    window.EBWidgets.createWidget({\n        widgetType: 'checkout',\n        eventId: '663145254307',\n        modal: true,\n        modalTriggerElementId: 'eventbrite-widget-modal-trigger-663145254307',\n        onOrderComplete: exampleCallback\n    });\n</script>"
+  }
+]

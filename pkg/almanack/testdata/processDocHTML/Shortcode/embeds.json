@@ -1,0 +1,7 @@
+[
+  {
+    "n": 1,
+    "type": "partner-embed",
+    "value": "<script src=\"http://example.com\"></script>"
+  }
+]

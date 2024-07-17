@@ -1,0 +1,43 @@
+[
+  {
+    "n": 1,
+    "type": "raw",
+    "value": "<script src=\"http://example.com/\"></script>"
+  },
+  {
+    "n": 2,
+    "type": "image",
+    "value": {
+      "path": "external/cwp3y3z5x8svbtsfv7t68hggc0.png",
+      "credit": "CarlCo",
+      "caption": "Here is a caption",
+      "description": "Blah blah blah.",
+      "width": 0,
+      "height": 0
+    }
+  },
+  {
+    "n": 3,
+    "type": "image",
+    "value": {
+      "path": "external/75h9dj4qkszh2ydb6e3h9pn2r0.jpeg",
+      "credit": "Amanda Berg",
+      "caption": "Overdose awareness",
+      "description": "",
+      "width": 0,
+      "height": 0
+    }
+  },
+  {
+    "n": 4,
+    "type": "image",
+    "value": {
+      "path": "external/08v6tmkadg07fyknwy3pb8sm3m.jpeg",
+      "credit": "Amanda Berg / For Spotlight PA",
+      "caption": "",
+      "description": "The House floor in the Pa. Capitol. The chamber is controlled by Democrats for the first session in more than a \"decade.\"",
+      "width": 0,
+      "height": 0
+    }
+  }
+]
