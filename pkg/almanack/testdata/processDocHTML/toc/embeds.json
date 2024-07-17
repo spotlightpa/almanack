@@ -1,0 +1,7 @@
+[
+  {
+    "n": 1,
+    "type": "toc",
+    "value": "<h3>Article contents</h3><ul><li><p><a href=\"#spl-heading-1\">Heading 1</a></p><ul><li><p><a href=\"#spl-heading-2\">Heading 1.1</a></p></li><li><p><a href=\"#spl-heading-3\">Heading 1.2: Headings with sub-formatting</a></p></li></ul></li><li><p><a href=\"#spl-heading-4\">Heading 2</a></p></li><li><p><a href=\"#spl-heading-5\">Heading 3</a></p><ul><li><p><a href=\"#spl-heading-6\">Heading 3.1</a></p><ul><li><p><a href=\"#spl-heading-7\">Heading 3.1.1</a></p></li><li><p><a href=\"#spl-heading-8\">Heading 3.1.2</a></p></li></ul></li></ul></li><li><p><a href=\"#spl-heading-9\">Heading 4</a></p></li></ul>"
+  }
+]

@@ -1,0 +1,19 @@
+[
+  {
+    "n": 1,
+    "type": "raw",
+    "value": "<script src=\"https://www.spotlightpa.org/embed.js\" async></script><div data-spl-embed-version=\"1\" data-spl-src=\"https://www.spotlightpa.org/embeds/newsletter/?preselect=palocal\"></div>"
+  },
+  {
+    "n": 2,
+    "type": "image",
+    "value": {
+      "path": "2023/12/01jr-8vcr-58ns-bgsp.jpeg",
+      "credit": "Sara Stewart / For Spotlight PA",
+      "caption": "A plaque inside Millvale \"they bar\" Harold's Haunt profiles the businesses' owners and namesake, a neighborhood ghost.",
+      "description": "A plaque inside Harold’s Haunt is pictured.",
+      "width": 0,
+      "height": 0
+    }
+  }
+]

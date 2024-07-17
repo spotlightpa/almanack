@@ -1,0 +1,14 @@
+[
+  {
+    "n": 1,
+    "type": "image",
+    "value": {
+      "path": "abc/123.jpeg",
+      "credit": "Cred 3",
+      "caption": "Cap 1",
+      "description": "Desc 2",
+      "width": 640,
+      "height": 480
+    }
+  }
+]

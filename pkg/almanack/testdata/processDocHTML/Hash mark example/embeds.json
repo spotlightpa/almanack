@@ -1,0 +1,12 @@
+[
+  {
+    "n": 1,
+    "type": "raw",
+    "value": "Blah blah\n\n###"
+  },
+  {
+    "n": 2,
+    "type": "raw",
+    "value": "<script src=\"https://www.spotlightpa.org/embed.js\" async></script>\n\n<div data-spl-embed-version=\"1\" data-spl-src=\"https://www.spotlightpa.org/embeds/cta/\"></div>"
+  }
+]
