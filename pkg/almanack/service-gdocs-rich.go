@@ -9,7 +9,7 @@ import (
 	"golang.org/x/net/html/atom"
 )
 
-func fixRichTextPlaceholders(doc *html.Node) {
+func intermediateDocToPartnerRichText(doc *html.Node) {
 	// Remove Spotlight PA exclusives
 	for dataEl, _ := range iterx.Concat2(
 		dataEls(doc, dtSpotlightText),
