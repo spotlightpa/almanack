@@ -14,66 +14,72 @@ import (
 	"golang.org/x/net/html/atom"
 )
 
-func fixMarkdownPlaceholders(rawHTML *html.Node) {
-	embeds := xhtml.SelectSlice(rawHTML, xhtml.WithAtom(atom.Data))
-	for _, dataEl := range embeds {
-		embed := extractDataTag(dataEl)
-		switch embed.Type {
-		default:
-			panic("unknown embed type: " + embed.Type)
-		case dtPartnerText:
-			dataEl.Parent.RemoveChild(dataEl)
-		case dtSpotlightText:
-			xhtml.ReplaceWith(dataEl, &html.Node{
-				Type: html.RawNode,
-				Data: embed.Value,
-			})
-		case dtSpotlightRaw:
-			data := replaceSpotlightShortcodes(embed.Value)
+func fixMarkdownPlaceholders(doc *html.Node) {
+	// Remove partner exclusive text
+	for dataEl, _ := range dataEls(doc, dtPartnerText) {
+		dataEl.Parent.RemoveChild(dataEl)
+	}
+	// Include Spotlight PA specific text as is
+	for dataEl, value := range dataEls(doc, dtSpotlightText) {
+		xhtml.ReplaceWith(dataEl, &html.Node{
+			Type: html.RawNode,
+			Data: value,
+		})
+	}
+	// Replace Spotlight PA raw embeds with shortcodes if possible
+	for dataEl, value := range dataEls(doc, dtSpotlightRaw) {
+		data := replaceSpotlightShortcodes(value)
+		xhtml.ReplaceWith(dataEl, &html.Node{
+			Type: html.RawNode,
+			Data: data,
+		})
+	}
+	for dataEl, value := range dataEls(doc, dtDBEmbed) {
+		dbembed := dbEmbedFromString(value)
+		switch dbembed.Type {
+		// Replace raw embeds with shortcodes if possible
+		case db.RawEmbedTag:
+			data := replaceSpotlightShortcodes(dbembed.Value.(string))
 			xhtml.ReplaceWith(dataEl, &html.Node{
 				Type: html.RawNode,
 				Data: data,
 			})
-		case dtDBEmbed:
-			dbembed := extractDBEmbed(embed)
-			switch dbembed.Type {
-			case db.RawEmbedTag:
-				data := replaceSpotlightShortcodes(dbembed.Value.(string))
-				xhtml.ReplaceWith(dataEl, &html.Node{
-					Type: html.RawNode,
-					Data: data,
-				})
-			case db.PartnerRawEmbedTag:
-				dataEl.Parent.RemoveChild(dataEl)
-			case db.ToCEmbedTag:
-				container := xhtml.New("div")
-				must.Do(xhtml.SetInnerHTML(container, dbembed.Value.(string)))
-				xhtml.ReplaceWith(dataEl, container)
-				xhtml.UnnestChildren(container)
-			case db.ImageEmbedTag:
-				image := dbembed.Value.(db.EmbedImage)
-				var widthHeight string
-				if image.Width != 0 {
-					widthHeight = fmt.Sprintf(`width-ratio="%d" height-ratio="%d" `,
-						image.Width, image.Height,
-					)
-				}
-				data := fmt.Sprintf(
-					`{{<picture src="%s" %sdescription="%s" caption="%s" credit="%s">}}`,
-					image.Path,
-					widthHeight,
-					html.EscapeString(strings.TrimSpace(image.Description)),
-					html.EscapeString(strings.TrimSpace(image.Caption)),
-					html.EscapeString(strings.TrimSpace(image.Credit)),
+		// Remove partner specific embeds
+		case db.PartnerRawEmbedTag:
+			dataEl.Parent.RemoveChild(dataEl)
+		// Insert ToC
+		case db.ToCEmbedTag:
+			container := xhtml.New("div")
+			must.Do(xhtml.SetInnerHTML(container, dbembed.Value.(string)))
+			xhtml.ReplaceWith(dataEl, container)
+			xhtml.UnnestChildren(container)
+		// Write picture shortcode
+		case db.ImageEmbedTag:
+			image := dbembed.Value.(db.EmbedImage)
+			var widthHeight string
+			if image.Width != 0 {
+				widthHeight = fmt.Sprintf(`width-ratio="%d" height-ratio="%d" `,
+					image.Width, image.Height,
 				)
-				xhtml.ReplaceWith(dataEl, &html.Node{
-					Type: html.RawNode,
-					Data: data,
-				})
-			default:
-				panic("unknown embed type: " + dbembed.Type)
 			}
+			data := fmt.Sprintf(
+				`{{<picture src="%s" %sdescription="%s" caption="%s" credit="%s">}}`,
+				image.Path,
+				widthHeight,
+				html.EscapeString(strings.TrimSpace(image.Description)),
+				html.EscapeString(strings.TrimSpace(image.Caption)),
+				html.EscapeString(strings.TrimSpace(image.Credit)),
+			)
+			xhtml.ReplaceWith(dataEl, &html.Node{
+				Type: html.RawNode,
+				Data: data,
+			})
+		default:
+			panic("unknown embed type: " + dbembed.Type)
 		}
+	}
+	if el := xhtml.Select(doc, xhtml.WithAtom(atom.Data)); el != nil {
+		panic("unprocessed data element: " + xhtml.OuterHTML(el))
 	}
 }
 

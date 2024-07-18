@@ -4,6 +4,7 @@ import (
 	"cmp"
 	"encoding/json"
 	"fmt"
+	"iter"
 	"slices"
 	"strconv"
 	"strings"
@@ -18,18 +19,48 @@ import (
 	"golang.org/x/net/html/atom"
 )
 
-type DataTagValue struct {
-	Type  DataTagValueType `json:"type"`
-	Value string           `json:"value"`
-}
-type DataTagValueType string
+// dataTagType is a string enum of possible types in
+// <data type="" value=""> elements used to pass information
+// from intermediate HTML to final processed documents
+type dataTagType string
 
 const (
-	dtSpotlightRaw  DataTagValueType = "spl"
-	dtSpotlightText DataTagValueType = "spl-text"
-	dtPartnerText   DataTagValueType = "partner-text"
-	dtDBEmbed       DataTagValueType = "db-embed"
+	dtSpotlightRaw  dataTagType = "spl"
+	dtSpotlightText dataTagType = "spl-text"
+	dtPartnerText   dataTagType = "partner-text"
+	dtDBEmbed       dataTagType = "db-embed"
 )
+
+func newDataTag(dtype dataTagType, value string) *html.Node {
+	data := xhtml.New("data", "type", string(dtype), "value", value)
+	return data
+}
+
+func dbEmbedFromString(s string) db.Embed {
+	var dbembed db.Embed
+	must.Do(json.Unmarshal([]byte(s), &dbembed))
+	return dbembed
+}
+
+func dbEmbedToString(embed db.Embed) string {
+	return string(must.Get(json.Marshal(embed)))
+}
+
+// dataEls yields a tuple of elements and their value attribute
+// for data elements with a matching type="" attribute.
+func dataEls(n *html.Node, tag dataTagType) iter.Seq2[*html.Node, string] {
+	return func(yield func(*html.Node, string) bool) {
+		els := xhtml.SelectSlice(n, func(n *html.Node) bool {
+			return n.DataAtom == atom.Data && xhtml.Attr(n, "type") == string(tag)
+		})
+
+		for _, el := range els {
+			if !yield(el, xhtml.Attr(el, "value")) {
+				return
+			}
+		}
+	}
+}
 
 var ascii = bytemap.Range(0, 127)
 
@@ -58,10 +89,7 @@ func processDocHTML(docHTML *html.Node) (
 
 		case "spl", "spl-embed":
 			embedHTML := xhtml.TextContent(rows.At(1, 0))
-			data := newDataTag(DataTagValue{
-				Type:  dtSpotlightRaw,
-				Value: embedHTML,
-			})
+			data := newDataTag(dtSpotlightRaw, embedHTML)
 			xhtml.ReplaceWith(tbl, data)
 
 		case "spl-text":
@@ -70,10 +98,7 @@ func processDocHTML(docHTML *html.Node) (
 			blocko.RemoveEmptyP(n)
 			blocko.RemoveMarks(n)
 			s := blocko.Blockize(n)
-			data := newDataTag(DataTagValue{
-				Type:  dtSpotlightText,
-				Value: s,
-			})
+			data := newDataTag(dtSpotlightText, s)
 			xhtml.ReplaceWith(tbl, data)
 
 		case "partner-embed":
@@ -87,15 +112,12 @@ func processDocHTML(docHTML *html.Node) (
 			blocko.MergeSiblings(n)
 			blocko.RemoveEmptyP(n)
 			blocko.RemoveMarks(n)
-			data := newDataTag(DataTagValue{
-				Type:  dtPartnerText,
-				Value: xhtml.InnerHTMLBlocks(n),
-			})
+			data := newDataTag(dtPartnerText, xhtml.InnerHTMLBlocks(n))
 			xhtml.ReplaceWith(tbl, data)
 
 		case "photo", "image", "photograph", "illustration", "illo":
 			embed.Type = db.ImageEmbedTag
-			if imageEmbed, warning := replaceImageEmbed(rows, n); warning != "" {
+			if imageEmbed, warning := processImage(rows, n); warning != "" {
 				tbl.Parent.RemoveChild(tbl)
 				warnings = append(warnings, warning)
 			} else {
@@ -104,7 +126,7 @@ func processDocHTML(docHTML *html.Node) (
 			}
 
 		case "metadata", "info":
-			replaceMetadata(rows, &metadata)
+			processMetadata(rows, &metadata)
 			tbl.Parent.RemoveChild(tbl)
 
 		case "comment", "ignore", "note":
@@ -128,11 +150,7 @@ func processDocHTML(docHTML *html.Node) (
 		continue
 	append:
 		embeds = append(embeds, embed)
-		value := must.Get(json.Marshal(embed))
-		data := newDataTag(DataTagValue{
-			Type:  dtDBEmbed,
-			Value: string(value),
-		})
+		data := newDataTag(dtDBEmbed, dbEmbedToString(embed))
 		xhtml.ReplaceWith(tbl, data)
 		n++
 	}
@@ -171,7 +189,7 @@ func processDocHTML(docHTML *html.Node) (
 			"Document contains <br> line breaks. Are you sure you want to use a line break? In Google Docs, select View > Show non-printing characters to see them.")
 	}
 
-	// Clone and remove turn data atoms into attributes
+	// Clone turn data elements into partner placeholders
 	richText = xhtml.Clone(docHTML)
 	fixRichTextPlaceholders(richText)
 
@@ -186,13 +204,7 @@ func processDocHTML(docHTML *html.Node) (
 	return
 }
 
-func newDataTag(tag DataTagValue) *html.Node {
-	value := must.Get(json.Marshal(tag))
-	data := xhtml.New("data", "value", string(value))
-	return data
-}
-
-func replaceImageEmbed(rows xhtml.TableNodes, n int) (imageEmbed *db.EmbedImage, warning string) {
+func processImage(rows xhtml.TableNodes, n int) (imageEmbed *db.EmbedImage, warning string) {
 	var width, height int
 	if w := xhtml.TextContent(rows.Value("width")); w != "" {
 		width, _ = strconv.Atoi(w)
@@ -220,7 +232,7 @@ func replaceImageEmbed(rows xhtml.TableNodes, n int) (imageEmbed *db.EmbedImage,
 	)
 }
 
-func replaceMetadata(rows xhtml.TableNodes, metadata *db.GDocsMetadata) {
+func processMetadata(rows xhtml.TableNodes, metadata *db.GDocsMetadata) {
 	metadata.InternalID = cmp.Or(
 		xhtml.TextContent(rows.Value("slug")),
 		xhtml.TextContent(rows.Value("internal id")),
@@ -304,18 +316,6 @@ func replaceMetadata(rows xhtml.TableNodes, metadata *db.GDocsMetadata) {
 		xhtml.TextContent(rows.Value("lead image path")),
 		xhtml.TextContent(rows.Value("path")),
 	)
-}
-
-func extractDataTag(n *html.Node) DataTagValue {
-	var embed DataTagValue
-	must.Do(json.Unmarshal([]byte(xhtml.Attr(n, "value")), &embed))
-	return embed
-}
-
-func extractDBEmbed(embed DataTagValue) db.Embed {
-	var dbembed db.Embed
-	must.Do(json.Unmarshal([]byte(embed.Value), &dbembed))
-	return dbembed
 }
 
 func processToc(doc *html.Node, rows xhtml.TableNodes) string {
