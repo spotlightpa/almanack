@@ -7,6 +7,7 @@ import (
 	"slices"
 	"strings"
 
+	"github.com/spotlightpa/almanack/internal/blocko"
 	"github.com/spotlightpa/almanack/internal/db"
 	"github.com/spotlightpa/almanack/internal/must"
 	"github.com/spotlightpa/almanack/internal/xhtml"
@@ -14,7 +15,7 @@ import (
 	"golang.org/x/net/html/atom"
 )
 
-func fixMarkdownPlaceholders(doc *html.Node) {
+func intermediateDocToMarkdown(doc *html.Node) string {
 	// Remove partner exclusive text
 	for dataEl, _ := range dataEls(doc, dtPartnerText) {
 		dataEl.Parent.RemoveChild(dataEl)
@@ -81,6 +82,7 @@ func fixMarkdownPlaceholders(doc *html.Node) {
 	if el := xhtml.Select(doc, xhtml.WithAtom(atom.Data)); el != nil {
 		panic("unprocessed data element: " + xhtml.OuterHTML(el))
 	}
+	return blocko.Blockize(doc)
 }
 
 func replaceSpotlightShortcodes(s string) string {

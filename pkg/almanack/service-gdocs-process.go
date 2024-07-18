@@ -191,15 +191,14 @@ func processDocHTML(docHTML *html.Node) (
 
 	// Clone turn data elements into partner placeholders
 	richText = xhtml.Clone(docHTML)
-	fixRichTextPlaceholders(richText)
+	intermediateDocToPartnerRichText(richText)
 
 	// For rawHTML, convert to raw nodes
 	rawHTML = xhtml.Clone(docHTML)
-	fixRawHTMLPlaceholders(rawHTML)
+	intermediateDocToPartnerHTML(rawHTML)
 
 	// Markdown data conversion
-	fixMarkdownPlaceholders(docHTML)
-	markdown = blocko.Blockize(docHTML)
+	markdown = intermediateDocToMarkdown(docHTML)
 
 	return
 }
