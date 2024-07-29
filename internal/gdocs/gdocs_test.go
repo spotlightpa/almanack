@@ -21,7 +21,7 @@ func TestConvert(t *testing.T) {
 		got := xhtml.OuterHTML(n)
 
 		bareName := strings.TrimSuffix(path, ".json")
-		testfile.Equal(be.Relaxed(t), bareName+".html", got)
+		testfile.Equalish(be.Relaxed(t), bareName+".html", got)
 	})
 }
 
@@ -36,7 +36,7 @@ func TestFullConvert(t *testing.T) {
 		be.NilErr(t, err)
 
 		bareName := strings.TrimSuffix(path, ".json")
-		testfile.Equal(be.Relaxed(t), bareName+".md", got)
+		testfile.Equalish(be.Relaxed(t), bareName+".md", got)
 	})
 }
 

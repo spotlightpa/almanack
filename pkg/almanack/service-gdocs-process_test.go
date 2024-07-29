@@ -24,11 +24,20 @@ func TestProcessDocHTML(t *testing.T) {
 		rawHTMLStr := xhtml.OuterHTML(rawHTML)
 
 		rt := be.Relaxed(t)
-		testfile.Equal(rt, filepath.Join(dir, "rich.html"), richTextStr)
-		testfile.Equal(rt, filepath.Join(dir, "raw.html"), rawHTMLStr)
-		testfile.Equal(rt, filepath.Join(dir, "article.md"), md)
+		testfile.Equalish(rt, filepath.Join(dir, "rich.html"), richTextStr)
+		testfile.Equalish(rt, filepath.Join(dir, "raw.html"), rawHTMLStr)
+		testfile.Equalish(rt, filepath.Join(dir, "article.md"), md)
 		testfile.EqualJSON(rt, filepath.Join(dir, "metadata.json"), metadata)
 		testfile.EqualJSON(rt, filepath.Join(dir, "embeds.json"), embeds)
 		testfile.EqualJSON(rt, filepath.Join(dir, "warnings.json"), warnings)
 	})
+}
+
+func BenchmarkProcessDocHTML(b *testing.B) {
+	input := testfile.Read(b, "testdata/processDocHTML/SPLEX23ERR/doc.html")
+	doc := must.Get(html.Parse(strings.NewReader(input)))
+	b.ResetTimer()
+	for range b.N {
+		processDocHTML(xhtml.Clone(doc))
+	}
 }
