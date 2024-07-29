@@ -100,15 +100,15 @@ func replaceSpotlightShortcodes(s string) string {
 	isFirst := true
 
 	// $("div[data-spl-embed-version=1]")
-	divs := xhtml.SelectAll(n, func(n *html.Node) bool {
+	els := xhtml.SelectAll(n, func(n *html.Node) bool {
 		return n.DataAtom == atom.Div && xhtml.Attr(n, "data-spl-embed-version") == "1"
 	})
-	for div := range divs {
+	for el := range els {
 		if !isFirst {
 			buf.WriteString("\n")
 		}
 		isFirst = false
-		netloc := xhtml.Attr(div, "data-spl-src")
+		netloc := xhtml.Attr(el, "data-spl-src")
 		u, err := url.Parse(netloc)
 		if err != nil {
 			return s
@@ -140,17 +140,16 @@ func replaceSpotlightShortcodes(s string) string {
 	}
 
 	// $("iframe[src~=vimeo]")
-	iframes := xhtml.SelectAll(n, func(n *html.Node) bool {
+	els = xhtml.SelectAll(n, func(n *html.Node) bool {
 		return n.DataAtom == atom.Iframe &&
 			strings.HasPrefix(xhtml.Attr(n, "src"), "https://player.vimeo.com/video/")
 	})
-	for iframe := range iframes {
+	for el := range els {
 		if !isFirst {
 			buf.WriteString("\n")
 		}
 		isFirst = false
-		src := xhtml.Attr(iframe, "src")
-		_ = src
+		src := xhtml.Attr(el, "src")
 		u, err := url.Parse(src)
 		if err != nil {
 			continue
@@ -165,6 +164,73 @@ func replaceSpotlightShortcodes(s string) string {
 			buf.WriteString(escapeAttr(secret))
 		}
 		buf.WriteString("\" >}}")
+	}
+
+	// $("div.flourish-embed.flourish-table")
+	els = xhtml.SelectAll(n, func(n *html.Node) bool {
+		return n.DataAtom == atom.Div &&
+			xhtml.Attr(n, "class") == "flourish-embed flourish-table"
+	})
+	for el := range els {
+		if !isFirst {
+			buf.WriteString("\n")
+		}
+		isFirst = false
+		src := xhtml.Attr(el, "data-src")
+		buf.WriteString(`{{<flourish src="`)
+		buf.WriteString(escapeAttr(src))
+		buf.WriteString(`" >}}`)
+	}
+
+	// $("iframe[src~=datawrapper.dwcdn.net]")
+	els = xhtml.SelectAll(n, func(n *html.Node) bool {
+		return n.DataAtom == atom.Iframe &&
+			strings.Contains(xhtml.Attr(n, "src"), "datawrapper.dwcdn.net")
+	})
+	for el := range els {
+		if !isFirst {
+			buf.WriteString("\n")
+		}
+		isFirst = false
+		src := xhtml.Attr(el, "src")
+		height := xhtml.Attr(el, "height")
+		buf.WriteString(`{{<datawrapper src="`)
+		buf.WriteString(escapeAttr(src))
+		buf.WriteString(`" height="`)
+		buf.WriteString(escapeAttr(height))
+		buf.WriteString(`" >}}`)
+	}
+
+	// $("iframe[src~=https://www.scribd.com/embeds/]")
+	els = xhtml.SelectAll(n, func(n *html.Node) bool {
+		return n.DataAtom == atom.Iframe &&
+			strings.HasPrefix(xhtml.Attr(n, "src"), "https://www.scribd.com/embeds/")
+	})
+	for el := range els {
+		if !isFirst {
+			buf.WriteString("\n")
+		}
+		isFirst = false
+		src := xhtml.Attr(el, "src")
+		buf.WriteString(`{{<scribd src="`)
+		buf.WriteString(escapeAttr(src))
+		buf.WriteString(`" >}}`)
+	}
+
+	// $("div[data-tf-live]")
+	els = xhtml.SelectAll(n, func(n *html.Node) bool {
+		return n.DataAtom == atom.Div &&
+			xhtml.Attr(n, "data-tf-live") != ""
+	})
+	for el := range els {
+		if !isFirst {
+			buf.WriteString("\n")
+		}
+		isFirst = false
+		id := xhtml.Attr(el, "data-tf-live")
+		buf.WriteString(`{{<typeform id="`)
+		buf.WriteString(escapeAttr(id))
+		buf.WriteString(`" >}}`)
 	}
 
 	if buf.Len() > 0 {
