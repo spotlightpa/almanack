@@ -82,6 +82,18 @@ func TestReplaceSpotlightShortcodes(t *testing.T) {
 			`<script src="https://www.spotlightpa.org/embed.js" async></script><div data-spl-embed-version="1" data-spl-src="https://www.spotlightpa.org/embeds/cta/?body=It's%20%3Cb%3Ecool%3C%2Fb%3E."></div>`,
 			`{{<embed/cta body="It&#39;s &lt;b&gt;cool&lt;/b&gt;.">}}`,
 		},
+		{
+			`<div style="padding:56.25% 0 0 0;position:relative;"><iframe src="https://player.vimeo.com/video/990627534?h=89f8de8242&color=ffcb05&title=0&byline=0" style="position:absolute;top:0;left:0;width:100%;height:100%;" frameborder="0" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen></iframe></div><script src="https://player.vimeo.com/api/player.js"></script>
+			`,
+			`{{<vimeo id="990627534" secret="89f8de8242" >}}`,
+		},
+		{
+			`<script src="https://www.spotlightpa.org/embed.js" async></script><div data-spl-embed-version="1" data-spl-src="https://www.spotlightpa.org/embeds/cta/?body=It's%20%3Cb%3Ecool%3C%2Fb%3E."></div>
+			<div style="padding:56.25% 0 0 0;position:relative;"><iframe src="https://player.vimeo.com/video/990627534?h=89f8de8242&color=ffcb05&title=0&byline=0" style="position:absolute;top:0;left:0;width:100%;height:100%;" frameborder="0" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen></iframe></div><script src="https://player.vimeo.com/api/player.js"></script>
+			`,
+			`{{<embed/cta body="It&#39;s &lt;b&gt;cool&lt;/b&gt;.">}}` + "\n" +
+				`{{<vimeo id="990627534" secret="89f8de8242" >}}`,
+		},
 	}
 	for _, tc := range cases {
 		t := be.Relaxed(t)
