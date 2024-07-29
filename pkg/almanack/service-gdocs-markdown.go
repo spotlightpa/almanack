@@ -96,20 +96,18 @@ func replaceSpotlightShortcodes(s string) string {
 	if err != nil {
 		return s
 	}
+	var buf strings.Builder
+	isFirst := true
+
 	// $("div[data-spl-embed-version=1]")
-	divs := xhtml.SelectSlice(n, func(n *html.Node) bool {
+	divs := xhtml.SelectAll(n, func(n *html.Node) bool {
 		return n.DataAtom == atom.Div && xhtml.Attr(n, "data-spl-embed-version") == "1"
 	})
-	// Unknown embed type
-	if len(divs) < 1 {
-		attr := escapeAttr(s)
-		return fmt.Sprintf(`{{<embed/raw srcdoc="%s">}}`, attr)
-	}
-	var buf strings.Builder
-	for i, div := range divs {
-		if i != 0 {
+	for div := range divs {
+		if !isFirst {
 			buf.WriteString("\n")
 		}
+		isFirst = false
 		netloc := xhtml.Attr(div, "data-spl-src")
 		u, err := url.Parse(netloc)
 		if err != nil {
@@ -140,7 +138,41 @@ func replaceSpotlightShortcodes(s string) string {
 		}
 		buf.WriteString(">}}")
 	}
-	return buf.String()
+
+	// $("iframe[src~=vimeo]")
+	iframes := xhtml.SelectAll(n, func(n *html.Node) bool {
+		return n.DataAtom == atom.Iframe &&
+			strings.HasPrefix(xhtml.Attr(n, "src"), "https://player.vimeo.com/video/")
+	})
+	for iframe := range iframes {
+		if !isFirst {
+			buf.WriteString("\n")
+		}
+		isFirst = false
+		src := xhtml.Attr(iframe, "src")
+		_ = src
+		u, err := url.Parse(src)
+		if err != nil {
+			continue
+		}
+		secret := u.Query().Get("h")
+		id := strings.TrimPrefix(u.Path, "/video/")
+
+		buf.WriteString("{{<vimeo id=\"")
+		buf.WriteString(escapeAttr(id))
+		if secret != "" {
+			buf.WriteString("\" secret=\"")
+			buf.WriteString(escapeAttr(secret))
+		}
+		buf.WriteString("\" >}}")
+	}
+
+	if buf.Len() > 0 {
+		return buf.String()
+	}
+	// Unknown embed type
+	attr := escapeAttr(s)
+	return fmt.Sprintf(`{{<embed/raw srcdoc="%s">}}`, attr)
 }
 
 func escapeAttr(s string) string {
