@@ -1,0 +1,85 @@
+<table><tbody><tr><td><p>metadata</p></td><td></td></tr><tr><td><p>Slug</p></td><td><p>SPLBUD24EVENT</p></td></tr><tr><td><p>URL</p></td><td><p>pennsylvania-budget-josh-shapiro-legislature-education-funding</p></td></tr><tr><td><p>Byline</p></td><td><p>Spotlight PA Staff</p></td></tr><tr><td><p>Eyebrow</p></td><td><p>Events</p></td></tr><tr><td><p>Hed</p></td><td><p>WATCH: What Pennsylvania’s new $47.6 billion budget means for you</p></td></tr><tr><td><p>SEO Hed</p></td><td><p>Live event: Learn how PA’s new budget benefits you</p></td></tr><tr><td><p>SEO Description</p></td><td><p>Spotlight PA hosted a free panel on Pennsylvania’s budget winners and losers.</p></td></tr><tr><td><p>Facebook Hed</p></td><td><p>Live event: Learn how PA’s new budget benefits you</p></td></tr><tr><td><p>Twitter Hed</p></td><td><p>Live event: Learn how PA’s new budget benefits you</p></td></tr><tr><td><p>Blurb</p></td><td><p>Spotlight PA hosted a free panel on what did — and didn’t — make it into Pennsylvania’s new budget.</p></td></tr><tr><td><p>Lede image path</p></td><td><p>2023/08/01jd-ah85-c3ry-svfm.jpeg</p></td></tr><tr><td><p>Lede image credit</p></td><td><p>Amanda Berg / For Spotlight PA</p></td></tr><tr><td><p>Lede image description</p></td><td><p>The exterior of the Pennsylvania Capitol in Harrisburg.</p></td></tr><tr><td><p>Lede image caption</p></td><td><p>N / A</p></td></tr><tr><td><p>Budget</p></td><td></td></tr><tr><td><p>Spotlight PA Event: What Pennsylvania’s new $47.6 billion budget means for you</p></td><td></td></tr></tbody></table>
+
+<table><tbody><tr><td><p>partner-text</p></td></tr><tr><td><p><a href="https://www.spotlightpa.org/"><em>Spotlight PA</em></a><em> is an independent, nonpartisan, and nonprofit newsroom producing investigative and public-service journalism that holds power to account and drives positive change in Pennsylvania. </em><a href="https://www.spotlightpa.org/newsletters"><em>Sign up for our free newsletters</em></a><em>.</em></p></td></tr></tbody></table>
+
+HARRISBURG — Lawmakers have finalized Pennsylvania’s new $47.6 billion budget — and no one is completely happy.
+
+Democratic Gov. Josh Shapiro didn’t get recreational marijuana or a tax on skill games; legislative Democrats didn’t get a minimum wage increase; and legislative Republicans didn’t get tax cuts.
+
+Still, <a href="https://www.spotlightpa.org/news/2024/07/pennsylvania-budget-public-schools-economic-development-scholarships-josh-shapiro-legislature/">plenty made it into the final plan</a>. It increases K-12 education spending, <a href="https://www.spotlightpa.org/news/2024/07/pennsylvania-legislature-budget-deal-education-spending-public-schools-josh-shapiro/">sends $500 million to the state’s poorest schools</a>, funnels new dollars into economic development, and creates a new college scholarship program.
+
+For more insight on the spending plan, Spotlight PA’s Capitol reporter Stephen Caruso is hosting a live panel.
+
+Spotlight PA held a free panel discussion on the major components of the budget, the politics that shaped the deal, and what was left on the cutting room floor.
+
+<strong>Our panelists were:</strong>
+
+- <strong>Stephen Caruso,</strong> Capitol reporter, Spotlight PA
+
+- <strong>Kristina Moon,</strong> senior attorney, Education Law Center
+
+- <strong>Mustafa Rashed,</strong> president &amp; CEO, Bellevue Strategies
+
+- <strong>Stan Saylor,</strong> former House GOP appropriations chair
+
+<table><tbody><tr><td><p>raw</p></td></tr><tr><td><p><em></em><mark>&lt;div style=&#34;padding:56.25% 0 0 0;position:relative;&#34;&gt;&lt;iframe src=&#34;https://player.vimeo.com/video/990627534?h=89f8de8242&amp;color=ffcb05&amp;title=0&amp;byline=0&#34; style=&#34;position:absolute;top:0;left:0;width:100%;height:100%;&#34; frameborder=&#34;0&#34; allow=&#34;autoplay; fullscreen; picture-in-picture&#34; allowfullscreen&gt;&lt;/iframe&gt;&lt;/div&gt;&lt;script src=&#34;https://player.vimeo.com/api/player.js&#34;&gt;&lt;/script&gt;</mark></p><p><mark>&lt;p&gt;&lt;a href=&#34;https://vimeo.com/990627534&#34;&gt;</mark></p></td></tr></tbody></table>
+
+<strong>» Spotlight PA’s events operate on a “pay-what-you-can” honor system.</strong> If you value this public-service event, pay it forward and contribute any amount to Spotlight PA now so we can keep our programming free for everyone: <a href="http://spotlightpa.org/donate">spotlightpa.org/donate</a>.
+
+<em>\#\#\#</em>
+
+<strong><em>\[DELETE BELOW/FOR TEMPLATE PURPOSES ONLY\]</em></strong>
+
+USE REAL HEADINGS, NOT JUST BOLD TEXT:
+
+# Heading 1: Mostly don’t use this because the title is h1
+
+## Heading 2: Mostly just use this for subheds.
+
+### H3: Sub-subheds.
+
+#### H4: Sub-sub-subhed.
+
+<a href="https://docs.google.com/document/d/11EyWDaxf0Ox42w9Bhybm_DIc6nZX1P9dWGJbP6ptoHY/edit"><strong>Table information</strong></a><strong></strong>
+
+TO EMBED HTML
+
+<table><tbody><tr><td><p>raw</p></td></tr><tr><td><p><em></em>&lt;script src=&#34;https://www.spotlightpa.org/embed.js&#34; async&gt;&lt;/script&gt;&lt;div data-spl-embed-version=&#34;1&#34; data-spl-src=&#34;https://www.spotlightpa.org/embeds/newsletter/&#34;&gt;&lt;/div&gt;</p></td></tr></tbody></table>
+
+To add raw code that will appear on spotlightpa.org but not be distributed to partners:
+
+<table><tbody><tr><td><p>spl-embed</p></td></tr><tr><td><p><em></em>{{&lt;featured/related-stories</p><p>title=&#34;More Stories from the 2024 Election&#34;</p><p>link=&#34;/election&#34;</p><p>cta=&#34;Visit the Election Center →&#34;</p><p>limit=&#34;12&#34;</p><p>&gt;}}</p></td></tr></tbody></table>
+
+To add text that will only appear on spotlightpa.org but not be distributed to partners:
+
+<table><tbody><tr><td><p>spl-text</p></td></tr><tr><td><p>Read more, <em>only </em><strong><em>here</em></strong> at Spotlight PA!</p></td></tr></tbody></table>
+
+To add raw code that will only be distributed to partners but not appear on spotlightpa.org:
+
+<table><tbody><tr><td><p>partner-embed</p></td></tr><tr><td><p><em></em>&lt;script src=&#34;https://www.example.org/&#34;&gt;&lt;/script&gt;</p></td></tr></tbody></table>
+
+To add text that will only be distributed to partners but not appear on spotlightpa.org:
+
+<table><tbody><tr><td><p>partner-text</p></td></tr><tr><td><p>To read more, visit <a href="https://www.spotlightpa.org/">Spotlight PA</a> today!</p></td></tr></tbody></table>
+
+TO ADD ADDITIONAL IMAGE
+
+<table><tbody><tr><td><p>image</p></td><td></td></tr><tr><td><p><em>INSERT IMAGE HERE</em></p></td><td></td></tr><tr><td><p>path</p></td><td><p>external/08v6tmkadg07fyknwy3pb8sm3m.jpeg</p></td></tr><tr><td><p>caption</p></td><td><p>The House floor in the Pa. Capitol. The chamber is controlled by Democrats for the first session in more than a decade.</p></td></tr><tr><td><p>description</p></td><td><p>The House floor in the Pa. Capitol.</p></td></tr><tr><td><p>credit</p></td><td><p>Amanda Berg / For Spotlight PA</p></td></tr></tbody></table>
+
+To prevent the Spotlight PA auto-cropper from cropping the image to a 3 x 2 aspect ratio, specify the width and height of the original image.
+
+<table><tbody><tr><td><p>image</p></td><td></td></tr><tr><td><p>path</p></td><td><p>external/08v6tmkadg07fyknwy3pb8sm3m.jpeg</p></td></tr><tr><td><p>caption</p></td><td><p>The House floor in the Pa. Capitol. The chamber is controlled by Democrats for the first session in more than a decade.</p></td></tr><tr><td><p>description</p></td><td><p>The House floor in the Pa. Capitol.</p></td></tr><tr><td><p>credit</p></td><td><p>Amanda Berg / For Spotlight PA</p></td></tr><tr><td><p>width</p></td><td><p>3200</p></td></tr><tr><td><p>height</p></td><td><p>2134</p></td></tr></tbody></table>
+
+TO HIDE TEXT FROM FINAL COPY:
+
+<table><tbody><tr><td><p>Comment</p></td></tr><tr><td><p>This text will be ignored by Almanck.</p></td></tr></tbody></table>
+
+Or include the text after the end of story marker, which is \#\#\# on a line by itself.
+
+TO ADD A TABLE OF CONTENTS, USE REAL HEADINGS AND ADD:
+
+<table><tbody><tr><td><p>toc</p></td></tr><tr><td><p>Name your TOC here (e.g. “Contents” or “Skip to Section”)</p></td></tr></tbody></table>
+
+TO ADD A PLAIN TABLE (<strong>Note that plain tables do not work well on mobile</strong>. Prefer to use table embeds from Datawrapper or Flourish):
+
+<table><tbody><tr><td><p>table</p></td><td></td><td></td></tr><tr><td><p>a</p></td><td><p>b</p></td><td><p>c</p></td></tr><tr><td><p>1</p></td><td><p>2</p></td><td><p>3</p></td></tr></tbody></table>

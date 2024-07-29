@@ -85,10 +85,19 @@ func processDocHTML(docHTML *html.Node) (
 					"Embed #%d contains unusual characters.", n,
 				))
 			}
+			if !xhtml.IsBalanced(embedHTML) {
+				warnings = append(warnings, fmt.Sprintf(
+					"Embed #%d seems to contain unbalanced HTML.", n,
+				))
+			}
 			goto append
 
 		case "spl", "spl-embed":
 			embedHTML := xhtml.TextContent(rows.At(1, 0))
+			if !strings.Contains(embedHTML, "{{<") && !xhtml.IsBalanced(embedHTML) {
+				warnings = append(warnings,
+					"Spotlight PA embed seems to contain unbalanced HTML.")
+			}
 			data := newDataTag(dtSpotlightRaw, embedHTML)
 			xhtml.ReplaceWith(tbl, data)
 
@@ -105,6 +114,16 @@ func processDocHTML(docHTML *html.Node) (
 			embedHTML := xhtml.TextContent(rows.At(1, 0))
 			embed.Type = db.PartnerRawEmbedTag
 			embed.Value = embedHTML
+			if !ascii.Contains(embedHTML) {
+				warnings = append(warnings, fmt.Sprintf(
+					"Embed #%d contains unusual characters.", n,
+				))
+			}
+			if !xhtml.IsBalanced(embedHTML) {
+				warnings = append(warnings, fmt.Sprintf(
+					"Embed #%d seems to contain unbalanced HTML.", n,
+				))
+			}
 			goto append
 
 		case "partner-text":
