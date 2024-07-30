@@ -3,7 +3,7 @@ package xhtml
 import (
 	"strings"
 
-	"github.com/carlmjohnson/deque"
+	"github.com/earthboundkid/deque/v2"
 	"golang.org/x/net/html"
 )
 
