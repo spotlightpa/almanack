@@ -22,7 +22,7 @@ require (
 	github.com/carlmjohnson/slackhook v0.23.2
 	github.com/carlmjohnson/versioninfo v0.22.5
 	github.com/earthboundkid/bytemap/v2 v2.24.1
-	github.com/earthboundkid/deque/v2 v2.24.1
+	github.com/earthboundkid/deque/v2 v2.24.2
 	github.com/earthboundkid/mid v0.24.1
 	github.com/gabriel-vasile/mimetype v1.4.5
 	github.com/getsentry/sentry-go v0.28.1
