@@ -13,13 +13,11 @@ export default {
     let client = useClient();
 
     // TODO: Fixme
-    // eslint-disable-next-line vue/no-setup-props-destructure
     let rows = props.initialBody.split("\n").length;
     if (rows < 4) {
       rows = 4;
     }
 
-    // eslint-disable-next-line vue/no-setup-props-destructure
     let emailStatus = reactive({
       subject: props.initialSubject,
       body: props.initialBody,

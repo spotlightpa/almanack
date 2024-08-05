@@ -10,7 +10,6 @@ let dnt = !window.location.host.match(/spotlightpa\.org$/);
 
 export function callGA(...args) {
   if (dnt) {
-    // eslint-disable-next-line no-console
     console.info("GA", args);
     return;
   }
