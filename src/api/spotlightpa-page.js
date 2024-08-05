@@ -241,7 +241,6 @@ function useAutocompletions() {
     if (!err) {
       autocomplete.topics = data.topics || [];
     } else {
-      // eslint-disable-next-line no-console
       console.warn(err);
     }
   });
@@ -249,7 +248,6 @@ function useAutocompletions() {
     if (!err) {
       autocomplete.series = data.series || [];
     } else {
-      // eslint-disable-next-line no-console
       console.warn(err);
     }
   });

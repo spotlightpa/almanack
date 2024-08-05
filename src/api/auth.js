@@ -23,7 +23,6 @@ function makeAuth() {
     authState.user = null;
   });
   netlifyIdentity.on("error", (err) => {
-    // eslint-disable-next-line no-console
     console.warn(err);
     authState.user = null;
   });
@@ -52,7 +51,6 @@ function makeAuth() {
       try {
         await netlifyIdentity.logout();
       } catch (e) {
-        // eslint-disable-next-line no-console
         console.warn(e);
         netlifyIdentity.store.user = null;
       }

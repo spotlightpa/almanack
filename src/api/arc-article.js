@@ -148,7 +148,7 @@ export default class ArcArticle {
       if (ignoreComponentTypes[block.type]) {
         return [];
       }
-      // eslint-disable-next-line no-console
+
       console.warn("unknown block type", block.type, block);
       return [];
     });
@@ -208,7 +208,7 @@ export default class ArcArticle {
       if (ignoreComponentTypes[block.type]) {
         return [];
       }
-      // eslint-disable-next-line no-console
+
       console.warn("unknown block type", block.type, block);
       return [];
     });

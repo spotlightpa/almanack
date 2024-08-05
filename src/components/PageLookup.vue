@@ -16,7 +16,6 @@ async function lookup(fullurl) {
   let path = null;
   try {
     path = new URL(fullurl).pathname;
-    // eslint-disable-next-line no-empty
   } catch (e) {
     return [null, e];
   }

@@ -42,7 +42,6 @@ class SidebarData {
   swap({ pos, dir }) {
     let target = pos + dir;
     if (target < 0 || target >= this.items.length) {
-      // eslint-disable-next-line no-console
       console.error("bad swap", pos, target);
       return;
     }

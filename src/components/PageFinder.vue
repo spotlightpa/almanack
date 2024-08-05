@@ -45,7 +45,6 @@ export default {
       const select = "-body";
       let [data, err] = await listPagesByFTS({ params: { query, select } });
       if (this.currentRequest !== token) {
-        // eslint-disable-next-line no-console
         console.warn("discarding stale result");
         return;
       }

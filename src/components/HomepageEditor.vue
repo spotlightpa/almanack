@@ -1,4 +1,5 @@
 <script>
+/* eslint-disable vue/no-mutating-props */
 export default {
   props: {
     editorsPicks: Object,
