@@ -76,3 +76,6 @@
   to = "/index.html"
   status = 404
   force = false
+
+[functions.schedule]
+schedule = "*/3 * * * *"  # Every three minutes
