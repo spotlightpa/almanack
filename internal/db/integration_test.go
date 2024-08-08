@@ -12,7 +12,7 @@ import (
 
 	"github.com/carlmjohnson/be"
 	"github.com/carlmjohnson/be/testfile"
-	"github.com/carlmjohnson/requests"
+	"github.com/carlmjohnson/requests/reqtest"
 	"github.com/spotlightpa/almanack/internal/aws"
 	"github.com/spotlightpa/almanack/internal/db"
 	"github.com/spotlightpa/almanack/internal/google"
@@ -36,13 +36,13 @@ func TestProcessGDocsDoc(t *testing.T) {
 			FileStore:  aws.NewBlobStore("mem://"),
 			Gsvc:       new(google.Service),
 			Client: &http.Client{
-				Transport: requests.Replay(path),
+				Transport: reqtest.Replay(path),
 			},
 		}
 		if os.Getenv("RECORD") != "" {
-			svc.Client.Transport = requests.Caching(nil, path)
+			svc.Client.Transport = reqtest.Caching(nil, path)
 			cl, _ := svc.Gsvc.DriveClient(context.Background())
-			cl.Transport = requests.Caching(cl.Transport, path)
+			cl.Transport = reqtest.Caching(cl.Transport, path)
 			svc.Gsvc.SetMockClient(cl)
 		} else {
 			svc.Gsvc.SetMockClient(svc.Client)

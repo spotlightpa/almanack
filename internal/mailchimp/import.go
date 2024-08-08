@@ -7,6 +7,7 @@ import (
 
 	"github.com/carlmjohnson/errorx"
 	"github.com/carlmjohnson/requests"
+	"github.com/carlmjohnson/requests/reqhtml"
 	"github.com/spotlightpa/almanack/internal/xhtml"
 	"golang.org/x/net/html"
 	"golang.org/x/net/html/atom"
@@ -19,7 +20,7 @@ func ImportPage(ctx context.Context, cl *http.Client, page string) (body string,
 	err = requests.
 		URL(page).
 		Client(cl).
-		Handle(requests.ToHTML(&node)).
+		Handle(reqhtml.To(&node)).
 		Fetch(ctx)
 	if err != nil {
 		return "", err
