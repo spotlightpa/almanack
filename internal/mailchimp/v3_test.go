@@ -9,18 +9,18 @@ import (
 
 	"github.com/carlmjohnson/be"
 	"github.com/carlmjohnson/be/testfile"
-	"github.com/carlmjohnson/requests"
+	"github.com/carlmjohnson/requests/reqtest"
 	"github.com/spotlightpa/almanack/internal/mailchimp"
 )
 
 func TestV3(t *testing.T) {
 	cl := *http.DefaultClient
-	cl.Transport = requests.Replay("testdata")
+	cl.Transport = reqtest.Replay("testdata")
 	apiKey := os.Getenv("ALMANACK_MC_TEST_API_KEY")
 	listID := os.Getenv("ALMANACK_MC_TEST_LISTID")
 
 	if os.Getenv("RECORD") != "" {
-		cl.Transport = requests.Caching(nil, "testdata")
+		cl.Transport = reqtest.Caching(nil, "testdata")
 	}
 	v3 := mailchimp.NewV3(apiKey, listID, &cl)
 	res, err := v3.ListCampaigns(context.Background())

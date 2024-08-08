@@ -7,7 +7,7 @@ import (
 
 	"github.com/carlmjohnson/be"
 	"github.com/carlmjohnson/be/testfile"
-	"github.com/carlmjohnson/requests"
+	"github.com/carlmjohnson/requests/reqtest"
 	"github.com/spotlightpa/almanack/internal/google"
 	"github.com/spotlightpa/almanack/pkg/almlog"
 	"gopkg.in/Iwark/spreadsheet.v2"
@@ -18,7 +18,7 @@ func TestSheetToFileObjects(t *testing.T) {
 	almlog.UseTestLogger(t)
 
 	cl := &http.Client{}
-	cl.Transport = requests.Replay("testdata/sheets")
+	cl.Transport = reqtest.Replay("testdata/sheets")
 
 	obj, err := google.SheetToDonorWall(ctx, cl, "abc123")
 	be.NilErr(t, err)
