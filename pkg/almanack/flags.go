@@ -14,6 +14,7 @@ import (
 	"github.com/spotlightpa/almanack/internal/index"
 	"github.com/spotlightpa/almanack/internal/mailchimp"
 	"github.com/spotlightpa/almanack/internal/plausible"
+	"github.com/spotlightpa/almanack/pkg/almlog"
 )
 
 func AddFlags(fl *flag.FlagSet) func() (svc Services, err error) {
@@ -42,7 +43,9 @@ func AddFlags(fl *flag.FlagSet) func() (svc Services, err error) {
 			return
 		}
 
-		client := *http.DefaultClient
+		client := http.Client{
+			Transport: almlog.HTTPTransport,
+		}
 
 		is, fs := getS3Store()
 		mc := mailchimp.NewMailService(*mailServiceAPIKey, *mailServiceListID, &client)
