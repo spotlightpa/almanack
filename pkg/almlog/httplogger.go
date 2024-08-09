@@ -1,7 +1,6 @@
 package almlog
 
 import (
-	"errors"
 	"net/http"
 	"time"
 
@@ -12,8 +11,7 @@ var HTTPTransport http.RoundTripper
 
 func init() {
 	HTTPTransport = requests.LogTransport(http.DefaultTransport, logReq)
-	http.DefaultTransport = requests.ErrorTransport(errors.New("use of http.DefaultTransport"))
-	http.DefaultClient.Transport = requests.ErrorTransport(errors.New("use of http.DefaultClient"))
+	http.DefaultTransport = HTTPTransport
 }
 
 func logReq(req *http.Request, res *http.Response, err error, duration time.Duration) {
