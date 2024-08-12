@@ -8,6 +8,7 @@ import (
 	"github.com/spotlightpa/almanack/internal/db"
 	"github.com/spotlightpa/almanack/internal/github"
 	"github.com/spotlightpa/almanack/internal/google"
+	"github.com/spotlightpa/almanack/internal/healthchecksio"
 	"github.com/spotlightpa/almanack/internal/index"
 	"github.com/spotlightpa/almanack/internal/mailchimp"
 	"github.com/spotlightpa/almanack/internal/plausible"
@@ -30,4 +31,5 @@ type Services struct {
 	Gsvc             *google.Service
 	mailchimp.EmailService
 	Plausible plausible.API
+	HC        healthchecksio.Client
 }
