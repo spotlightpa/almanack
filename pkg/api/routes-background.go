@@ -3,6 +3,7 @@ package api
 import (
 	"context"
 	"errors"
+	"fmt"
 	"net/http"
 	"strings"
 	"time"
@@ -37,6 +38,13 @@ func (app *appEnv) backgroundSleep(w http.ResponseWriter, r *http.Request) http.
 
 func (app *appEnv) backgroundCron(w http.ResponseWriter, r *http.Request) http.Handler {
 	app.logStart(r)
+
+	if err := app.svc.HC.Start(r.Context()); err != nil {
+		app.logErr(r.Context(), err)
+		l := almlog.FromContext(r.Context())
+		l.ErrorContext(r.Context(), "could not contact Healthchecks.io with start; continuing")
+		// fallthrough and keep trying…
+	}
 
 	if err := flowmatic.Do(
 		func() error {
@@ -114,8 +122,23 @@ func (app *appEnv) backgroundCron(w http.ResponseWriter, r *http.Request) http.H
 			)
 		},
 	); err != nil {
+		msg := fmt.Appendf(nil, "error: %v", err)
+		if suberr := app.svc.HC.Status(r.Context(), 500, msg); suberr != nil {
+			app.logErr(r.Context(), suberr)
+			l := almlog.FromContext(r.Context())
+			l.ErrorContext(r.Context(), "could not contact Healthchecks.io with error")
+			// fallthrough to reply
+		}
+
 		// reply shows up in dev only
 		return app.jsonErr(err)
+	}
+
+	if suberr := app.svc.HC.Status(r.Context(), 200, []byte("OK")); suberr != nil {
+		app.logErr(r.Context(), suberr)
+		l := almlog.FromContext(r.Context())
+		l.ErrorContext(r.Context(), "could not contact Healthchecks.io with success")
+		// fallthrough to reply
 	}
 
 	return app.jsonAccepted("OK")

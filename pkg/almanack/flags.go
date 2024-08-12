@@ -11,6 +11,7 @@ import (
 	"github.com/spotlightpa/almanack/internal/db"
 	"github.com/spotlightpa/almanack/internal/github"
 	"github.com/spotlightpa/almanack/internal/google"
+	"github.com/spotlightpa/almanack/internal/healthchecksio"
 	"github.com/spotlightpa/almanack/internal/index"
 	"github.com/spotlightpa/almanack/internal/mailchimp"
 	"github.com/spotlightpa/almanack/internal/plausible"
@@ -35,6 +36,7 @@ func AddFlags(fl *flag.FlagSet) func() (svc Services, err error) {
 	gsvc.AddFlags(fl)
 	mailServiceAPIKey := fl.String("mc-api-key", "", "API `key` for MailChimp v2")
 	mailServiceListID := fl.String("mc-list-id", "", "List `ID` MailChimp v2 campaign")
+	hc := fl.String("healthchecks-uuid", "", "`UUID` for Healthchecks.io alert")
 	var pl plausible.API
 	pl.AddFlags(fl)
 
@@ -67,6 +69,7 @@ func AddFlags(fl *flag.FlagSet) func() (svc Services, err error) {
 			Gsvc:                 &gsvc,
 			EmailService:         mc,
 			Plausible:            pl,
+			HC:                   healthchecksio.New(*hc, &client),
 		}, nil
 	}
 }
