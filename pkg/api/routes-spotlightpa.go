@@ -893,45 +893,6 @@ func (app *appEnv) listPagesByFTS(w http.ResponseWriter, r *http.Request) {
 	app.replyJSON(http.StatusOK, w, pages)
 }
 
-func (app *appEnv) listArcByLastUpdated(w http.ResponseWriter, r *http.Request) {
-	var page int32
-	_ = intFromQuery(r, "page", &page)
-	refresh, _ := boolFromQuery(r, "refresh")
-	app.logStart(r, "page", page, "refresh", refresh)
-
-	if refresh {
-		if fatal, err := app.svc.RefreshArcFromFeed(r.Context()); err != nil {
-			if fatal {
-				app.replyErr(w, r, err)
-				return
-			}
-			app.logErr(r.Context(), err)
-		}
-	}
-
-	var (
-		resp struct {
-			Stories  []db.ListArcByLastUpdatedRow `json:"stories"`
-			NextPage int32                        `json:"next_page,string,omitempty"`
-		}
-		err error
-	)
-	pager := paginate.PageNumber(page)
-	pager.PageSize = 20
-	resp.Stories, err = paginate.List(pager, r.Context(),
-		app.svc.Queries.ListArcByLastUpdated,
-		db.ListArcByLastUpdatedParams{
-			Limit:  pager.Limit(),
-			Offset: pager.Offset(),
-		})
-	resp.NextPage = pager.NextPage
-	if err != nil {
-		app.replyErr(w, r, err)
-		return
-	}
-	app.replyJSON(http.StatusOK, w, &resp)
-}
-
 func (app *appEnv) postSharedArticle(w http.ResponseWriter, r *http.Request) {
 	app.logStart(r)
 
@@ -941,32 +902,6 @@ func (app *appEnv) postSharedArticle(w http.ResponseWriter, r *http.Request) {
 	}
 
 	article, err := app.svc.Queries.UpdateSharedArticle(r.Context(), req)
-	if err != nil {
-		app.replyErr(w, r, err)
-		return
-	}
-
-	app.replyJSON(http.StatusOK, w, &article)
-}
-
-func (app *appEnv) postSharedArticleFromArc(w http.ResponseWriter, r *http.Request) {
-	app.logStart(r)
-
-	var req struct {
-		ArcID string `json:"arc_id"`
-	}
-	if !app.readJSON(w, r, &req) {
-		return
-	}
-	if fatal, err := app.svc.RefreshArcFromFeed(r.Context()); err != nil {
-		if fatal {
-			app.replyErr(w, r, err)
-			return
-		}
-		app.logErr(r.Context(), err)
-	}
-
-	article, err := app.svc.Queries.UpsertSharedArticleFromArc(r.Context(), req.ArcID)
 	if err != nil {
 		app.replyErr(w, r, err)
 		return

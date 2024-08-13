@@ -11,7 +11,6 @@ import {
   listImages,
   getSharedArticle,
   postSharedArticle,
-  postSharedArticleFromArc,
   postSharedArticleFromGDocs,
 } from "@/api/client-v2.js";
 import { processGDocsDoc } from "@/api/gdocs.js";
@@ -126,14 +125,6 @@ const pageCreateDisabled = computed(() => {
   }
   return null;
 });
-
-const { exec: arcExec, apiStateRefs: arcState } = makeState();
-const { isLoadingThrottled: arcLoading, error: arcError } = arcState;
-function refreshArc() {
-  arcExec(() =>
-    post(postSharedArticleFromArc, { arc_id: article.value.sourceID })
-  );
-}
 
 const { apiStateRefs: gdocsState, exec: gdocsExec } = makeState();
 const { isLoadingThrottled: gdocsLoading, error: gdocsError } = gdocsState;
@@ -482,19 +473,7 @@ function setImageProps(image) {
             "
           ></BulmaTextarea>
 
-          <button
-            v-if="article.isArc"
-            class="button is-warning has-text-weight-semibold"
-            type="button"
-            :class="arcLoading && 'is-loading'"
-            @click="refreshArc"
-          >
-            Refresh from Arc
-          </button>
-          <ErrorSimple
-            :error="saveError || arcError"
-            class="mt-1"
-          ></ErrorSimple>
+          <ErrorSimple :error="saveError" class="mt-1"></ErrorSimple>
           <div v-if="article.isGDoc" class="buttons">
             <button
               class="button is-warning has-text-weight-semibold"
