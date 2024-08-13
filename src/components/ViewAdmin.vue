@@ -221,13 +221,6 @@ const nextPage = computedProp("next_page", (page) => ({
     ></ErrorReloader>
 
     <h2 class="mt-5 title">Import Articles</h2>
-    <LinkButtons>
-      <LinkRoute
-        label="Import from Arc"
-        to="arc-import"
-        :icon="['fas', 'pen-nib']"
-      ></LinkRoute>
-    </LinkButtons>
 
     <label for="gdocs-importer" class="mt-4 label">
       Import from Google Docs

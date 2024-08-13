@@ -55,8 +55,6 @@ func (app *appEnv) routes() http.Handler {
 		spotlightMW.HandlerFunc(app.listAllSeries))
 	mux.Handle(`GET /api/all-topics`,
 		spotlightMW.HandlerFunc(app.listAllTopics))
-	mux.Handle(`GET /api/arc-by-last-updated`,
-		spotlightMW.HandlerFunc(app.listArcByLastUpdated))
 	mux.Handle(`GET /api/authorized-addresses`,
 		spotlightMW.HandlerFunc(app.listAddresses))
 	mux.Handle(`POST /api/authorized-addresses`,
@@ -107,8 +105,6 @@ func (app *appEnv) routes() http.Handler {
 		spotlightMW.HandlerFunc(app.postPageRefresh))
 	mux.Handle(`POST /api/shared-article`,
 		spotlightMW.HandlerFunc(app.postSharedArticle))
-	mux.Handle(`POST /api/shared-article-from-arc`,
-		spotlightMW.HandlerFunc(app.postSharedArticleFromArc))
 	mux.Handle(`POST /api/shared-article-from-gdocs`,
 		spotlightMW.HandlerFunc(app.postSharedArticleFromGDocs))
 	mux.Handle(`GET /api/sidebar`,

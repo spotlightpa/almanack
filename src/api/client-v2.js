@@ -72,7 +72,6 @@ export function post(url, obj) {
 
 // Alphabetize lists by URL to show duplicates
 // GET and POST listed as two endpoints
-export const listArcByLastUpdated = `/api/arc-by-last-updated`;
 export const listAllPages = `/api/all-pages`;
 export const listAllSeries = `/api/all-series`;
 export const listAllTopics = `/api/all-topics`;
@@ -102,7 +101,6 @@ export const listPages = `/api/pages`;
 export const listPagesByFTS = `/api/pages-by-fts`;
 export const getSharedArticle = `/api/shared-article`;
 export const postSharedArticle = `/api/shared-article`;
-export const postSharedArticleFromArc = `/api/shared-article-from-arc`;
 export const postSharedArticleFromGDocs = `/api/shared-article-from-gdocs`;
 export const listSharedArticles = `/api/shared-articles`;
 export const getSidebar = `/api/sidebar`;
