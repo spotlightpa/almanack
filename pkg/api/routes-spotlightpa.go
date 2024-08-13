@@ -648,38 +648,7 @@ func (app *appEnv) postPageRefresh(w http.ResponseWriter, r *http.Request) {
 		app.replyJSON(http.StatusOK, w, &page)
 		return
 	case "arc":
-		arcID := page.SourceID
-		if arcID == "" {
-			app.replyNewErr(http.StatusConflict, w, r, "no arc-id on page %d", id)
-			return
-		}
-
-		if fatal, err := app.svc.RefreshArcFromFeed(r.Context()); err != nil {
-			if fatal {
-				app.replyErr(w, r, err)
-				return
-			}
-			app.logErr(r.Context(), err)
-		}
-
-		story, err := app.svc.Queries.GetArcByArcID(r.Context(), arcID)
-		if err != nil {
-			if db.IsNotFound(err) {
-				err = fmt.Errorf("page %d refers to bad arc-id %q: %w", id, arcID, err)
-			}
-			app.replyErr(w, r, err)
-			return
-		}
-
-		if warnings, err := app.svc.RefreshPageFromArcStory(r.Context(), &page, &story, req.RefreshMetadata); err != nil {
-			app.replyErr(w, r, err)
-			return
-		} else {
-			for _, w := range warnings {
-				app.logErr(r.Context(), fmt.Errorf("got warning: %s", w))
-			}
-		}
-		app.replyJSON(http.StatusOK, w, page)
+		app.replyNewErr(http.StatusConflict, w, r, "can not refresh source-type arc; id=%d", id)
 		return
 	default:
 		app.replyNewErr(http.StatusConflict, w, r,
