@@ -477,24 +477,6 @@ export default {
       <BulmaField help="Remember to save pages after refreshing">
         <div class="buttons">
           <button
-            v-if="page.arcID"
-            class="block button is-warning is-small has-text-weight-semibold"
-            :class="{ 'is-loading': isLoadingThrottled }"
-            type="button"
-            @click.prevent="refreshFromSource({ metadata: false })"
-          >
-            Refresh content from Arc
-          </button>
-          <button
-            v-if="page.arcID"
-            class="block button is-warning is-small has-text-weight-semibold"
-            :class="{ 'is-loading': isLoadingThrottled }"
-            type="button"
-            @click.prevent="refreshFromSource({ metadata: true })"
-          >
-            Refresh content and metadata from Arc
-          </button>
-          <button
             v-if="page.isGDoc"
             class="block button is-warning is-small has-text-weight-semibold"
             :class="{ 'is-loading': isLoadingThrottled }"
