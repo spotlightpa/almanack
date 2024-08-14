@@ -17,7 +17,7 @@ import (
 
 func intermediateDocToMarkdown(doc *html.Node) string {
 	// Remove partner exclusive text
-	for dataEl, _ := range dataEls(doc, dtPartnerText) {
+	for dataEl := range dataEls(doc, dtPartnerText) {
 		dataEl.Parent.RemoveChild(dataEl)
 	}
 	// Include Spotlight PA specific text as is

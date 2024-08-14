@@ -11,7 +11,7 @@ import (
 
 func intermediateDocToPartnerRichText(doc *html.Node) {
 	// Remove Spotlight PA exclusives
-	for dataEl, _ := range iterx.Concat2(
+	for dataEl := range iterx.Concat2(
 		dataEls(doc, dtSpotlightText),
 		dataEls(doc, dtSpotlightRaw),
 	) {
