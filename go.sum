@@ -90,8 +90,6 @@ github.com/carlmjohnson/flowmatic v0.23.4 h1:SfK6f+zKUlw4aga1ph+7/csqVeUAWnBxfqK
 github.com/carlmjohnson/flowmatic v0.23.4/go.mod h1:Jpvyl591Dvkt9chYpnVupjxlKvqkZ9CtCmqL4wfQD7U=
 github.com/carlmjohnson/gateway v1.22.2 h1:Nr7JVUSruWG3I6PGGxUTaIGLHSEhCcoppFX0zGxha80=
 github.com/carlmjohnson/gateway v1.22.2/go.mod h1:C2xSaIo4kkvdbTQQI5EhmzzWC1wB/+f5COhlpQ4O8fA=
-github.com/carlmjohnson/requests v0.24.1 h1:M8hmzyJr3A9D3u96MjCNuUVLd7Z3hQb7UjP5DsBp3lE=
-github.com/carlmjohnson/requests v0.24.1/go.mod h1:duYA/jDnyZ6f3xbcF5PpZ9N8clgopubP2nK5i6MVMhU=
 github.com/carlmjohnson/requests v0.24.2 h1:JDakhAmTIKL/qL/1P7Kkc2INGBJIkIFP6xUeUmPzLso=
 github.com/carlmjohnson/requests v0.24.2/go.mod h1:duYA/jDnyZ6f3xbcF5PpZ9N8clgopubP2nK5i6MVMhU=
 github.com/carlmjohnson/resperr v0.22.0 h1:oSliyZLmyncmPLEZXydy6gNhJgQ/9AaVpaGQLDRQ/NM=
