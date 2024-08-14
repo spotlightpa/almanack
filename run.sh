@@ -108,6 +108,7 @@ function test:db() {
 
 function test:misc() {
 	_git-xargs '*.sh' shellcheck _
+	go mod tidy -diff
 }
 
 function format() {
