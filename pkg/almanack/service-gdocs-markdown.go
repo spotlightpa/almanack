@@ -52,6 +52,14 @@ func intermediateDocToMarkdown(doc *html.Node) string {
 		case db.ToCEmbedTag:
 			container := xhtml.New("div")
 			must.Do(xhtml.SetInnerHTML(container, dbembed.Value.(string)))
+			container.InsertBefore(&html.Node{
+				Type: html.RawNode,
+				Data: "{{<toc>}}",
+			}, container.FirstChild)
+			container.AppendChild(&html.Node{
+				Type: html.RawNode,
+				Data: "{{</toc>}}",
+			})
 			xhtml.ReplaceWith(dataEl, container)
 			xhtml.UnnestChildren(container)
 		// Write picture shortcode
