@@ -1,5 +1,7 @@
 Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
 
+{{<toc>}}
+
 ### Article contents
 
 - <a href="#spl-heading-1">Heading 1</a>
@@ -19,6 +21,8 @@ Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor i
     - <a href="#spl-heading-8">Heading 3.1.2</a>
 
 - <a href="#spl-heading-9">Heading 4</a>
+
+{{</toc>}}
 
 <h2 id="spl-heading-1">Heading 1</h2>
 

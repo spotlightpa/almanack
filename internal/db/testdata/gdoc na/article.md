@@ -30,6 +30,8 @@ TO HIDE TEXT FROM FINAL COPY:
 
 TO ADD A TABLE OF CONTENTS, USE REAL HEADINGS AND ADD:
 
+{{<toc>}}
+
 ### Contents
 
 - <a href="#spl-heading-1">Heading 1: Mostly don’t use this because the title is h1</a>
@@ -39,6 +41,8 @@ TO ADD A TABLE OF CONTENTS, USE REAL HEADINGS AND ADD:
     - <a href="#spl-heading-3">H3: Sub-subheds.</a>
 
       - <a href="#spl-heading-4">H4: Sub-sub-subhed.</a>
+
+{{</toc>}}
 
 TO ADD A PLAIN TABLE (<strong>Note that plain tables do not work well on mobile</strong>. Prefer to use table embeds from Datawrapper or Flourish):
 
