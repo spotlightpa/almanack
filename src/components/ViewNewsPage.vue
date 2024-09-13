@@ -426,6 +426,73 @@ export default {
         </div>
       </BulmaField>
 
+      <details class="my-5">
+        <summary>Mobile App Photo Override</summary>
+        <BulmaField
+          label="Mobile app photo ID"
+          help="If present, overrides default photo in the mobile app."
+          v-slot="{ idForLabel }"
+        >
+          <div class="is-flex">
+            <input :id="idForLabel" v-model="page.appImage" class="input" />
+            <BulmaPaste @paste="page.appImage = $event"></BulmaPaste>
+          </div>
+        </BulmaField>
+
+        <div v-if="page.appImage" class="is-flex">
+          <div>
+            <picture class="has-ratio" style="aspect-ratio: 5/4">
+              <img
+                :src="
+                  page.getAppImagePreviewURL({
+                    width: 400,
+                    height: 500,
+                    gravity: page.appImageGravity,
+                  })
+                "
+                class="border-thick"
+                width="200"
+              />
+            </picture>
+            <p class="has-text-centered">4 x 5</p>
+          </div>
+        </div>
+
+        <BulmaField label="Mobile app image focus">
+          <div class="control is-expanded">
+            <span class="select is-fullwidth">
+              <select v-model="page.appImageGravity">
+                <option
+                  v-for="[val, desc] in [
+                    ['', 'Auto'],
+                    ['we', 'Left'],
+                    ['no', 'Top'],
+                    ['ea', 'Right'],
+                    ['so', 'Bottom'],
+                    ['ce', 'Center'],
+                  ]"
+                  :key="val"
+                  :value="val"
+                >
+                  {{ desc }}
+                </option>
+              </select>
+            </span>
+          </div>
+        </BulmaField>
+
+        <BulmaTextarea
+          v-model="page.appImageDescription"
+          label="Mobile app image alt text"
+        ></BulmaTextarea>
+
+        <BulmaFieldInput
+          class="mb-6"
+          v-model="page.appImageCredit"
+          label="Mobile app image credit"
+        ></BulmaFieldInput>
+      </details>
+
       <BulmaFieldInput
         v-model="page.slug"
         label="URL keywords slug"
