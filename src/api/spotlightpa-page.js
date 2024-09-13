@@ -136,11 +136,19 @@ export class Page {
     return imgproxyURL(this.image, options);
   }
 
-  getAppImagePreviewURL(options) {
+  getAppImagePreviewURL() {
     if (!this.appImage || this.appImage.match(/^http/)) {
-      return "";
+      return this.getImagePreviewURL({
+        width: 400,
+        height: 500,
+        gravity: this.imageGravity,
+      });
     }
-    return imgproxyURL(this.appImage, options);
+    return imgproxyURL(this.appImage, {
+      width: 400,
+      height: 500,
+      gravity: this.appImageGravity,
+    });
   }
 
   get imagePreviewURL() {
