@@ -344,13 +344,7 @@ export default {
         <div class="ml-5">
           <picture class="has-ratio" style="aspect-ratio: 5/4">
             <img
-              :src="
-                page.getImagePreviewURL({
-                  width: 400,
-                  height: 500,
-                  gravity: page.imageGravity,
-                })
-              "
+              :src="page.getAppImagePreviewURL()"
               class="border-thick"
               width="200"
             />
@@ -443,13 +437,7 @@ export default {
           <div>
             <picture class="has-ratio" style="aspect-ratio: 5/4">
               <img
-                :src="
-                  page.getAppImagePreviewURL({
-                    width: 400,
-                    height: 500,
-                    gravity: page.appImageGravity,
-                  })
-                "
+                :src="page.getAppImagePreviewURL()"
                 class="border-thick"
                 width="200"
               />
