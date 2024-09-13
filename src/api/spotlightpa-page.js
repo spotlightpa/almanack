@@ -46,6 +46,10 @@ export class Page {
     this.blurb = this.frontmatter["blurb"] ?? "";
     this.topics = this.frontmatter["topics"] ?? [];
     this.series = this.frontmatter["series"] ?? [];
+    this.appImage = this.frontmatter["app-image"] ?? "";
+    this.appImageGravity = this.frontmatter["app-image-gravity"] ?? "";
+    this.appImageDescription = this.frontmatter["app-image-description"] ?? "";
+    this.appImageCredit = this.frontmatter["app-image-credit"] ?? "";
     this.image = this.frontmatter["image"] ?? "";
     this.imageGravity = this.frontmatter["image-gravity"] ?? "";
     this.imageDescription = this.frontmatter["image-description"] ?? "";
@@ -132,6 +136,13 @@ export class Page {
     return imgproxyURL(this.image, options);
   }
 
+  getAppImagePreviewURL(options) {
+    if (!this.appImage || this.appImage.match(/^http/)) {
+      return "";
+    }
+    return imgproxyURL(this.appImage, options);
+  }
+
   get imagePreviewURL() {
     return this.getImagePreviewURL();
   }
@@ -202,6 +213,10 @@ export class Page {
         blurb: this.blurb,
         topics: this.topics,
         series: this.series,
+        "app-image": this.appImage,
+        "app-image-gravity": this.appImageGravity,
+        "app-image-description": this.appImageDescription,
+        "app-image-credit": this.appImageCredit,
         image: this.image,
         "image-gravity": this.imageGravity,
         "image-description": this.imageDescription,
