@@ -29,6 +29,10 @@ func OuterHTML(n *html.Node) string {
 
 // InnerHTML returns the serialized markup contained within n.
 func InnerHTML(n *html.Node) string {
+	if n == nil {
+		return ""
+	}
+
 	var buf strings.Builder
 	buf.Grow(256)
 
@@ -43,6 +47,10 @@ func InnerHTML(n *html.Node) string {
 // InnerHTMLBlocks is the same as InnerHTML,
 // but it separates top level nodes with a line break.
 func InnerHTMLBlocks(n *html.Node) string {
+	if n == nil {
+		return ""
+	}
+
 	var buf strings.Builder
 	buf.Grow(256)
 
@@ -57,6 +65,9 @@ func InnerHTMLBlocks(n *html.Node) string {
 
 // TextContent joins and trims the text node children of n.
 func TextContent(n *html.Node) string {
+	if n == nil {
+		return ""
+	}
 	var buf strings.Builder
 	buf.Grow(256)
 
