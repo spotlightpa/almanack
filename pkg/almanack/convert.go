@@ -7,12 +7,12 @@ import (
 	"fmt"
 	"html"
 	"net/url"
-	"regexp"
 	"slices"
 	"strconv"
 	"strings"
 
 	"github.com/spotlightpa/almanack/internal/arc"
+	"github.com/spotlightpa/almanack/internal/lazy"
 	"github.com/spotlightpa/almanack/internal/must"
 	"github.com/spotlightpa/almanack/internal/stringx"
 	"github.com/spotlightpa/almanack/pkg/almlog"
@@ -268,9 +268,9 @@ func resolveFromInky(s string) string {
 	return u.String()
 }
 
-var fixcreditre = regexp.MustCompile(`(?i)\b(staff( photographer)?)\b`)
+var fixcreditRE = lazy.RE(`(?i)\b(staff( photographer)?)\b`)
 
 // change staff to inky
 func fixCredit(s string) string {
-	return fixcreditre.ReplaceAllLiteralString(s, "Philadelphia Inquirer")
+	return fixcreditRE().ReplaceAllLiteralString(s, "Philadelphia Inquirer")
 }
