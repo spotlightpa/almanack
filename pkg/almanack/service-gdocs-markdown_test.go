@@ -78,6 +78,16 @@ func TestReplaceSpotlightShortcodes(t *testing.T) {
 				`{{<scribd src="https://www.scribd.com/embeds/489945100/content?start_page=1&amp;view_mode=scroll&amp;access_key=key-29gXRO2IEpbetVJqdcQL" >}}` + "\n" +
 				`{{<typeform id="01HFS5TPTDZNNK7PV48PN752KC" >}}`,
 		},
+		{
+			`
+		<a href="#XHEPNKWD" style="display: none"></a>
+		`,
+			`{{<fundraiseup id="XHEPNKWD">}}`,
+		},
+		{
+			`<a href="#XMXVXGPU" style="display: none"></a>`,
+			`{{<fundraiseup id="XMXVXGPU">}}`,
+		},
 	}
 	for _, tc := range cases {
 		t := be.Relaxed(t)

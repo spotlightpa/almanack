@@ -9,6 +9,7 @@ import (
 
 	"github.com/spotlightpa/almanack/internal/blocko"
 	"github.com/spotlightpa/almanack/internal/db"
+	"github.com/spotlightpa/almanack/internal/lazy"
 	"github.com/spotlightpa/almanack/internal/must"
 	"github.com/spotlightpa/almanack/internal/xhtml"
 	"golang.org/x/net/html"
@@ -93,12 +94,18 @@ func intermediateDocToMarkdown(doc *html.Node) string {
 	return blocko.Blockize(doc)
 }
 
+// Fundraise Up embeds
+var fruRe = lazy.RE(`^\s*<a href="#(\w+)" style="display: none"></a>\s*$`)
+
 func replaceSpotlightShortcodes(s string) string {
 	if s == "" {
 		return s
 	}
 	if strings.Contains(s, "{{<") && strings.Contains(s, ">}}") {
 		return s
+	}
+	if matches := fruRe().FindStringSubmatch(s); len(matches) == 2 {
+		return fmt.Sprintf(`{{<fundraiseup id="%s">}}`, matches[1])
 	}
 	n, err := html.Parse(strings.NewReader(s))
 	if err != nil {
