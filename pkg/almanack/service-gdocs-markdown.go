@@ -184,7 +184,7 @@ func replaceSpotlightShortcodes(s string) string {
 	// $("div.flourish-embed.flourish-table")
 	els = xhtml.SelectAll(n, func(n *html.Node) bool {
 		return n.DataAtom == atom.Div &&
-			xhtml.Attr(n, "class") == "flourish-embed flourish-table"
+			strings.Contains(xhtml.Attr(n, "class"), "flourish-embed")
 	})
 	for el := range els {
 		if !isFirst {
