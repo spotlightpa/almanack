@@ -71,10 +71,6 @@ func (app *appEnv) routes() http.Handler {
 		spotlightMW.HandlerFunc(app.getSiteData(almanack.HomepageLoc)))
 	mux.Handle(`POST /api/editors-picks`,
 		spotlightMW.HandlerFunc(app.setSiteData((almanack.HomepageLoc))))
-	mux.Handle(`GET /api/election-feature`,
-		spotlightMW.HandlerFunc(app.getSiteData(almanack.ElectionFeatLoc)))
-	mux.Handle(`POST /api/election-feature`,
-		spotlightMW.HandlerFunc(app.setSiteData((almanack.ElectionFeatLoc))))
 	mux.Handle(`POST /api/files-create`,
 		spotlightMW.HandlerFunc(app.postFileCreate))
 	mux.Handle(`GET /api/files-list`,

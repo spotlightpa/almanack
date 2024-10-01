@@ -7,7 +7,6 @@ const (
 	SidebarLoc      = "data/sidebar.json"
 	SiteParamsLoc   = "config/_default/params.json"
 	StateCollegeLoc = "data/stateCollege.json"
-	ElectionFeatLoc = "data/elections.json"
 )
 
 var messageForLoc = map[string]string{
@@ -15,7 +14,6 @@ var messageForLoc = map[string]string{
 	SidebarLoc:      "Setting sidebar configuration",
 	SiteParamsLoc:   "Setting site parameters",
 	StateCollegeLoc: "Setting State College frontpage configuration",
-	ElectionFeatLoc: "Setting Elections feature configuration",
 }
 
 func MessageForLoc(loc string) string {

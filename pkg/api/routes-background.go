@@ -62,7 +62,6 @@ func (app *appEnv) backgroundCron(w http.ResponseWriter, r *http.Request) http.H
 			}
 			errs = append(errs, poperr)
 			// TODO: Query all locations from DB side
-			errs = append(errs, app.svc.PopScheduledSiteChanges(r.Context(), almanack.ElectionFeatLoc))
 			errs = append(errs, app.svc.PopScheduledSiteChanges(r.Context(), almanack.HomepageLoc))
 			errs = append(errs, app.svc.PopScheduledSiteChanges(r.Context(), almanack.SidebarLoc))
 			errs = append(errs, app.svc.PopScheduledSiteChanges(r.Context(), almanack.SiteParamsLoc))
