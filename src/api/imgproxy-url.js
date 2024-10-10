@@ -21,6 +21,6 @@ export default function imageURL(
   width = Math.round(width);
   height = Math.round(height);
   quality = Math.round(quality);
-
-  return `${baseURL}/${signature}/rt:${resizing_type}/w:${width}/h:${height}/g:${gravity}/el:${enlarge}/q:${quality}/${encoded_source_url}.${extension}`;
+  let qualityStr = quality ? `/q:${quality}` : "";
+  return `${baseURL}/${signature}/rt:${resizing_type}/w:${width}/h:${height}/g:${gravity}/el:${enlarge}${qualityStr}/${encoded_source_url}.${extension}`;
 }
