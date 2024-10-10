@@ -13,6 +13,7 @@ const height = ref(ratio(600, 16, 9));
 const gravity = ref("sm");
 const extension = ref("jpeg");
 const quality = ref(0);
+const fromWidth = ref(true);
 
 const badPath = computed(() => path.value.startsWith("http"));
 
@@ -29,7 +30,11 @@ const url = computed(
 );
 
 function doRatio(wr, hr) {
-  height.value = ratio(width.value, wr, hr);
+  if (fromWidth.value) {
+    height.value = ratio(width.value, wr, hr);
+  } else {
+    width.value = ratio(height.value, hr, wr);
+  }
 }
 </script>
 
@@ -79,33 +84,46 @@ function doRatio(wr, hr) {
       </div>
     </div>
   </div>
-  <div class="buttons">
+  <p class="label">Aspect Ratio</p>
+  <div class="buttons are-small">
+    <button
+      class="button is-light has-text-weight-semibold"
+      type="button"
+      @click="fromWidth = !fromWidth"
+    >
+      {{ fromWidth ? "Set from width" : "Set from height" }}
+    </button>
     <button
       class="button is-primary has-text-weight-semibold"
+      type="button"
       @click="doRatio(16, 9)"
     >
       16 x 9
     </button>
     <button
       class="button is-primary has-text-weight-semibold"
+      type="button"
       @click="doRatio(3, 2)"
     >
       3 x 2
     </button>
     <button
       class="button is-primary has-text-weight-semibold"
+      type="button"
       @click="doRatio(4, 3)"
     >
       4 x 3
     </button>
     <button
       class="button is-primary has-text-weight-semibold"
+      type="button"
       @click="doRatio(1, 1)"
     >
       Square
     </button>
     <button
       class="button is-primary has-text-weight-semibold"
+      type="button"
       @click="doRatio(4, 5)"
     >
       4 x 5
