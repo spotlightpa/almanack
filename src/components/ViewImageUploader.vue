@@ -154,6 +154,12 @@ watch(rawQuery, (val) => {
       </p>
     </div>
 
+    <h2 class="mt-5 title">Resize an image</h2>
+    <details>
+      <summary>Almanack image resizer</summary>
+      <ImageResize />
+    </details>
+
     <h2 class="mt-5 title">Existing Images</h2>
 
     <BulmaFieldInput
