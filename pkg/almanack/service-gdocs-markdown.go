@@ -248,6 +248,32 @@ func replaceSpotlightShortcodes(s string) string {
 		buf.WriteString(`" >}}`)
 	}
 
+	// $("iframe[src^=https://youtube.com/embeds/]")
+	els = xhtml.SelectAll(n, func(n *html.Node) bool {
+		if n.DataAtom != atom.Iframe {
+			return false
+		}
+		src := xhtml.Attr(n, "src")
+		return strings.HasPrefix(src, "https://www.youtube.com/embed/") ||
+			strings.HasPrefix(src, "https://www.youtube-nocookie.com/embed/")
+	})
+	for el := range els {
+		if !isFirst {
+			buf.WriteString("\n")
+		}
+		isFirst = false
+		src := xhtml.Attr(el, "src")
+		u := must.Get(url.Parse(src))
+		id := strings.TrimPrefix(u.Path, "/embed/")
+		buf.WriteString(`{{<youtube id="`)
+		buf.WriteString(escapeAttr(id))
+		if start := u.Query().Get("start"); start != "" {
+			buf.WriteString(`" start="`)
+			buf.WriteString(escapeAttr(start))
+		}
+		buf.WriteString(`" loading="lazy">}}`)
+	}
+
 	if buf.Len() > 0 {
 		return buf.String()
 	}
