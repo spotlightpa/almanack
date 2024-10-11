@@ -88,6 +88,14 @@ func TestReplaceSpotlightShortcodes(t *testing.T) {
 			`<a href="#XMXVXGPU" style="display: none"></a>`,
 			`{{<fundraiseup id="XMXVXGPU">}}`,
 		},
+		{
+			`<iframe width="100%" height="315" src="https://www.youtube.com/embed/XbnubJm-ofk?si=Umnc0yFxgFLJ9uyK" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>`,
+			`{{<youtube id="XbnubJm-ofk" loading="lazy">}}`,
+		},
+		{
+			`<iframe width="560" height="315" src="https://www.youtube-nocookie.com/embed/XbnubJm-ofk?si=QdOwK7Cv4oF3QNb_&amp;start=11" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>`,
+			`{{<youtube id="XbnubJm-ofk" start="11" loading="lazy">}}`,
+		},
 	}
 	for _, tc := range cases {
 		t := be.Relaxed(t)
