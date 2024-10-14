@@ -99,7 +99,7 @@ function test:frontend() {
 }
 
 function test:backend() {
-	go test -race ./... -v
+	go test -race -v ./...
 }
 
 function test:db() {
