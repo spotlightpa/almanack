@@ -845,7 +845,9 @@ func (app *appEnv) listPagesByFTS(w http.ResponseWriter, r *http.Request) {
 				app.replyErr(w, r, err)
 				return
 			}
-			pages = append(idpages, pages...)
+			pages = db.ConcatUnique(idpages, pages, func(p db.Page) int64 {
+				return p.ID
+			})
 			if len(pages) > 20 {
 				pages = pages[:20]
 			}
