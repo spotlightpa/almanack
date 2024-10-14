@@ -278,10 +278,10 @@ LIMIT $1 OFFSET $2;
 WITH query AS (
   SELECT
     id,
-    ts_rank(fts_doc_en, id_tsq) AS rank
+    ts_rank(internal_id_fts, id_tsq) AS rank
   FROM
     page,
-    tsquery (@query::text) id_tsq
+    tsquery (lower(@query::text)) id_tsq
   WHERE
     internal_id_fts @@ id_tsq
   ORDER BY
