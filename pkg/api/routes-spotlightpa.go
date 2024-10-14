@@ -21,6 +21,7 @@ import (
 	"github.com/spotlightpa/almanack/internal/gdocs"
 	"github.com/spotlightpa/almanack/internal/google"
 	"github.com/spotlightpa/almanack/internal/paginate"
+	"github.com/spotlightpa/almanack/internal/slicex"
 	"github.com/spotlightpa/almanack/internal/stringx"
 	"github.com/spotlightpa/almanack/pkg/almanack"
 	"github.com/spotlightpa/almanack/pkg/almlog"
@@ -845,7 +846,8 @@ func (app *appEnv) listPagesByFTS(w http.ResponseWriter, r *http.Request) {
 				app.replyErr(w, r, err)
 				return
 			}
-			pages = db.ConcatUnique(idpages, pages, func(p db.Page) int64 {
+			pages = slices.Concat(idpages, pages)
+			slicex.UniquesFunc(&pages, func(p db.Page) int64 {
 				return p.ID
 			})
 			if len(pages) > 20 {
