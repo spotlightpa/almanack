@@ -481,10 +481,10 @@ const listPagesByInternalID = `-- name: ListPagesByInternalID :many
 WITH query AS (
   SELECT
     id,
-    ts_rank(fts_doc_en, id_tsq) AS rank
+    ts_rank(internal_id_fts, id_tsq) AS rank
   FROM
     page,
-    tsquery ($2::text) id_tsq
+    tsquery (lower($2::text)) id_tsq
   WHERE
     internal_id_fts @@ id_tsq
   ORDER BY
