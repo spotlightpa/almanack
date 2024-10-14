@@ -10,25 +10,13 @@ import (
 	"golang.org/x/net/html/atom"
 )
 
-const (
-	_continue = true
-	_break    = false
-)
-
 func all(n *html.Node, yield func(*html.Node) bool) bool {
-	if n == nil {
-		return _continue
-	}
-	if !yield(n) {
-		return _break
-	}
-
 	for c := range ChildNodes(n) {
-		if !all(c, yield) {
-			return _break
+		if !yield(c) || !all(c, yield) {
+			return false
 		}
 	}
-	return _continue
+	return true
 }
 
 // All vists all child nodes in depth-first pre-order.
@@ -48,25 +36,30 @@ func SelectSlice(n *html.Node, match func(*html.Node) bool) []*html.Node {
 	return slices.Collect(SelectAll(n, match))
 }
 
-// SelectSlice returns the first child node matched by the selector or nil.
+// Select returns the first child node matched by the selector or nil.
 func Select(n *html.Node, match func(*html.Node) bool) *html.Node {
 	return iterx.First(SelectAll(n, match))
 }
 
-// Parents returns an iterator traversing the node and its parents.
+// Parents returns an iterator traversing the node's parents.
 func Parents(n *html.Node) iter.Seq[*html.Node] {
 	return func(yield func(*html.Node) bool) {
-		for p := n; p != nil; p = p.Parent {
-			if !yield(p) {
-				return
-			}
+		for p := n.Parent; p != nil && yield(p); p = p.Parent {
 		}
 	}
 }
 
 // Closest traverses the node and its parents until it finds a node that matches.
 func Closest(n *html.Node, match func(*html.Node) bool) *html.Node {
-	return iterx.First(iterx.Filter(Parents(n), match))
+	if match(n) {
+		return n
+	}
+	for p := range Parents(n) {
+		if match(p) {
+			return p
+		}
+	}
+	return nil
 }
 
 func WithAtom(a atom.Atom) func(n *html.Node) bool {
