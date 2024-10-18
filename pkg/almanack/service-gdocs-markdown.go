@@ -104,6 +104,13 @@ func replaceSpotlightShortcodes(s string) string {
 	if strings.Contains(s, "{{<") && strings.Contains(s, ">}}") {
 		return s
 	}
+
+	// Dewey assistant key
+	if strings.Contains(s, "3a59cd0d-c005-4a65-807d-3a5e539bd515") {
+		return "{{<dewey-assistant>}}"
+	}
+
+	// Fundraise Up psuedolink
 	if matches := fruRe().FindStringSubmatch(s); len(matches) == 2 {
 		return fmt.Sprintf(`{{<fundraiseup id="%s">}}`, matches[1])
 	}
