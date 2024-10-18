@@ -68,7 +68,7 @@ const nextPage = computedProp("next_page", (page) => ({
       <template v-if="page">(page {{ page }})</template>
     </h1>
 
-    <LinkButtons label="News Partners">
+    <LinkButtons label="News partners">
       <LinkRoute
         label="External Editor View"
         to="shared-articles"
@@ -117,6 +117,19 @@ const nextPage = computedProp("next_page", (page) => ({
       ></LinkRoute>
     </LinkButtons>
 
+    <LinkButtons label="State College">
+      <LinkRoute
+        label="State College Articles"
+        to="statecollege-pages"
+        :icon="['fas', 'file-signature']"
+      ></LinkRoute>
+      <LinkRoute
+        label="Frontpage Editor"
+        to="state-college-editor"
+        :icon="['fas', 'newspaper']"
+      ></LinkRoute>
+    </LinkButtons>
+
     <LinkButtons label="Uploads">
       <LinkRoute
         label="Photo manager"
@@ -127,18 +140,6 @@ const nextPage = computedProp("next_page", (page) => ({
         label="File manager"
         to="file-uploader"
         :icon="['fa', 'file-upload']"
-      ></LinkRoute>
-    </LinkButtons>
-    <LinkButtons label="State College">
-      <LinkRoute
-        label="Articles"
-        to="statecollege-pages"
-        :icon="['fas', 'file-signature']"
-      ></LinkRoute>
-      <LinkRoute
-        label="Frontpage Editor"
-        to="state-college-editor"
-        :icon="['fas', 'newspaper']"
       ></LinkRoute>
     </LinkButtons>
 
