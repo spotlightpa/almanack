@@ -96,6 +96,21 @@ func TestReplaceSpotlightShortcodes(t *testing.T) {
 			`<iframe width="560" height="315" src="https://www.youtube-nocookie.com/embed/XbnubJm-ofk?si=QdOwK7Cv4oF3QNb_&amp;start=11" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>`,
 			`{{<youtube id="XbnubJm-ofk" start="11" loading="lazy">}}`,
 		},
+		{
+			`<script type="text/javascript">
+			(function (e, o) {
+			  var deweyConfig = {
+				key: "3a59cd0d-c005-4a65-807d-3a5e539bd515",
+				options: {
+				  targetElementId: "deweyChatTarget",
+				}
+			  };
+			  var n = window.dewey = window.dewey || {}; if (n.invoked) { console.error("Dewey snippet included twice."); return } n.invoked = true; n.load = function (e, t) { return new Promise(((r, d) => { var i = o.createElement("script"); i.type = "text/javascript"; i.async = true; i.onload = r; i.onerror = d; i.src = ` + "`" + `https://app.askdewey.co/dewey.js/v1/${e}/dewey.min.js` + "`" + `; n._loadOptions = t; o.head.appendChild(i) })) }; n.SNIPPET_VERSION = "0.0.2"; async function t() { try { await n.load(deweyConfig.key, deweyConfig.options); n.start() } catch (e) { console.error("Failed to load Dewey script:", e) } } t()
+			})(window, document);
+		  </script>
+		  <div id="deweyChatTarget"></div>`,
+			`{{<dewey-assistant>}}`,
+		},
 	}
 	for _, tc := range cases {
 		t := be.Relaxed(t)
