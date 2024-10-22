@@ -72,17 +72,6 @@ func (app *appEnv) backgroundCron(w http.ResponseWriter, r *http.Request) http.H
 			return app.svc.UpdateMostPopular(r.Context())
 		},
 		func() error {
-			types, err := app.svc.Queries.ListNewsletterTypes(r.Context())
-			if err != nil {
-				return err
-			}
-			var errs []error
-			// Update newsletter archives first and then import anything new
-			errs = append(errs, app.svc.UpdateNewsletterArchives(r.Context(), types))
-			errs = append(errs, app.svc.ImportNewsletterPages(r.Context(), types))
-			return errors.Join(errs...)
-		},
-		func() error {
 			return app.svc.UploadPendingImages(r.Context())
 		},
 		func() error {

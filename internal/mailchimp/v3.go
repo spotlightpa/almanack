@@ -1,12 +1,9 @@
 package mailchimp
 
 import (
-	"context"
 	"flag"
-	"fmt"
 	"net/http"
 	"strings"
-	"time"
 
 	"github.com/carlmjohnson/requests"
 )
@@ -38,62 +35,4 @@ func (v3 V3) config(rb *requests.Builder) {
 		Client(v3.cl).
 		BasicAuth("", v3.apiKey).
 		Hostf("%s.api.mailchimp.com", datacenter)
-}
-
-func (v3 V3) ListCampaigns(ctx context.Context) (*ListCampaignsResp, error) {
-	var data ListCampaignsResp
-	if err := requests.
-		New(v3.config).
-		Path("campaigns").
-		Param("list_id", v3.listID).
-		Param("count", "10").
-		Param("offset", "0").
-		Param("status", "sent").
-		Param("fields", "campaigns.archive_url,campaigns.send_time,campaigns.settings.subject_line,campaigns.settings.title,campaigns.settings.preview_text").
-		Param("sort_field", "send_time").
-		Param("sort_dir", "desc").
-		ToJSON(&data).
-		Fetch(ctx); err != nil {
-		return nil, fmt.Errorf("could not list MC campaigns: %w", err)
-	}
-	return &data, nil
-}
-
-type ListCampaignsResp struct {
-	Campaigns []Campaign `json:"campaigns"`
-}
-
-type Campaign struct {
-	ArchiveURL string    `json:"archive_url"`
-	SentAt     time.Time `json:"send_time"`
-	Settings   struct {
-		Subject     string `json:"subject_line"`
-		Title       string `json:"title"`
-		PreviewText string `json:"preview_text"`
-	} `json:"settings"`
-}
-
-type Newsletter struct {
-	Subject     string    `json:"subject"`
-	Blurb       string    `json:"blurb"`
-	Description string    `json:"description"`
-	ArchiveURL  string    `json:"archive_url"`
-	PublishedAt time.Time `json:"published_at"`
-}
-
-func (resp *ListCampaignsResp) ToNewsletters(mcKind string) []Newsletter {
-	newsletters := make([]Newsletter, 0, len(resp.Campaigns))
-	for _, camp := range resp.Campaigns {
-		// Hacky but probably the best method?
-		if strings.Contains(camp.Settings.Title, mcKind) {
-			newsletters = append(newsletters, Newsletter{
-				Subject:     camp.Settings.Subject,
-				Blurb:       camp.Settings.PreviewText,
-				Description: camp.Settings.Title,
-				ArchiveURL:  camp.ArchiveURL,
-				PublishedAt: camp.SentAt,
-			})
-		}
-	}
-	return newsletters
 }
