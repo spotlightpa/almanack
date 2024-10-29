@@ -111,6 +111,20 @@ func TestReplaceSpotlightShortcodes(t *testing.T) {
 		  <div id="deweyChatTarget"></div>`,
 			`{{<dewey-assistant>}}`,
 		},
+		{
+			`<script src="https://www.spotlightpa.org/embed.js" async></script><div data-spl-embed-version="1" data-spl-src="https://www.spotlightpa.org/embeds/donate/"></div>`,
+			"{{<embed/donate>}}",
+		},
+		{
+			`<script src="https://www.spotlightpa.org/embed.js" async></script><div data-spl-embed-version="1" data-spl-src="https://www.spotlightpa.org/embeds/tips/?tip_text=Do%20you%20have%20information%20relating%20to%20this%20case%20that%20we%20should%20investigate%3F%20Tell%20us%20now.&form_name=statecollege-embed"></div>
+		`,
+			`{{<embed/tips form_name="statecollege-embed" tip_text="Do you have information relating to this case that we should investigate? Tell us now.">}}`,
+		},
+		{
+			`<script src="https://www.spotlightpa.org/embed.js" async></script><div data-spl-embed-version="1" data-spl-src="https://www.spotlightpa.org/embeds/newsletter/?cta=Sign%20up%20for%20our%20new%20regional%20newsletter%2C%20%3Cb%3ETalk%20of%20the%20Town%3C%2Fb%3E%2C%20and%20get%20all%20the%20news%20and%20notes%20from%20State%20College%20and%20north-central%20PA.&button=Sign%20Up%20Now&preselect=state_college&eyebrow=DON'T%20MISS%20A%20BEAT"></div>
+		`,
+			`{{<embed/newsletter button="Sign Up Now" cta="Sign up for our new regional newsletter, &lt;b&gt;Talk of the Town&lt;/b&gt;, and get all the news and notes from State College and north-central PA." eyebrow="DON&#39;T MISS A BEAT" preselect="state_college">}}`,
+		},
 	}
 	for _, tc := range cases {
 		t := be.Relaxed(t)
