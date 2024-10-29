@@ -595,14 +595,6 @@ func (app *appEnv) postPageRefresh(w http.ResponseWriter, r *http.Request) {
 	}
 
 	switch page.SourceType {
-	case "mailchimp":
-		err = app.svc.RefreshPageFromMailchimp(r.Context(), &page)
-		if err != nil {
-			app.replyErr(w, r, err)
-			return
-		}
-		app.replyJSON(http.StatusOK, w, &page)
-		return
 	case "gdocs":
 		dbDoc, err := app.svc.Queries.GetGDocsByExternalIDWhereProcessed(r.Context(), page.SourceID)
 		if err != nil {
@@ -646,6 +638,10 @@ func (app *appEnv) postPageRefresh(w http.ResponseWriter, r *http.Request) {
 		page.Body = dbDoc.ArticleMarkdown
 		app.replyJSON(http.StatusOK, w, &page)
 		return
+	case "mailchimp":
+		app.replyNewErr(http.StatusConflict, w, r, "can not refresh source-type mailchimp; id=%d", id)
+		return
+
 	case "arc":
 		app.replyNewErr(http.StatusConflict, w, r, "can not refresh source-type arc; id=%d", id)
 		return

@@ -7,7 +7,6 @@ import (
 	"errors"
 	"fmt"
 	"maps"
-	"net/http"
 	"strings"
 
 	"github.com/carlmjohnson/errorx"
@@ -18,7 +17,6 @@ import (
 	"github.com/jackc/pgx/v5/pgtype"
 	"github.com/spotlightpa/almanack/internal/arc"
 	"github.com/spotlightpa/almanack/internal/db"
-	"github.com/spotlightpa/almanack/internal/mailchimp"
 	"github.com/spotlightpa/almanack/internal/stringx"
 	"github.com/spotlightpa/almanack/internal/timex"
 	"github.com/spotlightpa/almanack/pkg/almlog"
@@ -362,30 +360,4 @@ func (svc Services) Notify(ctx context.Context, page *db.Page, publishingNow boo
 			},
 		},
 	})
-}
-
-func (svc Services) RefreshPageFromMailchimp(ctx context.Context, page *db.Page) (err error) {
-	defer errorx.Trace(&err)
-
-	id := page.ID
-	archiveURL, err := svc.Queries.GetArchiveURLForPageID(ctx, id)
-	if err != nil {
-		return err
-	}
-	if archiveURL == "" {
-		return resperr.New(http.StatusConflict, "no archiveURL for page %d", id)
-	}
-
-	body, err := mailchimp.ImportPage(ctx, svc.Client, archiveURL)
-	if err != nil {
-		return err
-	}
-	*page, err = svc.Queries.UpdatePageRawContent(ctx, db.UpdatePageRawContentParams{
-		ID:         id,
-		RawContent: body,
-	})
-	if err != nil {
-		return err
-	}
-	return nil
 }
