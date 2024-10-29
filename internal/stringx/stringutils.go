@@ -114,6 +114,7 @@ func ExtractNames(s string) []string {
 		if part == "" || staffRe().MatchString(part) {
 			continue
 		}
+		part, _, _ = strings.Cut(part, "/")
 		part = outletRe().ReplaceAllString(part, "")
 		part = strings.TrimSpace(part)
 		if part == "" {
