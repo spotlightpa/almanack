@@ -14,3 +14,7 @@ ALTER TABLE page
 
 ALTER TABLE image
   DROP COLUMN fts;
+
+DROP TABLE newsletter;
+
+DROP TABLE newsletter_type;

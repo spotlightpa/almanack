@@ -97,25 +97,6 @@ type ImageType struct {
 	Extensions []string `json:"extensions"`
 }
 
-type Newsletter struct {
-	Subject         string      `json:"subject"`
-	ArchiveURL      string      `json:"archive_url"`
-	PublishedAt     time.Time   `json:"published_at"`
-	Type            string      `json:"type"`
-	CreatedAt       time.Time   `json:"created_at"`
-	UpdatedAt       time.Time   `json:"updated_at"`
-	ID              int64       `json:"id"`
-	Description     string      `json:"description"`
-	Blurb           string      `json:"blurb"`
-	SpotlightPAPath pgtype.Text `json:"spotlightpa_path"`
-}
-
-type NewsletterType struct {
-	Shortname   string `json:"shortname"`
-	Name        string `json:"name"`
-	Description string `json:"description"`
-}
-
 type Option struct {
 	ID    int64  `json:"id"`
 	Key   string `json:"key"`

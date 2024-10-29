@@ -30,24 +30,6 @@ func (q *Queries) CreatePage(ctx context.Context, arg CreatePageParams) error {
 	return err
 }
 
-const getArchiveURLForPageID = `-- name: GetArchiveURLForPageID :one
-SELECT
-  coalesce(archive_url, '')
-FROM
-  page
-  LEFT JOIN newsletter ON page.source_id = newsletter.id::text
-    AND page.source_type = 'mailchimp'
-WHERE
-  page.id = $1
-`
-
-func (q *Queries) GetArchiveURLForPageID(ctx context.Context, id int64) (string, error) {
-	row := q.db.QueryRow(ctx, getArchiveURLForPageID, id)
-	var archive_url string
-	err := row.Scan(&archive_url)
-	return archive_url, err
-}
-
 const getPageByFilePath = `-- name: GetPageByFilePath :one
 SELECT
   id, file_path, frontmatter, body, schedule_for, last_published, created_at, updated_at, url_path, source_type, source_id, publication_date
