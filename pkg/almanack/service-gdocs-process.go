@@ -366,7 +366,16 @@ func processToc(doc *html.Node, rows xhtml.TableNodes) string {
 	container.AppendChild(ul)
 	currentUl := ul
 	lastDepth := 7 // Past H6, the maximum possible depth
+	const limit = 20
+	n := 0
 	for _, h := range headers {
+		n++
+		if n >= limit {
+			li := xhtml.New("li")
+			xhtml.AppendText(li, "More…")
+			currentUl.AppendChild(li)
+			break
+		}
 		// If this one is deeper or less deep than its predecessor,
 		// add and remove ULs as needed
 		d := h.depth
