@@ -366,7 +366,7 @@ func processToc(doc *html.Node, rows xhtml.TableNodes) string {
 	container.AppendChild(ul)
 	currentUl := ul
 	lastDepth := 7 // Past H6, the maximum possible depth
-	const limit = 20
+	const limit = 10
 	n := 0
 	for _, h := range headers {
 		n++
