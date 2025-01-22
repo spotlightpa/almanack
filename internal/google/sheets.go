@@ -19,9 +19,11 @@ type DonorWall struct {
 }
 
 type Donor struct {
-	Display string `json:"display"`
-	Sort    string `json:"sort"`
-	URL     string `json:"url"`
+	Display      string `json:"display"`
+	Sort         string `json:"sort"`
+	URL          string `json:"url"`
+	Category     string `json:"category,omitempty"`
+	CategoryRank string `json:"categoryRank,omitempty"`
 }
 
 // SheetToDonorWall connects to Google Sheets,
@@ -37,14 +39,26 @@ func SheetToDonorWall(ctx context.Context, cl *http.Client, sheetID string) (map
 	l := almlog.FromContext(ctx)
 	l.InfoContext(ctx, "got sheet", "id", sheetID, "title", doc.Properties.Title)
 
-	sheet, err := doc.SheetByTitle("data")
+	sheet, err := doc.SheetByTitle("categories")
+	if err != nil {
+		return nil, resperr.WithUserMessage(err, "Spreadsheet missing 'categories' sheet.")
+	}
+	sm := NewSheetMap(sheet)
+	cats := make(map[string]string)
+	for sm.Next() {
+		cname := sm.Field("Name")
+		crank := sm.Field("Rank")
+		cats[cname] = crank
+	}
+
+	sheet, err = doc.SheetByTitle("data")
 	if err != nil {
 		return nil, resperr.WithUserMessage(err, "Spreadsheet missing 'data' sheet.")
 	}
 
 	m := make(map[string]DonorWall)
 
-	sm := NewSheetMap(sheet)
+	sm = NewSheetMap(sheet)
 	for sm.Next() {
 		sname := sm.Field("Sheet")
 		fname := sm.Field("File")
@@ -56,9 +70,11 @@ func SheetToDonorWall(ctx context.Context, cl *http.Client, sheetID string) (map
 		wallmap := NewSheetMap(wallsheet)
 		for wallmap.Next() {
 			wall.List = append(wall.List, Donor{
-				Display: wallmap.Field("Display"),
-				Sort:    wallmap.Field("Sort"),
-				URL:     wallmap.Field("URL"),
+				Display:      wallmap.Field("Display"),
+				Sort:         wallmap.Field("Sort"),
+				URL:          wallmap.Field("URL"),
+				Category:     wallmap.Field("Range"),
+				CategoryRank: cats[wallmap.Field("Range")],
 			})
 		}
 		m[fname] = wall
@@ -116,7 +132,7 @@ func (sm *SheetMap) Next() bool {
 func (sm *SheetMap) Field(fieldname string) string {
 	fieldname = strings.ToLower(fieldname)
 	if idx, ok := sm.idx[fieldname]; ok {
-		return sm.sheet.Rows[sm.row][idx].Value
+		return strings.TrimSpace(sm.sheet.Rows[sm.row][idx].Value)
 	}
 	return ""
 }
