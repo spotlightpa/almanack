@@ -1,7 +1,6 @@
 package gdocs
 
 import (
-	"strings"
 	"testing"
 
 	"github.com/carlmjohnson/be"
@@ -20,8 +19,7 @@ func TestConvert(t *testing.T) {
 		n := Convert(&doc)
 		got := xhtml.OuterHTML(n)
 
-		bareName := strings.TrimSuffix(path, ".json")
-		testfile.Equalish(be.Relaxed(t), bareName+".html", got)
+		testfile.Equalish(be.Relaxed(t), testfile.Ext(path, ".html"), got)
 	})
 }
 
@@ -35,8 +33,7 @@ func TestFullConvert(t *testing.T) {
 		got, err := blocko.MinifyAndBlockize(xhtml.OuterHTML(n))
 		be.NilErr(t, err)
 
-		bareName := strings.TrimSuffix(path, ".json")
-		testfile.Equalish(be.Relaxed(t), bareName+".md", got)
+		testfile.Equalish(t, testfile.Ext(path, ".md"), got)
 	})
 }
 

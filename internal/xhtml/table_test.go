@@ -15,7 +15,7 @@ func TestTable(t *testing.T) {
 	t.Parallel()
 	testfile.Run(t, "testdata/*.html", func(t *testing.T, path string) {
 		in := testfile.Read(t, path)
-		bareName := strings.TrimSuffix(path, ".html")
+		bareName := testfile.Ext(path, "")
 
 		root, err := html.Parse(strings.NewReader(in))
 		be.NilErr(t, err)
