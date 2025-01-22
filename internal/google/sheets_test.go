@@ -19,6 +19,13 @@ func TestSheetToFileObjects(t *testing.T) {
 
 	cl := &http.Client{}
 	cl.Transport = reqtest.Replay("testdata/sheets")
+	// To update sheet, use this path
+	if false {
+		svc := google.Service{}
+		gcl, err := svc.SheetsClient(ctx)
+		be.NilErr(t, err)
+		cl.Transport = reqtest.Caching(gcl.Transport, "testdata/sheets")
+	}
 
 	obj, err := google.SheetToDonorWall(ctx, cl, "abc123")
 	be.NilErr(t, err)
