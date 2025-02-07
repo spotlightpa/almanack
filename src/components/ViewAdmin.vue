@@ -164,6 +164,10 @@ const nextPage = computedProp("next_page", (page) => ({
         label="Legacy admin"
         href="https://www.spotlightpa.org/admin/"
       ></LinkHref>
+      <LinkHref
+        label="Set up Gmail signature"
+        href="https://gmailsig.spotlightpa.org/"
+      ></LinkHref>
       <button
         type="button"
         class="button is-light is-small has-text-weight-semibold"
