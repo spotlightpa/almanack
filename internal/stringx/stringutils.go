@@ -101,8 +101,8 @@ func RemoveAllWhitespace(s string) string {
 
 var (
 	staffRe        = lazy.RE(`(?i)\bstaff\b`)
-	extractSplitRe = lazy.RE(`(?i)[,;]|\band\b`)
-	outletRe       = lazy.RE(`(?i)\b(of|for)\b.*$`)
+	extractSplitRe = lazy.RE(`(?i)[,;]|\b(and|y)\b`)
+	outletRe       = lazy.RE(`(?i)\b(of|for|de)\b.*$`)
 )
 
 func ExtractNames(s string) []string {
