@@ -51,7 +51,7 @@ func TestProcessGDocsDoc(t *testing.T) {
 		var doc docs.Document
 		testfile.ReadJSON(t, path+"/doc.json", &doc)
 		// Run twice to test the already uploaded path
-		for i := 0; i < 2; i++ {
+		for range 2 {
 			dbDoc, err := svc.Queries.CreateGDocsDoc(ctx, db.CreateGDocsDocParams{
 				ExternalID: fmt.Sprintf("abc123_%s", stringx.SlugifyURL(path)),
 				Document:   doc,
