@@ -81,6 +81,7 @@ func TestExtractName(t *testing.T) {
 			"Stephen Caruso of Spotlight PA, Kate Huangpu of Spotlight PA, and Katie Meyer of Spotlight PA",
 			[]string{"Stephen Caruso", "Kate Huangpu", "Katie Meyer"},
 		},
+		{"Kate Huangpu y Elizabeth Estrada de Spotlight PA", []string{"Kate Huangpu", "Elizabeth Estrada"}},
 		{
 			"STEPHEN CARUSO OF SPOTLIGHT PA, KATE HUANGPU OF SPOTLIGHT PA, AND KATIE MEYER OF SPOTLIGHT PA",
 			[]string{"STEPHEN CARUSO", "KATE HUANGPU", "KATIE MEYER"},
