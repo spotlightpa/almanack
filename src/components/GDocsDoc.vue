@@ -111,7 +111,7 @@ function copyHTML() {
   </h2>
 
   <div v-for="(e, i) of article.gdocs.embeds" :key="i">
-    <div v-if="e.type === 'raw'" class="block">
+    <div v-if="e.type === 'raw' || e.type === 'partner-embed'" class="block">
       <h2 class="subtitle is-4 has-text-weight-semibold">
         Embed #{{ e.n }}: Raw HTML
       </h2>
