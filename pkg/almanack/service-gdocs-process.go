@@ -134,12 +134,13 @@ func processDocHTML(docHTML *html.Node) (
 			data := newDataTag(dtPartnerText, xhtml.InnerHTMLBlocks(n))
 			xhtml.ReplaceWith(tbl, data)
 
-		case "photo", "image", "photograph", "illustration", "illo", "spl-photo", "partner-photo":
+		case "photo", "image", "photograph", "illustration", "illo",
+			"spl-photo", "partner-photo", "spl-image", "partner-image":
 			embed.Type = db.ImageEmbedTag
 			kind := "all"
-			if label == "spl-photo" {
+			if label == "spl-photo" || label == "spl-image" {
 				kind = "spl"
-			} else if label == "partner-photo" {
+			} else if label == "partner-photo" || label == "partner-image" {
 				kind = "partner"
 			}
 			if imageEmbed, warning := processImage(rows, n, kind); warning != "" {
