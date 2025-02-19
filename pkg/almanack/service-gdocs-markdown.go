@@ -66,6 +66,10 @@ func intermediateDocToMarkdown(doc *html.Node) string {
 		// Write picture shortcode
 		case db.ImageEmbedTag:
 			image := dbembed.Value.(db.EmbedImage)
+			if image.Kind == "partner" {
+				dataEl.Parent.RemoveChild(dataEl)
+				continue
+			}
 			var widthHeight string
 			if image.Width != 0 {
 				widthHeight = fmt.Sprintf(`width-ratio="%d" height-ratio="%d" `,

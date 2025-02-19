@@ -113,7 +113,7 @@ func (svc Services) ProcessGDocsDoc(ctx context.Context, dbDoc db.GDocsDoc) (err
 	// Handle image uploads/database lookups
 	for tbl, rows := range xhtml.Tables(docHTML) {
 		switch label := rows.Label(); label {
-		case "photo", "image", "photograph", "illustration", "illo":
+		case "photo", "image", "photograph", "illustration", "illo", "spl-photo", "partner-photo":
 			if warning := svc.replaceImagePath(
 				ctx, tbl, rows, dbDoc.ExternalID, objID2Path,
 			); warning != "" {

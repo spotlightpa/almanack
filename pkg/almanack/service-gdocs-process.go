@@ -134,14 +134,25 @@ func processDocHTML(docHTML *html.Node) (
 			data := newDataTag(dtPartnerText, xhtml.InnerHTMLBlocks(n))
 			xhtml.ReplaceWith(tbl, data)
 
-		case "photo", "image", "photograph", "illustration", "illo":
+		case "photo", "image", "photograph", "illustration", "illo", "spl-photo", "partner-photo":
 			embed.Type = db.ImageEmbedTag
-			if imageEmbed, warning := processImage(rows, n); warning != "" {
+			kind := "all"
+			if label == "spl-photo" {
+				kind = "spl"
+			} else if label == "partner-photo" {
+				kind = "partner"
+			}
+			if imageEmbed, warning := processImage(rows, n, kind); warning != "" {
 				tbl.Parent.RemoveChild(tbl)
 				warnings = append(warnings, warning)
 			} else {
 				embed.Value = *imageEmbed
-				goto append
+				if kind != "spl" {
+					embeds = append(embeds, embed)
+					n++
+				}
+				data := newDataTag(dtDBEmbed, dbEmbedToString(embed))
+				xhtml.ReplaceWith(tbl, data)
 			}
 
 		case "metadata", "info":
@@ -222,7 +233,7 @@ func processDocHTML(docHTML *html.Node) (
 	return
 }
 
-func processImage(rows xhtml.TableNodes, n int) (imageEmbed *db.EmbedImage, warning string) {
+func processImage(rows xhtml.TableNodes, n int, kind string) (imageEmbed *db.EmbedImage, warning string) {
 	var width, height int
 	if w := xhtml.TextContent(rows.Value("width")); w != "" {
 		width, _ = strconv.Atoi(w)
@@ -239,6 +250,7 @@ func processImage(rows xhtml.TableNodes, n int) (imageEmbed *db.EmbedImage, warn
 		),
 		Width:  width,
 		Height: height,
+		Kind:   kind,
 	}
 
 	if path := xhtml.TextContent(rows.Value("path")); path != "" {

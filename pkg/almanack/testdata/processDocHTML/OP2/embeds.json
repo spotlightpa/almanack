@@ -14,24 +14,11 @@
       "description": "Blah blah blah.",
       "width": 0,
       "height": 0,
-      "kind": "all"
+      "kind": "partner"
     }
   },
   {
     "n": 3,
-    "type": "image",
-    "value": {
-      "path": "external/75h9dj4qkszh2ydb6e3h9pn2r0.jpeg",
-      "credit": "Amanda Berg",
-      "caption": "Overdose awareness",
-      "description": "",
-      "width": 0,
-      "height": 0,
-      "kind": "all"
-    }
-  },
-  {
-    "n": 4,
     "type": "image",
     "value": {
       "path": "external/08v6tmkadg07fyknwy3pb8sm3m.jpeg",

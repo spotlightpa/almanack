@@ -30,6 +30,10 @@ func intermediateDocToPartnerHTML(doc *html.Node) {
 		switch dbembed.Type {
 		// Replace images with red placeholder text
 		case db.ImageEmbedTag:
+			if imgTag := dbembed.Value.(db.EmbedImage); imgTag.Kind == "spl" {
+				dataEl.Parent.RemoveChild(dataEl)
+				continue
+			}
 			placeholder := xhtml.New("h2", "style", "color: red;")
 			xhtml.AppendText(placeholder, fmt.Sprintf("Embed #%d", dbembed.N))
 			xhtml.ReplaceWith(dataEl, placeholder)

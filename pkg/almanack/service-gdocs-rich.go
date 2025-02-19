@@ -3,6 +3,7 @@ package almanack
 import (
 	"fmt"
 
+	"github.com/spotlightpa/almanack/internal/db"
 	"github.com/spotlightpa/almanack/internal/iterx"
 	"github.com/spotlightpa/almanack/internal/xhtml"
 	"golang.org/x/net/html"
@@ -27,6 +28,10 @@ func intermediateDocToPartnerRichText(doc *html.Node) {
 	// Replace other embeds with red placeholder text
 	for dataEl, value := range dataEls(doc, dtDBEmbed) {
 		dbembed := dbEmbedFromString(value)
+		if imgTag, ok := dbembed.Value.(db.EmbedImage); ok && imgTag.Kind == "spl" {
+			dataEl.Parent.RemoveChild(dataEl)
+			continue
+		}
 		placeholder := xhtml.New("h2", "style", "color: red;")
 		xhtml.AppendText(placeholder, fmt.Sprintf("Embed #%d", dbembed.N))
 		xhtml.ReplaceWith(dataEl, placeholder)
