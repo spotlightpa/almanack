@@ -17,38 +17,40 @@ export default {
       <table class="table is-striped is-narrow is-fullwidth">
         <tbody>
           <tr v-for="image in images" :key="image.id">
-            <a
-              class="is-flex-tablet p-1 has-text-black"
-              @click="$emit('select-image', image)"
-            >
-              <div
-                class="mr-2 is-flex-shrink-0 is-clipped"
-                style="width: 128px"
+            <td>
+              <a
+                class="is-flex-tablet p-1 has-text-black"
+                @click="$emit('select-image', image)"
               >
-                <picture class="has-ratio">
-                  <img
-                    class="is-3x4"
-                    :src="
-                      imgproxyURL(image.path, {
-                        width: 256,
-                        height: 192,
-                        extension: 'webp',
-                      })
-                    "
-                    :alt="image.path"
-                    loading="lazy"
-                  />
-                </picture>
-              </div>
-              <div>
-                <div class="clamped-3">
-                  {{ image.description }}
-                  <template v-if="image.credit">
-                    ({{ image.credit }})
-                  </template>
+                <div
+                  class="mr-2 is-flex-shrink-0 is-clipped"
+                  style="width: 128px"
+                >
+                  <picture class="has-ratio">
+                    <img
+                      class="is-3x4"
+                      :src="
+                        imgproxyURL(image.path, {
+                          width: 256,
+                          height: 192,
+                          extension: 'webp',
+                        })
+                      "
+                      :alt="image.path"
+                      loading="lazy"
+                    />
+                  </picture>
                 </div>
-              </div>
-            </a>
+                <div>
+                  <div class="clamped-3">
+                    {{ image.description }}
+                    <template v-if="image.credit">
+                      ({{ image.credit }})
+                    </template>
+                  </div>
+                </div>
+              </a>
+            </td>
           </tr>
         </tbody>
       </table>
