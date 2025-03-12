@@ -1,6 +1,6 @@
 module github.com/spotlightpa/almanack
 
-go 1.23.0
+go 1.24
 
 toolchain go1.24.0
 
@@ -14,7 +14,6 @@ require (
 	github.com/carlmjohnson/emailx v0.23.1
 	github.com/carlmjohnson/errorx v0.23.2
 	github.com/carlmjohnson/exitcode v0.20.2
-	github.com/carlmjohnson/flagx v0.22.2
 	github.com/carlmjohnson/flowmatic v0.23.4
 	github.com/carlmjohnson/gateway v1.22.2
 	github.com/carlmjohnson/requests v0.24.3
@@ -23,6 +22,7 @@ require (
 	github.com/carlmjohnson/versioninfo v0.22.5
 	github.com/earthboundkid/bytemap/v2 v2.24.1
 	github.com/earthboundkid/deque/v2 v2.24.2
+	github.com/earthboundkid/flagx/v2 v2.25.1
 	github.com/earthboundkid/mid v0.24.1
 	github.com/gabriel-vasile/mimetype v1.4.8
 	github.com/getsentry/sentry-go v0.31.1
