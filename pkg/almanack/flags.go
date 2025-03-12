@@ -4,8 +4,8 @@ import (
 	"flag"
 	"net/http"
 
-	"github.com/carlmjohnson/flagx"
 	"github.com/carlmjohnson/slackhook"
+	"github.com/earthboundkid/flagx/v2"
 
 	"github.com/spotlightpa/almanack/internal/aws"
 	"github.com/spotlightpa/almanack/internal/db"
