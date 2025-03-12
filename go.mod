@@ -19,11 +19,11 @@ require (
 	github.com/carlmjohnson/requests v0.24.3
 	github.com/carlmjohnson/resperr v0.22.0
 	github.com/carlmjohnson/slackhook v0.23.2
-	github.com/carlmjohnson/versioninfo v0.22.5
 	github.com/earthboundkid/bytemap/v2 v2.24.1
 	github.com/earthboundkid/deque/v2 v2.24.2
 	github.com/earthboundkid/flagx/v2 v2.25.1
 	github.com/earthboundkid/mid v0.24.1
+	github.com/earthboundkid/versioninfo/v2 v2.24.1
 	github.com/gabriel-vasile/mimetype v1.4.8
 	github.com/getsentry/sentry-go v0.31.1
 	github.com/go-chi/chi/v5 v5.2.1
