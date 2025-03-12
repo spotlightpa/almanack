@@ -11,8 +11,8 @@ import (
 	"time"
 
 	"github.com/carlmjohnson/gateway"
-	"github.com/carlmjohnson/versioninfo"
 	"github.com/earthboundkid/flagx/v2"
+	"github.com/earthboundkid/versioninfo/v2"
 	"github.com/getsentry/sentry-go"
 	sentryhttp "github.com/getsentry/sentry-go/http"
 
