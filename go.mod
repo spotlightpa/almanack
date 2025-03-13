@@ -34,7 +34,7 @@ require (
 	github.com/microcosm-cc/bluemonday v1.0.27
 	github.com/tdewolff/minify/v2 v2.21.3
 	gocloud.dev v0.40.0
-	golang.org/x/net v0.35.0
+	golang.org/x/net v0.36.0
 	golang.org/x/oauth2 v0.27.0
 	google.golang.org/api v0.223.0
 	gopkg.in/Iwark/spreadsheet.v2 v2.0.0-20230915040305-7677e8164883
