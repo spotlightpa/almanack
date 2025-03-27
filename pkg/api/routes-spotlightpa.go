@@ -632,6 +632,7 @@ func (app *appEnv) postPageRefresh(w http.ResponseWriter, r *http.Request) {
 				"title-tag":     dbDoc.Metadata.SEOTitle,
 				"og-title":      dbDoc.Metadata.OGTitle,
 				"twitter-title": dbDoc.Metadata.TwitterTitle,
+				"layout":        dbDoc.Metadata.Layout,
 			}
 			// Remove blanks
 			maps.DeleteFunc(fm, func(key string, v any) bool {

@@ -269,6 +269,7 @@ func (svc Services) CreatePageFromGDocsDoc(ctx context.Context, shared *db.Share
 		"title-tag":     dbDoc.Metadata.SEOTitle,
 		"og-title":      dbDoc.Metadata.OGTitle,
 		"twitter-title": dbDoc.Metadata.TwitterTitle,
+		"layout":        dbDoc.Metadata.Layout,
 	}
 
 	filepath := buildFilePath(fm, kind)

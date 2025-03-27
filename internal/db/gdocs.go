@@ -25,6 +25,7 @@ type GDocsMetadata struct {
 	SEOTitle             string             `json:"seo_title"`
 	OGTitle              string             `json:"og_title"`
 	TwitterTitle         string             `json:"twitter_title"`
+	Layout               string             `json:"layout"`
 }
 
 const (
