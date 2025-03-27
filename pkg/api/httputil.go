@@ -17,7 +17,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/carlmjohnson/resperr"
+	"github.com/earthboundkid/resperr/v2"
 	"github.com/getsentry/sentry-go"
 
 	"github.com/spotlightpa/almanack/internal/netlifyid"
@@ -96,27 +96,20 @@ func (app *appEnv) tryReadJSON(w http.ResponseWriter, r *http.Request, dst any) 
 
 		switch {
 		case errors.As(err, &syntaxError):
-			return resperr.WithUserMessagef(err,
-				"Request body contains badly-formed JSON (at position %d)",
-				syntaxError.Offset)
+			return resperr.E{E: err, M: fmt.Sprintf("Request body contains badly-formed JSON (at position %d)", syntaxError.Offset)}
 
 		case errors.Is(err, io.ErrUnexpectedEOF):
-			return resperr.WithUserMessage(err,
-				"Request body contains badly-formed JSON")
+			return resperr.E{E: err, M: "Request body contains badly-formed JSON"}
 
 		case errors.As(err, &unmarshalTypeError):
-			return resperr.WithUserMessagef(err,
-				"Request body contains an invalid value for the %q field (at position %d)",
-				unmarshalTypeError.Field, unmarshalTypeError.Offset)
+			return resperr.E{E: err, M: fmt.Sprintf("Request body contains an invalid value for the %q field (at position %d)", unmarshalTypeError.Field, unmarshalTypeError.Offset)}
 
 		case strings.HasPrefix(err.Error(), "json: unknown field "):
 			fieldName := strings.TrimPrefix(err.Error(), "json: unknown field ")
-			return resperr.WithUserMessagef(err,
-				"Request body contains unknown field %s", fieldName)
+			return resperr.E{E: err, M: fmt.Sprintf("Request body contains unknown field %s", fieldName)}
 
 		case errors.Is(err, io.EOF):
-			return resperr.WithUserMessage(nil,
-				"Request body must not be empty")
+			return resperr.E{M: "Request body contains badly-formed JSON"}
 
 		case errors.As(err, &maxBytesError):
 			return resperr.New(http.StatusRequestEntityTooLarge,
@@ -130,8 +123,7 @@ func (app *appEnv) tryReadJSON(w http.ResponseWriter, r *http.Request, dst any) 
 
 	var discard any
 	if err := dec.Decode(&discard); !errors.Is(err, io.EOF) {
-		return resperr.WithUserMessagef(nil,
-			"Request body must only contain a single JSON object")
+		return resperr.E{M: "Request body must only contain a single JSON object"}
 	}
 
 	return nil
@@ -200,8 +192,7 @@ func intParam[Int int | int32 | int64](r *http.Request, param string, p *Int) er
 		return fmt.Errorf("parameter %q not set", param)
 	}
 	if err := intFromString(pstr, p); err != nil {
-		return resperr.WithUserMessagef(
-			err, "Bad integer parameter for %s", param)
+		return (resperr.E{E: err, M: fmt.Sprintf("Bad integer parameter for %s", param)})
 	}
 	return nil
 }
@@ -238,8 +229,7 @@ func boolFromQuery(r *http.Request, param string) (val bool, err error) {
 	s := r.URL.Query().Get(param)
 	val, err = strconv.ParseBool(s)
 	if err != nil {
-		err = resperr.WithUserMessagef(err,
-			"Could not interpret %s=%q", param, s)
+		err = resperr.E{E: err, M: fmt.Sprintf("Could not interpret %s=%q", param, s)}
 	}
 	return
 }
@@ -309,7 +299,7 @@ func (app *appEnv) jsonNewErr(code int, format string, args ...any) http.Handler
 
 func (app *appEnv) jsonBadRequest(err error, format string, args ...any) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		app.replyErr(w, r, resperr.WithUserMessagef(err, format, args...))
+		app.replyErr(w, r, resperr.E{E: err, M: fmt.Sprintf(format, args...)})
 	})
 }
 
@@ -339,6 +329,6 @@ func (app *appEnv) htmlErr(err error) http.Handler {
 
 func (app *appEnv) htmlBadRequest(err error, format string, args ...any) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		app.replyHTMLErr(w, r, resperr.WithUserMessagef(err, format, args...))
+		app.replyHTMLErr(w, r, resperr.E{E: err, M: fmt.Sprintf(format, args...)})
 	})
 }

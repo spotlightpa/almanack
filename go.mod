@@ -17,12 +17,12 @@ require (
 	github.com/carlmjohnson/flowmatic v0.23.4
 	github.com/carlmjohnson/gateway v1.22.2
 	github.com/carlmjohnson/requests v0.24.3
-	github.com/carlmjohnson/resperr v0.22.0
 	github.com/carlmjohnson/slackhook v0.23.2
 	github.com/earthboundkid/bytemap/v2 v2.24.1
 	github.com/earthboundkid/deque/v2 v2.24.2
 	github.com/earthboundkid/flagx/v2 v2.25.1
 	github.com/earthboundkid/mid v0.24.1
+	github.com/earthboundkid/resperr/v2 v2.25.1
 	github.com/earthboundkid/versioninfo/v2 v2.24.1
 	github.com/gabriel-vasile/mimetype v1.4.8
 	github.com/getsentry/sentry-go v0.31.1

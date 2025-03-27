@@ -5,7 +5,7 @@ import (
 	"html/template"
 	"net/http"
 
-	"github.com/carlmjohnson/resperr"
+	"github.com/earthboundkid/resperr/v2"
 	"github.com/spotlightpa/almanack/internal/db"
 	"github.com/spotlightpa/almanack/layouts"
 )

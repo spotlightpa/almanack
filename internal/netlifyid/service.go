@@ -11,7 +11,7 @@ import (
 
 	"github.com/aws/aws-lambda-go/lambdacontext"
 	"github.com/carlmjohnson/errorx"
-	"github.com/carlmjohnson/resperr"
+	"github.com/earthboundkid/resperr/v2"
 	"github.com/spotlightpa/almanack/pkg/almlog"
 )
 
@@ -77,10 +77,10 @@ func (as NetlifyAuth) HasRole(r *http.Request, role string) error {
 		)
 	}
 
-	err := resperr.WithUserMessage(
-		fmt.Errorf("no user info provided: is this localhost?"),
-		"no user info provided",
-	)
+	err := resperr.E{
+		E: fmt.Errorf("no user info provided: is this localhost?"),
+		M: "no user info provided",
+	}
 	l.ErrorContext(r.Context(),
 		"netlify.HasRole: no identity found: running on AWS?",
 		"err", err)
@@ -91,10 +91,10 @@ func (as NetlifyAuth) HasRole(r *http.Request, role string) error {
 func FromLambdaContext(ctx context.Context) (*JWT, error) {
 	lc, ok := lambdacontext.FromContext(ctx)
 	if !ok {
-		return nil, resperr.WithUserMessage(
-			fmt.Errorf("no context given: is this localhost?"),
-			"no context provided",
-		)
+		return nil, resperr.E{
+			E: fmt.Errorf("no context given: is this localhost?"),
+			M: "no context provided",
+		}
 	}
 	encoded := lc.ClientContext.Custom["netlify"]
 	jwtBytes, err := base64.StdEncoding.DecodeString(encoded)

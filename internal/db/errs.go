@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/carlmjohnson/resperr"
+	"github.com/earthboundkid/resperr/v2"
 	"github.com/jackc/pgx/v5"
 )
 

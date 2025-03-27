@@ -2,10 +2,11 @@ package google
 
 import (
 	"context"
+	"fmt"
 	"net/http"
 	"strings"
 
-	"github.com/carlmjohnson/resperr"
+	"github.com/earthboundkid/resperr/v2"
 	"github.com/spotlightpa/almanack/pkg/almlog"
 	spreadsheet "gopkg.in/Iwark/spreadsheet.v2"
 )
@@ -33,7 +34,7 @@ func SheetToDonorWall(ctx context.Context, cl *http.Client, sheetID string) (map
 	service := spreadsheet.NewServiceWithClient(cl)
 	doc, err := service.FetchSpreadsheet(sheetID)
 	if err != nil {
-		return nil, resperr.WithUserMessage(err, "Problem fetching Google Sheet")
+		return nil, resperr.E{E: err, M: "Problem fetching Google Sheet"}
 	}
 
 	l := almlog.FromContext(ctx)
@@ -41,7 +42,7 @@ func SheetToDonorWall(ctx context.Context, cl *http.Client, sheetID string) (map
 
 	sheet, err := doc.SheetByTitle("categories")
 	if err != nil {
-		return nil, resperr.WithUserMessage(err, "Spreadsheet missing 'categories' sheet.")
+		return nil, resperr.E{E: err, M: "Spreadsheet missing 'categories' sheet."}
 	}
 	sm := NewSheetMap(sheet)
 	cats := make(map[string]string)
@@ -53,7 +54,7 @@ func SheetToDonorWall(ctx context.Context, cl *http.Client, sheetID string) (map
 
 	sheet, err = doc.SheetByTitle("data")
 	if err != nil {
-		return nil, resperr.WithUserMessage(err, "Spreadsheet missing 'data' sheet.")
+		return nil, resperr.E{E: err, M: "Spreadsheet missing 'data' sheet."}
 	}
 
 	m := make(map[string]DonorWall)
@@ -64,7 +65,7 @@ func SheetToDonorWall(ctx context.Context, cl *http.Client, sheetID string) (map
 		fname := sm.Field("File")
 		wallsheet, err := doc.SheetByTitle(sname)
 		if err != nil {
-			return nil, resperr.WithUserMessagef(err, "Spreadsheet missing %q sheet.", sname)
+			return nil, resperr.E{E: err, M: fmt.Sprintf("Spreadsheet missing %q sheet.", sname)}
 		}
 		var wall DonorWall
 		wallmap := NewSheetMap(wallsheet)
@@ -81,7 +82,7 @@ func SheetToDonorWall(ctx context.Context, cl *http.Client, sheetID string) (map
 	}
 
 	if len(m) < 1 {
-		return nil, resperr.WithUserMessage(err, "No rows in 'data' sheet.")
+		return nil, resperr.E{E: err, M: "No rows in 'data' sheet."}
 	}
 	return m, nil
 }

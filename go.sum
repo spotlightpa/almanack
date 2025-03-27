@@ -90,8 +90,6 @@ github.com/carlmjohnson/gateway v1.22.2 h1:Nr7JVUSruWG3I6PGGxUTaIGLHSEhCcoppFX0z
 github.com/carlmjohnson/gateway v1.22.2/go.mod h1:C2xSaIo4kkvdbTQQI5EhmzzWC1wB/+f5COhlpQ4O8fA=
 github.com/carlmjohnson/requests v0.24.3 h1:LYcM/jVIVPkioigMjEAnBACXl2vb42TVqiC8EYNoaXQ=
 github.com/carlmjohnson/requests v0.24.3/go.mod h1:duYA/jDnyZ6f3xbcF5PpZ9N8clgopubP2nK5i6MVMhU=
-github.com/carlmjohnson/resperr v0.22.0 h1:oSliyZLmyncmPLEZXydy6gNhJgQ/9AaVpaGQLDRQ/NM=
-github.com/carlmjohnson/resperr v0.22.0/go.mod h1:iEKmv4gBlxjy4iLy7ExxLjdCBJ5wSaRlDZDnqGfBtls=
 github.com/carlmjohnson/slackhook v0.23.2 h1:CdPIxx3oYV7VKGW+d/cXE2SXsY6V/P3ggiLNY5yBCF8=
 github.com/carlmjohnson/slackhook v0.23.2/go.mod h1:/xsrT0OnsHPORX4CnbZq/HvJTPovOkfU+iOlORZPlII=
 github.com/census-instrumentation/opencensus-proto v0.2.1/go.mod h1:f6KPmirojxKA12rnyqOA5BBL4O983OfeGPqjHWSTneU=
@@ -110,6 +108,8 @@ github.com/earthboundkid/flagx/v2 v2.25.1 h1:NCnaW8sg0B9EcThAFUOEPQFbD2qhGFMp1s4
 github.com/earthboundkid/flagx/v2 v2.25.1/go.mod h1:uFev2jp4UhPBLZpRkeHEXuko2vVhi/E/vuxrYgDVjBg=
 github.com/earthboundkid/mid v0.24.1 h1:Hz8neRUGqnghs/0UtrdoTZBis7x1OXbOHvLVQzlGXh4=
 github.com/earthboundkid/mid v0.24.1/go.mod h1:hEWtmnPsQdlni4aenDZ4NQ81NesS7gas5RVoiEncpU0=
+github.com/earthboundkid/resperr/v2 v2.25.1 h1:H6GCeI/hynE3z1D3eGJ4Dh5s9AzjEf1YHFO4fRIgSs0=
+github.com/earthboundkid/resperr/v2 v2.25.1/go.mod h1:1cymu80qg8aRoJzpjWdyYDbLCWzGl+AtlwUzAMmSnEM=
 github.com/earthboundkid/versioninfo/v2 v2.24.1 h1:SJTMHaoUx3GzjjnUO1QzP3ZXK6Ee/nbWyCm58eY3oUg=
 github.com/earthboundkid/versioninfo/v2 v2.24.1/go.mod h1:VcWEooDEuyUJnMfbdTh0uFN4cfEIg+kHMuWB2CDCLjw=
 github.com/envoyproxy/go-control-plane v0.9.0/go.mod h1:YTl/9mNaCwkRvm6d1a2C3ymFceY/DCBVvsKhRF0iEA4=
