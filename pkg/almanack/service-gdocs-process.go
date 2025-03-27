@@ -347,6 +347,7 @@ func processMetadata(rows xhtml.TableNodes, metadata *db.GDocsMetadata) {
 		xhtml.TextContent(rows.Value("lead image path")),
 		xhtml.TextContent(rows.Value("path")),
 	)
+	metadata.Layout = xhtml.TextContent(rows.Value("layout"))
 }
 
 func processToc(doc *html.Node, rows xhtml.TableNodes) string {

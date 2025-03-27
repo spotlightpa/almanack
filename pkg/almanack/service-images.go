@@ -13,7 +13,7 @@ import (
 	"github.com/carlmjohnson/errorx"
 	"github.com/carlmjohnson/flowmatic"
 	"github.com/carlmjohnson/requests"
-	"github.com/carlmjohnson/resperr"
+	"github.com/earthboundkid/resperr/v2"
 	"github.com/gabriel-vasile/mimetype"
 	"github.com/spotlightpa/almanack/internal/db"
 	"github.com/spotlightpa/almanack/internal/google"
@@ -36,11 +36,10 @@ func FetchImageURL(ctx context.Context, c *http.Client, srcurl string) (body []b
 				ctype = ct.String()
 				return nil
 			}
-			return resperr.WithUserMessage(
-				fmt.Errorf("%q did not have proper MIME type: %s",
+			return resperr.E{
+				E: fmt.Errorf("%q did not have proper MIME type: %s",
 					srcurl, ct.String()),
-				"URL must be an image",
-			)
+				M: "URL must be an image"}
 		}).
 		ToBytesBuffer(&buf).
 		Fetch(ctx); err != nil {
@@ -206,9 +205,10 @@ func (svc Services) imageTypeFromExtension(ctx context.Context, srcURL string) (
 	itype, err := svc.Queries.GetImageTypeForExtension(ctx, ext)
 	if err != nil {
 		if db.IsNotFound(err) {
-			return "", resperr.WithUserMessagef(err,
-				"Unknown image extension (%q) on source: %q",
-				ext, srcURL)
+			return "", resperr.E{
+				E: err,
+				M: fmt.Sprintf("Unknown image extension (%q) on source: %q", ext, srcURL),
+			}
 		}
 		return "", err
 	}

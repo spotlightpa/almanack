@@ -9,8 +9,8 @@ import (
 	"unicode/utf8"
 
 	"github.com/carlmjohnson/requests"
-	"github.com/carlmjohnson/resperr"
 	"github.com/earthboundkid/bytemap/v2"
+	"github.com/earthboundkid/resperr/v2"
 	"github.com/spotlightpa/almanack/internal/xhtml"
 	"golang.org/x/net/html"
 	"google.golang.org/api/docs/v1"
@@ -33,7 +33,7 @@ func Request(ctx context.Context, cl *http.Client, docID string) (d *docs.Docume
 		Fetch(ctx); err != nil {
 		e := &errJSON.Error
 		e.Wrap(err)
-		return nil, resperr.WithCodeAndMessage(e, e.Code, e.Message)
+		return nil, resperr.E{E: e, S: e.Code, M: e.Message}
 	}
 	return &doc, nil
 }

@@ -15,7 +15,7 @@ import (
 
 	"github.com/carlmjohnson/emailx"
 	"github.com/carlmjohnson/flowmatic"
-	"github.com/carlmjohnson/resperr"
+	"github.com/earthboundkid/resperr/v2"
 	"github.com/jackc/pgx/v5"
 	"github.com/spotlightpa/almanack/internal/db"
 	"github.com/spotlightpa/almanack/internal/gdocs"
@@ -72,9 +72,7 @@ func (app *appEnv) postSignedUpload(w http.ResponseWriter, r *http.Request) {
 
 	ext, ok := supportedContentTypes[userData.Type]
 	if !ok {
-		app.replyErr(w, r, resperr.WithUserMessagef(
-			nil, "File has an unsupported content type: %q", ext,
-		))
+		app.replyErr(w, r, error(resperr.E{M: fmt.Sprintf("File has an unsupported content type: %q", ext)}))
 		return
 	}
 
@@ -223,8 +221,7 @@ func (app *appEnv) postAddress(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if !emailx.Valid(req.Address) {
-		app.replyErr(w, r, resperr.WithUserMessagef(nil,
-			"Invalid email address: %q", req.Address))
+		app.replyErr(w, r, resperr.E{M: fmt.Sprintf("Invalid email address: %q", req.Address)})
 		return
 	}
 
@@ -262,7 +259,7 @@ func (app *appEnv) listImages(w http.ResponseWriter, r *http.Request) {
 	var page int32
 	_ = intFromQuery(r, "page", &page)
 	if page < 0 {
-		app.replyErr(w, r, resperr.WithUserMessage(nil, "Invalid page"))
+		app.replyErr(w, r, resperr.E{M: "Invalid page"})
 		return
 	}
 
@@ -349,7 +346,7 @@ func (app *appEnv) listFiles(w http.ResponseWriter, r *http.Request) {
 	var page int32
 	_ = intFromQuery(r, "page", &page)
 	if page < 0 {
-		app.replyErr(w, r, resperr.WithUserMessage(nil, "Invalid page"))
+		app.replyErr(w, r, resperr.E{M: "Invalid page"})
 		return
 	}
 
@@ -448,7 +445,7 @@ func (app *appEnv) listPages(w http.ResponseWriter, r *http.Request) {
 	var page int32
 	_ = intFromQuery(r, "page", &page)
 	if page < 0 {
-		app.replyErr(w, r, resperr.WithUserMessage(nil, "Invalid page"))
+		app.replyErr(w, r, resperr.E{M: "Invalid page"})
 		return
 	}
 
@@ -635,6 +632,7 @@ func (app *appEnv) postPageRefresh(w http.ResponseWriter, r *http.Request) {
 				"title-tag":     dbDoc.Metadata.SEOTitle,
 				"og-title":      dbDoc.Metadata.OGTitle,
 				"twitter-title": dbDoc.Metadata.TwitterTitle,
+				"layout":        dbDoc.Metadata.Layout,
 			}
 			// Remove blanks
 			maps.DeleteFunc(fm, func(key string, v any) bool {
@@ -669,7 +667,7 @@ func (app *appEnv) postPageCreate(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if !slices.Contains([]string{"news", "statecollege"}, req.PageKind) {
-		app.replyErr(w, r, resperr.WithUserMessage(nil, "Invalid page_kind"))
+		app.replyErr(w, r, resperr.E{M: "Invalid page_kind"})
 		return
 	}
 
@@ -769,8 +767,7 @@ func (app *appEnv) setSiteData(loc string) http.HandlerFunc {
 			return
 		}
 		if len(req.Configs) < 1 {
-			app.replyErr(w, r, resperr.WithUserMessage(
-				nil, "No schedulable items provided"))
+			app.replyErr(w, r, resperr.E{M: "No schedulable items provided"})
 			return
 		}
 

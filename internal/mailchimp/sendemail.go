@@ -7,7 +7,7 @@ import (
 
 	"github.com/carlmjohnson/errorx"
 	"github.com/carlmjohnson/requests"
-	"github.com/carlmjohnson/resperr"
+	"github.com/earthboundkid/resperr/v2"
 	"github.com/spotlightpa/almanack/pkg/almlog"
 )
 

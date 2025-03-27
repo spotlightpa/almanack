@@ -7,8 +7,8 @@ import (
 	"strings"
 
 	"github.com/carlmjohnson/requests"
-	"github.com/carlmjohnson/resperr"
 	"github.com/earthboundkid/bytemap/v2"
+	"github.com/earthboundkid/resperr/v2"
 )
 
 func (gsvc *Service) DriveClient(ctx context.Context) (cl *http.Client, err error) {

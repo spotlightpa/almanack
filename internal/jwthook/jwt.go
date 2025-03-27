@@ -12,7 +12,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/carlmjohnson/resperr"
+	"github.com/earthboundkid/resperr/v2"
 )
 
 func Verify(secret, token string) *Claim {

@@ -5,7 +5,7 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/carlmjohnson/resperr"
+	"github.com/earthboundkid/resperr/v2"
 )
 
 type Paginator[I int | int32 | int64] struct {
@@ -46,7 +46,7 @@ func List[Param, Result any, I int | int32 | int64](
 		panic(fmt.Sprint("bad pagination size", pg.PageSize))
 	}
 	if pg.PageNum < 0 {
-		return nil, resperr.WithUserMessage(nil, "Invalid page number.")
+		return nil, resperr.E{M: "Invalid page number."}
 	}
 
 	results, err = fn(ctx, param)

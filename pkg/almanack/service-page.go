@@ -12,8 +12,8 @@ import (
 
 	"github.com/carlmjohnson/errorx"
 	"github.com/carlmjohnson/flowmatic"
-	"github.com/carlmjohnson/resperr"
 	"github.com/carlmjohnson/slackhook"
+	"github.com/earthboundkid/resperr/v2"
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgtype"
 	"github.com/spotlightpa/almanack/internal/arc"
@@ -244,7 +244,7 @@ func (svc Services) CreatePageFromGDocsDoc(ctx context.Context, shared *db.Share
 	dbDoc, err := svc.Queries.GetGDocsByID(ctx, dbDocID)
 	if !dbDoc.ProcessedAt.Valid {
 		// improve
-		return resperr.WithUserMessage(nil, "Document must be processed before conversion.")
+		return resperr.E{M: "Document must be processed before conversion."}
 	}
 	body := dbDoc.ArticleMarkdown
 	fm := map[string]any{
@@ -269,6 +269,7 @@ func (svc Services) CreatePageFromGDocsDoc(ctx context.Context, shared *db.Share
 		"title-tag":     dbDoc.Metadata.SEOTitle,
 		"og-title":      dbDoc.Metadata.OGTitle,
 		"twitter-title": dbDoc.Metadata.TwitterTitle,
+		"layout":        dbDoc.Metadata.Layout,
 	}
 
 	filepath := buildFilePath(fm, kind)

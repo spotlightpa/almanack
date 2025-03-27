@@ -10,8 +10,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/carlmjohnson/resperr"
 	"github.com/carlmjohnson/slackhook"
+	"github.com/earthboundkid/resperr/v2"
 	"github.com/spotlightpa/almanack/internal/db"
 	"github.com/spotlightpa/almanack/internal/httpx"
 	"github.com/spotlightpa/almanack/internal/jwthook"
@@ -115,9 +115,9 @@ func (app *appEnv) getBookmarklet(w http.ResponseWriter, r *http.Request) {
 	page, err := app.svc.Queries.GetPageByURLPath(r.Context(), "%"+slug+"%")
 	if err != nil {
 		if db.IsNotFound(err) {
-			err = resperr.WithUserMessagef(
-				db.NoRowsAs404(err, "could not find url-path %q", slug),
-				"No matching page found for %s.", slug)
+			err = resperr.E{
+				E: db.NoRowsAs404(err, "could not find url-path %q", slug),
+				M: fmt.Sprintf("No matching page found for %s.", slug)}
 		}
 		app.replyHTMLErr(w, r, err)
 		return
