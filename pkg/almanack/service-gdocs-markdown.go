@@ -70,6 +70,17 @@ func intermediateDocToMarkdown(doc *html.Node) string {
 				dataEl.Parent.RemoveChild(dataEl)
 				continue
 			}
+			var tag string
+			switch image.Kind {
+			case "wide":
+				tag = "featured/picture"
+			case "left":
+				tag = "featured/picture-left"
+			case "right":
+				tag = "featured/picture-right"
+			default:
+				tag = "picture"
+			}
 			var widthHeight string
 			if image.Width != 0 {
 				widthHeight = fmt.Sprintf(`width-ratio="%d" height-ratio="%d" `,
@@ -77,7 +88,8 @@ func intermediateDocToMarkdown(doc *html.Node) string {
 				)
 			}
 			data := fmt.Sprintf(
-				`{{<picture src="%s" %sdescription="%s" caption="%s" credit="%s">}}`,
+				`{{<%s src="%s" %sdescription="%s" caption="%s" credit="%s">}}`,
+				tag,
 				image.Path,
 				widthHeight,
 				html.EscapeString(strings.TrimSpace(image.Description)),
