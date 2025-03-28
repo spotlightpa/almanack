@@ -14,8 +14,14 @@ This is my \_<a href="https://docs.google.com/document/d/103kCeBG2OQS_ZHkHUyKpT9
 
 Here is <em>some</em> <strong>text</strong>. Lorem ipsum.
 
-{{<picture src="external/75h9dj4qkszh2ydb6e3h9pn2r0.jpeg" description="" caption="Overdose awareness" credit="Amanda Berg">}}
+{{<featured/picture-left src="external/75h9dj4qkszh2ydb6e3h9pn2r0.jpeg" description="" caption="Overdose awareness" credit="Amanda Berg">}}
 
 And here’s another image:
 
 {{<picture src="external/08v6tmkadg07fyknwy3pb8sm3m.jpeg" description="The House floor in the Pa. Capitol. The chamber is controlled by Democrats for the first session in more than a &#34;decade.&#34;" caption="" credit="Amanda Berg / For Spotlight PA">}}
+
+{{<featured/picture src="external/75h9dj4qkszh2ydb6e3h9pn2r0.jpeg" description="" caption="Overdose awareness" credit="Amanda Berg">}}
+
+ 
+
+{{<featured/picture-right src="external/75h9dj4qkszh2ydb6e3h9pn2r0.jpeg" description="" caption="Overdose awareness" credit="Amanda Berg">}}

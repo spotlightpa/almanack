@@ -135,13 +135,24 @@ func processDocHTML(docHTML *html.Node) (
 			xhtml.ReplaceWith(tbl, data)
 
 		case "photo", "image", "photograph", "illustration", "illo",
-			"spl-photo", "partner-photo", "spl-image", "partner-image":
+			"spl-photo", "partner-photo", "spl-image", "partner-image",
+			"picture-wide", "photo-wide", "picture-left", "photo-left",
+			"picture-right", "photo-right":
 			embed.Type = db.ImageEmbedTag
-			kind := "all"
-			if label == "spl-photo" || label == "spl-image" {
+			var kind string
+			switch label {
+			case "spl-photo", "spl-image":
 				kind = "spl"
-			} else if label == "partner-photo" || label == "partner-image" {
+			case "partner-photo", "partner-image":
 				kind = "partner"
+			case "picture-wide", "photo-wide":
+				kind = "wide"
+			case "picture-left", "photo-left":
+				kind = "left"
+			case "picture-right", "photo-right":
+				kind = "right"
+			default:
+				kind = "all"
 			}
 			if imageEmbed, warning := processImage(rows, n, kind); warning != "" {
 				tbl.Parent.RemoveChild(tbl)
