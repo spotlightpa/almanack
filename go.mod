@@ -11,7 +11,6 @@ require (
 	github.com/aws/aws-sdk-go v1.55.6
 	github.com/carlmjohnson/be v0.24.1
 	github.com/carlmjohnson/crockford v0.23.1
-	github.com/carlmjohnson/emailx v0.23.1
 	github.com/carlmjohnson/errorx v0.23.2
 	github.com/carlmjohnson/exitcode v0.20.2
 	github.com/carlmjohnson/flowmatic v0.23.4
@@ -20,6 +19,7 @@ require (
 	github.com/carlmjohnson/slackhook v0.23.2
 	github.com/earthboundkid/bytemap/v2 v2.24.1
 	github.com/earthboundkid/deque/v2 v2.24.2
+	github.com/earthboundkid/emailx/v2 v2.24.1
 	github.com/earthboundkid/flagx/v2 v2.25.1
 	github.com/earthboundkid/mid v0.24.1
 	github.com/earthboundkid/resperr/v2 v2.25.1
@@ -69,7 +69,6 @@ require (
 	github.com/aws/aws-sdk-go-v2/service/sts v1.33.17 // indirect
 	github.com/aws/smithy-go v1.22.3 // indirect
 	github.com/aymerick/douceur v0.2.0 // indirect
-	github.com/carlmjohnson/bytemap v0.23.5 // indirect
 	github.com/carlmjohnson/deque v0.23.1 // indirect
 	github.com/cloudflare/circl v1.6.0 // indirect
 	github.com/felixge/httpsnoop v1.0.4 // indirect

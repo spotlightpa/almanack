@@ -82,14 +82,10 @@ github.com/aymerick/douceur v0.2.0 h1:Mv+mAeH1Q+n9Fr+oyamOlAkUNPWPlA8PPGR0QAaYuP
 github.com/aymerick/douceur v0.2.0/go.mod h1:wlT5vV2O3h55X9m7iVYN0TBM0NH/MmbLnd30/FjWUq4=
 github.com/carlmjohnson/be v0.24.1 h1:QNG+beMZHF6AZsElCrf7S4fVGa0EDtQGkXQiBFPuDZc=
 github.com/carlmjohnson/be v0.24.1/go.mod h1:KAgPUh0HpzWYZZI+IABdo80wTgY43YhbdsiLYAaSI/Q=
-github.com/carlmjohnson/bytemap v0.23.5 h1:TFjPrPfPN2eG3j3APlx71bkq5hzY1yqFR6QuCtz07SQ=
-github.com/carlmjohnson/bytemap v0.23.5/go.mod h1:gf5DpJDZebWrIaw9QBVewmlInMe3Dk9RtyYUcB3LKAA=
 github.com/carlmjohnson/crockford v0.23.1 h1:ImVIp5KOZvHXpxaVGP78WanEPxzH0ZqqE4Nd9YuJAb4=
 github.com/carlmjohnson/crockford v0.23.1/go.mod h1:+uz/aAJerF/noKb/fS4l9vl4bFexgpDjdVoL9XeKn/0=
 github.com/carlmjohnson/deque v0.23.1 h1:X2HOJM9xcglY03deMZ0oZ1V2xtbqYV7dJDnZiSZN4Ak=
 github.com/carlmjohnson/deque v0.23.1/go.mod h1:LF5NJjICBrEOPx84pxPL4nCimy5n9NQjxKi5cXkh+8U=
-github.com/carlmjohnson/emailx v0.23.1 h1:8F/bgLEFhMzL81zDiZL8ZajpmydTrNV0+xppxOUzFks=
-github.com/carlmjohnson/emailx v0.23.1/go.mod h1:ClIUSwpTxGoDPaRyI6njAkUtnP5k0oq/sFbOfOZXp/0=
 github.com/carlmjohnson/errorx v0.23.2 h1:2fjvOIzDofHTv5GSgD5B2EtvfFR74qSHkW4mvh6aMxs=
 github.com/carlmjohnson/errorx v0.23.2/go.mod h1:toJQ39OZZ2ddtRygoDX7Spj8IC8S/AfSA5q+9vZDmus=
 github.com/carlmjohnson/exitcode v0.20.2 h1:vE6rmkCGNA4kO4m1qwWIa77PKlUBVg46cNjs22eAOXE=
@@ -118,6 +114,8 @@ github.com/earthboundkid/bytemap/v2 v2.24.1 h1:/uV7l5RwQk+i7CHBaysasl+nmHR/VYOGQ
 github.com/earthboundkid/bytemap/v2 v2.24.1/go.mod h1:amqatzrKVIgZYITQzyXL1bV4pH3cEVqRdX23T3iKhnM=
 github.com/earthboundkid/deque/v2 v2.24.2 h1:U0vh6utzBx922tezr53ryt2tOIJ1GUKMABmYpxCgV48=
 github.com/earthboundkid/deque/v2 v2.24.2/go.mod h1:k/HnjdCUwuMdqNzbS2exS37GEXJBzHSpNBVppL/nEHg=
+github.com/earthboundkid/emailx/v2 v2.24.1 h1:DK/4Eh36IvxCR+29E7xbaxi8gPxgAvm4zMw3DY6VZmM=
+github.com/earthboundkid/emailx/v2 v2.24.1/go.mod h1:8UAz0q898I8GBxekObC/Tj6qfF3CJWWNACn+U2DRHlY=
 github.com/earthboundkid/flagx/v2 v2.25.1 h1:NCnaW8sg0B9EcThAFUOEPQFbD2qhGFMp1s4GqU3kPW8=
 github.com/earthboundkid/flagx/v2 v2.25.1/go.mod h1:uFev2jp4UhPBLZpRkeHEXuko2vVhi/E/vuxrYgDVjBg=
 github.com/earthboundkid/mid v0.24.1 h1:Hz8neRUGqnghs/0UtrdoTZBis7x1OXbOHvLVQzlGXh4=

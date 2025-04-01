@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/carlmjohnson/emailx"
+	"github.com/earthboundkid/emailx/v2"
 )
 
 func GetRolesForEmail(ctx context.Context, q *Queries, email string) (roles []string, err error) {
