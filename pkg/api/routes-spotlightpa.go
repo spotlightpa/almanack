@@ -13,8 +13,8 @@ import (
 	"slices"
 	"strings"
 
-	"github.com/carlmjohnson/emailx"
 	"github.com/carlmjohnson/flowmatic"
+	"github.com/earthboundkid/emailx/v2"
 	"github.com/earthboundkid/resperr/v2"
 	"github.com/jackc/pgx/v5"
 	"github.com/spotlightpa/almanack/internal/db"
