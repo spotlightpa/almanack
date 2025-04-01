@@ -37,13 +37,14 @@
     "eslint": "^9.8.0",
     "eslint-config-prettier": "^10.0.1",
     "eslint-plugin-prettier": "^5.2.1",
-    "eslint-plugin-vue": "^9.27.0",
+    "eslint-plugin-vue": "^10.0.0",
     "globals": "^16.0.0",
     "prettier": "3.5.3",
     "sass": "^1.54.3",
     "unplugin-vue-components": "28.4.1",
     "vite": "^6.2.4",
-    "vite-plugin-eslint": "^1.7.0"
+    "vite-plugin-eslint": "^1.7.0",
+    "vue-eslint-parser": "^10.1.1"
   },
   "prettier": {
     "trailingComma": "es5"
