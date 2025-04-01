@@ -19,7 +19,7 @@
     "@fortawesome/free-solid-svg-icons": "^6.1.2",
     "@fortawesome/vue-fontawesome": "^3.0.1",
     "@sentry/vue": "^9.3.0",
-    "@unhead/vue": "^1.7.4",
+    "@unhead/vue": "^2.0.2",
     "bulma": "^0.9.4",
     "core-js": "^3.38.0",
     "journalize": "^2.5.1",

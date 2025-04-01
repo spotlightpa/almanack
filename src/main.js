@@ -10,7 +10,7 @@ if (import.meta.env.MODE === "production") {
   Sentry.init({ app, dsn });
 }
 
-import { createHead } from "@unhead/vue";
+import { createHead } from "@unhead/vue/legacy";
 const head = createHead();
 app.use(head);
 import { Head } from "@unhead/vue/components";
