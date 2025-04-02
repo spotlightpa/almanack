@@ -113,6 +113,9 @@ func intermediateDocToMarkdown(doc *html.Node) string {
 // Fundraise Up embeds
 var fruRe = lazy.RE(`^\s*<a href="#(\w+)" style="display: none"></a>\s*$`)
 
+// Digits in min-height
+var digitsRe = lazy.RE(`\d+`)
+
 func replaceSpotlightShortcodes(s string) string {
 	if s == "" {
 		return s
@@ -232,6 +235,30 @@ func replaceSpotlightShortcodes(s string) string {
 		isFirst = false
 		src := xhtml.Attr(el, "src")
 		height := xhtml.Attr(el, "height")
+		buf.WriteString(`{{<datawrapper src="`)
+		buf.WriteString(escapeAttr(src))
+		buf.WriteString(`" height="`)
+		buf.WriteString(escapeAttr(height))
+		buf.WriteString(`" >}}`)
+	}
+
+	// $("script[src~=datawrapper.dwcdn.net]")
+	els = xhtml.SelectAll(n, func(n *html.Node) bool {
+		return n.DataAtom == atom.Script &&
+			strings.Contains(xhtml.Attr(n, "src"), "datawrapper.dwcdn.net")
+	})
+	for el := range els {
+		if !isFirst {
+			buf.WriteString("\n")
+		}
+		isFirst = false
+		src := xhtml.Attr(el, "src")
+		// Strip the embed.js from the src because we want the iframe path
+		src = strings.TrimSuffix(src, "embed.js")
+		// Parent div should have style="min-height:###px".
+		// We're lazy and just look for digits.
+		parentStyle := xhtml.Attr(el.Parent, "style")
+		height := digitsRe().FindString(parentStyle)
 		buf.WriteString(`{{<datawrapper src="`)
 		buf.WriteString(escapeAttr(src))
 		buf.WriteString(`" height="`)

@@ -125,6 +125,10 @@ func TestReplaceSpotlightShortcodes(t *testing.T) {
 		`,
 			`{{<embed/newsletter button="Sign Up Now" cta="Sign up for our new regional newsletter, &lt;b&gt;Talk of the Town&lt;/b&gt;, and get all the news and notes from State College and north-central PA." eyebrow="DON&#39;T MISS A BEAT" preselect="state_college">}}`,
 		},
+		{
+			`<div style="min-height:609px;" id="datawrapper-vis-R2dcp"><script type="text/javascript" defer src="https://datawrapper.dwcdn.net/R2dcp/embed.js" charset="utf-8" data-target="#datawrapper-vis-R2dcp"></script><noscript><img src="https://datawrapper.dwcdn.net/R2dcp/full.png" alt="" /></noscript></div>`,
+			`{{<datawrapper src="https://datawrapper.dwcdn.net/R2dcp/" height="609" >}}`,
+		},
 	}
 	for _, tc := range cases {
 		t := be.Relaxed(t)
