@@ -40,14 +40,6 @@ export default class PageListItem {
   }
 
   get link() {
-    if (this.filePath.match(/newsletters/)) {
-      return {
-        name: "newsletter-page",
-        params: {
-          id: "" + this.id,
-        },
-      };
-    }
     return {
       name: "news-page",
       params: {

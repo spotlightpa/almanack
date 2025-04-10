@@ -212,22 +212,6 @@ let router = createRouter({
       },
     },
     {
-      path: "/admin/newsletters",
-      name: "newsletters",
-      component: load(() => import("@/components/ViewNewsletterList.vue")),
-      props: (route) => ({ page: route.query.page }),
-      meta: {
-        requiresAuth: isSpotlightPAUser,
-      },
-    },
-    {
-      path: "/admin/newsletters/:id",
-      name: "newsletter-page",
-      component: load(() => import("@/components/ViewNewsletterPage.vue")),
-      props: true,
-      meta: { requiresAuth: isSpotlightPAUser },
-    },
-    {
       path: "/:pathMatch(.*)*",
       name: "error",
       component: ViewError,
