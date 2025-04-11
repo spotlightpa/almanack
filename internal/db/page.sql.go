@@ -12,22 +12,37 @@ import (
 	"github.com/jackc/pgx/v5/pgtype"
 )
 
-const createPage = `-- name: CreatePage :exec
+const createPageV2 = `-- name: CreatePageV2 :one
 INSERT INTO page ("file_path", "source_type", "source_id")
   VALUES ($1, $2, $3)
-ON CONFLICT (file_path)
-  DO NOTHING
+RETURNING
+  id, file_path, frontmatter, body, schedule_for, last_published, created_at, updated_at, url_path, source_type, source_id, publication_date
 `
 
-type CreatePageParams struct {
+type CreatePageV2Params struct {
 	FilePath   string `json:"file_path"`
 	SourceType string `json:"source_type"`
 	SourceID   string `json:"source_id"`
 }
 
-func (q *Queries) CreatePage(ctx context.Context, arg CreatePageParams) error {
-	_, err := q.db.Exec(ctx, createPage, arg.FilePath, arg.SourceType, arg.SourceID)
-	return err
+func (q *Queries) CreatePageV2(ctx context.Context, arg CreatePageV2Params) (Page, error) {
+	row := q.db.QueryRow(ctx, createPageV2, arg.FilePath, arg.SourceType, arg.SourceID)
+	var i Page
+	err := row.Scan(
+		&i.ID,
+		&i.FilePath,
+		&i.Frontmatter,
+		&i.Body,
+		&i.ScheduleFor,
+		&i.LastPublished,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+		&i.URLPath,
+		&i.SourceType,
+		&i.SourceID,
+		&i.PublicationDate,
+	)
+	return i, err
 }
 
 const getPageByFilePath = `-- name: GetPageByFilePath :one
