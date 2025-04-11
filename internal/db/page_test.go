@@ -288,16 +288,17 @@ func TestServicePublish(t *testing.T) {
 	// Success case
 	{
 		const path1 = "content/news/1.md"
-
-		be.NilErr(t, svc.Queries.CreatePage(ctx, db.CreatePageParams{
+		p0, err := svc.Queries.CreatePageV2(ctx, db.CreatePageV2Params{
 			FilePath:   path1,
 			SourceType: "manual",
 			SourceID:   "n/a",
-		}))
+		})
+		be.NilErr(t, err)
 
 		p, err := svc.Queries.GetPageByFilePath(ctx, path1)
 		be.NilErr(t, err)
 		be.False(t, p.LastPublished.Valid)
+		be.Equal(t, p0.ID, p.ID)
 
 		_, err = os.Stat(filepath.Join(tmp, path1))
 		be.Nonzero(t, err)
@@ -331,14 +332,14 @@ func TestServicePublish(t *testing.T) {
 	}
 	{
 		const path2 = "content/news/2.md"
-
-		be.NilErr(t, svc.Queries.CreatePage(ctx, db.CreatePageParams{
+		_, err := svc.Queries.CreatePageV2(ctx, db.CreatePageV2Params{
 			FilePath:   path2,
 			SourceType: "manual",
 			SourceID:   "n/a",
-		}))
+		})
+		be.NilErr(t, err)
 
-		_, err := os.Stat(filepath.Join(tmp, path2))
+		_, err = os.Stat(filepath.Join(tmp, path2))
 		be.Nonzero(t, err)
 
 		// Can't create another page with the same URLPath
@@ -396,13 +397,14 @@ func TestServicePublish(t *testing.T) {
 	// Test Github failure
 	{
 		const path3 = "content/news/3.md"
-		be.NilErr(t, svc.Queries.CreatePage(ctx, db.CreatePageParams{
+		_, err := svc.Queries.CreatePageV2(ctx, db.CreatePageV2Params{
 			FilePath:   path3,
 			SourceType: "manual",
 			SourceID:   "n/a",
-		}))
+		})
+		be.NilErr(t, err)
 
-		_, err := os.Stat(filepath.Join(tmp, path3))
+		_, err = os.Stat(filepath.Join(tmp, path3))
 		be.Nonzero(t, err)
 
 		p4 := &db.Page{
@@ -453,12 +455,12 @@ func TestServicePopScheduledPages(t *testing.T) {
 
 	{
 		const path = "content/news/test-pop.md"
-
-		be.NilErr(t, svc.Queries.CreatePage(ctx, db.CreatePageParams{
+		_, err := svc.Queries.CreatePageV2(ctx, db.CreatePageV2Params{
 			FilePath:   path,
 			SourceType: "manual",
 			SourceID:   "n/a",
-		}))
+		})
+		be.NilErr(t, err)
 
 		p, err := svc.Queries.GetPageByFilePath(ctx, path)
 		be.NilErr(t, err)

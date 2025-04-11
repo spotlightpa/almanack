@@ -14,6 +14,7 @@ import (
 	"github.com/carlmjohnson/slackhook"
 	"github.com/earthboundkid/resperr/v2"
 	"github.com/jackc/pgx/v5"
+	"github.com/jackc/pgx/v5/pgconn"
 	"github.com/jackc/pgx/v5/pgtype"
 	"github.com/spotlightpa/almanack/internal/arc"
 	"github.com/spotlightpa/almanack/internal/db"
@@ -276,17 +277,21 @@ func (svc Services) CreatePageFromGDocsDoc(ctx context.Context, shared *db.Share
 }
 
 func (svc Services) createPageForSharedArticle(ctx context.Context, shared *db.SharedArticle, body string, fm map[string]any, filepath string) error {
-	return svc.Tx.Begin(ctx, pgx.TxOptions{}, func(q *db.Queries) (txerr error) {
+	ignoreErr := false
+	err := svc.Tx.Begin(ctx, pgx.TxOptions{}, func(q *db.Queries) (txerr error) {
 		defer errorx.Trace(&txerr)
-
-		if txerr = q.CreatePage(ctx, db.CreatePageParams{
+		//TODO fixme
+		_, txerr = q.CreatePageV2(ctx, db.CreatePageV2Params{
 			FilePath:   filepath,
 			SourceType: shared.SourceType,
 			SourceID:   shared.SourceID,
-		}); txerr != nil {
+		})
+		if txerr != nil {
+			if perr, ok := txerr.(*pgconn.PgError); ok && perr.Code == "23505" && perr.ConstraintName == "page_path_key" {
+				ignoreErr = true
+			}
 			return txerr
 		}
-
 		page, txerr := q.UpdatePage(ctx, db.UpdatePageParams{
 			FilePath:         filepath,
 			SetFrontmatter:   true,
@@ -312,6 +317,10 @@ func (svc Services) createPageForSharedArticle(ctx context.Context, shared *db.S
 		*shared = newSharedArt
 		return nil
 	})
+	if err != nil && !ignoreErr {
+		return err
+	}
+	return nil
 }
 
 func buildFilePath(fm map[string]any, kind string) string {

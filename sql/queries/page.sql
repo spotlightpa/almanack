@@ -1,8 +1,8 @@
--- name: CreatePage :exec
+-- name: CreatePageV2 :one
 INSERT INTO page ("file_path", "source_type", "source_id")
   VALUES (@file_path, @source_type, @source_id)
-ON CONFLICT (file_path)
-  DO NOTHING;
+RETURNING
+  *;
 
 -- name: UpdatePage :one
 UPDATE
