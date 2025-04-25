@@ -186,6 +186,15 @@ let router = createRouter({
       },
     },
     {
+      path: "/admin/berks",
+      name: "berks-pages",
+      component: load(() => import("@/components/ViewBerksList.vue")),
+      props: (route) => ({ page: route.query.page }),
+      meta: {
+        requiresAuth: isSpotlightPAUser,
+      },
+    },
+    {
       path: "/admin/shared-articles/:id",
       name: "shared-article-admin",
       component: load(() => import("@/components/ViewSharedArticleAdmin.vue")),

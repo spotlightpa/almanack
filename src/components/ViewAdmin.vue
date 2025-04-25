@@ -70,7 +70,7 @@ const nextPage = computedProp("next_page", (page) => ({
 
     <LinkButtons label="News partners">
       <LinkRoute
-        label="External Editor View"
+        label="Partner Article List"
         to="shared-articles"
         :icon="['fas', 'file-invoice']"
       ></LinkRoute>
@@ -83,27 +83,14 @@ const nextPage = computedProp("next_page", (page) => ({
 
     <LinkButtons label="Spotlight PA promotions">
       <LinkRoute
-        label="Homepage Editor"
-        to="homepage-editor"
-        :icon="['fas', 'newspaper']"
+        label="Sitewide Settings"
+        to="site-params"
+        :icon="['fas', 'sliders-h']"
       ></LinkRoute>
       <LinkRoute
         label="Sidebar Items"
         to="sidebar-items"
         :icon="['fas', 'check-circle']"
-      ></LinkRoute>
-      <LinkRoute
-        label="Sitewide Settings"
-        to="site-params"
-        :icon="['fas', 'sliders-h']"
-      ></LinkRoute>
-    </LinkButtons>
-
-    <LinkButtons label="Spotlight PA pages">
-      <LinkRoute
-        label="Spotlight PA Articles"
-        to="news-pages"
-        :icon="['fas', 'file-signature']"
       ></LinkRoute>
       <LinkRoute
         label="Donor Walls"
@@ -112,16 +99,34 @@ const nextPage = computedProp("next_page", (page) => ({
       ></LinkRoute>
     </LinkButtons>
 
-    <LinkButtons label="State College">
+    <LinkButtons label="Landing pages">
+      <LinkRoute
+        label="Homepage Editor"
+        to="homepage-editor"
+        :icon="['fas', 'newspaper']"
+      ></LinkRoute>
+      <LinkRoute
+        label="State College Frontpage"
+        to="state-college-editor"
+        :icon="['fas', 'newspaper']"
+      ></LinkRoute>
+    </LinkButtons>
+
+    <LinkButtons label="Spotlight PA article pages">
+      <LinkRoute
+        label="News Articles"
+        to="news-pages"
+        :icon="['fas', 'file-signature']"
+      ></LinkRoute>
       <LinkRoute
         label="State College Articles"
         to="statecollege-pages"
         :icon="['fas', 'file-signature']"
       ></LinkRoute>
       <LinkRoute
-        label="Frontpage Editor"
-        to="state-college-editor"
-        :icon="['fas', 'newspaper']"
+        label="Berks County Articles"
+        to="berks-pages"
+        :icon="['fas', 'file-signature']"
       ></LinkRoute>
     </LinkButtons>
 
