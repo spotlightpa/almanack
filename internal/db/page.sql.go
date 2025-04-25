@@ -703,7 +703,43 @@ func (q *Queries) PopScheduledPages(ctx context.Context) ([]Page, error) {
 	return items, nil
 }
 
-const updatePage = `-- name: UpdatePage :one
+const updatePageRawContent = `-- name: UpdatePageRawContent :one
+UPDATE
+  page
+SET
+  frontmatter = frontmatter || jsonb_build_object('raw-content', $1::text)
+WHERE
+  id = $2
+RETURNING
+  id, file_path, frontmatter, body, schedule_for, last_published, created_at, updated_at, url_path, source_type, source_id, publication_date
+`
+
+type UpdatePageRawContentParams struct {
+	RawContent string `json:"raw_content"`
+	ID         int64  `json:"id"`
+}
+
+func (q *Queries) UpdatePageRawContent(ctx context.Context, arg UpdatePageRawContentParams) (Page, error) {
+	row := q.db.QueryRow(ctx, updatePageRawContent, arg.RawContent, arg.ID)
+	var i Page
+	err := row.Scan(
+		&i.ID,
+		&i.FilePath,
+		&i.Frontmatter,
+		&i.Body,
+		&i.ScheduleFor,
+		&i.LastPublished,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+		&i.URLPath,
+		&i.SourceType,
+		&i.SourceID,
+		&i.PublicationDate,
+	)
+	return i, err
+}
+
+const updatePageV2 = `-- name: UpdatePageV2 :one
 UPDATE
   page
 SET
@@ -733,12 +769,12 @@ SET
     last_published
   END
 WHERE
-  file_path = $9
+  id = $9
 RETURNING
   id, file_path, frontmatter, body, schedule_for, last_published, created_at, updated_at, url_path, source_type, source_id, publication_date
 `
 
-type UpdatePageParams struct {
+type UpdatePageV2Params struct {
 	SetFrontmatter   bool               `json:"set_frontmatter"`
 	Frontmatter      Map                `json:"frontmatter"`
 	SetBody          bool               `json:"set_body"`
@@ -747,11 +783,11 @@ type UpdatePageParams struct {
 	ScheduleFor      pgtype.Timestamptz `json:"schedule_for"`
 	URLPath          string             `json:"url_path"`
 	SetLastPublished bool               `json:"set_last_published"`
-	FilePath         string             `json:"file_path"`
+	ID               int64              `json:"id"`
 }
 
-func (q *Queries) UpdatePage(ctx context.Context, arg UpdatePageParams) (Page, error) {
-	row := q.db.QueryRow(ctx, updatePage,
+func (q *Queries) UpdatePageV2(ctx context.Context, arg UpdatePageV2Params) (Page, error) {
+	row := q.db.QueryRow(ctx, updatePageV2,
 		arg.SetFrontmatter,
 		arg.Frontmatter,
 		arg.SetBody,
@@ -760,44 +796,8 @@ func (q *Queries) UpdatePage(ctx context.Context, arg UpdatePageParams) (Page, e
 		arg.ScheduleFor,
 		arg.URLPath,
 		arg.SetLastPublished,
-		arg.FilePath,
+		arg.ID,
 	)
-	var i Page
-	err := row.Scan(
-		&i.ID,
-		&i.FilePath,
-		&i.Frontmatter,
-		&i.Body,
-		&i.ScheduleFor,
-		&i.LastPublished,
-		&i.CreatedAt,
-		&i.UpdatedAt,
-		&i.URLPath,
-		&i.SourceType,
-		&i.SourceID,
-		&i.PublicationDate,
-	)
-	return i, err
-}
-
-const updatePageRawContent = `-- name: UpdatePageRawContent :one
-UPDATE
-  page
-SET
-  frontmatter = frontmatter || jsonb_build_object('raw-content', $1::text)
-WHERE
-  id = $2
-RETURNING
-  id, file_path, frontmatter, body, schedule_for, last_published, created_at, updated_at, url_path, source_type, source_id, publication_date
-`
-
-type UpdatePageRawContentParams struct {
-	RawContent string `json:"raw_content"`
-	ID         int64  `json:"id"`
-}
-
-func (q *Queries) UpdatePageRawContent(ctx context.Context, arg UpdatePageRawContentParams) (Page, error) {
-	row := q.db.QueryRow(ctx, updatePageRawContent, arg.RawContent, arg.ID)
 	var i Page
 	err := row.Scan(
 		&i.ID,

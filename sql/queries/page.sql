@@ -4,7 +4,7 @@ INSERT INTO page ("file_path", "source_type", "source_id")
 RETURNING
   *;
 
--- name: UpdatePage :one
+-- name: UpdatePageV2 :one
 UPDATE
   page
 SET
@@ -34,7 +34,7 @@ SET
     last_published
   END
 WHERE
-  file_path = @file_path
+  id = @id
 RETURNING
   *;
 

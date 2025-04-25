@@ -533,19 +533,19 @@ func (app *appEnv) getPage(w http.ResponseWriter, r *http.Request) {
 func (app *appEnv) postPage(w http.ResponseWriter, r *http.Request) {
 	app.logStart(r)
 
-	var userUpdate db.UpdatePageParams
+	var userUpdate db.UpdatePageV2Params
 	if !app.readJSON(w, r, &userUpdate) {
 		return
 	}
 
-	oldPage, err := app.svc.Queries.GetPageByFilePath(r.Context(), userUpdate.FilePath)
+	oldPage, err := app.svc.Queries.GetPageByID(r.Context(), userUpdate.ID)
 	if err != nil {
 		err = fmt.Errorf("postPage connection problem: %w", err)
 		app.replyErr(w, r, err)
 		return
 	}
 	ctx := context.WithoutCancel(r.Context())
-	res, err := app.svc.Queries.UpdatePage(ctx, userUpdate)
+	res, err := app.svc.Queries.UpdatePageV2(ctx, userUpdate)
 	if err != nil {
 		err = fmt.Errorf("postPage update problem: %w", err)
 		app.replyErr(w, r, err)
