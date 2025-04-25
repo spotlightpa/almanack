@@ -112,6 +112,9 @@ async function createPage(kind) {
   if (kind === "statecollege") {
     prompt = "Create Spotlight PA State College page?";
   }
+  if (kind === "berks") {
+    prompt = "Create Berks County page?";
+  }
   if (!window.confirm(prompt)) return;
   await pageExec(() =>
     post(postPageCreate, { shared_article_id: props.id, page_kind: kind })
@@ -544,6 +547,14 @@ function setImageProps(image) {
                 @click="createPage('statecollege')"
               >
                 As State College article
+              </button>
+              <button
+                class="button is-primary has-text-weight-semibold"
+                :class="pageLoading ? 'is-loading' : ''"
+                :disabled="pageCreateDisabled"
+                @click="createPage('berks')"
+              >
+                As Berks County article
               </button>
             </div>
           </div>
