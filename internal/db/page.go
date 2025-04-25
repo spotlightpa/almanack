@@ -103,7 +103,7 @@ func (page *Page) SetURLPath() {
 	upath = strings.TrimPrefix(upath, "content")
 	upath = strings.TrimSuffix(upath, ".md")
 	dir, fname := path.Split(upath)
-	if dir == "/news/" || dir == "/statecollege/" {
+	if dir == "/news/" || dir == "/statecollege/" || dir == "/berks/" {
 		if pub, ok := timex.Unwrap(page.Frontmatter["published"]); ok {
 			pub = timex.ToEST(pub)
 			dir = pub.Format(dir + "2006/01/")

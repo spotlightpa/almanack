@@ -106,7 +106,7 @@ export class Page {
     }
     let [, dir, fname] = this.filePath.match(/^content\/(.+)\/([^/]+)\.md/);
     let slug = this.slug || fname;
-    if (dir === "news" || dir === "statecollege") {
+    if (dir === "news" || dir === "statecollege" || dir === "berks") {
       let date = this.publicationDate ?? new Date();
       let year = date.getFullYear();
       let month = (date.getMonth() + 1).toString().padStart(2, "0");
