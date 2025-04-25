@@ -304,7 +304,7 @@ func TestServicePublish(t *testing.T) {
 		be.Nonzero(t, err)
 
 		p1 := &db.Page{
-			ID:            1,
+			ID:            p0.ID,
 			FilePath:      path1,
 			Frontmatter:   map[string]any{},
 			Body:          "hello",
@@ -455,21 +455,22 @@ func TestServicePopScheduledPages(t *testing.T) {
 
 	{
 		const path = "content/news/test-pop.md"
-		_, err := svc.Queries.CreatePageV2(ctx, db.CreatePageV2Params{
+		p, err := svc.Queries.CreatePageV2(ctx, db.CreatePageV2Params{
 			FilePath:   path,
 			SourceType: "manual",
 			SourceID:   "n/a",
 		})
 		be.NilErr(t, err)
 
-		p, err := svc.Queries.GetPageByFilePath(ctx, path)
+		p, err = svc.Queries.GetPageByFilePath(ctx, path)
 		be.NilErr(t, err)
 		be.False(t, p.LastPublished.Valid)
 
 		_, err = os.Stat(filepath.Join(tmp, path))
 		be.Nonzero(t, err)
 
-		p, err = svc.Queries.UpdatePage(ctx, db.UpdatePageParams{
+		p, err = svc.Queries.UpdatePageV2(ctx, db.UpdatePageV2Params{
+			ID:             p.ID,
 			SetFrontmatter: false,
 			Frontmatter:    map[string]any{},
 			SetBody:        false,
@@ -481,7 +482,6 @@ func TestServicePopScheduledPages(t *testing.T) {
 			},
 			URLPath:          "",
 			SetLastPublished: false,
-			FilePath:         path,
 		})
 		be.NilErr(t, err)
 		be.False(t, p.LastPublished.Valid)

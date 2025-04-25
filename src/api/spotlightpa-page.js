@@ -198,7 +198,7 @@ export class Page {
 
   toJSON() {
     return {
-      file_path: this.filePath,
+      id: this.id,
       set_frontmatter: true,
       frontmatter: {
         // preserve unknown props

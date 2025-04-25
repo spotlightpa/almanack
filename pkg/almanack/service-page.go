@@ -42,8 +42,8 @@ func (svc Services) PublishPage(ctx context.Context, txq *db.Queries, page *db.P
 		func() (txerr error) {
 			defer errorx.Trace(&txerr)
 
-			p2, txerr = txq.UpdatePage(ctx, db.UpdatePageParams{
-				FilePath:         page.FilePath,
+			p2, txerr = txq.UpdatePageV2(ctx, db.UpdatePageV2Params{
+				ID:               page.ID,
 				URLPath:          page.URLPath.String,
 				SetLastPublished: true,
 				SetFrontmatter:   false,
@@ -147,10 +147,10 @@ func (svc Services) RefreshPageContents(ctx context.Context, id int64) (err erro
 
 	l := almlog.FromContext(ctx)
 	l.InfoContext(ctx, "Services.RefreshPageContents: page changed",
-		"filepath", page.FilePath)
+		"file_path", page.FilePath, "id", page.ID)
 
-	_, err = svc.Queries.UpdatePage(ctx, db.UpdatePageParams{
-		FilePath:       page.FilePath,
+	_, err = svc.Queries.UpdatePageV2(ctx, db.UpdatePageV2Params{
+		ID:             page.ID,
 		SetFrontmatter: true,
 		Frontmatter:    page.Frontmatter,
 		SetBody:        true,
@@ -280,8 +280,7 @@ func (svc Services) createPageForSharedArticle(ctx context.Context, shared *db.S
 	ignoreErr := false
 	err := svc.Tx.Begin(ctx, pgx.TxOptions{}, func(q *db.Queries) (txerr error) {
 		defer errorx.Trace(&txerr)
-		//TODO fixme
-		_, txerr = q.CreatePageV2(ctx, db.CreatePageV2Params{
+		p, txerr := q.CreatePageV2(ctx, db.CreatePageV2Params{
 			FilePath:   filepath,
 			SourceType: shared.SourceType,
 			SourceID:   shared.SourceID,
@@ -292,8 +291,8 @@ func (svc Services) createPageForSharedArticle(ctx context.Context, shared *db.S
 			}
 			return txerr
 		}
-		page, txerr := q.UpdatePage(ctx, db.UpdatePageParams{
-			FilePath:         filepath,
+		page, txerr := q.UpdatePageV2(ctx, db.UpdatePageV2Params{
+			ID:               p.ID,
 			SetFrontmatter:   true,
 			Frontmatter:      fm,
 			SetBody:          true,

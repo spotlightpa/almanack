@@ -29,7 +29,8 @@ func TestMap(t *testing.T) {
 	p1, err := q.GetPageByFilePath(ctx, testpath)
 	be.NilErr(t, err)
 	be.Equal(t, testpath, p1.FilePath)
-	p2, err := q.UpdatePage(ctx, db.UpdatePageParams{
+	p2, err := q.UpdatePageV2(ctx, db.UpdatePageV2Params{
+		ID:             p1.ID,
 		SetFrontmatter: true,
 		Frontmatter: db.Map{
 			"hello":  "world",
@@ -38,7 +39,6 @@ func TestMap(t *testing.T) {
 		},
 		SetBody:     true,
 		Body:        "hello",
-		FilePath:    testpath,
 		ScheduleFor: db.NullTime,
 	})
 	be.NilErr(t, err)
