@@ -682,19 +682,6 @@ func (app *appEnv) postPageCreate(w http.ResponseWriter, r *http.Request) {
 	}
 
 	switch sharedArt.SourceType {
-	case "arc":
-		warnings, err := app.svc.CreatePageFromArcSource(r.Context(), &sharedArt, req.PageKind)
-		for _, w := range warnings {
-			app.logErr(r.Context(), fmt.Errorf("got warning: %s", w))
-		}
-		if err != nil {
-			app.replyErr(w, r, err)
-			return
-		}
-
-		app.replyJSON(http.StatusOK, w, sharedArt)
-		return
-
 	case "gdocs":
 		err = app.svc.CreatePageFromGDocsDoc(r.Context(), &sharedArt, req.PageKind)
 		if err != nil {
