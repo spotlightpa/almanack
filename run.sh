@@ -103,7 +103,7 @@ function test:backend() {
 }
 
 function test:db() {
-	ALMANACK_POSTGRES=$PG_LOCAL_URL go test "$@" -v ./internal/db
+	ALMANACK_POSTGRES=$PG_LOCAL_URL go test "$@" ./internal/db
 }
 
 function test:misc() {
