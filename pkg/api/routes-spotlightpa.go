@@ -533,7 +533,7 @@ func (app *appEnv) getPage(w http.ResponseWriter, r *http.Request) {
 func (app *appEnv) postPage(w http.ResponseWriter, r *http.Request) {
 	app.logStart(r)
 
-	var userUpdate db.UpdatePageV2Params
+	var userUpdate db.UpdatePageParams
 	if !app.readJSON(w, r, &userUpdate) {
 		return
 	}
@@ -545,7 +545,7 @@ func (app *appEnv) postPage(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	ctx := context.WithoutCancel(r.Context())
-	res, err := app.svc.Queries.UpdatePageV2(ctx, userUpdate)
+	res, err := app.svc.Queries.UpdatePage(ctx, userUpdate)
 	if err != nil {
 		err = fmt.Errorf("postPage update problem: %w", err)
 		app.replyErr(w, r, err)
