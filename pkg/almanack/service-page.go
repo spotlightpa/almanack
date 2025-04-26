@@ -286,7 +286,9 @@ func (svc Services) createPageForSharedArticle(ctx context.Context, shared *db.S
 			SourceID:   shared.SourceID,
 		})
 		if txerr != nil {
-			if perr, ok := txerr.(*pgconn.PgError); ok && perr.Code == "23505" && perr.ConstraintName == "page_path_key" {
+			// If the page already exists, just keep going
+			if perr, ok := txerr.(*pgconn.PgError); ok &&
+				perr.Code == "23505" && perr.ConstraintName == "page_path_key" {
 				ignoreErr = true
 			}
 			return txerr
@@ -316,7 +318,7 @@ func (svc Services) createPageForSharedArticle(ctx context.Context, shared *db.S
 		*shared = newSharedArt
 		return nil
 	})
-	if err != nil && !ignoreErr {
+	if !ignoreErr {
 		return err
 	}
 	return nil
