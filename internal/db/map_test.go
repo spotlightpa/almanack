@@ -15,13 +15,13 @@ func TestMap(t *testing.T) {
 
 	ctx := context.Background()
 	const testpath = "test/hello.md"
-	_, err := q.CreatePageV2(ctx, db.CreatePageV2Params{
+	_, err := q.CreatePage(ctx, db.CreatePageParams{
 		FilePath:   testpath,
 		SourceType: "testing",
 	})
 	be.NilErr(t, err)
 	// create again
-	_, err = q.CreatePageV2(ctx, db.CreatePageV2Params{
+	_, err = q.CreatePage(ctx, db.CreatePageParams{
 		FilePath:   testpath,
 		SourceType: "testing",
 	})
@@ -29,7 +29,7 @@ func TestMap(t *testing.T) {
 	p1, err := q.GetPageByFilePath(ctx, testpath)
 	be.NilErr(t, err)
 	be.Equal(t, testpath, p1.FilePath)
-	p2, err := q.UpdatePageV2(ctx, db.UpdatePageV2Params{
+	p2, err := q.UpdatePage(ctx, db.UpdatePageParams{
 		ID:             p1.ID,
 		SetFrontmatter: true,
 		Frontmatter: db.Map{

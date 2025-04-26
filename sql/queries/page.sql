@@ -1,10 +1,10 @@
--- name: CreatePageV2 :one
+-- name: CreatePage :one
 INSERT INTO page ("file_path", "source_type", "source_id")
   VALUES (@file_path, @source_type, @source_id)
 RETURNING
   *;
 
--- name: UpdatePageV2 :one
+-- name: UpdatePage :one
 UPDATE
   page
 SET

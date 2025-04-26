@@ -288,7 +288,7 @@ func TestServicePublish(t *testing.T) {
 	// Success case
 	{
 		const path1 = "content/news/1.md"
-		p0, err := svc.Queries.CreatePageV2(ctx, db.CreatePageV2Params{
+		p0, err := svc.Queries.CreatePage(ctx, db.CreatePageParams{
 			FilePath:   path1,
 			SourceType: "manual",
 			SourceID:   "n/a",
@@ -332,7 +332,7 @@ func TestServicePublish(t *testing.T) {
 	}
 	{
 		const path2 = "content/news/2.md"
-		_, err := svc.Queries.CreatePageV2(ctx, db.CreatePageV2Params{
+		_, err := svc.Queries.CreatePage(ctx, db.CreatePageParams{
 			FilePath:   path2,
 			SourceType: "manual",
 			SourceID:   "n/a",
@@ -397,7 +397,7 @@ func TestServicePublish(t *testing.T) {
 	// Test Github failure
 	{
 		const path3 = "content/news/3.md"
-		_, err := svc.Queries.CreatePageV2(ctx, db.CreatePageV2Params{
+		_, err := svc.Queries.CreatePage(ctx, db.CreatePageParams{
 			FilePath:   path3,
 			SourceType: "manual",
 			SourceID:   "n/a",
@@ -455,7 +455,7 @@ func TestServicePopScheduledPages(t *testing.T) {
 
 	{
 		const path = "content/news/test-pop.md"
-		p, err := svc.Queries.CreatePageV2(ctx, db.CreatePageV2Params{
+		p, err := svc.Queries.CreatePage(ctx, db.CreatePageParams{
 			FilePath:   path,
 			SourceType: "manual",
 			SourceID:   "n/a",
@@ -469,7 +469,7 @@ func TestServicePopScheduledPages(t *testing.T) {
 		_, err = os.Stat(filepath.Join(tmp, path))
 		be.Nonzero(t, err)
 
-		p, err = svc.Queries.UpdatePageV2(ctx, db.UpdatePageV2Params{
+		p, err = svc.Queries.UpdatePage(ctx, db.UpdatePageParams{
 			ID:             p.ID,
 			SetFrontmatter: false,
 			Frontmatter:    map[string]any{},
