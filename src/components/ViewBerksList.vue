@@ -20,7 +20,7 @@ export default {
       fetch,
       pages: computedList("pages", (page) => new PageListItem(page)),
       nextPage: computedProp("next_page", (page) => ({
-        name: "statecollege-pages",
+        name: "berks-pages",
         query: { page },
       })),
     };
@@ -30,10 +30,10 @@ export default {
 
 <template>
   <MetaHead>
-    <title>State College Articles • Spotlight PA Almanack</title>
+    <title>Berks County Articles • Spotlight PA Almanack</title>
   </MetaHead>
   <PageList
-    title="State College Articles"
+    title="Berks County Articles"
     :page="page"
     :next-page="nextPage"
     :api-state="apiState"
