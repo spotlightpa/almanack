@@ -59,8 +59,8 @@ func (page *Page) FromTOML(content string) (err error) {
 	defer errorx.Trace(&err)
 
 	const delimiter = "+++\n"
-
-	if !strings.HasPrefix(content, delimiter) {
+	content, ok := strings.CutPrefix(content, delimiter)
+	if !ok {
 		// try parsing as JSON
 		if !strings.HasPrefix(content, "{") {
 			return fmt.Errorf("could not parse frontmatter: no prefix delimiter")
@@ -73,7 +73,6 @@ func (page *Page) FromTOML(content string) (err error) {
 		page.Body = ""
 		return nil
 	}
-	content = strings.TrimPrefix(content, delimiter)
 	frontmatter, body, ok := strings.Cut(content, delimiter)
 	if !ok {
 		return fmt.Errorf("could not parse frontmatter: no end delimiter")
