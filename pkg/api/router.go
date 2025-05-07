@@ -93,6 +93,8 @@ func (app *appEnv) routes() http.Handler {
 		spotlightMW.HandlerFunc(app.postPage))
 	mux.Handle(`POST /api/page-create`,
 		spotlightMW.HandlerFunc(app.postPageCreate))
+	mux.Handle(`POST /api/page-load`,
+		spotlightMW.Controller(app.postPageLoad))
 	mux.Handle(`GET /api/pages`,
 		spotlightMW.HandlerFunc(app.listPages))
 	mux.Handle(`GET /api/pages-by-fts`,
