@@ -2,6 +2,7 @@ package db
 
 import (
 	"cmp"
+	"context"
 	"encoding/json"
 	"fmt"
 	"path"
@@ -11,9 +12,56 @@ import (
 
 	"github.com/BurntSushi/toml"
 	"github.com/carlmjohnson/errorx"
+	"github.com/jackc/pgx/v5"
+	"github.com/jackc/pgx/v5/pgtype"
 	"github.com/microcosm-cc/bluemonday"
 	"github.com/spotlightpa/almanack/internal/timex"
 )
+
+func CreatePageFromContent(ctx context.Context, tx *Txable, path, content string) (*Page, error) {
+	var p Page
+	if err := p.FromTOML(content); err != nil {
+		return nil, err
+	}
+	err := tx.Begin(ctx, pgx.TxOptions{}, func(q *Queries) error {
+		dbPage, err := q.CreatePage(ctx, CreatePageParams{
+			FilePath:   path,
+			SourceType: "load",
+			SourceID:   path,
+		})
+		if err != nil {
+			return err
+		}
+
+		// Fix p fields
+		p.SetURLPath()
+
+		pubDate, ok := timex.Unwrap(p.Frontmatter["published"])
+		if !ok {
+			pubDate = time.Now()
+		}
+		pubDate = timex.ToEST(pubDate)
+		p.Frontmatter["published"] = pubDate
+
+		dbPage, err = q.UpdatePage(ctx, UpdatePageParams{
+			ID:               dbPage.ID,
+			SetFrontmatter:   true,
+			Frontmatter:      p.Frontmatter,
+			SetBody:          true,
+			Body:             p.Body,
+			URLPath:          p.URLPath.String,
+			SetScheduleFor:   true,
+			ScheduleFor:      pgtype.Timestamptz{Time: pubDate, Valid: true},
+			SetLastPublished: true,
+		})
+		p = dbPage
+		return err
+	})
+	if err != nil {
+		return nil, err
+	}
+	return &p, nil
+}
 
 func (page *Page) ToTOML() (string, error) {
 	var buf strings.Builder

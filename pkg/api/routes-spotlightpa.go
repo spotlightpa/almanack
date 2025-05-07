@@ -12,20 +12,17 @@ import (
 	"path"
 	"slices"
 	"strings"
-	"time"
 
 	"github.com/carlmjohnson/flowmatic"
 	"github.com/earthboundkid/emailx/v2"
 	"github.com/earthboundkid/resperr/v2"
 	"github.com/jackc/pgx/v5"
-	"github.com/jackc/pgx/v5/pgtype"
 	"github.com/spotlightpa/almanack/internal/db"
 	"github.com/spotlightpa/almanack/internal/gdocs"
 	"github.com/spotlightpa/almanack/internal/google"
 	"github.com/spotlightpa/almanack/internal/paginate"
 	"github.com/spotlightpa/almanack/internal/slicex"
 	"github.com/spotlightpa/almanack/internal/stringx"
-	"github.com/spotlightpa/almanack/internal/timex"
 	"github.com/spotlightpa/almanack/pkg/almanack"
 	"github.com/spotlightpa/almanack/pkg/almlog"
 )
@@ -999,9 +996,11 @@ func (app *appEnv) postDonorWall(w http.ResponseWriter, r *http.Request) http.Ha
 }
 
 func (app *appEnv) postPageLoad(w http.ResponseWriter, r *http.Request) http.Handler {
-	// Get the path from the request
-	// Load it from the store
-	// Shove it in the DB
+	// Load a page already published in the content store and add it to the database.
+	// Steps:
+	// - Get the path from the request
+	// - Load it from the store
+	// - Shove it in the DB
 	app.logStart(r)
 	if err := r.ParseForm(); err != nil {
 		return app.jsonErr(err)
@@ -1016,41 +1015,7 @@ func (app *appEnv) postPageLoad(w http.ResponseWriter, r *http.Request) http.Han
 	if err != nil {
 		return app.jsonErr(err)
 	}
-	var p db.Page
-	if err := p.FromTOML(content); err != nil {
-		return app.jsonErr(err)
-	}
-	dbPage, err := app.svc.Queries.CreatePage(r.Context(), db.CreatePageParams{
-		FilePath:   path,
-		SourceType: "load",
-		SourceID:   path,
-	})
-	if err != nil {
-		return app.jsonErr(err)
-	}
-
-	// Fix p fields
-	p.SetURLPath()
-
-	pubDate, ok := timex.Unwrap(p.Frontmatter["published"])
-	if !ok {
-		pubDate = time.Now()
-	}
-	pubDate = timex.ToEST(pubDate)
-	p.Frontmatter["published"] = pubDate
-
-	dbPage, err = app.svc.Queries.UpdatePage(r.Context(), db.UpdatePageParams{
-		ID:               dbPage.ID,
-		SetFrontmatter:   true,
-		Frontmatter:      p.Frontmatter,
-		SetBody:          true,
-		Body:             p.Body,
-		URLPath:          p.URLPath.String,
-		SetScheduleFor:   true,
-		ScheduleFor:      pgtype.Timestamptz{Time: pubDate, Valid: true},
-		SetLastPublished: true,
-	})
-	if err != nil {
+	if _, err := db.CreatePageFromContent(r.Context(), app.svc.Tx, path, content); err != nil {
 		return app.jsonErr(err)
 	}
 	return app.jsonOK("ok")
