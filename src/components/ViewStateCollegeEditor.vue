@@ -3,22 +3,20 @@ import { reactive, computed, toRefs, watch } from "vue";
 
 import { useClient } from "@/api/client.js";
 import { makeState } from "@/api/service-util.js";
-import Page from "@/api/spotlightpa-all-pages-item.js";
 
 import { formatDateTime, today, tomorrow } from "@/utils/time-format.js";
 import useScrollTo from "@/utils/use-scroll-to.js";
 import maybeDate from "@/utils/maybe-date.js";
 
 class EditorsPicksData {
-  constructor(siteConfig, pagesByPath) {
-    this.pagesByPath = pagesByPath;
+  constructor(siteConfig) {
     this.reset(siteConfig);
   }
 
   reset(siteConfig) {
     for (let prop of ["featuredStories", "subfeatures", "topSlots", "topper"]) {
       let a = siteConfig.data?.[prop] ?? [];
-      this[prop] = a.map((s) => this.pagesByPath.get(s)).filter((a) => !!a);
+      this[prop] = a.map((filePath) => ({ filePath })).filter((a) => !!a);
     }
     this.scheduleFor = maybeDate(siteConfig, "schedule_for");
     this.publishedAt = maybeDate(siteConfig, "published_at");
@@ -27,14 +25,11 @@ class EditorsPicksData {
 
   clone(scheduleFor) {
     let { data } = JSON.parse(JSON.stringify(this));
-    let newPick = new EditorsPicksData(
-      {
-        schedule_for: scheduleFor,
-        data,
-        published_at: null,
-      },
-      this.pagesByPath
-    );
+    let newPick = new EditorsPicksData({
+      schedule_for: scheduleFor,
+      data,
+      published_at: null,
+    });
     return newPick;
   }
 
@@ -56,29 +51,19 @@ export default {
   setup() {
     const [container, scrollTo] = useScrollTo();
 
-    let { listAllPages, getStateCollegeEditor, saveStateCollegeEditor } =
-      useClient();
-    let { apiState: listState, exec: listExec } = makeState();
+    let { getStateCollegeEditor, saveStateCollegeEditor } = useClient();
     let { apiState: edPicksState, exec: edPickExec } = makeState();
     let state = reactive({
-      isLoading: computed(() => listState.isLoading || edPicksState.isLoading),
-      error: computed(() => listState.error ?? edPicksState.error),
-      pages: computed(
-        () => listState.rawData?.pages.map((p) => new Page(p)) ?? []
-      ),
-      pagesByPath: computed(
-        () => new Map(state.pages.map((p) => [p.filePath, p]))
-      ),
+      isLoading: computed(() => edPicksState.isLoading),
+      error: computed(() => edPicksState.error),
+
       rawPicks: computed(() => edPicksState.rawData?.configs ?? []),
       allEdPicks: [],
       nextSchedule: null,
     });
     let actions = {
       reload() {
-        return Promise.all([
-          listExec(listAllPages),
-          edPickExec(getStateCollegeEditor),
-        ]);
+        return Promise.all([edPickExec(getStateCollegeEditor)]);
       },
       save() {
         return edPickExec(() =>
@@ -88,17 +73,15 @@ export default {
         );
       },
       reset() {
-        let { pages, rawPicks } = state;
-        if (!pages.length || !rawPicks.length) {
+        let { rawPicks } = state;
+        if (!rawPicks.length) {
           return;
         }
-        state.allEdPicks = rawPicks.map(
-          (data) => new EditorsPicksData(data, state.pagesByPath)
-        );
+        state.allEdPicks = rawPicks.map((data) => new EditorsPicksData(data));
       },
     };
     watch(
-      () => [state.pages, state.rawPicks],
+      () => [state.rawPicks],
       () => actions.reset(),
       { deep: true }
     );
