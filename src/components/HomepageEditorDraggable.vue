@@ -35,8 +35,8 @@ export default {
     chosen-class="is-primary"
     :component-data="getComponentData()"
   >
-    <template #item="{ element: page, index }">
-      <HomepageEditorItem :file-path="page.filePath" @remove="remove(index)" />
+    <template #item="{ element: filePath, index }">
+      <HomepageEditorItem :file-path="filePath" @remove="remove(index)" />
     </template>
     <template #header>
       <span v-if="!modelValue.length" class="has-text-grey-lighter">

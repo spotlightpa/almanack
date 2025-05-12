@@ -16,7 +16,7 @@ class EditorsPicksData {
   reset(siteConfig) {
     for (let prop of ["featuredStories", "subfeatures", "topSlots", "topper"]) {
       let a = siteConfig.data?.[prop] ?? [];
-      this[prop] = a.map((filePath) => ({ filePath })).filter((a) => !!a);
+      this[prop] = [...a];
     }
     this.scheduleFor = maybeDate(siteConfig, "schedule_for");
     this.publishedAt = maybeDate(siteConfig, "published_at");
@@ -34,14 +34,13 @@ class EditorsPicksData {
   }
 
   toJSON() {
-    const getPath = (a) => a.filePath;
     return {
       schedule_for: this.scheduleFor,
       data: {
-        featuredStories: this.featuredStories.map(getPath),
-        subfeatures: this.subfeatures.map(getPath),
-        topSlots: this.topSlots.map(getPath),
-        topper: this.topper.map(getPath),
+        featuredStories: this.featuredStories,
+        subfeatures: this.subfeatures,
+        topSlots: this.topSlots,
+        topper: this.topper,
       },
     };
   }
@@ -63,7 +62,7 @@ export default {
     });
     let actions = {
       reload() {
-        return Promise.all([edPickExec(getStateCollegeEditor)]);
+        return edPickExec(getStateCollegeEditor);
       },
       save() {
         return edPickExec(() =>
@@ -81,7 +80,7 @@ export default {
       },
     };
     watch(
-      () => [state.rawPicks],
+      () => state.rawPicks,
       () => actions.reset(),
       { deep: true }
     );
