@@ -1,9 +1,10 @@
-package xhtml
+package tableaux
 
 import (
 	"iter"
 	"strings"
 
+	"github.com/earthboundkid/xhtml"
 	"github.com/spotlightpa/almanack/internal/stringx"
 	"golang.org/x/net/html"
 	"golang.org/x/net/html/atom"
@@ -11,11 +12,11 @@ import (
 
 func Tables(root *html.Node) iter.Seq2[*html.Node, TableNodes] {
 	return func(yield func(*html.Node, TableNodes) bool) {
-		tables := SelectSlice(root, WithAtom(atom.Table))
+		tables := xhtml.SelectSlice(root, xhtml.WithAtom(atom.Table))
 		for _, tblNode := range tables {
 			var tbl TableNodes
-			for row := range SelectAll(tblNode, WithAtom(atom.Tr)) {
-				tds := SelectSlice(row, func(n *html.Node) bool {
+			for row := range xhtml.SelectAll(tblNode, xhtml.WithAtom(atom.Tr)) {
+				tds := xhtml.SelectSlice(row, func(n *html.Node) bool {
 					return n.DataAtom == atom.Td || n.DataAtom == atom.Th
 				})
 				tbl = append(tbl, tds)
@@ -41,7 +42,7 @@ func (rows TableNodes) At(row, col int) *html.Node {
 }
 
 func slugify(n *html.Node) string {
-	return strings.TrimSpace(stringx.RemoveParens(strings.ToLower(TextContent(n))))
+	return strings.TrimSpace(stringx.RemoveParens(strings.ToLower(xhtml.TextContent(n))))
 }
 
 func (rows TableNodes) Label() string {
@@ -52,7 +53,7 @@ func (rows TableNodes) Value(name string) *html.Node {
 	for i := range rows {
 		if slugify(rows.At(i, 0)) == name {
 			cell := rows.At(i, 1)
-			if s := TextContent(cell); s == "" {
+			if s := xhtml.TextContent(cell); s == "" {
 				cell = rows.At(i+1, 0)
 			}
 			if stringx.RemoveAllWhitespace(slugify(cell)) == "n/a" {

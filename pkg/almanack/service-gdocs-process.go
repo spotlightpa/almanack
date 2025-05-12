@@ -10,11 +10,12 @@ import (
 	"strings"
 
 	"github.com/earthboundkid/bytemap/v2"
+	"github.com/earthboundkid/xhtml"
 	"github.com/spotlightpa/almanack/internal/blocko"
 	"github.com/spotlightpa/almanack/internal/db"
 	"github.com/spotlightpa/almanack/internal/must"
 	"github.com/spotlightpa/almanack/internal/stringx"
-	"github.com/spotlightpa/almanack/internal/xhtml"
+	"github.com/spotlightpa/almanack/internal/tableaux"
 	"golang.org/x/net/html"
 	"golang.org/x/net/html/atom"
 )
@@ -73,7 +74,7 @@ func processDocHTML(docHTML *html.Node) (
 ) {
 	// Now collect the embeds array and metadata
 	n := 1
-	for tbl, rows := range xhtml.Tables(docHTML) {
+	for tbl, rows := range tableaux.Tables(docHTML) {
 		embed := db.Embed{N: n}
 		switch label := rows.Label(); label {
 		case "html", "embed", "raw", "script":
@@ -204,7 +205,7 @@ func processDocHTML(docHTML *html.Node) (
 	blocko.RemoveMarks(docHTML)
 
 	// Warn about fake headings
-	for n := range xhtml.ChildNodes(docHTML) {
+	for n := range docHTML.ChildNodes() {
 		// <p> with only b/i/strong/em for a child
 		if n.DataAtom != atom.P {
 			continue
@@ -245,7 +246,7 @@ func processDocHTML(docHTML *html.Node) (
 	return
 }
 
-func processImage(rows xhtml.TableNodes, n int, kind string) (imageEmbed *db.EmbedImage, warning string) {
+func processImage(rows tableaux.TableNodes, n int, kind string) (imageEmbed *db.EmbedImage, warning string) {
 	var width, height int
 	if w := xhtml.TextContent(rows.Value("width")); w != "" {
 		width, _ = strconv.Atoi(w)
@@ -274,7 +275,7 @@ func processImage(rows xhtml.TableNodes, n int, kind string) (imageEmbed *db.Emb
 	)
 }
 
-func processMetadata(rows xhtml.TableNodes, metadata *db.GDocsMetadata) {
+func processMetadata(rows tableaux.TableNodes, metadata *db.GDocsMetadata) {
 	metadata.InternalID = cmp.Or(
 		xhtml.TextContent(rows.Value("slug")),
 		xhtml.TextContent(rows.Value("internal id")),
@@ -361,14 +362,14 @@ func processMetadata(rows xhtml.TableNodes, metadata *db.GDocsMetadata) {
 	metadata.Layout = xhtml.TextContent(rows.Value("layout"))
 }
 
-func processToc(doc *html.Node, rows xhtml.TableNodes) string {
+func processToc(doc *html.Node, rows tableaux.TableNodes) string {
 	type header struct {
 		text  string
 		id    string
 		depth int
 	}
 	var headers []header
-	for n := range xhtml.All(doc) {
+	for n := range doc.Descendants() {
 		switch n.DataAtom {
 		case atom.H1, atom.H2, atom.H3, atom.H4, atom.H5, atom.H6:
 		default:

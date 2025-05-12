@@ -1,4 +1,4 @@
-package xhtml_test
+package tableaux_test
 
 import (
 	"fmt"
@@ -7,7 +7,8 @@ import (
 
 	"github.com/carlmjohnson/be"
 	"github.com/carlmjohnson/be/testfile"
-	"github.com/spotlightpa/almanack/internal/xhtml"
+	"github.com/earthboundkid/xhtml"
+	"github.com/spotlightpa/almanack/internal/tableaux"
 	"golang.org/x/net/html"
 )
 
@@ -20,9 +21,9 @@ func TestTable(t *testing.T) {
 		root, err := html.Parse(strings.NewReader(in))
 		be.NilErr(t, err)
 		i := 0
-		for _, tbl := range xhtml.Tables(root) {
+		for _, tbl := range tableaux.Tables(root) {
 			i++
-			rows := xhtml.Map(tbl, xhtml.InnerHTML)
+			rows := tableaux.Map(tbl, xhtml.InnerHTML)
 			testfile.EqualJSON(t, fmt.Sprintf("%s-%d.json", bareName, i), &rows)
 		}
 	})

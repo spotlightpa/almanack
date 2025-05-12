@@ -5,10 +5,11 @@ import (
 	"fmt"
 	"io"
 
-	"github.com/spotlightpa/almanack/internal/xhtml"
+	"github.com/earthboundkid/xhtml"
 	"github.com/tdewolff/minify/v2"
 	"github.com/tdewolff/minify/v2/html"
 	nethtml "golang.org/x/net/html"
+	"golang.org/x/net/html/atom"
 )
 
 func Minify(r io.Reader) (*nethtml.Node, error) {
@@ -25,7 +26,7 @@ func Minify(r io.Reader) (*nethtml.Node, error) {
 	if err != nil {
 		return nil, err
 	}
-	body := xhtml.Select(doc, xhtml.WithBody)
+	body := xhtml.Select(doc, xhtml.WithAtom(atom.Body))
 	if body == nil {
 		return nil, fmt.Errorf("could not find body")
 	}

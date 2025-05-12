@@ -4,7 +4,7 @@ import (
 	"slices"
 	"strings"
 
-	"github.com/spotlightpa/almanack/internal/xhtml"
+	"github.com/earthboundkid/xhtml"
 	"golang.org/x/net/html"
 	"golang.org/x/net/html/atom"
 )
@@ -61,7 +61,7 @@ var whitespaceReplacer = strings.NewReplacer(
 )
 
 func replaceWhitespace(root *html.Node) {
-	for n := range xhtml.All(root) {
+	for n := range root.Descendants() {
 		if n.Type != html.TextNode {
 			continue
 		}
@@ -91,7 +91,7 @@ var specialReplacer = strings.NewReplacer(
 )
 
 func replaceSpecials(root *html.Node) {
-	for n := range xhtml.All(root) {
+	for n := range root.Descendants() {
 		if n.Type != html.TextNode {
 			continue
 		}
