@@ -18,12 +18,12 @@ require (
 	github.com/carlmjohnson/requests v0.24.3
 	github.com/carlmjohnson/slackhook v0.23.2
 	github.com/earthboundkid/bytemap/v2 v2.24.1
-	github.com/earthboundkid/deque/v2 v2.24.2
 	github.com/earthboundkid/emailx/v2 v2.24.1
 	github.com/earthboundkid/flagx/v2 v2.25.1
 	github.com/earthboundkid/mid v0.24.1
 	github.com/earthboundkid/resperr/v2 v2.25.1
 	github.com/earthboundkid/versioninfo/v2 v2.24.1
+	github.com/earthboundkid/xhtml v0.25.2
 	github.com/gabriel-vasile/mimetype v1.4.9
 	github.com/getsentry/sentry-go v0.32.0
 	github.com/go-chi/chi/v5 v5.2.1
@@ -34,7 +34,7 @@ require (
 	github.com/microcosm-cc/bluemonday v1.0.27
 	github.com/tdewolff/minify/v2 v2.23.3
 	gocloud.dev v0.41.0
-	golang.org/x/net v0.39.0
+	golang.org/x/net v0.40.0
 	golang.org/x/oauth2 v0.29.0
 	google.golang.org/api v0.231.0
 	gopkg.in/Iwark/spreadsheet.v2 v2.0.0-20230915040305-7677e8164883
@@ -71,6 +71,7 @@ require (
 	github.com/aymerick/douceur v0.2.0 // indirect
 	github.com/carlmjohnson/deque v0.23.1 // indirect
 	github.com/cloudflare/circl v1.6.1 // indirect
+	github.com/earthboundkid/deque/v2 v2.24.2 // indirect
 	github.com/felixge/httpsnoop v1.0.4 // indirect
 	github.com/go-logr/logr v1.4.2 // indirect
 	github.com/go-logr/stdr v1.2.2 // indirect
@@ -98,10 +99,10 @@ require (
 	go.opentelemetry.io/otel v1.35.0 // indirect
 	go.opentelemetry.io/otel/metric v1.35.0 // indirect
 	go.opentelemetry.io/otel/trace v1.35.0 // indirect
-	golang.org/x/crypto v0.37.0 // indirect
-	golang.org/x/sync v0.13.0 // indirect
-	golang.org/x/sys v0.32.0 // indirect
-	golang.org/x/text v0.24.0 // indirect
+	golang.org/x/crypto v0.38.0 // indirect
+	golang.org/x/sync v0.14.0 // indirect
+	golang.org/x/sys v0.33.0 // indirect
+	golang.org/x/text v0.25.0 // indirect
 	golang.org/x/xerrors v0.0.0-20240903120638-7835f813f4da // indirect
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20250428153025-10db94c68c34 // indirect
 	google.golang.org/grpc v1.72.0 // indirect

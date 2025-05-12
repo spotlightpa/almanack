@@ -5,8 +5,8 @@ import (
 
 	"github.com/carlmjohnson/be"
 	"github.com/carlmjohnson/be/testfile"
+	"github.com/earthboundkid/xhtml"
 	"github.com/spotlightpa/almanack/internal/blocko"
-	"github.com/spotlightpa/almanack/internal/xhtml"
 	"golang.org/x/net/html"
 	"google.golang.org/api/docs/v1"
 )

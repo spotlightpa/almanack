@@ -5,7 +5,7 @@ import (
 	"testing"
 
 	"github.com/carlmjohnson/be"
-	"github.com/spotlightpa/almanack/internal/xhtml"
+	"github.com/earthboundkid/xhtml"
 	"golang.org/x/net/html"
 	"golang.org/x/net/html/atom"
 )

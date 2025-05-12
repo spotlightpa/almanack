@@ -3,9 +3,9 @@ package almanack
 import (
 	"fmt"
 
+	"github.com/earthboundkid/xhtml"
 	"github.com/spotlightpa/almanack/internal/db"
 	"github.com/spotlightpa/almanack/internal/iterx"
-	"github.com/spotlightpa/almanack/internal/xhtml"
 	"golang.org/x/net/html"
 	"golang.org/x/net/html/atom"
 )

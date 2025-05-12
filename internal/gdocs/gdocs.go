@@ -11,7 +11,7 @@ import (
 	"github.com/carlmjohnson/requests"
 	"github.com/earthboundkid/bytemap/v2"
 	"github.com/earthboundkid/resperr/v2"
-	"github.com/spotlightpa/almanack/internal/xhtml"
+	"github.com/earthboundkid/xhtml"
 	"golang.org/x/net/html"
 	"google.golang.org/api/docs/v1"
 	"google.golang.org/api/googleapi"

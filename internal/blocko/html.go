@@ -3,7 +3,6 @@ package blocko
 import (
 	"strings"
 
-	"github.com/spotlightpa/almanack/internal/xhtml"
 	"golang.org/x/net/html"
 	"golang.org/x/net/html/atom"
 )
@@ -57,7 +56,7 @@ var inlineElements = map[atom.Atom]bool{
 
 func isEmpty(n *html.Node) bool {
 	root := n
-	for n := range xhtml.All(n) {
+	for n := range n.Descendants() {
 		if n == root {
 			continue
 		}

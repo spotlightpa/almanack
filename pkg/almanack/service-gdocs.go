@@ -13,11 +13,12 @@ import (
 	"github.com/carlmjohnson/crockford"
 	"github.com/carlmjohnson/errorx"
 	"github.com/carlmjohnson/requests"
+	"github.com/earthboundkid/xhtml"
 	"github.com/spotlightpa/almanack/internal/db"
 	"github.com/spotlightpa/almanack/internal/gdocs"
 	"github.com/spotlightpa/almanack/internal/must"
 	"github.com/spotlightpa/almanack/internal/stringx"
-	"github.com/spotlightpa/almanack/internal/xhtml"
+	"github.com/spotlightpa/almanack/internal/tableaux"
 	"github.com/spotlightpa/almanack/pkg/almlog"
 	"golang.org/x/net/html"
 	"golang.org/x/net/html/atom"
@@ -111,7 +112,7 @@ func (svc Services) ProcessGDocsDoc(ctx context.Context, dbDoc db.GDocsDoc) (err
 	var warnings []string
 
 	// Handle image uploads/database lookups
-	for tbl, rows := range xhtml.Tables(docHTML) {
+	for tbl, rows := range tableaux.Tables(docHTML) {
 		switch label := rows.Label(); label {
 		case "photo", "image", "photograph", "illustration", "illo",
 			"spl-photo", "partner-photo", "spl-image", "partner-image":
@@ -159,7 +160,7 @@ func (svc Services) ProcessGDocsDoc(ctx context.Context, dbDoc db.GDocsDoc) (err
 }
 
 func removeTail(n *html.Node) {
-	for c := range xhtml.ChildNodes(n) {
+	for c := range n.ChildNodes() {
 		if c.DataAtom == atom.Table {
 			continue
 		}
@@ -180,7 +181,7 @@ func removeTail(n *html.Node) {
 func (svc Services) replaceImagePath(
 	ctx context.Context,
 	tbl *html.Node,
-	rows xhtml.TableNodes,
+	rows tableaux.TableNodes,
 	externalID string,
 	objID2Path map[string]string,
 ) (warning string) {
@@ -258,7 +259,7 @@ func setRowValue(tbl *html.Node, key, value string) {
 func (svc Services) replaceMetadataImagePath(
 	ctx context.Context,
 	tbl *html.Node,
-	rows xhtml.TableNodes,
+	rows tableaux.TableNodes,
 	externalID string,
 	objID2Path map[string]string,
 ) string {
