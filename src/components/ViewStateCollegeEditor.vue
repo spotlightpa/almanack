@@ -1,7 +1,12 @@
 <script>
 import { reactive, computed, toRefs, watch } from "vue";
 
-import { useClient } from "@/api/client.js";
+import {
+  get,
+  post,
+  getStateCollegeEditor,
+  saveStateCollegeEditor,
+} from "@/api/client-v2.js";
 import { makeState } from "@/api/service-util.js";
 
 import { formatDateTime, today, tomorrow } from "@/utils/time-format.js";
@@ -50,23 +55,19 @@ export default {
   setup() {
     const [container, scrollTo] = useScrollTo();
 
-    let { getStateCollegeEditor, saveStateCollegeEditor } = useClient();
     let { apiState: edPicksState, exec: edPickExec } = makeState();
     let state = reactive({
-      isLoading: computed(() => edPicksState.isLoading),
-      error: computed(() => edPicksState.error),
-
       rawPicks: computed(() => edPicksState.rawData?.configs ?? []),
       allEdPicks: [],
       nextSchedule: null,
     });
     let actions = {
       reload() {
-        return edPickExec(getStateCollegeEditor);
+        return edPickExec(() => get(getStateCollegeEditor));
       },
       save() {
         return edPickExec(() =>
-          saveStateCollegeEditor({
+          post(saveStateCollegeEditor, {
             configs: state.allEdPicks,
           })
         );
@@ -88,6 +89,7 @@ export default {
     return {
       container,
 
+      edPicksState,
       ...toRefs(state),
       ...actions,
       formatDateTime,
@@ -183,8 +185,8 @@ export default {
       <button
         type="button"
         class="button is-primary has-text-weight-semibold"
-        :disabled="isLoading || null"
-        :class="{ 'is-loading': isLoading }"
+        :disabled="edPicksState.isLoadingThrottled || null"
+        :class="{ 'is-loading': edPicksState.isLoadingThrottled }"
         @click="save"
       >
         Save
@@ -192,16 +194,17 @@ export default {
       <button
         type="button"
         class="button is-light has-text-weight-semibold"
-        :disabled="isLoading || null"
-        :class="{ 'is-loading': isLoading }"
+        :disabled="edPicksState.isLoadingThrottled || null"
+        :class="{ 'is-loading': edPicksState.isLoadingThrottled }"
         @click="reset"
       >
         Revert
       </button>
     </div>
-
-    <SpinnerProgress :is-loading="isLoading"></SpinnerProgress>
-    <ErrorReloader :error="error" @reload="reload"></ErrorReloader>
+    <SpinnerProgress
+      :is-loading="edPicksState.isLoadingThrottled"
+    ></SpinnerProgress>
+    <ErrorReloader :error="edPicksState.error" @reload="reload"></ErrorReloader>
   </div>
 </template>
 
