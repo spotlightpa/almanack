@@ -14,12 +14,8 @@ export default {
   setup() {
     const [container, scrollTo] = useScrollTo();
     const picks = usePicks({
-      async fetchData() {
-        return get(getEditorsPicks);
-      },
-      saveData(data) {
-        return post(saveEditorsPicks, data);
-      },
+      fetchData: () => get(getEditorsPicks),
+      saveData: (data) => post(saveEditorsPicks, data),
     });
 
     return {
@@ -29,7 +25,7 @@ export default {
       async addScheduledPicks() {
         let lastPick =
           picks.allEdPicks.value[picks.allEdPicks.value.length - 1];
-        picks.allEdPicks.value(lastPick.clone(picks.nextSchedule.value));
+        picks.allEdPicks.value.push(lastPick.clone(picks.nextSchedule.value));
         picks.nextSchedule.value = null;
         await scrollTo();
       },
