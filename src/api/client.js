@@ -26,7 +26,6 @@ const responseError = async (rsp) => {
 const endpoints = {
   // Alphabetize lists by URL to show duplicates
   // GET and POST listed as two endpoints
-  listAllPages: `/api/all-pages`,
   listAllSeries: `/api/all-series`,
   listAllTopics: `/api/all-topics`,
   postAuthorizedDomain: `/api/authorized-domains`,
@@ -169,7 +168,6 @@ function makeClient($auth) {
     "getSidebar",
     "getSiteParams",
     "getStateCollegeEditor",
-    "listAllPages",
     "listAllSeries",
     "listAllTopics",
     "listAuthorizedDomains",

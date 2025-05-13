@@ -49,8 +49,6 @@ func (app *appEnv) routes() http.Handler {
 	spotlightMW := authMW.With(app.hasRoleMiddleware("Spotlight PA"))
 
 	// Start Spotlight endpoints
-	mux.Handle(`GET /api/all-pages`,
-		spotlightMW.HandlerFunc(app.listAllPages))
 	mux.Handle(`GET /api/all-series`,
 		spotlightMW.HandlerFunc(app.listAllSeries))
 	mux.Handle(`GET /api/all-topics`,

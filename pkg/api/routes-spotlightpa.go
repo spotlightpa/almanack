@@ -700,25 +700,6 @@ func (app *appEnv) postPageCreate(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func (app *appEnv) listAllPages(w http.ResponseWriter, r *http.Request) {
-	app.logStart(r)
-
-	type response struct {
-		Pages []db.ListAllPagesRow `json:"pages"`
-	}
-	var (
-		res response
-		err error
-	)
-
-	if res.Pages, err = app.svc.Queries.ListAllPages(r.Context()); err != nil {
-		app.replyErr(w, r, err)
-		return
-	}
-
-	app.replyJSON(http.StatusOK, w, res)
-}
-
 func (app *appEnv) getSiteData(loc string) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		app.logStart(r, "location", loc)
