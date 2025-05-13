@@ -55,9 +55,9 @@ export default {
   setup() {
     const [container, scrollTo] = useScrollTo();
 
-    let { apiState: edPicksState, exec: edPickExec } = makeState();
+    let { apiStateRefs: edPicksState, exec: edPickExec } = makeState();
     let state = reactive({
-      rawPicks: computed(() => edPicksState.rawData?.configs ?? []),
+      rawPicks: computed(() => edPicksState.rawData.value?.configs ?? []),
       allEdPicks: [],
       nextSchedule: null,
     });
@@ -89,7 +89,9 @@ export default {
     return {
       container,
 
-      edPicksState,
+      isLoadingThrottled: edPicksState.isLoadingThrottled,
+      error: edPicksState.error,
+
       ...toRefs(state),
       ...actions,
       formatDateTime,
@@ -185,8 +187,8 @@ export default {
       <button
         type="button"
         class="button is-primary has-text-weight-semibold"
-        :disabled="edPicksState.isLoadingThrottled || null"
-        :class="{ 'is-loading': edPicksState.isLoadingThrottled }"
+        :disabled="isLoadingThrottled || null"
+        :class="{ 'is-loading': isLoadingThrottled }"
         @click="save"
       >
         Save
@@ -194,17 +196,15 @@ export default {
       <button
         type="button"
         class="button is-light has-text-weight-semibold"
-        :disabled="edPicksState.isLoadingThrottled || null"
-        :class="{ 'is-loading': edPicksState.isLoadingThrottled }"
+        :disabled="isLoadingThrottled || null"
+        :class="{ 'is-loading': isLoadingThrottled }"
         @click="reset"
       >
         Revert
       </button>
     </div>
-    <SpinnerProgress
-      :is-loading="edPicksState.isLoadingThrottled"
-    ></SpinnerProgress>
-    <ErrorReloader :error="edPicksState.error" @reload="reload"></ErrorReloader>
+    <SpinnerProgress :is-loading="isLoadingThrottled"></SpinnerProgress>
+    <ErrorReloader :error="error" @reload="reload"></ErrorReloader>
   </div>
 </template>
 
