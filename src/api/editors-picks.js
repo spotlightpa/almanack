@@ -1,13 +1,6 @@
 import { reactive, computed, toRefs, watch } from "vue";
 
-import {
-  get,
-  post,
-  getStateCollegeEditor,
-  saveStateCollegeEditor,
-} from "@/api/client-v2.js";
 import { makeState } from "@/api/service-util.js";
-
 import maybeDate from "@/utils/maybe-date.js";
 
 class EditorsPicksData {
@@ -48,7 +41,7 @@ class EditorsPicksData {
   }
 }
 
-export default function usePicks() {
+export default function usePicks({ fetchData, saveData }) {
   let { apiStateRefs: edPicksState, exec: edPickExec } = makeState();
   let state = reactive({
     rawPicks: computed(() => edPicksState.rawData.value?.configs ?? []),
@@ -57,11 +50,11 @@ export default function usePicks() {
   });
   let actions = {
     reload() {
-      return edPickExec(() => get(getStateCollegeEditor));
+      return edPickExec(fetchData);
     },
     save() {
       return edPickExec(() =>
-        post(saveStateCollegeEditor, {
+        saveData({
           configs: state.allEdPicks,
         })
       );

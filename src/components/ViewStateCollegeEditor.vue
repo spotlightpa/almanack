@@ -1,12 +1,26 @@
 <script>
+import {
+  get,
+  post,
+  getStateCollegeEditor,
+  saveStateCollegeEditor,
+} from "@/api/client-v2.js";
+import usePicks from "@/api/editors-picks.js";
+
 import { formatDateTime, today, tomorrow } from "@/utils/time-format.js";
 import useScrollTo from "@/utils/use-scroll-to.js";
-import usePicks from "@/api/editors-picks.js";
 
 export default {
   setup() {
     const [container, scrollTo] = useScrollTo();
-    const picks = usePicks();
+    const picks = usePicks({
+      async fetchData() {
+        return get(getStateCollegeEditor);
+      },
+      saveData(data) {
+        return post(saveStateCollegeEditor, data);
+      },
+    });
 
     return {
       container,
