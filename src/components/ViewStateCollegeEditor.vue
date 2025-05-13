@@ -1,108 +1,26 @@
 <script>
-import { reactive, computed, toRefs, watch } from "vue";
-
-import {
-  get,
-  post,
-  getStateCollegeEditor,
-  saveStateCollegeEditor,
-} from "@/api/client-v2.js";
-import { makeState } from "@/api/service-util.js";
-
 import { formatDateTime, today, tomorrow } from "@/utils/time-format.js";
 import useScrollTo from "@/utils/use-scroll-to.js";
-import maybeDate from "@/utils/maybe-date.js";
-
-class EditorsPicksData {
-  constructor(siteConfig) {
-    this.reset(siteConfig);
-  }
-
-  reset(siteConfig) {
-    for (let prop of ["featuredStories", "subfeatures", "topSlots", "topper"]) {
-      let a = siteConfig.data?.[prop] ?? [];
-      this[prop] = [...a];
-    }
-    this.scheduleFor = maybeDate(siteConfig, "schedule_for");
-    this.publishedAt = maybeDate(siteConfig, "published_at");
-    this.isCurrent = !!this.publishedAt;
-  }
-
-  clone(scheduleFor) {
-    let { data } = JSON.parse(JSON.stringify(this));
-    let newPick = new EditorsPicksData({
-      schedule_for: scheduleFor,
-      data,
-      published_at: null,
-    });
-    return newPick;
-  }
-
-  toJSON() {
-    return {
-      schedule_for: this.scheduleFor,
-      data: {
-        featuredStories: this.featuredStories,
-        subfeatures: this.subfeatures,
-        topSlots: this.topSlots,
-        topper: this.topper,
-      },
-    };
-  }
-}
+import usePicks from "@/api/editors-picks.js";
 
 export default {
   setup() {
     const [container, scrollTo] = useScrollTo();
+    const picks = usePicks();
 
-    let { apiStateRefs: edPicksState, exec: edPickExec } = makeState();
-    let state = reactive({
-      rawPicks: computed(() => edPicksState.rawData.value?.configs ?? []),
-      allEdPicks: [],
-      nextSchedule: null,
-    });
-    let actions = {
-      reload() {
-        return edPickExec(() => get(getStateCollegeEditor));
-      },
-      save() {
-        return edPickExec(() =>
-          post(saveStateCollegeEditor, {
-            configs: state.allEdPicks,
-          })
-        );
-      },
-      reset() {
-        let { rawPicks } = state;
-        if (!rawPicks.length) {
-          return;
-        }
-        state.allEdPicks = rawPicks.map((data) => new EditorsPicksData(data));
-      },
-    };
-    watch(
-      () => state.rawPicks,
-      () => actions.reset(),
-      { deep: true }
-    );
-    actions.reload();
     return {
       container,
-
-      isLoadingThrottled: edPicksState.isLoadingThrottled,
-      error: edPicksState.error,
-
-      ...toRefs(state),
-      ...actions,
+      ...picks,
       formatDateTime,
       async addScheduledPicks() {
-        let lastPick = state.allEdPicks[state.allEdPicks.length - 1];
-        state.allEdPicks.push(lastPick.clone(state.nextSchedule));
-        state.nextSchedule = null;
+        let lastPick =
+          picks.allEdPicks.value[picks.allEdPicks.value.length - 1];
+        picks.allEdPicks.value(lastPick.clone(picks.nextSchedule.value));
+        picks.nextSchedule.value = null;
         await scrollTo();
       },
       removeScheduledPick(i) {
-        state.allEdPicks.splice(i, 1);
+        picks.allEdPicks.value.splice(i, 1);
       },
       today,
       tomorrow,
