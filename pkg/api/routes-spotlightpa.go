@@ -700,7 +700,7 @@ func (app *appEnv) postPageCreate(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func (app *appEnv) getSiteData(loc string) http.HandlerFunc {
+func (app *appEnv) siteDataGet(loc string) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		app.logStart(r, "location", loc)
 
@@ -720,7 +720,12 @@ func (app *appEnv) getSiteData(loc string) http.HandlerFunc {
 	}
 }
 
-func (app *appEnv) setSiteData(loc string) http.HandlerFunc {
+func (app *appEnv) getSiteData(w http.ResponseWriter, r *http.Request) http.Handler {
+	loc := r.URL.Query().Get("location")
+	return app.siteDataGet(loc)
+}
+
+func (app *appEnv) siteDataSet(loc string) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		app.logStart(r, "location", loc)
 
@@ -749,6 +754,11 @@ func (app *appEnv) setSiteData(loc string) http.HandlerFunc {
 
 		app.replyJSON(http.StatusOK, w, res)
 	}
+}
+
+func (app *appEnv) postSiteData(w http.ResponseWriter, r *http.Request) http.Handler {
+	loc := r.URL.Query().Get("location")
+	return app.siteDataSet(loc)
 }
 
 func (app *appEnv) listPagesByFTS(w http.ResponseWriter, r *http.Request) {

@@ -1,3 +1,11 @@
+-- name: ListSiteKeys :many
+SELECT DISTINCT
+  key
+FROM
+  site_data
+ORDER BY
+  key ASC;
+
 -- name: GetSiteData :many
 SELECT
   *

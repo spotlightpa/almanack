@@ -33,8 +33,6 @@ const endpoints = {
   postAuthorizedEmailAddress: `/api/authorized-addresses`,
   listAuthorizedEmailAddresses: `/api/authorized-addresses`,
   createSignedUpload: `/api/create-signed-upload`,
-  getEditorsPicks: `/api/editors-picks`,
-  saveEditorsPicks: `/api/editors-picks`,
   createFile: `/api/files-create`,
   listFiles: `/api/files-list`,
   updateFile: `/api/files-update`,
@@ -163,7 +161,6 @@ function makeClient($auth) {
   };
 
   let simpleGetActions = [
-    "getEditorsPicks",
     "getSharedArticle",
     "getSidebar",
     "getSiteParams",
@@ -188,7 +185,6 @@ function makeClient($auth) {
     "postPage",
     "postSiteParams",
     "saveArticle",
-    "saveEditorsPicks",
     "saveSidebar",
     "saveStateCollegeEditor",
     "sendMessage",
