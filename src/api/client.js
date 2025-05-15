@@ -26,7 +26,6 @@ const responseError = async (rsp) => {
 const endpoints = {
   // Alphabetize lists by URL to show duplicates
   // GET and POST listed as two endpoints
-  listAllPages: `/api/all-pages`,
   listAllSeries: `/api/all-series`,
   listAllTopics: `/api/all-topics`,
   postAuthorizedDomain: `/api/authorized-domains`,
@@ -34,8 +33,6 @@ const endpoints = {
   postAuthorizedEmailAddress: `/api/authorized-addresses`,
   listAuthorizedEmailAddresses: `/api/authorized-addresses`,
   createSignedUpload: `/api/create-signed-upload`,
-  getEditorsPicks: `/api/editors-picks`,
-  saveEditorsPicks: `/api/editors-picks`,
   createFile: `/api/files-create`,
   listFiles: `/api/files-list`,
   updateFile: `/api/files-update`,
@@ -164,12 +161,10 @@ function makeClient($auth) {
   };
 
   let simpleGetActions = [
-    "getEditorsPicks",
     "getSharedArticle",
     "getSidebar",
     "getSiteParams",
     "getStateCollegeEditor",
-    "listAllPages",
     "listAllSeries",
     "listAllTopics",
     "listAuthorizedDomains",
@@ -190,7 +185,6 @@ function makeClient($auth) {
     "postPage",
     "postSiteParams",
     "saveArticle",
-    "saveEditorsPicks",
     "saveSidebar",
     "saveStateCollegeEditor",
     "sendMessage",

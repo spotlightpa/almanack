@@ -72,7 +72,6 @@ export function post(url, obj) {
 
 // Alphabetize lists by URL to show duplicates
 // GET and POST listed as two endpoints
-export const listAllPages = `/api/all-pages`;
 export const listAllSeries = `/api/all-series`;
 export const listAllTopics = `/api/all-topics`;
 export const postAuthorizedDomain = `/api/authorized-domains`;
@@ -81,8 +80,6 @@ export const postAuthorizedEmailAddress = `/api/authorized-addresses`;
 export const listAuthorizedEmailAddresses = `/api/authorized-addresses`;
 export const createSignedUpload = `/api/create-signed-upload`;
 export const postDonorWall = `/api/donor-wall`;
-export const getEditorsPicks = `/api/editors-picks`;
-export const saveEditorsPicks = `/api/editors-picks`;
 export const createFile = `/api/files-create`;
 export const listFiles = `/api/files-list`;
 export const updateFile = `/api/files-update`;
@@ -103,7 +100,7 @@ export const postSharedArticleFromGDocs = `/api/shared-article-from-gdocs`;
 export const listSharedArticles = `/api/shared-articles`;
 export const getSidebar = `/api/sidebar`;
 export const saveSidebar = `/api/sidebar`;
+export const getSiteData = `/api/site-data`;
+export const postSiteData = `/api/site-data`;
 export const getSiteParams = `/api/site-params`;
 export const postSiteParams = `/api/site-params`;
-export const getStateCollegeEditor = `/api/state-college-editor`;
-export const saveStateCollegeEditor = `/api/state-college-editor`;

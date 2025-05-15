@@ -24,6 +24,7 @@ export default {
   },
 };
 </script>
+
 <template>
   <draggable
     :list="modelValue"
@@ -34,11 +35,8 @@ export default {
     chosen-class="is-primary"
     :component-data="getComponentData()"
   >
-    <template #item="{ element: page, index }">
-      <span class="tag is-medium spacer select-none">
-        {{ page.internalID }}
-        <button class="delete" @click="remove(index)"></button>
-      </span>
+    <template #item="{ element: filePath, index }">
+      <HomepageEditorItem :file-path="filePath" @remove="remove(index)" />
     </template>
     <template #header>
       <span v-if="!modelValue.length" class="has-text-grey-lighter">
