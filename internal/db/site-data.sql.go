@@ -91,35 +91,6 @@ func (q *Queries) GetSiteData(ctx context.Context, key string) ([]SiteDatum, err
 	return items, nil
 }
 
-const listSiteKeys = `-- name: ListSiteKeys :many
-SELECT DISTINCT
-  key
-FROM
-  site_data
-ORDER BY
-  key ASC
-`
-
-func (q *Queries) ListSiteKeys(ctx context.Context) ([]string, error) {
-	rows, err := q.db.Query(ctx, listSiteKeys)
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-	var items []string
-	for rows.Next() {
-		var key string
-		if err := rows.Scan(&key); err != nil {
-			return nil, err
-		}
-		items = append(items, key)
-	}
-	if err := rows.Err(); err != nil {
-		return nil, err
-	}
-	return items, nil
-}
-
 const popScheduledSiteChanges = `-- name: PopScheduledSiteChanges :many
 UPDATE
   site_data

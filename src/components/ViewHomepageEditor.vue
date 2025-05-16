@@ -1,32 +1,131 @@
 <script>
-import { get, post, getSiteData, postSiteData } from "@/api/client-v2.js";
-import usePicks from "@/api/editors-picks.js";
+import { reactive, computed, toRefs, watch } from "vue";
 
+import { useClient } from "@/api/client.js";
+import { makeState } from "@/api/service-util.js";
+
+import Page from "@/api/spotlightpa-all-pages-item.js";
 import { formatDateTime, today, tomorrow } from "@/utils/time-format.js";
 import useScrollTo from "@/utils/use-scroll-to.js";
+import maybeDate from "@/utils/maybe-date.js";
+
+class EditorsPicksData {
+  constructor(siteConfig, pagesByPath) {
+    this.pagesByPath = pagesByPath;
+    this.reset(siteConfig);
+  }
+
+  reset(siteConfig) {
+    for (let prop of [
+      "featuredStories",
+      "subfeatures",
+      "topSlots",
+      "topper",
+      "edCallout",
+      "edInvestigations",
+      "edImpact",
+    ]) {
+      let a = siteConfig.data?.[prop] ?? [];
+      this[prop] = a.map((s) => this.pagesByPath.get(s)).filter((a) => !!a);
+    }
+    this.scheduleFor = maybeDate(siteConfig, "schedule_for");
+    this.publishedAt = maybeDate(siteConfig, "published_at");
+    this.isCurrent = !!this.publishedAt;
+  }
+
+  clone(scheduleFor) {
+    let { data } = JSON.parse(JSON.stringify(this));
+    let newPick = new EditorsPicksData(
+      {
+        schedule_for: scheduleFor,
+        data,
+        published_at: null,
+      },
+      this.pagesByPath
+    );
+    return newPick;
+  }
+
+  toJSON() {
+    const getPath = (a) => a.filePath;
+    return {
+      schedule_for: this.scheduleFor,
+      data: {
+        featuredStories: this.featuredStories.map(getPath),
+        subfeatures: this.subfeatures.map(getPath),
+        topSlots: this.topSlots.map(getPath),
+        topper: this.topper.map(getPath),
+        edCallout: this.edCallout.map(getPath),
+        edInvestigations: this.edInvestigations.map(getPath),
+        edImpact: this.edImpact.map(getPath),
+      },
+    };
+  }
+}
 
 export default {
   setup() {
     const [container, scrollTo] = useScrollTo();
-    const picks = usePicks({
-      fetchData: () => get(getSiteData + "?location=data/editorsPicks.json"),
-      saveData: (data) =>
-        post(postSiteData + "?location=data/editorsPicks.json", data),
-    });
 
+    let { listAllPages, getEditorsPicks, saveEditorsPicks } = useClient();
+    let { apiState: listState, exec: listExec } = makeState();
+    let { apiState: edPicksState, exec: edPickExec } = makeState();
+    let state = reactive({
+      isLoading: computed(() => listState.isLoading || edPicksState.isLoading),
+      error: computed(() => listState.error ?? edPicksState.error),
+      pages: computed(
+        () => listState.rawData?.pages.map((p) => new Page(p)) ?? []
+      ),
+      pagesByPath: computed(
+        () => new Map(state.pages.map((p) => [p.filePath, p]))
+      ),
+      rawPicks: computed(() => edPicksState.rawData?.configs ?? []),
+      allEdPicks: [],
+      nextSchedule: null,
+    });
+    let actions = {
+      reload() {
+        return Promise.all([
+          listExec(listAllPages),
+          edPickExec(getEditorsPicks),
+        ]);
+      },
+      save() {
+        return edPickExec(() =>
+          saveEditorsPicks({
+            configs: state.allEdPicks,
+          })
+        );
+      },
+      reset() {
+        let { pages, rawPicks } = state;
+        if (!pages.length || !rawPicks.length) {
+          return;
+        }
+        state.allEdPicks = rawPicks.map(
+          (data) => new EditorsPicksData(data, state.pagesByPath)
+        );
+      },
+    };
+    watch(
+      () => [state.pages, state.rawPicks],
+      () => actions.reset(),
+      { deep: true }
+    );
+    actions.reload();
     return {
       container,
-      ...picks,
+      ...toRefs(state),
+      ...actions,
       formatDateTime,
       async addScheduledPicks() {
-        let lastPick =
-          picks.allEdPicks.value[picks.allEdPicks.value.length - 1];
-        picks.allEdPicks.value.push(lastPick.clone(picks.nextSchedule.value));
-        picks.nextSchedule.value = null;
+        let lastPick = state.allEdPicks[state.allEdPicks.length - 1];
+        state.allEdPicks.push(lastPick.clone(state.nextSchedule));
+        state.nextSchedule = null;
         await scrollTo();
       },
       removeScheduledPick(i) {
-        picks.allEdPicks.value.splice(i, 1);
+        state.allEdPicks.splice(i, 1);
       },
       today,
       tomorrow,
@@ -108,8 +207,8 @@ export default {
       <button
         type="button"
         class="button is-primary has-text-weight-semibold"
-        :disabled="isLoadingThrottled || null"
-        :class="{ 'is-loading': isLoadingThrottled }"
+        :disabled="isLoading || null"
+        :class="{ 'is-loading': isLoading }"
         @click="save"
       >
         Save
@@ -117,15 +216,15 @@ export default {
       <button
         type="button"
         class="button is-light has-text-weight-semibold"
-        :disabled="isLoadingThrottled || null"
-        :class="{ 'is-loading': isLoadingThrottled }"
+        :disabled="isLoading || null"
+        :class="{ 'is-loading': isLoading }"
         @click="reset"
       >
         Revert
       </button>
     </div>
 
-    <SpinnerProgress :is-loading="isLoadingThrottled"></SpinnerProgress>
+    <SpinnerProgress :is-loading="isLoading"></SpinnerProgress>
     <ErrorReloader :error="error" @reload="reload"></ErrorReloader>
   </div>
 </template>
