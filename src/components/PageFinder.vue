@@ -72,6 +72,7 @@ export default {
       :model-value="pages"
       item-key="id"
       :sort="false"
+      :clone="(obj) => obj.filePath"
       :group="{ name: 'articles', pull: 'clone', put: false }"
       ghost-class="is-info"
       chosen-class="is-active"
