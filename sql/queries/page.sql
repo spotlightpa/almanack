@@ -169,6 +169,28 @@ FROM
 ORDER BY
   publication_date DESC;
 
+-- name: ListAllPages :many
+SELECT
+  id,
+  file_path,
+  coalesce(frontmatter ->> 'internal-id', '')::text AS internal_id,
+  coalesce(frontmatter ->> 'title', '')::text AS hed,
+  ARRAY (
+    SELECT
+      jsonb_array_elements_text(
+        CASE WHEN frontmatter ->> 'authors' IS NOT NULL THEN
+          frontmatter -> 'authors'
+        ELSE
+          '[]'::jsonb
+        END))::text[] AS authors,
+  publication_date::timestamptz AS pub_date
+FROM
+  page
+WHERE
+  publication_date IS NOT NULL
+ORDER BY
+  publication_date DESC;
+
 -- name: ListPagesByURLPaths :many
 WITH query_paths AS (
   SELECT

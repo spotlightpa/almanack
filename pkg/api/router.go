@@ -49,6 +49,8 @@ func (app *appEnv) routes() http.Handler {
 	spotlightMW := authMW.With(app.hasRoleMiddleware("Spotlight PA"))
 
 	// Start Spotlight endpoints
+	mux.Handle(`GET /api/all-pages`,
+		spotlightMW.HandlerFunc(app.listAllPages))
 	mux.Handle(`GET /api/all-series`,
 		spotlightMW.HandlerFunc(app.listAllSeries))
 	mux.Handle(`GET /api/all-topics`,
@@ -65,6 +67,10 @@ func (app *appEnv) routes() http.Handler {
 		spotlightMW.HandlerFunc(app.postSignedUpload))
 	mux.Handle(`POST /api/donor-wall`,
 		spotlightMW.Controller(app.postDonorWall))
+	mux.Handle(`GET /api/editors-picks`,
+		spotlightMW.HandlerFunc(app.getSiteData(almanack.HomepageLoc)))
+	mux.Handle(`POST /api/editors-picks`,
+		spotlightMW.HandlerFunc(app.setSiteData((almanack.HomepageLoc))))
 	mux.Handle(`POST /api/files-create`,
 		spotlightMW.HandlerFunc(app.postFileCreate))
 	mux.Handle(`GET /api/files-list`,
@@ -100,17 +106,17 @@ func (app *appEnv) routes() http.Handler {
 	mux.Handle(`POST /api/shared-article-from-gdocs`,
 		spotlightMW.HandlerFunc(app.postSharedArticleFromGDocs))
 	mux.Handle(`GET /api/sidebar`,
-		spotlightMW.HandlerFunc(app.siteDataGet(almanack.SidebarLoc)))
+		spotlightMW.HandlerFunc(app.getSiteData(almanack.SidebarLoc)))
 	mux.Handle(`POST /api/sidebar`,
-		spotlightMW.HandlerFunc(app.siteDataSet((almanack.SidebarLoc))))
-	mux.Handle(`GET /api/site-data`,
-		spotlightMW.Controller(app.getSiteData))
-	mux.Handle(`POST /api/site-data`,
-		spotlightMW.Controller(app.postSiteData))
+		spotlightMW.HandlerFunc(app.setSiteData((almanack.SidebarLoc))))
 	mux.Handle(`GET /api/site-params`,
-		spotlightMW.HandlerFunc(app.siteDataGet(almanack.SiteParamsLoc)))
+		spotlightMW.HandlerFunc(app.getSiteData(almanack.SiteParamsLoc)))
 	mux.Handle(`POST /api/site-params`,
-		spotlightMW.HandlerFunc(app.siteDataSet((almanack.SiteParamsLoc))))
+		spotlightMW.HandlerFunc(app.setSiteData((almanack.SiteParamsLoc))))
+	mux.Handle(`GET /api/state-college-editor`,
+		spotlightMW.HandlerFunc(app.getSiteData(almanack.StateCollegeLoc)))
+	mux.Handle(`POST /api/state-college-editor`,
+		spotlightMW.HandlerFunc(app.setSiteData((almanack.StateCollegeLoc))))
 	// End spotlight endpoints
 
 	// Don't trust this middleware!

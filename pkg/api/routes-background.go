@@ -11,6 +11,7 @@ import (
 	"github.com/spotlightpa/almanack/internal/db"
 	"github.com/spotlightpa/almanack/internal/paginate"
 	"github.com/spotlightpa/almanack/internal/timex"
+	"github.com/spotlightpa/almanack/pkg/almanack"
 	"github.com/spotlightpa/almanack/pkg/almlog"
 )
 
@@ -60,13 +61,11 @@ func (app *appEnv) backgroundCron(w http.ResponseWriter, r *http.Request) http.H
 				app.logErr(r.Context(), warning)
 			}
 			errs = append(errs, poperr)
-			keys, err := app.svc.Queries.ListSiteKeys(r.Context())
-			if err != nil {
-				return err
-			}
-			for _, key := range keys {
-				errs = append(errs, app.svc.PopScheduledSiteChanges(r.Context(), key))
-			}
+			// TODO: Query all locations from DB side
+			errs = append(errs, app.svc.PopScheduledSiteChanges(r.Context(), almanack.HomepageLoc))
+			errs = append(errs, app.svc.PopScheduledSiteChanges(r.Context(), almanack.SidebarLoc))
+			errs = append(errs, app.svc.PopScheduledSiteChanges(r.Context(), almanack.SiteParamsLoc))
+			errs = append(errs, app.svc.PopScheduledSiteChanges(r.Context(), almanack.StateCollegeLoc))
 			return errors.Join(errs...)
 		},
 		func() error {

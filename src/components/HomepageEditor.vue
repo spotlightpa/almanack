@@ -7,7 +7,7 @@ export default {
 
   methods: {
     push(article) {
-      this.editorsPicks.featuredStories.push(article.filePath);
+      this.editorsPicks.featuredStories.push(article);
     },
   },
 };
