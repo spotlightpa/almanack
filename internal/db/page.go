@@ -264,7 +264,7 @@ func (page *Page) ShouldPublish() bool {
 }
 
 func (page *Page) IsNewsyPage() bool {
-	return page.IsNewsPage() || page.IsStateCollegePage()
+	return page.IsNewsPage() || page.IsStateCollegePage() || page.IsBerksPage()
 }
 
 func (page *Page) IsNewsPage() bool {
@@ -273,6 +273,10 @@ func (page *Page) IsNewsPage() bool {
 
 func (page *Page) IsStateCollegePage() bool {
 	return strings.HasPrefix(page.FilePath, "content/statecollege/")
+}
+
+func (page *Page) IsBerksPage() bool {
+	return strings.HasPrefix(page.FilePath, "content/berks/")
 }
 
 func (page *Page) ShouldNotify(oldPage *Page) bool {
