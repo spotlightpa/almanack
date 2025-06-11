@@ -9,7 +9,14 @@ class EditorsPicksData {
   }
 
   reset(siteConfig) {
-    for (let prop of ["featuredStories", "subfeatures", "topSlots", "topper"]) {
+    for (let prop of [
+      "featuredStories",
+      "subfeatures",
+      "topSlots",
+      "edImpact",
+      "edInvestigations",
+      "edCallout",
+    ]) {
       let a = siteConfig.data?.[prop] ?? [];
       this[prop] = [...a];
     }
@@ -35,7 +42,9 @@ class EditorsPicksData {
         featuredStories: this.featuredStories,
         subfeatures: this.subfeatures,
         topSlots: this.topSlots,
-        topper: this.topper,
+        edImpact: this.edImpact,
+        edInvestigations: this.edInvestigations,
+        edCallout: this.edCallout,
       },
     };
   }

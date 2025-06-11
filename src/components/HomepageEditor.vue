@@ -3,6 +3,9 @@
 export default {
   props: {
     editorsPicks: Object,
+    showCallout: Boolean,
+    showInvestigation: Boolean,
+    showImpact: Boolean,
   },
 
   methods: {
@@ -36,38 +39,25 @@ export default {
         <HomepageEditorDraggable
           v-model="editorsPicks.topSlots"
         ></HomepageEditorDraggable>
-        Pin stories at the top of homepage
+        Pin stories at the top left of homepage
       </BulmaField>
-      <BulmaField label="Homepage topper">
-        <HomepageEditorDraggable
-          v-model="editorsPicks.topper"
-        ></HomepageEditorDraggable>
-        If populated, a topper will appear on the homepage with the first story
-        as its featured item and the other stories as bulleted items underneath
-      </BulmaField>
-      <BulmaField
-        v-if="editorsPicks.edCallout"
-        label="Editor's Picks Homepage Callout"
-      >
+      <BulmaField v-if="showCallout" label="Editor's Picks Homepage Callout">
         <HomepageEditorDraggable
           v-model="editorsPicks.edCallout"
         ></HomepageEditorDraggable>
-        New section for homepage redesign
+        Requires at least two stories
       </BulmaField>
-      <BulmaField
-        v-if="editorsPicks.edInvestigations"
-        label="Featured Investigations"
-      >
+      <BulmaField v-if="showInvestigation" label="Featured Investigations">
         <HomepageEditorDraggable
           v-model="editorsPicks.edInvestigations"
         ></HomepageEditorDraggable>
-        New section for homepage redesign
+        Shows an investigation on a black background
       </BulmaField>
-      <BulmaField v-if="editorsPicks.edImpact" label="Featured Impact">
+      <BulmaField v-if="showImpact" label="Featured Impact">
         <HomepageEditorDraggable
           v-model="editorsPicks.edImpact"
         ></HomepageEditorDraggable>
-        New section for homepage redesign
+        Requires at least two stories
       </BulmaField>
     </div>
   </div>

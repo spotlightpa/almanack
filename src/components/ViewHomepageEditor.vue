@@ -58,7 +58,12 @@ export default {
               : `Scheduled for ${formatDateTime(edpick.scheduleFor)}`
           }}
         </h2>
-        <HomepageEditor :editors-picks="edpick"></HomepageEditor>
+        <HomepageEditor
+          :editors-picks="edpick"
+          :show-callout="true"
+          :show-investigation="true"
+          :show-impact="true"
+        ></HomepageEditor>
         <button
           v-if="!edpick.isCurrent"
           type="button"
