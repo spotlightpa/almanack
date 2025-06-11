@@ -34,4 +34,4 @@ jobs:
           govulncheck -version
 
       - name: Run `govulncheck`
-        run: "echo 'TODO: enable once rangefunc support is added'"
+        run: "govulncheck ./..."
