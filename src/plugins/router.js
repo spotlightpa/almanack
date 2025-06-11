@@ -142,6 +142,14 @@ let router = createRouter({
       },
     },
     {
+      path: "/admin/berks-editor",
+      name: "berks-editor",
+      component: load(() => import("@/components/ViewBerksEditor.vue")),
+      meta: {
+        requiresAuth: isSpotlightPAUser,
+      },
+    },
+    {
       path: "/admin/sidebar-items",
       name: "sidebar-items",
       component: load(() => import("@/components/ViewSidebarItems.vue")),
