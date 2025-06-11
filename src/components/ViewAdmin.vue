@@ -110,6 +110,11 @@ const nextPage = computedProp("next_page", (page) => ({
         to="state-college-editor"
         :icon="['fas', 'newspaper']"
       ></LinkRoute>
+      <LinkRoute
+        label="Berks Frontpage"
+        to="berks-editor"
+        :icon="['fas', 'newspaper']"
+      ></LinkRoute>
     </LinkButtons>
 
     <LinkButtons label="Spotlight PA article pages">
