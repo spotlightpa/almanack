@@ -26,7 +26,7 @@ require (
 	github.com/earthboundkid/xhtml v0.25.2
 	github.com/gabriel-vasile/mimetype v1.4.9
 	github.com/getsentry/sentry-go v0.33.0
-	github.com/go-chi/chi/v5 v5.2.1
+	github.com/go-chi/chi/v5 v5.2.2
 	github.com/go-logfmt/logfmt v0.6.0
 	github.com/google/go-github/v53 v53.2.0
 	github.com/jackc/pgx/v5 v5.7.5
