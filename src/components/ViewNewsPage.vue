@@ -627,6 +627,17 @@ export default {
             <option value="featured"></option>
           </datalist>
         </BulmaField>
+
+        <BulmaFieldCheckbox
+          v-model="page.isDraft"
+          label="Unpublish as draft (for emergency use only!!)"
+        >
+          Emergency unpublish story by marking as draft.
+          <span class="help is-danger">
+            Warning: Unpublishing makes the URL a 404 error, but content can
+            still be found in public archives.
+          </span>
+        </BulmaFieldCheckbox>
       </details>
 
       <BulmaWarnings
