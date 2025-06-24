@@ -61,6 +61,7 @@ export class Page {
     this.extendedKicker = this.frontmatter["extended-kicker"] ?? "";
     this.modalExclude = this.frontmatter["modal-exclude"] ?? false;
     this.suppressDate = this.frontmatter["suppress-date"] ?? false;
+    this.isDraft = this.frontmatter["draft"] ?? false;
     this.isPinned = this.frontmatter["pinned"] ?? false;
     this.noIndex = this.frontmatter["no-index"] ?? null;
     this.overrideURL = this.frontmatter["url"] ?? "";
@@ -236,6 +237,7 @@ export class Page {
         "extended-kicker": this.extendedKicker,
         "modal-exclude": this.modalExclude,
         "suppress-date": this.suppressDate,
+        draft: this.isDraft,
         pinned: this.isPinned,
         "no-index": this.noIndex,
         url: this.overrideURL,
