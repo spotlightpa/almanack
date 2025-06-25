@@ -24,7 +24,7 @@ defineExpose({ saveData });
     <summary class="title is-4">Featured layout promo</summary>
     <p class="mb-4 content">
       Featured layout promo is a large house ad in articles using the featured
-      layout.
+      template.
     </p>
     <BulmaFieldInput
       v-model="data.featuredPromoLink.value"

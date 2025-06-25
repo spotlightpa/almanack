@@ -15,7 +15,7 @@ const adBreaker = ref();
 const adHeadwater = ref();
 const adRail = ref();
 const river = ref();
-const featured = ref();
+const featuredArticle = ref();
 const footer = ref();
 
 function saveParams() {
@@ -35,7 +35,7 @@ function saveParams() {
       ...adHeadwater.value.saveData(),
       ...adRail.value.saveData(),
       ...river.value.saveData(),
-      ...featured.value.saveData(),
+      ...featuredArticle.value.saveData(),
       ...footer.value.saveData(),
     },
   };
@@ -107,11 +107,11 @@ defineExpose({
     :file-props="fileProps"
     :params="params"
   ></SiteParamsSupport>
-  <SiteParamsFeatured
-    ref="featured"
+  <SiteParamsFeaturedArticle
+    ref="featuredArticle"
     :file-props="fileProps"
     :params="params"
-  ></SiteParamsFeatured>
+  ></SiteParamsFeaturedArticle>
 
   <h2 class="mt-5 title is-5">Takeover and sticky ad slots</h2>
   <SiteParamsSticky
