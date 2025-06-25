@@ -1,27 +1,54 @@
 <script setup>
-import { ref } from "vue";
+import useProps from "@/utils/use-props.js";
+import { toRel, toAbs } from "@/utils/link.js";
 
-defineProps({ params: Object, fileProps: Object });
+const props = defineProps({ params: Object, fileProps: Object });
 
-const imageSet = ref(null);
-
-defineExpose({
-  saveData() {
-    return imageSet.value.saveData();
-  },
+const [d, saveData] = useProps(props.params.data, {
+  active: ["ad-featured-active"],
+  imageDescription: ["ad-featured-image-description"],
+  images: ["ad-featured-images"],
+  link: ["ad-featured-link", toAbs, toRel],
 });
+
+defineExpose({ saveData });
 </script>
 
 <template>
   <details class="mt-4">
     <summary class="title is-4">Featured ad</summary>
-    <SiteParamsImageSet
-      ref="imageSet"
-      :params="params"
-      :file-props="fileProps"
-      prop-name="ad-hp-featured"
-      label="Featured ad is 250x300 square near the top of the homepage"
-      text="Show featured ad on homepage"
-    />
+    <BulmaField
+      label="Featured ad is 300x250 square near the top of the homepage"
+    >
+      <div>
+        <label class="checkbox">
+          <input v-model="d.active.value" type="checkbox" />
+          Show featured ad on homepage
+        </label>
+      </div>
+    </BulmaField>
+    <template v-if="d.active.value">
+      <BulmaFieldInput
+        v-model="d.link.value"
+        label="Ad link URL"
+        type="url"
+      ></BulmaFieldInput>
+      <BulmaTextarea
+        v-model="d.imageDescription.value"
+        label="Image description (alt text)"
+        help="For blind readers and search engines"
+      ></BulmaTextarea>
+      <BulmaField
+        label="Images"
+        help="If multiple images are provided, each page load will select one randomly"
+      >
+        <SiteParamsFiles
+          :files="d.images.value"
+          :file-props="fileProps"
+          @add="d.images.value.push($event)"
+          @remove="d.images.value.splice($event, 1)"
+        ></SiteParamsFiles>
+      </BulmaField>
+    </template>
   </details>
 </template>
