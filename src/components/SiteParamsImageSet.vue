@@ -59,6 +59,12 @@ defineExpose({
     <ul>
       <li v-for="(image, n) of imageSet" :key="image.id" class="zebra-row">
         <BulmaFieldInput
+          v-model="image.label"
+          label="Banner label"
+          placeholder="Sponsored by Acme"
+          help="Text accompanying a banner specifying the sponsor or presenter"
+        />
+        <BulmaFieldInput
           v-model="image.link"
           label="Link URL"
           type="url"
