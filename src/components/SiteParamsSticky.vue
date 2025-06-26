@@ -10,7 +10,6 @@ export default {
       stickyImageDescription: ["sticky-image-description"],
       stickyImages: ["sticky-images"],
       stickyLink: ["sticky-link", toAbs, toRel],
-      newsletterActive: ["newsletter-active"],
     });
     return {
       ...data,
@@ -54,17 +53,5 @@ export default {
         ></SiteParamsFiles>
       </BulmaField>
     </div>
-
-    <BulmaField
-      label="Newsletter"
-      help="Pop up is full screen newsletter takeover"
-    >
-      <div>
-        <label class="checkbox">
-          <input v-model="newsletterActive" type="checkbox" />
-          Show newsletter pop up
-        </label>
-      </div>
-    </BulmaField>
   </details>
 </template>

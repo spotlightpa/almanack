@@ -3,40 +3,42 @@ import { ref } from "vue";
 
 const props = defineProps({ params: Object, fileProps: Object });
 
-const banner = ref();
-const topper = ref();
-const top = ref();
-const sticky = ref();
-const takeover = ref();
-const sidebar = ref();
-const support = ref();
-const adFeatured = ref();
 const adBreaker = ref();
+const adFeatured = ref();
 const adHeadwater = ref();
 const adRail = ref();
-const river = ref();
+const banner = ref();
 const featuredArticle = ref();
 const footer = ref();
+const newsletter = ref();
+const river = ref();
+const sidebar = ref();
+const sticky = ref();
+const support = ref();
+const takeover = ref();
+const top = ref();
+const topper = ref();
 
 function saveParams() {
   return {
     schedule_for: props.params.scheduleFor,
     data: {
       ...props.params.data,
-      ...banner.value.saveData(),
-      ...topper.value.saveData(),
-      ...top.value.saveData(),
-      ...sticky.value.saveData(),
-      ...takeover.value.saveData(),
-      ...sidebar.value.saveData(),
-      ...support.value.saveData(),
-      ...adFeatured.value.saveData(),
       ...adBreaker.value.saveData(),
+      ...adFeatured.value.saveData(),
       ...adHeadwater.value.saveData(),
       ...adRail.value.saveData(),
-      ...river.value.saveData(),
+      ...banner.value.saveData(),
       ...featuredArticle.value.saveData(),
       ...footer.value.saveData(),
+      ...newsletter.value.saveData(),
+      ...river.value.saveData(),
+      ...sidebar.value.saveData(),
+      ...sticky.value.saveData(),
+      ...support.value.saveData(),
+      ...takeover.value.saveData(),
+      ...top.value.saveData(),
+      ...topper.value.saveData(),
     },
   };
 }
@@ -113,12 +115,17 @@ defineExpose({
     :params="params"
   ></SiteParamsFeaturedArticle>
 
-  <h2 class="mt-5 title is-5">Takeover and sticky ad slots</h2>
+  <h2 class="mt-5 title is-5">Sticky and popup ad slots</h2>
   <SiteParamsSticky
     ref="sticky"
     :file-props="fileProps"
     :params="params"
   ></SiteParamsSticky>
+  <SiteParamsNewsletter
+    ref="newsletter"
+    :file-props="fileProps"
+    :params="params"
+  ></SiteParamsNewsletter>
   <SiteParamsTakeover
     ref="takeover"
     :file-props="fileProps"
