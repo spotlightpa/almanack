@@ -32,7 +32,7 @@ export default {
         </label>
       </div>
     </BulmaField>
-    <template v-if="takeoverActive">
+    <div v-show="takeoverActive">
       <BulmaFieldInput
         v-model="takeoverHed"
         label="Hed for takeover"
@@ -56,6 +56,6 @@ export default {
           <BulmaPaste @paste="takeoverImage = $event"></BulmaPaste>
         </div>
       </BulmaField>
-    </template>
+    </div>
   </details>
 </template>

@@ -6,7 +6,7 @@ import { toRel, toAbs } from "@/utils/link.js";
 import sanitizeText from "@/utils/sanitize-text.js";
 
 function cleanText(text) {
-  return text
+  return (text ?? "")
     .split("\n")
     .map((p) => sanitizeText(p))
     .join("\n");
@@ -49,7 +49,7 @@ export default {
         </label>
       </div>
     </BulmaField>
-    <template v-if="supportActive">
+    <div v-show="supportActive">
       <BulmaFieldInput
         v-model="supportLink"
         label="Support box link"
@@ -129,7 +129,7 @@ export default {
           </div>
         </div>
       </BulmaField>
-    </template>
+    </div>
   </details>
 </template>
 

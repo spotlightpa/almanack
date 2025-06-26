@@ -27,7 +27,7 @@ defineExpose({ saveData });
         </label>
       </div>
     </BulmaField>
-    <template v-if="d.active.value">
+    <div v-show="d.active.value">
       <BulmaFieldInput
         v-model="d.link.value"
         label="Ad link URL"
@@ -49,6 +49,6 @@ defineExpose({ saveData });
           @remove="d.images.value.splice($event, 1)"
         ></SiteParamsFiles>
       </BulmaField>
-    </template>
+    </div>
   </details>
 </template>

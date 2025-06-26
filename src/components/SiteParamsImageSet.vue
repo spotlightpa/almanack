@@ -47,7 +47,7 @@ defineExpose({
   <BulmaFieldCheckbox v-model="active" :label="label" :help="help">
     {{ " " + text }}
   </BulmaFieldCheckbox>
-  <template v-if="active">
+  <div v-show="active">
     <h4 class="title is-5">
       {{ imageSet.length }} promotion{{ imageSet.length !== 1 ? "s" : "" }}
       active
@@ -106,7 +106,7 @@ defineExpose({
         Add promotion to set
       </button>
     </div>
-  </template>
+  </div>
 </template>
 
 <style>
