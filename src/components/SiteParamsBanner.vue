@@ -33,7 +33,7 @@ export default {
         </label>
       </div>
     </BulmaField>
-    <template v-if="bannerActive">
+    <div v-show="bannerActive">
       <BulmaTextarea
         v-model="bannerText"
         label="Banner Text"
@@ -68,6 +68,6 @@ export default {
           </a>
         </div>
       </BulmaField>
-    </template>
+    </div>
   </details>
 </template>

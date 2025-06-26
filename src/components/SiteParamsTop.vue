@@ -37,7 +37,7 @@ export default {
         </label>
       </div>
     </BulmaField>
-    <template v-if="promoActive">
+    <div v-show="promoActive">
       <BulmaFieldInput
         v-model="promoLink"
         label="Top promo link"
@@ -53,13 +53,13 @@ export default {
       </BulmaField>
 
       <BulmaTextarea
-        v-if="promoType === 'text'"
+        v-show="promoType === 'text'"
         v-model="promoText"
         label="Top promo text"
         help="Text will appear between navbar and page content"
       ></BulmaTextarea>
 
-      <template v-if="promoType === 'image'">
+      <div v-show="promoType === 'image'">
         <BulmaTextarea
           v-model="promoImageDescription"
           label="Top promo image description"
@@ -133,7 +133,7 @@ export default {
             @remove="promoMobileImages.splice($event, 1)"
           ></SiteParamsFiles>
         </BulmaField>
-      </template>
-    </template>
+      </div>
+    </div>
   </details>
 </template>

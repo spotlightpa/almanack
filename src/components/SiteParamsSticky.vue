@@ -31,7 +31,7 @@ export default {
         </label>
       </div>
     </BulmaField>
-    <template v-if="stickyActive">
+    <div v-show="stickyActive">
       <BulmaFieldInput
         v-model="stickyLink"
         label="Sticky link"
@@ -53,7 +53,7 @@ export default {
           @remove="stickyImages.splice($event, 1)"
         ></SiteParamsFiles>
       </BulmaField>
-    </template>
+    </div>
 
     <BulmaField
       label="Newsletter"

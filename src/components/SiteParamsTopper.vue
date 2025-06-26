@@ -40,7 +40,7 @@ export default {
         </label>
       </div>
     </BulmaField>
-    <template v-if="topperActive">
+    <div v-show="topperActive">
       <BulmaFieldInput
         v-model="topperLink"
         label="Topper link"
@@ -131,6 +131,6 @@ export default {
           @remove="topperMobileImages.splice($event, 1)"
         ></SiteParamsFiles>
       </BulmaField>
-    </template>
+    </div>
   </details>
 </template>
