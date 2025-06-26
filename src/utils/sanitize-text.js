@@ -1,6 +1,6 @@
 export default function sanitizeText(text) {
   let el = document.createElement("div");
-  el.innerText = text;
+  el.innerText = text ?? "";
   text = el.innerHTML;
   text = text
     .replace(/&lt;strong&gt;/g, "<strong>")
