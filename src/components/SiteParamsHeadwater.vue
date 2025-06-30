@@ -18,24 +18,24 @@ defineExpose({
 
 <template>
   <details class="mt-4">
-    <summary class="title is-4">Footer ad</summary>
+    <summary class="title is-4">Homepage headwater ad</summary>
     <SiteParamsImageSet
       ref="desktopImageSet"
       :params="params"
       :file-props="fileProps"
       :show-width-height="true"
-      prop-name="ad-footer-desktop"
-      label="Footer desktop ad is a rectangular ad at the bottom of the page"
-      text="Show footer ad on desktop"
+      prop-name="ad-hp-headwater-desktop"
+      label="Desktop headerwater ad is a rectangular ad before the homepage river"
+      text="Show headwater ad on desktop"
     />
     <SiteParamsImageSet
       ref="mobileImageSet"
       :params="params"
       :file-props="fileProps"
       :show-width-height="false"
-      prop-name="ad-footer-mobile"
-      label="Footer mobile ad is 300x250 square at the bottom of the page"
-      text="Show footer ad on mobile"
+      prop-name="ad-hp-headwater-mobile"
+      label="Mobile headwater ad is a 300x250 square before the homepage river"
+      text="Show headwater ad on mobile"
     />
   </details>
 </template>

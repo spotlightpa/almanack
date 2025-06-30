@@ -8,6 +8,7 @@ const adFeatured = ref();
 const adHeadwater = ref();
 const adRail = ref();
 const banner = ref();
+const header = ref();
 const featuredArticle = ref();
 const footer = ref();
 const newsletter = ref();
@@ -16,8 +17,6 @@ const sidebar = ref();
 const sticky = ref();
 const support = ref();
 const takeover = ref();
-const top = ref();
-const topper = ref();
 
 function saveParams() {
   return {
@@ -29,6 +28,7 @@ function saveParams() {
       ...adHeadwater.value.saveData(),
       ...adRail.value.saveData(),
       ...banner.value.saveData(),
+      ...header.value.saveData(),
       ...featuredArticle.value.saveData(),
       ...footer.value.saveData(),
       ...newsletter.value.saveData(),
@@ -37,8 +37,6 @@ function saveParams() {
       ...sticky.value.saveData(),
       ...support.value.saveData(),
       ...takeover.value.saveData(),
-      ...top.value.saveData(),
-      ...topper.value.saveData(),
     },
   };
 }
@@ -55,21 +53,11 @@ defineExpose({
     :file-props="fileProps"
     :params="params"
   ></SiteParamsBanner>
-  <SiteParamsTopper
-    ref="topper"
+  <SiteParamsHeader
+    ref="header"
     :file-props="fileProps"
     :params="params"
-  ></SiteParamsTopper>
-  <SiteParamsTop
-    ref="top"
-    :file-props="fileProps"
-    :params="params"
-  ></SiteParamsTop>
-  <SiteParamsSidebar
-    ref="sidebar"
-    :file-props="fileProps"
-    :params="params"
-  ></SiteParamsSidebar>
+  ></SiteParamsHeader>
   <SiteParamsFooter
     ref="footer"
     :file-props="fileProps"
@@ -77,26 +65,26 @@ defineExpose({
   ></SiteParamsFooter>
 
   <h2 class="mt-5 title is-5">Homepage ad slots</h2>
-  <SiteParamsAdFeatured
+  <SiteParamsFeaturedHomepage
     ref="adFeatured"
     :file-props="fileProps"
     :params="params"
-  ></SiteParamsAdFeatured>
-  <SiteParamsAdBreaker
+  ></SiteParamsFeaturedHomepage>
+  <SiteParamsBreaker
     ref="adBreaker"
     :file-props="fileProps"
     :params="params"
-  ></SiteParamsAdBreaker>
-  <SiteParamsAdHeadwater
+  ></SiteParamsBreaker>
+  <SiteParamsHeadwater
     ref="adHeadwater"
     :file-props="fileProps"
     :params="params"
-  ></SiteParamsAdHeadwater>
-  <SiteParamsAdRail
+  ></SiteParamsHeadwater>
+  <SiteParamsRail
     ref="adRail"
     :file-props="fileProps"
     :params="params"
-  ></SiteParamsAdRail>
+  ></SiteParamsRail>
   <SiteParamsRiver
     ref="river"
     :file-props="fileProps"
@@ -104,6 +92,11 @@ defineExpose({
   ></SiteParamsRiver>
 
   <h2 class="mt-5 title is-5">Article page ad slots</h2>
+  <SiteParamsSidebar
+    ref="sidebar"
+    :file-props="fileProps"
+    :params="params"
+  ></SiteParamsSidebar>
   <SiteParamsSupport
     ref="support"
     :file-props="fileProps"

@@ -8,28 +8,44 @@ const props = defineProps({
   text: String,
   help: String,
   fileProps: Object,
+  showWidthHeight: Boolean,
 });
 let n = 0;
 
 function deserialize(v) {
   let a = v || [];
-  return a.map((o) => ({ ...o, id: n++ }));
+  return a.map((o) => ({
+    ...o,
+    id: n++,
+  }));
 }
 
 function serialize(v) {
   return v.map((o) => ({ ...o, id: undefined }));
 }
 
-let [{ imageSet, active }, saveData] = useProps(props.params.data, {
-  imageSet: [props.propName, deserialize, serialize],
-  active: [props.propName + "-active", (v) => v ?? false],
-});
+let widthHeightProps = props.showWidthHeight
+  ? {
+      width: [props.propName + "-width", (v) => v ?? 0],
+      height: [props.propName + "-height", (v) => v ?? 0],
+    }
+  : {};
+
+let [{ imageSet, active, width, height }, saveData] = useProps(
+  props.params.data,
+  {
+    imageSet: [props.propName, deserialize, serialize],
+    active: [props.propName + "-active", (v) => v ?? false],
+    ...widthHeightProps,
+  }
+);
 
 function pushImage() {
   imageSet.value.push({
     id: n++,
+    label: "",
     link: "https://www.spotlightpa.org/donate/",
-    description: "Lorem ipsum",
+    description: "",
     sources: [],
   });
 }
@@ -48,6 +64,27 @@ defineExpose({
     {{ " " + text }}
   </BulmaFieldCheckbox>
   <div v-show="active">
+    <template v-if="showWidthHeight">
+      <p class="help">Set size for promotions</p>
+      <div class="is-flex mb-2">
+        <BulmaField v-slot="{ idForLabel }" label="Image width">
+          <input
+            :id="idForLabel"
+            v-model.number="width"
+            class="input"
+            inputmode="numeric"
+          />
+        </BulmaField>
+        <BulmaField v-slot="{ idForLabel }" class="ml-2" label="Image height">
+          <input
+            :id="idForLabel"
+            v-model.number="height"
+            class="input"
+            inputmode="numeric"
+          />
+        </BulmaField>
+      </div>
+    </template>
     <h4 class="title is-5">
       {{ imageSet.length }} promotion{{ imageSet.length !== 1 ? "s" : "" }}
       active
@@ -77,7 +114,7 @@ defineExpose({
         />
         <BulmaField
           label="Images"
-          help="If multiple images are provided, each page load will select one randomly"
+          help="If multiple images are provided for the same promotion, each page load will select one randomly"
         >
           <SiteParamsFiles
             :files="image.sources"
@@ -97,7 +134,7 @@ defineExpose({
         </div>
       </li>
     </ul>
-    <div class="mt-5 buttons">
+    <div class="my-5 buttons">
       <button
         type="button"
         class="button is-success has-text-weight-semibold"
