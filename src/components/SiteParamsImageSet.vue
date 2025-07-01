@@ -44,6 +44,7 @@ function pushImage() {
   imageSet.value.push({
     id: n++,
     label: "",
+    labelLink: "",
     link: "https://www.spotlightpa.org/donate/",
     description: "",
     sources: [],
@@ -94,21 +95,27 @@ defineExpose({
       load.
     </h5>
     <ul>
-      <li v-for="(image, n) of imageSet" :key="image.id" class="zebra-row">
+      <li v-for="(promo, n) of imageSet" :key="promo.id" class="zebra-row">
         <BulmaFieldInput
-          v-model="image.label"
+          v-model="promo.label"
           label="Banner label"
           placeholder="Sponsored by Acme"
           help="Text accompanying a banner specifying the sponsor or presenter"
         />
         <BulmaFieldInput
-          v-model="image.link"
+          v-model="promo.labelLink"
+          label="Banner label link"
+          placeholder="https://www.spotlightpa.org/support/"
+          help="Link that clicking the ad label will go to"
+        />
+        <BulmaFieldInput
+          v-model="promo.link"
           label="Link URL"
           type="url"
           placeholder="https://www.spotlightpa.org/donate/"
         />
         <BulmaTextarea
-          v-model="image.description"
+          v-model="promo.description"
           label="Image description (alt text)"
           help="For blind readers and search engines"
         />
@@ -117,10 +124,10 @@ defineExpose({
           help="If multiple images are provided for the same promotion, each page load will select one randomly"
         >
           <SiteParamsFiles
-            :files="image.sources"
+            :files="promo.sources"
             :file-props="fileProps"
-            @add="image.sources.push($event)"
-            @remove="image.sources.splice($event, 1)"
+            @add="promo.sources.push($event)"
+            @remove="promo.sources.splice($event, 1)"
           />
         </BulmaField>
         <div class="mt-1 mb-2 buttons">
