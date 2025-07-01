@@ -33,7 +33,7 @@ require (
 	github.com/jackc/tern/v2 v2.3.3
 	github.com/microcosm-cc/bluemonday v1.0.27
 	github.com/tdewolff/minify/v2 v2.23.8
-	gocloud.dev v0.42.0
+	gocloud.dev v0.41.0
 	golang.org/x/net v0.41.0
 	golang.org/x/oauth2 v0.30.0
 	google.golang.org/api v0.239.0
