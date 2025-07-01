@@ -20,34 +20,36 @@ export default {
       <table class="table is-striped is-narrow is-fullwidth">
         <tbody>
           <tr v-for="file in files" :key="file.id">
-            <a
-              class="is-flex-tablet p-1 has-text-black"
-              @click="$emit('select-file', file)"
-            >
-              <div>
-                <div class="clamped-3">
-                  <span class="has-text-weight-semibold">
-                    {{ file.filename
-                    }}<template v-if="file.description">: </template>
-                  </span>
-                  <span class="has-text-grey">
-                    {{ file.description }}
-                  </span>
-                  {{ " " }}
-                  <span>
-                    {{ formatDate(file.created_at) }}
-                  </span>
-                  {{ " " }}
-                  <span class="has-text-grey">
-                    {{ formatTime(file.created_at) }}
-                  </span>
-                  {{ " " }}
-                  <span v-if="file.bytes">
-                    {{ humanSize(file.bytes) }}
-                  </span>
+            <td>
+              <a
+                class="is-flex-tablet p-1 has-text-black"
+                @click="$emit('select-file', file)"
+              >
+                <div>
+                  <div class="clamped-3">
+                    <span class="has-text-weight-semibold">
+                      {{ file.filename
+                      }}<template v-if="file.description">: </template>
+                    </span>
+                    <span class="has-text-grey">
+                      {{ file.description }}
+                    </span>
+                    {{ " " }}
+                    <span>
+                      {{ formatDate(file.created_at) }}
+                    </span>
+                    {{ " " }}
+                    <span class="has-text-grey">
+                      {{ formatTime(file.created_at) }}
+                    </span>
+                    {{ " " }}
+                    <span v-if="file.bytes">
+                      {{ humanSize(file.bytes) }}
+                    </span>
+                  </div>
                 </div>
-              </div>
-            </a>
+              </a>
+            </td>
           </tr>
         </tbody>
       </table>
