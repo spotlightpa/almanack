@@ -14,13 +14,13 @@ defineExpose({
 
 <template>
   <details class="mt-4">
-    <summary class="title is-4">Sidebar top</summary>
+    <summary class="title is-4">Article rail top</summary>
     <SiteParamsImageSet
       ref="imageSet"
       :params="params"
       :file-props="fileProps"
       :show-width-height="false"
-      prop-name="ad-sidebar-top"
+      prop-name="ad-art-rail"
       label="Sidebar top ad is a 300x250 ad on the article rail sidebar"
       text="Show sidebar top ad"
     />

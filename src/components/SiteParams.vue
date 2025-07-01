@@ -3,17 +3,17 @@ import { ref } from "vue";
 
 const props = defineProps({ params: Object, fileProps: Object });
 
-const adBreaker = ref();
-const adFeatured = ref();
-const adHeadwater = ref();
-const adRail = ref();
 const banner = ref();
-const header = ref();
+const breaker = ref();
 const featuredArticle = ref();
+const featuredHomepage = ref();
 const footer = ref();
+const header = ref();
+const headwater = ref();
 const newsletter = ref();
+const railArticle = ref();
+const railHomepage = ref();
 const river = ref();
-const sidebar = ref();
 const sticky = ref();
 const support = ref();
 const takeover = ref();
@@ -23,17 +23,17 @@ function saveParams() {
     schedule_for: props.params.scheduleFor,
     data: {
       ...props.params.data,
-      ...adBreaker.value.saveData(),
-      ...adFeatured.value.saveData(),
-      ...adHeadwater.value.saveData(),
-      ...adRail.value.saveData(),
       ...banner.value.saveData(),
-      ...header.value.saveData(),
+      ...breaker.value.saveData(),
       ...featuredArticle.value.saveData(),
+      ...featuredHomepage.value.saveData(),
       ...footer.value.saveData(),
+      ...header.value.saveData(),
+      ...headwater.value.saveData(),
       ...newsletter.value.saveData(),
+      ...railArticle.value.saveData(),
+      ...railHomepage.value.saveData(),
       ...river.value.saveData(),
-      ...sidebar.value.saveData(),
       ...sticky.value.saveData(),
       ...support.value.saveData(),
       ...takeover.value.saveData(),
@@ -66,25 +66,25 @@ defineExpose({
 
   <h2 class="mt-5 title is-5">Homepage ad slots</h2>
   <SiteParamsFeaturedHomepage
-    ref="adFeatured"
+    ref="featuredHomepage"
     :file-props="fileProps"
     :params="params"
   ></SiteParamsFeaturedHomepage>
   <SiteParamsBreaker
-    ref="adBreaker"
+    ref="breaker"
     :file-props="fileProps"
     :params="params"
   ></SiteParamsBreaker>
   <SiteParamsHeadwater
-    ref="adHeadwater"
+    ref="headwater"
     :file-props="fileProps"
     :params="params"
   ></SiteParamsHeadwater>
-  <SiteParamsRail
-    ref="adRail"
+  <SiteParamsRailHomepage
+    ref="railHomepage"
     :file-props="fileProps"
     :params="params"
-  ></SiteParamsRail>
+  ></SiteParamsRailHomepage>
   <SiteParamsRiver
     ref="river"
     :file-props="fileProps"
@@ -92,11 +92,11 @@ defineExpose({
   ></SiteParamsRiver>
 
   <h2 class="mt-5 title is-5">Article page ad slots</h2>
-  <SiteParamsSidebar
-    ref="sidebar"
+  <SiteParamsRailArticle
+    ref="railArticle"
     :file-props="fileProps"
     :params="params"
-  ></SiteParamsSidebar>
+  ></SiteParamsRailArticle>
   <SiteParamsSupport
     ref="support"
     :file-props="fileProps"
