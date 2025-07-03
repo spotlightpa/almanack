@@ -11,8 +11,8 @@ const footer = ref();
 const header = ref();
 const headwater = ref();
 const newsletter = ref();
-const railArticle = ref();
-const railHomepage = ref();
+const railSticky = ref();
+const railTop = ref();
 const river = ref();
 const sticky = ref();
 const support = ref();
@@ -31,8 +31,8 @@ function saveParams() {
       ...header.value.saveData(),
       ...headwater.value.saveData(),
       ...newsletter.value.saveData(),
-      ...railArticle.value.saveData(),
-      ...railHomepage.value.saveData(),
+      ...railSticky.value.saveData(),
+      ...railTop.value.saveData(),
       ...river.value.saveData(),
       ...sticky.value.saveData(),
       ...support.value.saveData(),
@@ -58,6 +58,16 @@ defineExpose({
     :file-props="fileProps"
     :params="params"
   ></SiteParamsHeader>
+  <SiteParamsRailTop
+    ref="railTop"
+    :file-props="fileProps"
+    :params="params"
+  ></SiteParamsRailTop>
+  <SiteParamsRailSticky
+    ref="railSticky"
+    :file-props="fileProps"
+    :params="params"
+  ></SiteParamsRailSticky>
   <SiteParamsFooter
     ref="footer"
     :file-props="fileProps"
@@ -80,11 +90,6 @@ defineExpose({
     :file-props="fileProps"
     :params="params"
   ></SiteParamsHeadwater>
-  <SiteParamsRailHomepage
-    ref="railHomepage"
-    :file-props="fileProps"
-    :params="params"
-  ></SiteParamsRailHomepage>
   <SiteParamsRiver
     ref="river"
     :file-props="fileProps"
@@ -92,11 +97,6 @@ defineExpose({
   ></SiteParamsRiver>
 
   <h2 class="mt-5 title is-5">Article page ad slots</h2>
-  <SiteParamsRailArticle
-    ref="railArticle"
-    :file-props="fileProps"
-    :params="params"
-  ></SiteParamsRailArticle>
   <SiteParamsSupport
     ref="support"
     :file-props="fileProps"
