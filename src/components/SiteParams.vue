@@ -125,3 +125,12 @@ defineExpose({
     :params="params"
   ></SiteParamsTakeover>
 </template>
+
+<style>
+.ad-demo {
+  max-width: 100%;
+  width: 500px;
+  margin-inline: auto;
+  display: block;
+}
+</style>

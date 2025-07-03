@@ -1,6 +1,8 @@
 <script setup>
 import { ref } from "vue";
 
+import adImg from "@/assets/img/ad-featured.png";
+
 defineProps({ params: Object, fileProps: Object });
 
 const imageSet = ref(null);
@@ -24,5 +26,6 @@ defineExpose({
       label="Featured ad is 600x500 square near the top of the homepage"
       text="Show homepage featured ad"
     />
+    <img :src="adImg" class="ad-demo" style="" />
   </details>
 </template>

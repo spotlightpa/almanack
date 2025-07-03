@@ -1,6 +1,8 @@
 <script setup>
 import { ref } from "vue";
 
+import adImg from "@/assets/img/ad-footer.png";
+
 defineProps({ params: Object, fileProps: Object });
 
 const desktopImageSet = ref(null);
@@ -37,5 +39,6 @@ defineExpose({
       label="Footer mobile ad is a square ad at the bottom of the page"
       text="Show footer ad on mobile"
     />
+    <img :src="adImg" class="ad-demo" style="" />
   </details>
 </template>

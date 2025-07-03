@@ -1,6 +1,8 @@
 <script setup>
 import { ref } from "vue";
 
+import adImg from "@/assets/img/ad-breaker.png";
+
 defineProps({ params: Object, fileProps: Object });
 
 const desktopImageSet = ref(null);
@@ -37,5 +39,6 @@ defineExpose({
       label="Mobile breaker ad is a square ad after the featured slot on the homepage"
       text="Show breaker ad on mobile"
     />
+    <img :src="adImg" class="ad-demo" style="" />
   </details>
 </template>

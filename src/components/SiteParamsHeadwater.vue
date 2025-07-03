@@ -1,5 +1,6 @@
 <script setup>
 import { ref } from "vue";
+import adImg from "@/assets/img/ad-headwater.png";
 
 defineProps({ params: Object, fileProps: Object });
 
@@ -37,5 +38,6 @@ defineExpose({
       label="Mobile headwater ad is a square ad before the homepage river"
       text="Show headwater ad on mobile"
     />
+    <img :src="adImg" class="ad-demo" style="" />
   </details>
 </template>

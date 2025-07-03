@@ -1,5 +1,6 @@
 <script setup>
 import { ref } from "vue";
+import adImg from "@/assets/img/ad-rail.png";
 
 defineProps({ params: Object, fileProps: Object });
 
@@ -24,5 +25,6 @@ defineExpose({
       label="Rail ad is 640x535 rectangle at the top of the homepage river sidebar"
       text="Show rail ad"
     />
+    <img :src="adImg" class="ad-demo" style="" />
   </details>
 </template>

@@ -1,6 +1,8 @@
 <script setup>
 import { ref } from "vue";
 
+import adImg from "@/assets/img/ad-header.png";
+
 defineProps({ params: Object, fileProps: Object });
 
 const desktopImageSet = ref(null);
@@ -37,5 +39,6 @@ defineExpose({
       label="Header mobile ad is a square ad at the start of the page"
       text="Show header ad on mobile"
     />
+    <img :src="adImg" class="ad-demo" style="" />
   </details>
 </template>
