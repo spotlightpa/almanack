@@ -32,9 +32,9 @@ defineExpose({
       ref="mobileImageSet"
       :params="params"
       :file-props="fileProps"
-      :show-width-height="false"
+      :show-width-height="true"
       prop-name="ad-footer-mobile"
-      label="Footer mobile ad is 300x250 square at the bottom of the page"
+      label="Footer mobile ad is a square ad at the bottom of the page"
       text="Show footer ad on mobile"
     />
   </details>

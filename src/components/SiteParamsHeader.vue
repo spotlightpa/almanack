@@ -32,9 +32,9 @@ defineExpose({
       ref="mobileImageSet"
       :params="params"
       :file-props="fileProps"
-      :show-width-height="false"
+      :show-width-height="true"
       prop-name="ad-header-mobile"
-      label="Header mobile ad is 300x250 square at the start of the page"
+      label="Header mobile ad is a square ad at the start of the page"
       text="Show header ad on mobile"
     />
   </details>

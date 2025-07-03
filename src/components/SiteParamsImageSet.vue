@@ -97,6 +97,12 @@ defineExpose({
     <ul>
       <li v-for="(promo, n) of imageSet" :key="promo.id" class="zebra-row">
         <BulmaFieldInput
+          v-model="promo.link"
+          label="Link URL"
+          type="url"
+          placeholder="https://www.spotlightpa.org/donate/"
+        />
+        <BulmaFieldInput
           v-model="promo.label"
           label="Banner label"
           placeholder="Sponsored by Acme"
@@ -105,14 +111,9 @@ defineExpose({
         <BulmaFieldInput
           v-model="promo.labelLink"
           label="Banner label link"
+          type="url"
           placeholder="https://www.spotlightpa.org/support/"
           help="Link that clicking the ad label will go to"
-        />
-        <BulmaFieldInput
-          v-model="promo.link"
-          label="Link URL"
-          type="url"
-          placeholder="https://www.spotlightpa.org/donate/"
         />
         <BulmaTextarea
           v-model="promo.description"
