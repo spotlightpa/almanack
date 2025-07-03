@@ -32,9 +32,9 @@ defineExpose({
       ref="mobileImageSet"
       :params="params"
       :file-props="fileProps"
-      :show-width-height="false"
+      :show-width-height="true"
       prop-name="ad-hp-headwater-mobile"
-      label="Mobile headwater ad is a 300x250 square before the homepage river"
+      label="Mobile headwater ad is a square ad before the homepage river"
       text="Show headwater ad on mobile"
     />
   </details>

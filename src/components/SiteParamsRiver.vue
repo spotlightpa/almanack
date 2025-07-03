@@ -32,9 +32,9 @@ defineExpose({
       ref="mobileImageSet"
       :params="params"
       :file-props="fileProps"
-      :show-width-height="false"
+      :show-width-height="true"
       prop-name="ad-hp-river-mobile"
-      label="Mobile river ad is a 300x250 square between every five items in the homepage river"
+      label="Mobile river ad is a square ad between every five items in the homepage river"
       text="Show river ads on mobile"
     />
   </details>

@@ -21,7 +21,7 @@ defineExpose({
       :file-props="fileProps"
       :show-width-height="false"
       prop-name="ad-hp-rail"
-      label="Rail ad is 600x300 rectangle at the top of the homepage river sidebar"
+      label="Rail ad is 640x535 rectangle at the top of the homepage river sidebar"
       text="Show rail ad"
     />
   </details>

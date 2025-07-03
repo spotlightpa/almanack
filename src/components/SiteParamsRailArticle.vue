@@ -21,7 +21,7 @@ defineExpose({
       :file-props="fileProps"
       :show-width-height="false"
       prop-name="ad-art-rail"
-      label="Sidebar top ad is a 300x250 ad on the article rail sidebar"
+      label="Sidebar top ad is a 640x535 ad on the article rail sidebar"
       text="Show sidebar top ad"
     />
   </details>

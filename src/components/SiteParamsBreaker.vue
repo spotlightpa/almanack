@@ -32,9 +32,9 @@ defineExpose({
       ref="mobileImageSet"
       :params="params"
       :file-props="fileProps"
-      :show-width-height="false"
+      :show-width-height="true"
       prop-name="ad-hp-breaker-mobile"
-      label="Mobile breaker ad is a 300x250 square after the featured slot on the homepage"
+      label="Mobile breaker ad is a square ad after the featured slot on the homepage"
       text="Show breaker ad on mobile"
     />
   </details>
