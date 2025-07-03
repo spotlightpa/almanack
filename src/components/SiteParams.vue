@@ -3,42 +3,40 @@ import { ref } from "vue";
 
 const props = defineProps({ params: Object, fileProps: Object });
 
-const adBreaker = ref();
-const adFeatured = ref();
-const adHeadwater = ref();
-const adRail = ref();
 const banner = ref();
+const breaker = ref();
 const featuredArticle = ref();
+const featuredHomepage = ref();
 const footer = ref();
+const header = ref();
+const headwater = ref();
 const newsletter = ref();
+const railSticky = ref();
+const railTop = ref();
 const river = ref();
-const sidebar = ref();
 const sticky = ref();
 const support = ref();
 const takeover = ref();
-const top = ref();
-const topper = ref();
 
 function saveParams() {
   return {
     schedule_for: props.params.scheduleFor,
     data: {
       ...props.params.data,
-      ...adBreaker.value.saveData(),
-      ...adFeatured.value.saveData(),
-      ...adHeadwater.value.saveData(),
-      ...adRail.value.saveData(),
       ...banner.value.saveData(),
+      ...breaker.value.saveData(),
       ...featuredArticle.value.saveData(),
+      ...featuredHomepage.value.saveData(),
       ...footer.value.saveData(),
+      ...header.value.saveData(),
+      ...headwater.value.saveData(),
       ...newsletter.value.saveData(),
+      ...railSticky.value.saveData(),
+      ...railTop.value.saveData(),
       ...river.value.saveData(),
-      ...sidebar.value.saveData(),
       ...sticky.value.saveData(),
       ...support.value.saveData(),
       ...takeover.value.saveData(),
-      ...top.value.saveData(),
-      ...topper.value.saveData(),
     },
   };
 }
@@ -55,21 +53,21 @@ defineExpose({
     :file-props="fileProps"
     :params="params"
   ></SiteParamsBanner>
-  <SiteParamsTopper
-    ref="topper"
+  <SiteParamsHeader
+    ref="header"
     :file-props="fileProps"
     :params="params"
-  ></SiteParamsTopper>
-  <SiteParamsTop
-    ref="top"
+  ></SiteParamsHeader>
+  <SiteParamsRailTop
+    ref="railTop"
     :file-props="fileProps"
     :params="params"
-  ></SiteParamsTop>
-  <SiteParamsSidebar
-    ref="sidebar"
+  ></SiteParamsRailTop>
+  <SiteParamsRailSticky
+    ref="railSticky"
     :file-props="fileProps"
     :params="params"
-  ></SiteParamsSidebar>
+  ></SiteParamsRailSticky>
   <SiteParamsFooter
     ref="footer"
     :file-props="fileProps"
@@ -77,26 +75,21 @@ defineExpose({
   ></SiteParamsFooter>
 
   <h2 class="mt-5 title is-5">Homepage ad slots</h2>
-  <SiteParamsAdFeatured
-    ref="adFeatured"
+  <SiteParamsFeaturedHomepage
+    ref="featuredHomepage"
     :file-props="fileProps"
     :params="params"
-  ></SiteParamsAdFeatured>
-  <SiteParamsAdBreaker
-    ref="adBreaker"
+  ></SiteParamsFeaturedHomepage>
+  <SiteParamsBreaker
+    ref="breaker"
     :file-props="fileProps"
     :params="params"
-  ></SiteParamsAdBreaker>
-  <SiteParamsAdHeadwater
-    ref="adHeadwater"
+  ></SiteParamsBreaker>
+  <SiteParamsHeadwater
+    ref="headwater"
     :file-props="fileProps"
     :params="params"
-  ></SiteParamsAdHeadwater>
-  <SiteParamsAdRail
-    ref="adRail"
-    :file-props="fileProps"
-    :params="params"
-  ></SiteParamsAdRail>
+  ></SiteParamsHeadwater>
   <SiteParamsRiver
     ref="river"
     :file-props="fileProps"
@@ -132,3 +125,12 @@ defineExpose({
     :params="params"
   ></SiteParamsTakeover>
 </template>
+
+<style>
+.ad-demo {
+  max-width: 100%;
+  width: 500px;
+  margin-inline: auto;
+  display: block;
+}
+</style>
