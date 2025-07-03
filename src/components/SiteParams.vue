@@ -22,7 +22,7 @@ function saveParams() {
   return {
     schedule_for: props.params.scheduleFor,
     data: {
-      ...props.params.data,
+      // ...props.params.data,
       ...banner.value.saveData(),
       ...breaker.value.saveData(),
       ...featuredArticle.value.saveData(),
