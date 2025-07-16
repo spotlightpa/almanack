@@ -246,6 +246,16 @@ func (svc Services) CreatePageFromGDocsDoc(ctx context.Context, shared *db.Share
 		return resperr.E{M: "Document must be processed before conversion."}
 	}
 	body := dbDoc.ArticleMarkdown
+	slug := strings.ToLower(cmp.Or(
+		dbDoc.Metadata.URLSlug,
+		stringx.SlugifyURL(shared.Hed),
+	))
+	switch {
+	case dbDoc.Metadata.Eyebrow != "" && slug != "":
+		slug = stringx.SlugifyURL(dbDoc.Metadata.Eyebrow) + "-" + slug
+	case dbDoc.Metadata.Eyebrow != "" && slug == "":
+		slug = stringx.SlugifyURL(dbDoc.Metadata.Eyebrow)
+	}
 	fm := map[string]any{
 		"internal-id":       shared.InternalID,
 		"published":         shared.PublicationDate.Time,
@@ -259,11 +269,8 @@ func (svc Services) CreatePageFromGDocsDoc(ctx context.Context, shared *db.Share
 		"image-description": shared.LedeImageDescription,
 		"image-caption":     shared.LedeImageCaption,
 		// Fields not exposed to Shared Admin
-		"kicker": dbDoc.Metadata.Eyebrow,
-		"slug": strings.ToLower(cmp.Or(
-			dbDoc.Metadata.URLSlug,
-			stringx.SlugifyURL(shared.Hed),
-		)),
+		"kicker":        dbDoc.Metadata.Eyebrow,
+		"slug":          slug,
 		"linktitle":     dbDoc.Metadata.LinkTitle,
 		"title-tag":     dbDoc.Metadata.SEOTitle,
 		"og-title":      dbDoc.Metadata.OGTitle,
