@@ -597,11 +597,8 @@ export default {
           Don't show date on page
         </BulmaFieldCheckbox>
 
-        <BulmaFieldCheckbox
-          v-model="page.modalExclude"
-          label="Hide newsletters pop-up"
-        >
-          Don't show newsletters modal screen on this page
+        <BulmaFieldCheckbox v-model="page.modalExclude" label="Hide pop-up ads">
+          Don't trigger Wisepops and newsletter modal screens on this article
         </BulmaFieldCheckbox>
 
         <BulmaFieldCheckbox v-model="page.noIndex" label="No index">
