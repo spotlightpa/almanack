@@ -252,7 +252,7 @@ func (svc Services) CreatePageFromGDocsDoc(ctx context.Context, shared *db.Share
 	))
 	switch {
 	case dbDoc.Metadata.Eyebrow != "" && slug != "":
-		slug = stringx.SlugifyURL(dbDoc.Metadata.Eyebrow) + "-" + slug
+		slug += "-" + stringx.SlugifyURL(dbDoc.Metadata.Eyebrow)
 	case dbDoc.Metadata.Eyebrow != "" && slug == "":
 		slug = stringx.SlugifyURL(dbDoc.Metadata.Eyebrow)
 	}
