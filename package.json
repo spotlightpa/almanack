@@ -14,11 +14,11 @@
     "lint:prettier": "prettier --ignore-path .gitignore --write './*.{js,vue,yml,json}' 'src/**/*.{js,vue,yml,json}'"
   },
   "dependencies": {
-    "@fortawesome/fontawesome-svg-core": "^6.1.2",
-    "@fortawesome/free-regular-svg-icons": "^6.1.2",
-    "@fortawesome/free-solid-svg-icons": "^6.1.2",
+    "@fortawesome/fontawesome-svg-core": "^7.0.0",
+    "@fortawesome/free-regular-svg-icons": "^7.0.0",
+    "@fortawesome/free-solid-svg-icons": "^7.0.0",
     "@fortawesome/vue-fontawesome": "^3.0.1",
-    "@sentry/vue": "^9.24.0",
+    "@sentry/vue": "^10.0.0",
     "@unhead/vue": "^2.0.10",
     "bulma": "^0.9.4",
     "core-js": "^3.38.0",
