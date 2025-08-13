@@ -1,0 +1,273 @@
+HTTP/2.0 200 OK
+Alt-Svc: h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
+Content-Type: application/json; charset=UTF-8
+Date: Wed, 13 Aug 2025 18:58:52 GMT
+Server: ESF
+Vary: Origin
+Vary: X-Origin
+Vary: Referer
+X-Content-Type-Options: nosniff
+X-Frame-Options: SAMEORIGIN
+X-Xss-Protection: 0
+
+{
+  "dimensionHeaders": [
+    {
+      "name": "pagePath"
+    }
+  ],
+  "metricHeaders": [
+    {
+      "name": "screenPageViews",
+      "type": "TYPE_INTEGER"
+    }
+  ],
+  "rows": [
+    {
+      "dimensionValues": [
+        {
+          "value": "/news/2025/08/public-transit-pennsylvania-budget-senate-pittman-shapiro-capitol/"
+        }
+      ],
+      "metricValues": [
+        {
+          "value": "568"
+        }
+      ]
+    },
+    {
+      "dimensionValues": [
+        {
+          "value": "/statecollege/2025/08/penn-state-pennsylvania-lobbying-harrisburg-bendapudi-penn-state/"
+        }
+      ],
+      "metricValues": [
+        {
+          "value": "222"
+        }
+      ]
+    },
+    {
+      "dimensionValues": [
+        {
+          "value": "/news/2025/08/pennsylvania-septa-transit-cuts-service-reduction-budget-crisis-capitol/"
+        }
+      ],
+      "metricValues": [
+        {
+          "value": "107"
+        }
+      ]
+    },
+    {
+      "dimensionValues": [
+        {
+          "value": "/news/2025/08/pennsylvania-elder-abuse-prevention-reform-delayed-caregiving/"
+        }
+      ],
+      "metricValues": [
+        {
+          "value": "98"
+        }
+      ]
+    },
+    {
+      "dimensionValues": [
+        {
+          "value": "/news/2025/08/clairton-explosion-us-steel-shapiro-coke-environment/"
+        }
+      ],
+      "metricValues": [
+        {
+          "value": "53"
+        }
+      ]
+    },
+    {
+      "dimensionValues": [
+        {
+          "value": "/news/2025/08/clean-energy-tax-credits-cut-pennsylvania-power-bills-rising-environment/"
+        }
+      ],
+      "metricValues": [
+        {
+          "value": "50"
+        }
+      ]
+    },
+    {
+      "dimensionValues": [
+        {
+          "value": "/news/2025/08/pittsburgh-steel-plant-explosion-deaths-injuries-us-steel-clairton-environment/"
+        }
+      ],
+      "metricValues": [
+        {
+          "value": "41"
+        }
+      ]
+    },
+    {
+      "dimensionValues": [
+        {
+          "value": "/news/2025/07/capitol-legal-marijuana-cannabis-pennsylvania-budget-senate-republican/"
+        }
+      ],
+      "metricValues": [
+        {
+          "value": "25"
+        }
+      ]
+    },
+    {
+      "dimensionValues": [
+        {
+          "value": "/news/2025/06/minimum-wage-15-pennsylvania-house-senate-philadelphia/"
+        }
+      ],
+      "metricValues": [
+        {
+          "value": "19"
+        }
+      ]
+    },
+    {
+      "dimensionValues": [
+        {
+          "value": "/news/2025/08/pennsylvania-governor-shapiro-inauguration-donors-revealed-investigation-josh-shapiro/"
+        }
+      ],
+      "metricValues": [
+        {
+          "value": "17"
+        }
+      ]
+    },
+    {
+      "dimensionValues": [
+        {
+          "value": "/news/2025/08/voter-rolls-trump-department-of-justice-elections-pennsylvania-elections/"
+        }
+      ],
+      "metricValues": [
+        {
+          "value": "14"
+        }
+      ]
+    },
+    {
+      "dimensionValues": [
+        {
+          "value": "/news/2025/08/pennsylvania-harrisburg-lawmakers-television-tim-twardzik-camera-bartolotta-pennsylvania-local/"
+        }
+      ],
+      "metricValues": [
+        {
+          "value": "13"
+        }
+      ]
+    },
+    {
+      "dimensionValues": [
+        {
+          "value": "/news/2025/08/septa-cuts-fare-hikes-pennsylvania-legislature-action-capitol/"
+        }
+      ],
+      "metricValues": [
+        {
+          "value": "13"
+        }
+      ]
+    },
+    {
+      "dimensionValues": [
+        {
+          "value": "/news/2025/06/summer-activities-parks-festivals-attractions-best-pennsylvania/"
+        }
+      ],
+      "metricValues": [
+        {
+          "value": "12"
+        }
+      ]
+    },
+    {
+      "dimensionValues": [
+        {
+          "value": "/news/2025/06/amazon-data-centers-pennsylvania-tax-break-energy-grid/"
+        }
+      ],
+      "metricValues": [
+        {
+          "value": "11"
+        }
+      ]
+    },
+    {
+      "dimensionValues": [
+        {
+          "value": "/news/2025/07/data-centers-pennsylvania-artificial-intelligence-ai/"
+        }
+      ],
+      "metricValues": [
+        {
+          "value": "11"
+        }
+      ]
+    },
+    {
+      "dimensionValues": [
+        {
+          "value": "/news/2025/07/pennsylvania-community-mental-health-crisis-funding-olmstead-implementation-health/"
+        }
+      ],
+      "metricValues": [
+        {
+          "value": "11"
+        }
+      ]
+    },
+    {
+      "dimensionValues": [
+        {
+          "value": "/statecollege/2025/06/pennsylvania-immigration-detention-center-abuse-allegations/"
+        }
+      ],
+      "metricValues": [
+        {
+          "value": "11"
+        }
+      ]
+    },
+    {
+      "dimensionValues": [
+        {
+          "value": "/statecollege/2025/08/campgrounds-pennsylvania-takac-amusement-tax-outdoor-recreation-amusment-rural-issues/"
+        }
+      ],
+      "metricValues": [
+        {
+          "value": "11"
+        }
+      ]
+    },
+    {
+      "dimensionValues": [
+        {
+          "value": "/news/2025/02/judicial-retention-election-pennsylvania-2025-supreme-court-partisan/"
+        }
+      ],
+      "metricValues": [
+        {
+          "value": "10"
+        }
+      ]
+    }
+  ],
+  "rowCount": 271,
+  "metadata": {
+    "currencyCode": "USD",
+    "timeZone": "America/New_York"
+  },
+  "kind": "analyticsData#runReport"
+}
