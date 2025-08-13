@@ -15,6 +15,10 @@ func (svc Services) UpdateMostPopular(ctx context.Context) (err error) {
 	l := almlog.FromContext(ctx)
 	l.InfoContext(ctx, "Services.UpdateMostPopular")
 
+	if err := svc.ConfigureGoogleCert(ctx); err != nil {
+		return err
+	}
+
 	cl, err := svc.Gsvc.GAClient(ctx)
 	if err != nil {
 		return err
