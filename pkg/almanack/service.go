@@ -11,7 +11,6 @@ import (
 	"github.com/spotlightpa/almanack/internal/healthchecksio"
 	"github.com/spotlightpa/almanack/internal/index"
 	"github.com/spotlightpa/almanack/internal/mailchimp"
-	"github.com/spotlightpa/almanack/internal/plausible"
 )
 
 type Services struct {
@@ -30,6 +29,5 @@ type Services struct {
 	NewletterService mailchimp.V3
 	Gsvc             *google.Service
 	mailchimp.EmailService
-	Plausible plausible.API
-	HC        healthchecksio.Client
+	HC healthchecksio.Client
 }

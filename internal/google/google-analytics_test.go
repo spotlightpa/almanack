@@ -26,5 +26,5 @@ func TestMostPopularNews(t *testing.T) {
 	}
 	pages, err := svc.MostPopularNews(ctx, &cl)
 	be.NilErr(t, err)
-	be.True(t, len(pages) >= 20)
+	be.EqualLength(t, 20, pages)
 }

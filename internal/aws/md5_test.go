@@ -33,5 +33,5 @@ func TestMD5(t *testing.T) {
 	hash, size, err = bucket.ReadMD5(ctx, "hello.txt")
 	be.NilErr(t, err)
 	be.AllEqual(t, wantMD5[:], hash)
-	be.Equal(t, int64(len(teststr)), size)
+	be.EqualLength(t, int(size), teststr)
 }
