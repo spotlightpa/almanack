@@ -1,0 +1,186 @@
+{
+  "version": "1.5",
+  "identifier": "testArticle",
+  "title": "Sample Article",
+  "language": "en",
+  "layout": {
+    "columns": 20,
+    "width": 1024,
+    "gutter": 20,
+    "margin": 60
+  },
+  "components": [
+    {
+      "role": "heading",
+      "text": "Welcome to <i>Apple News</i>",
+      "format": "html",
+      "textStyle": "default"
+    },
+    {
+      "role": "body",
+      "text": "\n      This is a\n      <strong> sample article </strong>\n      that demonstrates how to convert HTML to Apple News Format.\n    ",
+      "format": "html"
+    },
+    {
+      "role": "body",
+      "text": "\n      You can include\n      <em> italic text </em>\n      and\n      <a href=\"https://example.com\"> links </a>\n      in your articles.\n    ",
+      "format": "html"
+    },
+    {
+      "role": "heading",
+      "text": "Features",
+      "format": "html",
+      "textStyle": "default"
+    },
+    {
+      "role": "body",
+      "text": "<ul>\n      <li>Support for headings</li>\n      <li>Paragraph text with formatting</li>\n      <li>Links and emphasis</li>\n      <li>Lists and quotes</li>\n    </ul>",
+      "format": "html"
+    },
+    {
+      "role": "quote",
+      "text": "\n      This is a sample quote that will be styled appropriately in Apple News.\n    ",
+      "format": "html"
+    },
+    {
+      "role": "body",
+      "text": "Images can also be included:",
+      "format": "html"
+    },
+    {
+      "role": "image",
+      "URL": "bundle://header.png",
+      "caption": "Sample image"
+    },
+    {
+      "role": "caption",
+      "text": "image caption here",
+      "format": "html"
+    }
+  ],
+  "metadata": {
+    "excerpt": "Quia consequuntur magni accusantium doloremque eos qui ratione voluptatem sequi nesciunt?",
+    "generatorName": "Spotlight PA Feed2ANF",
+    "generatorVersion": "0.0.1"
+  },
+  "documentStyle": {
+    "backgroundColor": "#FFF"
+  },
+  "componentTextStyles": {
+    "bodyFirstDropCap": {
+      "dropCapStyle": {
+        "numberOfLines": 2,
+        "fontName": "DINAlternate-Bold",
+        "textColor": "#A6AAA9"
+      }
+    },
+    "default": {
+      "fontFamily": "system",
+      "fontSize": 16,
+      "textColor": "#222222",
+      "lineHeight": 22,
+      "linkStyle": {
+        "textColor": "#D5B327"
+      }
+    },
+    "default-body": {
+      "fontName": "IowanOldStyle-Roman",
+      "paragraphSpacingBefore": 12,
+      "paragraphSpacingAfter": 12
+    },
+    "default-byline": {
+      "fontName": "DINAlternate-Bold",
+      "fontSize": 15,
+      "textColor": "#53585F",
+      "lineHeight": 18
+    },
+    "default-caption": {
+      "fontName": "IowanOldStyle-Italic",
+      "fontSize": 14,
+      "textColor": "#53585F",
+      "lineHeight": 18,
+      "paragraphSpacingBefore": 12,
+      "paragraphSpacingAfter": 12
+    },
+    "default-heading1": {
+      "fontName": "DINAlternate-Bold",
+      "textColor": "#53585F",
+      "tracking": 0.12
+    },
+    "default-heading2": {
+      "fontName": "DINAlternate-Bold",
+      "textColor": "#53585F",
+      "tracking": 0.05
+    },
+    "default-intro": {
+      "fontName": "DINAlternate-Bold",
+      "fontSize": 18,
+      "textColor": "#A6AAA9",
+      "lineHeight": 22
+    },
+    "default-title": {
+      "fontName": "DINAlternate-Bold",
+      "fontSize": 42,
+      "textColor": "#53585F",
+      "lineHeight": 44
+    }
+  },
+  "textStyles": {},
+  "componentLayouts": {
+    "bigDividerLayout": {
+      "columnSpan": 20,
+      "columnStart": 0,
+      "margin": {
+        "bottom": 6,
+        "top": 6
+      },
+      "ignoreDocumentMargin": "right"
+    },
+    "fullBleedLayout": {
+      "ignoreDocumentMargin": true
+    },
+    "fullMarginAboveHalfBelowLayout": {
+      "columnSpan": 14,
+      "columnStart": 0,
+      "margin": {
+        "bottom": 12,
+        "top": 24
+      }
+    },
+    "fullMarginBelowLayout": {
+      "columnSpan": 14,
+      "columnStart": 0,
+      "margin": {
+        "bottom": 24
+      }
+    },
+    "halfMarginBelowLayout": {
+      "columnSpan": 14,
+      "columnStart": 0,
+      "margin": {
+        "bottom": 12
+      }
+    },
+    "halfMarginBothLayout": {
+      "columnSpan": 14,
+      "columnStart": 0,
+      "margin": {
+        "bottom": 12,
+        "top": 12
+      }
+    },
+    "heading1Layout": {
+      "columnSpan": 14,
+      "columnStart": 0,
+      "margin": {
+        "bottom": 3,
+        "top": 24
+      }
+    },
+    "noMarginLayout": {
+      "columnSpan": 14,
+      "columnStart": 0
+    }
+  },
+  "componentStyles": {}
+}
