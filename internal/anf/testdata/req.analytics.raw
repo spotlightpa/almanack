@@ -1,0 +1,6 @@
+POST /v1beta/properties/1:runReport HTTP/1.1
+Host: analyticsdata.googleapis.com
+Content-Type: application/json
+Content-Length: 362
+
+{"dateRanges":[{"startDate":"today","endDate":"today"}],"dimensions":[{"name":"pagePath"}],"metrics":[{"name":"screenPageViews"}],"orderBys":[{"metric":{"metricName":"screenPageViews"},"desc":true}],"dimensionFilter":{"filter":{"fieldName":"pagePath","stringFilter":{"matchType":"FULL_REGEXP","value":"^/(news|statecollege|berks)/\\d\\d\\d\\d/.*"}}},"limit":20}
