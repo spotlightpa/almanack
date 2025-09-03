@@ -7,12 +7,12 @@ feed_items AS (
   SELECT
     data ->> 'id' AS external_id,
     data ->> 'author' AS author,
-    CASE WHEN data ? 'authors' THEN
+    CASE WHEN jsonb_typeof(data -> 'authors') = 'array' THEN
       ARRAY (
         SELECT
           jsonb_array_elements_text(data -> 'authors'))
       ELSE
-        '{}'::text[]
+        ARRAY[]::text[]
     END AS authors,
     data ->> 'category' AS category,
     data ->> 'content_html' AS content_html,
@@ -59,5 +59,9 @@ feed_items AS (
       "language" = EXCLUDED.language,
       "title" = EXCLUDED.title,
       "url" = EXCLUDED.url,
-      "uploaded_at" = NULL,
+      "uploaded_at" = CASE WHEN apple_news_feed.content_html <> EXCLUDED.content_html THEN
+        NULL
+      ELSE
+        apple_news_feed.uploaded_at
+      END,
       "updated_at" = CURRENT_TIMESTAMP;
