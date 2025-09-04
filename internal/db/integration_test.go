@@ -156,5 +156,18 @@ func TestPublishAppleNews(t *testing.T) {
 			NewsFeedURL: "https://www.spotlightpa.org/feeds/full.json",
 		},
 	}
+	be.NilErr(t, svc.UpdateAppleNewsArchive(ctx))
+	newItems, err := svc.Queries.ListANFUpdates(ctx)
+	be.NilErr(t, err)
+	be.EqualLength(t, 15, newItems)
+
 	be.NilErr(t, svc.PublishAppleNewsFeed(ctx))
+	newItems, err = svc.Queries.ListANFUpdates(ctx)
+	be.NilErr(t, err)
+	be.Zero(t, newItems)
+
+	be.NilErr(t, svc.UpdateAppleNewsArchive(ctx))
+	newItems, err = svc.Queries.ListANFUpdates(ctx)
+	be.NilErr(t, err)
+	be.EqualLength(t, 0, newItems)
 }
