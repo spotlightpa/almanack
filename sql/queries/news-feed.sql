@@ -65,3 +65,21 @@ feed_items AS (
         apple_news_feed.uploaded_at
       END,
       "updated_at" = CURRENT_TIMESTAMP;
+
+-- name: ListANFUpdates :many
+SELECT
+  *
+FROM
+  apple_news_feed
+WHERE
+  uploaded_at IS NULL;
+
+-- name: UpdateANFUploaded :one
+UPDATE
+  apple_news_feed
+SET
+  uploaded_at = CURRENT_TIMESTAMP
+WHERE
+  id = $1
+RETURNING
+  *;
