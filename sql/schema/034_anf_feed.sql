@@ -18,7 +18,7 @@ CREATE TABLE apple_news_feed (
   "updated_at" timestamp with time zone NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE INDEX apple_news_feed_published_at_idx ON apple_news_feed ("published_at");
+CREATE INDEX apple_news_feed_published_at_idx ON apple_news_feed ("uploaded_at");
 
 ---- create above / drop below ----
 DROP TABLE apple_news_feed;
