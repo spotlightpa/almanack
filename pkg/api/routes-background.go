@@ -116,6 +116,9 @@ func (app *appEnv) backgroundCron(w http.ResponseWriter, r *http.Request) http.H
 				},
 			)
 		},
+		func() error {
+			return app.svc.PublishAppleNewsFeed(r.Context())
+		},
 	); err != nil {
 		// reply shows up in dev only
 		return app.jsonErr(err)
