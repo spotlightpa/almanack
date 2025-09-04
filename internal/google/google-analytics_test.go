@@ -2,7 +2,6 @@ package google
 
 import (
 	"cmp"
-	"context"
 	"net/http"
 	"os"
 	"testing"
@@ -16,7 +15,7 @@ func TestMostPopularNews(t *testing.T) {
 	almlog.UseTestLogger(t)
 	svc := Service{}
 	svc.viewID = cmp.Or(os.Getenv("ALMANACK_GOOGLE_TEST_VIEW"), "1")
-	ctx := context.Background()
+	ctx := t.Context()
 	cl := *http.DefaultClient
 	cl.Transport = reqtest.Replay("testdata")
 	if os.Getenv("ALMANACK_GOOGLE_TEST_RECORD_REQUEST") != "" {

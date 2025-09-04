@@ -1,7 +1,6 @@
 package github_test
 
 import (
-	"context"
 	"os"
 	"testing"
 	"time"
@@ -21,7 +20,7 @@ func TestGithub(t *testing.T) {
 	}
 
 	client := github.NewClient(token, owner, repo, branch)
-	ctx := context.Background()
+	ctx := t.Context()
 	// create
 	testFileContents := time.Now().Format(time.Stamp)
 	fname := time.Now().Format("test-" + time.RFC3339 + ".txt")

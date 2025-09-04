@@ -1,7 +1,6 @@
 package api
 
 import (
-	"context"
 	"fmt"
 	"net/http"
 	"net/http/httputil"
@@ -168,7 +167,7 @@ func (app *appEnv) postIdentityHook(w http.ResponseWriter, r *http.Request) {
 		color = colorRed
 	}
 	l := almlog.FromContext(r.Context())
-	app.svc.SlackTech.Post(context.Background(), l.InfoContext, app.svc.Client,
+	app.svc.SlackTech.Post(r.Context(), l.InfoContext, app.svc.Client,
 		slackhook.Message{
 			Attachments: []slackhook.Attachment{
 				{

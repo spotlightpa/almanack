@@ -1,7 +1,6 @@
 package aws_test
 
 import (
-	"context"
 	"crypto/md5"
 	"os"
 	"path/filepath"
@@ -18,7 +17,7 @@ func TestMD5(t *testing.T) {
 	const teststr = "Hello, World!"
 	wantMD5 := md5.Sum([]byte(teststr))
 
-	ctx := context.Background()
+	ctx := t.Context()
 	bucket := aws.NewBlobStore("file://" + dir + "/")
 	err := bucket.WriteFile(ctx, "hello.txt", nil, []byte(teststr))
 	be.NilErr(t, err)

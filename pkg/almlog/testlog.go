@@ -1,25 +1,15 @@
 package almlog
 
 import (
-	"bytes"
+	"io"
 	"log/slog"
-	"testing"
 )
 
-func UseTestLogger(t testing.TB) {
+func UseTestLogger(t interface{ Output() io.Writer }) {
 	opts := slog.HandlerOptions{
 		Level:       Level,
 		ReplaceAttr: removeTime,
 	}
-	Logger = slog.New(slog.NewTextHandler(tWriter{t}, &opts))
+	Logger = slog.New(slog.NewTextHandler(t.Output(), &opts))
 	slog.SetDefault(Logger)
-}
-
-type tWriter struct {
-	t testing.TB
-}
-
-func (tw tWriter) Write(data []byte) (int, error) {
-	tw.t.Log(string(bytes.TrimSpace(data)))
-	return len(data), nil
 }

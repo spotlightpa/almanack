@@ -1,7 +1,6 @@
 package google_test
 
 import (
-	"context"
 	"net/http"
 	"testing"
 
@@ -14,7 +13,7 @@ import (
 )
 
 func TestSheetToFileObjects(t *testing.T) {
-	ctx := context.Background()
+	ctx := t.Context()
 	almlog.UseTestLogger(t)
 
 	cl := &http.Client{}
