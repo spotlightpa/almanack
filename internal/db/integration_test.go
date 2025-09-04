@@ -1,7 +1,6 @@
 package db_test
 
 import (
-	"context"
 	"encoding/json"
 	"fmt"
 	"net/http"
@@ -26,7 +25,7 @@ func TestProcessGDocsDoc(t *testing.T) {
 	almlog.UseTestLogger(t)
 	p := createTestDB(t)
 	q := db.New(p)
-	ctx := context.Background()
+	ctx := t.Context()
 	testfile.Run(t, "testdata/gdoc*", func(t *testing.T, path string) {
 		t.Parallel()
 		svc := almanack.Services{
@@ -41,7 +40,7 @@ func TestProcessGDocsDoc(t *testing.T) {
 		}
 		if os.Getenv("RECORD") != "" {
 			svc.Client.Transport = reqtest.Caching(nil, path)
-			cl, _ := svc.Gsvc.DriveClient(context.Background())
+			cl, _ := svc.Gsvc.DriveClient(t.Context())
 			cl.Transport = reqtest.Caching(cl.Transport, path)
 			svc.Gsvc.SetMockClient(cl)
 		} else {

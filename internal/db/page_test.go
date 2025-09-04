@@ -1,7 +1,6 @@
 package db_test
 
 import (
-	"context"
 	"errors"
 	"fmt"
 	"os"
@@ -273,7 +272,7 @@ func TestShouldPublishShouldNotify(t *testing.T) {
 }
 
 func TestServicePublish(t *testing.T) {
-	ctx := context.Background()
+	ctx := t.Context()
 	almlog.UseTestLogger(t)
 
 	p := createTestDB(t)
@@ -441,7 +440,7 @@ func TestServicePublish(t *testing.T) {
 }
 
 func TestServicePopScheduledPages(t *testing.T) {
-	ctx := context.Background()
+	ctx := t.Context()
 	almlog.UseTestLogger(t)
 
 	p := createTestDB(t)

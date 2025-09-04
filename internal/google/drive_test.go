@@ -2,7 +2,6 @@ package google
 
 import (
 	"cmp"
-	"context"
 	"net/http"
 	"os"
 	"testing"
@@ -14,7 +13,7 @@ import (
 func TestListDriveFiles(t *testing.T) {
 	svc := Service{}
 	svc.driveID = cmp.Or(os.Getenv("ALMANACK_GOOGLE_TEST_DRIVE"), "1")
-	ctx := context.Background()
+	ctx := t.Context()
 	cl := *http.DefaultClient
 	cl.Transport = reqtest.Replay("testdata")
 	if os.Getenv("ALMANACK_GOOGLE_TEST_RECORD_REQUEST") != "" {
@@ -31,7 +30,7 @@ func TestListDriveFiles(t *testing.T) {
 
 func TestDownloadFile(t *testing.T) {
 	var gsvc Service
-	ctx := context.Background()
+	ctx := t.Context()
 	cl := *http.DefaultClient
 	cl.Transport = reqtest.Replay("testdata")
 	b, err := gsvc.DownloadFile(ctx, &cl, "1ssiQd8AKXHo99qkZZwYbHxfVJHY3RPnL")

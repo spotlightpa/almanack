@@ -1,7 +1,6 @@
 package mailchimp_test
 
 import (
-	"context"
 	"net/http"
 	"os"
 	"testing"
@@ -24,6 +23,6 @@ func TestSendEmail(t *testing.T) {
 		cl.Transport = reqtest.Caching(nil, "testdata/sendemail")
 	}
 	v3 := mailchimp.NewV3(apiKey, listID, &cl)
-	err := v3.SendEmail(context.Background(), "Test message", "Hello, World!")
+	err := v3.SendEmail(t.Context(), "Test message", "Hello, World!")
 	be.NilErr(t, err)
 }

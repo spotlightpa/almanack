@@ -1,7 +1,6 @@
 package db_test
 
 import (
-	"context"
 	"strings"
 	"testing"
 
@@ -13,7 +12,7 @@ func TestRoles(t *testing.T) {
 	p := createTestDB(t)
 
 	q := db.New(p)
-	ctx := context.Background()
+	ctx := t.Context()
 	r, err := q.UpsertRolesForAddress(ctx, db.UpsertRolesForAddressParams{
 		EmailAddress: "a@foo.com",
 		Roles:        []string{"fooer"},

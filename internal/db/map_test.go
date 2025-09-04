@@ -1,7 +1,6 @@
 package db_test
 
 import (
-	"context"
 	"fmt"
 	"testing"
 
@@ -13,7 +12,7 @@ func TestMap(t *testing.T) {
 	p := createTestDB(t)
 	q := db.New(p)
 
-	ctx := context.Background()
+	ctx := t.Context()
 	const testpath = "test/hello.md"
 	_, err := q.CreatePage(ctx, db.CreatePageParams{
 		FilePath:   testpath,
