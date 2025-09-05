@@ -59,7 +59,8 @@ feed_items AS (
       "language" = EXCLUDED.language,
       "title" = EXCLUDED.title,
       "url" = EXCLUDED.url,
-      "uploaded_at" = CASE WHEN apple_news_feed.content_html <> EXCLUDED.content_html THEN
+      "uploaded_at" = CASE WHEN apple_news_feed.external_updated_at <>
+	EXCLUDED.external_updated_at THEN
         NULL
       ELSE
         apple_news_feed.uploaded_at
