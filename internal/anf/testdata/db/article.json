@@ -1,6 +1,6 @@
 {
-  "version": "1.0",
-  "identifier": "Apple_Demo",
+  "version": "1.20",
+  "identifier": "e56116d65bfb2463e4ff2523ee31f424",
   "title": "Secretive board overseeing Pa.’s billion-dollar opioid response invites public to speak for 1st time",
   "language": "en-us",
   "layout": {
@@ -319,6 +319,9 @@
       "Ed Mahon"
     ],
     "canonicalURL": "https://www.spotlightpa.org/news/2025/09/opioid-settlement-funds-pennsylvania-public-input-controversy-health/",
+    "keywords": [
+      "Health"
+    ],
     "thumbnailURL": "https://www.spotlightpa.org/imgproxy/insecure/rt:fill/w:800/h:1000/g:sm/el:1/q:75/MjAyNS8wOC8wMW1iLTN0dDItdjB5bS00eGptLmpwZWc=.jpeg",
     "dateCreated": "2025-09-04T05:00:00-04:00",
     "dateModified": "2025-09-04T04:57:03-04:00",
@@ -341,6 +344,10 @@
       "fontSize": 18,
       "textColor": "#000",
       "lineHeight": 26,
+      "linkStyle": {
+        "textColor": "#0066CC",
+        "underline": true
+      },
       "textAlignment": "left"
     },
     "default-caption": {
