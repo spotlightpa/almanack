@@ -1,6 +1,6 @@
 {
-  "version": "1.5",
-  "identifier": "testArticle",
+  "version": "1.0",
+  "identifier": "Apple_Demo",
   "title": "Sample Article",
   "language": "en",
   "layout": {
@@ -12,174 +12,157 @@
   "components": [
     {
       "role": "heading",
+      "layout": "introLayout",
       "text": "Welcome to <i>Apple News</i>",
       "format": "html",
-      "textStyle": "default"
+      "textStyle": "introStyle"
     },
     {
       "role": "body",
+      "layout": "bodyLayout",
       "text": "\n      This is a\n      <strong> sample article </strong>\n      that demonstrates how to convert HTML to Apple News Format.\n    ",
       "format": "html"
     },
     {
       "role": "body",
+      "layout": "bodyLayout",
       "text": "\n      You can include\n      <em> italic text </em>\n      and\n      <a href=\"https://example.com\"> links </a>\n      in your articles.\n    ",
       "format": "html"
     },
     {
       "role": "heading",
+      "layout": "introLayout",
       "text": "Features",
       "format": "html",
-      "textStyle": "default"
+      "textStyle": "introStyle"
     },
     {
       "role": "body",
+      "layout": "bodyLayout",
       "text": "<ul>\n      <li>Support for headings</li>\n      <li>Paragraph text with formatting</li>\n      <li>Links and emphasis</li>\n      <li>Lists and quotes</li>\n    </ul>",
       "format": "html"
     },
     {
       "role": "quote",
+      "layout": "bodyLayout",
       "text": "\n      This is a sample quote that will be styled appropriately in Apple News.\n    ",
       "format": "html"
     },
     {
       "role": "body",
+      "layout": "bodyLayout",
       "text": "Images can also be included:",
       "format": "html"
     },
     {
       "role": "image",
+      "layout": "bodyLayout",
       "URL": "bundle://header.png",
       "caption": "Sample image"
     },
     {
       "role": "caption",
+      "layout": "bodyLayout",
       "text": "image caption here",
       "format": "html"
     }
   ],
+  "subtitle": "Non occidere quae cumque vi ventia",
   "metadata": {
-    "excerpt": "Quia consequuntur magni accusantium doloremque eos qui ratione voluptatem sequi nesciunt?",
+    "excerpt": "Simple with Headline above Header Image",
+    "thumbnailURL": "https://developer.apple.com/news-publisher/download/Apple-News-Example-Articles/images/Iceland01.jpg",
     "generatorName": "Spotlight PA Feed2ANF",
     "generatorVersion": "0.0.1"
   },
   "documentStyle": {
-    "backgroundColor": "#FFF"
+    "backgroundColor": "#f6f6f6"
   },
   "componentTextStyles": {
-    "bodyFirstDropCap": {
-      "dropCapStyle": {
-        "numberOfLines": 2,
-        "fontName": "DINAlternate-Bold",
-        "textColor": "#A6AAA9"
-      }
-    },
-    "default": {
-      "fontFamily": "system",
+    "default-author": {
+      "fontName": "HelveticaNeue-Bold",
       "fontSize": 16,
-      "textColor": "#222222",
-      "lineHeight": 22,
-      "linkStyle": {
-        "textColor": "#D5B327"
-      }
+      "textColor": "#000",
+      "textAlignment": "left"
     },
     "default-body": {
-      "fontName": "IowanOldStyle-Roman",
-      "paragraphSpacingBefore": 12,
-      "paragraphSpacingAfter": 12
-    },
-    "default-byline": {
-      "fontName": "DINAlternate-Bold",
-      "fontSize": 15,
-      "textColor": "#53585F",
-      "lineHeight": 18
+      "fontName": "Georgia",
+      "fontSize": 18,
+      "textColor": "#000",
+      "lineHeight": 26,
+      "textAlignment": "left"
     },
     "default-caption": {
-      "fontName": "IowanOldStyle-Italic",
+      "fontName": "HelveticaNeue-Italic",
       "fontSize": 14,
       "textColor": "#53585F",
       "lineHeight": 18,
       "paragraphSpacingBefore": 12,
       "paragraphSpacingAfter": 12
     },
-    "default-heading1": {
-      "fontName": "DINAlternate-Bold",
-      "textColor": "#53585F",
-      "tracking": 0.12
-    },
-    "default-heading2": {
-      "fontName": "DINAlternate-Bold",
-      "textColor": "#53585F",
-      "tracking": 0.05
-    },
-    "default-intro": {
-      "fontName": "DINAlternate-Bold",
-      "fontSize": 18,
-      "textColor": "#A6AAA9",
-      "lineHeight": 22
+    "default-subtitle": {
+      "fontName": "HelveticaNeue-Thin",
+      "fontSize": 20,
+      "textColor": "#2F2F2F",
+      "lineHeight": 24,
+      "textAlignment": "center"
     },
     "default-title": {
-      "fontName": "DINAlternate-Bold",
-      "fontSize": 42,
-      "textColor": "#53585F",
-      "lineHeight": 44
+      "fontName": "HelveticaNeue-Bold",
+      "fontSize": 64,
+      "textColor": "#000",
+      "lineHeight": 74,
+      "textAlignment": "left"
+    },
+    "introStyle": {
+      "fontName": "HelveticaNeue-Medium",
+      "fontSize": 24,
+      "textColor": "#000",
+      "textAlignment": "left"
     }
   },
   "textStyles": {},
   "componentLayouts": {
-    "bigDividerLayout": {
+    "authorLayout": {
       "columnSpan": 20,
       "columnStart": 0,
       "margin": {
-        "bottom": 6,
-        "top": 6
-      },
-      "ignoreDocumentMargin": "right"
+        "bottom": 15,
+        "top": 15
+      }
     },
-    "fullBleedLayout": {
+    "bodyLayout": {
+      "columnSpan": 18,
+      "columnStart": 0,
+      "margin": {
+        "bottom": 15,
+        "top": 15
+      }
+    },
+    "headerImageLayout": {
+      "columnSpan": 20,
+      "columnStart": 0,
+      "margin": {
+        "bottom": 15,
+        "top": 15
+      },
+      "minimumHeight": "40vh",
       "ignoreDocumentMargin": true
     },
-    "fullMarginAboveHalfBelowLayout": {
-      "columnSpan": 14,
+    "introLayout": {
+      "columnSpan": 20,
       "columnStart": 0,
       "margin": {
-        "bottom": 12,
-        "top": 24
+        "bottom": 15,
+        "top": 15
       }
     },
-    "fullMarginBelowLayout": {
-      "columnSpan": 14,
+    "titleLayout": {
+      "columnSpan": 20,
       "columnStart": 0,
       "margin": {
-        "bottom": 24
+        "bottom": 10,
+        "top": 50
       }
-    },
-    "halfMarginBelowLayout": {
-      "columnSpan": 14,
-      "columnStart": 0,
-      "margin": {
-        "bottom": 12
-      }
-    },
-    "halfMarginBothLayout": {
-      "columnSpan": 14,
-      "columnStart": 0,
-      "margin": {
-        "bottom": 12,
-        "top": 12
-      }
-    },
-    "heading1Layout": {
-      "columnSpan": 14,
-      "columnStart": 0,
-      "margin": {
-        "bottom": 3,
-        "top": 24
-      }
-    },
-    "noMarginLayout": {
-      "columnSpan": 14,
-      "columnStart": 0
     }
   },
   "componentStyles": {}
