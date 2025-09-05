@@ -53,8 +53,8 @@
     "default-title": {
       "textAlignment": "left",
       "fontName": "HelveticaNeue-Bold",
-      "fontSize": 64,
-      "lineHeight": 74,
+      "fontSize": 32,
+      "lineHeight": 36,
       "textColor": "#000"
     },
     "default-subtitle": {
@@ -90,25 +90,32 @@
       "paragraphSpacingAfter": 12,
       "paragraphSpacingBefore": 12,
       "textColor": "#53585F"
+    },
+    "eyebrowStyle": {
+      "backgroundColor": "#000000",
+      "fontName": "HelveticaNeue-Bold",
+      "fontSize": 24,
+      "lineHeight": 28,
+      "textColor": "#ffFFff"
     }
   },
   "componentLayouts": {
     "headerImageLayout": {
       "columnStart": 0,
-      "columnSpan": 20,
+      "columnSpan": 24,
       "ignoreDocumentMargin": true,
-      "minimumHeight": "40vh",
+      "minimumHeight": "50vh",
       "margin": {
         "top": 15,
-        "bottom": 15
+        "bottom": 0
       }
     },
     "titleLayout": {
       "columnStart": 0,
       "columnSpan": 20,
       "margin": {
-        "top": 50,
-        "bottom": 10
+        "top": 0,
+        "bottom": 16
       }
     },
     "introLayout": {
@@ -133,6 +140,14 @@
       "margin": {
         "top": 15,
         "bottom": 15
+      }
+    },
+    "eyebrowLayout": {
+      "columnStart": 0,
+      "columnSpan": 18,
+      "margin": {
+        "top": 4,
+        "bottom": 4
       }
     }
   }

@@ -1,0 +1,436 @@
+{
+  "version": "1.0",
+  "identifier": "Apple_Demo",
+  "title": "Secretive board overseeing Pa.’s billion-dollar opioid response invites public to speak for 1st time",
+  "language": "en-us",
+  "layout": {
+    "columns": 20,
+    "width": 1024,
+    "gutter": 20,
+    "margin": 60
+  },
+  "components": [
+    {
+      "role": "intro",
+      "layout": "eyebrowLayout",
+      "text": " Health ",
+      "textStyle": "eyebrowStyle"
+    },
+    {
+      "role": "title",
+      "layout": "titleLayout",
+      "text": "Secretive board overseeing Pa.’s billion-dollar opioid response invites public to speak for 1st time"
+    },
+    {
+      "role": "author",
+      "text": "by Ed Mahon of Spotlight PA"
+    },
+    {
+      "role": "header",
+      "layout": "headerImageLayout",
+      "style": {
+        "fill": {
+          "type": "image",
+          "URL": "https://www.spotlightpa.org/imgproxy/insecure/rt:fill/w:800/h:1000/g:sm/el:1/q:75/MjAyNS8wOC8wMW1iLTN0dDItdjB5bS00eGptLmpwZWc=.jpeg",
+          "fillMode": "cover",
+          "verticalAlignment": "center"
+        }
+      },
+      "text": ""
+    },
+    {
+      "role": "body",
+      "layout": "bodyLayout",
+      "text": "HARRISBURG — An attorney advocated for allowing opioid settlement money to be spent on public defenders.",
+      "format": "html"
+    },
+    {
+      "role": "body",
+      "layout": "bodyLayout",
+      "text": "A prevention expert talked about effective strategies for deterring substance misuse in the first place, cautioning against one-time speakers at assemblies.",
+      "format": "html"
+    },
+    {
+      "role": "body",
+      "layout": "bodyLayout",
+      "text": "Multiple family members who lost loved ones to a drug overdose shared their personal experiences, and some speakers criticized what they see as secrecy around funding decisions.",
+      "format": "html"
+    },
+    {
+      "role": "body",
+      "layout": "bodyLayout",
+      "text": "“Here’s what we want: full transparency,” said Carla Sofronski, executive director of the PA Harm Reduction Network. “We want public accountability.”",
+      "format": "html"
+    },
+    {
+      "role": "body",
+      "layout": "bodyLayout",
+      "text": "<i><a href=\"https://www.spotlightpa.org/newsletters/\">\n  <b>Free Newsletter:</b>\n  Sign up for a free roundup of the top news from across Pennsylvania, all in\n  one daily or weekly email from Spotlight PA.</a></i>",
+      "format": "html"
+    },
+    {
+      "role": "body",
+      "layout": "bodyLayout",
+      "text": "Those were some of the comments made at the first public listening session hosted by a powerful Pennsylvania board that’s responsible for distributing and overseeing opioid settlement money. The state is estimated to receive about $2 billion over roughly two decades as a result of settlements and litigation with drug companies over their role in the opioid crisis, which kills thousands of people in Pennsylvania each year.",
+      "format": "html"
+    },
+    {
+      "role": "body",
+      "layout": "bodyLayout",
+      "text": "A 2022 court order created the Pennsylvania Opioid Misuse and Addiction Abatement Trust, tasking the organization with certain responsibilities for the funds. The trust board can withhold funding from counties and other local governments if its officials decide they spent the money inappropriately — a power that has led to <a href=\"https://www.spotlightpa.org/news/2024/11/pennsylvania-opioid-settlement-money-commonwealth-court-spending-lawsuits/\">big</a> <a href=\"https://www.npr.org/sections/shots-health-news/2024/11/18/nx-s1-5192942/philadelphia-kensington-drug-settlement-funds-pharma-million-from-opioid-lawsuits\">disagreements</a>.",
+      "format": "html"
+    },
+    {
+      "role": "body",
+      "layout": "bodyLayout",
+      "text": "Three years after forming, and <a href=\"https://www.linkedin.com/posts/cathleen-palm-2429741bb_secret-meetings-by-pas-opioid-money-board-activity-7204832179002994689-QBVs/?utm_source=share&amp;utm_medium=member_desktop\">facing criticism</a> over <a href=\"https://www.spotlightpa.org/news/2024/06/pennsylvania-opioid-settlement-board-secret-meetings-lawmaker-challenge/\">secret meetings</a> and actions that shut the <a href=\"https://www.nbcphiladelphia.com/investigations/pennsylvania-opioid-settlement-funding/4186293/\">public out of the process</a>, the trust board held its first public listening session in August.",
+      "format": "html"
+    },
+    {
+      "role": "body",
+      "layout": "bodyLayout",
+      "text": "But some family members and advocates are calling for more changes to its processes, including public comment at regular meetings, greater transparency before decisions are made, and more power in the hands of people directly affected by the epidemic.",
+      "format": "html"
+    },
+    {
+      "role": "body",
+      "layout": "bodyLayout",
+      "text": "“I’m hoping that they took what we said and they learn from the past mistakes, and that they make the changes necessary to include the public more often,” said Kathy Strain, a Berks County resident and advocate who has lost more than one family member to an opioid overdose.",
+      "format": "html"
+    },
+    {
+      "role": "body",
+      "layout": "bodyLayout",
+      "text": "Here’s what you need to know about this first public listening session.",
+      "format": "html"
+    },
+    {
+      "role": "heading",
+      "layout": "introLayout",
+      "text": "Why did the trust host the listening session now?",
+      "format": "html",
+      "textStyle": "introStyle"
+    },
+    {
+      "role": "body",
+      "layout": "bodyLayout",
+      "text": "Across the country, state opioid councils hold great power over these settlement decisions.",
+      "format": "html"
+    },
+    {
+      "role": "body",
+      "layout": "bodyLayout",
+      "text": "But a <a href=\"https://kffhealthnews.org/news/article/opioid-settlement-fund-council-meetings-public-comment-closed/\">Spotlight PA and KFF Health News investigation</a> last year found that the public, including relatives of people who died from overdoses, are routinely shut out of having a meaningful say in how the opioid windfall can be best used.",
+      "format": "html"
+    },
+    {
+      "role": "body",
+      "layout": "bodyLayout",
+      "text": "Pennsylvania’s opioid trust was one of at least 14 councils that routinely block members of the public from speaking at their meetings, a first-of-its kind survey from the news organizations found. <strong></strong>",
+      "format": "html"
+    },
+    {
+      "role": "body",
+      "layout": "bodyLayout",
+      "text": "Following the reporting, officials in Maine changed their policy to allow regular public comment at their meetings. “The Maine Recovery Council feels it is important that the people of Maine have a voice in the work of the Council,” <a href=\"https://www.maine.gov/ag/docs/public%20comment%20policy.pdf\">the new procedure reads</a>.",
+      "format": "html"
+    },
+    {
+      "role": "body",
+      "layout": "bodyLayout",
+      "text": "In Pennsylvania, the trust has continued to block public comment at regular meetings. Its members also meet in <a href=\"https://www.spotlightpa.org/news/2024/03/opioid-settlement-secret-review/\">private working groups</a> to make recommendations over whether to approve decisions made by local government officials. Trust officials have maintained they comply with the state’s open meetings law.",
+      "format": "html"
+    },
+    {
+      "role": "body",
+      "layout": "bodyLayout",
+      "text": "But <a href=\"https://web-cdn.bsky.app/profile/edmahon.bsky.social/post/3li3l336as223\">in a shift</a>, the trust in February passed a resolution to hold a public listening session.",
+      "format": "html"
+    },
+    {
+      "role": "body",
+      "layout": "bodyLayout",
+      "text": "Tom VanKirk, chair of the trust, said members had received “various requests from different organizations, individuals to be able to make presentations at these public meetings.” And he said members “recognize the value of engaging with the community members.”",
+      "format": "html"
+    },
+    {
+      "role": "body",
+      "layout": "bodyLayout",
+      "text": "VanKirk described state Sen. Greg Rothman (R., Cumberland) — who previously criticized the board’s <a href=\"https://www.spotlightpa.org/news/2024/06/pennsylvania-opioid-settlement-board-secret-meetings-lawmaker-challenge/\">use of secret meetings</a> — as “one of the first people to raise this.” Rothman’s chief of staff, Morgan Wagner, in February said the senator is &#34;glad to see that it&#39;s the will of the trust to permit some greater public participation in this process and hopes that it will continue.&#34; Rothman recently resigned from the board, telling Spotlight PA “the time is right to allow another member of the Senate Republican Caucus to serve on the Board.”",
+      "format": "html"
+    },
+    {
+      "role": "body",
+      "layout": "bodyLayout",
+      "text": "In a statement, Rothman also said his goal on the board was to “advocate for those impacted by this epidemic” and “to be a strong advocate for greater transparency, fiscal accountability, and public participation.”",
+      "format": "html"
+    },
+    {
+      "role": "body",
+      "layout": "bodyLayout",
+      "text": "“I’m pleased that the Board has implemented some improvements in those areas, including holding its first-ever Public Listening Session,” Rothman said.",
+      "format": "html"
+    },
+    {
+      "role": "heading",
+      "layout": "introLayout",
+      "text": "Who spoke at the listening session?",
+      "format": "html",
+      "textStyle": "introStyle"
+    },
+    {
+      "role": "body",
+      "layout": "bodyLayout",
+      "text": "Ahead of the meeting, VanKirk said speakers would have to <a href=\"https://web.archive.org/web/20250716062550/https://www.paopioidtrust.org/meetings/2023-meetings/2025/20250821-public-listening-session\">register in advance</a>, and that the session would be limited to 15 speakers. Ultimately, 10 people signed up and later confirmed their participation, VanKirk said in August.",
+      "format": "html"
+    },
+    {
+      "role": "body",
+      "layout": "bodyLayout",
+      "text": "Speakers and the issues they raised varied. Some spoke virtually, while others attended the event in person at Seven Springs Mountain Resort in southwestern Pennsylvania. A public board meeting of the trust and the listening session “were held in conjunction with the annual conference of the County Commissioners Association of Pennsylvania,” VanKirk told Spotlight PA.",
+      "format": "html"
+    },
+    {
+      "role": "body",
+      "layout": "bodyLayout",
+      "text": "Speakers were limited to five minutes each.",
+      "format": "html"
+    },
+    {
+      "role": "body",
+      "layout": "bodyLayout",
+      "text": "Andrew Capone, an assistant director of training with the Public Defender Association of Pennsylvania, urged the trust to remove guidance that discourages counties from spending opioid settlement funds on public defenders. He described his own experience helping patients at a rehabilitation facility who feared arrest or incarceration could derail their recovery.",
+      "format": "html"
+    },
+    {
+      "role": "body",
+      "layout": "bodyLayout",
+      "text": "“Public defenders are uniquely positioned to serve people suffering from opioid use disorder in Pennsylvania,” Capone told the board.",
+      "format": "html"
+    },
+    {
+      "role": "body",
+      "layout": "bodyLayout",
+      "text": "An <a href=\"https://www.paopioidtrust.org/about-us/faqs\">FAQ section of the trust website</a>, as of late August, said that “the services of an assistant public defender are required to be provided by the counties” and so “the costs associated with their position would not be considered an abatement strategy.” Spotlight PA first reported on conflict over the guidance in <a href=\"https://www.spotlightpa.org/news/2024/04/opioid-settlement-cash-boon-to-pennsylvania-prosecutors-but-public-defenders-are-being-turned-away/\">April 2024.</a>",
+      "format": "html"
+    },
+    {
+      "role": "body",
+      "layout": "bodyLayout",
+      "text": "Jeff Hanley, executive director of the Commonwealth Prevention Alliance, advocated for spending the funds on “prevention programs that are proven to work.” Such efforts, he said in comments to Spotlight PA, aim to avert or delay youth substance use, promote positive mental health, and prevent misuse.",
+      "format": "html"
+    },
+    {
+      "role": "body",
+      "layout": "bodyLayout",
+      "text": "He told the board “not everyone can do prevention.” He stressed the importance of evidence-based strategies, long-term approaches, community engagement, and other targeted approaches.",
+      "format": "html"
+    },
+    {
+      "role": "body",
+      "layout": "bodyLayout",
+      "text": "“Well-meaning efforts alone are not enough,” he said. “One-time presentations — assemblies or classroom talks — rarely build skills, change attitudes, or reduce substance use.”",
+      "format": "html"
+    },
+    {
+      "role": "body",
+      "layout": "bodyLayout",
+      "text": "Sofronski of the PA Harm Reduction Network criticized some of the programs <a href=\"https://www.spotlightpa.org/news/2025/03/pennsylvania-opioid-settlement-decide-spending/\">counties have spent opioid settlement money on</a>, including <a href=\"https://kffhealthnews.org/news/article/opioid-settlement-money-corporations-cash-cow/\">drug disposal bags</a>, speakers, and unproven awareness campaigns. Meanwhile, street outreach, distribution of overdose reversal medication, drug checking programs, and <a href=\"https://www.spotlightpa.org/news/2024/08/pennsylvania-syringe-services-by-numbers/\">syringe services programs</a> are underfunded and ignored, she said.",
+      "format": "html"
+    },
+    {
+      "role": "body",
+      "layout": "bodyLayout",
+      "text": "Marianne Sinisi said she drove about two hours from Blair County to attend the meeting in person. She brought a photo of her son Shawn, who died from a drug overdose in 2018.",
+      "format": "html"
+    },
+    {
+      "role": "body",
+      "layout": "bodyLayout",
+      "text": "“It’s very emotional. It’s very draining,” she told Spotlight PA afterward. “Definitely a lot of tears on my way home. …You wonder what it’s going to take to make them take you serious.”",
+      "format": "html"
+    },
+    {
+      "role": "heading",
+      "layout": "introLayout",
+      "text": "How did trust officials respond to the comments?",
+      "format": "html",
+      "textStyle": "introStyle"
+    },
+    {
+      "role": "body",
+      "layout": "bodyLayout",
+      "text": "Ahead of time, VanKirk said the session was intended for the public to comment and it would “not include dialogue with or answers or responses from the trustees.” He said the trust wants to “speak as one group” and could follow up later with responses.",
+      "format": "html"
+    },
+    {
+      "role": "body",
+      "layout": "bodyLayout",
+      "text": "“We will also post it on our website so that everybody can know what you raised and what our response to it is, if it calls for a response,” he said.",
+      "format": "html"
+    },
+    {
+      "role": "body",
+      "layout": "bodyLayout",
+      "text": "<i><a href=\"https://www.spotlightpa.org/donate/\"><b>While You’re Here:</b>\n  If you learned something from this report, pay it forward and become a member of Spotlight PA so someone else can in the future.</a></i>",
+      "format": "html"
+    },
+    {
+      "role": "body",
+      "layout": "bodyLayout",
+      "text": "At the end of the meeting, VanKirk said the trust will have similar sessions in the future, and he said he appreciated the input from all the speakers.",
+      "format": "html"
+    },
+    {
+      "role": "body",
+      "layout": "bodyLayout",
+      "text": "“I can tell you we heard you,” he said. “And we will be taking everything into account.”",
+      "format": "html"
+    },
+    {
+      "role": "heading",
+      "layout": "introLayout",
+      "text": "Are the transparency and participation concerns resolved?",
+      "format": "html",
+      "textStyle": "introStyle"
+    },
+    {
+      "role": "body",
+      "layout": "bodyLayout",
+      "text": "No. During the meeting and in interviews afterward, some of the speakers called for greater transparency and more public involvement.",
+      "format": "html"
+    },
+    {
+      "role": "body",
+      "layout": "bodyLayout",
+      "text": "“If you really, really want to discuss this with the public, why isn’t this group primarily composed of community members with lived experience?” Strain, the Berks County resident and advocate, told the board.",
+      "format": "html"
+    },
+    {
+      "role": "body",
+      "layout": "bodyLayout",
+      "text": "“We should ensure that those who have firsthand experience with this crisis have a significant say,” she added. “They know what works and what doesn’t. Their experiences are the reason we are here today.”",
+      "format": "html"
+    }
+  ],
+  "subtitle": "Non occidere quae cumque vi ventia",
+  "metadata": {
+    "authors": [
+      "Ed Mahon"
+    ],
+    "canonicalURL": "https://www.spotlightpa.org/news/2025/09/opioid-settlement-funds-pennsylvania-public-input-controversy-health/",
+    "thumbnailURL": "https://www.spotlightpa.org/imgproxy/insecure/rt:fill/w:800/h:1000/g:sm/el:1/q:75/MjAyNS8wOC8wMW1iLTN0dDItdjB5bS00eGptLmpwZWc=.jpeg",
+    "dateCreated": "2025-09-04T05:00:00-04:00",
+    "dateModified": "2025-09-04T04:57:03-04:00",
+    "datePublished": "2025-09-04T05:00:00-04:00",
+    "generatorName": "Spotlight PA Feed2ANF",
+    "generatorVersion": "0.0.1"
+  },
+  "documentStyle": {
+    "backgroundColor": "#f6f6f6"
+  },
+  "componentTextStyles": {
+    "default-author": {
+      "fontName": "HelveticaNeue-Bold",
+      "fontSize": 16,
+      "textColor": "#000",
+      "textAlignment": "left"
+    },
+    "default-body": {
+      "fontName": "Georgia",
+      "fontSize": 18,
+      "textColor": "#000",
+      "lineHeight": 26,
+      "textAlignment": "left"
+    },
+    "default-caption": {
+      "fontName": "HelveticaNeue-Italic",
+      "fontSize": 14,
+      "textColor": "#53585F",
+      "lineHeight": 18,
+      "paragraphSpacingBefore": 12,
+      "paragraphSpacingAfter": 12
+    },
+    "default-subtitle": {
+      "fontName": "HelveticaNeue-Thin",
+      "fontSize": 20,
+      "textColor": "#2F2F2F",
+      "lineHeight": 24,
+      "textAlignment": "center"
+    },
+    "default-title": {
+      "fontName": "HelveticaNeue-Bold",
+      "fontSize": 32,
+      "textColor": "#000",
+      "lineHeight": 36,
+      "textAlignment": "left"
+    },
+    "eyebrowStyle": {
+      "backgroundColor": "#000000",
+      "fontName": "HelveticaNeue-Bold",
+      "fontSize": 24,
+      "textColor": "#ffFFff",
+      "lineHeight": 28
+    },
+    "introStyle": {
+      "fontName": "HelveticaNeue-Medium",
+      "fontSize": 24,
+      "textColor": "#000",
+      "textAlignment": "left"
+    }
+  },
+  "textStyles": {},
+  "componentLayouts": {
+    "authorLayout": {
+      "columnSpan": 20,
+      "columnStart": 0,
+      "margin": {
+        "bottom": 15,
+        "top": 15
+      }
+    },
+    "bodyLayout": {
+      "columnSpan": 18,
+      "columnStart": 0,
+      "margin": {
+        "bottom": 15,
+        "top": 15
+      }
+    },
+    "eyebrowLayout": {
+      "columnSpan": 18,
+      "columnStart": 0,
+      "margin": {
+        "bottom": 4,
+        "top": 4
+      }
+    },
+    "headerImageLayout": {
+      "columnSpan": 24,
+      "columnStart": 0,
+      "margin": {
+        "bottom": 0,
+        "top": 15
+      },
+      "minimumHeight": "50vh",
+      "ignoreDocumentMargin": true
+    },
+    "introLayout": {
+      "columnSpan": 20,
+      "columnStart": 0,
+      "margin": {
+        "bottom": 15,
+        "top": 15
+      }
+    },
+    "titleLayout": {
+      "columnSpan": 20,
+      "columnStart": 0,
+      "margin": {
+        "bottom": 16,
+        "top": 0
+      }
+    }
+  },
+  "componentStyles": {}
+}
