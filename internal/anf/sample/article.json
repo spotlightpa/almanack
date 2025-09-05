@@ -1,247 +1,139 @@
 {
-  "componentLayouts": {
-    "bigDividerLayout": {
-      "columnSpan": 20,
-      "columnStart": 0,
-      "ignoreDocumentMargin": "right",
-      "margin": {
-        "bottom": 6,
-        "top": 6
-      }
-    },
-    "fullBleedLayout": {
-      "ignoreDocumentMargin": true
-    },
-    "fullMarginAboveHalfBelowLayout": {
-      "columnSpan": 14,
-      "columnStart": 0,
-      "margin": {
-        "bottom": 12,
-        "top": 24
-      }
-    },
-    "fullMarginBelowLayout": {
-      "columnSpan": 14,
-      "columnStart": 0,
-      "margin": {
-        "bottom": 24
-      }
-    },
-    "halfMarginBelowLayout": {
-      "columnSpan": 14,
-      "columnStart": 0,
-      "margin": {
-        "bottom": 12
-      }
-    },
-    "halfMarginBothLayout": {
-      "columnSpan": 14,
-      "columnStart": 0,
-      "margin": {
-        "bottom": 12,
-        "top": 12
-      }
-    },
-    "heading1Layout": {
-      "columnSpan": 14,
-      "columnStart": 0,
-      "margin": {
-        "bottom": 3,
-        "top": 24
-      }
-    },
-    "noMarginLayout": {
-      "columnSpan": 14,
-      "columnStart": 0
-    }
+  "version": "1.0",
+  "identifier": "Apple_Demo",
+  "title": "Simple with Headline above Header Image",
+  "language": "en",
+  "layout": {
+    "columns": 20,
+    "width": 1024,
+    "margin": 60,
+    "gutter": 20
   },
-  "componentStyles": {},
-  "componentTextStyles": {
-    "bodyFirstDropCap": {
-      "dropCapStyle": {
-        "fontName": "DINAlternate-Bold",
-        "numberOfLines": 2,
-        "textColor": "#A6AAA9"
+  "subtitle": "Non occidere quae cumque vi ventia",
+  "metadata": {
+    "excerpt": "Simple with Headline above Header Image",
+    "thumbnailURL": "https://developer.apple.com/news-publisher/download/Apple-News-Example-Articles/images/Iceland01.jpg"
+  },
+  "documentStyle": {
+    "backgroundColor": "#f6f6f6"
+  },
+  "components": [
+    {
+      "role": "title",
+      "text": "Headline Above Image"
+    },
+    {
+      "role": "intro",
+      "layout": "introLayout",
+      "text": "Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto.",
+      "textStyle": "introStyle"
+    },
+    {
+      "role": "header",
+      "layout": "headerImageLayout",
+      "style": {
+        "fill": {
+          "type": "image",
+          "URL": "https://developer.apple.com/news-publisher/download/Apple-News-Example-Articles/images/Iceland01.jpg",
+          "fillMode": "cover",
+          "verticalAlignment": "center"
+        }
       }
     },
-    "default": {
-      "fontFamily": "system",
+    {
+      "role": "author",
+      "text": "Byline | Publisher | Date"
+    },
+    {
+      "role": "body",
+      "text": "Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo. Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed quia consequuntur magni dolores eos qui ratione voluptatem sequi nesciunt. Neque porro quisquam est, qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit, sed quia non numquam eius modi tempora incidunt ut labore et dolore magnam aliquam quaerat voluptatem. Ut enim ad minima veniam, quis nostrum exercitationem ullam corporis suscipit laboriosam, nisi ut aliquid ex ea commodi consequatur?\n\nQuis autem vel eum iure reprehenderit qui in ea voluptate velit esse quam nihil molestiae consequatur, vel illum qui dolorem eum fugiat quo voluptas nulla pariatur? At vero eos et accusamus et iusto odio dignissimos ducimus qui blanditiis praesentium voluptatum deleniti atque corrupti quos dolores et quas molestias excepturi sint occaecati cupiditate non provident, similique sunt in culpa qui officia deserunt mollitia animi, id est laborum et dolorum fuga. Et harum quidem rerum facilis est et expedita distinctio. Nam libero tempore, cum soluta nobis est eligendi optio cumque nihil impedit quo minus id quod maxime placeat facere possimus, omnis voluptas assumenda est, omnis dolor repellendus.\n\nTemporibus autem quibusdam et aut officiis debitis aut rerum necessitatibus saepe eveniet ut et voluptates repudiandae sint et molestiae non recusandae. Itaque earum rerum hic tenetur a sapiente delectus, ut aut reiciendis voluptatibus maiores alias consequatur aut perferendis doloribus asperiores repellat. Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo. Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed quia consequuntur magni dolores eos qui ratione voluptatem sequi nesciunt.\n\nNeque porro quisquam est, qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit, sed quia non numquam eius modi tempora incidunt ut labore et dolore magnam aliquam quaerat voluptatem. Ut enim ad minima veniam, quis nostrum exercitationem ullam corporis suscipit laboriosam, nisi ut aliquid ex ea commodi consequatur? Quis autem vel eum iure reprehenderit qui in ea voluptate velit esse quam nihil molestiae consequatur, vel illum qui dolorem eum fugiat quo voluptas nulla pariatur? At vero eos et accusamus et iusto odio dignissimos ducimus qui blanditiis praesentium voluptatum deleniti atque corrupti quos dolores et quas molestias excepturi sint occaecati cupiditate non provident, similique sunt in culpa qui officia deserunt mollitia animi, id est laborum et dolorum fuga. Et harum quidem rerum facilis est et expedita distinctio.\n\nNam libero tempore, cum soluta nobis est eligendi optio cumque nihil impedit quo minus id quod maxime placeat facere possimus, omnis voluptas assumenda est, omnis dolor repellendus. Temporibus autem quibusdam et aut officiis debitis aut rerum necessitatibus saepe eveniet ut et voluptates repudiandae sint et molestiae non recusandae. Itaque earum rerum hic tenetur a sapiente delectus, ut aut reiciendis voluptatibus maiores alias consequatur aut perferendis doloribus asperiores repellat. Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo. Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed quia consequuntur magni dolores eos qui ratione voluptatem sequi nesciunt.\n\nNeque porro quisquam est, qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit, sed quia non numquam eius modi tempora incidunt ut labore et dolore magnam aliquam quaerat voluptatem. Ut enim ad minima veniam, quis nostrum exercitationem ullam corporis suscipit laboriosam, nisi ut aliquid ex ea commodi consequatur? Quis autem vel eum iure reprehenderit qui in ea voluptate velit esse quam nihil molestiae consequatur, vel illum qui dolorem eum fugiat quo voluptas nulla pariatur? At vero eos et accusamus et iusto odio dignissimos ducimus qui blanditiis praesentium voluptatum deleniti atque corrupti quos dolores et quas molestias excepturi sint occaecati cupiditate non provident, similique sunt in culpa qui officia deserunt mollitia animi, id est laborum et dolorum fuga. Et harum quidem rerum facilis est et expedita distinctio. Nam libero tempore, cum soluta nobis est eligendi optio cumque nihil impedit quo minus id quod maxime placeat facere possimus, omnis voluptas assumenda est, omnis dolor repellendus. Temporibus autem quibusdam et aut officiis debitis aut rerum necessitatibus saepe eveniet ut et voluptates repudiandae sint et molestiae non recusandae. Itaque earum rerum hic tenetur a sapiente delectus, ut aut reiciendis voluptatibus maiores alias consequatur aut perferendis doloribus asperiores repellat. Sed ut perspiciatis.\n\n"
+    }
+  ],
+  "componentTextStyles": {
+    "default-title": {
+      "textAlignment": "left",
+      "fontName": "HelveticaNeue-Bold",
+      "fontSize": 64,
+      "lineHeight": 74,
+      "textColor": "#000"
+    },
+    "default-subtitle": {
+      "fontName": "HelveticaNeue-Thin",
+      "fontSize": 20,
+      "textColor": "#2F2F2F",
+      "textAlignment": "center",
+      "lineHeight": 24
+    },
+    "introStyle": {
+      "textAlignment": "left",
+      "fontName": "HelveticaNeue-Medium",
+      "fontSize": 24,
+      "textColor": "#000"
+    },
+    "default-author": {
+      "textAlignment": "left",
+      "fontName": "HelveticaNeue-Bold",
       "fontSize": 16,
-      "lineHeight": 22,
-      "linkStyle": {
-        "textColor": "#D5B327"
-      },
-      "textColor": "#222222"
+      "textColor": "#000"
     },
     "default-body": {
-      "fontName": "IowanOldStyle-Roman",
-      "paragraphSpacingAfter": 12,
-      "paragraphSpacingBefore": 12
-    },
-    "default-byline": {
-      "fontName": "DINAlternate-Bold",
-      "fontSize": 15,
-      "lineHeight": 18,
-      "textColor": "#53585F"
+      "textAlignment": "left",
+      "fontName": "Georgia",
+      "fontSize": 18,
+      "lineHeight": 26,
+      "textColor": "#000"
     },
     "default-caption": {
-      "fontName": "IowanOldStyle-Italic",
+      "fontName": "HelveticaNeue-Italic",
       "fontSize": 14,
       "lineHeight": 18,
       "paragraphSpacingAfter": 12,
       "paragraphSpacingBefore": 12,
       "textColor": "#53585F"
-    },
-    "default-heading1": {
-      "fontName": "DINAlternate-Bold",
-      "textColor": "#53585F",
-      "tracking": 0.12
-    },
-    "default-heading2": {
-      "fontName": "DINAlternate-Bold",
-      "textColor": "#53585F",
-      "tracking": 0.05
-    },
-    "default-intro": {
-      "fontName": "DINAlternate-Bold",
-      "fontSize": 18,
-      "lineHeight": 22,
-      "textColor": "#A6AAA9"
-    },
-    "default-title": {
-      "fontName": "DINAlternate-Bold",
-      "fontSize": 42,
-      "lineHeight": 44,
-      "textColor": "#53585F"
     }
   },
-  "components": [
-    {
-      "layout": "heading1Layout",
-      "role": "heading1",
-      "text": "HEADING"
-    },
-    {
-      "layout": "bigDividerLayout",
-      "role": "divider",
-      "stroke": {
-        "color": "#D5B327",
-        "width": 3
+  "componentLayouts": {
+    "headerImageLayout": {
+      "columnStart": 0,
+      "columnSpan": 20,
+      "ignoreDocumentMargin": true,
+      "minimumHeight": "40vh",
+      "margin": {
+        "top": 15,
+        "bottom": 15
       }
     },
-    {
-      "layout": "halfMarginBelowLayout",
-      "role": "title",
-      "text": "ARTICLE TITLE"
-    },
-    {
-      "layout": "halfMarginBelowLayout",
-      "role": "intro",
-      "text": "Etiam rhoncus. Maecenas tempus, tellus eget condimentum rhoncus, sem quam semper libero, sit amet adipiscing sem neque ipsum?"
-    },
-    {
-      "layout": "fullMarginBelowLayout",
-      "role": "byline",
-      "text": "By Urna Semper"
-    },
-    {
-      "URL": "bundle://header.jpg",
-      "caption": "A caption for the photo.",
-      "layout": "fullBleedLayout",
-      "role": "photo"
-    },
-    {
-      "layout": "halfMarginBothLayout",
-      "role": "caption",
-      "text": "ABOVE: A caption for the photo (Attribution)"
-    },
-    {
-      "layout": "fullMarginBelowLayout",
-      "role": "divider",
-      "stroke": {
-        "color": "#D5B327",
-        "width": 1
+    "titleLayout": {
+      "columnStart": 0,
+      "columnSpan": 20,
+      "margin": {
+        "top": 50,
+        "bottom": 10
       }
     },
-    {
-      "format": "html",
-      "layout": "noMarginLayout",
-      "role": "body",
-      "text": "<p>Nam libero tempore, cum soluta nobis est eligendi optio cumque nihil impedit quo minus id quod maxime placeat facere possimus, omnis voluptas assumenda est, dolor repellendus. <a href='http://www.apple.com'>Link text</a> quibusdam et aut.</p><p>Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed quia consequuntur magni dolores eos qui ratione voluptatem sequi nesciunt. Neque porro quisquam est, qui dolorem ipsum quia dolor sit amet, adipisci velit.</p>",
-      "textStyle": "bodyFirstDropCap"
+    "introLayout": {
+      "columnStart": 0,
+      "columnSpan": 20,
+      "margin": {
+        "top": 15,
+        "bottom": 15
+      }
     },
-    {
-      "layout": "fullMarginAboveHalfBelowLayout",
-      "role": "heading2",
-      "text": "HEADING"
+    "authorLayout": {
+      "columnStart": 0,
+      "columnSpan": 20,
+      "margin": {
+        "top": 15,
+        "bottom": 15
+      }
     },
-    {
-      "format": "html",
-      "layout": "noMarginLayout",
-      "role": "body",
-      "text": "<p>Quis autem vel eum iure reprehenderit qui in ea voluptate velit esse quam nihil molestiae consequatur, vel illum qui dolorem eum fugiat quo voluptas nulla pariatur? At vero eos et accusamus et iusto odio ducimus qui blanditiis.</p><p>Cras ultricies mi eu turpis hendrerit fringilla. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; In ac dui quis mi consectetuer.</p><p>Temporibus autem et aut officiis debitis aut rerum necessitatibus saepe eveniet ut et voluptates repudiandae sint et molestiae non recusandae. Itaque rerum hic tenetur.</p><p>Inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo esciunt enim ipsam voluptatem quia.</p><p>Ut aut reiciendis voluptatibus maiores alias consequatur aut perferendis <a href='http://www.apple.com'>doloribus asperiores</a> repellat. Sed ut perspiciatis unde omnis iste natus sit voluptatem accusantium doloremque, totam rem aperiam, eaque ipsa quae ab illo inventore.</p><p>Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed quia consequuntur magni.</p>"
-    },
-    {
-      "layout": "fullMarginAboveHalfBelowLayout",
-      "role": "heading2",
-      "text": "HEADING"
-    },
-    {
-      "format": "html",
-      "layout": "noMarginLayout",
-      "role": "body",
-      "text": "Sed quia non numquam eius modi tempora incidunt ut labore et dolore magnam aliquam quaerat voluptatem. Ut enim ad minima veniam, quis nostrum exercitationem ullam corporis suscipit laboriosam, nisi ut aliquid ex ea commodi consequatur? Quis autem vel eum iure reprehenderit qui in ea voluptate velit esse quam nihil molestiae consequatur, vel illum qui dolorem eum fugiat quo voluptas."
-    },
-    {
-      "layout": "fullMarginAboveHalfBelowLayout",
-      "role": "heading2",
-      "text": "GALLERY HEADING"
-    },
-    {
-      "format": "html",
-      "layout": "noMarginLayout",
-      "role": "body",
-      "text": "Et harum quidem rerum facilis est et expedita distinctio. Nam libero tempore, cum soluta nobis est eligendi optio cumque nihil impedit quo minus id quod maxime placeat facere possimus, omnis voluptas est, omnis dolor repellendus."
-    },
-    {
-      "layout": "fullMarginAboveHalfBelowLayout",
-      "role": "heading2",
-      "text": "HEADING"
-    },
-    {
-      "format": "html",
-      "layout": "noMarginLayout",
-      "role": "body",
-      "text": "<p>Consequatur aut doloribus asperiores repellat. Sed ut perspiciatis unde omnis iste natus error sit volup tatem accusantium doloremque laudantium, totam rem, eaque ipsa quae ab illo inventore veritatis et quasi archit ecto beatae vitae.</p><p>Nemo enim ipsam volup tatem quia voluptas sit aspernatur aut odit aut fugit, sed quia conse quuntur magni. Neque porro quisquam est, qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit, sed quia non numquam eius modi tempora incidunt ut labore et dolore aliquam quaerat voluptatem. Ut enim ad minima veniam, quis nostrum exercitationem ullam corporis suscipit laboriosam.</p><p>Consequatur aut perferendis doloribus asperiores repellat. Sed ut perspiciatis unde omnis iste natus error sit volup tatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi archit ecto beatae vitae dicta. Nemo enim ipsam volup tatem quia voluptas sit <a href='http://www.apple.com'>link text</a> aut odit aut fugit, sed quia conse quuntur perspiciatis doloribus magni dolores.</p><p>Neque porro quisquam est, qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit, sed quia non numquam eius modi tempora incidunt ut labore et dolore magnam aliquam quaerat voluptatem. Ut enim ad minima veniam, quis nostrum exercitationem ullam suscipit laboriosam.</p>"
-    },
-    {
-      "layout": "fullMarginAboveHalfBelowLayout",
-      "role": "heading2",
-      "text": "HEADING"
-    },
-    {
-      "format": "html",
-      "layout": "noMarginLayout",
-      "role": "body",
-      "text": "Quis autem vel eum iure reprehenderit qui in ea voluptate velit esse quam nihil molestiae consequatur, vel illum qui dolorem eum fugiat quo voluptas nulla pariatur? At vero eos et accusamus et iusto odio. Dignissimos ducimus qui blanditiis praesentium voluptatum deleniti atque corrupti quos dolores et quas molestias excepturi sint occaecati."
+    "bodyLayout": {
+      "columnStart": 0,
+      "columnSpan": 18,
+      "margin": {
+        "top": 15,
+        "bottom": 15
+      }
     }
-  ],
-  "documentStyle": {
-    "backgroundColor": "#FFF"
-  },
-  "identifier": "testArticle",
-  "language": "en",
-  "layout": {
-    "columns": 20,
-    "gutter": 20,
-    "margin": 60,
-    "width": 1024
-  },
-  "metadata": {
-    "excerpt": "Quia consequuntur magni accusantium doloremque eos qui ratione voluptatem sequi nesciunt?",
-    "thumbnailURL": ""
-  },
-  "textStyles": {},
-  "title": "Article Title",
-  "version": "1.5"
+  }
 }
