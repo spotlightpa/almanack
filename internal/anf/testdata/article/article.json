@@ -392,10 +392,17 @@
     },
     "default-title": {
       "fontName": "HelveticaNeue-Bold",
-      "fontSize": 64,
+      "fontSize": 32,
       "textColor": "#000",
-      "lineHeight": 74,
+      "lineHeight": 36,
       "textAlignment": "left"
+    },
+    "eyebrowStyle": {
+      "backgroundColor": "#000000",
+      "fontName": "HelveticaNeue-Bold",
+      "fontSize": 24,
+      "textColor": "#ffFFff",
+      "lineHeight": 28
     },
     "introStyle": {
       "fontName": "HelveticaNeue-Medium",
@@ -422,14 +429,22 @@
         "top": 15
       }
     },
-    "headerImageLayout": {
-      "columnSpan": 20,
+    "eyebrowLayout": {
+      "columnSpan": 18,
       "columnStart": 0,
       "margin": {
-        "bottom": 15,
+        "bottom": 4,
+        "top": 4
+      }
+    },
+    "headerImageLayout": {
+      "columnSpan": 24,
+      "columnStart": 0,
+      "margin": {
+        "bottom": 0,
         "top": 15
       },
-      "minimumHeight": "40vh",
+      "minimumHeight": "50vh",
       "ignoreDocumentMargin": true
     },
     "introLayout": {
@@ -444,8 +459,8 @@
       "columnSpan": 20,
       "columnStart": 0,
       "margin": {
-        "bottom": 10,
-        "top": 50
+        "bottom": 16,
+        "top": 0
       }
     }
   },
