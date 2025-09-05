@@ -1,5 +1,5 @@
 {
-  "version": "1.0",
+  "version": "1.20",
   "identifier": "Apple_Demo",
   "title": "Untitled",
   "language": "en",
@@ -373,6 +373,10 @@
       "fontSize": 18,
       "textColor": "#000",
       "lineHeight": 26,
+      "linkStyle": {
+        "textColor": "#0066CC",
+        "underline": true
+      },
       "textAlignment": "left"
     },
     "default-caption": {

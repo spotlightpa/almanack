@@ -15,14 +15,14 @@ func FromDB(item db.AppleNewsFeed) (*Article, error) {
 		return nil, err
 	}
 	a := templateDoc.Clone()
+	a.Identifier = item.ExternalID
 	a.Title = item.Title
 	a.Language = cmp.Or(item.Language, "en-us")
 	a.Metadata = &Metadata{
 		Authors:      item.Authors,
 		CanonicalURL: item.URL,
-		// CoverArt:            ,
 		// Excerpt:             "",
-		// Keywords:            "",
+		Keywords:     []string{item.Category},
 		ThumbnailURL: item.Image,
 		// TransparentToolbar:  "",
 		// VideoURL:            "",
@@ -64,20 +64,6 @@ func FromDB(item db.AppleNewsFeed) (*Article, error) {
 				},
 			},
 		},
-		/*
-					{
-			      "role": "header",
-			      "layout": "headerImageLayout",
-			      "style": {
-			        "fill": {
-			          "type": "image",
-			          "URL": "https://developer.apple.com/news-publisher/download/Apple-News-Example-Articles/images/Iceland01.jpg",
-			          "fillMode": "cover",
-			          "verticalAlignment": "center"
-			        }
-			      }
-			    },
-		*/
 	}
 
 	a.Components = append(a.Components, comps...)
