@@ -1,5 +1,5 @@
 {
-  "version": "1.0",
+  "version": "1.20",
   "identifier": "Apple_Demo",
   "title": "Simple with Headline above Header Image",
   "language": "en",
@@ -81,7 +81,11 @@
       "fontName": "Georgia",
       "fontSize": 18,
       "lineHeight": 26,
-      "textColor": "#000"
+      "textColor": "#000",
+      "linkStyle": {
+        "textColor": "#0066CC",
+        "underline": true
+      }
     },
     "default-caption": {
       "fontName": "HelveticaNeue-Italic",
