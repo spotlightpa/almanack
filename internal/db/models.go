@@ -20,6 +20,26 @@ type AddressRole struct {
 	UpdatedAt    time.Time `json:"updated_at"`
 }
 
+type AppleNewsFeed struct {
+	ID                  int64              `json:"id"`
+	ExternalID          string             `json:"external_id"`
+	Author              string             `json:"author"`
+	Authors             []string           `json:"authors"`
+	Category            string             `json:"category"`
+	ContentHtml         string             `json:"content_html"`
+	ExternalUpdatedAt   time.Time          `json:"external_updated_at"`
+	ExternalPublishedAt time.Time          `json:"external_published_at"`
+	Image               string             `json:"image"`
+	ImageCredit         string             `json:"image_credit"`
+	ImageDescription    string             `json:"image_description"`
+	Language            string             `json:"language"`
+	Title               string             `json:"title"`
+	URL                 string             `json:"url"`
+	UploadedAt          pgtype.Timestamptz `json:"uploaded_at"`
+	CreatedAt           time.Time          `json:"created_at"`
+	UpdatedAt           time.Time          `json:"updated_at"`
+}
+
 type Arc struct {
 	ID          int64              `json:"id"`
 	ArcID       string             `json:"arc_id"`

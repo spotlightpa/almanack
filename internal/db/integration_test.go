@@ -2,6 +2,7 @@ package db_test
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"net/http"
 	"os"
@@ -11,9 +12,11 @@ import (
 
 	"github.com/carlmjohnson/be"
 	"github.com/carlmjohnson/be/testfile"
+	"github.com/carlmjohnson/requests"
 	"github.com/carlmjohnson/requests/reqtest"
 	"github.com/spotlightpa/almanack/internal/aws"
 	"github.com/spotlightpa/almanack/internal/db"
+	"github.com/spotlightpa/almanack/internal/feed2anf"
 	"github.com/spotlightpa/almanack/internal/google"
 	"github.com/spotlightpa/almanack/internal/stringx"
 	"github.com/spotlightpa/almanack/pkg/almanack"
@@ -135,4 +138,36 @@ func TestEmbed_UnmarshalJSON(t *testing.T) {
 		var e2 db.Embed
 		be.Nonzero(t, json.Unmarshal(b, &e2))
 	}
+}
+
+func TestPublishAppleNews(t *testing.T) {
+	almlog.UseTestLogger(t)
+	p := createTestDB(t)
+	q := db.New(p)
+	ctx := t.Context()
+	cl := &http.Client{
+		Transport: reqtest.Caching(almlog.HTTPTransport, "testdata/anf"),
+	}
+	http.DefaultClient.Transport = requests.ErrorTransport(errors.New("used default client"))
+	svc := almanack.Services{
+		Client:  cl,
+		Queries: q,
+		ANF: &feed2anf.Service{
+			NewsFeedURL: "https://www.spotlightpa.org/feeds/full.json",
+		},
+	}
+	be.NilErr(t, svc.UpdateAppleNewsArchive(ctx))
+	newItems, err := svc.Queries.ListANFUpdates(ctx)
+	be.NilErr(t, err)
+	be.EqualLength(t, 15, newItems)
+
+	be.NilErr(t, svc.PublishAppleNewsFeed(ctx))
+	newItems, err = svc.Queries.ListANFUpdates(ctx)
+	be.NilErr(t, err)
+	be.Zero(t, newItems)
+
+	be.NilErr(t, svc.UpdateAppleNewsArchive(ctx))
+	newItems, err = svc.Queries.ListANFUpdates(ctx)
+	be.NilErr(t, err)
+	be.EqualLength(t, 0, newItems)
 }
