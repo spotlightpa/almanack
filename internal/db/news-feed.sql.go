@@ -9,24 +9,24 @@ import (
 	"context"
 )
 
-const listANFUpdates = `-- name: ListANFUpdates :many
+const listNewsFeedUpdates = `-- name: ListNewsFeedUpdates :many
 SELECT
   id, external_id, author, authors, category, content_html, external_updated_at, external_published_at, image, image_credit, image_description, language, title, url, uploaded_at, created_at, updated_at
 FROM
-  apple_news_feed
+  news_feed_item
 WHERE
   uploaded_at IS NULL
 `
 
-func (q *Queries) ListANFUpdates(ctx context.Context) ([]AppleNewsFeed, error) {
-	rows, err := q.db.Query(ctx, listANFUpdates)
+func (q *Queries) ListNewsFeedUpdates(ctx context.Context) ([]NewsFeedItem, error) {
+	rows, err := q.db.Query(ctx, listNewsFeedUpdates)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
-	var items []AppleNewsFeed
+	var items []NewsFeedItem
 	for rows.Next() {
-		var i AppleNewsFeed
+		var i NewsFeedItem
 		if err := rows.Scan(
 			&i.ID,
 			&i.ExternalID,
@@ -56,7 +56,43 @@ func (q *Queries) ListANFUpdates(ctx context.Context) ([]AppleNewsFeed, error) {
 	return items, nil
 }
 
-const updateANFArchives = `-- name: UpdateANFArchives :execrows
+const updateFeedUploaded = `-- name: UpdateFeedUploaded :one
+UPDATE
+  news_feed_item
+SET
+  uploaded_at = CURRENT_TIMESTAMP
+WHERE
+  id = $1
+RETURNING
+  id, external_id, author, authors, category, content_html, external_updated_at, external_published_at, image, image_credit, image_description, language, title, url, uploaded_at, created_at, updated_at
+`
+
+func (q *Queries) UpdateFeedUploaded(ctx context.Context, id int64) (NewsFeedItem, error) {
+	row := q.db.QueryRow(ctx, updateFeedUploaded, id)
+	var i NewsFeedItem
+	err := row.Scan(
+		&i.ID,
+		&i.ExternalID,
+		&i.Author,
+		&i.Authors,
+		&i.Category,
+		&i.ContentHtml,
+		&i.ExternalUpdatedAt,
+		&i.ExternalPublishedAt,
+		&i.Image,
+		&i.ImageCredit,
+		&i.ImageDescription,
+		&i.Language,
+		&i.Title,
+		&i.URL,
+		&i.UploadedAt,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+	)
+	return i, err
+}
+
+const upsertNewsFeedArchives = `-- name: UpsertNewsFeedArchives :execrows
 WITH raw_json AS (
   SELECT
     jsonb_array_elements($1::jsonb) AS data
@@ -84,7 +120,7 @@ feed_items AS (
     data ->> 'url' AS url
   FROM
     raw_json)
-  INSERT INTO apple_news_feed ("external_id", "author", "authors", "category",
+  INSERT INTO news_feed_item ("external_id", "author", "authors", "category",
     "content_html", "external_updated_at", "external_published_at", "image",
     "image_credit", "image_description", "language", "title", "url")
   SELECT
@@ -117,55 +153,19 @@ feed_items AS (
       "language" = EXCLUDED.language,
       "title" = EXCLUDED.title,
       "url" = EXCLUDED.url,
-      "uploaded_at" = CASE WHEN apple_news_feed.external_updated_at <>
+      "uploaded_at" = CASE WHEN news_feed_item.external_updated_at <>
 	EXCLUDED.external_updated_at THEN
         NULL
       ELSE
-        apple_news_feed.uploaded_at
+        news_feed_item.uploaded_at
       END,
       "updated_at" = CURRENT_TIMESTAMP
 `
 
-func (q *Queries) UpdateANFArchives(ctx context.Context, data []byte) (int64, error) {
-	result, err := q.db.Exec(ctx, updateANFArchives, data)
+func (q *Queries) UpsertNewsFeedArchives(ctx context.Context, data []byte) (int64, error) {
+	result, err := q.db.Exec(ctx, upsertNewsFeedArchives, data)
 	if err != nil {
 		return 0, err
 	}
 	return result.RowsAffected(), nil
-}
-
-const updateANFUploaded = `-- name: UpdateANFUploaded :one
-UPDATE
-  apple_news_feed
-SET
-  uploaded_at = CURRENT_TIMESTAMP
-WHERE
-  id = $1
-RETURNING
-  id, external_id, author, authors, category, content_html, external_updated_at, external_published_at, image, image_credit, image_description, language, title, url, uploaded_at, created_at, updated_at
-`
-
-func (q *Queries) UpdateANFUploaded(ctx context.Context, id int64) (AppleNewsFeed, error) {
-	row := q.db.QueryRow(ctx, updateANFUploaded, id)
-	var i AppleNewsFeed
-	err := row.Scan(
-		&i.ID,
-		&i.ExternalID,
-		&i.Author,
-		&i.Authors,
-		&i.Category,
-		&i.ContentHtml,
-		&i.ExternalUpdatedAt,
-		&i.ExternalPublishedAt,
-		&i.Image,
-		&i.ImageCredit,
-		&i.ImageDescription,
-		&i.Language,
-		&i.Title,
-		&i.URL,
-		&i.UploadedAt,
-		&i.CreatedAt,
-		&i.UpdatedAt,
-	)
-	return i, err
 }

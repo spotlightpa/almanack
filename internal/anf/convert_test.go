@@ -13,9 +13,6 @@ func TestConvert(t *testing.T) {
 		in := testfile.Read(t, match)
 		art, err := anf.ConvertToAppleNews([]byte(in))
 		be.NilErr(t, err)
-		art.Metadata.DateCreated = nil
-		art.Metadata.DateModified = nil
-		art.Metadata.DatePublished = nil
 		testfile.EqualJSON(t, testfile.Ext(match, ".json"), art)
 	})
 }
