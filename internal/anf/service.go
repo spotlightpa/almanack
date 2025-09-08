@@ -37,7 +37,7 @@ func (svc *Service) Publish(ctx context.Context, cl *http.Client, a *Article) er
 				return err
 			}
 			h := make(textproto.MIMEHeader)
-			disposition := fmt.Sprintf(`Content-Disposition: form-data; filename=article.json; size=%d`, len(data))
+			disposition := fmt.Sprintf(`form-data; filename=article.json; size=%d`, len(data))
 			h.Set("Content-Disposition", disposition)
 			h.Set("Content-Type", "application/json")
 			w, err := multi.CreatePart(h)
