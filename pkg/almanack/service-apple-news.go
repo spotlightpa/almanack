@@ -18,7 +18,7 @@ func (svc Services) PublishAppleNewsFeed(ctx context.Context) (err error) {
 		return err
 	}
 	// Check for unuploaded items
-	newItems, err := svc.Queries.ListANFUpdates(ctx)
+	newItems, err := svc.Queries.ListNewsFeedUpdates(ctx)
 	if err != nil {
 		return err
 	}
@@ -28,7 +28,7 @@ func (svc Services) PublishAppleNewsFeed(ctx context.Context) (err error) {
 		// Convert to ANF
 		// Upload to Apple
 		// Mark as uploaded
-		_, err := svc.Queries.UpdateANFUploaded(ctx, newItem.ID)
+		_, err := svc.Queries.UpdateFeedUploaded(ctx, newItem.ID)
 		if err != nil {
 			return err
 		}
@@ -54,7 +54,7 @@ func (svc Services) UpdateAppleNewsArchive(ctx context.Context) (err error) {
 	if err != nil {
 		return err
 	}
-	updated, err := svc.Queries.UpdateANFArchives(ctx, data)
+	updated, err := svc.Queries.UpsertNewsFeedArchives(ctx, data)
 	l.InfoContext(ctx, "UpdateAppleNewsArchive", "updated_rows", updated)
 	return err
 }

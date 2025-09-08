@@ -1,4 +1,4 @@
--- name: UpdateANFArchives :execrows
+-- name: UpsertNewsFeedArchives :execrows
 WITH raw_json AS (
   SELECT
     jsonb_array_elements(@data::jsonb) AS data
@@ -26,7 +26,7 @@ feed_items AS (
     data ->> 'url' AS url
   FROM
     raw_json)
-  INSERT INTO apple_news_feed ("external_id", "author", "authors", "category",
+  INSERT INTO news_feed_item ("external_id", "author", "authors", "category",
     "content_html", "external_updated_at", "external_published_at", "image",
     "image_credit", "image_description", "language", "title", "url")
   SELECT
@@ -59,25 +59,25 @@ feed_items AS (
       "language" = EXCLUDED.language,
       "title" = EXCLUDED.title,
       "url" = EXCLUDED.url,
-      "uploaded_at" = CASE WHEN apple_news_feed.external_updated_at <>
+      "uploaded_at" = CASE WHEN news_feed_item.external_updated_at <>
 	EXCLUDED.external_updated_at THEN
         NULL
       ELSE
-        apple_news_feed.uploaded_at
+        news_feed_item.uploaded_at
       END,
       "updated_at" = CURRENT_TIMESTAMP;
 
--- name: ListANFUpdates :many
+-- name: ListNewsFeedUpdates :many
 SELECT
   *
 FROM
-  apple_news_feed
+  news_feed_item
 WHERE
   uploaded_at IS NULL;
 
--- name: UpdateANFUploaded :one
+-- name: UpdateFeedUploaded :one
 UPDATE
-  apple_news_feed
+  news_feed_item
 SET
   uploaded_at = CURRENT_TIMESTAMP
 WHERE
