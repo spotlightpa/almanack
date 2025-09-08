@@ -1,4 +1,4 @@
-package feed2anf
+package jsonfeed
 
 type Feed struct {
 	Description string `json:"description"`

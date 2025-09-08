@@ -16,8 +16,8 @@ import (
 	"github.com/carlmjohnson/requests/reqtest"
 	"github.com/spotlightpa/almanack/internal/aws"
 	"github.com/spotlightpa/almanack/internal/db"
-	"github.com/spotlightpa/almanack/internal/feed2anf"
 	"github.com/spotlightpa/almanack/internal/google"
+	"github.com/spotlightpa/almanack/internal/jsonfeed"
 	"github.com/spotlightpa/almanack/internal/stringx"
 	"github.com/spotlightpa/almanack/pkg/almanack"
 	"github.com/spotlightpa/almanack/pkg/almlog"
@@ -152,8 +152,8 @@ func TestPublishAppleNews(t *testing.T) {
 	svc := almanack.Services{
 		Client:  cl,
 		Queries: q,
-		ANF: &feed2anf.Service{
-			NewsFeedURL: "https://www.spotlightpa.org/feeds/full.json",
+		NewsFeed: &jsonfeed.NewsFeed{
+			URL: "https://www.spotlightpa.org/feeds/full.json",
 		},
 	}
 	be.NilErr(t, svc.UpdateAppleNewsArchive(ctx))

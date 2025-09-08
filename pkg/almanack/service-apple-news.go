@@ -6,7 +6,8 @@ import (
 
 	"github.com/carlmjohnson/errorx"
 	"github.com/carlmjohnson/requests"
-	"github.com/spotlightpa/almanack/internal/feed2anf"
+	"github.com/spotlightpa/almanack/internal/anf"
+	"github.com/spotlightpa/almanack/internal/jsonfeed"
 	"github.com/spotlightpa/almanack/pkg/almlog"
 )
 
@@ -23,12 +24,16 @@ func (svc Services) PublishAppleNewsFeed(ctx context.Context) (err error) {
 		return err
 	}
 	l.InfoContext(ctx, "PublishAppleNewsFeed: need uploading", "n", len(newItems))
-	for _, newItem := range newItems {
-		// Build templates
+	for i := range newItems {
+		newItem := &newItems[i]
 		// Convert to ANF
-		// Upload to Apple
+		_, err := anf.FromDB(newItem)
+		if err != nil {
+			return err
+		}
+		// TODO: Upload to Apple
 		// Mark as uploaded
-		_, err := svc.Queries.UpdateFeedUploaded(ctx, newItem.ID)
+		_, err = svc.Queries.UpdateFeedUploaded(ctx, newItem.ID)
 		if err != nil {
 			return err
 		}
@@ -41,9 +46,9 @@ func (svc Services) UpdateAppleNewsArchive(ctx context.Context) (err error) {
 	l := almlog.FromContext(ctx)
 
 	// Fetch the feed
-	var source feed2anf.Feed
+	var source jsonfeed.Feed
 	if err = requests.
-		URL(svc.ANF.NewsFeedURL).
+		URL(svc.NewsFeed.URL).
 		Client(svc.Client).
 		ToJSON(&source).
 		Fetch(ctx); err != nil {
