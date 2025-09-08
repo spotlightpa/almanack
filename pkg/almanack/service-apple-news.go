@@ -24,11 +24,14 @@ func (svc Services) PublishAppleNewsFeed(ctx context.Context) (err error) {
 	for i := range newItems {
 		newItem := &newItems[i]
 		// Convert to ANF
-		_, err := anf.FromDB(newItem)
+		art, err := anf.FromDB(newItem)
 		if err != nil {
 			return err
 		}
-		// TODO: Upload to Apple
+		// Upload to Apple
+		if err = svc.ANF.Publish(ctx, svc.Client, art); err != nil {
+			return err
+		}
 		// Mark as uploaded
 		_, err = svc.Queries.UpdateFeedUploaded(ctx, newItem.ID)
 		if err != nil {
