@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	"github.com/carlmjohnson/slackhook"
+	"github.com/spotlightpa/almanack/internal/anf"
 	"github.com/spotlightpa/almanack/internal/aws"
 	"github.com/spotlightpa/almanack/internal/db"
 	"github.com/spotlightpa/almanack/internal/github"
@@ -30,6 +31,7 @@ type Services struct {
 	NewletterService mailchimp.V3
 	Gsvc             *google.Service
 	NewsFeed         *jsonfeed.NewsFeed
+	ANF              *anf.Service
 	mailchimp.EmailService
 	HC healthchecksio.Client
 }
