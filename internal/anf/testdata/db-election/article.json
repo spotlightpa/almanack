@@ -1,0 +1,450 @@
+{
+  "version": "1.20",
+  "identifier": "8bf8b1704375712d971b52127a1f680d",
+  "title": "How 3 justices seeking another term on Pa. Supreme Court ruled in pivotal election cases",
+  "language": "en-us",
+  "layout": {
+    "columns": 20,
+    "width": 1024,
+    "gutter": 20,
+    "margin": 60
+  },
+  "components": [
+    {
+      "role": "intro",
+      "layout": "eyebrowLayout",
+      "text": " Elections ",
+      "textStyle": "eyebrowStyle"
+    },
+    {
+      "role": "title",
+      "layout": "titleLayout",
+      "text": "How 3 justices seeking another term on Pa. Supreme Court ruled in pivotal election cases"
+    },
+    {
+      "role": "author",
+      "text": "by Carter Walker of Votebeat"
+    },
+    {
+      "role": "header",
+      "layout": "headerImageLayout",
+      "style": {
+        "fill": {
+          "type": "image",
+          "URL": "https://www.spotlightpa.org/imgproxy/insecure/rt:fill/w:800/h:1000/g:sm/el:1/q:75/MjAyNS8wOS8wMW1iLWVqNGQtOGEzNy00MXd3LmpwZWc=.jpeg",
+          "fillMode": "cover",
+          "verticalAlignment": "center"
+        }
+      },
+      "text": ""
+    },
+    {
+      "role": "body",
+      "layout": "bodyLayout",
+      "text": "<em>This article is made possible through </em><a href=\"https://www.spotlightpa.org/\"><em>Spotlight PA’s</em></a><em> collaboration with </em><a href=\"https://www.votebeat.org/\"><em>Votebeat</em></a><em>, a nonpartisan news organization covering local election administration and voting. Sign up for </em><a href=\"https://votebe.at/pennsylvanianewsletter\"><em>Votebeat Pennsylvania&#39;s free newsletters here</em></a><em>.</em>",
+      "format": "html"
+    },
+    {
+      "role": "body",
+      "layout": "bodyLayout",
+      "text": "This November’s retention elections for judges on Pennsylvania’s appellate courts are shaping up to be more combative and political than usual, thanks in part to a decade of battles over the commonwealth’s election laws.",
+      "format": "html"
+    },
+    {
+      "role": "body",
+      "layout": "bodyLayout",
+      "text": "Three state Supreme Court justices, all Democrats, are up for retention this November, which means voters must select “yes” or “no” on whether to keep the judges on the bench for another 10 years.",
+      "format": "html"
+    },
+    {
+      "role": "body",
+      "layout": "bodyLayout",
+      "text": "Democrats have controlled the court since 2015, and only one judge on Pennsylvania’s appellate courts has ever lost a retention election. But Republicans see an opportunity for a repeat of that this year and a chance to take back the court. They’re urging voters to vote “no” on the three incumbents, citing among other things, their rulings on 2020 election logistics, <a href=\"https://www.votebeat.org/pennsylvania/2025/02/04/curing-policies-lower-mail-ballot-rejection-rate/\">ballot curing</a>, and redistricting. If the no vote prevails for a judge, the governor and state Senate could select a temporary replacement, and the seat would be up for election in 2027.",
+      "format": "html"
+    },
+    {
+      "role": "body",
+      "layout": "bodyLayout",
+      "text": "“They’ve issued blatantly partisan rulings, from accepting late mail-in ballots to approving a biased redistricting map,” James Markley, communications director for the Pennsylvania GOP, said of the Supreme Court’s Democratic majority. “And now they expect another 10-year term? Pennsylvanians don’t want a decade more of liberal judicial overreach.”",
+      "format": "html"
+    },
+    {
+      "role": "body",
+      "layout": "bodyLayout",
+      "text": "Mitch Kates, executive director of the Pennsylvania Democratic Party, defended the jurists&#39; records. For example, he said, when the court overturned the state’s congressional map and selected a new map, the new one initially produced an evenly split congressional delegation, and Democrats have since lost seats, showing that the districts are competitive.",
+      "format": "html"
+    },
+    {
+      "role": "body",
+      "layout": "bodyLayout",
+      "text": "“Their rulings have been fair,” Kates said. “There hasn&#39;t been a hyperpartisan bend to them.”",
+      "format": "html"
+    },
+    {
+      "role": "body",
+      "layout": "bodyLayout",
+      "text": "<i><a href=\"https://www.spotlightpa.org/newsletters/\">\n  <b>Free Newsletter:</b>\n  Sign up for a free roundup of the top news from across Pennsylvania, all in\n  one daily or weekly email from Spotlight PA.</a></i>",
+      "format": "html"
+    },
+    {
+      "role": "body",
+      "layout": "bodyLayout",
+      "text": "The seven-member state Supreme Court currently has five justices elected as Democrats. The three on the ballot in November are Christine Donohue, Kevin Dougherty, and David Wecht. While the Democratic Party is campaigning for their retention, their names on the ballot <a href=\"https://www.pacourts.us/Storage/media/pdfs/20210224/033231-retentionelections-001750.pdf\">will not include a party designation</a> this year.",
+      "format": "html"
+    },
+    {
+      "role": "body",
+      "layout": "bodyLayout",
+      "text": "The Pennsylvania Bar Association, which reviews candidates for judicial office, has recommended all three Supreme Court justices for retention. In <a href=\"https://www.pabar.org/site/For-Lawyers/Committees-Commissions/Judicial-Evaluation/Resources/JEC-Ratings/2025\">questionnaires for the bar association</a>, they offered some insight into how they approach the law.",
+      "format": "html"
+    },
+    {
+      "role": "body",
+      "layout": "bodyLayout",
+      "text": "Marian Schneider, former senior voting rights policy counsel at the ACLU of Pennsylvania, is teaching a class at Villanova University’s school of law this fall on voting rights and state law. Many of the election cases these judges have ruled on will be on the syllabus.",
+      "format": "html"
+    },
+    {
+      "role": "body",
+      "layout": "bodyLayout",
+      "text": "She said that she hasn’t always agreed with the justices’ decisions, but she doesn’t see partisan influence in their rulings.",
+      "format": "html"
+    },
+    {
+      "role": "body",
+      "layout": "bodyLayout",
+      "text": "“Any one of those three justices have voted with their Republican counterparts in a variety of cases, including in the voting rights cases,” she said.",
+      "format": "html"
+    },
+    {
+      "role": "body",
+      "layout": "bodyLayout",
+      "text": "Commonwealth Court Judge Michael Wojcik is also up for retention, as is Superior Court Judge Alice Dubow, although that court does not handle election law issues. The Bar Association has recommended both for retention.",
+      "format": "html"
+    },
+    {
+      "role": "body",
+      "layout": "bodyLayout",
+      "text": "Here is a look at five of the most consequential election law cases of the past few years, and how the judges up for retention ruled on them. More election law cases can be found <a href=\"https://www.pacourts.us/news-and-statistics/cases-of-public-interest\">on the Pennsylvania court system’s website</a>.",
+      "format": "html"
+    },
+    {
+      "role": "heading",
+      "layout": "introLayout",
+      "text": "2020 election rules",
+      "format": "html",
+      "textStyle": "introStyle"
+    },
+    {
+      "role": "body",
+      "layout": "bodyLayout",
+      "text": "In the summer of 2020, as the COVID-19 pandemic disrupted elections across the country, Pennsylvania Democrats sued the state, seeking a slew of accommodations mostly aimed at making it easier to vote by mail.",
+      "format": "html"
+    },
+    {
+      "role": "body",
+      "layout": "bodyLayout",
+      "text": "For example, they wanted the courts to affirm the use of ballot drop boxes; extend the deadline for returning mail ballots; require counties to contact voters who made errors on their mail ballot envelope and let them fix the error; and eliminate the secrecy envelope requirement for mail ballots.",
+      "format": "html"
+    },
+    {
+      "role": "body",
+      "layout": "bodyLayout",
+      "text": "Conservatives frequently point to <a href=\"https://www.scotusblog.com/election-litigation/pennsylvania-democratic-party-v-boockvar/\">this case</a> in arguing that the justices should not be retained.",
+      "format": "html"
+    },
+    {
+      "role": "body",
+      "layout": "bodyLayout",
+      "text": "In his majority opinion, then-Justice Max Baer ruled that the state Election Code does allow for drop boxes and extended the deadline for receiving mail ballots to the Friday after the election.",
+      "format": "html"
+    },
+    {
+      "role": "body",
+      "layout": "bodyLayout",
+      "text": "The opinion did not require counties to notify voters about ballot envelope errors, or invalidate the secrecy envelope requirement.",
+      "format": "html"
+    },
+    {
+      "role": "body",
+      "layout": "bodyLayout",
+      "text": "Dougherty and Wecht joined in that opinion. Donohue joined, but <a href=\"https://www.aclupa.org/app/uploads/2020/09/concurring_and_dissenting_opinion_-_justice_donohue.pdf\">dissented</a> with the part about moving the deadline by which a ballot must be returned because she felt it was not appropriate for the court to make that decision.",
+      "format": "html"
+    },
+    {
+      "role": "heading",
+      "layout": "introLayout",
+      "text": "Requirement to write date on mail ballot envelope",
+      "format": "html",
+      "textStyle": "introStyle"
+    },
+    {
+      "role": "body",
+      "layout": "bodyLayout",
+      "text": "Whether voters should have to write a date on their mail ballot return envelopes has been the most litigated piece of election law since 2020, with state and federal courts vacillating on the requirement. The state Supreme Court and Commonwealth Court are among those that have heard cases.",
+      "format": "html"
+    },
+    {
+      "role": "body",
+      "layout": "bodyLayout",
+      "text": "In a decision ahead of the 2020 presidential election, the state Supreme Court split.",
+      "format": "html"
+    },
+    {
+      "role": "body",
+      "layout": "bodyLayout",
+      "text": "<a href=\"https://www.pacourts.us/Storage/media/pdfs/20210604/010357-opinionannouncingthejudgmentofthecourt-010686.pdf\">Donohue, joined by two other justices, ruled</a> the mail ballots shouldn’t be rejected for lacking a date on the envelope. Dougherty joined with two Republican justices in support of the opposite view. Wecht cast the tiebreaking vote, <a href=\"https://www.pacourts.us/Storage/media/pdfs/20210601/172839-file-10687.pdf\">ruling</a> that the law did require dates, but that ballots for the 2020 election should not be set aside for not having one.",
+      "format": "html"
+    },
+    {
+      "role": "body",
+      "layout": "bodyLayout",
+      "text": "Two years later, <a href=\"https://www.politico.com/news/2022/11/01/pennsylvania-court-undated-ballots-00064549\">the court deadlocked</a> on this issue. Three justices, including Donohue and Wecht, agreed the dating requirement violated a provision in the federal Civil Rights Act. Dougherty joined with two Republican justices who found it did not.",
+      "format": "html"
+    },
+    {
+      "role": "body",
+      "layout": "bodyLayout",
+      "text": "Yet another case stemming from a 2024 special election in Philadelphia is <a href=\"https://www.votebeat.org/pennsylvania/2025/01/17/baxter-philadelphia-undated-misdated-mail-ballot-case/\">currently before the high court</a>, and it may provide the justices another opportunity to rule on the matter.",
+      "format": "html"
+    },
+    {
+      "role": "heading",
+      "layout": "introLayout",
+      "text": "‘Notice and cure’: fixing errors that disqualify ballots",
+      "format": "html",
+      "textStyle": "introStyle"
+    },
+    {
+      "role": "body",
+      "layout": "bodyLayout",
+      "text": "Many counties in the state have opted to notify voters of an error that could get their ballot disqualified — for example, if their ballot lacked a proper date, signature, or secrecy envelope, — and give them a chance to fix, or “cure,” the problem. But some do not.",
+      "format": "html"
+    },
+    {
+      "role": "body",
+      "layout": "bodyLayout",
+      "text": "Pennsylvania courts have been in the middle of battles over whether to require counties to adopt “notice and cure” policies, or prohibit them from doing so.",
+      "format": "html"
+    },
+    {
+      "role": "body",
+      "layout": "bodyLayout",
+      "text": "In a 2024 case against Washington County, a coalition of voting rights groups and individual voters challenged the county’s practice of rejecting deficient mail ballots without notifying voters ahead of time. Wojcik, writing the majority opinion for a panel of Commonwealth Court judges, <a href=\"https://www.votebeat.org/pennsylvania/2024/09/24/mail-ballot-notice-cure-lawsuit-commonwealth-court-washington-county-aclu/\">ruled against the county</a> and said the policy deprives voters the opportunity to contest the rejection of their ballot or to cast a provisional ballot.",
+      "format": "html"
+    },
+    {
+      "role": "body",
+      "layout": "bodyLayout",
+      "text": "The county appealed that decision to the state Supreme Court, which has yet to rule.",
+      "format": "html"
+    },
+    {
+      "role": "body",
+      "layout": "bodyLayout",
+      "text": "In a separate case, which the state Supreme Court ruled on, justices did not rule voters should be allowed to “cure” their original ballot, but it <a href=\"https://www.votebeat.org/pennsylvania/2024/10/23/state-supreme-court-ruling-provisional-ballots-rejected-mail-voters-butler-county/\">affirmed they have a right to cast a provisional ballot</a> and have it counted.",
+      "format": "html"
+    },
+    {
+      "role": "body",
+      "layout": "bodyLayout",
+      "text": "Donohue <a href=\"https://law.justia.com/cases/pennsylvania/supreme-court/2024/27-wap-2024.html\">wrote that opinion,</a> and was joined by Dougherty. Wecht joined the two Republican justices in a dissent that said state law was “clear and unambiguous” that the county could not count the provisional ballots.",
+      "format": "html"
+    },
+    {
+      "role": "body",
+      "layout": "bodyLayout",
+      "text": "<i><a href=\"https://www.spotlightpa.org/donate/\"><b>While You’re Here:</b>\n  If you learned something from this report, pay it forward and become a member of Spotlight PA so someone else can in the future.</a></i>",
+      "format": "html"
+    },
+    {
+      "role": "heading",
+      "layout": "introLayout",
+      "text": "Redistricting after court strikes down gerrymander",
+      "format": "html",
+      "textStyle": "introStyle"
+    },
+    {
+      "role": "body",
+      "layout": "bodyLayout",
+      "text": "In 2018, the state Supreme Court in a 4-3 decision <a href=\"https://www.npr.org/sections/thetwo-way/2018/01/22/579788104/pennsylvania-supreme-court-strikes-down-voting-map\">struck down the state’s congressional map</a> as an unconstitutional gerrymander that favored Republicans. Donohue, Dougherty, and Wecht were all in the majority.",
+      "format": "html"
+    },
+    {
+      "role": "body",
+      "layout": "bodyLayout",
+      "text": "When the legislature and governor couldn’t agree on a new map, a court-appointed expert <a href=\"https://www.inquirer.com/philly/news/politics/pennsylvania-gerrymandering-supreme-court-map-congressional-districts-2018-elections-20180219.html\">drew a replacement</a> with more compact districts that split fewer counties.",
+      "format": "html"
+    },
+    {
+      "role": "body",
+      "layout": "bodyLayout",
+      "text": "In the next election, Pennsylvania’s congressional delegation changed from a 13-5 GOP majority to an even partisan split, though <a href=\"https://whyy.org/articles/analysis-suggests-pa-democrats-would-have-surged-in-2018-even-without-congressional-map-change/\">an analysis </a>attributed only part of that to the redistricting.",
+      "format": "html"
+    },
+    {
+      "role": "body",
+      "layout": "bodyLayout",
+      "text": "When it was time to redraw the maps after the 2020 census, the legislative and executive branches again could not agree on a new congressional one, and the court <a href=\"https://www.spotlightpa.org/news/2022/03/pennsylvania-redistricting-supreme-court-congressional-map-reasons/\">selected a map drawn by an outside expert</a> that met its criteria from the 2018 case. Donohue, Dougherty, and Wecht <a href=\"https://www.pacourts.us/assets/opinions/Supreme/out/J-20-2022mo.pdf?cb=1\">joined the majority opinion</a> then as well.",
+      "format": "html"
+    },
+    {
+      "role": "heading",
+      "layout": "introLayout",
+      "text": "Constitutionality of mail voting",
+      "format": "html",
+      "textStyle": "introStyle"
+    },
+    {
+      "role": "body",
+      "layout": "bodyLayout",
+      "text": "Two cases, which were consolidated, dealt with whether Pennsylvania’s 2019 no-excuse mail voting law, Act 77, was constitutional. Following President Donald Trump’s attack on mail voting in 2020, some Republicans sought to invalidate the law their party had supported just years earlier based on what they viewed as a conflict with the state’s absentee ballot law.",
+      "format": "html"
+    },
+    {
+      "role": "body",
+      "layout": "bodyLayout",
+      "text": "In August 2022, the court <a href=\"https://www.spotlightpa.org/news/2022/08/pa-mail-voting-law-uphelp-state-supreme-court/?utm_source=chatgpt.com\">upheld the law</a>.",
+      "format": "html"
+    },
+    {
+      "role": "body",
+      "layout": "bodyLayout",
+      "text": "Donohue wrote the majority opinion, and was joined by four other justices, including Dougherty and Wecht. Donohue wrote that the legislature acted within its authority when it passed the law and that the state constitution didn’t expressly prohibit the legislature from creating universal mail voting.",
+      "format": "html"
+    },
+    {
+      "role": "body",
+      "layout": "bodyLayout",
+      "text": "<em>Carter Walker is a reporter for Votebeat in partnership with Spotlight PA. Contact Carter at </em><a href=\"mailto:cwalker@votebeat.org\"><em>cwalker@votebeat.org</em></a><em>.</em>",
+      "format": "html"
+    }
+  ],
+  "subtitle": "Non occidere quae cumque vi ventia",
+  "metadata": {
+    "authors": [
+      "Carter Walker"
+    ],
+    "canonicalURL": "https://www.spotlightpa.org/news/2025/09/judicial-retention-candidates-election-cases-2025-republican-court-flip-elections/",
+    "keywords": [
+      "Elections"
+    ],
+    "thumbnailURL": "https://www.spotlightpa.org/imgproxy/insecure/rt:fill/w:800/h:1000/g:sm/el:1/q:75/MjAyNS8wOS8wMW1iLWVqNGQtOGEzNy00MXd3LmpwZWc=.jpeg",
+    "dateCreated": "2025-09-03T04:00:00-04:00",
+    "dateModified": "2025-09-03T03:57:01-04:00",
+    "datePublished": "2025-09-03T04:00:00-04:00",
+    "generatorName": "Spotlight PA Feed2ANF",
+    "generatorVersion": "0.0.1"
+  },
+  "documentStyle": {
+    "backgroundColor": "#f6f6f6"
+  },
+  "componentTextStyles": {
+    "default-author": {
+      "fontName": "HelveticaNeue-Bold",
+      "fontSize": 16,
+      "textColor": "#000",
+      "textAlignment": "left"
+    },
+    "default-body": {
+      "fontName": "Georgia",
+      "fontSize": 18,
+      "textColor": "#000",
+      "lineHeight": 26,
+      "linkStyle": {
+        "textColor": "#0066CC",
+        "underline": true
+      },
+      "textAlignment": "left"
+    },
+    "default-caption": {
+      "fontName": "HelveticaNeue-Italic",
+      "fontSize": 14,
+      "textColor": "#53585F",
+      "lineHeight": 18,
+      "paragraphSpacingBefore": 12,
+      "paragraphSpacingAfter": 12
+    },
+    "default-subtitle": {
+      "fontName": "HelveticaNeue-Thin",
+      "fontSize": 20,
+      "textColor": "#2F2F2F",
+      "lineHeight": 24,
+      "textAlignment": "center"
+    },
+    "default-title": {
+      "fontName": "HelveticaNeue-Bold",
+      "fontSize": 32,
+      "textColor": "#000",
+      "lineHeight": 36,
+      "textAlignment": "left"
+    },
+    "eyebrowStyle": {
+      "backgroundColor": "#000000",
+      "fontName": "HelveticaNeue-Bold",
+      "fontSize": 24,
+      "textColor": "#ffFFff",
+      "lineHeight": 28
+    },
+    "introStyle": {
+      "fontName": "HelveticaNeue-Medium",
+      "fontSize": 24,
+      "textColor": "#000",
+      "textAlignment": "left"
+    }
+  },
+  "textStyles": {},
+  "componentLayouts": {
+    "authorLayout": {
+      "columnSpan": 20,
+      "columnStart": 0,
+      "margin": {
+        "bottom": 15,
+        "top": 15
+      }
+    },
+    "bodyLayout": {
+      "columnSpan": 18,
+      "columnStart": 0,
+      "margin": {
+        "bottom": 15,
+        "top": 15
+      }
+    },
+    "eyebrowLayout": {
+      "columnSpan": 18,
+      "columnStart": 0,
+      "margin": {
+        "bottom": 4,
+        "top": 4
+      }
+    },
+    "headerImageLayout": {
+      "columnSpan": 24,
+      "columnStart": 0,
+      "margin": {
+        "bottom": 0,
+        "top": 15
+      },
+      "minimumHeight": "50vh",
+      "ignoreDocumentMargin": true
+    },
+    "introLayout": {
+      "columnSpan": 20,
+      "columnStart": 0,
+      "margin": {
+        "bottom": 15,
+        "top": 15
+      }
+    },
+    "titleLayout": {
+      "columnSpan": 20,
+      "columnStart": 0,
+      "margin": {
+        "bottom": 16,
+        "top": 0
+      }
+    }
+  },
+  "componentStyles": {}
+}

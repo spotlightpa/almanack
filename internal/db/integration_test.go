@@ -157,17 +157,19 @@ func TestPublishAppleNews(t *testing.T) {
 		},
 	}
 	be.NilErr(t, svc.UpdateAppleNewsArchive(ctx))
-	newItems, err := svc.Queries.ListANFUpdates(ctx)
+	newItems, err := svc.Queries.ListNewsFeedUpdates(ctx)
 	be.NilErr(t, err)
 	be.EqualLength(t, 15, newItems)
 
 	be.NilErr(t, svc.PublishAppleNewsFeed(ctx))
-	newItems, err = svc.Queries.ListANFUpdates(ctx)
+	// Publishing should mark everyone as uploaded
+	newItems, err = svc.Queries.ListNewsFeedUpdates(ctx)
 	be.NilErr(t, err)
 	be.Zero(t, newItems)
 
+	// Updating archive should not mark previously uploaded items as null
 	be.NilErr(t, svc.UpdateAppleNewsArchive(ctx))
-	newItems, err = svc.Queries.ListANFUpdates(ctx)
+	newItems, err = svc.Queries.ListNewsFeedUpdates(ctx)
 	be.NilErr(t, err)
 	be.EqualLength(t, 0, newItems)
 }

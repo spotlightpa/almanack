@@ -1,4 +1,4 @@
-CREATE TABLE apple_news_feed (
+CREATE TABLE news_feed_item (
   "id" bigserial PRIMARY KEY,
   "external_id" text NOT NULL UNIQUE,
   "author" text NOT NULL DEFAULT '',
@@ -18,7 +18,7 @@ CREATE TABLE apple_news_feed (
   "updated_at" timestamp with time zone NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE INDEX apple_news_feed_published_at_idx ON apple_news_feed ("uploaded_at");
+CREATE INDEX news_feed_item_published_at_idx ON news_feed_item ("uploaded_at");
 
 ---- create above / drop below ----
-DROP TABLE apple_news_feed;
+DROP TABLE news_feed_item;
