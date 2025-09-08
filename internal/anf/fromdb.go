@@ -6,7 +6,7 @@ import (
 	"github.com/spotlightpa/almanack/internal/db"
 )
 
-func FromDB(item db.NewsFeedItem) (*Article, error) {
+func FromDB(item *db.NewsFeedItem) (*Article, error) {
 	a, err := ConvertToAppleNews(item.ContentHtml)
 	if err != nil {
 		return nil, err
