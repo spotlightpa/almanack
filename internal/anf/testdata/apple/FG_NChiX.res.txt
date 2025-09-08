@@ -1,0 +1,22 @@
+HTTP/2.0 200 OK
+Connection: close
+Cache-Control: no-cache, no-store, max-age=0, must-revalidate
+Content-Type: application/json
+Date: Mon, 08 Sep 2025 18:44:10 GMT
+Expires: 0
+Pragma: no-cache
+Request-Id: cefbaaf0-8ce3-11f0-9eee-9ba0a9bb764f
+Server: AppleHttpServer/b8ec80cca6989c12f052ddc48a820b0e67d3d547
+Strict-Transport-Security: max-age=31536000 ; includeSubDomains
+Strict-Transport-Security: max-age=31536000
+Vary: Origin
+Vary: Access-Control-Request-Method
+Vary: Access-Control-Request-Headers
+X-B3-Traceid: 90065e8ba54b883d
+X-Content-Type-Options: nosniff
+X-Frame-Options: DENY
+X-Request-Id: cefbaaf0-8ce3-11f0-9eee-9ba0a9bb764f
+X-Test-Source-Environment: prod
+X-Xss-Protection: 0
+
+{"data":{"createdAt":"2019-12-12T20:40:36Z","modifiedAt":"2025-09-08T17:59:52Z","id":"24ec5a73-9637-4835-a0be-288dc5c0fd80","type":"channel","shareUrl":"https://apple.news/TJOxac5Y3SDWgviiNxcD9gA","links":{"defaultSection":"https://news-api.apple.com/sections/32c84a90-100a-4781-826b-6dbaaf9fb3c7","self":"https://news-api.apple.com/channels/24ec5a73-9637-4835-a0be-288dc5c0fd80"},"name":"Spotlight PA","website":"https://www.spotlightpa.org","fonts":[]}}
