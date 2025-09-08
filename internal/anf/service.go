@@ -13,14 +13,14 @@ import (
 )
 
 type Service struct {
-	Key, Secret, ChannelID string
+	ChannelID, Key, Secret string
 }
 
 func AddFlags(fl *flag.FlagSet) (svc *Service) {
 	svc = new(Service)
+	fl.StringVar(&svc.ChannelID, "apple-news-channel-id", "", "`channel id` for Apple News Publisher")
 	fl.StringVar(&svc.Key, "apple-news-key", "", "`key` for Apple News Publisher")
 	fl.StringVar(&svc.Secret, "apple-news-secret", "", "`secret` for Apple News Publisher")
-	fl.StringVar(&svc.Secret, "apple-news-channel-id", "", "`channel id` for Apple News Publisher")
 	return svc
 }
 
