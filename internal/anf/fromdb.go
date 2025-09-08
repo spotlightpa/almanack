@@ -9,12 +9,13 @@ import (
 	"golang.org/x/net/html"
 )
 
-func FromDB(item db.AppleNewsFeed) (*Article, error) {
-	comps, err := buildComponents(item.ContentHtml)
+func FromDB(item db.NewsFeedItem) (*Article, error) {
+	doc, err := html.Parse(strings.NewReader(item.ContentHtml))
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("BuildComponents: parsing HTML: %w", err)
 	}
-	a := templateDoc.Clone()
+	a := ConvertHTMLToAppleNews(doc)
+	comps := a.Components
 	a.Identifier = item.ExternalID
 	a.Title = item.Title
 	a.Language = cmp.Or(item.Language, "en-us")
@@ -67,14 +68,5 @@ func FromDB(item db.AppleNewsFeed) (*Article, error) {
 	}
 
 	a.Components = append(a.Components, comps...)
-	return &a, nil
-}
-
-func buildComponents(htmlContent string) ([]Component, error) {
-	doc, err := html.Parse(strings.NewReader(htmlContent))
-	if err != nil {
-		return nil, fmt.Errorf("BuildComponents: parsing HTML: %w", err)
-	}
-	art := ConvertHTMLToAppleNews(doc)
-	return art.Components, nil
+	return a, nil
 }

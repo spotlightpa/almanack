@@ -12,7 +12,7 @@ import (
 
 func TestFromDB(t *testing.T) {
 	testfile.Run(t, "testdata/*/item.json", func(t *testing.T, match string) {
-		var item db.AppleNewsFeed
+		var item db.NewsFeedItem
 		testfile.ReadJSON(t, match, &item)
 		art, err := anf.FromDB(item)
 		be.NilErr(t, err)
