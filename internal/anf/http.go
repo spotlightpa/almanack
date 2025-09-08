@@ -14,7 +14,11 @@ import (
 )
 
 func HHMACSignRequest(req *http.Request, key, secret string, now time.Time) error {
-	h := hmac.New(sha256.New, []byte(secret))
+	secretB, err := base64.StdEncoding.DecodeString(secret)
+	if err != nil {
+		return fmt.Errorf("bad secret: %w", err)
+	}
+	h := hmac.New(sha256.New, secretB)
 
 	h.Write([]byte(req.Method))
 	h.Write([]byte(req.URL.String()))
