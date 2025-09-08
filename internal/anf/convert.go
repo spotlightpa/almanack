@@ -22,8 +22,8 @@ func ConvertHTMLToAppleNews(doc *html.Node) *Article {
 	var c converter
 	c.a = templateDoc.Clone()
 
-	title := extractTitle(doc)
-	c.a.Title = cmp.Or(title, "Untitled")
+	titleEl := xhtml.Select(doc, xhtml.WithAtom(atom.Title))
+	c.a.Title = cmp.Or(xhtml.TextContent(titleEl), "Untitled")
 
 	c.a.Metadata.DateCreated = nil
 	c.a.Metadata.DateModified = nil
