@@ -27,10 +27,14 @@ func AddFlags(fl *flag.FlagSet) (svc *Service) {
 func (svc *Service) Publish(ctx context.Context, cl *http.Client, a *Article) error {
 	cl2 := *cl
 	cl2.Transport = HHMacTransport(svc.Key, svc.Secret, cl.Transport)
+	var errDetails struct {
+		Errors []struct{ Code string }
+	}
 	err := requests.
 		URL("https://news-api.apple.com").
 		Pathf("/channels/%s/articles", svc.ChannelID).
 		Client(&cl2).
+		ErrorJSON(&errDetails).
 		Config(requests.BodyMultipart("", func(multi *multipart.Writer) error {
 			data, err := json.Marshal(a)
 			if err != nil {
@@ -48,7 +52,10 @@ func (svc *Service) Publish(ctx context.Context, cl *http.Client, a *Article) er
 			return err
 		})).
 		Fetch(ctx)
-	return err
+	if err != nil {
+		return fmt.Errorf("service Apple News error: %v", errDetails)
+	}
+	return nil
 }
 
 func (svc *Service) Read(ctx context.Context, cl *http.Client) (any, error) {
