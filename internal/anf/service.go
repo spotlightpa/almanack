@@ -29,7 +29,7 @@ func (svc *Service) Publish(ctx context.Context, cl *http.Client, a *Article) er
 	cl2.Transport = HHMacTransport(svc.Key, svc.Secret, cl.Transport)
 	err := requests.
 		URL("https://news-api.apple.com").
-		Pathf("%s/articles", svc.ChannelID).
+		Pathf("/channels/%s/articles", svc.ChannelID).
 		Client(&cl2).
 		Config(requests.BodyMultipart("", func(multi *multipart.Writer) error {
 			data, err := json.Marshal(a)
@@ -49,4 +49,24 @@ func (svc *Service) Publish(ctx context.Context, cl *http.Client, a *Article) er
 		})).
 		Fetch(ctx)
 	return err
+}
+
+func (svc *Service) Read(ctx context.Context, cl *http.Client) (any, error) {
+	cl2 := *cl
+	cl2.Transport = HHMacTransport(svc.Key, svc.Secret, cl.Transport)
+	var data any
+	var errDetails struct {
+		Errors []struct{ Code string }
+	}
+	err := requests.
+		URL("https://news-api.apple.com").
+		Pathf("/channels/%s/", svc.ChannelID).
+		Client(&cl2).
+		ErrorJSON(&errDetails).
+		ToJSON(&data).
+		Fetch(ctx)
+	if err != nil {
+		return nil, fmt.Errorf("service Apple News error: %v", errDetails)
+	}
+	return data, nil
 }

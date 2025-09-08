@@ -1,6 +1,6 @@
 POST /v1beta/properties/1:runReport HTTP/1.1
 Host: analyticsdata.googleapis.com
-Authorization: HHMAC; key="key"; signature="anlHDGgheFsZuO6gLwj0+OJMWXziD6Qhc/KVpJP/Pd4="; date="2000-01-01T00:00:00Z"
+Authorization: HHMAC; key="key"; signature="6OOUdQ+rNm1sCjmBL04OVqXs7P43ByKeMR/ohh9pdYc="; date="2000-01-01T00:00:00Z"
 Content-Length: 362
 Content-Type: application/json
 
