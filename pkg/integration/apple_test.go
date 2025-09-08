@@ -30,7 +30,7 @@ func TestPublishAppleNews(t *testing.T) {
 			URL: "https://www.spotlightpa.org/feeds/full.json",
 		},
 	}
-	be.NilErr(t, svc.UpdateAppleNewsArchive(ctx))
+	be.NilErr(t, svc.NewsFeed.UpdateAppleNewsArchive(ctx, svc.Client, svc.Queries))
 	newItems, err := svc.Queries.ListNewsFeedUpdates(ctx)
 	be.NilErr(t, err)
 	be.EqualLength(t, 15, newItems)
@@ -42,7 +42,7 @@ func TestPublishAppleNews(t *testing.T) {
 	be.Zero(t, newItems)
 
 	// Updating archive should not mark previously uploaded items as null
-	be.NilErr(t, svc.UpdateAppleNewsArchive(ctx))
+	be.NilErr(t, svc.NewsFeed.UpdateAppleNewsArchive(ctx, svc.Client, svc.Queries))
 	newItems, err = svc.Queries.ListNewsFeedUpdates(ctx)
 	be.NilErr(t, err)
 	be.EqualLength(t, 0, newItems)
