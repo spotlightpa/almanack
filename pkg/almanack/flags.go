@@ -7,6 +7,7 @@ import (
 	"github.com/carlmjohnson/slackhook"
 	"github.com/earthboundkid/flagx/v2"
 
+	"github.com/spotlightpa/almanack/internal/anf"
 	"github.com/spotlightpa/almanack/internal/aws"
 	"github.com/spotlightpa/almanack/internal/db"
 	"github.com/spotlightpa/almanack/internal/github"
@@ -22,7 +23,8 @@ func AddFlags(fl *flag.FlagSet) func() (svc Services, err error) {
 	arcFeedURL := fl.String("src-feed", "", "source `URL` for Arc feed")
 	mailchimpSignupURL := fl.String("mc-signup-url", "http://example.com", "`URL` to redirect users to for MailChimp signup")
 	netlifyHookSecret := fl.String("netlify-webhook-secret", "", "`shared secret` to authorize Netlify identity webhook")
-	anf := jsonfeed.AddFlags(fl)
+	newsfeed := jsonfeed.AddFlags(fl)
+	anfService := anf.AddFlags(fl)
 
 	pg, tx := db.AddFlags(fl, "postgres", "PostgreSQL database `URL`")
 	slackSocial := slackhook.New(slackhook.MockClient)
@@ -68,7 +70,8 @@ func AddFlags(fl *flag.FlagSet) func() (svc Services, err error) {
 			Gsvc:                 &gsvc,
 			EmailService:         mc,
 			HC:                   healthchecksio.New(*hc, &client),
-			NewsFeed:             anf,
+			NewsFeed:             newsfeed,
+			ANF:                  anfService,
 		}, nil
 	}
 }
