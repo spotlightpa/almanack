@@ -2,19 +2,15 @@ package anf
 
 import (
 	"cmp"
-	"fmt"
-	"strings"
 
 	"github.com/spotlightpa/almanack/internal/db"
-	"golang.org/x/net/html"
 )
 
 func FromDB(item db.NewsFeedItem) (*Article, error) {
-	doc, err := html.Parse(strings.NewReader(item.ContentHtml))
+	a, err := ConvertToAppleNews(item.ContentHtml)
 	if err != nil {
-		return nil, fmt.Errorf("BuildComponents: parsing HTML: %w", err)
+		return nil, err
 	}
-	a := ConvertHTMLToAppleNews(doc)
 	comps := a.Components
 	a.Identifier = item.ExternalID
 	a.Title = item.Title

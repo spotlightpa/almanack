@@ -1,17 +1,17 @@
 package anf
 
 import (
-	"bytes"
 	"cmp"
 	"fmt"
+	"strings"
 
 	"github.com/earthboundkid/xhtml"
 	"golang.org/x/net/html"
 	"golang.org/x/net/html/atom"
 )
 
-func ConvertToAppleNews(htmlContent []byte) (*Article, error) {
-	doc, err := html.Parse(bytes.NewReader(htmlContent))
+func ConvertToAppleNews(htmlContent string) (*Article, error) {
+	doc, err := html.Parse(strings.NewReader(htmlContent))
 	if err != nil {
 		return nil, fmt.Errorf("ConvertToAppleNews: parsing HTML: %w", err)
 	}
