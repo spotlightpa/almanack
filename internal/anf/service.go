@@ -14,6 +14,7 @@ import (
 
 type Service struct {
 	ChannelID, Key, Secret string
+	*http.Client
 }
 
 func AddFlags(fl *flag.FlagSet) (svc *Service) {
@@ -24,9 +25,7 @@ func AddFlags(fl *flag.FlagSet) (svc *Service) {
 	return svc
 }
 
-func (svc *Service) Publish(ctx context.Context, cl *http.Client, a *Article) (*Response, error) {
-	cl2 := *cl
-	cl2.Transport = HHMacTransport(svc.Key, svc.Secret, cl.Transport)
+func (svc *Service) Publish(ctx context.Context, a *Article) (*Response, error) {
 	var errDetails struct {
 		Errors []struct{ Code string }
 	}
@@ -34,7 +33,7 @@ func (svc *Service) Publish(ctx context.Context, cl *http.Client, a *Article) (*
 	err := requests.
 		URL("https://news-api.apple.com").
 		Pathf("/channels/%s/articles", svc.ChannelID).
-		Client(&cl2).
+		Client(svc.client()).
 		ErrorJSON(&errDetails).
 		Config(requests.BodyMultipart("", func(multi *multipart.Writer) error {
 			data, err := json.Marshal(a)
@@ -60,9 +59,9 @@ func (svc *Service) Publish(ctx context.Context, cl *http.Client, a *Article) (*
 	return &res, nil
 }
 
-func (svc *Service) Update(ctx context.Context, cl *http.Client, a *Article, appleID, revision string) (*Response, error) {
-	cl2 := *cl
-	cl2.Transport = HHMacTransport(svc.Key, svc.Secret, cl.Transport)
+func (svc *Service) Update(ctx context.Context, a *Article, appleID, revision string) (*Response, error) {
+	cl2 := *svc.Client
+	cl2.Transport = HHMacTransport(svc.Key, svc.Secret, cl2.Transport)
 	var errDetails struct {
 		Errors []struct{ Code string }
 	}
@@ -84,7 +83,7 @@ func (svc *Service) Update(ctx context.Context, cl *http.Client, a *Article, app
 	err = requests.
 		URL("https://news-api.apple.com").
 		Pathf("/articles/%s", appleID).
-		Client(&cl2).
+		Client(svc.client()).
 		ErrorJSON(&errDetails).
 		Config(requests.BodyMultipart("", func(multi *multipart.Writer) error {
 			{
@@ -124,9 +123,7 @@ func (svc *Service) Update(ctx context.Context, cl *http.Client, a *Article, app
 	return &res, nil
 }
 
-func (svc *Service) Read(ctx context.Context, cl *http.Client) (any, error) {
-	cl2 := *cl
-	cl2.Transport = HHMacTransport(svc.Key, svc.Secret, cl.Transport)
+func (svc *Service) Read(ctx context.Context) (any, error) {
 	var data any
 	var errDetails struct {
 		Errors []struct{ Code string }
@@ -134,7 +131,7 @@ func (svc *Service) Read(ctx context.Context, cl *http.Client) (any, error) {
 	err := requests.
 		URL("https://news-api.apple.com").
 		Pathf("/channels/%s/", svc.ChannelID).
-		Client(&cl2).
+		Client(svc.client()).
 		ErrorJSON(&errDetails).
 		ToJSON(&data).
 		Fetch(ctx)
@@ -144,9 +141,7 @@ func (svc *Service) Read(ctx context.Context, cl *http.Client) (any, error) {
 	return data, nil
 }
 
-func (svc *Service) List(ctx context.Context, cl *http.Client) (any, error) {
-	cl2 := *cl
-	cl2.Transport = HHMacTransport(svc.Key, svc.Secret, cl.Transport)
+func (svc *Service) List(ctx context.Context) (any, error) {
 	var data any
 	var errDetails struct {
 		Errors []struct{ Code string }
@@ -154,7 +149,7 @@ func (svc *Service) List(ctx context.Context, cl *http.Client) (any, error) {
 	err := requests.
 		URL("https://news-api.apple.com").
 		Pathf("/channels/%s/articles", svc.ChannelID).
-		Client(&cl2).
+		Client(svc.client()).
 		ErrorJSON(&errDetails).
 		ToJSON(&data).
 		Fetch(ctx)
@@ -162,4 +157,10 @@ func (svc *Service) List(ctx context.Context, cl *http.Client) (any, error) {
 		return nil, fmt.Errorf("service Apple News error: %v", errDetails)
 	}
 	return data, nil
+}
+
+func (svc *Service) client() *http.Client {
+	cl2 := *svc.Client
+	cl2.Transport = HHMacTransport(svc.Key, svc.Secret, cl2.Transport)
+	return &cl2
 }
