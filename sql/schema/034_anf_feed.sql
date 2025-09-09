@@ -14,6 +14,8 @@ CREATE TABLE news_feed_item (
   "title" text NOT NULL DEFAULT '',
   "url" text NOT NULL DEFAULT '',
   "uploaded_at" timestamp with time zone,
+  "apple_id" text NOT NULL DEFAULT '',
+  "apple_revision" text NOT NULL DEFAULT '',
   "created_at" timestamp with time zone NOT NULL DEFAULT CURRENT_TIMESTAMP,
   "updated_at" timestamp with time zone NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
