@@ -14,6 +14,7 @@ import (
 	"github.com/carlmjohnson/be/testfile"
 	"github.com/carlmjohnson/requests"
 	"github.com/carlmjohnson/requests/reqtest"
+	"github.com/spotlightpa/almanack/internal/anf"
 	"github.com/spotlightpa/almanack/internal/aws"
 	"github.com/spotlightpa/almanack/internal/db"
 	"github.com/spotlightpa/almanack/internal/google"
@@ -146,7 +147,7 @@ func TestPublishAppleNews(t *testing.T) {
 	q := db.New(p)
 	ctx := t.Context()
 	cl := &http.Client{
-		Transport: reqtest.Caching(almlog.HTTPTransport, "testdata/anf"),
+		Transport: reqtest.Replay("testdata/anf"),
 	}
 	http.DefaultClient.Transport = requests.ErrorTransport(errors.New("used default client"))
 	svc := almanack.Services{
@@ -155,7 +156,13 @@ func TestPublishAppleNews(t *testing.T) {
 		NewsFeed: &jsonfeed.NewsFeed{
 			URL: "https://www.spotlightpa.org/feeds/full.json",
 		},
+		ANF: &anf.Service{Client: &http.Client{
+			Transport: reqtest.ReplayString(`HTTP/2.0 200 OK
+
+{}`),
+		}},
 	}
+
 	be.NilErr(t, svc.NewsFeed.UpdateAppleNewsArchive(ctx, svc.Client, svc.Queries))
 	newItems, err := svc.Queries.ListNewsFeedUpdates(ctx)
 	be.NilErr(t, err)
