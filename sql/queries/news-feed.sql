@@ -75,6 +75,18 @@ FROM
 WHERE
   uploaded_at IS NULL;
 
+-- name: UpdateFeedAppleID :one
+UPDATE
+  news_feed_item
+SET
+  apple_id = $1,
+  apple_revision = $2,
+  uploaded_at = CURRENT_TIMESTAMP
+WHERE
+  id = $3
+RETURNING
+  *;
+
 -- name: UpdateFeedUploaded :one
 UPDATE
   news_feed_item

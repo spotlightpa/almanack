@@ -11,7 +11,7 @@ import (
 
 const listNewsFeedUpdates = `-- name: ListNewsFeedUpdates :many
 SELECT
-  id, external_id, author, authors, category, content_html, external_updated_at, external_published_at, image, image_credit, image_description, language, title, url, uploaded_at, created_at, updated_at
+  id, external_id, author, authors, category, content_html, external_updated_at, external_published_at, image, image_credit, image_description, language, title, url, uploaded_at, apple_id, apple_revision, created_at, updated_at
 FROM
   news_feed_item
 WHERE
@@ -43,6 +43,8 @@ func (q *Queries) ListNewsFeedUpdates(ctx context.Context) ([]NewsFeedItem, erro
 			&i.Title,
 			&i.URL,
 			&i.UploadedAt,
+			&i.AppleID,
+			&i.AppleRevision,
 			&i.CreatedAt,
 			&i.UpdatedAt,
 		); err != nil {
@@ -56,6 +58,52 @@ func (q *Queries) ListNewsFeedUpdates(ctx context.Context) ([]NewsFeedItem, erro
 	return items, nil
 }
 
+const updateFeedAppleID = `-- name: UpdateFeedAppleID :one
+UPDATE
+  news_feed_item
+SET
+  apple_id = $1,
+  apple_revision = $2,
+  uploaded_at = CURRENT_TIMESTAMP
+WHERE
+  id = $3
+RETURNING
+  id, external_id, author, authors, category, content_html, external_updated_at, external_published_at, image, image_credit, image_description, language, title, url, uploaded_at, apple_id, apple_revision, created_at, updated_at
+`
+
+type UpdateFeedAppleIDParams struct {
+	AppleID       string `json:"apple_id"`
+	AppleRevision string `json:"apple_revision"`
+	ID            int64  `json:"id"`
+}
+
+func (q *Queries) UpdateFeedAppleID(ctx context.Context, arg UpdateFeedAppleIDParams) (NewsFeedItem, error) {
+	row := q.db.QueryRow(ctx, updateFeedAppleID, arg.AppleID, arg.AppleRevision, arg.ID)
+	var i NewsFeedItem
+	err := row.Scan(
+		&i.ID,
+		&i.ExternalID,
+		&i.Author,
+		&i.Authors,
+		&i.Category,
+		&i.ContentHtml,
+		&i.ExternalUpdatedAt,
+		&i.ExternalPublishedAt,
+		&i.Image,
+		&i.ImageCredit,
+		&i.ImageDescription,
+		&i.Language,
+		&i.Title,
+		&i.URL,
+		&i.UploadedAt,
+		&i.AppleID,
+		&i.AppleRevision,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+	)
+	return i, err
+}
+
 const updateFeedUploaded = `-- name: UpdateFeedUploaded :one
 UPDATE
   news_feed_item
@@ -64,7 +112,7 @@ SET
 WHERE
   id = $1
 RETURNING
-  id, external_id, author, authors, category, content_html, external_updated_at, external_published_at, image, image_credit, image_description, language, title, url, uploaded_at, created_at, updated_at
+  id, external_id, author, authors, category, content_html, external_updated_at, external_published_at, image, image_credit, image_description, language, title, url, uploaded_at, apple_id, apple_revision, created_at, updated_at
 `
 
 func (q *Queries) UpdateFeedUploaded(ctx context.Context, id int64) (NewsFeedItem, error) {
@@ -86,6 +134,8 @@ func (q *Queries) UpdateFeedUploaded(ctx context.Context, id int64) (NewsFeedIte
 		&i.Title,
 		&i.URL,
 		&i.UploadedAt,
+		&i.AppleID,
+		&i.AppleRevision,
 		&i.CreatedAt,
 		&i.UpdatedAt,
 	)
