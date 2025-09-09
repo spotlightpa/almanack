@@ -9,6 +9,7 @@ import (
 	"fmt"
 	"html/template"
 	"io"
+	"maps"
 	"mime"
 	"net/http"
 	"net/url"
@@ -40,10 +41,8 @@ func (app *appEnv) replyJSON(statusCode int, w http.ResponseWriter, data any) {
 func (app *appEnv) replyErr(w http.ResponseWriter, r *http.Request, err error) {
 	app.logErr(r.Context(), err)
 	code := resperr.StatusCode(err)
-	details := url.Values{"message": []string{resperr.UserMessage(err)}}
-	if v := resperr.ValidationErrors(err); len(v) != 0 {
-		details = v
-	}
+	details := url.Values{"": []string{resperr.UserMessage(err)}}
+	maps.Insert(details, maps.All(resperr.ValidationErrors(err)))
 	app.replyJSON(code, w, struct {
 		Status  int        `json:"status"`
 		Details url.Values `json:"details"`

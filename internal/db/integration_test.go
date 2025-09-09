@@ -2,6 +2,7 @@ package db_test
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"net/http"
 	"os"
@@ -11,10 +12,13 @@ import (
 
 	"github.com/carlmjohnson/be"
 	"github.com/carlmjohnson/be/testfile"
+	"github.com/carlmjohnson/requests"
 	"github.com/carlmjohnson/requests/reqtest"
+	"github.com/spotlightpa/almanack/internal/anf"
 	"github.com/spotlightpa/almanack/internal/aws"
 	"github.com/spotlightpa/almanack/internal/db"
 	"github.com/spotlightpa/almanack/internal/google"
+	"github.com/spotlightpa/almanack/internal/jsonfeed"
 	"github.com/spotlightpa/almanack/internal/stringx"
 	"github.com/spotlightpa/almanack/pkg/almanack"
 	"github.com/spotlightpa/almanack/pkg/almlog"
@@ -135,4 +139,44 @@ func TestEmbed_UnmarshalJSON(t *testing.T) {
 		var e2 db.Embed
 		be.Nonzero(t, json.Unmarshal(b, &e2))
 	}
+}
+
+func TestPublishAppleNews(t *testing.T) {
+	almlog.UseTestLogger(t)
+	p := createTestDB(t)
+	q := db.New(p)
+	ctx := t.Context()
+	cl := &http.Client{
+		Transport: reqtest.Replay("testdata/anf"),
+	}
+	http.DefaultClient.Transport = requests.ErrorTransport(errors.New("used default client"))
+	svc := almanack.Services{
+		Client:  cl,
+		Queries: q,
+		NewsFeed: &jsonfeed.NewsFeed{
+			URL: "https://www.spotlightpa.org/feeds/full.json",
+		},
+		ANF: &anf.Service{Client: &http.Client{
+			Transport: reqtest.ReplayString(`HTTP/2.0 200 OK
+
+{}`),
+		}},
+	}
+
+	be.NilErr(t, svc.NewsFeed.UpdateAppleNewsArchive(ctx, svc.Client, svc.Queries))
+	newItems, err := svc.Queries.ListNewsFeedUpdates(ctx)
+	be.NilErr(t, err)
+	be.EqualLength(t, 15, newItems)
+
+	be.NilErr(t, svc.PublishAppleNewsFeed(ctx))
+	// Publishing should mark everyone as uploaded
+	newItems, err = svc.Queries.ListNewsFeedUpdates(ctx)
+	be.NilErr(t, err)
+	be.Zero(t, newItems)
+
+	// Updating archive should not mark previously uploaded items as null
+	be.NilErr(t, svc.NewsFeed.UpdateAppleNewsArchive(ctx, svc.Client, svc.Queries))
+	newItems, err = svc.Queries.ListNewsFeedUpdates(ctx)
+	be.NilErr(t, err)
+	be.EqualLength(t, 0, newItems)
 }
