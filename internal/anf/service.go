@@ -24,12 +24,13 @@ func AddFlags(fl *flag.FlagSet) (svc *Service) {
 	return svc
 }
 
-func (svc *Service) Publish(ctx context.Context, cl *http.Client, a *Article) error {
+func (svc *Service) Publish(ctx context.Context, cl *http.Client, a *Article) (*Response, error) {
 	cl2 := *cl
 	cl2.Transport = HHMacTransport(svc.Key, svc.Secret, cl.Transport)
 	var errDetails struct {
 		Errors []struct{ Code string }
 	}
+	var res Response
 	err := requests.
 		URL("https://news-api.apple.com").
 		Pathf("/channels/%s/articles", svc.ChannelID).
@@ -51,11 +52,76 @@ func (svc *Service) Publish(ctx context.Context, cl *http.Client, a *Article) er
 			_, err = w.Write(data)
 			return err
 		})).
+		ToJSON(&res).
 		Fetch(ctx)
 	if err != nil {
-		return fmt.Errorf("service Apple News error: %v", errDetails)
+		return nil, fmt.Errorf("service Apple News error: %v", errDetails)
 	}
-	return nil
+	return &res, nil
+}
+
+func (svc *Service) Update(ctx context.Context, cl *http.Client, a *Article, appleID, revision string) (*Response, error) {
+	cl2 := *cl
+	cl2.Transport = HHMacTransport(svc.Key, svc.Secret, cl.Transport)
+	var errDetails struct {
+		Errors []struct{ Code string }
+	}
+	type Data struct {
+		Revision string `json:"revision"`
+	}
+	metadata := struct {
+		Data Data `json:"data"`
+	}{Data{Revision: revision}}
+	metadataB, err := json.Marshal(metadata)
+	if err != nil {
+		return nil, err
+	}
+	data, err := json.Marshal(a)
+	if err != nil {
+		return nil, err
+	}
+	var res Response
+	err = requests.
+		URL("https://news-api.apple.com").
+		Pathf("/articles/%s", appleID).
+		Client(&cl2).
+		ErrorJSON(&errDetails).
+		Config(requests.BodyMultipart("", func(multi *multipart.Writer) error {
+			{
+				h := make(textproto.MIMEHeader)
+				disposition := fmt.Sprintf(`form-data; name=metadata; size=%d`, len(metadataB))
+				h.Set("Content-Disposition", disposition)
+				h.Set("Content-Type", "application/json")
+				w, err := multi.CreatePart(h)
+				if err != nil {
+					return err
+				}
+				if _, err = w.Write(metadataB); err != nil {
+					return err
+				}
+			}
+			{
+				h := make(textproto.MIMEHeader)
+				disposition := fmt.Sprintf(`form-data; filename=article.json; size=%d`, len(data))
+				h.Set("Content-Disposition", disposition)
+				h.Set("Content-Type", "application/json")
+				w, err := multi.CreatePart(h)
+				if err != nil {
+					return err
+				}
+				if _, err = w.Write(data); err != nil {
+					return err
+				}
+			}
+
+			return nil
+		})).
+		ToJSON(&res).
+		Fetch(ctx)
+	if err != nil {
+		return nil, fmt.Errorf("service Apple News error: %v", errDetails)
+	}
+	return &res, nil
 }
 
 func (svc *Service) Read(ctx context.Context, cl *http.Client) (any, error) {
@@ -68,6 +134,26 @@ func (svc *Service) Read(ctx context.Context, cl *http.Client) (any, error) {
 	err := requests.
 		URL("https://news-api.apple.com").
 		Pathf("/channels/%s/", svc.ChannelID).
+		Client(&cl2).
+		ErrorJSON(&errDetails).
+		ToJSON(&data).
+		Fetch(ctx)
+	if err != nil {
+		return nil, fmt.Errorf("service Apple News error: %v", errDetails)
+	}
+	return data, nil
+}
+
+func (svc *Service) List(ctx context.Context, cl *http.Client) (any, error) {
+	cl2 := *cl
+	cl2.Transport = HHMacTransport(svc.Key, svc.Secret, cl.Transport)
+	var data any
+	var errDetails struct {
+		Errors []struct{ Code string }
+	}
+	err := requests.
+		URL("https://news-api.apple.com").
+		Pathf("/channels/%s/articles", svc.ChannelID).
 		Client(&cl2).
 		ErrorJSON(&errDetails).
 		ToJSON(&data).
