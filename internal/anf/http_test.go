@@ -39,12 +39,12 @@ func TestRead(t *testing.T) {
 		ChannelID: "abc",
 		Key:       "123",
 		Secret:    "aGVsbG8=",
-	}
-	cl := &http.Client{
-		Transport: reqtest.Caching(nil, "testdata/apple/"),
+		Client: &http.Client{
+			Transport: reqtest.Replay("testdata/apple/"),
+		},
 	}
 	synctest.Test(t, func(t *testing.T) {
-		data, err := svc.Read(t.Context(), cl)
+		data, err := svc.Read(t.Context())
 		be.NilErr(t, err)
 		be.Nonzero(t, data)
 	})
