@@ -758,3 +758,47 @@ type PhotoComponent struct {
 }
 
 func (PhotoComponent) componentRole() string { return "photo" }
+
+type Response struct {
+	Data Data `json:"data"`
+	Meta Meta `json:"meta"`
+}
+
+type Data struct {
+	CreatedAt                   time.Time `json:"createdAt"`
+	ModifiedAt                  time.Time `json:"modifiedAt"`
+	ID                          string    `json:"id"`
+	Type                        string    `json:"type"`
+	ShareURL                    string    `json:"shareUrl"`
+	Links                       Links     `json:"links"`
+	Document                    Article   `json:"document"`
+	Revision                    string    `json:"revision"`
+	State                       string    `json:"state"`
+	AccessoryText               any       `json:"accessoryText"`
+	Title                       string    `json:"title"`
+	MaturityRating              any       `json:"maturityRating"`
+	Warnings                    any       `json:"warnings"`
+	TargetTerritoryCountryCodes []string  `json:"targetTerritoryCountryCodes"`
+	IsCandidateToBeFeatured     bool      `json:"isCandidateToBeFeatured"`
+	IsSponsored                 bool      `json:"isSponsored"`
+	IsPreview                   bool      `json:"isPreview"`
+	IsDevelopingStory           bool      `json:"isDevelopingStory"`
+	IsHidden                    bool      `json:"isHidden"`
+}
+
+type Links struct {
+	Channel  string   `json:"channel"`
+	Self     string   `json:"self"`
+	Sections []string `json:"sections"`
+}
+
+type Meta struct {
+	Throttling Throttling `json:"throttling"`
+}
+
+type Throttling struct {
+	IsThrottled             bool `json:"isThrottled"`
+	QueueSize               int  `json:"queueSize"`
+	EstimatedDelayInSeconds int  `json:"estimatedDelayInSeconds"`
+	QuotaAvailable          int  `json:"quotaAvailable"`
+}
