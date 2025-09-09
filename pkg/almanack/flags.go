@@ -52,6 +52,7 @@ func AddFlags(fl *flag.FlagSet) func() (svc Services, err error) {
 
 		is, fs := getS3Store()
 		mc := mailchimp.NewMailService(*mailServiceAPIKey, *mailServiceListID, &client)
+		anfService.Client = &client
 
 		return Services{
 			arcFeedURL:           *arcFeedURL,
