@@ -391,8 +391,8 @@ func processToc(doc *html.Node, rows tableaux.TableNodes) string {
 	ul := xhtml.New("ul")
 	container.AppendChild(ul)
 	currentUl := ul
-	lastDepth := 7 // Past H6, the maximum possible depth
-	const limit = 10
+	lastDepth := 7    // Past H6, the maximum possible depth
+	const limit = 100 // Effectively disable this for now
 	n := 0
 	for _, h := range headers {
 		n++
