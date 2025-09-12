@@ -112,6 +112,21 @@ func TestReplaceSpotlightShortcodes(t *testing.T) {
 			`{{<dewey-assistant>}}`,
 		},
 		{
+			`<script type="text/javascript">
+var deweyConfig = {
+  key: "ba7fd845-222f-4d30-b2d1-ef3210971999",
+  options: {
+    verbose: true,
+    targetElementId: "dewey--frame"
+  }
+};
+!function(e,o,n){async function d(){try{await t.load(n.key,n.options),t.start()}catch(e){console.error("Failed to load Dewey script:",e)}}var t=window.dewey=window.dewey||{};t.invoked?console.error("Dewey snippet included twice."):(t.invoked=!0,t.load=function(e,n){return new Promise((e,d)=>{var a=o.createElement("script");a.type="text/javascript",a.async=!0,a.onload=e,a.onerror=d,a.src="https://app.askdewey.co/dewey.js/v1/ba7fd845-222f-4d30-b2d1-ef3210971999/dewey.min.js",t._loadOptions=n,o.head.appendChild(a)})},t.SNIPPET_VERSION="0.0.3",d())}(window,document,deweyConfig);
+</script>
+<div id="dewey--frame"></div>
+`,
+			`{{<dewey-assistant>}}`,
+		},
+		{
 			`<script src="https://www.spotlightpa.org/embed.js" async></script><div data-spl-embed-version="1" data-spl-src="https://www.spotlightpa.org/embeds/donate/"></div>`,
 			"{{<embed/donate>}}",
 		},
