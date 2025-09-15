@@ -24,6 +24,11 @@ func TestPublishAppleNews(t *testing.T) {
 		Transport: reqtest.Replay("testdata/anf"),
 	}
 	http.DefaultClient.Transport = requests.ErrorTransport(errors.New("used default client"))
+	res := anf.Response{
+		Data: anf.Data{
+			ID: "abc123",
+		},
+	}
 	svc := almanack.Services{
 		Client:  cl,
 		Queries: q,
@@ -31,19 +36,18 @@ func TestPublishAppleNews(t *testing.T) {
 			URL: "https://www.spotlightpa.org/feeds/full.json",
 		},
 		ANF: &anf.Service{Client: &http.Client{
-			Transport: reqtest.ReplayString(`HTTP/2.0 200 OK
-
-{}`),
+			Transport: reqtest.ReplayJSON(200, &res),
 		}},
 	}
 
+	// Updating archive should add unuploaded items
 	be.NilErr(t, svc.NewsFeed.UpdateAppleNewsArchive(ctx, svc.Client, svc.Queries))
 	newItems, err := svc.Queries.ListNewsFeedUpdates(ctx)
 	be.NilErr(t, err)
 	be.EqualLength(t, 15, newItems)
 
+	// Publishing should mark everything as uploaded
 	be.NilErr(t, svc.PublishAppleNewsFeed(ctx))
-	// Publishing should mark everyone as uploaded
 	newItems, err = svc.Queries.ListNewsFeedUpdates(ctx)
 	be.NilErr(t, err)
 	be.Zero(t, newItems)
