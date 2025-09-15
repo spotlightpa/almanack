@@ -175,7 +175,7 @@ func (svc *Service) ReadArticle(ctx context.Context, articleID string) (*Respons
 	}
 	err := requests.
 		URL("https://news-api.apple.com").
-		Pathf("/article/%s/", articleID).
+		Pathf("/articles/%s", articleID).
 		Client(svc.client()).
 		ErrorJSON(&errDetails).
 		ToJSON(&res).
