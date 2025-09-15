@@ -73,17 +73,18 @@ SELECT
 FROM
   news_feed_item
 WHERE
-  uploaded_at IS NULL;
+  "uploaded_at" IS NULL;
 
 -- name: UpdateFeedAppleID :one
 UPDATE
   news_feed_item
 SET
-  apple_id = $1,
-  apple_revision = $2,
-  uploaded_at = CURRENT_TIMESTAMP
+  "apple_id" = $1,
+  "apple_share_url" = $2,
+  "uploaded_at" = CURRENT_TIMESTAMP,
+  "updated_at" = CURRENT_TIMESTAMP
 WHERE
-  id = $3
+  "id" = $3
 RETURNING
   *;
 
@@ -91,8 +92,9 @@ RETURNING
 UPDATE
   news_feed_item
 SET
-  uploaded_at = CURRENT_TIMESTAMP
+  "uploaded_at" = CURRENT_TIMESTAMP,
+  "updated_at" = CURRENT_TIMESTAMP
 WHERE
-  id = $1
+  "id" = $1
 RETURNING
   *;
