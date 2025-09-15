@@ -13,7 +13,7 @@ require (
 	github.com/carlmjohnson/exitcode v0.20.2
 	github.com/carlmjohnson/flowmatic v0.23.4
 	github.com/carlmjohnson/gateway v1.22.2
-	github.com/carlmjohnson/requests v0.24.3
+	github.com/carlmjohnson/requests v0.25.1
 	github.com/carlmjohnson/slackhook v0.23.2
 	github.com/earthboundkid/bytemap/v2 v2.24.1
 	github.com/earthboundkid/emailx/v2 v2.24.1
