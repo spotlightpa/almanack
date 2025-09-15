@@ -44,7 +44,7 @@ func TestRead(t *testing.T) {
 		},
 	}
 	synctest.Test(t, func(t *testing.T) {
-		data, err := svc.Read(t.Context())
+		data, err := svc.ReadChannel(t.Context())
 		be.NilErr(t, err)
 		be.Nonzero(t, data)
 	})

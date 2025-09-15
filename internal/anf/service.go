@@ -25,9 +25,12 @@ func AddFlags(fl *flag.FlagSet) (svc *Service) {
 	return svc
 }
 
-func (svc *Service) Publish(ctx context.Context, a *Article) (*Response, error) {
+func (svc *Service) Create(ctx context.Context, a *Article) (*Response, error) {
 	var errDetails struct {
-		Errors []struct{ Code string }
+		Errors []struct {
+			Code  string
+			Value string
+		}
 	}
 	var res Response
 	err := requests.
@@ -123,7 +126,7 @@ func (svc *Service) Update(ctx context.Context, a *Article, appleID, revision st
 	return &res, nil
 }
 
-func (svc *Service) Read(ctx context.Context) (any, error) {
+func (svc *Service) ReadChannel(ctx context.Context) (any, error) {
 	var data any
 	var errDetails struct {
 		Errors []struct{ Code string }
@@ -163,4 +166,22 @@ func (svc *Service) client() *http.Client {
 	cl2 := *svc.Client
 	cl2.Transport = HHMacTransport(svc.Key, svc.Secret, cl2.Transport)
 	return &cl2
+}
+
+func (svc *Service) ReadArticle(ctx context.Context, articleID string) (*Response, error) {
+	var res Response
+	var errDetails struct {
+		Errors []struct{ Code string }
+	}
+	err := requests.
+		URL("https://news-api.apple.com").
+		Pathf("/article/%s/", articleID).
+		Client(svc.client()).
+		ErrorJSON(&errDetails).
+		ToJSON(&res).
+		Fetch(ctx)
+	if err != nil {
+		return nil, fmt.Errorf("service Apple News error: %v", errDetails)
+	}
+	return &res, nil
 }

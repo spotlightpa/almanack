@@ -11,11 +11,11 @@ import (
 
 const listNewsFeedUpdates = `-- name: ListNewsFeedUpdates :many
 SELECT
-  id, external_id, author, authors, category, content_html, external_updated_at, external_published_at, image, image_credit, image_description, language, title, url, uploaded_at, apple_id, apple_revision, created_at, updated_at
+  id, external_id, author, authors, category, content_html, external_updated_at, external_published_at, image, image_credit, image_description, language, title, url, uploaded_at, apple_id, apple_share_url, created_at, updated_at
 FROM
   news_feed_item
 WHERE
-  uploaded_at IS NULL
+  "uploaded_at" IS NULL
 `
 
 func (q *Queries) ListNewsFeedUpdates(ctx context.Context) ([]NewsFeedItem, error) {
@@ -44,7 +44,7 @@ func (q *Queries) ListNewsFeedUpdates(ctx context.Context) ([]NewsFeedItem, erro
 			&i.URL,
 			&i.UploadedAt,
 			&i.AppleID,
-			&i.AppleRevision,
+			&i.AppleShareUrl,
 			&i.CreatedAt,
 			&i.UpdatedAt,
 		); err != nil {
@@ -62,23 +62,24 @@ const updateFeedAppleID = `-- name: UpdateFeedAppleID :one
 UPDATE
   news_feed_item
 SET
-  apple_id = $1,
-  apple_revision = $2,
-  uploaded_at = CURRENT_TIMESTAMP
+  "apple_id" = $1,
+  "apple_share_url" = $2,
+  "uploaded_at" = CURRENT_TIMESTAMP,
+  "updated_at" = CURRENT_TIMESTAMP
 WHERE
-  id = $3
+  "id" = $3
 RETURNING
-  id, external_id, author, authors, category, content_html, external_updated_at, external_published_at, image, image_credit, image_description, language, title, url, uploaded_at, apple_id, apple_revision, created_at, updated_at
+  id, external_id, author, authors, category, content_html, external_updated_at, external_published_at, image, image_credit, image_description, language, title, url, uploaded_at, apple_id, apple_share_url, created_at, updated_at
 `
 
 type UpdateFeedAppleIDParams struct {
 	AppleID       string `json:"apple_id"`
-	AppleRevision string `json:"apple_revision"`
+	AppleShareUrl string `json:"apple_share_url"`
 	ID            int64  `json:"id"`
 }
 
 func (q *Queries) UpdateFeedAppleID(ctx context.Context, arg UpdateFeedAppleIDParams) (NewsFeedItem, error) {
-	row := q.db.QueryRow(ctx, updateFeedAppleID, arg.AppleID, arg.AppleRevision, arg.ID)
+	row := q.db.QueryRow(ctx, updateFeedAppleID, arg.AppleID, arg.AppleShareUrl, arg.ID)
 	var i NewsFeedItem
 	err := row.Scan(
 		&i.ID,
@@ -97,7 +98,7 @@ func (q *Queries) UpdateFeedAppleID(ctx context.Context, arg UpdateFeedAppleIDPa
 		&i.URL,
 		&i.UploadedAt,
 		&i.AppleID,
-		&i.AppleRevision,
+		&i.AppleShareUrl,
 		&i.CreatedAt,
 		&i.UpdatedAt,
 	)
@@ -108,11 +109,12 @@ const updateFeedUploaded = `-- name: UpdateFeedUploaded :one
 UPDATE
   news_feed_item
 SET
-  uploaded_at = CURRENT_TIMESTAMP
+  "uploaded_at" = CURRENT_TIMESTAMP,
+  "updated_at" = CURRENT_TIMESTAMP
 WHERE
-  id = $1
+  "id" = $1
 RETURNING
-  id, external_id, author, authors, category, content_html, external_updated_at, external_published_at, image, image_credit, image_description, language, title, url, uploaded_at, apple_id, apple_revision, created_at, updated_at
+  id, external_id, author, authors, category, content_html, external_updated_at, external_published_at, image, image_credit, image_description, language, title, url, uploaded_at, apple_id, apple_share_url, created_at, updated_at
 `
 
 func (q *Queries) UpdateFeedUploaded(ctx context.Context, id int64) (NewsFeedItem, error) {
@@ -135,7 +137,7 @@ func (q *Queries) UpdateFeedUploaded(ctx context.Context, id int64) (NewsFeedIte
 		&i.URL,
 		&i.UploadedAt,
 		&i.AppleID,
-		&i.AppleRevision,
+		&i.AppleShareUrl,
 		&i.CreatedAt,
 		&i.UpdatedAt,
 	)

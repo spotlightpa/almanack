@@ -114,7 +114,7 @@ type NewsFeedItem struct {
 	URL                 string             `json:"url"`
 	UploadedAt          pgtype.Timestamptz `json:"uploaded_at"`
 	AppleID             string             `json:"apple_id"`
-	AppleRevision       string             `json:"apple_revision"`
+	AppleShareUrl       string             `json:"apple_share_url"`
 	CreatedAt           time.Time          `json:"created_at"`
 	UpdatedAt           time.Time          `json:"updated_at"`
 }
