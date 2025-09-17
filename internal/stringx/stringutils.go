@@ -125,3 +125,12 @@ func ExtractNames(s string) []string {
 
 	return names
 }
+
+func Truncate(s string, maximum int) string {
+	r := []rune(s)
+	if len(r) <= maximum {
+		return s
+	}
+	truncated := r[:max(maximum-3, 0)]
+	return string(truncated) + "…"
+}
