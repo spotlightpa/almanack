@@ -108,3 +108,21 @@ func TestExtractName(t *testing.T) {
 		be.AllEqual(rt, tc.Want, stringx.ExtractNames(tc.Input))
 	}
 }
+
+func TestTruncate(t *testing.T) {
+	cases := []struct {
+		input, want string
+		max         int
+	}{
+		{"", "", 0},
+		{"1", "…", 0},
+		{"1234567890", "1234567890", 10},
+		{"1234567890", "123456…", 9},
+		{"1234567890", "12345…", 8},
+	}
+	for _, tc := range cases {
+		t.Run(tc.input, func(t *testing.T) {
+			be.Equal(t, tc.want, stringx.Truncate(tc.input, tc.max))
+		})
+	}
+}

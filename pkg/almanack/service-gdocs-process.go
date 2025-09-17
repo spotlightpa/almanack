@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"iter"
+	"regexp"
 	"slices"
 	"strconv"
 	"strings"
@@ -215,14 +216,25 @@ func processDocHTML(docHTML *html.Node) (
 			slices.Contains([]atom.Atom{
 				atom.B, atom.Strong,
 			}, n.FirstChild.DataAtom) {
-			text := xhtml.TextContent(n)
-			if len([]rune(text)) > 17 {
-				runes := []rune(text)[:13]
-				text = string(runes) + "..."
-			}
+			text := stringx.Truncate(xhtml.TextContent(n), 17)
 			warning := fmt.Sprintf(
 				"Paragraph beginning %q looks like a header, but does not use H-tag.", text)
 			warnings = append(warnings, warning)
+		}
+	}
+
+	// Warn about TK in document
+	tkRe := regexp.MustCompile(`(?i)\bTK\b`)
+	for n := range docHTML.ChildNodes() {
+		if n.Type != html.TextNode {
+			continue
+		}
+		if tkRe.MatchString(n.Data) {
+			text := stringx.Truncate(n.Data, 17)
+			warning := fmt.Sprintf(
+				`Text %q contains "TK". Did you mean to remove it?`, text)
+			warnings = append(warnings, warning)
+			break
 		}
 	}
 
