@@ -46,7 +46,7 @@ func FromDB(item *db.NewsFeedItem) (*Article, error) {
 			Layout: "titleLayout",
 		},
 		TextComponent{
-			Role: "author",
+			Role: "byline",
 			Text: "by " + item.Author,
 		},
 		TextComponent{
