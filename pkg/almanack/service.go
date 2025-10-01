@@ -4,12 +4,14 @@ import (
 	"net/http"
 
 	"github.com/carlmjohnson/slackhook"
+	"github.com/spotlightpa/almanack/internal/anf"
 	"github.com/spotlightpa/almanack/internal/aws"
 	"github.com/spotlightpa/almanack/internal/db"
 	"github.com/spotlightpa/almanack/internal/github"
 	"github.com/spotlightpa/almanack/internal/google"
 	"github.com/spotlightpa/almanack/internal/healthchecksio"
 	"github.com/spotlightpa/almanack/internal/index"
+	"github.com/spotlightpa/almanack/internal/jsonfeed"
 	"github.com/spotlightpa/almanack/internal/mailchimp"
 )
 
@@ -28,6 +30,8 @@ type Services struct {
 	Indexer          index.Indexer
 	NewletterService mailchimp.V3
 	Gsvc             *google.Service
+	NewsFeed         *jsonfeed.NewsFeed
+	ANF              *anf.Service
 	mailchimp.EmailService
 	HC healthchecksio.Client
 }
