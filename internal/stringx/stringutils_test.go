@@ -18,6 +18,9 @@ func TestSlugifyURL(t *testing.T) {
 		{"  a b the c  ", "b-c"},
 		{"Pa.'s favorite", "pennsylvanias-favorite"},
 		{"the (fort~Nightly)   news  ", "fort-nightly-news"},
+		{"Español", "espanol"},
+		{"𝙩𝙚𝙨𝙩 𝙨𝙩𝙧𝙞𝙣𝙜.", "test-string"},
+		{"Groß fæces", "gross-faeces"},
 	}
 	for _, tc := range cases {
 		t.Run(tc.input, func(t *testing.T) {

@@ -34,6 +34,7 @@ require (
 	gocloud.dev v0.41.0
 	golang.org/x/net v0.44.0
 	golang.org/x/oauth2 v0.31.0
+	golang.org/x/text v0.29.0
 	google.golang.org/api v0.251.0
 	gopkg.in/Iwark/spreadsheet.v2 v2.0.0-20230915040305-7677e8164883
 )
@@ -100,7 +101,6 @@ require (
 	golang.org/x/crypto v0.42.0 // indirect
 	golang.org/x/sync v0.17.0 // indirect
 	golang.org/x/sys v0.36.0 // indirect
-	golang.org/x/text v0.29.0 // indirect
 	golang.org/x/xerrors v0.0.0-20240903120638-7835f813f4da // indirect
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20250929231259-57b25ae835d4 // indirect
 	google.golang.org/grpc v1.75.1 // indirect
