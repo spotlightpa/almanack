@@ -6,6 +6,9 @@ import (
 	"unicode"
 
 	"github.com/spotlightpa/almanack/internal/lazy"
+	"golang.org/x/text/runes"
+	"golang.org/x/text/transform"
+	"golang.org/x/text/unicode/norm"
 )
 
 // First non-blank string
@@ -25,7 +28,27 @@ var (
 	nonasciiRe  = lazy.RE(`\W+`)
 )
 
+func StripAccents(text string) (string, error) {
+	t := transform.Chain(
+		norm.NFKD,
+		runes.Remove(runes.In(unicode.Mn)),
+		norm.NFC)
+	result, _, err := transform.String(t, text)
+	if err != nil {
+		return text, err
+	}
+	result = strings.NewReplacer(
+		"æ", "ae",
+		"Æ", "AE",
+		"œ", "oe",
+		"Œ", "OE",
+		"ß", "ss",
+	).Replace(result)
+	return result, nil
+}
+
 func SlugifyURL(s string) string {
+	s, _ = StripAccents(s)
 	s = strings.ToLower(s)
 	s = articleRe().ReplaceAllString(s, " ")
 	s = pennRe().ReplaceAllString(s, "pennsylvania")
@@ -37,6 +60,7 @@ func SlugifyURL(s string) string {
 }
 
 func SlugifyFilename(s string) string {
+	s, _ = StripAccents(s)
 	hadDash := false
 	f := func(r rune) rune {
 		switch {
