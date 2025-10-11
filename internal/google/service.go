@@ -21,8 +21,9 @@ type Service struct {
 	cert       []byte
 	mockClient *http.Client
 
-	viewID  string
-	driveID string
+	viewID    string
+	driveID   string
+	projectID string
 }
 
 func (gsvc *Service) AddFlags(fl *flag.FlagSet) {
@@ -31,6 +32,7 @@ func (gsvc *Service) AddFlags(fl *flag.FlagSet) {
 	fl.Func("google-json", "GZIP Base64 JSON `credentials` for Google", gsvc.ConfigureCert)
 	fl.StringVar(&gsvc.viewID, "ga-view-id", "", "view `ID` for Google Analytics")
 	fl.StringVar(&gsvc.driveID, "google-drive-id", "", "`ID` for shared Google Drive")
+	fl.StringVar(&gsvc.projectID, "google-project-id", "", "`ID` for Google Cloud project")
 }
 
 func (gsvc *Service) HasCert() bool {
