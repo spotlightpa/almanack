@@ -118,8 +118,8 @@ github.com/earthboundkid/emailx/v2 v2.24.1 h1:DK/4Eh36IvxCR+29E7xbaxi8gPxgAvm4zM
 github.com/earthboundkid/emailx/v2 v2.24.1/go.mod h1:8UAz0q898I8GBxekObC/Tj6qfF3CJWWNACn+U2DRHlY=
 github.com/earthboundkid/flagx/v2 v2.25.1 h1:NCnaW8sg0B9EcThAFUOEPQFbD2qhGFMp1s4GqU3kPW8=
 github.com/earthboundkid/flagx/v2 v2.25.1/go.mod h1:uFev2jp4UhPBLZpRkeHEXuko2vVhi/E/vuxrYgDVjBg=
-github.com/earthboundkid/mid v0.24.1 h1:Hz8neRUGqnghs/0UtrdoTZBis7x1OXbOHvLVQzlGXh4=
-github.com/earthboundkid/mid v0.24.1/go.mod h1:hEWtmnPsQdlni4aenDZ4NQ81NesS7gas5RVoiEncpU0=
+github.com/earthboundkid/mid v0.25.1 h1:dVEIjRt44r64hnoWEWpwcx7EgDG0LZuPIkOhEwHpRzc=
+github.com/earthboundkid/mid v0.25.1/go.mod h1:3gjEZPooEuCZSPms/B0tt0k66GeG+RfhpUsmtKKYSlw=
 github.com/earthboundkid/resperr/v2 v2.25.1 h1:H6GCeI/hynE3z1D3eGJ4Dh5s9AzjEf1YHFO4fRIgSs0=
 github.com/earthboundkid/resperr/v2 v2.25.1/go.mod h1:1cymu80qg8aRoJzpjWdyYDbLCWzGl+AtlwUzAMmSnEM=
 github.com/earthboundkid/versioninfo/v2 v2.24.1 h1:SJTMHaoUx3GzjjnUO1QzP3ZXK6Ee/nbWyCm58eY3oUg=
