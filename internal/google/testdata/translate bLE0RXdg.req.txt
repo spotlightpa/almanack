@@ -1,0 +1,5 @@
+POST /v3/projects/1:translateText HTTP/1.1
+Host: translate.googleapis.com
+Content-Type: application/json
+
+{"contents":["Hello, World!"],"sourceLanguageCode":"en-US","targetLanguageCode":"es","mimeType":"text/plain"}
