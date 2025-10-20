@@ -161,6 +161,9 @@ func processDocHTML(docHTML *html.Node) (
 				warnings = append(warnings, warning)
 			} else {
 				embed.Value = *imageEmbed
+				if bytemap.Make(" \t\n\r").Contains(imageEmbed.Description) {
+					warnings = append(warnings, fmt.Sprintf("Image embed #%d missing alt description.", embed.N))
+				}
 				if kind != "spl" {
 					embeds = append(embeds, embed)
 					n++
