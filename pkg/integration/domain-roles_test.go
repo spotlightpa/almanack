@@ -1,4 +1,4 @@
-package db_test
+package integration_test
 
 import (
 	"strings"
