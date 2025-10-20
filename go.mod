@@ -18,7 +18,7 @@ require (
 	github.com/earthboundkid/bytemap/v2 v2.24.1
 	github.com/earthboundkid/emailx/v2 v2.24.1
 	github.com/earthboundkid/flagx/v2 v2.25.1
-	github.com/earthboundkid/mid v0.24.1
+	github.com/earthboundkid/mid v0.25.1
 	github.com/earthboundkid/resperr/v2 v2.25.1
 	github.com/earthboundkid/versioninfo/v2 v2.24.1
 	github.com/earthboundkid/xhtml v0.25.2
