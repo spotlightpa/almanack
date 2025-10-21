@@ -41,6 +41,6 @@ func (nf *NewsFeed) UpdateAppleNewsArchive(ctx context.Context, cl *http.Client,
 		return err
 	}
 	updated, err := q.UpsertNewsFeedArchives(ctx, data)
-	l.InfoContext(ctx, "UpdateAppleNewsArchive", "updated_rows", updated)
+	l.InfoContext(ctx, "UpsertNewsFeedArchives", "updated_rows", updated)
 	return err
 }

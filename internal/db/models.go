@@ -102,6 +102,7 @@ type NewsFeedItem struct {
 	ExternalID          string             `json:"external_id"`
 	Author              string             `json:"author"`
 	Authors             []string           `json:"authors"`
+	Blurb               string             `json:"blurb"`
 	Category            string             `json:"category"`
 	ContentHtml         string             `json:"content_html"`
 	ExternalUpdatedAt   time.Time          `json:"external_updated_at"`

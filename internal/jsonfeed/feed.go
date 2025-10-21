@@ -12,6 +12,7 @@ type Feed struct {
 type Item struct {
 	Author           string   `json:"author"`
 	Authors          []string `json:"authors"`
+	Blurb            string   `json:"blurb"`
 	Category         string   `json:"category"`
 	ContentHTML      string   `json:"content_html"`
 	DateModified     string   `json:"date_modified"`
