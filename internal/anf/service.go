@@ -3,6 +3,7 @@ package anf
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"flag"
 	"fmt"
 	"mime/multipart"
@@ -22,6 +23,9 @@ func AddFlags(fl *flag.FlagSet) (svc *Service) {
 	fl.StringVar(&svc.ChannelID, "apple-news-channel-id", "", "`channel id` for Apple News Publisher")
 	fl.StringVar(&svc.Key, "apple-news-key", "", "`key` for Apple News Publisher")
 	fl.StringVar(&svc.Secret, "apple-news-secret", "", "`secret` for Apple News Publisher")
+	svc.Client = &http.Client{
+		Transport: requests.ErrorTransport(errors.New("apple news client not configured")),
+	}
 	return svc
 }
 
