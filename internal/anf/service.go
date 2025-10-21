@@ -75,8 +75,6 @@ func (svc *Service) Create(ctx context.Context, a *Article) (*Response, error) {
 }
 
 func (svc *Service) Update(ctx context.Context, a *Article, appleID, revision string) (*Response, error) {
-	cl2 := *svc.Client
-	cl2.Transport = HHMacTransport(svc.Key, svc.Secret, cl2.Transport)
 	type Data struct {
 		Revision string `json:"revision"`
 	}
