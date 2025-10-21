@@ -36,6 +36,12 @@ type ServiceErrorResponse struct {
 	} `json:"errors"`
 }
 
+func (svc *Service) client() *http.Client {
+	cl2 := *svc.Client
+	cl2.Transport = HHMacTransport(svc.Key, svc.Secret, cl2.Transport)
+	return &cl2
+}
+
 func (svc *Service) Create(ctx context.Context, a *Article) (*Response, error) {
 	var res Response
 	var errDetails ServiceErrorResponse
@@ -160,12 +166,6 @@ func (svc *Service) List(ctx context.Context) (any, error) {
 		return nil, fmt.Errorf("service Apple News error: %v; %w", errDetails, err)
 	}
 	return data, nil
-}
-
-func (svc *Service) client() *http.Client {
-	cl2 := *svc.Client
-	cl2.Transport = HHMacTransport(svc.Key, svc.Secret, cl2.Transport)
-	return &cl2
 }
 
 func (svc *Service) ReadArticle(ctx context.Context, articleID string) (*Response, error) {
