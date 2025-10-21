@@ -63,7 +63,7 @@ func (svc *Service) Create(ctx context.Context, a *Article) (*Response, error) {
 		ToJSON(&res).
 		Fetch(ctx)
 	if err != nil {
-		return nil, fmt.Errorf("service Apple News error: %v", errDetails)
+		return nil, fmt.Errorf("service Apple News error: %v; %w", errDetails, err)
 	}
 	return &res, nil
 }
@@ -125,7 +125,7 @@ func (svc *Service) Update(ctx context.Context, a *Article, appleID, revision st
 		ToJSON(&res).
 		Fetch(ctx)
 	if err != nil {
-		return nil, fmt.Errorf("service Apple News error: %v", errDetails)
+		return nil, fmt.Errorf("service Apple News error: %v; %w", errDetails, err)
 	}
 	return &res, nil
 }
@@ -141,7 +141,7 @@ func (svc *Service) ReadChannel(ctx context.Context) (any, error) {
 		ToJSON(&data).
 		Fetch(ctx)
 	if err != nil {
-		return nil, fmt.Errorf("service Apple News error: %v", errDetails)
+		return nil, fmt.Errorf("service Apple News error: %v; %w", errDetails, err)
 	}
 	return data, nil
 }
@@ -157,7 +157,7 @@ func (svc *Service) List(ctx context.Context) (any, error) {
 		ToJSON(&data).
 		Fetch(ctx)
 	if err != nil {
-		return nil, fmt.Errorf("service Apple News error: %v", errDetails)
+		return nil, fmt.Errorf("service Apple News error: %v; %w", errDetails, err)
 	}
 	return data, nil
 }
@@ -179,7 +179,7 @@ func (svc *Service) ReadArticle(ctx context.Context, articleID string) (*Respons
 		ToJSON(&res).
 		Fetch(ctx)
 	if err != nil {
-		return nil, fmt.Errorf("service Apple News error: %v", errDetails)
+		return nil, fmt.Errorf("service Apple News error: %v; %w", errDetails, err)
 	}
 	return &res, nil
 }
