@@ -29,13 +29,15 @@ func AddFlags(fl *flag.FlagSet) (svc *Service) {
 	return svc
 }
 
+type ServiceErrorResponse struct {
+	Errors []struct {
+		Code  string `json:"code"`
+		Value string `json:"value"`
+	} `json:"errors"`
+}
+
 func (svc *Service) Create(ctx context.Context, a *Article) (*Response, error) {
-	var errDetails struct {
-		Errors []struct {
-			Code  string
-			Value string
-		}
-	}
+	var errDetails ServiceErrorResponse
 	var res Response
 	err := requests.
 		URL("https://news-api.apple.com").
@@ -69,9 +71,7 @@ func (svc *Service) Create(ctx context.Context, a *Article) (*Response, error) {
 func (svc *Service) Update(ctx context.Context, a *Article, appleID, revision string) (*Response, error) {
 	cl2 := *svc.Client
 	cl2.Transport = HHMacTransport(svc.Key, svc.Secret, cl2.Transport)
-	var errDetails struct {
-		Errors []struct{ Code string }
-	}
+	var errDetails ServiceErrorResponse
 	type Data struct {
 		Revision string `json:"revision"`
 	}
@@ -132,9 +132,7 @@ func (svc *Service) Update(ctx context.Context, a *Article, appleID, revision st
 
 func (svc *Service) ReadChannel(ctx context.Context) (any, error) {
 	var data any
-	var errDetails struct {
-		Errors []struct{ Code string }
-	}
+	var errDetails ServiceErrorResponse
 	err := requests.
 		URL("https://news-api.apple.com").
 		Pathf("/channels/%s/", svc.ChannelID).
@@ -150,9 +148,7 @@ func (svc *Service) ReadChannel(ctx context.Context) (any, error) {
 
 func (svc *Service) List(ctx context.Context) (any, error) {
 	var data any
-	var errDetails struct {
-		Errors []struct{ Code string }
-	}
+	var errDetails ServiceErrorResponse
 	err := requests.
 		URL("https://news-api.apple.com").
 		Pathf("/channels/%s/articles", svc.ChannelID).
@@ -174,9 +170,7 @@ func (svc *Service) client() *http.Client {
 
 func (svc *Service) ReadArticle(ctx context.Context, articleID string) (*Response, error) {
 	var res Response
-	var errDetails struct {
-		Errors []struct{ Code string }
-	}
+	var errDetails ServiceErrorResponse
 	err := requests.
 		URL("https://news-api.apple.com").
 		Pathf("/articles/%s", articleID).
