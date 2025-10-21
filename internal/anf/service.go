@@ -37,13 +37,12 @@ type ServiceErrorResponse struct {
 }
 
 func (svc *Service) Create(ctx context.Context, a *Article) (*Response, error) {
-	var errDetails ServiceErrorResponse
 	var res Response
+	var errDetails ServiceErrorResponse
 	err := requests.
 		URL("https://news-api.apple.com").
 		Pathf("/channels/%s/articles", svc.ChannelID).
 		Client(svc.client()).
-		ErrorJSON(&errDetails).
 		Config(requests.BodyMultipart("", func(multi *multipart.Writer) error {
 			data, err := json.Marshal(a)
 			if err != nil {
@@ -60,6 +59,7 @@ func (svc *Service) Create(ctx context.Context, a *Article) (*Response, error) {
 			_, err = w.Write(data)
 			return err
 		})).
+		ErrorJSON(&errDetails).
 		ToJSON(&res).
 		Fetch(ctx)
 	if err != nil {
@@ -71,7 +71,6 @@ func (svc *Service) Create(ctx context.Context, a *Article) (*Response, error) {
 func (svc *Service) Update(ctx context.Context, a *Article, appleID, revision string) (*Response, error) {
 	cl2 := *svc.Client
 	cl2.Transport = HHMacTransport(svc.Key, svc.Secret, cl2.Transport)
-	var errDetails ServiceErrorResponse
 	type Data struct {
 		Revision string `json:"revision"`
 	}
@@ -87,11 +86,11 @@ func (svc *Service) Update(ctx context.Context, a *Article, appleID, revision st
 		return nil, err
 	}
 	var res Response
+	var errDetails ServiceErrorResponse
 	err = requests.
 		URL("https://news-api.apple.com").
 		Pathf("/articles/%s", appleID).
 		Client(svc.client()).
-		ErrorJSON(&errDetails).
 		Config(requests.BodyMultipart("", func(multi *multipart.Writer) error {
 			{
 				h := make(textproto.MIMEHeader)
@@ -122,6 +121,7 @@ func (svc *Service) Update(ctx context.Context, a *Article, appleID, revision st
 
 			return nil
 		})).
+		ErrorJSON(&errDetails).
 		ToJSON(&res).
 		Fetch(ctx)
 	if err != nil {
