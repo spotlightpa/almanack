@@ -42,7 +42,7 @@
     "prettier": "3.6.2",
     "sass": "^1.54.3",
     "unplugin-vue-components": "29.1.0",
-    "vite": "^7.1.5",
+    "vite": "^7.1.11",
     "vite-plugin-eslint": "^1.7.0",
     "vue-eslint-parser": "^10.1.1"
   },
