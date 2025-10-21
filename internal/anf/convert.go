@@ -20,7 +20,7 @@ func ConvertToAppleNews(htmlContent string) (*Article, error) {
 
 func ConvertHTMLToAppleNews(doc *html.Node) *Article {
 	var c converter
-	c.a = templateDoc.Clone()
+	c.a = templateDoc().Clone()
 
 	titleEl := xhtml.Select(doc, xhtml.WithAtom(atom.Title))
 	c.a.Title = cmp.Or(xhtml.TextContent(titleEl), "Untitled")
