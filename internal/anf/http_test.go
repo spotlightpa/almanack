@@ -40,7 +40,7 @@ func TestRead(t *testing.T) {
 		Key:       "123",
 		Secret:    "aGVsbG8=",
 		Client: &http.Client{
-			Transport: reqtest.Replay("testdata/apple/"),
+			Transport: reqtest.Replay("testdata/api/"),
 		},
 	}
 	synctest.Test(t, func(t *testing.T) {
