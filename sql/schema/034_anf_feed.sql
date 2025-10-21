@@ -3,6 +3,7 @@ CREATE TABLE news_feed_item (
   "external_id" text NOT NULL UNIQUE,
   "author" text NOT NULL DEFAULT '',
   "authors" text[] NOT NULL DEFAULT '{}',
+  "blurb" text NOT NULL DEFAULT '',
   "category" text NOT NULL DEFAULT '',
   "content_html" text NOT NULL DEFAULT '',
   "external_updated_at" timestamp with time zone NOT NULL,

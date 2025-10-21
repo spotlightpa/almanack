@@ -18,7 +18,7 @@ func FromDB(item *db.NewsFeedItem) (*Article, error) {
 	a.Metadata = &Metadata{
 		Authors:      item.Authors,
 		CanonicalURL: item.URL,
-		// Excerpt:             "",
+		Excerpt:      item.Blurb,
 		Keywords:     []string{item.Category},
 		ThumbnailURL: item.Image,
 		// TransparentToolbar:  "",

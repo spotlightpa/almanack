@@ -14,6 +14,7 @@ feed_items AS (
       ELSE
         ARRAY[]::text[]
     END AS authors,
+    data ->> 'blurb' AS blurb,
     data ->> 'category' AS category,
     data ->> 'content_html' AS content_html,
     iso_to_timestamptz (data ->> 'date_modified')::timestamptz AS external_updated_at,
@@ -26,13 +27,14 @@ feed_items AS (
     data ->> 'url' AS url
   FROM
     raw_json)
-  INSERT INTO news_feed_item ("external_id", "author", "authors", "category",
-    "content_html", "external_updated_at", "external_published_at", "image",
-    "image_credit", "image_description", "language", "title", "url")
+  INSERT INTO news_feed_item ("external_id", "author", "authors", "blurb",
+    "category", "content_html", "external_updated_at", "external_published_at",
+    "image", "image_credit", "image_description", "language", "title", "url")
   SELECT
     "external_id",
     COALESCE("author", ''),
     "authors",
+    COALESCE("blurb", ''),
     COALESCE("category", ''),
     COALESCE("content_html", ''),
     "external_updated_at",

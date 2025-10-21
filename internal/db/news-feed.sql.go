@@ -11,7 +11,7 @@ import (
 
 const listNewsFeedUpdates = `-- name: ListNewsFeedUpdates :many
 SELECT
-  id, external_id, author, authors, category, content_html, external_updated_at, external_published_at, image, image_credit, image_description, language, title, url, uploaded_at, apple_id, apple_share_url, created_at, updated_at
+  id, external_id, author, authors, blurb, category, content_html, external_updated_at, external_published_at, image, image_credit, image_description, language, title, url, uploaded_at, apple_id, apple_share_url, created_at, updated_at
 FROM
   news_feed_item
 WHERE
@@ -32,6 +32,7 @@ func (q *Queries) ListNewsFeedUpdates(ctx context.Context) ([]NewsFeedItem, erro
 			&i.ExternalID,
 			&i.Author,
 			&i.Authors,
+			&i.Blurb,
 			&i.Category,
 			&i.ContentHtml,
 			&i.ExternalUpdatedAt,
@@ -69,7 +70,7 @@ SET
 WHERE
   "id" = $3
 RETURNING
-  id, external_id, author, authors, category, content_html, external_updated_at, external_published_at, image, image_credit, image_description, language, title, url, uploaded_at, apple_id, apple_share_url, created_at, updated_at
+  id, external_id, author, authors, blurb, category, content_html, external_updated_at, external_published_at, image, image_credit, image_description, language, title, url, uploaded_at, apple_id, apple_share_url, created_at, updated_at
 `
 
 type UpdateFeedAppleIDParams struct {
@@ -86,6 +87,7 @@ func (q *Queries) UpdateFeedAppleID(ctx context.Context, arg UpdateFeedAppleIDPa
 		&i.ExternalID,
 		&i.Author,
 		&i.Authors,
+		&i.Blurb,
 		&i.Category,
 		&i.ContentHtml,
 		&i.ExternalUpdatedAt,
@@ -114,7 +116,7 @@ SET
 WHERE
   "id" = $1
 RETURNING
-  id, external_id, author, authors, category, content_html, external_updated_at, external_published_at, image, image_credit, image_description, language, title, url, uploaded_at, apple_id, apple_share_url, created_at, updated_at
+  id, external_id, author, authors, blurb, category, content_html, external_updated_at, external_published_at, image, image_credit, image_description, language, title, url, uploaded_at, apple_id, apple_share_url, created_at, updated_at
 `
 
 func (q *Queries) UpdateFeedUploaded(ctx context.Context, id int64) (NewsFeedItem, error) {
@@ -125,6 +127,7 @@ func (q *Queries) UpdateFeedUploaded(ctx context.Context, id int64) (NewsFeedIte
 		&i.ExternalID,
 		&i.Author,
 		&i.Authors,
+		&i.Blurb,
 		&i.Category,
 		&i.ContentHtml,
 		&i.ExternalUpdatedAt,
@@ -160,6 +163,7 @@ feed_items AS (
       ELSE
         ARRAY[]::text[]
     END AS authors,
+    data ->> 'blurb' AS blurb,
     data ->> 'category' AS category,
     data ->> 'content_html' AS content_html,
     iso_to_timestamptz (data ->> 'date_modified')::timestamptz AS external_updated_at,
@@ -172,13 +176,14 @@ feed_items AS (
     data ->> 'url' AS url
   FROM
     raw_json)
-  INSERT INTO news_feed_item ("external_id", "author", "authors", "category",
-    "content_html", "external_updated_at", "external_published_at", "image",
-    "image_credit", "image_description", "language", "title", "url")
+  INSERT INTO news_feed_item ("external_id", "author", "authors", "blurb",
+    "category", "content_html", "external_updated_at", "external_published_at",
+    "image", "image_credit", "image_description", "language", "title", "url")
   SELECT
     "external_id",
     COALESCE("author", ''),
     "authors",
+    COALESCE("blurb", ''),
     COALESCE("category", ''),
     COALESCE("content_html", ''),
     "external_updated_at",
