@@ -9,6 +9,7 @@ import (
 
 	"github.com/carlmjohnson/flowmatic"
 	"github.com/spotlightpa/almanack/internal/db"
+	"github.com/spotlightpa/almanack/internal/iterx"
 	"github.com/spotlightpa/almanack/internal/paginate"
 	"github.com/spotlightpa/almanack/internal/timex"
 	"github.com/spotlightpa/almanack/pkg/almlog"
@@ -120,12 +121,18 @@ func (app *appEnv) backgroundCron(w http.ResponseWriter, r *http.Request) http.H
 			return app.svc.PublishAppleNewsFeed(r.Context())
 		},
 	); err != nil {
+		// Log multierrors individually so Sentry isn't confused
+		for suberr := range iterx.ErrorChildren(err) {
+			app.logErr(r.Context(), suberr)
+		}
 		// reply shows up in dev only
-		return app.jsonErr(err)
+		return app.jsonErr(errBackgroundCron)
 	}
 
 	return app.jsonAccepted("OK")
 }
+
+var errBackgroundCron = errors.New("bad background cron")
 
 func (app *appEnv) backgroundRefreshPages(w http.ResponseWriter, r *http.Request) http.Handler {
 	app.logStart(r)
