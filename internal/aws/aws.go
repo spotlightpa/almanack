@@ -12,7 +12,7 @@ import (
 	"time"
 
 	"github.com/aws/aws-sdk-go/service/s3"
-	"github.com/carlmjohnson/errorx"
+	"github.com/earthboundkid/errorx/v2"
 	"gocloud.dev/blob"
 
 	"github.com/spotlightpa/almanack/internal/httpx"

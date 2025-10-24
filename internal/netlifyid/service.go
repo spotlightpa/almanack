@@ -10,7 +10,7 @@ import (
 	"strings"
 
 	"github.com/aws/aws-lambda-go/lambdacontext"
-	"github.com/carlmjohnson/errorx"
+	"github.com/earthboundkid/errorx/v2"
 	"github.com/earthboundkid/resperr/v2"
 	"github.com/spotlightpa/almanack/pkg/almlog"
 )

@@ -9,8 +9,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/carlmjohnson/slackhook"
 	"github.com/earthboundkid/resperr/v2"
+	"github.com/earthboundkid/slackhook/v2"
 	"github.com/spotlightpa/almanack/internal/db"
 	"github.com/spotlightpa/almanack/internal/httpx"
 	"github.com/spotlightpa/almanack/internal/jwthook"

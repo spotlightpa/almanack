@@ -9,10 +9,10 @@ import (
 	"maps"
 	"strings"
 
-	"github.com/carlmjohnson/errorx"
 	"github.com/carlmjohnson/flowmatic"
-	"github.com/carlmjohnson/slackhook"
+	"github.com/earthboundkid/errorx/v2"
 	"github.com/earthboundkid/resperr/v2"
+	"github.com/earthboundkid/slackhook/v2"
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgconn"
 	"github.com/jackc/pgx/v5/pgtype"
