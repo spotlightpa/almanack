@@ -10,9 +10,9 @@ import (
 	"strings"
 
 	"github.com/carlmjohnson/crockford"
-	"github.com/carlmjohnson/errorx"
 	"github.com/carlmjohnson/flowmatic"
 	"github.com/carlmjohnson/requests"
+	"github.com/earthboundkid/errorx/v2"
 	"github.com/earthboundkid/resperr/v2"
 	"github.com/gabriel-vasile/mimetype"
 	"github.com/spotlightpa/almanack/internal/db"

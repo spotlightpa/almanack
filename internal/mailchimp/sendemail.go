@@ -5,8 +5,8 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/carlmjohnson/errorx"
 	"github.com/carlmjohnson/requests"
+	"github.com/earthboundkid/errorx/v2"
 	"github.com/earthboundkid/resperr/v2"
 	"github.com/spotlightpa/almanack/pkg/almlog"
 )

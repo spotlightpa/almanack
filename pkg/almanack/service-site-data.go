@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/carlmjohnson/errorx"
+	"github.com/earthboundkid/errorx/v2"
 	"github.com/jackc/pgx/v5"
 	"github.com/spotlightpa/almanack/internal/db"
 	"github.com/spotlightpa/almanack/pkg/almlog"

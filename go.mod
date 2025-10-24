@@ -1,6 +1,6 @@
 module github.com/spotlightpa/almanack
 
-go 1.25
+go 1.25.3
 
 require (
 	github.com/BurntSushi/toml v1.5.0
@@ -9,17 +9,17 @@ require (
 	github.com/aws/aws-sdk-go v1.55.8
 	github.com/carlmjohnson/be v0.25.2
 	github.com/carlmjohnson/crockford v0.23.1
-	github.com/carlmjohnson/errorx v0.23.2
 	github.com/carlmjohnson/exitcode v0.20.2
 	github.com/carlmjohnson/flowmatic v0.23.4
 	github.com/carlmjohnson/gateway v1.22.2
 	github.com/carlmjohnson/requests v0.25.1
-	github.com/carlmjohnson/slackhook v0.23.2
 	github.com/earthboundkid/bytemap/v2 v2.24.1
 	github.com/earthboundkid/emailx/v2 v2.24.1
+	github.com/earthboundkid/errorx/v2 v2.25.1
 	github.com/earthboundkid/flagx/v2 v2.25.1
 	github.com/earthboundkid/mid v0.24.1
 	github.com/earthboundkid/resperr/v2 v2.25.1
+	github.com/earthboundkid/slackhook/v2 v2.25.1
 	github.com/earthboundkid/versioninfo/v2 v2.24.1
 	github.com/earthboundkid/xhtml v0.25.2
 	github.com/gabriel-vasile/mimetype v1.4.10
@@ -32,9 +32,9 @@ require (
 	github.com/microcosm-cc/bluemonday v1.0.27
 	github.com/tdewolff/minify/v2 v2.24.3
 	gocloud.dev v0.41.0
-	golang.org/x/net v0.44.0
+	golang.org/x/net v0.46.0
 	golang.org/x/oauth2 v0.31.0
-	golang.org/x/text v0.29.0
+	golang.org/x/text v0.30.0
 	google.golang.org/api v0.251.0
 	gopkg.in/Iwark/spreadsheet.v2 v2.0.0-20230915040305-7677e8164883
 )
@@ -98,9 +98,9 @@ require (
 	go.opentelemetry.io/otel v1.38.0 // indirect
 	go.opentelemetry.io/otel/metric v1.38.0 // indirect
 	go.opentelemetry.io/otel/trace v1.38.0 // indirect
-	golang.org/x/crypto v0.42.0 // indirect
+	golang.org/x/crypto v0.43.0 // indirect
 	golang.org/x/sync v0.17.0 // indirect
-	golang.org/x/sys v0.36.0 // indirect
+	golang.org/x/sys v0.37.0 // indirect
 	golang.org/x/xerrors v0.0.0-20240903120638-7835f813f4da // indirect
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20250929231259-57b25ae835d4 // indirect
 	google.golang.org/grpc v1.75.1 // indirect

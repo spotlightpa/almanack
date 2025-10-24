@@ -6,8 +6,8 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/carlmjohnson/errorx"
 	"github.com/carlmjohnson/requests"
+	"github.com/earthboundkid/errorx/v2"
 )
 
 // Client is a convenient way to ping HealthChecks.io

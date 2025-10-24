@@ -11,8 +11,8 @@ import (
 	"strings"
 
 	"github.com/carlmjohnson/crockford"
-	"github.com/carlmjohnson/errorx"
 	"github.com/carlmjohnson/requests"
+	"github.com/earthboundkid/errorx/v2"
 	"github.com/earthboundkid/xhtml"
 	"github.com/spotlightpa/almanack/internal/db"
 	"github.com/spotlightpa/almanack/internal/gdocs"

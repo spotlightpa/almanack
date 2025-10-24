@@ -5,7 +5,7 @@ import (
 	"os"
 	"time"
 
-	"github.com/carlmjohnson/errorx"
+	"github.com/earthboundkid/errorx/v2"
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/jackc/tern/v2/migrate"
 )

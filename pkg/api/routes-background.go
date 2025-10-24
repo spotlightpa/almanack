@@ -71,19 +71,20 @@ func (app *appEnv) backgroundCron(w http.ResponseWriter, r *http.Request) http.H
 			return errors.Join(errs...)
 		},
 		func() error {
-			return app.svc.UpdateMostPopular(r.Context())
+			// Wrapping each return so single errors don't get unwrapped
+			return errors.Join(app.svc.UpdateMostPopular(r.Context()))
 		},
 		func() error {
-			return app.svc.UploadPendingImages(r.Context())
+			return errors.Join(app.svc.UploadPendingImages(r.Context()))
 		},
 		func() error {
-			return app.svc.ProcessGDocs(r.Context())
+			return errors.Join(app.svc.ProcessGDocs(r.Context()))
 		},
 		func() error {
-			return app.svc.Queries.DeleteGDocsDocWhereUnunused(r.Context())
+			return errors.Join(app.svc.Queries.DeleteGDocsDocWhereUnunused(r.Context()))
 		},
 		func() error {
-			return updateMD5s(
+			return errors.Join(updateMD5s(
 				r.Context(),
 				app.svc.Queries.ListImagesWhereNoMD5,
 				func(ctx context.Context, image db.Image) ([]byte, int64, error) {
@@ -97,10 +98,10 @@ func (app *appEnv) backgroundCron(w http.ResponseWriter, r *http.Request) http.H
 					})
 					return err
 				},
-			)
+			))
 		},
 		func() error {
-			return updateMD5s(
+			return errors.Join(updateMD5s(
 				r.Context(),
 				app.svc.Queries.ListFilesWhereNoMD5,
 				func(ctx context.Context, file db.File) ([]byte, int64, error) {
@@ -115,17 +116,17 @@ func (app *appEnv) backgroundCron(w http.ResponseWriter, r *http.Request) http.H
 					})
 					return err
 				},
-			)
+			))
 		},
 		func() error {
-			return app.svc.PublishAppleNewsFeed(r.Context())
+			return errors.Join(app.svc.PublishAppleNewsFeed(r.Context()))
 		},
 	); err != nil {
 		// Log multierrors individually so Sentry isn't confused
 		for suberr := range iterx.ErrorChildren(err) {
 			app.logErr(r.Context(), suberr)
 		}
-		// reply shows up in dev only
+		// Actual reply shows up in dev only but gets logged in prod
 		return app.jsonErr(errBackgroundCron)
 	}
 

@@ -6,8 +6,8 @@ import (
 	"flag"
 	"net/http"
 
-	"github.com/carlmjohnson/errorx"
 	"github.com/carlmjohnson/requests"
+	"github.com/earthboundkid/errorx/v2"
 	"github.com/spotlightpa/almanack/internal/db"
 	"github.com/spotlightpa/almanack/pkg/almlog"
 )
