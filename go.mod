@@ -8,12 +8,11 @@ require (
 	github.com/aws/aws-lambda-go v1.49.0
 	github.com/aws/aws-sdk-go v1.55.8
 	github.com/carlmjohnson/be v0.25.2
-	github.com/carlmjohnson/crockford v0.23.1
-	github.com/carlmjohnson/exitcode v0.20.2
 	github.com/carlmjohnson/flowmatic v0.23.4
 	github.com/carlmjohnson/gateway v1.22.2
 	github.com/carlmjohnson/requests v0.25.1
 	github.com/earthboundkid/bytemap/v2 v2.24.1
+	github.com/earthboundkid/crockford/v2 v2.25.3
 	github.com/earthboundkid/emailx/v2 v2.24.1
 	github.com/earthboundkid/errorx/v2 v2.25.1
 	github.com/earthboundkid/flagx/v2 v2.25.1

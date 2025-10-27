@@ -6,7 +6,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/carlmjohnson/crockford"
+	"github.com/earthboundkid/crockford/v2"
 	"github.com/spotlightpa/almanack/internal/aws"
 )
 

@@ -9,9 +9,9 @@ import (
 	"path"
 	"strings"
 
-	"github.com/carlmjohnson/crockford"
 	"github.com/carlmjohnson/flowmatic"
 	"github.com/carlmjohnson/requests"
+	"github.com/earthboundkid/crockford/v2"
 	"github.com/earthboundkid/errorx/v2"
 	"github.com/earthboundkid/resperr/v2"
 	"github.com/gabriel-vasile/mimetype"
