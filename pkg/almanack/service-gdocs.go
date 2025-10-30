@@ -10,8 +10,8 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/carlmjohnson/crockford"
 	"github.com/carlmjohnson/requests"
+	"github.com/earthboundkid/crockford/v2"
 	"github.com/earthboundkid/errorx/v2"
 	"github.com/earthboundkid/xhtml"
 	"github.com/spotlightpa/almanack/internal/db"
