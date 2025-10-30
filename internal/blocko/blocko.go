@@ -31,7 +31,7 @@ func Blockize(root *html.Node) string {
 }
 
 func blockToStrings(p *html.Node) []string {
-	if !markdownBlockElements[p.DataAtom] {
+	if !BlockElements[p.DataAtom] {
 		return []string{xhtml.OuterHTML(p)}
 	}
 	prefix := ""

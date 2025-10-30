@@ -7,7 +7,7 @@ import (
 	"golang.org/x/net/html/atom"
 )
 
-var markdownBlockElements = map[atom.Atom]bool{
+var BlockElements = map[atom.Atom]bool{
 	atom.P:  true,
 	atom.H1: true,
 	atom.H2: true,
@@ -19,7 +19,7 @@ var markdownBlockElements = map[atom.Atom]bool{
 	atom.Ol: true,
 }
 
-var inlineElements = map[atom.Atom]bool{
+var InlineElements = map[atom.Atom]bool{
 	atom.A:       true,
 	atom.Abbr:    true,
 	atom.Acronym: true,
@@ -68,7 +68,7 @@ func isEmpty(n *html.Node) bool {
 				continue
 			}
 		case html.ElementNode:
-			if inlineElements[n.DataAtom] {
+			if InlineElements[n.DataAtom] {
 				continue
 			}
 		}
