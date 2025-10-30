@@ -14,6 +14,7 @@ import (
 	"github.com/earthboundkid/crockford/v2"
 	"github.com/earthboundkid/errorx/v2"
 	"github.com/earthboundkid/xhtml"
+	"github.com/spotlightpa/almanack/internal/blocko"
 	"github.com/spotlightpa/almanack/internal/db"
 	"github.com/spotlightpa/almanack/internal/gdocs"
 	"github.com/spotlightpa/almanack/internal/must"
@@ -164,7 +165,9 @@ func removeTail(n *html.Node) {
 		if c.DataAtom == atom.Table {
 			continue
 		}
-
+		if !blocko.BlockElements[c.DataAtom] {
+			continue
+		}
 		if text := xhtml.TextContent(c); text != "###" {
 			continue
 		}

@@ -22,7 +22,7 @@ func MergeSiblings(root *html.Node) {
 	inlineSiblings := xhtml.SelectSlice(root, func(n *html.Node) bool {
 		brother := n.NextSibling
 		return brother != nil &&
-			inlineElements[n.DataAtom] &&
+			InlineElements[n.DataAtom] &&
 			n.DataAtom == brother.DataAtom &&
 			slices.Equal(n.Attr, brother.Attr)
 	})
@@ -109,7 +109,7 @@ func fixBareLI(root *html.Node) {
 		child := n.FirstChild
 		return n.DataAtom == atom.Li && child != nil &&
 			(child.Type == html.TextNode ||
-				inlineElements[child.DataAtom])
+				InlineElements[child.DataAtom])
 	})
 	for _, li := range bareLIs {
 		p := xhtml.New("p")
