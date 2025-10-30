@@ -73,6 +73,28 @@ func processDocHTML(docHTML *html.Node) (
 	markdown string,
 	warnings []string,
 ) {
+	var intDoc *html.Node
+	metadata, embeds, warnings, intDoc = createIntermediateDoc(docHTML)
+
+	// Clone turn data elements into partner placeholders
+	richText = xhtml.Clone(intDoc)
+	intermediateDocToPartnerRichText(richText)
+
+	// For rawHTML, convert to raw nodes
+	rawHTML = xhtml.Clone(intDoc)
+	intermediateDocToPartnerHTML(rawHTML)
+
+	// Markdown data conversion
+	markdown = intermediateDocToMarkdown(intDoc)
+	return
+}
+
+func createIntermediateDoc(docHTML *html.Node) (
+	metadata db.GDocsMetadata,
+	embeds []db.Embed,
+	warnings []string,
+	intermediateDoc *html.Node,
+) {
 	// Now collect the embeds array and metadata
 	n := 1
 	for tbl, rows := range tableaux.Tables(docHTML) {
@@ -202,14 +224,14 @@ func processDocHTML(docHTML *html.Node) (
 		n++
 	}
 
-	docHTML = must.Get(blocko.Minify(xhtml.ToBuffer(docHTML)))
+	intermediateDoc = must.Get(blocko.Minify(xhtml.ToBuffer(docHTML)))
 
-	blocko.MergeSiblings(docHTML)
-	blocko.RemoveEmptyP(docHTML)
-	blocko.RemoveMarks(docHTML)
+	blocko.MergeSiblings(intermediateDoc)
+	blocko.RemoveEmptyP(intermediateDoc)
+	blocko.RemoveMarks(intermediateDoc)
 
 	// Warn about fake headings
-	for n := range docHTML.ChildNodes() {
+	for n := range intermediateDoc.ChildNodes() {
 		// <p> with only b/i/strong/em for a child
 		if n.DataAtom != atom.P {
 			continue
@@ -228,7 +250,7 @@ func processDocHTML(docHTML *html.Node) (
 
 	// Warn about TK in document
 	tkRe := regexp.MustCompile(`(?i)\bTK\b`)
-	for n := range docHTML.ChildNodes() {
+	for n := range intermediateDoc.ChildNodes() {
 		if n.Type != html.TextNode {
 			continue
 		}
@@ -242,21 +264,10 @@ func processDocHTML(docHTML *html.Node) (
 	}
 
 	// Warn about <br>
-	if n := xhtml.Select(docHTML, xhtml.WithAtom(atom.Br)); n != nil {
+	if n := xhtml.Select(intermediateDoc, xhtml.WithAtom(atom.Br)); n != nil {
 		warnings = append(warnings,
 			"Document contains <br> line breaks. Are you sure you want to use a line break? In Google Docs, select View > Show non-printing characters to see them.")
 	}
-
-	// Clone turn data elements into partner placeholders
-	richText = xhtml.Clone(docHTML)
-	intermediateDocToPartnerRichText(richText)
-
-	// For rawHTML, convert to raw nodes
-	rawHTML = xhtml.Clone(docHTML)
-	intermediateDocToPartnerHTML(rawHTML)
-
-	// Markdown data conversion
-	markdown = intermediateDocToMarkdown(docHTML)
 
 	return
 }
