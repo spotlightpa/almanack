@@ -88,17 +88,6 @@ func (svc Services) ProcessGDocs(ctx context.Context) error {
 func (svc Services) ProcessGDocsDoc(ctx context.Context, dbDoc db.GDocsDoc) (err error) {
 	defer errorx.Trace(&err)
 
-	// Get existing image uploads
-	rows, err := svc.Queries.ListGDocsImagesByExternalID(ctx, dbDoc.ExternalID)
-	if err != nil {
-		return err
-	}
-
-	objID2Path := make(map[string]string, len(rows))
-	for _, row := range rows {
-		objID2Path[row.DocObjectID] = row.Path
-	}
-
 	docHTML := gdocs.Convert(&dbDoc.Document)
 	if n := xhtml.Select(docHTML, xhtml.WithAtom(atom.Data)); n != nil {
 		return fmt.Errorf(
@@ -110,26 +99,9 @@ func (svc Services) ProcessGDocsDoc(ctx context.Context, dbDoc db.GDocsDoc) (err
 	// First remove everything after a ###
 	removeTail(docHTML)
 
-	var warnings []string
-
-	// Handle image uploads/database lookups
-	for tbl, rows := range tableaux.Tables(docHTML) {
-		switch label := rows.Label(); label {
-		case "photo", "image", "photograph", "illustration", "illo",
-			"spl-photo", "partner-photo", "spl-image", "partner-image":
-			if warning := svc.replaceImagePath(
-				ctx, tbl, rows, dbDoc.ExternalID, objID2Path,
-			); warning != "" {
-				warnings = append(warnings, warning)
-			}
-
-		case "metadata", "info":
-			if warning := svc.replaceMetadataImagePath(
-				ctx, tbl, rows, dbDoc.ExternalID, objID2Path,
-			); warning != "" {
-				warnings = append(warnings, warning)
-			}
-		}
+	warnings, err := svc.processDocExternals(ctx, &dbDoc, docHTML)
+	if err != nil {
+		return err
 	}
 
 	metadata, embeds, richText, rawHTML, md, warnings2 := processDocHTML(docHTML)
@@ -179,6 +151,40 @@ func removeTail(n *html.Node) {
 		xhtml.RemoveAll(remove)
 		return
 	}
+}
+
+func (svc Services) processDocExternals(ctx context.Context, dbDoc *db.GDocsDoc, docHTML *html.Node) (warnings []string, err error) {
+	// Get existing image uploads
+	rows, err := svc.Queries.ListGDocsImagesByExternalID(ctx, dbDoc.ExternalID)
+	if err != nil {
+		return nil, err
+	}
+
+	objID2Path := make(map[string]string, len(rows))
+	for _, row := range rows {
+		objID2Path[row.DocObjectID] = row.Path
+	}
+
+	// Handle image uploads/database lookups
+	for tbl, rows := range tableaux.Tables(docHTML) {
+		switch label := rows.Label(); label {
+		case "photo", "image", "photograph", "illustration", "illo",
+			"spl-photo", "partner-photo", "spl-image", "partner-image":
+			if warning := svc.replaceImagePath(
+				ctx, tbl, rows, dbDoc.ExternalID, objID2Path,
+			); warning != "" {
+				warnings = append(warnings, warning)
+			}
+
+		case "metadata", "info":
+			if warning := svc.replaceMetadataImagePath(
+				ctx, tbl, rows, dbDoc.ExternalID, objID2Path,
+			); warning != "" {
+				warnings = append(warnings, warning)
+			}
+		}
+	}
+	return warnings, nil
 }
 
 func (svc Services) replaceImagePath(
