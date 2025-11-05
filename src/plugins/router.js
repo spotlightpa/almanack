@@ -229,6 +229,12 @@ let router = createRouter({
       },
     },
     {
+      path: "/admin/page-load",
+      name: "page-load",
+      component: load(() => import("@/components/ViewPageLoad.vue")),
+      meta: { requiresAuth: isSpotlightPAUser },
+    },
+    {
       path: "/:pathMatch(.*)*",
       name: "error",
       component: ViewError,

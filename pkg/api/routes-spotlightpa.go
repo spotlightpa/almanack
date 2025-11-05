@@ -993,10 +993,11 @@ func (app *appEnv) postPageLoad(w http.ResponseWriter, r *http.Request) http.Han
 	// - Load it from the store
 	// - Shove it in the DB
 	app.logStart(r)
-	if err := r.ParseForm(); err != nil {
-		return app.jsonErr(err)
+	var req string
+	if !app.readJSON(w, r, &req) {
+		return nil
 	}
-	path := r.PostForm.Get("path")
+	path := req
 	var v resperr.Validator
 	v.AddIf("path", path == "", "missing path")
 	if err := v.Err(); err != nil {
@@ -1006,8 +1007,9 @@ func (app *appEnv) postPageLoad(w http.ResponseWriter, r *http.Request) http.Han
 	if err != nil {
 		return app.jsonErr(err)
 	}
-	if _, err := db.CreatePageFromContent(r.Context(), app.svc.Tx, path, content); err != nil {
+	page, err := db.CreatePageFromContent(r.Context(), app.svc.Tx, path, content)
+	if err != nil {
 		return app.jsonErr(err)
 	}
-	return app.jsonOK("ok")
+	return app.jsonOK(page.ID)
 }
