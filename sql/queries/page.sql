@@ -117,7 +117,8 @@ SELECT
 FROM
   page
 WHERE
-  url_path ILIKE @url_path::text;
+  RTRIM(url_path, '/')
+  ILIKE RTRIM(@url_path::text, '/');
 
 -- name: ListAllTopics :many
 WITH topics AS (

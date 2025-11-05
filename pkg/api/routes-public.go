@@ -111,7 +111,7 @@ func (app *appEnv) getBookmarklet(w http.ResponseWriter, r *http.Request) {
 	slug := r.PathValue("slug")
 	app.logStart(r, "slug", slug)
 
-	page, err := app.svc.Queries.GetPageByURLPath(r.Context(), "%"+slug+"%")
+	page, err := app.svc.Queries.GetPageByURLPath(r.Context(), "%"+slug)
 	if err != nil {
 		if db.IsNotFound(err) {
 			err = resperr.E{
