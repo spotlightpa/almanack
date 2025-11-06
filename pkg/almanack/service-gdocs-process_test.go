@@ -20,10 +20,12 @@ func TestProcessDocHTML(t *testing.T) {
 
 		dir := filepath.Dir(path)
 
+		intermediateDoc := xhtml.OuterHTML(doc)
 		richTextStr := xhtml.OuterHTML(richText)
 		rawHTMLStr := xhtml.OuterHTML(rawHTML)
 
 		rt := be.Relaxed(t)
+		testfile.Equalish(rt, filepath.Join(dir, "intermediate.html"), intermediateDoc)
 		testfile.Equalish(rt, filepath.Join(dir, "rich.html"), richTextStr)
 		testfile.Equalish(rt, filepath.Join(dir, "raw.html"), rawHTMLStr)
 		testfile.Equalish(rt, filepath.Join(dir, "article.md"), md)
