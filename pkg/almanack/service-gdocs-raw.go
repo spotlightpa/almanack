@@ -10,22 +10,23 @@ import (
 	"golang.org/x/net/html/atom"
 )
 
-func intermediateDocToPartnerHTML(doc *html.Node) {
+func intermediateDocToPartnerHTML(doc *html.Node) *html.Node {
+	rawHTML := xhtml.Clone(doc)
 	// Remove Spotlight PA exclusives
 	for dataEl := range iterx.Concat2(
-		dataEls(doc, dtSpotlightText),
-		dataEls(doc, dtSpotlightRaw),
+		dataEls(rawHTML, dtSpotlightText),
+		dataEls(rawHTML, dtSpotlightRaw),
 	) {
 		dataEl.Parent.RemoveChild(dataEl)
 	}
 	// Include partner text as is
-	for dataEl, text := range dataEls(doc, dtPartnerText) {
+	for dataEl, text := range dataEls(rawHTML, dtPartnerText) {
 		xhtml.ReplaceWith(dataEl, &html.Node{
 			Type: html.RawNode,
 			Data: text,
 		})
 	}
-	for dataEl, value := range dataEls(doc, dtDBEmbed) {
+	for dataEl, value := range dataEls(rawHTML, dtDBEmbed) {
 		dbembed := dbEmbedFromString(value)
 		switch dbembed.Type {
 		// Replace images with red placeholder text
@@ -48,7 +49,8 @@ func intermediateDocToPartnerHTML(doc *html.Node) {
 			panic("unknown embed type: " + dbembed.Type)
 		}
 	}
-	if el := xhtml.Select(doc, xhtml.WithAtom(atom.Data)); el != nil {
+	if el := xhtml.Select(rawHTML, xhtml.WithAtom(atom.Data)); el != nil {
 		panic("unprocessed data element: " + xhtml.OuterHTML(el))
 	}
+	return rawHTML
 }

@@ -104,7 +104,7 @@ func (svc Services) ProcessGDocsDoc(ctx context.Context, dbDoc db.GDocsDoc) (err
 		return err
 	}
 
-	metadata, embeds, richText, rawHTML, md, warnings2 := processDocHTML(docHTML)
+	metadata, embeds, _, richText, rawHTML, md, warnings2 := processDocHTML(docHTML)
 	warnings = append(warnings, warnings2...)
 
 	// Default slug is article title
