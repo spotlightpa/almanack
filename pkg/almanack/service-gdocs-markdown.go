@@ -17,6 +17,7 @@ import (
 )
 
 func intermediateDocToMarkdown(doc *html.Node) string {
+	doc = xhtml.Clone(doc)
 	// Remove partner exclusive text
 	for dataEl := range dataEls(doc, dtPartnerText) {
 		dataEl.Parent.RemoveChild(dataEl)

@@ -75,6 +75,7 @@ func processDocHTML(docHTML *html.Node) (
 ) {
 	var intDoc *html.Node
 	metadata, embeds, warnings, intDoc = createIntermediateDoc(docHTML)
+	*docHTML = *intDoc
 
 	// Clone turn data elements into partner placeholders
 	richText = xhtml.Clone(intDoc)
