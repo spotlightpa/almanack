@@ -16,11 +16,11 @@ func TestProcessDocHTML(t *testing.T) {
 	testfile.Run(t, "testdata/processDocHTML/*/doc.html", func(t *testing.T, path string) {
 		input := testfile.Read(t, path)
 		doc := must.Get(html.Parse(strings.NewReader(input)))
-		metadata, embeds, richText, rawHTML, md, warnings := processDocHTML(doc)
+		metadata, embeds, intDoc, richText, rawHTML, md, warnings := processDocHTML(doc)
 
 		dir := filepath.Dir(path)
 
-		intermediateDoc := xhtml.OuterHTML(doc)
+		intermediateDoc := xhtml.OuterHTML(intDoc)
 		richTextStr := xhtml.OuterHTML(richText)
 		rawHTMLStr := xhtml.OuterHTML(rawHTML)
 

@@ -69,23 +69,13 @@ var ascii = bytemap.Range(0, 127)
 func processDocHTML(docHTML *html.Node) (
 	metadata db.GDocsMetadata,
 	embeds []db.Embed,
-	richText *html.Node, rawHTML *html.Node,
+	intDoc, richText, rawHTML *html.Node,
 	markdown string,
 	warnings []string,
 ) {
-	var intDoc *html.Node
 	metadata, embeds, warnings, intDoc = createIntermediateDoc(docHTML)
-	*docHTML = *intDoc
-
-	// Clone turn data elements into partner placeholders
-	richText = xhtml.Clone(intDoc)
-	intermediateDocToPartnerRichText(richText)
-
-	// For rawHTML, convert to raw nodes
-	rawHTML = xhtml.Clone(intDoc)
-	intermediateDocToPartnerHTML(rawHTML)
-
-	// Markdown data conversion
+	richText = intermediateDocToPartnerRichText(intDoc)
+	rawHTML = intermediateDocToPartnerHTML(intDoc)
 	markdown = intermediateDocToMarkdown(intDoc)
 	return
 }
