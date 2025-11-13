@@ -87,11 +87,16 @@ func intermediateDocToMarkdown(doc *html.Node) string {
 					image.Width, image.Height,
 				)
 			}
+			focus := ""
+			if image.Focus != "" {
+				focus = fmt.Sprintf(`focus="%s" `, html.EscapeString(image.Focus))
+			}
 			data := fmt.Sprintf(
-				`{{<%s src="%s" %sdescription="%s" caption="%s" credit="%s">}}`,
+				`{{<%s src="%s" %s%sdescription="%s" caption="%s" credit="%s">}}`,
 				tag,
 				image.Path,
 				widthHeight,
+				focus,
 				html.EscapeString(strings.TrimSpace(image.Description)),
 				html.EscapeString(strings.TrimSpace(image.Caption)),
 				html.EscapeString(strings.TrimSpace(image.Credit)),
