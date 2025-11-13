@@ -23,7 +23,8 @@ func TestTranslate(t *testing.T) {
 		be.NilErr(t, err)
 		cl.Transport = reqtest.Record(gcl.Transport, "testdata")
 	}
-	translated, err := svc.Translate(ctx, &cl, "Hello, World!", "text/plain")
+	translated, err := svc.Translate(ctx, &cl, "text/plain", "Hello, World!")
 	be.NilErr(t, err)
-	be.Equal(t, "¡Hola Mundo!", translated)
+	be.EqualLength(t, 1, translated)
+	be.Equal(t, "¡Hola Mundo!", translated[0])
 }
