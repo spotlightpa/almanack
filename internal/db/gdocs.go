@@ -79,4 +79,5 @@ type EmbedImage struct {
 	Width       int    `json:"width"`
 	Height      int    `json:"height"`
 	Kind        string `json:"kind"`
+	Focus       string `json:"focus,omitzero"`
 }

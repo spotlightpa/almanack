@@ -14,7 +14,7 @@ This is my \_<a href="https://docs.google.com/document/d/103kCeBG2OQS_ZHkHUyKpT9
 
 Here is <em>some</em> <strong>text</strong>. Lorem ipsum.
 
-{{<featured/picture-left src="external/75h9dj4qkszh2ydb6e3h9pn2r0.jpeg" description="" caption="Overdose awareness" credit="Amanda Berg">}}
+{{<featured/picture-left src="external/75h9dj4qkszh2ydb6e3h9pn2r0.jpeg" focus="no" description="" caption="Overdose awareness" credit="Amanda Berg">}}
 
 And here’s another image:
 

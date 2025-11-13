@@ -279,6 +279,7 @@ func processImage(rows tableaux.TableNodes, n int, kind string) (imageEmbed *db.
 		Width:  width,
 		Height: height,
 		Kind:   kind,
+		Focus:  xhtml.TextContent(rows.Value("focus")),
 	}
 
 	if path := xhtml.TextContent(rows.Value("path")); path != "" {
