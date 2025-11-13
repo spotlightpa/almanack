@@ -12,7 +12,7 @@ func (gsvc *Service) TranslateClient(ctx context.Context) (cl *http.Client, err 
 	return gsvc.client(ctx, `https://www.googleapis.com/auth/cloud-translation`)
 }
 
-func (gsvc *Service) Translate(ctx context.Context, cl *http.Client, source, contentType string) (string, error) {
+func (gsvc *Service) Translate(ctx context.Context, cl *http.Client, contentType string, sourceTexts ...string) ([]string, error) {
 	type Req struct {
 		Contents           []string `json:"contents"`
 		SourceLanguageCode string   `json:"sourceLanguageCode"`
@@ -26,7 +26,7 @@ func (gsvc *Service) Translate(ctx context.Context, cl *http.Client, source, con
 		Translations []Translations `json:"translations"`
 	}
 	req := Req{
-		Contents:           []string{source},
+		Contents:           sourceTexts,
 		SourceLanguageCode: "en-US",
 		TargetLanguageCode: "es",
 		MimeType:           contentType,
@@ -39,10 +39,14 @@ func (gsvc *Service) Translate(ctx context.Context, cl *http.Client, source, con
 		BodyJSON(&req).
 		ToJSON(&res).
 		Fetch(ctx); err != nil {
-		return "", fmt.Errorf("could not translate: %w", err)
+		return nil, fmt.Errorf("could not translate: %w", err)
 	}
-	if len(res.Translations) != 1 {
-		return "", fmt.Errorf("unexpected response array: %v", res.Translations)
+	if len(res.Translations) != len(sourceTexts) {
+		return nil, fmt.Errorf("unexpected response array: %v", res.Translations)
 	}
-	return res.Translations[0].TranslatedText, nil
+	targetTexts := make([]string, len(res.Translations))
+	for i := range targetTexts {
+		targetTexts[i] = res.Translations[i].TranslatedText
+	}
+	return targetTexts, nil
 }
