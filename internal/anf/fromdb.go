@@ -7,7 +7,7 @@ import (
 )
 
 func FromDB(item *db.NewsFeedItem) (*Article, error) {
-	a, err := ConvertToAppleNews(item.ContentHtml)
+	a, err := ConvertToAppleNews(item.ContentHtml, item.URL)
 	if err != nil {
 		return nil, err
 	}
