@@ -4,8 +4,10 @@ SELECT
 FROM
   image
 WHERE
-  is_uploaded = TRUE
+  is_uploaded
   AND deleted_at IS NULL
+  AND (is_licensed
+    OR @show_unlicensed)
 ORDER BY
   updated_at DESC
 LIMIT $1 OFFSET $2;

@@ -179,20 +179,23 @@ SELECT
 FROM
   image
 WHERE
-  is_uploaded = TRUE
+  is_uploaded
   AND deleted_at IS NULL
+  AND (is_licensed
+    OR $3)
 ORDER BY
   updated_at DESC
 LIMIT $1 OFFSET $2
 `
 
 type ListImagesParams struct {
-	Limit  int32 `json:"limit"`
-	Offset int32 `json:"offset"`
+	Limit          int32       `json:"limit"`
+	Offset         int32       `json:"offset"`
+	ShowUnlicensed interface{} `json:"show_unlicensed"`
 }
 
 func (q *Queries) ListImages(ctx context.Context, arg ListImagesParams) ([]Image, error) {
-	rows, err := q.db.Query(ctx, listImages, arg.Limit, arg.Offset)
+	rows, err := q.db.Query(ctx, listImages, arg.Limit, arg.Offset, arg.ShowUnlicensed)
 	if err != nil {
 		return nil, err
 	}
