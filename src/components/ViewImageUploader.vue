@@ -21,7 +21,7 @@ const {
   computedProp,
 } = watchAPI(
   () => [props.page || 0, query.value],
-  ([page, query]) => get(listImages, { page, query })
+  ([page, query]) => get(listImages, { page, query, show_unlicensed: "1" })
 );
 
 const { apiStateRefs: saveState, exec } = makeState();

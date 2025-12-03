@@ -258,6 +258,7 @@ func (app *appEnv) listImages(w http.ResponseWriter, r *http.Request) {
 
 	var page int32
 	_ = intFromQuery(r, "page", &page)
+	showUnlicensed, _ := boolFromQuery(r, "show_unlicensed")
 	if page < 0 {
 		app.replyErr(w, r, resperr.E{M: "Invalid page"})
 		return
@@ -288,8 +289,9 @@ func (app *appEnv) listImages(w http.ResponseWriter, r *http.Request) {
 			r.Context(),
 			app.svc.Queries.ListImages,
 			db.ListImagesParams{
-				Offset: pager.Offset(),
-				Limit:  pager.Limit(),
+				Offset:         pager.Offset(),
+				Limit:          pager.Limit(),
+				ShowUnlicensed: showUnlicensed,
 			})
 	}
 	if err != nil {
