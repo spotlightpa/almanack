@@ -12,7 +12,7 @@ import (
 )
 
 func ConvertToAppleNews(htmlContent, srcURL string) (*Article, error) {
-	u, err := url.Parse(srcURL)
+	baseURL, err := url.Parse(srcURL)
 	if err != nil {
 		return nil, fmt.Errorf("ConvertToAppleNews: parsing URL: %w", err)
 	}
@@ -20,24 +20,7 @@ func ConvertToAppleNews(htmlContent, srcURL string) (*Article, error) {
 	if err != nil {
 		return nil, fmt.Errorf("ConvertToAppleNews: parsing HTML: %w", err)
 	}
-	for c := range doc.Descendants() {
-		// Absolutize URLs
-		switch c.DataAtom {
-		case atom.A, atom.Link:
-			if href := xhtml.Attr(c, "href"); href != "" {
-				if attrURL, err := u.Parse(href); err == nil {
-					xhtml.SetAttr(c, "href", attrURL.String())
-				}
-			}
-		case atom.Img, atom.Script, atom.Iframe, atom.Audio, atom.Video, atom.Source, atom.Embed:
-			if src := xhtml.Attr(c, "src"); src != "" {
-				if attrURL, err := u.Parse(src); err == nil {
-					xhtml.SetAttr(c, "src", attrURL.String())
-				}
-			}
-		}
-
-	}
+	xhtml.AbsolutizeURLs(doc, baseURL)
 	return ConvertHTMLToAppleNews(doc), nil
 }
 
