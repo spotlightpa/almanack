@@ -1,5 +1,7 @@
 name: Go
 on: [push]
+permissions:
+  contents: read
 jobs:
   build:
     name: Build
@@ -9,9 +11,9 @@ jobs:
       - uses: actions/setup-go@v5
         with:
           go-version: "stable"
-          cache: true
-      - name: Get dependencies
+      - name: Download modules
         run: go mod download
-
+      - name: Check go.mod
+        run: go mod tidy -diff
       - name: Test
         run: ./run.sh test:backend
