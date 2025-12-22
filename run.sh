@@ -76,7 +76,8 @@ function build:backend() {
 	go version
 	set -x
 	echo "${DEPLOY_PRIME_URL:-http://local.dev}" >pkg/almanack/deploy-url.txt
-	GOBIN=$THIS_DIR/functions go install ./funcs/...
+	LDFLAGS="-linkmode external -extldflags -static"
+	GOBIN=$THIS_DIR/functions go install -ldflags "$LDFLAGS" ./funcs/...
 	cp "$THIS_DIR/functions/almanack-api" "$THIS_DIR/functions/almanack-api-background"
 	set +x
 }
