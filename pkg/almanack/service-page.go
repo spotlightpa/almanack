@@ -6,7 +6,6 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"maps"
 	"strings"
 
 	"github.com/carlmjohnson/flowmatic"
@@ -16,7 +15,6 @@ import (
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgconn"
 	"github.com/jackc/pgx/v5/pgtype"
-	"github.com/spotlightpa/almanack/internal/arc"
 	"github.com/spotlightpa/almanack/internal/db"
 	"github.com/spotlightpa/almanack/internal/stringx"
 	"github.com/spotlightpa/almanack/internal/timex"
@@ -160,70 +158,6 @@ func (svc Services) RefreshPageContents(ctx context.Context, id int64) (err erro
 	})
 
 	return err
-}
-
-func (svc Services) RefreshPageFromArcStory(ctx context.Context, page *db.Page, story *db.Arc, refreshMetadata bool) (warnings []string, err error) {
-	defer errorx.Trace(&err)
-
-	var feedItem arc.FeedItem
-	if err = json.Unmarshal(story.RawData, &feedItem); err != nil {
-		return nil, err
-	}
-	body, warnings, err := ArcFeedItemToBody(ctx, svc, &feedItem)
-	if err != nil {
-		return nil, err
-	}
-
-	page.Body = body
-
-	if refreshMetadata {
-		fm, err := ArcFeedItemToFrontmatter(ctx, svc, &feedItem)
-		if err != nil {
-			return nil, err
-		}
-		// Update existing metadata without overwriting missing keys
-		if page.Frontmatter == nil {
-			page.Frontmatter = make(db.Map)
-		}
-		if page.LastPublished.Valid {
-			delete(fm, "slug")
-			delete(fm, "published")
-		}
-		maps.Copy(page.Frontmatter, fm)
-	}
-
-	return warnings, nil
-}
-
-func (svc Services) CreatePageFromArcSource(ctx context.Context, shared *db.SharedArticle, kind string) (warnings []string, err error) {
-	defer errorx.Trace(&err)
-
-	if shared.SourceType != "arc" {
-		return nil, fmt.Errorf(
-			"can't create new page for %d; wrong source type %q %q",
-			shared.ID, shared.SourceType, shared.SourceID)
-	}
-
-	var feedItem arc.FeedItem
-	if err = json.Unmarshal(shared.RawData, &feedItem); err != nil {
-		return nil, err
-	}
-	body, warnings, err := ArcFeedItemToBody(ctx, svc, &feedItem)
-	if err != nil {
-		return nil, err
-	}
-
-	fm, err := ArcFeedItemToFrontmatter(ctx, svc, &feedItem)
-	if err != nil {
-		return nil, err
-	}
-
-	filepath := buildFilePath(fm, kind)
-
-	if err = svc.createPageForSharedArticle(ctx, shared, body, fm, filepath); err != nil {
-		return nil, err
-	}
-	return warnings, nil
 }
 
 func (svc Services) CreatePageFromGDocsDoc(ctx context.Context, shared *db.SharedArticle, kind string) (err error) {

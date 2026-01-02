@@ -6,7 +6,6 @@ import (
 	"crypto/md5"
 	"fmt"
 	"net/http"
-	"path"
 	"strings"
 
 	"github.com/carlmjohnson/flowmatic"
@@ -50,38 +49,6 @@ func FetchImageURL(ctx context.Context, c *http.Client, srcurl string) (body []b
 	}
 
 	return buf.Bytes(), ctype, nil
-}
-
-func (svc Services) ReplaceImageURL(ctx context.Context, srcURL, description, credit string) (s string, err error) {
-	defer errorx.Trace(&err)
-
-	if srcURL == "" {
-		return "", fmt.Errorf("no image provided")
-	}
-	image, err := svc.Queries.GetImageBySourceURL(ctx, srcURL)
-	if err == nil { // found entry
-		return image.Path, nil
-	}
-	if !db.IsNotFound(err) {
-		return "", err
-	}
-
-	itype, err := svc.imageTypeFromExtension(ctx, srcURL)
-	if err != nil {
-		return "", err
-	}
-	uploadPath := hashURLpath(srcURL, itype)
-	if _, err = svc.Queries.UpsertImage(ctx, db.UpsertImageParams{
-		Path:        uploadPath,
-		Type:        itype,
-		Description: description,
-		Credit:      credit,
-		SourceURL:   srcURL,
-		IsUploaded:  false,
-	}); err != nil {
-		return "", err
-	}
-	return uploadPath, err
 }
 
 func (svc Services) ReplaceAndUploadImageURL(ctx context.Context, srcURL, description, credit string) (path string, err error) {
@@ -196,21 +163,4 @@ func imageTypeFromMIME(ct string) (string, error) {
 		return "", fmt.Errorf("bad image Content-Type: %q", ct)
 	}
 	return itype, nil
-}
-
-func (svc Services) imageTypeFromExtension(ctx context.Context, srcURL string) (typeName string, err error) {
-	ext := path.Ext(srcURL)
-	ext = strings.TrimPrefix(ext, ".")
-	ext = strings.ToLower(ext)
-	itype, err := svc.Queries.GetImageTypeForExtension(ctx, ext)
-	if err != nil {
-		if db.IsNotFound(err) {
-			return "", resperr.E{
-				E: err,
-				M: fmt.Sprintf("Unknown image extension (%q) on source: %q", ext, srcURL),
-			}
-		}
-		return "", err
-	}
-	return itype.Name, nil
 }
