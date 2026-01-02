@@ -195,37 +195,6 @@ func (svc Services) RefreshPageFromArcStory(ctx context.Context, page *db.Page, 
 	return warnings, nil
 }
 
-func (svc Services) CreatePageFromArcSource(ctx context.Context, shared *db.SharedArticle, kind string) (warnings []string, err error) {
-	defer errorx.Trace(&err)
-
-	if shared.SourceType != "arc" {
-		return nil, fmt.Errorf(
-			"can't create new page for %d; wrong source type %q %q",
-			shared.ID, shared.SourceType, shared.SourceID)
-	}
-
-	var feedItem arc.FeedItem
-	if err = json.Unmarshal(shared.RawData, &feedItem); err != nil {
-		return nil, err
-	}
-	body, warnings, err := ArcFeedItemToBody(ctx, svc, &feedItem)
-	if err != nil {
-		return nil, err
-	}
-
-	fm, err := ArcFeedItemToFrontmatter(ctx, svc, &feedItem)
-	if err != nil {
-		return nil, err
-	}
-
-	filepath := buildFilePath(fm, kind)
-
-	if err = svc.createPageForSharedArticle(ctx, shared, body, fm, filepath); err != nil {
-		return nil, err
-	}
-	return warnings, nil
-}
-
 func (svc Services) CreatePageFromGDocsDoc(ctx context.Context, shared *db.SharedArticle, kind string) (err error) {
 	defer errorx.Trace(&err)
 
