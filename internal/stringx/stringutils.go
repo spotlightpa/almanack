@@ -11,16 +11,6 @@ import (
 	"golang.org/x/text/unicode/norm"
 )
 
-// First non-blank string
-func First(ss ...string) string {
-	for _, s := range ss {
-		if s != "" {
-			return s
-		}
-	}
-	return ""
-}
-
 var (
 	articleRe   = lazy.RE(`\b(the|an?)\b`)
 	pennRe      = lazy.RE(`\bpa\b`)
