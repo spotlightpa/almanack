@@ -338,6 +338,9 @@ func buildFilePath(fm map[string]any, kind string) string {
 	}
 	slug, _ := fm["internal-id"].(string)
 	slug = cmp.Or(slug, "SPLXXX")
+	slug, _ = stringx.StripAccents(slug)
+	slug = stringx.ReplaceWhitespace(slug)
+
 	filepath := fmt.Sprintf("content/%s/%s-%s.md", kind, date, slug)
 	return filepath
 }

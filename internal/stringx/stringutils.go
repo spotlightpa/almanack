@@ -123,6 +123,15 @@ func RemoveAllWhitespace(s string) string {
 	}, s)
 }
 
+func ReplaceWhitespace(s string) string {
+	return strings.Map(func(r rune) rune {
+		if unicode.IsSpace(r) {
+			return '_'
+		}
+		return r
+	}, s)
+}
+
 var (
 	staffRe        = lazy.RE(`(?i)\bstaff\b`)
 	extractSplitRe = lazy.RE(`(?i)[,;]|\b(and|y)\b`)
