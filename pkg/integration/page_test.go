@@ -46,7 +46,7 @@ func TestServicePublish(t *testing.T) {
 		be.Equal(t, p0.ID, p.ID)
 
 		_, err = os.Stat(filepath.Join(tmp, path1))
-		be.Nonzero(t, err)
+		be.ErrorIs(t, os.ErrNotExist, err)
 
 		p1 := &db.Page{
 			ID:            p0.ID,
@@ -85,7 +85,7 @@ func TestServicePublish(t *testing.T) {
 		be.NilErr(t, err)
 
 		_, err = os.Stat(filepath.Join(tmp, path2))
-		be.Nonzero(t, err)
+		be.ErrorIs(t, os.ErrNotExist, err)
 
 		// Can't create another page with the same URLPath
 		p2 := &db.Page{
@@ -111,7 +111,7 @@ func TestServicePublish(t *testing.T) {
 		})
 		be.Nonzero(t, err)
 		_, err = os.Stat(filepath.Join(tmp, path2))
-		be.Nonzero(t, err)
+		be.ErrorIs(t, os.ErrNotExist, err)
 
 		// Can create if the URL changes
 		p3 := &db.Page{
@@ -150,7 +150,7 @@ func TestServicePublish(t *testing.T) {
 		be.NilErr(t, err)
 
 		_, err = os.Stat(filepath.Join(tmp, path3))
-		be.Nonzero(t, err)
+		be.ErrorIs(t, os.ErrNotExist, err)
 
 		p4 := &db.Page{
 			ID:            1,
@@ -212,7 +212,7 @@ func TestServicePopScheduledPages(t *testing.T) {
 		be.False(t, p.LastPublished.Valid)
 
 		_, err = os.Stat(filepath.Join(tmp, path))
-		be.Nonzero(t, err)
+		be.ErrorIs(t, os.ErrNotExist, err)
 
 		p, err = svc.Queries.UpdatePage(ctx, db.UpdatePageParams{
 			ID:             p.ID,
