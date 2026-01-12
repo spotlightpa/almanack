@@ -17,6 +17,4 @@ func makeTemplate(names ...string) *template.Template {
 			ParseFS(FS, names...))
 }
 
-var MailChimp = makeTemplate("mailchimp.html")
-
 var Error = makeTemplate("error.html")

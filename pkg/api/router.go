@@ -130,11 +130,6 @@ func (app *appEnv) routes() http.Handler {
 	mux.Handle(`GET /ssr/download-image`,
 		partnerSSRMW.Controller(app.redirectImageURL))
 
-	spotlightSSRMW := ssrMW.With(app.hasRoleMiddleware("Spotlight PA"))
-
-	mux.Handle(`GET /ssr/page/{id}`,
-		spotlightSSRMW.Controller(app.renderPage))
-
 	// Start background API endpoints
 	backgroundMW := mid.Stack{
 		httpx.WithTimeout(14 * time.Minute),

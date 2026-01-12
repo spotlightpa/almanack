@@ -1,41 +1,15 @@
 package api
 
 import (
-	"html/template"
 	"net/http"
 
 	"github.com/earthboundkid/resperr/v2"
 	"github.com/spotlightpa/almanack/internal/db"
-	"github.com/spotlightpa/almanack/layouts"
 )
 
 func (app *appEnv) renderNotFound(w http.ResponseWriter, r *http.Request) {
 	app.logStart(r)
 	app.replyHTMLErr(w, r, resperr.NotFound(r))
-}
-
-func (app *appEnv) renderPage(w http.ResponseWriter, r *http.Request) http.Handler {
-	var id int64
-	if err := intParam(r, "id", &id); err != nil {
-		return app.htmlErr(err)
-	}
-	app.logStart(r, "id", id)
-
-	page, err := app.svc.Queries.GetPageByID(r.Context(), id)
-	if err != nil {
-		err = db.NoRowsAs404(err, "could not find page ID %d", id)
-		return app.htmlErr(err)
-	}
-	title, _ := page.Frontmatter["title"].(string)
-	body, _ := page.Frontmatter["raw-content"].(string)
-
-	return app.htmlOK(layouts.MailChimp, struct {
-		Title string
-		Body  template.HTML
-	}{
-		Title: title,
-		Body:  template.HTML(body),
-	})
 }
 
 func (app *appEnv) redirectImageURL(w http.ResponseWriter, r *http.Request) http.Handler {
