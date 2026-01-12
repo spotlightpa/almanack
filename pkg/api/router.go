@@ -122,18 +122,16 @@ func (app *appEnv) routes() http.Handler {
 		ssrMW.Controller(app.userInfo))
 	mux.Handle(`/ssr/`,
 		ssrMW.HandlerFunc(app.renderNotFound))
+	mux.Handle(`GET /ssr/redirect/{slug}`,
+		ssrMW.Controller(app.redirectSSR))
 
 	partnerSSRMW := ssrMW.With(app.hasRoleMiddleware("editor"))
 
 	mux.Handle(`GET /ssr/download-image`,
 		partnerSSRMW.Controller(app.redirectImageURL))
-	mux.Handle(`GET /ssr/mailchimp-signup-url`,
-		partnerSSRMW.HandlerFunc(app.redirectSignupURL))
 
 	spotlightSSRMW := ssrMW.With(app.hasRoleMiddleware("Spotlight PA"))
 
-	mux.Handle(`GET /ssr/donor-wall`,
-		spotlightSSRMW.Controller(app.redirectDonorWall))
 	mux.Handle(`GET /ssr/page/{id}`,
 		spotlightSSRMW.Controller(app.renderPage))
 

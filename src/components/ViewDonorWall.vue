@@ -31,7 +31,7 @@ function updateDonorWall() {
       :icon="['fas', 'table-list']"
       target="_blank"
       label="Google Sheet"
-      href="/ssr/donor-wall"
+      href="/ssr/redirect/donor-wall"
     ></LinkHref>
     <LinkHref
       target="_blank"

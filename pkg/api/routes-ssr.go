@@ -1,7 +1,6 @@
 package api
 
 import (
-	"fmt"
 	"html/template"
 	"net/http"
 
@@ -9,11 +8,6 @@ import (
 	"github.com/spotlightpa/almanack/internal/db"
 	"github.com/spotlightpa/almanack/layouts"
 )
-
-func (app *appEnv) redirectSignupURL(w http.ResponseWriter, r *http.Request) {
-	app.logStart(r)
-	http.Redirect(w, r, app.svc.MailchimpSignupURL, http.StatusFound)
-}
 
 func (app *appEnv) renderNotFound(w http.ResponseWriter, r *http.Request) {
 	app.logStart(r)
@@ -58,13 +52,22 @@ func (app *appEnv) redirectImageURL(w http.ResponseWriter, r *http.Request) http
 	return nil
 }
 
-func (app *appEnv) redirectDonorWall(w http.ResponseWriter, r *http.Request) http.Handler {
+func (app *appEnv) redirectSSR(w http.ResponseWriter, r *http.Request) http.Handler {
 	app.logStart(r)
-	id, err := app.svc.Queries.GetOption(r.Context(), "donor-wall")
+	from := r.URL.Path
+	redirectInfo, err := app.svc.Queries.GetRedirect(r.Context(), from)
+	if err != nil {
+		return app.htmlErr(db.NoRowsAs404(err, "redirect not found: from=%q", from))
+	}
 	if err != nil {
 		return app.htmlErr(err)
 	}
-	sheetURL := fmt.Sprintf("https://docs.google.com/spreadsheets/d/%s/edit", id)
-	http.Redirect(w, r, sheetURL, http.StatusFound)
-	return nil
+	for _, role := range redirectInfo.Roles {
+
+		if err := app.auth.HasRole(r, role); err == nil {
+			http.Redirect(w, r, redirectInfo.To, int(redirectInfo.Code))
+			return nil
+		}
+	}
+	return app.htmlErr(resperr.New(http.StatusUnauthorized, "redirect missing role; want: %v", redirectInfo.Roles))
 }
