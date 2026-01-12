@@ -141,6 +141,15 @@ type Page struct {
 	PublicationDate pgtype.Timestamptz `json:"publication_date"`
 }
 
+type Redirect struct {
+	ID        int64     `json:"id"`
+	From      string    `json:"from"`
+	To        string    `json:"to"`
+	Roles     []string  `json:"roles"`
+	Code      int32     `json:"code"`
+	CreatedAt time.Time `json:"created_at"`
+}
+
 type SharedArticle struct {
 	ID                   int64              `json:"id"`
 	Status               string             `json:"status"`

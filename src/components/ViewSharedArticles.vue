@@ -45,7 +45,7 @@ const nextPage = computedProp("next_page", (page) => ({
       press@spotlightpa.org. Please add this address to your contacts to ensure
       that messages are not sent to spam. You can unsubscribe by following the
       unsubscribe link in the footer of an email, and you can
-      <a href="/ssr/mailchimp-signup-url">resubscribe here</a>.
+      <a href="/ssr/redirect/mailchimp-signup-url">resubscribe here</a>.
     </p>
 
     <SpinnerProgress :is-loading="apiState.isLoading.value"></SpinnerProgress>
