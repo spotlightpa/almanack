@@ -309,7 +309,7 @@ func processMetadata(rows tableaux.TableNodes, metadata *db.GDocsMetadata) {
 		strings.HasPrefix(metadata.Byline, "by ") {
 		metadata.Byline = metadata.Byline[3:]
 	}
-	metadata.Budget = xhtml.TextContent(rows.Value("budget"))
+	metadata.Budget = xhtml.TextContent(rows.ValueOrNext("budget"))
 	metadata.Hed = cmp.Or(
 		xhtml.TextContent(rows.Value("hed")),
 		xhtml.TextContent(rows.Value("title")),

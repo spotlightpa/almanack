@@ -49,12 +49,33 @@ func (rows TableNodes) Label() string {
 	return slugify(rows.At(0, 0))
 }
 
-func (rows TableNodes) Value(name string) *html.Node {
+func (rows TableNodes) ValueOrNext(name string) *html.Node {
 	for i := range rows {
 		if slugify(rows.At(i, 0)) == name {
 			cell := rows.At(i, 1)
 			if s := xhtml.TextContent(cell); s == "" {
 				cell = rows.At(i+1, 0)
+			}
+			if stringx.RemoveAllWhitespace(slugify(cell)) == "n/a" {
+				return &html.Node{
+					Type: html.CommentNode,
+				}
+			}
+			return cell
+		}
+	}
+	return nil
+}
+
+func (rows TableNodes) Value(name string) *html.Node {
+	for i := range rows {
+		if key := rows.At(i, 0); slugify(key) == name {
+			cell := rows.At(i, 1)
+			if s := xhtml.TextContent(cell); s == "" {
+				// If there's only one column or the column is wide, skip down
+				if len(rows[i]) == 1 || xhtml.Attr(key, "colspan") != "" {
+					cell = rows.At(i+1, 0)
+				}
 			}
 			if stringx.RemoveAllWhitespace(slugify(cell)) == "n/a" {
 				return &html.Node{
