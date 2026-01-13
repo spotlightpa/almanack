@@ -279,9 +279,9 @@ func (svc Services) replaceMetadataImagePath(
 	); path != "" {
 		return ""
 	}
-	cell := rows.Value("lede image")
+	cell := rows.ValueOrNext("lede image")
 	if cell == nil {
-		cell = rows.Value("lead image")
+		cell = rows.ValueOrNext("lead image")
 	}
 	if cell == nil {
 		return ""
