@@ -5,6 +5,7 @@ import (
 	"context"
 	"fmt"
 	"net/http"
+	"strconv"
 	"strings"
 	"unicode/utf8"
 
@@ -139,6 +140,14 @@ func buildObjectInfo(objs map[string]docs.InlineObject) map[string]*html.Node {
 
 func convertEl(n *html.Node, el *docs.StructuralElement, listInfo map[string]string, objInfo map[string]*html.Node) {
 	if el.Table != nil && el.Table.TableRows != nil {
+		// Define empty cell for checking later
+		emptyCell := func() *html.Node {
+			td := xhtml.New("td")
+			p := xhtml.New("p")
+			xhtml.AppendText(p, "\n")
+			td.AppendChild(p)
+			return td
+		}()
 		table := xhtml.New("table")
 		n.AppendChild(table)
 		for _, row := range el.Table.TableRows {
@@ -147,9 +156,14 @@ func convertEl(n *html.Node, el *docs.StructuralElement, listInfo map[string]str
 			if row.TableCells != nil {
 				for _, cell := range row.TableCells {
 					cellEl := xhtml.New("td")
-					rowEl.AppendChild(cellEl)
+					if colspan := int(cell.TableCellStyle.ColumnSpan); colspan != 1 {
+						xhtml.SetAttr(cellEl, "colspan", strconv.Itoa(colspan))
+					}
 					for _, content := range cell.Content {
 						convertEl(cellEl, content, listInfo, objInfo)
+					}
+					if !xhtml.DeepEqual(cellEl, emptyCell) {
+						rowEl.AppendChild(cellEl)
 					}
 				}
 			}
