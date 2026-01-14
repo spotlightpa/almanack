@@ -124,8 +124,8 @@ github.com/earthboundkid/slackhook/v2 v2.25.1 h1:/kHr/TUiqTkG4uFr8fPMTHOc6Z4+EDn
 github.com/earthboundkid/slackhook/v2 v2.25.1/go.mod h1:cuNGmAmIqJ2rPhgRpJpYP+ZX0jk4VnNkHPZeDKs1eFg=
 github.com/earthboundkid/versioninfo/v2 v2.24.1 h1:SJTMHaoUx3GzjjnUO1QzP3ZXK6Ee/nbWyCm58eY3oUg=
 github.com/earthboundkid/versioninfo/v2 v2.24.1/go.mod h1:VcWEooDEuyUJnMfbdTh0uFN4cfEIg+kHMuWB2CDCLjw=
-github.com/earthboundkid/xhtml v0.25.3 h1:DHOP54EoxSI4A2Q/A0uLACjFGCJTSfCr7WVOpiguC9I=
-github.com/earthboundkid/xhtml v0.25.3/go.mod h1:KKQ8YAYc/AfLQi4+aMKVU8KQvtDUEwT/uuyC99Zo2js=
+github.com/earthboundkid/xhtml v0.26.1 h1:Hu8xIwZZwzpHRMIXx09GsYB2RawhFwjlzaNoLocOwP8=
+github.com/earthboundkid/xhtml v0.26.1/go.mod h1:KKQ8YAYc/AfLQi4+aMKVU8KQvtDUEwT/uuyC99Zo2js=
 github.com/envoyproxy/go-control-plane v0.9.0/go.mod h1:YTl/9mNaCwkRvm6d1a2C3ymFceY/DCBVvsKhRF0iEA4=
 github.com/envoyproxy/go-control-plane v0.9.1-0.20191026205805-5f8ba28d4473/go.mod h1:YTl/9mNaCwkRvm6d1a2C3ymFceY/DCBVvsKhRF0iEA4=
 github.com/envoyproxy/go-control-plane v0.9.4/go.mod h1:6rpuAdCZL397s3pYoYcLgu1mIlRU8Am5FuJP05cCM98=
