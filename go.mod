@@ -20,7 +20,7 @@ require (
 	github.com/earthboundkid/resperr/v2 v2.25.1
 	github.com/earthboundkid/slackhook/v2 v2.25.1
 	github.com/earthboundkid/versioninfo/v2 v2.24.1
-	github.com/earthboundkid/xhtml v0.25.3
+	github.com/earthboundkid/xhtml v0.26.1
 	github.com/gabriel-vasile/mimetype v1.4.12
 	github.com/getsentry/sentry-go v0.40.0
 	github.com/go-chi/chi/v5 v5.2.3
