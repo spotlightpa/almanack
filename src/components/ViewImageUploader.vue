@@ -135,11 +135,13 @@ watch(rawQuery, (val) => {
     <title>Photo Uploads • Spotlight PA</title>
   </MetaHead>
   <div>
-    <h1 class="title">
+    <h1 class="mb-2 title">
       Upload an image
       <template v-if="page !== '0'">(overflow page {{ page }})</template>
     </h1>
-
+    <p class="mb-5 hint">
+      <a href="/ssr/redirect/image-guide" target="_blank">Image guide</a>.
+    </p>
     <ImageUploader @update-image-list="fetch"></ImageUploader>
 
     <div v-if="showReload" class="mt-5 message is-warning">

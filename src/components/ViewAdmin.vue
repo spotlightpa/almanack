@@ -261,7 +261,16 @@ const nextPage = computedProp("next_page", (page) => ({
       </div>
     </form>
     <div class="field">
-      <p class="help">Document must be shared with Spotlight PA.</p>
+      <p class="help">
+        Document must be shared with Spotlight PA.
+        <a href="/ssr/redirect/filing-folder" target="_blank">Filing folder</a>.
+        <a href="/ssr/redirect/templates-folder" target="_blank"
+          >Templates folder</a
+        >.
+        <a href="/ssr/redirect/table-reference" target="_blank"
+          >Magic table guide</a
+        >.
+      </p>
     </div>
     <div v-if="gdocsState.error.value" class="field">
       <ErrorSimple :error="gdocsState.error.value"></ErrorSimple>
