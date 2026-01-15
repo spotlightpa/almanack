@@ -57,8 +57,8 @@ export default {
     </div>
     <p>
       <router-link :to="{ name: 'image-uploader' }" target="_blank">
-        Manage photos
-      </router-link>
+        Manage photos</router-link
+      >. <a href="/ssr/redirect/image-guide" target="_blank">Image guide</a>.
     </p>
   </BulmaField>
 </template>
