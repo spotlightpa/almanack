@@ -24,7 +24,7 @@ func (gsvc *Service) MostPopularNews(ctx context.Context, cl *http.Client) (page
 	req := RunReportRequest{
 		DateRanges: []DateRange{
 			{
-				StartDate: "today",
+				StartDate: "yesterday",
 				EndDate:   "today",
 			},
 		},
