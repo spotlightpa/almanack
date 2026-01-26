@@ -236,10 +236,11 @@ FROM
   image,
   websearch_to_tsquery('english', $3) tsq
 WHERE
-  fts @@ tsq
-  AND is_uploaded
-  AND is_licensed
-  AND deleted_at IS NULL
+  "path" = $3
+  OR (fts @@ tsq
+    AND is_uploaded
+    AND is_licensed
+    AND deleted_at IS NULL)
 ORDER BY
   ts_rank(fts, tsq) DESC,
   updated_at DESC
