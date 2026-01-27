@@ -1,9 +1,12 @@
 package aws
 
 import (
-	"github.com/aws/aws-sdk-go/aws"
-	"github.com/aws/aws-sdk-go/aws/credentials"
-	"github.com/aws/aws-sdk-go/aws/session"
+	"context"
+	"net/url"
+
+	"github.com/aws/aws-sdk-go-v2/config"
+	"github.com/aws/aws-sdk-go-v2/credentials"
+	"github.com/aws/aws-sdk-go-v2/service/s3"
 	"gocloud.dev/blob"
 	_ "gocloud.dev/blob/fileblob"
 	_ "gocloud.dev/blob/memblob"
@@ -11,16 +14,24 @@ import (
 )
 
 func register(scheme, region, id, secret string) error {
-	sess, err := session.NewSession(&aws.Config{
-		Region:      aws.String(region),
-		Credentials: credentials.NewStaticCredentials(id, secret, ""),
-	})
+	cfg, err := config.LoadDefaultConfig(context.Background(),
+		config.WithRegion(region),
+		config.WithCredentialsProvider(credentials.NewStaticCredentialsProvider(id, secret, "")),
+	)
 	if err != nil {
 		return err
 	}
-	o := s3blob.URLOpener{
-		ConfigProvider: sess,
-	}
-	blob.DefaultURLMux().RegisterBucket(scheme, &o)
+	client := s3.NewFromConfig(cfg)
+	o := &customURLOpener{client: client}
+	blob.DefaultURLMux().RegisterBucket(scheme, o)
 	return nil
+}
+
+// customURLOpener implements blob.BucketURLOpener with static credentials.
+type customURLOpener struct {
+	client *s3.Client
+}
+
+func (o *customURLOpener) OpenBucketURL(ctx context.Context, u *url.URL) (*blob.Bucket, error) {
+	return s3blob.OpenBucket(ctx, o.client, u.Host, nil)
 }

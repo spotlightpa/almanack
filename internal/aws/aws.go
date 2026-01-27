@@ -11,7 +11,7 @@ import (
 	"path"
 	"time"
 
-	"github.com/aws/aws-sdk-go/service/s3"
+	"github.com/aws/aws-sdk-go-v2/service/s3"
 	"github.com/earthboundkid/errorx/v2"
 	"gocloud.dev/blob"
 
@@ -61,10 +61,10 @@ func (bs BlobStore) SignPutURL(ctx context.Context, srcPath string, h http.Heade
 	}
 	defer b.Close()
 	return b.SignedURL(ctx, srcPath, &blob.SignedURLOptions{
-		Expiry:                   15 * time.Minute,
-		Method:                   http.MethodPut,
-		ContentType:              h.Get("Content-Type"),
-		EnforceAbsentContentType: true,
+		Expiry: 15 * time.Minute,
+		Method: http.MethodPut,
+		// ContentType:              h.Get("Content-Type"),
+		// EnforceAbsentContentType: true,
 		BeforeSign: func(as func(any) bool) error {
 			var opts *s3.PutObjectInput
 			if as(&opts) {
