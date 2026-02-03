@@ -4,4 +4,6 @@
 
 - Use `go run .` or `go run ./cmd/foo` instead of `go build` to run programs, to avoid leaving behind build artifacts.
 
+- Prefer to use `gopls` for minor refactoring where possible.
+
 - Run `./run.sh help` to see managements commands for this repo. Do `./run.sh check-deps` after a new clone to see if you have all the tools needed.
