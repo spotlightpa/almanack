@@ -185,6 +185,7 @@ function check-deps() {
 	_installed shfmt || echo "install https://github.com/mvdan/sh"
 	_installed sqlc || echo "install https://sqlc.dev"
 	_installed tern || echo "install https://github.com/jackc/tern"
+	_installed pg_format || echo "install https://github.com/darold/pgFormatter"
 }
 
 TIMEFORMAT="Task completed in %1lR"
