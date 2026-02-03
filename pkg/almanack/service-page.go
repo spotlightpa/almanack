@@ -184,9 +184,11 @@ func (svc Services) CreatePageFromGDocsDoc(ctx context.Context, shared *db.Share
 		dbDoc.Metadata.URLSlug,
 		stringx.SlugifyURL(shared.Hed),
 	))
+	// Add the slugified eyebrow to the URL if it's not in there somewhere else
+	eyebrowSlug := stringx.SlugifyURL(dbDoc.Metadata.Eyebrow)
 	switch {
-	case dbDoc.Metadata.Eyebrow != "" && slug != "":
-		slug += "-" + stringx.SlugifyURL(dbDoc.Metadata.Eyebrow)
+	case dbDoc.Metadata.Eyebrow != "" && slug != "" && !strings.Contains(slug, eyebrowSlug):
+		slug += "-" + eyebrowSlug
 	case dbDoc.Metadata.Eyebrow != "" && slug == "":
 		slug = stringx.SlugifyURL(dbDoc.Metadata.Eyebrow)
 	}
