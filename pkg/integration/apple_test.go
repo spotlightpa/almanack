@@ -8,6 +8,7 @@ import (
 	"github.com/carlmjohnson/be"
 	"github.com/carlmjohnson/requests"
 	"github.com/carlmjohnson/requests/reqtest"
+	"github.com/jackc/pgx/v5/pgtype"
 	"github.com/spotlightpa/almanack/internal/anf"
 	"github.com/spotlightpa/almanack/internal/db"
 	"github.com/spotlightpa/almanack/internal/jsonfeed"
@@ -35,26 +36,156 @@ func TestPublishAppleNews(t *testing.T) {
 		NewsFeed: &jsonfeed.NewsFeed{
 			URL: "https://www.spotlightpa.org/feeds/full.json",
 		},
-		ANF: &anf.Service{Client: &http.Client{
-			Transport: reqtest.ReplayJSON(200, &res),
-		}},
+		ANF: &anf.Service{
+			ChannelID: "test-channel-id",
+			Key:       "test-key",
+			Secret:    "test-secret",
+			Client: &http.Client{
+				Transport: reqtest.ReplayJSON(200, &res),
+			},
+		},
 	}
 
-	// Updating archive should add unuploaded items
-	be.NilErr(t, svc.NewsFeed.UpdateAppleNewsArchive(ctx, svc.Client, svc.Queries))
-	newItems, err := svc.Queries.ListNewsFeedUpdates(ctx)
-	be.NilErr(t, err)
-	be.EqualLength(t, 15, newItems)
-
-	// Publishing should mark everything as uploaded
+	// PublishAppleNewsFeed should migrate legacy config to channel 1
+	// and then process items
 	be.NilErr(t, svc.PublishAppleNewsFeed(ctx))
-	newItems, err = svc.Queries.ListNewsFeedUpdates(ctx)
+
+	// Verify channel 1 was created
+	channel, err := q.GetAppleNewsChannel(ctx, 1)
+	be.NilErr(t, err)
+	be.Equal(t, "test-channel-id", channel.ChannelID)
+	be.Equal(t, "https://www.spotlightpa.org/feeds/full.json", channel.FeedUrl)
+
+	// Check items were uploaded
+	newItems, err := q.ListNewsFeedUpdatesForChannel(ctx, pgtype.Int8{Int64: 1, Valid: true})
 	be.NilErr(t, err)
 	be.Zero(t, newItems)
 
-	// Updating archive should not mark previously uploaded items as null
-	be.NilErr(t, svc.NewsFeed.UpdateAppleNewsArchive(ctx, svc.Client, svc.Queries))
-	newItems, err = svc.Queries.ListNewsFeedUpdates(ctx)
+	// Running again should not create duplicates or errors
+	be.NilErr(t, svc.PublishAppleNewsFeed(ctx))
+	newItems, err = q.ListNewsFeedUpdatesForChannel(ctx, pgtype.Int8{Int64: 1, Valid: true})
 	be.NilErr(t, err)
-	be.EqualLength(t, 0, newItems)
+	be.Zero(t, newItems)
+}
+
+func TestPublishAppleNewsMultiChannel(t *testing.T) {
+	almlog.UseTestLogger(t)
+	p := createTestDB(t)
+	q := db.New(p)
+	ctx := t.Context()
+	cl := &http.Client{
+		Transport: reqtest.Replay("testdata/anf"),
+	}
+	http.DefaultClient.Transport = requests.ErrorTransport(errors.New("used default client"))
+	res := anf.Response{
+		Data: anf.Data{
+			ID: "abc123",
+		},
+	}
+
+	// Create two channels in the database
+	channel1, err := q.CreateAppleNewsChannel(ctx, db.CreateAppleNewsChannelParams{
+		Name:      "Channel 1",
+		ChannelID: "channel-1-id",
+		Key:       "key-1",
+		Secret:    "secret-1",
+		FeedUrl:   "https://www.spotlightpa.org/feeds/full.json",
+		Active:    true,
+	})
+	be.NilErr(t, err)
+
+	channel2, err := q.CreateAppleNewsChannel(ctx, db.CreateAppleNewsChannelParams{
+		Name:      "Channel 2",
+		ChannelID: "channel-2-id",
+		Key:       "key-2",
+		Secret:    "secret-2",
+		FeedUrl:   "https://www.spotlightpa.org/feeds/full.json",
+		Active:    true,
+	})
+	be.NilErr(t, err)
+
+	svc := almanack.Services{
+		Client:  cl,
+		Queries: q,
+		// No legacy ANF/NewsFeed - using DB channels
+		ANF: &anf.Service{
+			Client: &http.Client{
+				Transport: reqtest.ReplayJSON(200, &res),
+			},
+		},
+	}
+
+	// Publishing should process both channels
+	be.NilErr(t, svc.PublishAppleNewsFeed(ctx))
+
+	// Both channels should have their items uploaded
+	newItems1, err := q.ListNewsFeedUpdatesForChannel(ctx, pgtype.Int8{Int64: channel1.ID, Valid: true})
+	be.NilErr(t, err)
+	be.Zero(t, newItems1)
+
+	newItems2, err := q.ListNewsFeedUpdatesForChannel(ctx, pgtype.Int8{Int64: channel2.ID, Valid: true})
+	be.NilErr(t, err)
+	be.Zero(t, newItems2)
+
+	// Verify last_synced_at was updated for both channels
+	channel1Updated, err := q.GetAppleNewsChannel(ctx, channel1.ID)
+	be.NilErr(t, err)
+	be.True(t, channel1Updated.LastSyncedAt.Valid)
+
+	channel2Updated, err := q.GetAppleNewsChannel(ctx, channel2.ID)
+	be.NilErr(t, err)
+	be.True(t, channel2Updated.LastSyncedAt.Valid)
+}
+
+func TestPublishAppleNewsInactiveChannel(t *testing.T) {
+	almlog.UseTestLogger(t)
+	p := createTestDB(t)
+	q := db.New(p)
+	ctx := t.Context()
+	cl := &http.Client{
+		Transport: reqtest.Replay("testdata/anf"),
+	}
+
+	// Create one active and one inactive channel
+	_, err := q.CreateAppleNewsChannel(ctx, db.CreateAppleNewsChannelParams{
+		Name:      "Active Channel",
+		ChannelID: "active-channel-id",
+		Key:       "key",
+		Secret:    "secret",
+		FeedUrl:   "https://www.spotlightpa.org/feeds/full.json",
+		Active:    true,
+	})
+	be.NilErr(t, err)
+
+	inactiveChannel, err := q.CreateAppleNewsChannel(ctx, db.CreateAppleNewsChannelParams{
+		Name:      "Inactive Channel",
+		ChannelID: "inactive-channel-id",
+		Key:       "key",
+		Secret:    "secret",
+		FeedUrl:   "https://www.spotlightpa.org/feeds/full.json",
+		Active:    false,
+	})
+	be.NilErr(t, err)
+
+	res := anf.Response{
+		Data: anf.Data{
+			ID: "abc123",
+		},
+	}
+	svc := almanack.Services{
+		Client:  cl,
+		Queries: q,
+		ANF: &anf.Service{
+			Client: &http.Client{
+				Transport: reqtest.ReplayJSON(200, &res),
+			},
+		},
+	}
+
+	be.NilErr(t, svc.PublishAppleNewsFeed(ctx))
+
+	// Inactive channel should not have last_synced_at set
+	inactiveChannelUpdated, err := q.GetAppleNewsChannel(ctx, inactiveChannel.ID)
+	be.NilErr(t, err)
+	be.False(t, inactiveChannelUpdated.LastSyncedAt.Valid)
 }

@@ -1,4 +1,4 @@
--- name: UpsertNewsFeedArchives :execrows
+-- name: UpsertNewsFeedArchivesForChannel :execrows
 WITH raw_json AS (
   SELECT
     jsonb_array_elements(@data::jsonb) AS data
@@ -29,7 +29,8 @@ feed_items AS (
     raw_json)
   INSERT INTO news_feed_item ("external_id", "author", "authors", "blurb",
     "category", "content_html", "external_updated_at", "external_published_at",
-    "image", "image_credit", "image_description", "language", "title", "url")
+    "image", "image_credit", "image_description", "language", "title", "url",
+    "channel_id")
   SELECT
     "external_id",
     COALESCE("author", ''),
@@ -44,10 +45,12 @@ feed_items AS (
     COALESCE("image_description", ''),
     COALESCE("language", ''),
     COALESCE("title", ''),
-    COALESCE("url", '')
+    COALESCE("url", ''),
+    @channel_id
   FROM
     feed_items
-  ON CONFLICT ("external_id")
+  ON CONFLICT ("external_id",
+    "channel_id")
     DO UPDATE SET
       "author" = EXCLUDED.author,
       "authors" = EXCLUDED.authors,
@@ -69,13 +72,14 @@ feed_items AS (
       END,
       "updated_at" = CURRENT_TIMESTAMP;
 
--- name: ListNewsFeedUpdates :many
+-- name: ListNewsFeedUpdatesForChannel :many
 SELECT
   *
 FROM
   news_feed_item
 WHERE
-  "uploaded_at" IS NULL;
+  "uploaded_at" IS NULL
+  AND "channel_id" = $1;
 
 -- name: UpdateFeedAppleID :one
 UPDATE
@@ -100,3 +104,11 @@ WHERE
   "id" = $1
 RETURNING
   *;
+
+-- name: MigrateNewsFeedItemsToChannel :execrows
+UPDATE
+  news_feed_item
+SET
+  channel_id = $1
+WHERE
+  channel_id IS NULL;

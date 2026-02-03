@@ -7,19 +7,22 @@ package db
 
 import (
 	"context"
+
+	"github.com/jackc/pgx/v5/pgtype"
 )
 
-const listNewsFeedUpdates = `-- name: ListNewsFeedUpdates :many
+const listNewsFeedUpdatesForChannel = `-- name: ListNewsFeedUpdatesForChannel :many
 SELECT
-  id, external_id, author, authors, blurb, category, content_html, external_updated_at, external_published_at, image, image_credit, image_description, language, title, url, uploaded_at, apple_id, apple_share_url, created_at, updated_at
+  id, external_id, author, authors, blurb, category, content_html, external_updated_at, external_published_at, image, image_credit, image_description, language, title, url, uploaded_at, apple_id, apple_share_url, created_at, updated_at, channel_id
 FROM
   news_feed_item
 WHERE
   "uploaded_at" IS NULL
+  AND "channel_id" = $1
 `
 
-func (q *Queries) ListNewsFeedUpdates(ctx context.Context) ([]NewsFeedItem, error) {
-	rows, err := q.db.Query(ctx, listNewsFeedUpdates)
+func (q *Queries) ListNewsFeedUpdatesForChannel(ctx context.Context, channelID pgtype.Int8) ([]NewsFeedItem, error) {
+	rows, err := q.db.Query(ctx, listNewsFeedUpdatesForChannel, channelID)
 	if err != nil {
 		return nil, err
 	}
@@ -48,6 +51,7 @@ func (q *Queries) ListNewsFeedUpdates(ctx context.Context) ([]NewsFeedItem, erro
 			&i.AppleShareUrl,
 			&i.CreatedAt,
 			&i.UpdatedAt,
+			&i.ChannelID,
 		); err != nil {
 			return nil, err
 		}
@@ -57,6 +61,23 @@ func (q *Queries) ListNewsFeedUpdates(ctx context.Context) ([]NewsFeedItem, erro
 		return nil, err
 	}
 	return items, nil
+}
+
+const migrateNewsFeedItemsToChannel = `-- name: MigrateNewsFeedItemsToChannel :execrows
+UPDATE
+  news_feed_item
+SET
+  channel_id = $1
+WHERE
+  channel_id IS NULL
+`
+
+func (q *Queries) MigrateNewsFeedItemsToChannel(ctx context.Context, channelID pgtype.Int8) (int64, error) {
+	result, err := q.db.Exec(ctx, migrateNewsFeedItemsToChannel, channelID)
+	if err != nil {
+		return 0, err
+	}
+	return result.RowsAffected(), nil
 }
 
 const updateFeedAppleID = `-- name: UpdateFeedAppleID :one
@@ -70,7 +91,7 @@ SET
 WHERE
   "id" = $3
 RETURNING
-  id, external_id, author, authors, blurb, category, content_html, external_updated_at, external_published_at, image, image_credit, image_description, language, title, url, uploaded_at, apple_id, apple_share_url, created_at, updated_at
+  id, external_id, author, authors, blurb, category, content_html, external_updated_at, external_published_at, image, image_credit, image_description, language, title, url, uploaded_at, apple_id, apple_share_url, created_at, updated_at, channel_id
 `
 
 type UpdateFeedAppleIDParams struct {
@@ -103,6 +124,7 @@ func (q *Queries) UpdateFeedAppleID(ctx context.Context, arg UpdateFeedAppleIDPa
 		&i.AppleShareUrl,
 		&i.CreatedAt,
 		&i.UpdatedAt,
+		&i.ChannelID,
 	)
 	return i, err
 }
@@ -116,7 +138,7 @@ SET
 WHERE
   "id" = $1
 RETURNING
-  id, external_id, author, authors, blurb, category, content_html, external_updated_at, external_published_at, image, image_credit, image_description, language, title, url, uploaded_at, apple_id, apple_share_url, created_at, updated_at
+  id, external_id, author, authors, blurb, category, content_html, external_updated_at, external_published_at, image, image_credit, image_description, language, title, url, uploaded_at, apple_id, apple_share_url, created_at, updated_at, channel_id
 `
 
 func (q *Queries) UpdateFeedUploaded(ctx context.Context, id int64) (NewsFeedItem, error) {
@@ -143,14 +165,15 @@ func (q *Queries) UpdateFeedUploaded(ctx context.Context, id int64) (NewsFeedIte
 		&i.AppleShareUrl,
 		&i.CreatedAt,
 		&i.UpdatedAt,
+		&i.ChannelID,
 	)
 	return i, err
 }
 
-const upsertNewsFeedArchives = `-- name: UpsertNewsFeedArchives :execrows
+const upsertNewsFeedArchivesForChannel = `-- name: UpsertNewsFeedArchivesForChannel :execrows
 WITH raw_json AS (
   SELECT
-    jsonb_array_elements($1::jsonb) AS data
+    jsonb_array_elements($2::jsonb) AS data
 ),
 feed_items AS (
   SELECT
@@ -178,7 +201,8 @@ feed_items AS (
     raw_json)
   INSERT INTO news_feed_item ("external_id", "author", "authors", "blurb",
     "category", "content_html", "external_updated_at", "external_published_at",
-    "image", "image_credit", "image_description", "language", "title", "url")
+    "image", "image_credit", "image_description", "language", "title", "url",
+    "channel_id")
   SELECT
     "external_id",
     COALESCE("author", ''),
@@ -193,10 +217,12 @@ feed_items AS (
     COALESCE("image_description", ''),
     COALESCE("language", ''),
     COALESCE("title", ''),
-    COALESCE("url", '')
+    COALESCE("url", ''),
+    $1
   FROM
     feed_items
-  ON CONFLICT ("external_id")
+  ON CONFLICT ("external_id",
+    "channel_id")
     DO UPDATE SET
       "author" = EXCLUDED.author,
       "authors" = EXCLUDED.authors,
@@ -219,8 +245,13 @@ feed_items AS (
       "updated_at" = CURRENT_TIMESTAMP
 `
 
-func (q *Queries) UpsertNewsFeedArchives(ctx context.Context, data []byte) (int64, error) {
-	result, err := q.db.Exec(ctx, upsertNewsFeedArchives, data)
+type UpsertNewsFeedArchivesForChannelParams struct {
+	ChannelID pgtype.Int8 `json:"channel_id"`
+	Data      []byte      `json:"data"`
+}
+
+func (q *Queries) UpsertNewsFeedArchivesForChannel(ctx context.Context, arg UpsertNewsFeedArchivesForChannelParams) (int64, error) {
+	result, err := q.db.Exec(ctx, upsertNewsFeedArchivesForChannel, arg.ChannelID, arg.Data)
 	if err != nil {
 		return 0, err
 	}
