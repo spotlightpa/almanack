@@ -43,13 +43,9 @@ func UpdateAppleNewsArchiveForChannel(ctx context.Context, cl *http.Client, q *d
 		return err
 	}
 	updated, err := q.UpsertNewsFeedArchivesForChannel(ctx, db.UpsertNewsFeedArchivesForChannelParams{
-		ChannelID: pgInt8(channelID),
+		ChannelID: pgtype.Int8{Int64: channelID, Valid: true},
 		Data:      data,
 	})
 	l.InfoContext(ctx, "UpsertNewsFeedArchivesForChannel", "channel_id", channelID, "updated_rows", updated)
 	return err
-}
-
-func pgInt8(n int64) pgtype.Int8 {
-	return pgtype.Int8{Int64: n, Valid: true}
 }

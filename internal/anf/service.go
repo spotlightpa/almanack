@@ -29,16 +29,6 @@ func AddFlags(fl *flag.FlagSet) (svc *Service) {
 	return svc
 }
 
-// NewForChannel creates an ANF Service configured for a specific database channel
-func NewForChannel(channelID, key, secret string, client *http.Client) *Service {
-	return &Service{
-		ChannelID: channelID,
-		Key:       key,
-		Secret:    secret,
-		Client:    client,
-	}
-}
-
 type ServiceErrorResponse struct {
 	Errors []struct {
 		Code  string `json:"code"`

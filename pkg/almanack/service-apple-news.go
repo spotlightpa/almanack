@@ -61,7 +61,7 @@ func (svc Services) publishAppleNewsFeedForChannel(ctx context.Context, channel 
 	}
 
 	// Get items needing upload for this channel
-	newItems, err := svc.Queries.ListNewsFeedUpdatesForChannel(ctx, pgInt8(channel.ID))
+	newItems, err := svc.Queries.ListNewsFeedUpdatesForChannel(ctx, pgtype.Int8{Int64: channel.ID, Valid: true})
 	if err != nil {
 		return err
 	}
@@ -71,12 +71,16 @@ func (svc Services) publishAppleNewsFeedForChannel(ctx context.Context, channel 
 		return nil
 	}
 
-	// Create ANF service with this channel's credentials
-	anfSvc := anf.NewForChannel(channel.ChannelID, channel.Key, channel.Secret, svc.Client)
+	anfSvc := anf.Service{
+		ChannelID: channel.ChannelID,
+		Key:       channel.Key,
+		Secret:    channel.Secret,
+		Client:    svc.Client,
+	}
 
 	var errs []error
 	for i := range newItems {
-		err := svc.uploadToAppleNewsWithService(ctx, anfSvc, &newItems[i])
+		err := svc.uploadToAppleNewsWithService(ctx, &anfSvc, &newItems[i])
 		errs = append(errs, err)
 	}
 	return errors.Join(errs...)
@@ -178,15 +182,11 @@ func (svc Services) MigrateToAppleNewsChannelsIfNeeded(ctx context.Context) erro
 	}
 
 	// Point existing news_feed_items to channel 1
-	migrated, err := svc.Queries.MigrateNewsFeedItemsToChannel(ctx, pgInt8(1))
+	migrated, err := svc.Queries.MigrateNewsFeedItemsToChannel(ctx, pgtype.Int8{Int64: 1, Valid: true})
 	if err != nil {
 		return fmt.Errorf("migrating news_feed_items: %w", err)
 	}
 	l.InfoContext(ctx, "MigrateToAppleNewsChannelsIfNeeded: migrated items", "count", migrated)
 
 	return nil
-}
-
-func pgInt8(n int64) pgtype.Int8 {
-	return pgtype.Int8{Int64: n, Valid: true}
 }
