@@ -1,4 +1,4 @@
--- name: UpsertNewsFeedArchivesForChannel :execrows
+-- name: UpsertNewsFeedArchives :execrows
 WITH raw_json AS (
   SELECT
     jsonb_array_elements(@data::jsonb) AS data
@@ -29,8 +29,7 @@ feed_items AS (
     raw_json)
   INSERT INTO news_feed_item ("external_id", "author", "authors", "blurb",
     "category", "content_html", "external_updated_at", "external_published_at",
-    "image", "image_credit", "image_description", "language", "title", "url",
-    "channel_id")
+    "image", "image_credit", "image_description", "language", "title", "url")
   SELECT
     "external_id",
     COALESCE("author", ''),
@@ -45,12 +44,10 @@ feed_items AS (
     COALESCE("image_description", ''),
     COALESCE("language", ''),
     COALESCE("title", ''),
-    COALESCE("url", ''),
-    @channel_id
+    COALESCE("url", '')
   FROM
     feed_items
-  ON CONFLICT ("external_id",
-    "channel_id")
+  ON CONFLICT ("external_id")
     DO UPDATE SET
       "author" = EXCLUDED.author,
       "authors" = EXCLUDED.authors,
@@ -64,51 +61,20 @@ feed_items AS (
       "language" = EXCLUDED.language,
       "title" = EXCLUDED.title,
       "url" = EXCLUDED.url,
-      "uploaded_at" = CASE WHEN news_feed_item.external_updated_at <>
-	EXCLUDED.external_updated_at THEN
-        NULL
-      ELSE
-        news_feed_item.uploaded_at
-      END,
       "updated_at" = CURRENT_TIMESTAMP;
 
--- name: ListNewsFeedUpdatesForChannel :many
+-- name: GetNewsFeedItemByExternalID :one
 SELECT
   *
 FROM
   news_feed_item
 WHERE
-  "uploaded_at" IS NULL
-  AND "channel_id" = $1;
+  external_id = $1;
 
--- name: UpdateFeedAppleID :one
-UPDATE
+-- name: ListNewsFeedItemsByExternalIDs :many
+SELECT
+  *
+FROM
   news_feed_item
-SET
-  "apple_id" = $1,
-  "apple_share_url" = $2,
-  "uploaded_at" = CURRENT_TIMESTAMP,
-  "updated_at" = CURRENT_TIMESTAMP
 WHERE
-  "id" = $3
-RETURNING
-  *;
-
--- name: UpdateFeedUploaded :one
-UPDATE
-  news_feed_item
-SET
-  "uploaded_at" = CURRENT_TIMESTAMP,
-  "updated_at" = CURRENT_TIMESTAMP
-WHERE
-  "id" = $1
-RETURNING
-  *;
-
--- name: MigrateNewsFeedItemsToChannel :execrows
-UPDATE
-  news_feed_item
-SET
-  channel_id = $1
-WHERE
-  channel_id IS NULL;
+  external_id = ANY (@external_ids::text[]);

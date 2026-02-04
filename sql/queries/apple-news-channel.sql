@@ -64,3 +64,71 @@ WHERE
 -- name: DeleteAppleNewsChannel :exec
 DELETE FROM apple_news_channel
 WHERE id = $1;
+
+-- name: UpsertANFChannelItem :one
+INSERT INTO anf_channel_item (channel_id, news_feed_item_id, apple_id,
+  apple_share_url, uploaded_at)
+  VALUES (@channel_id, @news_feed_item_id, @apple_id, @apple_share_url, CURRENT_TIMESTAMP)
+ON CONFLICT (channel_id, news_feed_item_id)
+  DO UPDATE SET
+    apple_id = EXCLUDED.apple_id, apple_share_url = EXCLUDED.apple_share_url,
+      uploaded_at = CURRENT_TIMESTAMP, updated_at = CURRENT_TIMESTAMP
+  RETURNING
+    *;
+
+-- name: GetANFChannelItem :one
+SELECT
+  *
+FROM
+  anf_channel_item
+WHERE
+  channel_id = $1
+  AND news_feed_item_id = $2;
+
+-- name: ListANFChannelItemsForChannel :many
+SELECT
+  *
+FROM
+  anf_channel_item
+WHERE
+  channel_id = $1;
+
+-- name: ListANFChannelItemsNeedingUpload :many
+-- Returns news_feed_items that are in the feed but either:
+-- 1. Not yet uploaded to this channel (no anf_channel_item row)
+-- 2. Updated since last upload (external_updated_at > uploaded_at)
+SELECT
+  nfi.*
+FROM
+  news_feed_item nfi
+WHERE
+  nfi.external_id = ANY (@external_ids::text[])
+  AND (NOT EXISTS (
+      SELECT
+        1
+      FROM
+        anf_channel_item aci
+      WHERE
+        aci.channel_id = @channel_id
+        AND aci.news_feed_item_id = nfi.id)
+      OR EXISTS (
+        SELECT
+          1
+        FROM
+          anf_channel_item aci
+        WHERE
+          aci.channel_id = @channel_id
+          AND aci.news_feed_item_id = nfi.id
+          AND nfi.external_updated_at > aci.uploaded_at));
+
+-- name: MarkANFChannelItemUploaded :one
+UPDATE
+  anf_channel_item
+SET
+  uploaded_at = CURRENT_TIMESTAMP,
+  updated_at = CURRENT_TIMESTAMP
+WHERE
+  channel_id = @channel_id
+  AND news_feed_item_id = @news_feed_item_id
+RETURNING
+  *;

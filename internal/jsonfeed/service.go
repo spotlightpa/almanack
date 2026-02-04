@@ -8,7 +8,6 @@ import (
 
 	"github.com/carlmjohnson/requests"
 	"github.com/earthboundkid/errorx/v2"
-	"github.com/jackc/pgx/v5/pgtype"
 	"github.com/spotlightpa/almanack/internal/db"
 	"github.com/spotlightpa/almanack/pkg/almlog"
 )
@@ -19,12 +18,13 @@ type NewsFeed struct {
 
 func AddFlags(fl *flag.FlagSet) (nf *NewsFeed) {
 	nf = new(NewsFeed)
-	fl.StringVar(&nf.URL, "news-feed-url", "https://www.spotlightpa.org/feeds/full.json", "`URL` for published news feed")
+	fl.StringVar(&nf.URL, "news-feed-url", "https://www.spotlightpa.org/feeds/full.json", "`URL` for published news feed (legacy, use database channels instead)")
 	return nf
 }
 
-// UpdateAppleNewsArchiveForChannel fetches a feed and upserts items for a specific channel
-func UpdateAppleNewsArchiveForChannel(ctx context.Context, cl *http.Client, q *db.Queries, channelID int64, feedURL string) (err error) {
+// FetchAndCache fetches the feed from the given URL and caches items in the database.
+// Returns the list of external IDs that were in the feed.
+func FetchAndCache(ctx context.Context, cl *http.Client, q *db.Queries, feedURL string) (externalIDs []string, err error) {
 	defer errorx.Trace(&err)
 	l := almlog.FromContext(ctx)
 
@@ -35,17 +35,21 @@ func UpdateAppleNewsArchiveForChannel(ctx context.Context, cl *http.Client, q *d
 		Client(cl).
 		ToJSON(&source).
 		Fetch(ctx); err != nil {
-		return err
+		return nil, err
 	}
+
+	// Extract external IDs
+	externalIDs = make([]string, len(source.Items))
+	for i, item := range source.Items {
+		externalIDs[i] = item.ID
+	}
+
 	// Update feed archives
 	data, err := json.Marshal(source.Items)
 	if err != nil {
-		return err
+		return nil, err
 	}
-	updated, err := q.UpsertNewsFeedArchivesForChannel(ctx, db.UpsertNewsFeedArchivesForChannelParams{
-		ChannelID: pgtype.Int8{Int64: channelID, Valid: true},
-		Data:      data,
-	})
-	l.InfoContext(ctx, "UpsertNewsFeedArchivesForChannel", "channel_id", channelID, "updated_rows", updated)
-	return err
+	updated, err := q.UpsertNewsFeedArchives(ctx, data)
+	l.InfoContext(ctx, "FetchAndCache", "feed_url", feedURL, "items", len(source.Items), "updated_rows", updated)
+	return externalIDs, err
 }

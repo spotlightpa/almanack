@@ -103,6 +103,37 @@ func (q *Queries) DeleteAppleNewsChannel(ctx context.Context, id int64) error {
 	return err
 }
 
+const getANFChannelItem = `-- name: GetANFChannelItem :one
+SELECT
+  id, channel_id, news_feed_item_id, apple_id, apple_share_url, uploaded_at, created_at, updated_at
+FROM
+  anf_channel_item
+WHERE
+  channel_id = $1
+  AND news_feed_item_id = $2
+`
+
+type GetANFChannelItemParams struct {
+	ChannelID      int64 `json:"channel_id"`
+	NewsFeedItemID int64 `json:"news_feed_item_id"`
+}
+
+func (q *Queries) GetANFChannelItem(ctx context.Context, arg GetANFChannelItemParams) (AnfChannelItem, error) {
+	row := q.db.QueryRow(ctx, getANFChannelItem, arg.ChannelID, arg.NewsFeedItemID)
+	var i AnfChannelItem
+	err := row.Scan(
+		&i.ID,
+		&i.ChannelID,
+		&i.NewsFeedItemID,
+		&i.AppleID,
+		&i.AppleShareUrl,
+		&i.UploadedAt,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+	)
+	return i, err
+}
+
 const getAppleNewsChannel = `-- name: GetAppleNewsChannel :one
 SELECT
   id, name, channel_id, key, secret, feed_url, active, last_synced_at, created_at, updated_at
@@ -128,6 +159,116 @@ func (q *Queries) GetAppleNewsChannel(ctx context.Context, id int64) (AppleNewsC
 		&i.UpdatedAt,
 	)
 	return i, err
+}
+
+const listANFChannelItemsForChannel = `-- name: ListANFChannelItemsForChannel :many
+SELECT
+  id, channel_id, news_feed_item_id, apple_id, apple_share_url, uploaded_at, created_at, updated_at
+FROM
+  anf_channel_item
+WHERE
+  channel_id = $1
+`
+
+func (q *Queries) ListANFChannelItemsForChannel(ctx context.Context, channelID int64) ([]AnfChannelItem, error) {
+	rows, err := q.db.Query(ctx, listANFChannelItemsForChannel, channelID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []AnfChannelItem
+	for rows.Next() {
+		var i AnfChannelItem
+		if err := rows.Scan(
+			&i.ID,
+			&i.ChannelID,
+			&i.NewsFeedItemID,
+			&i.AppleID,
+			&i.AppleShareUrl,
+			&i.UploadedAt,
+			&i.CreatedAt,
+			&i.UpdatedAt,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const listANFChannelItemsNeedingUpload = `-- name: ListANFChannelItemsNeedingUpload :many
+SELECT
+  nfi.id, nfi.external_id, nfi.author, nfi.authors, nfi.blurb, nfi.category, nfi.content_html, nfi.external_updated_at, nfi.external_published_at, nfi.image, nfi.image_credit, nfi.image_description, nfi.language, nfi.title, nfi.url, nfi.created_at, nfi.updated_at
+FROM
+  news_feed_item nfi
+WHERE
+  nfi.external_id = ANY ($1::text[])
+  AND (NOT EXISTS (
+      SELECT
+        1
+      FROM
+        anf_channel_item aci
+      WHERE
+        aci.channel_id = $2
+        AND aci.news_feed_item_id = nfi.id)
+      OR EXISTS (
+        SELECT
+          1
+        FROM
+          anf_channel_item aci
+        WHERE
+          aci.channel_id = $2
+          AND aci.news_feed_item_id = nfi.id
+          AND nfi.external_updated_at > aci.uploaded_at))
+`
+
+type ListANFChannelItemsNeedingUploadParams struct {
+	ExternalIds []string `json:"external_ids"`
+	ChannelID   int64    `json:"channel_id"`
+}
+
+// Returns news_feed_items that are in the feed but either:
+// 1. Not yet uploaded to this channel (no anf_channel_item row)
+// 2. Updated since last upload (external_updated_at > uploaded_at)
+func (q *Queries) ListANFChannelItemsNeedingUpload(ctx context.Context, arg ListANFChannelItemsNeedingUploadParams) ([]NewsFeedItem, error) {
+	rows, err := q.db.Query(ctx, listANFChannelItemsNeedingUpload, arg.ExternalIds, arg.ChannelID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []NewsFeedItem
+	for rows.Next() {
+		var i NewsFeedItem
+		if err := rows.Scan(
+			&i.ID,
+			&i.ExternalID,
+			&i.Author,
+			&i.Authors,
+			&i.Blurb,
+			&i.Category,
+			&i.ContentHtml,
+			&i.ExternalUpdatedAt,
+			&i.ExternalPublishedAt,
+			&i.Image,
+			&i.ImageCredit,
+			&i.ImageDescription,
+			&i.Language,
+			&i.Title,
+			&i.URL,
+			&i.CreatedAt,
+			&i.UpdatedAt,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
 }
 
 const listActiveAppleNewsChannels = `-- name: ListActiveAppleNewsChannels :many
@@ -212,6 +353,40 @@ func (q *Queries) ListAppleNewsChannels(ctx context.Context) ([]AppleNewsChannel
 	return items, nil
 }
 
+const markANFChannelItemUploaded = `-- name: MarkANFChannelItemUploaded :one
+UPDATE
+  anf_channel_item
+SET
+  uploaded_at = CURRENT_TIMESTAMP,
+  updated_at = CURRENT_TIMESTAMP
+WHERE
+  channel_id = $1
+  AND news_feed_item_id = $2
+RETURNING
+  id, channel_id, news_feed_item_id, apple_id, apple_share_url, uploaded_at, created_at, updated_at
+`
+
+type MarkANFChannelItemUploadedParams struct {
+	ChannelID      int64 `json:"channel_id"`
+	NewsFeedItemID int64 `json:"news_feed_item_id"`
+}
+
+func (q *Queries) MarkANFChannelItemUploaded(ctx context.Context, arg MarkANFChannelItemUploadedParams) (AnfChannelItem, error) {
+	row := q.db.QueryRow(ctx, markANFChannelItemUploaded, arg.ChannelID, arg.NewsFeedItemID)
+	var i AnfChannelItem
+	err := row.Scan(
+		&i.ID,
+		&i.ChannelID,
+		&i.NewsFeedItemID,
+		&i.AppleID,
+		&i.AppleShareUrl,
+		&i.UploadedAt,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+	)
+	return i, err
+}
+
 const updateAppleNewsChannel = `-- name: UpdateAppleNewsChannel :one
 UPDATE
   apple_news_channel
@@ -278,4 +453,44 @@ WHERE
 func (q *Queries) UpdateAppleNewsChannelLastSynced(ctx context.Context, id int64) error {
 	_, err := q.db.Exec(ctx, updateAppleNewsChannelLastSynced, id)
 	return err
+}
+
+const upsertANFChannelItem = `-- name: UpsertANFChannelItem :one
+INSERT INTO anf_channel_item (channel_id, news_feed_item_id, apple_id,
+  apple_share_url, uploaded_at)
+  VALUES ($1, $2, $3, $4, CURRENT_TIMESTAMP)
+ON CONFLICT (channel_id, news_feed_item_id)
+  DO UPDATE SET
+    apple_id = EXCLUDED.apple_id, apple_share_url = EXCLUDED.apple_share_url,
+      uploaded_at = CURRENT_TIMESTAMP, updated_at = CURRENT_TIMESTAMP
+  RETURNING
+    id, channel_id, news_feed_item_id, apple_id, apple_share_url, uploaded_at, created_at, updated_at
+`
+
+type UpsertANFChannelItemParams struct {
+	ChannelID      int64  `json:"channel_id"`
+	NewsFeedItemID int64  `json:"news_feed_item_id"`
+	AppleID        string `json:"apple_id"`
+	AppleShareUrl  string `json:"apple_share_url"`
+}
+
+func (q *Queries) UpsertANFChannelItem(ctx context.Context, arg UpsertANFChannelItemParams) (AnfChannelItem, error) {
+	row := q.db.QueryRow(ctx, upsertANFChannelItem,
+		arg.ChannelID,
+		arg.NewsFeedItemID,
+		arg.AppleID,
+		arg.AppleShareUrl,
+	)
+	var i AnfChannelItem
+	err := row.Scan(
+		&i.ID,
+		&i.ChannelID,
+		&i.NewsFeedItemID,
+		&i.AppleID,
+		&i.AppleShareUrl,
+		&i.UploadedAt,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+	)
+	return i, err
 }

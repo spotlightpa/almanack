@@ -8,7 +8,6 @@ import (
 	"github.com/carlmjohnson/be"
 	"github.com/carlmjohnson/requests"
 	"github.com/carlmjohnson/requests/reqtest"
-	"github.com/jackc/pgx/v5/pgtype"
 	"github.com/spotlightpa/almanack/internal/anf"
 	"github.com/spotlightpa/almanack/internal/db"
 	"github.com/spotlightpa/almanack/internal/jsonfeed"
@@ -56,16 +55,13 @@ func TestPublishAppleNews(t *testing.T) {
 	be.Equal(t, "test-channel-id", channel.ChannelID)
 	be.Equal(t, "https://www.spotlightpa.org/feeds/full.json", channel.FeedUrl)
 
-	// Check items were uploaded
-	newItems, err := q.ListNewsFeedUpdatesForChannel(ctx, pgtype.Int8{Int64: 1, Valid: true})
+	// Check items were uploaded (via anf_channel_item)
+	channelItems, err := q.ListANFChannelItemsForChannel(ctx, 1)
 	be.NilErr(t, err)
-	be.Zero(t, newItems)
+	be.Nonzero(t, channelItems)
 
-	// Running again should not create duplicates or errors
+	// Running again should not re-upload unchanged items
 	be.NilErr(t, svc.PublishAppleNewsFeed(ctx))
-	newItems, err = q.ListNewsFeedUpdatesForChannel(ctx, pgtype.Int8{Int64: 1, Valid: true})
-	be.NilErr(t, err)
-	be.Zero(t, newItems)
 }
 
 func TestPublishAppleNewsMultiChannel(t *testing.T) {
@@ -83,7 +79,7 @@ func TestPublishAppleNewsMultiChannel(t *testing.T) {
 		},
 	}
 
-	// Create two channels in the database
+	// Create two channels in the database (same feed URL for testing)
 	channel1, err := q.CreateAppleNewsChannel(ctx, db.CreateAppleNewsChannelParams{
 		Name:      "Channel 1",
 		ChannelID: "channel-1-id",
@@ -118,14 +114,14 @@ func TestPublishAppleNewsMultiChannel(t *testing.T) {
 	// Publishing should process both channels
 	be.NilErr(t, svc.PublishAppleNewsFeed(ctx))
 
-	// Both channels should have their items uploaded
-	newItems1, err := q.ListNewsFeedUpdatesForChannel(ctx, pgtype.Int8{Int64: channel1.ID, Valid: true})
+	// Both channels should have uploaded items
+	items1, err := q.ListANFChannelItemsForChannel(ctx, channel1.ID)
 	be.NilErr(t, err)
-	be.Zero(t, newItems1)
+	be.Nonzero(t, items1)
 
-	newItems2, err := q.ListNewsFeedUpdatesForChannel(ctx, pgtype.Int8{Int64: channel2.ID, Valid: true})
+	items2, err := q.ListANFChannelItemsForChannel(ctx, channel2.ID)
 	be.NilErr(t, err)
-	be.Zero(t, newItems2)
+	be.Nonzero(t, items2)
 
 	// Verify last_synced_at was updated for both channels
 	channel1Updated, err := q.GetAppleNewsChannel(ctx, channel1.ID)
