@@ -61,42 +61,20 @@ feed_items AS (
       "language" = EXCLUDED.language,
       "title" = EXCLUDED.title,
       "url" = EXCLUDED.url,
-      "uploaded_at" = CASE WHEN news_feed_item.external_updated_at <>
-	EXCLUDED.external_updated_at THEN
-        NULL
-      ELSE
-        news_feed_item.uploaded_at
-      END,
       "updated_at" = CURRENT_TIMESTAMP;
 
--- name: ListNewsFeedUpdates :many
+-- name: GetNewsFeedItemByExternalID :one
 SELECT
   *
 FROM
   news_feed_item
 WHERE
-  "uploaded_at" IS NULL;
+  external_id = $1;
 
--- name: UpdateFeedAppleID :one
-UPDATE
+-- name: ListNewsFeedItemsByExternalIDs :many
+SELECT
+  *
+FROM
   news_feed_item
-SET
-  "apple_id" = $1,
-  "apple_share_url" = $2,
-  "uploaded_at" = CURRENT_TIMESTAMP,
-  "updated_at" = CURRENT_TIMESTAMP
 WHERE
-  "id" = $3
-RETURNING
-  *;
-
--- name: UpdateFeedUploaded :one
-UPDATE
-  news_feed_item
-SET
-  "uploaded_at" = CURRENT_TIMESTAMP,
-  "updated_at" = CURRENT_TIMESTAMP
-WHERE
-  "id" = $1
-RETURNING
-  *;
+  external_id = ANY (@external_ids::text[]);

@@ -18,29 +18,38 @@ type NewsFeed struct {
 
 func AddFlags(fl *flag.FlagSet) (nf *NewsFeed) {
 	nf = new(NewsFeed)
-	fl.StringVar(&nf.URL, "news-feed-url", "https://www.spotlightpa.org/feeds/full.json", "`URL` for published news feed")
+	fl.StringVar(&nf.URL, "news-feed-url", "https://www.spotlightpa.org/feeds/full.json", "`URL` for published news feed (legacy, use database channels instead)")
 	return nf
 }
 
-func (nf *NewsFeed) UpdateAppleNewsArchive(ctx context.Context, cl *http.Client, q *db.Queries) (err error) {
+// FetchAndCache fetches the feed from the given URL and caches items in the database.
+// Returns the list of external IDs that were in the feed.
+func FetchAndCache(ctx context.Context, cl *http.Client, q *db.Queries, feedURL string) (externalIDs []string, err error) {
 	defer errorx.Trace(&err)
 	l := almlog.FromContext(ctx)
 
 	// Fetch the feed
 	var source Feed
 	if err = requests.
-		URL(nf.URL).
+		URL(feedURL).
 		Client(cl).
 		ToJSON(&source).
 		Fetch(ctx); err != nil {
-		return err
+		return nil, err
 	}
+
+	// Extract external IDs
+	externalIDs = make([]string, len(source.Items))
+	for i, item := range source.Items {
+		externalIDs[i] = item.ID
+	}
+
 	// Update feed archives
 	data, err := json.Marshal(source.Items)
 	if err != nil {
-		return err
+		return nil, err
 	}
 	updated, err := q.UpsertNewsFeedArchives(ctx, data)
-	l.InfoContext(ctx, "UpsertNewsFeedArchives", "updated_rows", updated)
-	return err
+	l.InfoContext(ctx, "FetchAndCache", "feed_url", feedURL, "items", len(source.Items), "updated_rows", updated)
+	return externalIDs, err
 }

@@ -9,17 +9,51 @@ import (
 	"context"
 )
 
-const listNewsFeedUpdates = `-- name: ListNewsFeedUpdates :many
+const getNewsFeedItemByExternalID = `-- name: GetNewsFeedItemByExternalID :one
 SELECT
-  id, external_id, author, authors, blurb, category, content_html, external_updated_at, external_published_at, image, image_credit, image_description, language, title, url, uploaded_at, apple_id, apple_share_url, created_at, updated_at
+  id, external_id, author, authors, blurb, category, content_html, external_updated_at, external_published_at, image, image_credit, image_description, language, title, url, created_at, updated_at
 FROM
   news_feed_item
 WHERE
-  "uploaded_at" IS NULL
+  external_id = $1
 `
 
-func (q *Queries) ListNewsFeedUpdates(ctx context.Context) ([]NewsFeedItem, error) {
-	rows, err := q.db.Query(ctx, listNewsFeedUpdates)
+func (q *Queries) GetNewsFeedItemByExternalID(ctx context.Context, externalID string) (NewsFeedItem, error) {
+	row := q.db.QueryRow(ctx, getNewsFeedItemByExternalID, externalID)
+	var i NewsFeedItem
+	err := row.Scan(
+		&i.ID,
+		&i.ExternalID,
+		&i.Author,
+		&i.Authors,
+		&i.Blurb,
+		&i.Category,
+		&i.ContentHtml,
+		&i.ExternalUpdatedAt,
+		&i.ExternalPublishedAt,
+		&i.Image,
+		&i.ImageCredit,
+		&i.ImageDescription,
+		&i.Language,
+		&i.Title,
+		&i.URL,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+	)
+	return i, err
+}
+
+const listNewsFeedItemsByExternalIDs = `-- name: ListNewsFeedItemsByExternalIDs :many
+SELECT
+  id, external_id, author, authors, blurb, category, content_html, external_updated_at, external_published_at, image, image_credit, image_description, language, title, url, created_at, updated_at
+FROM
+  news_feed_item
+WHERE
+  external_id = ANY ($1::text[])
+`
+
+func (q *Queries) ListNewsFeedItemsByExternalIDs(ctx context.Context, externalIds []string) ([]NewsFeedItem, error) {
+	rows, err := q.db.Query(ctx, listNewsFeedItemsByExternalIDs, externalIds)
 	if err != nil {
 		return nil, err
 	}
@@ -43,9 +77,6 @@ func (q *Queries) ListNewsFeedUpdates(ctx context.Context) ([]NewsFeedItem, erro
 			&i.Language,
 			&i.Title,
 			&i.URL,
-			&i.UploadedAt,
-			&i.AppleID,
-			&i.AppleShareUrl,
 			&i.CreatedAt,
 			&i.UpdatedAt,
 		); err != nil {
@@ -57,94 +88,6 @@ func (q *Queries) ListNewsFeedUpdates(ctx context.Context) ([]NewsFeedItem, erro
 		return nil, err
 	}
 	return items, nil
-}
-
-const updateFeedAppleID = `-- name: UpdateFeedAppleID :one
-UPDATE
-  news_feed_item
-SET
-  "apple_id" = $1,
-  "apple_share_url" = $2,
-  "uploaded_at" = CURRENT_TIMESTAMP,
-  "updated_at" = CURRENT_TIMESTAMP
-WHERE
-  "id" = $3
-RETURNING
-  id, external_id, author, authors, blurb, category, content_html, external_updated_at, external_published_at, image, image_credit, image_description, language, title, url, uploaded_at, apple_id, apple_share_url, created_at, updated_at
-`
-
-type UpdateFeedAppleIDParams struct {
-	AppleID       string `json:"apple_id"`
-	AppleShareUrl string `json:"apple_share_url"`
-	ID            int64  `json:"id"`
-}
-
-func (q *Queries) UpdateFeedAppleID(ctx context.Context, arg UpdateFeedAppleIDParams) (NewsFeedItem, error) {
-	row := q.db.QueryRow(ctx, updateFeedAppleID, arg.AppleID, arg.AppleShareUrl, arg.ID)
-	var i NewsFeedItem
-	err := row.Scan(
-		&i.ID,
-		&i.ExternalID,
-		&i.Author,
-		&i.Authors,
-		&i.Blurb,
-		&i.Category,
-		&i.ContentHtml,
-		&i.ExternalUpdatedAt,
-		&i.ExternalPublishedAt,
-		&i.Image,
-		&i.ImageCredit,
-		&i.ImageDescription,
-		&i.Language,
-		&i.Title,
-		&i.URL,
-		&i.UploadedAt,
-		&i.AppleID,
-		&i.AppleShareUrl,
-		&i.CreatedAt,
-		&i.UpdatedAt,
-	)
-	return i, err
-}
-
-const updateFeedUploaded = `-- name: UpdateFeedUploaded :one
-UPDATE
-  news_feed_item
-SET
-  "uploaded_at" = CURRENT_TIMESTAMP,
-  "updated_at" = CURRENT_TIMESTAMP
-WHERE
-  "id" = $1
-RETURNING
-  id, external_id, author, authors, blurb, category, content_html, external_updated_at, external_published_at, image, image_credit, image_description, language, title, url, uploaded_at, apple_id, apple_share_url, created_at, updated_at
-`
-
-func (q *Queries) UpdateFeedUploaded(ctx context.Context, id int64) (NewsFeedItem, error) {
-	row := q.db.QueryRow(ctx, updateFeedUploaded, id)
-	var i NewsFeedItem
-	err := row.Scan(
-		&i.ID,
-		&i.ExternalID,
-		&i.Author,
-		&i.Authors,
-		&i.Blurb,
-		&i.Category,
-		&i.ContentHtml,
-		&i.ExternalUpdatedAt,
-		&i.ExternalPublishedAt,
-		&i.Image,
-		&i.ImageCredit,
-		&i.ImageDescription,
-		&i.Language,
-		&i.Title,
-		&i.URL,
-		&i.UploadedAt,
-		&i.AppleID,
-		&i.AppleShareUrl,
-		&i.CreatedAt,
-		&i.UpdatedAt,
-	)
-	return i, err
 }
 
 const upsertNewsFeedArchives = `-- name: UpsertNewsFeedArchives :execrows
@@ -210,12 +153,6 @@ feed_items AS (
       "language" = EXCLUDED.language,
       "title" = EXCLUDED.title,
       "url" = EXCLUDED.url,
-      "uploaded_at" = CASE WHEN news_feed_item.external_updated_at <>
-	EXCLUDED.external_updated_at THEN
-        NULL
-      ELSE
-        news_feed_item.uploaded_at
-      END,
       "updated_at" = CURRENT_TIMESTAMP
 `
 
