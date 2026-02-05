@@ -133,6 +133,11 @@ const nextPage = computedProp("next_page", (page) => ({
         to="berks-pages"
         :icon="['fas', 'file-signature']"
       ></LinkRoute>
+      <LinkRoute
+        label="Sponsored Content"
+        to="sponsored-pages"
+        :icon="['fas', 'file-signature']"
+      ></LinkRoute>
     </LinkButtons>
 
     <LinkButtons label="Uploads">

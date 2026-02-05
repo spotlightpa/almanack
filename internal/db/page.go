@@ -150,7 +150,8 @@ func (page *Page) SetURLPath() {
 	upath = strings.TrimPrefix(upath, "content")
 	upath = strings.TrimSuffix(upath, ".md")
 	dir, fname := path.Split(upath)
-	if dir == "/news/" || dir == "/statecollege/" || dir == "/berks/" {
+	switch dir {
+	case "/news/", "/statecollege/", "/berks/", "/sponsored/":
 		if pub, ok := timex.Unwrap(page.Frontmatter["published"]); ok {
 			pub = timex.ToEST(pub)
 			dir = pub.Format(dir + "2006/01/")
@@ -279,8 +280,15 @@ func (page *Page) IsBerksPage() bool {
 	return strings.HasPrefix(page.FilePath, "content/berks/")
 }
 
+func (page *Page) IsSponsoredPage() bool {
+	return strings.HasPrefix(page.FilePath, "content/sponsored/")
+}
+
 func (page *Page) ShouldNotify(oldPage *Page) bool {
-	if !page.IsNewsyPage() || !page.ScheduleFor.Valid {
+	if !page.ScheduleFor.Valid {
+		return false
+	}
+	if !(page.IsNewsyPage() || page.IsSponsoredPage()) {
 		return false
 	}
 	if page.ShouldPublish() {
