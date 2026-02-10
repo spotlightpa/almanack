@@ -34,9 +34,9 @@ type FeedItem struct {
 	CreatedDate          time.Time          `json:"created_date"`
 	Credits              Credits            `json:"credits"`
 	Description          Description        `json:"description"`
-	DisplayDate          time.Time          `json:"display_date,omitempty"`
+	DisplayDate          time.Time          `json:"display_date"`
 	Distributor          Distributor        `json:"distributor"`
-	FirstPublishDate     time.Time          `json:"first_publish_date,omitempty"`
+	FirstPublishDate     time.Time          `json:"first_publish_date"`
 	Headlines            Headlines          `json:"headlines"`
 	ID                   string             `json:"_id"`
 	Label                Label              `json:"label"`
@@ -45,7 +45,7 @@ type FeedItem struct {
 	Owner                Owner              `json:"owner"`
 	Planning             Planning           `json:"planning"`
 	PromoItems           PromoItems         `json:"promo_items"`
-	PublishDate          time.Time          `json:"publish_date,omitempty"`
+	PublishDate          time.Time          `json:"publish_date"`
 	Publishing           Publishing         `json:"publishing"`
 	Slug                 string             `json:"slug"`
 	Source               Source             `json:"source"`
@@ -56,7 +56,7 @@ type FeedItem struct {
 	Version              string             `json:"version"`
 	Website              string             `json:"website"`
 	WebsiteURL           string             `json:"website_url,omitempty"`
-	Workflow             Workflow           `json:"workflow,omitempty"`
+	Workflow             Workflow           `json:"workflow"`
 }
 
 // Value implements the driver.Valuer interface.

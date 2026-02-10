@@ -745,16 +745,16 @@ type DividerComponent struct {
 func (DividerComponent) componentRole() string { return "divider" }
 
 type PhotoComponent struct {
-	Role                 string      `json:"role"`
-	Anchor               *Anchor     `json:"anchor,omitempty"`
-	Identifier           string      `json:"identifier,omitempty"`
-	Layout               any         `json:"layout,omitempty"` // string reference or ComponentLayout
-	Style                any         `json:"style,omitempty"`  // string reference or ComponentStyle
-	Animation            *Animation  `json:"animation,omitempty"`
-	Behavior             *Behavior   `json:"behavior,omitempty"`
-	URL                  string      `json:"URL"`
-	AccessibilityCaption *string     `json:"accessibilityCaption,omitempty"`
-	Caption              interface{} `json:"caption,omitempty"` // string or CaptionDescriptor
+	Role                 string     `json:"role"`
+	Anchor               *Anchor    `json:"anchor,omitempty"`
+	Identifier           string     `json:"identifier,omitempty"`
+	Layout               any        `json:"layout,omitempty"` // string reference or ComponentLayout
+	Style                any        `json:"style,omitempty"`  // string reference or ComponentStyle
+	Animation            *Animation `json:"animation,omitempty"`
+	Behavior             *Behavior  `json:"behavior,omitempty"`
+	URL                  string     `json:"URL"`
+	AccessibilityCaption *string    `json:"accessibilityCaption,omitempty"`
+	Caption              any        `json:"caption,omitempty"` // string or CaptionDescriptor
 }
 
 func (PhotoComponent) componentRole() string { return "photo" }

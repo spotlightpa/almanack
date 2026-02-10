@@ -66,9 +66,9 @@ func (cl *Client) CreateFile(ctx context.Context, msg, path string, content []by
 	// Note: the file needs to be absent from the repository as you are not
 	// specifying a SHA reference here.
 	opts := &github.RepositoryContentFileOptions{
-		Message: github.String(msg),
+		Message: new(msg),
 		Content: content,
-		Branch:  github.String(cl.branch),
+		Branch:  new(cl.branch),
 		Author:  makeAuthor(ctx),
 	}
 	_, _, err := cl.client.Repositories.CreateFile(ctx, cl.owner, cl.repo, path, opts)
@@ -132,9 +132,9 @@ func (cl *Client) UpdateFile(ctx context.Context, msg, path string, content []by
 	}
 
 	opts := &github.RepositoryContentFileOptions{
-		Message: github.String(msg),
+		Message: new(msg),
 		Content: content,
-		Branch:  github.String(cl.branch),
+		Branch:  new(cl.branch),
 		SHA:     sha,
 		Author:  makeAuthor(ctx),
 	}
@@ -161,7 +161,7 @@ func makeAuthor(ctx context.Context) *github.CommitAuthor {
 	email := cmp.Or(jwt.Email(), "webmaster@spotlightpa.org")
 
 	return &github.CommitAuthor{
-		Name:  github.String(name),
-		Email: github.String(email),
+		Name:  new(name),
+		Email: new(email),
 	}
 }
