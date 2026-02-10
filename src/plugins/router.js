@@ -203,6 +203,15 @@ let router = createRouter({
       },
     },
     {
+      path: "/admin/sponsored",
+      name: "sponsored-pages",
+      component: load(() => import("@/components/ViewSponsoredList.vue")),
+      props: (route) => ({ page: route.query.page }),
+      meta: {
+        requiresAuth: isSpotlightPAUser,
+      },
+    },
+    {
       path: "/admin/shared-articles/:id",
       name: "shared-article-admin",
       component: load(() => import("@/components/ViewSharedArticleAdmin.vue")),

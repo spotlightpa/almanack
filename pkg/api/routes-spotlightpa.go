@@ -664,7 +664,7 @@ func (app *appEnv) postPageCreate(w http.ResponseWriter, r *http.Request) {
 	if !app.readJSON(w, r, &req) {
 		return
 	}
-	if !slices.Contains([]string{"news", "statecollege", "berks"}, req.PageKind) {
+	if !slices.Contains([]string{"news", "statecollege", "berks", "sponsored"}, req.PageKind) {
 		app.replyErr(w, r, resperr.E{M: "Invalid page_kind"})
 		return
 	}
