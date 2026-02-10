@@ -671,7 +671,7 @@ func (app *appEnv) postPageCreate(w http.ResponseWriter, r *http.Request) {
 
 	sharedArt, err := app.svc.Queries.GetSharedArticleByID(r.Context(), req.SharedArticleID)
 	if err != nil {
-		err = db.NoRowsAs404(err, "missing id=%q", req.SharedArticleID)
+		err = db.NoRowsAs404(err, "missing id=%d", req.SharedArticleID)
 		app.replyErr(w, r, err)
 		return
 	}
