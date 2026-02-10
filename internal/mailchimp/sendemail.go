@@ -87,8 +87,8 @@ type ErrorResponse struct {
 
 type PostCampaignRequest struct {
 	Type            string           `json:"type"`
-	Recipients      Recipients       `json:"recipients,omitempty"`
-	Settings        Settings         `json:"settings,omitempty"`
+	Recipients      Recipients       `json:"recipients"`
+	Settings        Settings         `json:"settings"`
 	VariateSettings *VariateSettings `json:"variate_settings,omitempty"`
 	Tracking        *Tracking        `json:"tracking,omitempty"`
 	RssOpts         *RssOpts         `json:"rss_opts,omitempty"`
@@ -135,7 +135,7 @@ type Recipients struct {
 	ListName       string      `json:"list_name,omitempty"`
 	SegmentText    string      `json:"segment_text,omitempty"`
 	RecipientCount int         `json:"recipient_count,omitempty"`
-	SegmentOpts    SegmentOpts `json:"segment_opts,omitempty"`
+	SegmentOpts    SegmentOpts `json:"segment_opts"`
 }
 
 type Settings struct {
@@ -199,8 +199,8 @@ type Tracking struct {
 	Ecomm360        bool       `json:"ecomm360,omitempty"`
 	GoogleAnalytics string     `json:"google_analytics,omitempty"`
 	Clicktale       string     `json:"clicktale,omitempty"`
-	Salesforce      Salesforce `json:"salesforce,omitempty"`
-	Capsule         Capsule    `json:"capsule,omitempty"`
+	Salesforce      Salesforce `json:"salesforce"`
+	Capsule         Capsule    `json:"capsule"`
 }
 
 type DailySend struct {
@@ -215,7 +215,7 @@ type DailySend struct {
 
 type Schedule struct {
 	Hour            int       `json:"hour,omitempty"`
-	DailySend       DailySend `json:"daily_send,omitempty"`
+	DailySend       DailySend `json:"daily_send"`
 	WeeklySendDay   string    `json:"weekly_send_day,omitempty"`
 	MonthlySendDate int       `json:"monthly_send_date,omitempty"`
 }
@@ -223,8 +223,8 @@ type Schedule struct {
 type RssOpts struct {
 	FeedURL         string    `json:"feed_url,omitempty"`
 	Frequency       string    `json:"frequency,omitempty"`
-	Schedule        Schedule  `json:"schedule,omitempty"`
-	LastSent        time.Time `json:"last_sent,omitempty"`
+	Schedule        Schedule  `json:"schedule"`
+	LastSent        time.Time `json:"last_sent"`
 	ConstrainRssImg bool      `json:"constrain_rss_img,omitempty"`
 }
 
@@ -240,8 +240,8 @@ type AbSplitOpts struct {
 	ReplyEmailB    string    `json:"reply_email_b,omitempty"`
 	SubjectA       string    `json:"subject_a,omitempty"`
 	SubjectB       string    `json:"subject_b,omitempty"`
-	SendTimeA      time.Time `json:"send_time_a,omitempty"`
-	SendTimeB      time.Time `json:"send_time_b,omitempty"`
+	SendTimeA      time.Time `json:"send_time_a"`
+	SendTimeB      time.Time `json:"send_time_b"`
 	SendTimeWinner string    `json:"send_time_winner,omitempty"`
 }
 
@@ -264,7 +264,7 @@ type ReportSummary struct {
 	Clicks           int       `json:"clicks,omitempty"`
 	SubscriberClicks int       `json:"subscriber_clicks,omitempty"`
 	ClickRate        int       `json:"click_rate,omitempty"`
-	Ecommerce        Ecommerce `json:"ecommerce,omitempty"`
+	Ecommerce        Ecommerce `json:"ecommerce"`
 }
 
 type DeliveryStatus struct {
