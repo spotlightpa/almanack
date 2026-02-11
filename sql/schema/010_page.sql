@@ -1,7 +1,7 @@
 CREATE TABLE "page" (
   id bigserial PRIMARY KEY,
   path text NOT NULL UNIQUE,
-  frontmatter jsonb NOT NULL DEFAULT '{}' ::jsonb,
+  frontmatter jsonb NOT NULL DEFAULT '{}'::jsonb,
   body text NOT NULL DEFAULT '',
   schedule_for timestamptz,
   last_published timestamptz,

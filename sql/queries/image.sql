@@ -39,15 +39,18 @@ ON CONFLICT (path)
       excluded.credit
     ELSE
       image.credit
-    END, description = CASE WHEN image.description = '' THEN
+    END,
+    description = CASE WHEN image.description = '' THEN
       excluded.description
     ELSE
       image.description
-    END, keywords = CASE WHEN image.keywords = '' THEN
+    END,
+    keywords = CASE WHEN image.keywords = '' THEN
       excluded.keywords
     ELSE
       image.keywords
-    END, src_url = CASE WHEN image.src_url = '' THEN
+    END,
+    src_url = CASE WHEN image.src_url = '' THEN
       excluded.src_url
     ELSE
       image.src_url
@@ -65,23 +68,28 @@ ON CONFLICT (path)
       excluded.credit
     ELSE
       image.credit
-    END, description = CASE WHEN image.description = '' THEN
+    END,
+    description = CASE WHEN image.description = '' THEN
       excluded.description
     ELSE
       image.description
-    END, keywords = CASE WHEN image.keywords = '' THEN
+    END,
+    keywords = CASE WHEN image.keywords = '' THEN
       excluded.keywords
     ELSE
       image.keywords
-    END, src_url = CASE WHEN image.src_url = '' THEN
+    END,
+    src_url = CASE WHEN image.src_url = '' THEN
       excluded.src_url
     ELSE
       image.src_url
-    END, md5 = CASE WHEN image.md5 = '' THEN
+    END,
+    md5 = CASE WHEN image.md5 = '' THEN
       excluded.md5
     ELSE
       image.md5
-    END, bytes = CASE WHEN image.bytes = 0 THEN
+    END,
+    bytes = CASE WHEN image.bytes = 0 THEN
       excluded.bytes
     ELSE
       image.bytes

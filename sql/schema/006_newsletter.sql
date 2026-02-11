@@ -15,7 +15,7 @@ CREATE TABLE newsletter (
   subject text NOT NULL DEFAULT ''::text,
   archive_url text NOT NULL UNIQUE,
   published_at timestamp with time zone NOT NULL,
-  type text NOT NULL DEFAULT 'investigator' ::text REFERENCES newsletter_type (shortname),
+  type text NOT NULL DEFAULT 'investigator'::text REFERENCES newsletter_type (shortname),
   created_at timestamp with time zone NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updated_at timestamp with time zone NOT NULL DEFAULT CURRENT_TIMESTAMP
 );

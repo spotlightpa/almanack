@@ -1,7 +1,7 @@
 CREATE TABLE site_data (
   id serial PRIMARY KEY,
   key text NOT NULL UNIQUE,
-  data jsonb NOT NULL DEFAULT '{}' ::jsonb,
+  data jsonb NOT NULL DEFAULT '{}'::jsonb,
   created_at timestamp with time zone NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updated_at timestamp with time zone NOT NULL DEFAULT CURRENT_TIMESTAMP
 );

@@ -67,15 +67,15 @@ filtered_data AS (
     structured_data
   WHERE
     arc_id IS NULL)
-  INSERT INTO article (last_published, spotlightpa_path, spotlightpa_data)
-  SELECT
-    last_published,
-    spotlightpa_path,
-    spotlightpa_data
-  FROM
-    filtered_data
-  RETURNING
-    *;
+INSERT INTO article (last_published, spotlightpa_path, spotlightpa_data)
+SELECT
+  last_published,
+  spotlightpa_path,
+  spotlightpa_data
+FROM
+  filtered_data
+RETURNING
+  *;
 UPDATE
   article
 SET
