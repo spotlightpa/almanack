@@ -1,5 +1,5 @@
 ALTER TABLE "newsletter"
-  ADD COLUMN "id" BIGSERIAL PRIMARY KEY,
+  ADD COLUMN "id" bigserial PRIMARY KEY,
   ADD COLUMN "description" text NOT NULL DEFAULT '',
   ADD COLUMN "blurb" text NOT NULL DEFAULT '',
   ADD COLUMN "spotlightpa_path" text UNIQUE;

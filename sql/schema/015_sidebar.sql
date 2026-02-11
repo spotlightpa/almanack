@@ -12,8 +12,8 @@ WITH edpicks AS (
 items AS (
   SELECT
     jsonb_array_elements_text(data -> 'sidebarPicks') AS page
-FROM
-  edpicks
+  FROM
+    edpicks
 ),
 blob AS (
   SELECT
@@ -28,16 +28,16 @@ blob AS (
             }
     '::jsonb)
         FROM "items")) AS data)
-  INSERT INTO site_data (key, data, schedule_for, published_at)
-  SELECT
-    'data/sidebar.json',
-    data,
-    CURRENT_TIMESTAMP,
-    CURRENT_TIMESTAMP
-  FROM
-    blob
-  RETURNING
-    *;
+INSERT INTO site_data (key, data, schedule_for, published_at)
+SELECT
+  'data/sidebar.json',
+  data,
+  CURRENT_TIMESTAMP,
+  CURRENT_TIMESTAMP
+FROM
+  blob
+RETURNING
+  *;
 
 ---- create above / drop below ----
 DELETE FROM site_data

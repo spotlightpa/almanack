@@ -1,9 +1,9 @@
 CREATE TABLE g_docs_doc (
   "id" bigserial PRIMARY KEY,
   "external_id" text NOT NULL,
-  "document" jsonb NOT NULL DEFAULT '{}' ::jsonb,
-  "metadata" jsonb NOT NULL DEFAULT '{}' ::jsonb,
-  "embeds" jsonb NOT NULL DEFAULT '[]' ::jsonb,
+  "document" jsonb NOT NULL DEFAULT '{}'::jsonb,
+  "metadata" jsonb NOT NULL DEFAULT '{}'::jsonb,
+  "embeds" jsonb NOT NULL DEFAULT '[]'::jsonb,
   "rich_text" text NOT NULL DEFAULT '',
   "raw_html" text NOT NULL DEFAULT '',
   "article_markdown" text NOT NULL DEFAULT '',

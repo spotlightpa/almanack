@@ -25,7 +25,7 @@ INSERT INTO image_type (name, mime, extensions)
 CREATE TABLE image (
   id serial PRIMARY KEY,
   path text NOT NULL UNIQUE,
-  type text NOT NULL DEFAULT 'jpeg' ::text REFERENCES image_type (name),
+  type text NOT NULL DEFAULT 'jpeg'::text REFERENCES image_type (name),
   description text NOT NULL DEFAULT '',
   credit text NOT NULL DEFAULT '',
   src_url text NOT NULL DEFAULT '',

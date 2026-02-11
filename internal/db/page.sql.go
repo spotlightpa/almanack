@@ -423,7 +423,7 @@ WITH query AS (
     ts_rank(internal_id_fts, id_tsq) AS rank
   FROM
     page,
-    tsquery (lower($2::text)) id_tsq
+    tsquery(lower($2::text)) id_tsq
   WHERE
     internal_id_fts @@ id_tsq
   ORDER BY

@@ -1,7 +1,7 @@
 CREATE TABLE arc (
   id bigserial PRIMARY KEY,
   arc_id character varying(26) UNIQUE NOT NULL,
-  raw_data jsonb NOT NULL DEFAULT '{}' ::jsonb,
+  raw_data jsonb NOT NULL DEFAULT '{}'::jsonb,
   last_updated timestamptz GENERATED ALWAYS AS (iso_to_timestamptz (raw_data
     ->> 'last_updated_date')) STORED,
   created_at timestamptz NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -25,23 +25,24 @@ CREATE TRIGGER row_updated_at_on_arc_trigger_
   EXECUTE PROCEDURE update_row_updated_at_function_ ();
 
 CREATE TABLE shared_status (
-  id character (1) PRIMARY KEY,
+  id character(1) PRIMARY KEY,
   description text NOT NULL DEFAULT ''
 );
 
 INSERT INTO shared_status ("id", "description")
-  VALUES ('U', 'Unshared'),
+VALUES
+  ('U', 'Unshared'),
   ('P', 'Preview'),
   ('S', 'Shared');
 
 CREATE TABLE shared_article (
   id bigserial PRIMARY KEY,
-  status character (1) NOT NULL DEFAULT 'U' REFERENCES shared_status (id),
+  status character(1) NOT NULL DEFAULT 'U' REFERENCES shared_status (id),
   embargo_until timestamptz,
   note text NOT NULL DEFAULT '',
   "source_type" text NOT NULL DEFAULT '',
   "source_id" text NOT NULL DEFAULT '',
-  "raw_data" jsonb NOT NULL DEFAULT '{}' ::jsonb,
+  "raw_data" jsonb NOT NULL DEFAULT '{}'::jsonb,
   page_id bigint REFERENCES page (id) UNIQUE,
   created_at timestamptz NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updated_at timestamptz NOT NULL DEFAULT CURRENT_TIMESTAMP
