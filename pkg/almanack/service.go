@@ -16,7 +16,6 @@ import (
 )
 
 type Services struct {
-	arcFeedURL           string
 	MailchimpSignupURL   string
 	NetlifyWebhookSecret string
 	Client               *http.Client

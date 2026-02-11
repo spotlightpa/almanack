@@ -20,7 +20,6 @@ import (
 )
 
 func AddFlags(fl *flag.FlagSet) func() (svc Services, err error) {
-	arcFeedURL := fl.String("src-feed", "", "source `URL` for Arc feed")
 	mailchimpSignupURL := fl.String("mc-signup-url", "http://example.com", "`URL` to redirect users to for MailChimp signup")
 	netlifyHookSecret := fl.String("netlify-webhook-secret", "", "`shared secret` to authorize Netlify identity webhook")
 	newsfeed := jsonfeed.AddFlags(fl)
@@ -55,7 +54,6 @@ func AddFlags(fl *flag.FlagSet) func() (svc Services, err error) {
 		anfService.Client = &client
 
 		return Services{
-			arcFeedURL:           *arcFeedURL,
 			MailchimpSignupURL:   *mailchimpSignupURL,
 			NetlifyWebhookSecret: *netlifyHookSecret,
 			Client:               &client,
