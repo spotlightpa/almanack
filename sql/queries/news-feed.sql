@@ -27,10 +27,12 @@ feed_items AS (
     data ->> 'url' AS url
   FROM
     raw_json)
-INSERT INTO news_feed_item ("external_id", "author", "authors", "blurb",
-  "category", "content_html", "external_updated_at", "external_published_at",
-  "image", "image_credit", "image_description", "language", "title", "url")
+INSERT INTO news_feed_item ("source_feed_url", "external_id", "author",
+  "authors", "blurb", "category", "content_html", "external_updated_at",
+  "external_published_at", "image", "image_credit", "image_description",
+  "language", "title", "url")
 SELECT
+  @source_feed_url,
   "external_id",
   COALESCE("author", ''),
   "authors",
@@ -47,7 +49,8 @@ SELECT
   COALESCE("url", '')
 FROM
   feed_items
-ON CONFLICT ("external_id")
+ON CONFLICT ("source_feed_url",
+  "external_id")
   DO UPDATE SET
     "author" = EXCLUDED.author,
     "authors" = EXCLUDED.authors,
@@ -75,7 +78,8 @@ SELECT
 FROM
   news_feed_item
 WHERE
-  "uploaded_at" IS NULL;
+  "source_feed_url" = $1
+  AND "uploaded_at" IS NULL;
 
 -- name: UpdateFeedAppleID :one
 UPDATE
@@ -100,3 +104,11 @@ WHERE
   "id" = $1
 RETURNING
   *;
+
+-- name: ListAppleNewsChannels :many
+SELECT
+  *
+FROM
+  apple_news_channel
+ORDER BY
+  name;

@@ -24,37 +24,39 @@ func TestPublishAppleNews(t *testing.T) {
 		Transport: reqtest.Replay("testdata/anf"),
 	}
 	http.DefaultClient.Transport = requests.ErrorTransport(errors.New("used default client"))
-	res := anf.Response{
-		Data: anf.Data{
-			ID: "abc123",
-		},
-	}
 	svc := almanack.Services{
 		Client:  cl,
 		Queries: q,
-		NewsFeed: &jsonfeed.NewsFeed{
-			URL: "https://www.spotlightpa.org/feeds/full.json",
-		},
-		ANF: &anf.Service{Client: &http.Client{
-			Transport: reqtest.ReplayJSON(200, &res),
-		}},
 	}
+	nf := &jsonfeed.NewsFeed{
+		URL: "https://www.spotlightpa.org/feeds/full.json",
+	}
+	anfsvc := &anf.Service{Client: &http.Client{
+		Transport: reqtest.ReplayJSON(200, &anf.Response{
+			Data: anf.Data{
+				ID: "abc123",
+			}})}}
 
 	// Updating archive should add unuploaded items
-	be.NilErr(t, svc.NewsFeed.UpdateAppleNewsArchive(ctx, svc.Client, svc.Queries))
-	newItems, err := svc.Queries.ListNewsFeedUpdates(ctx)
+	be.NilErr(t, nf.UpdateAppleNewsArchive(ctx, svc.Client, svc.Queries))
+	newItems, err := svc.Queries.ListNewsFeedUpdates(ctx, nf.URL)
 	be.NilErr(t, err)
 	be.EqualLength(t, 15, newItems)
 
+	// It shouldn't confuse the feeds
+	newItems, err = svc.Queries.ListNewsFeedUpdates(ctx, "http://example.com")
+	be.NilErr(t, err)
+	be.Zero(t, newItems)
+
 	// Publishing should mark everything as uploaded
-	be.NilErr(t, svc.PublishAppleNewsFeed(ctx))
-	newItems, err = svc.Queries.ListNewsFeedUpdates(ctx)
+	be.Zero(t, svc.PublishAppleNewsFeed(ctx, nf, anfsvc))
+	newItems, err = svc.Queries.ListNewsFeedUpdates(ctx, nf.URL)
 	be.NilErr(t, err)
 	be.Zero(t, newItems)
 
 	// Updating archive should not mark previously uploaded items as null
-	be.NilErr(t, svc.NewsFeed.UpdateAppleNewsArchive(ctx, svc.Client, svc.Queries))
-	newItems, err = svc.Queries.ListNewsFeedUpdates(ctx)
+	be.NilErr(t, nf.UpdateAppleNewsArchive(ctx, svc.Client, svc.Queries))
+	newItems, err = svc.Queries.ListNewsFeedUpdates(ctx, nf.URL)
 	be.NilErr(t, err)
-	be.EqualLength(t, 0, newItems)
+	be.Zero(t, newItems)
 }

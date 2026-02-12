@@ -7,14 +7,12 @@ import (
 	"github.com/earthboundkid/flagx/v2"
 	"github.com/earthboundkid/slackhook/v2"
 
-	"github.com/spotlightpa/almanack/internal/anf"
 	"github.com/spotlightpa/almanack/internal/aws"
 	"github.com/spotlightpa/almanack/internal/db"
 	"github.com/spotlightpa/almanack/internal/github"
 	"github.com/spotlightpa/almanack/internal/google"
 	"github.com/spotlightpa/almanack/internal/healthchecksio"
 	"github.com/spotlightpa/almanack/internal/index"
-	"github.com/spotlightpa/almanack/internal/jsonfeed"
 	"github.com/spotlightpa/almanack/internal/mailchimp"
 	"github.com/spotlightpa/almanack/pkg/almlog"
 )
@@ -22,8 +20,6 @@ import (
 func AddFlags(fl *flag.FlagSet) func() (svc Services, err error) {
 	mailchimpSignupURL := fl.String("mc-signup-url", "http://example.com", "`URL` to redirect users to for MailChimp signup")
 	netlifyHookSecret := fl.String("netlify-webhook-secret", "", "`shared secret` to authorize Netlify identity webhook")
-	newsfeed := jsonfeed.AddFlags(fl)
-	anfService := anf.AddFlags(fl)
 
 	pg, tx := db.AddFlags(fl, "postgres", "PostgreSQL database `URL`")
 	slackSocial := slackhook.New(slackhook.MockClient)
@@ -51,7 +47,6 @@ func AddFlags(fl *flag.FlagSet) func() (svc Services, err error) {
 
 		is, fs := getS3Store()
 		mc := mailchimp.NewMailService(*mailServiceAPIKey, *mailServiceListID, &client)
-		anfService.Client = &client
 
 		return Services{
 			MailchimpSignupURL:   *mailchimpSignupURL,
@@ -69,8 +64,6 @@ func AddFlags(fl *flag.FlagSet) func() (svc Services, err error) {
 			Gsvc:                 &gsvc,
 			EmailService:         mc,
 			HC:                   healthchecksio.New(*hc, &client),
-			NewsFeed:             newsfeed,
-			ANF:                  anfService,
 		}, nil
 	}
 }

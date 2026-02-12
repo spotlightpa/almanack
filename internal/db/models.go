@@ -20,6 +20,18 @@ type AddressRole struct {
 	UpdatedAt    time.Time `json:"updated_at"`
 }
 
+type AppleNewsChannel struct {
+	ID             int64              `json:"id"`
+	Name           string             `json:"name"`
+	AppleChannelID string             `json:"apple_channel_id"`
+	Key            string             `json:"key"`
+	Secret         string             `json:"secret"`
+	SourceFeedUrl  string             `json:"source_feed_url"`
+	LastSyncedAt   pgtype.Timestamptz `json:"last_synced_at"`
+	CreatedAt      time.Time          `json:"created_at"`
+	UpdatedAt      time.Time          `json:"updated_at"`
+}
+
 type Arc struct {
 	ID          int64              `json:"id"`
 	ArcID       string             `json:"arc_id"`
@@ -118,6 +130,7 @@ type NewsFeedItem struct {
 	AppleShareUrl       string             `json:"apple_share_url"`
 	CreatedAt           time.Time          `json:"created_at"`
 	UpdatedAt           time.Time          `json:"updated_at"`
+	SourceFeedUrl       string             `json:"source_feed_url"`
 }
 
 type Option struct {
