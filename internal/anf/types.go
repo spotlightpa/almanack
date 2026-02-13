@@ -802,3 +802,32 @@ type Throttling struct {
 	EstimatedDelayInSeconds int  `json:"estimatedDelayInSeconds"`
 	QuotaAvailable          int  `json:"quotaAvailable"`
 }
+
+type ListSectionResponse struct {
+	Data []SectionData `json:"data"`
+}
+
+type SectionData struct {
+	ID         string    `json:"id"`
+	Name       string    `json:"name"`
+	Type       string    `json:"type"`
+	Links      Links     `json:"links"`
+	IsDefault  bool      `json:"isDefault"`
+	ShareURL   string    `json:"shareUrl"`
+	CreatedAt  time.Time `json:"createdAt"`
+	ModifiedAt time.Time `json:"modifiedAt"`
+}
+
+// ToMap returns a map from section name to URL with the default as "".
+func (res ListSectionResponse) ToMap() map[string]string {
+	m := make(map[string]string)
+	for _, obj := range res.Data {
+		if obj.Type == "section" {
+			m[obj.Name] = obj.Links.Self
+			if obj.IsDefault {
+				m[""] = obj.Links.Self
+			}
+		}
+	}
+	return m
+}

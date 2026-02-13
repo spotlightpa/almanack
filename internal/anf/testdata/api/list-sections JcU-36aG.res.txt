@@ -1,0 +1,22 @@
+HTTP/2.0 200 OK
+Connection: close
+Cache-Control: no-cache, no-store, max-age=0, must-revalidate
+Content-Type: application/json
+Date: Fri, 13 Feb 2026 19:21:49 GMT
+Expires: 0
+Pragma: no-cache
+Request-Id: 3ebcf160-0911-11f1-b640-cfaec1e1ffcb
+Server: AppleHttpServer/2caa77a6bc2e755fca0e0f63e4d67e53390f9184
+Strict-Transport-Security: max-age=31536000 ; includeSubDomains
+Strict-Transport-Security: max-age=31536000
+Vary: Origin
+Vary: Access-Control-Request-Method
+Vary: Access-Control-Request-Headers
+X-B3-Traceid: 57e506692cf11717
+X-Content-Type-Options: nosniff
+X-Frame-Options: DENY
+X-Request-Id: 3ebcf160-0911-11f1-b640-cfaec1e1ffcb
+X-Test-Source-Environment: prod
+X-Xss-Protection: 0
+
+{"data":[{"createdAt":"2019-12-12T20:40:36Z","modifiedAt":"2026-02-02T16:05:01Z","id":"00000000-0000-0000-0000-00000001","type":"section","shareUrl":"https://apple.news/abc123","links":{"channel":"https://news-api.apple.com/channels/00000000-0000-0000-0000-00000002","self":"https://news-api.apple.com/sections/00000000-0000-0000-0000-00000003"},"name":"News","isDefault":true}]}

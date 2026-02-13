@@ -166,6 +166,22 @@ func (svc *Service) List(ctx context.Context) (any, error) {
 	return data, nil
 }
 
+func (svc *Service) ListSections(ctx context.Context) (*ListSectionResponse, error) {
+	var data ListSectionResponse
+	var errDetails ServiceErrorResponse
+	err := requests.
+		URL("https://news-api.apple.com").
+		Pathf("/channels/%s/sections", svc.ChannelID).
+		Client(svc.client()).
+		ErrorJSON(&errDetails).
+		ToJSON(&data).
+		Fetch(ctx)
+	if err != nil {
+		return nil, fmt.Errorf("service Apple News error: %v; %w", errDetails, err)
+	}
+	return &data, nil
+}
+
 func (svc *Service) ReadArticle(ctx context.Context, articleID string) (*Response, error) {
 	var res Response
 	var errDetails ServiceErrorResponse

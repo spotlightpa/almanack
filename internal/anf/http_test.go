@@ -33,7 +33,7 @@ func TestHMACSignRequest(t *testing.T) {
 	})
 }
 
-func TestRead(t *testing.T) {
+func TestService(t *testing.T) {
 	almlog.UseTestLogger(t)
 	svc := anf.Service{
 		ChannelID: "abc",
@@ -47,5 +47,10 @@ func TestRead(t *testing.T) {
 		data, err := svc.ReadChannel(t.Context())
 		be.NilErr(t, err)
 		be.Nonzero(t, data)
+		sections, err := svc.ListSections(t.Context())
+		be.NilErr(t, err)
+		be.Nonzero(t, sections)
+		// Should have at least default channel
+		be.Nonzero(t, sections.ToMap()[""])
 	})
 }
