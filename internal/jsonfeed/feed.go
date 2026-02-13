@@ -24,4 +24,5 @@ type Item struct {
 	Language         string   `json:"language"`
 	Title            string   `json:"title"`
 	URL              string   `json:"url"`
+	Topics           []string `json:"topics"`
 }
