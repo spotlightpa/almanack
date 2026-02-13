@@ -24,15 +24,23 @@ func (svc Services) PublishAppleNewsFeed(ctx context.Context) (err error) {
 		return err
 	}
 	l.InfoContext(ctx, "PublishAppleNewsFeed: need uploading", "n", len(newItems))
+	if len(newItems) == 0 {
+		return nil
+	}
+	sectionsList, err := svc.ANF.ListSections(ctx)
+	if err != nil {
+		return err
+	}
+	sectionToURL := sectionsList.ToMap()
 	var errs []error
 	for i := range newItems {
-		err := svc.UploadToAppleNews(ctx, &newItems[i])
+		err := svc.UploadToAppleNews(ctx, &newItems[i], sectionToURL)
 		errs = append(errs, err)
 	}
 	return errors.Join(errs...)
 }
 
-func (svc Services) UploadToAppleNews(ctx context.Context, newItem *db.NewsFeedItem) (err error) {
+func (svc Services) UploadToAppleNews(ctx context.Context, newItem *db.NewsFeedItem, sectionToURL map[string]string) (err error) {
 	defer errorx.Trace(&err)
 
 	l := almlog.FromContext(ctx)
@@ -41,10 +49,11 @@ func (svc Services) UploadToAppleNews(ctx context.Context, newItem *db.NewsFeedI
 	if err != nil {
 		return err
 	}
+	sections := anf.BuildSections(newItem, sectionToURL)
 	// Upload to Apple
 	if newItem.AppleID == "" {
 		l.InfoContext(ctx, "UploadToAppleNews: Create", "url", art.Metadata.CanonicalURL)
-		res, err := svc.ANF.Create(ctx, art)
+		res, err := svc.ANF.Create(ctx, art, sections)
 		if err != nil {
 			err = fmt.Errorf("publishing %q to Apple: %w", art.Metadata.CanonicalURL, err)
 			l.ErrorContext(ctx, "error", "error", err)
@@ -69,7 +78,7 @@ func (svc Services) UploadToAppleNews(ctx context.Context, newItem *db.NewsFeedI
 		}
 		// Do the update
 		l.InfoContext(ctx, "UploadToAppleNews: Update", "url", art.Metadata.CanonicalURL)
-		_, err = svc.ANF.Update(ctx, art, newItem.AppleID, res.Data.Revision)
+		_, err = svc.ANF.Update(ctx, art, newItem.AppleID, res.Data.Revision, sections)
 		if err != nil {
 			err = fmt.Errorf("updating %q to Apple: %w", art.Metadata.CanonicalURL, err)
 			l.ErrorContext(ctx, "error", "error", err)

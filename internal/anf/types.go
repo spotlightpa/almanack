@@ -760,11 +760,11 @@ type PhotoComponent struct {
 func (PhotoComponent) componentRole() string { return "photo" }
 
 type Response struct {
-	Data Data `json:"data"`
-	Meta Meta `json:"meta"`
+	Data ResponseData `json:"data"`
+	Meta Meta         `json:"meta"`
 }
 
-type Data struct {
+type ResponseData struct {
 	CreatedAt                   time.Time `json:"createdAt"`
 	ModifiedAt                  time.Time `json:"modifiedAt"`
 	ID                          string    `json:"id"`

@@ -66,3 +66,15 @@ func FromDB(item *db.NewsFeedItem) (*Article, error) {
 	a.Components = append(a.Components, comps...)
 	return a, nil
 }
+
+func BuildSections(item *db.NewsFeedItem, sectionToURL map[string]string) []string {
+	var sections []string
+	// Add default section
+	sections = append(sections, sectionToURL[""])
+	for _, topic := range item.Topics {
+		if u, ok := sectionToURL[topic]; ok {
+			sections = append(sections, u)
+		}
+	}
+	return sections
+}
