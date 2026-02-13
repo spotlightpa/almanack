@@ -214,6 +214,10 @@ func (svc Services) CreatePageFromGDocsDoc(ctx context.Context, shared *db.Share
 		"layout":        dbDoc.Metadata.Layout,
 	}
 
+	if stringx.SlugifyURL(dbDoc.Metadata.Eyebrow) == "espanol" {
+		fm["language-code"] = "es"
+	}
+
 	filepath := buildFilePath(fm, kind)
 
 	return svc.createPageForSharedArticle(ctx, shared, body, fm, filepath)
