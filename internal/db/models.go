@@ -118,6 +118,7 @@ type NewsFeedItem struct {
 	AppleShareUrl       string             `json:"apple_share_url"`
 	CreatedAt           time.Time          `json:"created_at"`
 	UpdatedAt           time.Time          `json:"updated_at"`
+	Topics              []string           `json:"topics"`
 }
 
 type Option struct {
