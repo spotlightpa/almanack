@@ -24,12 +24,20 @@ feed_items AS (
     data ->> 'image_description' AS image_description,
     data ->> 'language' AS "language",
     data ->> 'title' AS title,
-    data ->> 'url' AS url
+    data ->> 'url' AS url,
+    CASE WHEN jsonb_typeof(data -> 'topics') = 'array' THEN
+      ARRAY (
+        SELECT
+          jsonb_array_elements_text(data -> 'topics'))
+    ELSE
+      ARRAY[]::text[]
+    END AS topics
   FROM
     raw_json)
 INSERT INTO news_feed_item ("external_id", "author", "authors", "blurb",
   "category", "content_html", "external_updated_at", "external_published_at",
-  "image", "image_credit", "image_description", "language", "title", "url")
+  "image", "image_credit", "image_description", "language", "title", "url",
+  "topics")
 SELECT
   "external_id",
   COALESCE("author", ''),
@@ -44,7 +52,8 @@ SELECT
   COALESCE("image_description", ''),
   COALESCE("language", ''),
   COALESCE("title", ''),
-  COALESCE("url", '')
+  COALESCE("url", ''),
+  "topics"
 FROM
   feed_items
 ON CONFLICT ("external_id")
@@ -61,6 +70,7 @@ ON CONFLICT ("external_id")
     "language" = EXCLUDED.language,
     "title" = EXCLUDED.title,
     "url" = EXCLUDED.url,
+    "topics" = EXCLUDED.topics,
     "uploaded_at" = CASE WHEN news_feed_item.external_updated_at <>
       EXCLUDED.external_updated_at THEN
       NULL
