@@ -42,28 +42,63 @@ func (svc *Service) client() *http.Client {
 	return &cl2
 }
 
-func (svc *Service) Create(ctx context.Context, a *Article) (*Response, error) {
+func (svc *Service) Create(ctx context.Context, a *Article, sections []string) (*Response, error) {
+	type ArticleLinksRequest struct {
+		Sections []string `json:"sections"`
+	}
+	type Data struct {
+		Links ArticleLinksRequest `json:"links"`
+	}
+	metadata := struct {
+		Data Data `json:"data"`
+	}{Data{
+		Links: ArticleLinksRequest{Sections: sections},
+	}}
+	metadataB, err := json.Marshal(metadata)
+	if err != nil {
+		return nil, err
+	}
+	data, err := json.Marshal(a)
+	if err != nil {
+		return nil, err
+	}
+
 	var res Response
 	var errDetails ServiceErrorResponse
-	err := requests.
+	err = requests.
 		URL("https://news-api.apple.com").
 		Pathf("/channels/%s/articles", svc.ChannelID).
 		Client(svc.client()).
 		Config(requests.BodyMultipart("", func(multi *multipart.Writer) error {
-			data, err := json.Marshal(a)
-			if err != nil {
-				return err
+			{
+				h := make(textproto.MIMEHeader)
+				disposition := fmt.Sprintf(`form-data; filename=metadata.json; size=%d`, len(metadataB))
+				h.Set("Content-Disposition", disposition)
+				h.Set("Content-Type", "application/json")
+				w, err := multi.CreatePart(h)
+				if err != nil {
+					return err
+				}
+				_, err = w.Write(metadataB)
+				if err != nil {
+					return err
+				}
 			}
-			h := make(textproto.MIMEHeader)
-			disposition := fmt.Sprintf(`form-data; filename=article.json; size=%d`, len(data))
-			h.Set("Content-Disposition", disposition)
-			h.Set("Content-Type", "application/json")
-			w, err := multi.CreatePart(h)
-			if err != nil {
-				return err
+			{
+				h := make(textproto.MIMEHeader)
+				disposition := fmt.Sprintf(`form-data; filename=article.json; size=%d`, len(data))
+				h.Set("Content-Disposition", disposition)
+				h.Set("Content-Type", "application/json")
+				w, err := multi.CreatePart(h)
+				if err != nil {
+					return err
+				}
+				_, err = w.Write(data)
+				if err != nil {
+					return err
+				}
 			}
-			_, err = w.Write(data)
-			return err
+			return nil
 		})).
 		ErrorJSON(&errDetails).
 		ToJSON(&res).
@@ -74,13 +109,20 @@ func (svc *Service) Create(ctx context.Context, a *Article) (*Response, error) {
 	return &res, nil
 }
 
-func (svc *Service) Update(ctx context.Context, a *Article, appleID, revision string) (*Response, error) {
+func (svc *Service) Update(ctx context.Context, a *Article, appleID, revision string, sections []string) (*Response, error) {
+	type ArticleLinksRequest struct {
+		Sections []string `json:"sections"`
+	}
 	type Data struct {
-		Revision string `json:"revision"`
+		Revision string              `json:"revision"`
+		Links    ArticleLinksRequest `json:"links"`
 	}
 	metadata := struct {
 		Data Data `json:"data"`
-	}{Data{Revision: revision}}
+	}{Data{
+		Revision: revision,
+		Links:    ArticleLinksRequest{Sections: sections},
+	}}
 	metadataB, err := json.Marshal(metadata)
 	if err != nil {
 		return nil, err

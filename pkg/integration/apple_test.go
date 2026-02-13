@@ -3,6 +3,7 @@ package integration_test
 import (
 	"errors"
 	"net/http"
+	"strings"
 	"testing"
 
 	"github.com/carlmjohnson/be"
@@ -24,10 +25,17 @@ func TestPublishAppleNews(t *testing.T) {
 		Transport: reqtest.Replay("testdata/anf"),
 	}
 	http.DefaultClient.Transport = requests.ErrorTransport(errors.New("used default client"))
-	res := anf.Response{
-		Data: anf.Data{
-			ID: "abc123",
-		},
+	// Return an anf.Response unless it's the section lookup
+	var anfRT requests.RoundTripFunc = func(req *http.Request) (*http.Response, error) {
+		var res any = anf.Response{
+			Data: anf.ResponseData{
+				ID: "abc123",
+			},
+		}
+		if strings.Contains(req.URL.Path, "/sections") {
+			res = anf.ListSectionResponse{}
+		}
+		return reqtest.ReplayJSON(200, &res).RoundTrip(req)
 	}
 	svc := almanack.Services{
 		Client:  cl,
@@ -36,7 +44,7 @@ func TestPublishAppleNews(t *testing.T) {
 			URL: "https://www.spotlightpa.org/feeds/full.json",
 		},
 		ANF: &anf.Service{Client: &http.Client{
-			Transport: reqtest.ReplayJSON(200, &res),
+			Transport: anfRT,
 		}},
 	}
 
