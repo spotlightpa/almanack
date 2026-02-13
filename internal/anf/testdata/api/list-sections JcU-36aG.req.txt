@@ -1,0 +1,4 @@
+GET /channels/abc/sections HTTP/1.1
+Host: news-api.apple.com
+Authorization: HHMAC; key="123"; signature="z8BELAmucEnq5YbXqAQCGsPxSWDCxXS2sCV5dqbv/L8="; date="2000-01-01T00:00:00Z"
+
