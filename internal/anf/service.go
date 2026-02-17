@@ -70,33 +70,11 @@ func (svc *Service) Create(ctx context.Context, a *Article, sections []string) (
 		Pathf("/channels/%s/articles", svc.ChannelID).
 		Client(svc.client()).
 		Config(requests.BodyMultipart("", func(multi *multipart.Writer) error {
-			{
-				h := make(textproto.MIMEHeader)
-				disposition := fmt.Sprintf(`form-data; filename=metadata.json; size=%d`, len(metadataB))
-				h.Set("Content-Disposition", disposition)
-				h.Set("Content-Type", "application/json")
-				w, err := multi.CreatePart(h)
-				if err != nil {
-					return err
-				}
-				_, err = w.Write(metadataB)
-				if err != nil {
-					return err
-				}
+			if err := writeFile(multi, "metadata.json", "application/json", metadataB); err != nil {
+				return err
 			}
-			{
-				h := make(textproto.MIMEHeader)
-				disposition := fmt.Sprintf(`form-data; filename=article.json; size=%d`, len(data))
-				h.Set("Content-Disposition", disposition)
-				h.Set("Content-Type", "application/json")
-				w, err := multi.CreatePart(h)
-				if err != nil {
-					return err
-				}
-				_, err = w.Write(data)
-				if err != nil {
-					return err
-				}
+			if err := writeFile(multi, "article.json", "application/json", data); err != nil {
+				return err
 			}
 			return nil
 		})).
@@ -138,33 +116,12 @@ func (svc *Service) Update(ctx context.Context, a *Article, appleID, revision st
 		Pathf("/articles/%s", appleID).
 		Client(svc.client()).
 		Config(requests.BodyMultipart("", func(multi *multipart.Writer) error {
-			{
-				h := make(textproto.MIMEHeader)
-				disposition := fmt.Sprintf(`form-data; name=metadata; size=%d`, len(metadataB))
-				h.Set("Content-Disposition", disposition)
-				h.Set("Content-Type", "application/json")
-				w, err := multi.CreatePart(h)
-				if err != nil {
-					return err
-				}
-				if _, err = w.Write(metadataB); err != nil {
-					return err
-				}
+			if err := writeFile(multi, "metadata", "application/json", metadataB); err != nil {
+				return err
 			}
-			{
-				h := make(textproto.MIMEHeader)
-				disposition := fmt.Sprintf(`form-data; filename=article.json; size=%d`, len(data))
-				h.Set("Content-Disposition", disposition)
-				h.Set("Content-Type", "application/json")
-				w, err := multi.CreatePart(h)
-				if err != nil {
-					return err
-				}
-				if _, err = w.Write(data); err != nil {
-					return err
-				}
+			if err := writeFile(multi, "article.json", "application/json", data); err != nil {
+				return err
 			}
-
 			return nil
 		})).
 		ErrorJSON(&errDetails).
@@ -238,4 +195,20 @@ func (svc *Service) ReadArticle(ctx context.Context, articleID string) (*Respons
 		return nil, fmt.Errorf("service Apple News error: %v; %w", errDetails, err)
 	}
 	return &res, nil
+}
+
+func writeFile(multi *multipart.Writer, name, contentType string, content []byte) error {
+	h := make(textproto.MIMEHeader)
+	disposition := fmt.Sprintf(`form-data; filename=%s; size=%d`, name, len(content))
+	h.Set("Content-Disposition", disposition)
+	h.Set("Content-Type", contentType)
+	w, err := multi.CreatePart(h)
+	if err != nil {
+		return err
+	}
+	_, err = w.Write(content)
+	if err != nil {
+		return err
+	}
+	return nil
 }
