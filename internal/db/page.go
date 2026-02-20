@@ -196,7 +196,7 @@ func (page *Page) ToIndex() any {
 	kicker, _ := page.Frontmatter["kicker"].(string)
 	topics, _ := page.Frontmatter["topics"].([]string)
 	series, _ := page.Frontmatter["series"].([]string)
-	linkTitle, _ := page.Frontmatter["linkTitle"].(string)
+	linkTitle, _ := page.Frontmatter["linktitle"].(string)
 	aliases, _ := page.Frontmatter["aliases"].([]string)
 	rawContent, _ := page.Frontmatter["raw-content"].(string)
 
