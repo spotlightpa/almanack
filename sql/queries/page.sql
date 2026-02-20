@@ -190,7 +190,7 @@ SELECT
   "file_path"::text,
   coalesce(frontmatter ->> 'internal-id', '')::text AS "internal_id",
   coalesce(frontmatter ->> 'title', '')::text AS "title",
-  coalesce(frontmatter ->> 'link-title', '')::text AS "link_title",
+  coalesce(frontmatter ->> 'linktitle', '')::text AS "link_title",
   coalesce(frontmatter ->> 'description', '')::text AS "description",
   coalesce(frontmatter ->> 'blurb', '')::text AS "blurb",
   coalesce(frontmatter ->> 'image', '')::text AS "image",
