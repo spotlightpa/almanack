@@ -58,6 +58,11 @@ function sql:sqlc() {
 	}
 }
 
+function db:new() {
+	cd sql/schema
+	tern new "$@"
+}
+
 function db:migrate() {
 	cd sql/schema
 	tern migrate "$@"
