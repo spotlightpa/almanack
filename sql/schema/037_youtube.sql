@@ -6,6 +6,7 @@ CREATE TABLE youtube (
   "thumbnail_url" text NOT NULL DEFAULT '',
   "external_published_at" timestamp with time zone NOT NULL,
   "external_updated_at" timestamp with time zone NOT NULL,
+  "uploaded_at" timestamp with time zone,
   "created_at" timestamp with time zone NOT NULL DEFAULT CURRENT_TIMESTAMP,
   "updated_at" timestamp with time zone NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
