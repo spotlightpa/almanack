@@ -12,7 +12,7 @@ import (
 
 func TestService(t *testing.T) {
 	almlog.UseTestLogger(t)
-	svc := youtube.Service{
+	svc := youtube.Feed{
 		ChannelID: "abc123",
 	}
 	cl := &http.Client{

@@ -3,6 +3,7 @@ package youtube
 import (
 	"context"
 	"encoding/xml"
+	"flag"
 	"net/http"
 	"time"
 
@@ -11,14 +12,20 @@ import (
 	"github.com/earthboundkid/errorx/v2"
 )
 
-type Service struct {
+type Feed struct {
 	ChannelID string
 }
 
-func (svc *Service) FetchFeed(ctx context.Context, cl *http.Client) (entries []Entry, err error) {
+func AddFlags(fl *flag.FlagSet) (feed *Feed) {
+	feed = new(Feed)
+	fl.StringVar(&feed.ChannelID, "youtube-channel-id", "", "`URL` for YouTube feed")
+	return feed
+}
+
+func (svc *Feed) FetchFeed(ctx context.Context, cl *http.Client) (entries []Entry, err error) {
 	defer errorx.Trace(&err)
 
-	var feed Feed
+	var feed XML
 	if err = requests.
 		URL("https://www.youtube.com/feeds/videos.xml").
 		Client(cl).
@@ -30,7 +37,7 @@ func (svc *Service) FetchFeed(ctx context.Context, cl *http.Client) (entries []E
 	return feed.Entries, nil
 }
 
-type Feed struct {
+type XML struct {
 	XMLName xml.Name `xml:"feed"`
 	Title   string   `xml:"title"`
 	Author  Author   `xml:"author"`
