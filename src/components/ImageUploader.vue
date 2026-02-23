@@ -16,7 +16,6 @@ let acceptedTypes = [
 export default {
   name: "ImageUploader",
   setup(props, { emit }) {
-
     let state = reactive({
       isUploading: false,
       filename: "",
