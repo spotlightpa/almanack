@@ -175,38 +175,50 @@ let router = createRouter({
         requiresAuth: isSpotlightPAUser,
       },
     },
-    ...[
-      {
-        section: "news",
-        path: "content/news/",
-        title: "Spotlight PA News Pages",
-      },
-      {
-        section: "statecollege",
-        path: "content/statecollege/",
-        title: "State College Articles",
-      },
-      {
-        section: "berks",
-        path: "content/berks/",
-        title: "Berks County Articles",
-      },
-      {
-        section: "sponsored",
-        path: "content/sponsored/",
-        title: "Sponsored Content",
-      },
-    ].map(({ section, path, title }) => ({
-      path: `/admin/${section}`,
-      name: `${section}-pages`,
+    {
+      path: "/admin/news",
+      name: "news-pages",
       component: load(() => import("@/components/ViewPagesList.vue")),
       props: (route) => ({ page: route.query.page }),
       meta: {
         requiresAuth: isSpotlightPAUser,
-        contentPath: path,
-        title,
+        contentPath: "content/news/",
+        title: "Spotlight PA News Pages",
       },
-    })),
+    },
+    {
+      path: "/admin/statecollege",
+      name: "statecollege-pages",
+      component: load(() => import("@/components/ViewPagesList.vue")),
+      props: (route) => ({ page: route.query.page }),
+      meta: {
+        requiresAuth: isSpotlightPAUser,
+        contentPath: "content/statecollege/",
+        title: "State College Articles",
+      },
+    },
+    {
+      path: "/admin/berks",
+      name: "berks-pages",
+      component: load(() => import("@/components/ViewPagesList.vue")),
+      props: (route) => ({ page: route.query.page }),
+      meta: {
+        requiresAuth: isSpotlightPAUser,
+        contentPath: "content/berks/",
+        title: "Berks County Articles",
+      },
+    },
+    {
+      path: "/admin/sponsored",
+      name: "sponsored-pages",
+      component: load(() => import("@/components/ViewPagesList.vue")),
+      props: (route) => ({ page: route.query.page }),
+      meta: {
+        requiresAuth: isSpotlightPAUser,
+        contentPath: "content/sponsored/",
+        title: "Sponsored Content",
+      },
+    },
     {
       path: "/admin/shared-articles/:id",
       name: "shared-article-admin",
