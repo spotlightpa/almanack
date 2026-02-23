@@ -1,5 +1,5 @@
 <script setup>
-import { computed, ref, nextTick } from "vue";
+import { computed, ref } from "vue";
 import { useRouter } from "vue-router";
 
 import { intcomma } from "journalize";
@@ -28,7 +28,9 @@ const { apiState, fetch, computedObj } = watchAPI(
 );
 
 const showComposer = ref(false);
-const composer = ref(null);
+const composerSubject = ref("");
+const composerBodyText = ref("");
+const initialComposerSubject = ref("");
 const isDirty = ref(false);
 const status = ref(null);
 const note = ref("");
@@ -190,8 +192,16 @@ async function toggleComposer() {
   if (!showComposer.value) {
     return;
   }
-  await nextTick();
-  composer.value.$el.scrollIntoView({ behavior: "smooth", block: "center" });
+  initialComposerSubject.value = `New Spotlight PA story ${article.value.internalID}`;
+  composerSubject.value = initialComposerSubject.value;
+  composerBodyText.value = emailBody.value;
+}
+
+function resetComposer() {
+  if (window.confirm("Are you sure you want to discard your changes?")) {
+    composerSubject.value = initialComposerSubject.value;
+    composerBodyText.value = emailBody.value;
+  }
 }
 
 const { computedList: imageList } = watchAPI(
@@ -602,11 +612,12 @@ function setImageProps(image) {
 
           <EmailComposer
             v-if="showComposer"
-            ref="composer"
+            v-model:subject="composerSubject"
+            v-model:body="composerBodyText"
             class="mt-5"
-            :initial-subject="`New Spotlight PA story ${article.internalID}`"
-            :initial-body="emailBody"
+            :can-discard="composerSubject !== initialComposerSubject || composerBodyText !== emailBody"
             @hide="showComposer = false"
+            @discard="resetComposer"
           ></EmailComposer>
 
           <div

@@ -1,69 +1,52 @@
-<script>
-import { computed, reactive, toRefs } from "vue";
+<script setup>
+import { computed, ref } from "vue";
 import { post, sendMessage } from "@/api/client-v2.js";
 
-export default {
-  name: "EmailComposer",
+const props = defineProps({
+  subject: { type: String, required: true },
+  body: { type: String, required: true },
+  canDiscard: { type: Boolean, default: false },
+});
 
-  props: {
-    initialSubject: String,
-    initialBody: String,
-  },
-  setup(props) {
-    // TODO: Fixme
-    let rows = props.initialBody.split("\n").length;
-    if (rows < 4) {
-      rows = 4;
-    }
+const emit = defineEmits(["update:subject", "update:body", "hide", "discard"]);
 
-    let emailStatus = reactive({
-      subject: props.initialSubject,
-      body: props.initialBody,
-      error: null,
-      isSending: false,
-      hasSent: false,
+const rows = computed(() => Math.max(4, props.body.split("\n").length));
+
+const error = ref(null);
+const isSending = ref(false);
+const hasSent = ref(false);
+
+async function send() {
+  if (window.confirm("Are you sure you want to send this message?")) {
+    isSending.value = true;
+    [, error.value] = await post(sendMessage, {
+      subject: props.subject,
+      body: props.body,
     });
-
-    return {
-      ...toRefs(emailStatus),
-
-      rows,
-
-      hasChanged: computed(
-        () =>
-          props.initialSubject !== emailStatus.subject ||
-          props.initialBody !== emailStatus.body
-      ),
-      async send() {
-        if (window.confirm("Are you sure you want to send this message?")) {
-          emailStatus.isSending = true;
-          [, emailStatus.error] = await post(sendMessage, {
-            subject: emailStatus.subject,
-            body: emailStatus.body,
-          });
-          emailStatus.isSending = false;
-          if (emailStatus.error) return;
-          emailStatus.hasSent = true;
-          window.setTimeout(() => {
-            emailStatus.hasSent = false;
-          }, 5000);
-        }
-      },
-      discard() {
-        if (window.confirm("Are you sure you want to discard your changes?")) {
-          emailStatus.subject = props.initialSubject;
-          emailStatus.body = props.initialBody;
-        }
-      },
-    };
-  },
-};
+    isSending.value = false;
+    if (error.value) return;
+    hasSent.value = true;
+    window.setTimeout(() => {
+      hasSent.value = false;
+    }, 5000);
+  }
+}
 </script>
+
 <template>
   <div class="box">
     <div class="field">
-      <BulmaFieldInput v-model="subject" label="Subject"></BulmaFieldInput>
-      <BulmaTextarea v-model="body" label="Body" :rows="rows"></BulmaTextarea>
+      <BulmaFieldInput
+        :model-value="subject"
+        label="Subject"
+        @update:model-value="emit('update:subject', $event)"
+      ></BulmaFieldInput>
+      <BulmaTextarea
+        :model-value="body"
+        label="Body"
+        :rows="rows"
+        @update:model-value="emit('update:body', $event)"
+      ></BulmaTextarea>
     </div>
     <ErrorSimple :error="error"></ErrorSimple>
     <div class="buttons">
@@ -78,9 +61,10 @@ export default {
         <span> Send Message </span>
       </button>
       <button
+        v-if="canDiscard"
         class="button has-text-weight-semibold is-danger"
-        :disabled="isSending || !hasChanged || null"
-        @click="discard"
+        :disabled="isSending || null"
+        @click="emit('discard')"
       >
         <span class="icon">
           <font-awesome-icon :icon="['fas', 'trash-alt']"></font-awesome-icon>
@@ -89,7 +73,7 @@ export default {
       </button>
       <button
         class="button has-text-weight-semibold is-light"
-        @click="$emit('hide')"
+        @click="emit('hide')"
       >
         Close Composer
       </button>

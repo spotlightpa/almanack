@@ -50,6 +50,8 @@ async function importGDocsURL(id) {
 
 const showBookmarklet = ref(false);
 const showComposer = ref(false);
+const composerSubject = ref("Subject");
+const composerBody = ref("Email body");
 
 const articles = computedList("stories", (a) => new SharedArticle(a));
 const nextPage = computedProp("next_page", (page) => ({
@@ -217,9 +219,9 @@ const nextPage = computedProp("next_page", (page) => ({
     <keep-alive>
       <EmailComposer
         v-if="showComposer"
+        v-model:subject="composerSubject"
+        v-model:body="composerBody"
         class="mt-5"
-        initial-subject="Subject"
-        initial-body="Email body"
         @hide="showComposer = false"
       ></EmailComposer>
     </keep-alive>
