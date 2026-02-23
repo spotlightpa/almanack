@@ -1,21 +1,29 @@
 <script>
 import { get, post, getSiteData, postSiteData } from "@/api/client-v2.js";
 import usePicks from "@/api/editors-picks.js";
+import { useRoute } from "vue-router";
 
 import { formatDateTime, today, tomorrow } from "@/utils/time-format.js";
 import useScrollTo from "@/utils/use-scroll-to.js";
 
 export default {
   setup() {
+    const route = useRoute();
+    const { dataFile, title, showCallout, showInvestigation, showImpact } =
+      route.meta;
+
     const [container, scrollTo] = useScrollTo();
     const picks = usePicks({
-      fetchData: () => get(getSiteData + "?location=data/stateCollege.json"),
-      saveData: (data) =>
-        post(postSiteData + "?location=data/stateCollege.json", data),
+      fetchData: () => get(getSiteData + "?location=" + dataFile),
+      saveData: (data) => post(postSiteData + "?location=" + dataFile, data),
     });
 
     return {
       container,
+      title,
+      showCallout,
+      showInvestigation,
+      showImpact,
       ...picks,
       formatDateTime,
       async addScheduledPicks() {
@@ -37,20 +45,17 @@ export default {
 
 <template>
   <MetaHead>
-    <title>State College Frontpage Editor • Spotlight PA Almanack</title>
+    <title>{{ title }} • Spotlight PA Almanack</title>
   </MetaHead>
   <div>
     <BulmaBreadcrumbs
       :links="[
         { name: 'Admin', to: { name: 'admin' } },
-        {
-          name: 'State College Frontpage Editor',
-          to: { name: 'state-college-editor' },
-        },
+        { name: title, to: { name: $route.name } },
       ]"
     ></BulmaBreadcrumbs>
 
-    <h1 class="title">State College Frontpage Editor</h1>
+    <h1 class="title">{{ title }}</h1>
 
     <div v-if="allEdPicks.length" ref="container">
       <div v-for="(edpick, i) of allEdPicks" :key="i" class="p-4 zebra-row">
@@ -61,7 +66,12 @@ export default {
               : `Scheduled for ${formatDateTime(edpick.scheduleFor)}`
           }}
         </h2>
-        <HomepageEditor :editors-picks="edpick"></HomepageEditor>
+        <HomepageEditor
+          :editors-picks="edpick"
+          :show-callout="showCallout"
+          :show-investigation="showInvestigation"
+          :show-impact="showImpact"
+        ></HomepageEditor>
         <button
           v-if="!edpick.isCurrent"
           type="button"
