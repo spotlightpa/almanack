@@ -1,16 +1,19 @@
 <script setup>
 import { ref } from "vue";
-import { useRouter } from "vue-router";
+import { useRouter, useRoute } from "vue-router";
 
 import { get, getSharedArticle } from "@/api/client-v2.js";
 
 const router = useRouter();
+const route = useRoute();
 const props = defineProps({
   id: String,
   sourceType: {
     default: "arc",
   },
 });
+
+const redirectTo = route.meta.redirectTo || "shared-article";
 
 const isLoading = ref(false);
 const isLoadingDebounced = ref(false);
@@ -31,7 +34,7 @@ async function load() {
     return;
   }
   router.replace({
-    name: "shared-article",
+    name: redirectTo,
     params: {
       id: "" + article.id,
     },
