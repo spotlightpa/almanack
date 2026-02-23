@@ -62,7 +62,7 @@ export default {
         <h2 data-scroll-to class="title">
           {{
             edpick.isCurrent
-              ? "Current Frontpage"
+              ? "Current layout"
               : `Scheduled for ${formatDateTime(edpick.scheduleFor)}`
           }}
         </h2>
