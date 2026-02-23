@@ -175,42 +175,15 @@ let router = createRouter({
         requiresAuth: isSpotlightPAUser,
       },
     },
-    {
-      path: "/admin/news",
-      name: "news-pages",
-      component: load(() => import("@/components/ViewNewsPagesList.vue")),
+    ...["news", "statecollege", "berks", "sponsored"].map((section) => ({
+      path: `/admin/${section}`,
+      name: `${section}-pages`,
+      component: load(() => import("@/components/ViewPagesList.vue")),
       props: (route) => ({ page: route.query.page }),
       meta: {
         requiresAuth: isSpotlightPAUser,
       },
-    },
-    {
-      path: "/admin/statecollege",
-      name: "statecollege-pages",
-      component: load(() => import("@/components/ViewStateCollegeList.vue")),
-      props: (route) => ({ page: route.query.page }),
-      meta: {
-        requiresAuth: isSpotlightPAUser,
-      },
-    },
-    {
-      path: "/admin/berks",
-      name: "berks-pages",
-      component: load(() => import("@/components/ViewBerksList.vue")),
-      props: (route) => ({ page: route.query.page }),
-      meta: {
-        requiresAuth: isSpotlightPAUser,
-      },
-    },
-    {
-      path: "/admin/sponsored",
-      name: "sponsored-pages",
-      component: load(() => import("@/components/ViewSponsoredList.vue")),
-      props: (route) => ({ page: route.query.page }),
-      meta: {
-        requiresAuth: isSpotlightPAUser,
-      },
-    },
+    })),
     {
       path: "/admin/shared-articles/:id",
       name: "shared-article-admin",
