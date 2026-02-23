@@ -178,37 +178,45 @@ let router = createRouter({
     {
       path: "/admin/news",
       name: "news-pages",
-      component: load(() => import("@/components/ViewNewsPagesList.vue")),
+      component: load(() => import("@/components/ViewPagesList.vue")),
       props: (route) => ({ page: route.query.page }),
       meta: {
         requiresAuth: isSpotlightPAUser,
+        contentPath: "content/news/",
+        title: "Spotlight PA News Pages",
       },
     },
     {
       path: "/admin/statecollege",
       name: "statecollege-pages",
-      component: load(() => import("@/components/ViewStateCollegeList.vue")),
+      component: load(() => import("@/components/ViewPagesList.vue")),
       props: (route) => ({ page: route.query.page }),
       meta: {
         requiresAuth: isSpotlightPAUser,
+        contentPath: "content/statecollege/",
+        title: "State College Articles",
       },
     },
     {
       path: "/admin/berks",
       name: "berks-pages",
-      component: load(() => import("@/components/ViewBerksList.vue")),
+      component: load(() => import("@/components/ViewPagesList.vue")),
       props: (route) => ({ page: route.query.page }),
       meta: {
         requiresAuth: isSpotlightPAUser,
+        contentPath: "content/berks/",
+        title: "Berks County Articles",
       },
     },
     {
       path: "/admin/sponsored",
       name: "sponsored-pages",
-      component: load(() => import("@/components/ViewSponsoredList.vue")),
+      component: load(() => import("@/components/ViewPagesList.vue")),
       props: (route) => ({ page: route.query.page }),
       meta: {
         requiresAuth: isSpotlightPAUser,
+        contentPath: "content/sponsored/",
+        title: "Sponsored Content",
       },
     },
     {
