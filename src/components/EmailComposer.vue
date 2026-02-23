@@ -1,6 +1,6 @@
 <script>
 import { computed, reactive, toRefs } from "vue";
-import { useClient } from "@/api/client.js";
+import { post, sendMessage } from "@/api/client-v2.js";
 
 export default {
   name: "EmailComposer",
@@ -10,8 +10,6 @@ export default {
     initialBody: String,
   },
   setup(props) {
-    let client = useClient();
-
     // TODO: Fixme
     let rows = props.initialBody.split("\n").length;
     if (rows < 4) {
@@ -39,7 +37,7 @@ export default {
       async send() {
         if (window.confirm("Are you sure you want to send this message?")) {
           emailStatus.isSending = true;
-          [, emailStatus.error] = await client.sendMessage({
+          [, emailStatus.error] = await post(sendMessage, {
             subject: emailStatus.subject,
             body: emailStatus.body,
           });

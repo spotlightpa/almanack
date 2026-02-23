@@ -1,6 +1,6 @@
 <script>
 import { watchAPI } from "@/api/service-util.js";
-import { useClient } from "@/api/client.js";
+import { get, listPages } from "@/api/client-v2.js";
 import PageListItem from "@/api/spotlightpa-page-list-item.js";
 import { useRoute } from "vue-router";
 
@@ -9,13 +9,9 @@ export default {
   setup(props) {
     const route = useRoute();
 
-    let { listPages } = useClient();
     const { apiState, fetch, computedList, computedProp } = watchAPI(
       () => [props.page, route.meta.contentPath],
-      ([page, path]) =>
-        listPages({
-          params: { page, path },
-        })
+      ([page, path]) => get(listPages, { page, path })
     );
 
     return {

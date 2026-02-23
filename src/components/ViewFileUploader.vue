@@ -1,7 +1,13 @@
 <script>
 import { reactive, computed, toRefs, watch } from "vue";
 
-import { useClient } from "@/api/client.js";
+import {
+  get,
+  post,
+  listFiles,
+  updateFile,
+  uploadFile,
+} from "@/api/client-v2.js";
 import { makeState } from "@/api/service-util.js";
 
 import { formatDate } from "@/utils/time-format.js";
@@ -10,7 +16,6 @@ import humanSize from "@/utils/human-size.js";
 export default {
   props: { page: { type: String, default: "0" } },
   setup(props) {
-    let { listFiles, updateFile, uploadFile } = useClient();
     let { apiStateRefs, exec } = makeState();
 
     const { rawData } = apiStateRefs;
@@ -37,15 +42,17 @@ export default {
 
     let actions = {
       async fetch() {
-        exec(() => listFiles({ params: { page: props.page } }));
+        exec(() => get(listFiles, { page: props.page }));
       },
       updateDescription(file) {
         let description = window.prompt("Update description", file.description);
         if (description !== null && description !== file.description) {
           exec(() =>
-            Promise.resolve()
-              .then(() => updateFile(file.url, { description }))
-              .then(() => listFiles({ params: { page: props.page } }))
+            post(updateFile, {
+              url: file.url,
+              description,
+              set_description: true,
+            }).then(() => get(listFiles, { page: props.page }))
           );
         }
       },

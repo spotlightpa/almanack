@@ -1,11 +1,9 @@
 <script>
 import draggable from "vuedraggable";
 
-import { useClient } from "@/api/client.js";
+import { get, listPagesByFTS } from "@/api/client-v2.js";
 
 import { Page } from "@/api/spotlightpa-page.js";
-
-const { listPagesByFTS } = useClient();
 
 export default {
   components: {
@@ -43,7 +41,7 @@ export default {
     async fetch(query) {
       let token = ++this.currentRequest;
       const select = "-body";
-      let [data, err] = await listPagesByFTS({ params: { query, select } });
+      let [data, err] = await get(listPagesByFTS, { query, select });
       if (this.currentRequest !== token) {
         console.warn("discarding stale result");
         return;
