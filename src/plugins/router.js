@@ -128,25 +128,40 @@ let router = createRouter({
     {
       path: "/admin/editors-picks",
       name: "homepage-editor",
-      component: load(() => import("@/components/ViewHomepageEditor.vue")),
+      component: load(() => import("@/components/ViewFrontpageEditor.vue")),
       meta: {
         requiresAuth: isSpotlightPAUser,
+        dataFile: "data/editorsPicks.json",
+        title: "Homepage Editor",
+        showCallout: true,
+        showInvestigation: true,
+        showImpact: true,
       },
     },
     {
       path: "/admin/state-college-editor",
       name: "state-college-editor",
-      component: load(() => import("@/components/ViewStateCollegeEditor.vue")),
+      component: load(() => import("@/components/ViewFrontpageEditor.vue")),
       meta: {
         requiresAuth: isSpotlightPAUser,
+        dataFile: "data/stateCollege.json",
+        title: "State College Frontpage Editor",
+        showCallout: false,
+        showInvestigation: false,
+        showImpact: false,
       },
     },
     {
       path: "/admin/berks-editor",
       name: "berks-editor",
-      component: load(() => import("@/components/ViewBerksEditor.vue")),
+      component: load(() => import("@/components/ViewFrontpageEditor.vue")),
       meta: {
         requiresAuth: isSpotlightPAUser,
+        dataFile: "data/berks-frontpage.json",
+        title: "Berks Frontpage Editor",
+        showCallout: false,
+        showInvestigation: false,
+        showImpact: false,
       },
     },
     {
