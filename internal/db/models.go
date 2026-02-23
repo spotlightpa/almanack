@@ -189,3 +189,15 @@ type SiteDatum struct {
 	ScheduleFor time.Time          `json:"schedule_for"`
 	PublishedAt pgtype.Timestamptz `json:"published_at"`
 }
+
+type Youtube struct {
+	ID                  int64     `json:"id"`
+	ExternalID          string    `json:"external_id"`
+	Title               string    `json:"title"`
+	URL                 string    `json:"url"`
+	ThumbnailUrl        string    `json:"thumbnail_url"`
+	ExternalPublishedAt time.Time `json:"external_published_at"`
+	ExternalUpdatedAt   time.Time `json:"external_updated_at"`
+	CreatedAt           time.Time `json:"created_at"`
+	UpdatedAt           time.Time `json:"updated_at"`
+}
