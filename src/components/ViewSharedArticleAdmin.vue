@@ -30,7 +30,7 @@ const { apiState, fetch, computedObj } = watchAPI(
 const showComposer = ref(false);
 const composerSubject = ref("");
 const composerBodyText = ref("");
-const initialComposerSubject = ref("");
+let initialComposerSubject = "";
 const isDirty = ref(false);
 const status = ref(null);
 const note = ref("");
@@ -192,14 +192,14 @@ async function toggleComposer() {
   if (!showComposer.value) {
     return;
   }
-  initialComposerSubject.value = `New Spotlight PA story ${article.value.internalID}`;
-  composerSubject.value = initialComposerSubject.value;
+  initialComposerSubject = `New Spotlight PA story ${article.value.internalID}`;
+  composerSubject.value = initialComposerSubject;
   composerBodyText.value = emailBody.value;
 }
 
 function resetComposer() {
   if (window.confirm("Are you sure you want to discard your changes?")) {
-    composerSubject.value = initialComposerSubject.value;
+    composerSubject.value = initialComposerSubject;
     composerBodyText.value = emailBody.value;
   }
 }
