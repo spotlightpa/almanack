@@ -176,10 +176,26 @@ let router = createRouter({
       },
     },
     ...[
-      { section: "news", path: "content/news/", title: "Spotlight PA News Pages" },
-      { section: "statecollege", path: "content/statecollege/", title: "State College Articles" },
-      { section: "berks", path: "content/berks/", title: "Berks County Articles" },
-      { section: "sponsored", path: "content/sponsored/", title: "Sponsored Content" },
+      {
+        section: "news",
+        path: "content/news/",
+        title: "Spotlight PA News Pages",
+      },
+      {
+        section: "statecollege",
+        path: "content/statecollege/",
+        title: "State College Articles",
+      },
+      {
+        section: "berks",
+        path: "content/berks/",
+        title: "Berks County Articles",
+      },
+      {
+        section: "sponsored",
+        path: "content/sponsored/",
+        title: "Sponsored Content",
+      },
     ].map(({ section, path, title }) => ({
       path: `/admin/${section}`,
       name: `${section}-pages`,
