@@ -175,13 +175,20 @@ let router = createRouter({
         requiresAuth: isSpotlightPAUser,
       },
     },
-    ...["news", "statecollege", "berks", "sponsored"].map((section) => ({
+    ...[
+      { section: "news", path: "content/news/", title: "Spotlight PA News Pages" },
+      { section: "statecollege", path: "content/statecollege/", title: "State College Articles" },
+      { section: "berks", path: "content/berks/", title: "Berks County Articles" },
+      { section: "sponsored", path: "content/sponsored/", title: "Sponsored Content" },
+    ].map(({ section, path, title }) => ({
       path: `/admin/${section}`,
       name: `${section}-pages`,
       component: load(() => import("@/components/ViewPagesList.vue")),
       props: (route) => ({ page: route.query.page }),
       meta: {
         requiresAuth: isSpotlightPAUser,
+        contentPath: path,
+        title,
       },
     })),
     {
