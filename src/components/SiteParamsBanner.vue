@@ -1,25 +1,28 @@
-<script>
+<script setup>
 import useProps from "@/utils/use-props.js";
 import sanitizeText from "@/utils/sanitize-text.js";
 import { toRel, toAbs } from "@/utils/link.js";
 
-export default {
-  props: { params: Object, fileProps: Object },
-  setup(props) {
-    let [data, saveData] = useProps(props.params.data, {
-      bannerActive: ["banner-active"],
-      bannerText: ["banner", undefined, sanitizeText],
-      bannerLink: ["banner-link", (v) => toAbs(v), (v) => toRel(v)],
-      bannerBgColor: ["banner-bg-color"],
-      bannerTextColor: ["banner-text-color"],
-    });
-    return {
-      ...data,
-      saveData,
-      sanitizeText,
-    };
-  },
-};
+const props = defineProps({
+  params: Object,
+  fileProps: Object,
+});
+
+const [data, saveData] = useProps(props.params.data, {
+  bannerActive: ["banner-active"],
+  bannerText: ["banner", undefined, sanitizeText],
+  bannerLink: ["banner-link", (v) => toAbs(v), (v) => toRel(v)],
+  bannerBgColor: ["banner-bg-color"],
+  bannerTextColor: ["banner-text-color"],
+});
+
+const {
+  bannerActive,
+  bannerText,
+  bannerLink,
+  bannerBgColor,
+  bannerTextColor,
+} = data;
 </script>
 
 <template>

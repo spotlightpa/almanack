@@ -1,18 +1,16 @@
-<script>
+<script setup>
 import useProps from "@/utils/use-props.js";
 
-export default {
-  props: { params: Object, fileProps: Object },
-  setup(props) {
-    let [data, saveData] = useProps(props.params.data, {
-      newsletterActive: ["newsletter-active"],
-    });
-    return {
-      ...data,
-      saveData,
-    };
-  },
-};
+const props = defineProps({
+  params: Object,
+  fileProps: Object,
+});
+
+const [data, saveData] = useProps(props.params.data, {
+  newsletterActive: ["newsletter-active"],
+});
+
+const { newsletterActive } = data;
 </script>
 
 <template>

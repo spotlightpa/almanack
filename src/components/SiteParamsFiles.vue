@@ -1,20 +1,20 @@
-<script>
+<script setup>
 import { ref } from "vue";
 
-export default {
-  props: { files: Array, fileProps: Object },
-  setup(_, { emit }) {
-    const inputText = ref("");
-    return {
-      inputText,
-      addText() {
-        let text = inputText.value;
-        inputText.value = "";
-        emit("add", text);
-      },
-    };
-  },
-};
+defineProps({
+  files: Array,
+  fileProps: Object,
+});
+
+const emit = defineEmits(["add", "change", "remove"]);
+
+const inputText = ref("");
+
+function addText() {
+  let text = inputText.value;
+  inputText.value = "";
+  emit("add", text);
+}
 </script>
 
 <template>
