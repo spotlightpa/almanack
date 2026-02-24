@@ -71,7 +71,7 @@ let router = createRouter({
       name: "arc-article",
       component: load(() => import("@/components/ViewArticleRedirect.vue")),
       props: true,
-      meta: { requiresAuth: isEditor },
+      meta: { requiresAuth: isEditor, redirectTo: "shared-article" },
     },
     {
       path: "/admin/article-redirect",
@@ -81,7 +81,7 @@ let router = createRouter({
         id: route.query.id,
         sourceType: route.query.source_type,
       }),
-      meta: { requiresAuth: isEditor },
+      meta: { requiresAuth: isEditor, redirectTo: "shared-article" },
     },
     {
       path: "/admin/article-admin-redirect",

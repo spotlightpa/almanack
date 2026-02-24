@@ -13,8 +13,6 @@ const props = defineProps({
   },
 });
 
-const redirectTo = route.meta.redirectTo || "shared-article";
-
 const isLoading = ref(false);
 const isLoadingDebounced = ref(false);
 window.setTimeout(() => {
@@ -34,7 +32,7 @@ async function load() {
     return;
   }
   router.replace({
-    name: redirectTo,
+    name: route.meta.redirectTo,
     params: {
       id: "" + article.id,
     },
