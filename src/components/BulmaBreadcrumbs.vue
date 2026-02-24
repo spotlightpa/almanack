@@ -1,23 +1,19 @@
-<script>
+<script setup>
 import { useRouter } from "vue-router";
-export default {
-  props: { links: Array },
-  setup() {
-    const { resolve, currentRoute } = useRouter();
-    return {
-      isSelf({ to }) {
-        let route = resolve(to);
-        if (route.name !== currentRoute.value.name) {
-          return false;
-        }
-        return (
-          JSON.stringify(route.query) ===
-          JSON.stringify(currentRoute.value.query)
-        );
-      },
-    };
-  },
-};
+
+defineProps({ links: Array });
+
+const { resolve, currentRoute } = useRouter();
+
+function isSelf({ to }) {
+  let route = resolve(to);
+  if (route.name !== currentRoute.value.name) {
+    return false;
+  }
+  return (
+    JSON.stringify(route.query) === JSON.stringify(currentRoute.value.query)
+  );
+}
 </script>
 
 <template>

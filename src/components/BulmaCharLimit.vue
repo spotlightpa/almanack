@@ -1,20 +1,18 @@
-<script>
-export default {
-  props: {
-    value: {
-      type: String,
-      required: true,
-    },
-    warn: {
-      type: Number,
-      default: 15,
-    },
-    max: {
-      type: Number,
-      default: 20,
-    },
+<script setup>
+defineProps({
+  value: {
+    type: String,
+    required: true,
   },
-};
+  warn: {
+    type: Number,
+    default: 15,
+  },
+  max: {
+    type: Number,
+    default: 20,
+  },
+});
 </script>
 
 <template>

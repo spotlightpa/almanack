@@ -1,27 +1,23 @@
-<script>
-export default {
-  props: {
-    values: {
-      type: Array,
-      required: true,
-    },
+<script setup>
+import { computed } from "vue";
+
+const props = defineProps({
+  values: {
+    type: Array,
+    required: true,
   },
-  computed: {
-    active() {
-      return this.values
-        .filter(([cond]) => cond)
-        .map(([, link, msg]) => ({ link, msg }));
-    },
-  },
-  methods: {
-    scrollTo(link) {
-      document.querySelector(link)?.scrollIntoView({
-        behavior: "smooth",
-        block: "start",
-      });
-    },
-  },
-};
+});
+
+const active = computed(() =>
+  props.values.filter(([cond]) => cond).map(([, link, msg]) => ({ link, msg }))
+);
+
+function scrollTo(link) {
+  document.querySelector(link)?.scrollIntoView({
+    behavior: "smooth",
+    block: "start",
+  });
+}
 </script>
 
 <template>

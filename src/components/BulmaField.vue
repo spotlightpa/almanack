@@ -1,29 +1,23 @@
-<script>
+<script setup>
 let labelIDCounter = 0;
 
-export default {
-  name: "BulmaField",
-  props: {
-    label: String,
-    labelClass: {
-      type: String,
-      default: "label",
-    },
-    controlClass: String,
-    help: String,
-    validationMessage: String,
-    required: {
-      type: Boolean,
-      default: false,
-    },
+defineProps({
+  label: String,
+  labelClass: {
+    type: String,
+    default: "label",
   },
-  data() {
-    labelIDCounter++;
-    return {
-      idForLabel: `BulmaField-${labelIDCounter}`,
-    };
+  controlClass: String,
+  help: String,
+  validationMessage: String,
+  required: {
+    type: Boolean,
+    default: false,
   },
-};
+});
+
+labelIDCounter++;
+const idForLabel = `BulmaField-${labelIDCounter}`;
 </script>
 
 <template>

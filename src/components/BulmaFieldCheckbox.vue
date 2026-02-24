@@ -1,34 +1,30 @@
-<script>
-export default {
-  props: {
-    label: String,
-    labelClass: {
-      type: String,
-      default: "label",
-    },
-    modelValue: Boolean,
-    placeholder: String,
-    help: String,
-    name: String,
+<script setup>
+import { computed } from "vue";
+
+const props = defineProps({
+  label: String,
+  labelClass: {
+    type: String,
+    default: "label",
   },
-  computed: {
-    fieldProps() {
-      return {
-        label: this.label,
-        help: this.help,
-        labelClass: this.labelClass,
-      };
-    },
-    checkboxValue: {
-      get() {
-        return this.modelValue;
-      },
-      set(event) {
-        this.$emit("update:modelValue", event);
-      },
-    },
-  },
-};
+  modelValue: Boolean,
+  placeholder: String,
+  help: String,
+  name: String,
+});
+
+const emit = defineEmits(["update:modelValue"]);
+
+const fieldProps = computed(() => ({
+  label: props.label,
+  help: props.help,
+  labelClass: props.labelClass,
+}));
+
+const checkboxValue = computed({
+  get: () => props.modelValue,
+  set: (val) => emit("update:modelValue", val),
+});
 </script>
 
 <template>

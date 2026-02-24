@@ -1,106 +1,106 @@
-<script>
+<script setup>
+import { ref, computed } from "vue";
+
 let labelIDCounter = 0;
 
-export default {
-  emits: ["update:modelValue"],
-  props: {
-    label: String,
-    labelClass: {
-      type: String,
-      default: "label",
-    },
-    modelValue: Array,
-    options: Array,
-    placeholder: String,
-    help: String,
-    validator: Function,
-    required: {
-      type: Boolean,
-      default: false,
-    },
-    readonly: {
-      type: Boolean,
-      default: false,
-    },
+const props = defineProps({
+  label: String,
+  labelClass: {
+    type: String,
+    default: "label",
   },
-  data() {
-    labelIDCounter++;
-    return {
-      currentInput: "",
-      hasFocus: false,
-      dragoverIndex: null,
-      dragoverFrom: null,
-      idForDatalist: `BulmaAutocompleteArray-${labelIDCounter}`,
-    };
+  modelValue: Array,
+  options: Array,
+  placeholder: String,
+  help: String,
+  validator: Function,
+  required: {
+    type: Boolean,
+    default: false,
   },
-  computed: {
-    fieldProps() {
-      return {
-        label: this.label,
-        help: this.help,
-        labelClass: this.labelClass,
-        required: this.required,
-      };
-    },
+  readonly: {
+    type: Boolean,
+    default: false,
   },
-  watch: {},
-  methods: {
-    detectChange(value) {
-      let oldValue = this.currentInput;
-      this.currentInput = value;
-      // assume big growth is from datalist entry
-      if (this.currentInput.length - oldValue.length > 1) {
-        this.push();
-      }
-    },
-    push() {
-      let input = this.currentInput.trim();
-      if (!input) {
-        return;
-      }
-      let vals = [...this.modelValue];
-      vals.push(input);
-      this.$emit("update:modelValue", vals);
-      this.currentInput = "";
-    },
-    paste(event) {
-      this.currentInput = event?.clipboardData?.getData?.("text") ?? "";
-    },
-    remove(i) {
-      let vals = [...this.modelValue];
-      vals.splice(i, 1);
-      this.$emit("update:modelValue", vals);
-    },
-    dragover(i) {
-      if (
-        // abort if some random other thing is being dragged on it
-        this.dragoverFrom === null ||
-        // performance? avoid triggering reactivity system
-        this.dragoverIndex === i
-      ) {
-        return;
-      }
-      this.dragoverIndex = i;
-    },
-    dragleave() {
-      // performance? avoid triggering reactivity system
-      if (this.dragoverIndex === null) {
-        return;
-      }
-      this.dragoverIndex = null;
-    },
-    drop(to) {
-      let from = this.dragoverFrom;
-      if (from === null || from === to) {
-        return;
-      }
-      let vals = [...this.modelValue];
-      vals[from] = this.modelValue[to];
-      vals[to] = this.modelValue[from];
-      this.$emit("update:modelValue", vals);
-    },
-  },
-};
+});
+
+const emit = defineEmits(["update:modelValue"]);
+
+labelIDCounter++;
+const idForDatalist = `BulmaAutocompleteArray-${labelIDCounter}`;
+
+const currentInput = ref("");
+const hasFocus = ref(false);
+const dragoverIndex = ref(null);
+const dragoverFrom = ref(null);
+
+const fieldProps = computed(() => ({
+  label: props.label,
+  help: props.help,
+  labelClass: props.labelClass,
+  required: props.required,
+}));
+
+function detectChange(value) {
+  let oldValue = currentInput.value;
+  currentInput.value = value;
+  // assume big growth is from datalist entry
+  if (currentInput.value.length - oldValue.length > 1) {
+    push();
+  }
+}
+
+function push() {
+  let input = currentInput.value.trim();
+  if (!input) {
+    return;
+  }
+  let vals = [...props.modelValue];
+  vals.push(input);
+  emit("update:modelValue", vals);
+  currentInput.value = "";
+}
+
+function paste(event) {
+  currentInput.value = event?.clipboardData?.getData?.("text") ?? "";
+}
+
+function remove(i) {
+  let vals = [...props.modelValue];
+  vals.splice(i, 1);
+  emit("update:modelValue", vals);
+}
+
+function dragover(i) {
+  if (
+    // abort if some random other thing is being dragged on it
+    dragoverFrom.value === null ||
+    // performance? avoid triggering reactivity system
+    dragoverIndex.value === i
+  ) {
+    return;
+  }
+  dragoverIndex.value = i;
+}
+
+function dragleave() {
+  // performance? avoid triggering reactivity system
+  if (dragoverIndex.value === null) {
+    return;
+  }
+  dragoverIndex.value = null;
+}
+
+function drop(to) {
+  let from = dragoverFrom.value;
+  if (from === null || from === to) {
+    return;
+  }
+  let vals = [...props.modelValue];
+  vals[from] = props.modelValue[to];
+  vals[to] = props.modelValue[from];
+  emit("update:modelValue", vals);
+}
 </script>
 
 <template>
