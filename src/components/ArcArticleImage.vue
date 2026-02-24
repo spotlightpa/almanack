@@ -6,7 +6,9 @@ const props = defineProps({
   n: Number,
 });
 
-const credits = computed(() => props.block.credits?.by?.map?.((v) => v.name) ?? []);
+const credits = computed(
+  () => props.block.credits?.by?.map?.((v) => v.name) ?? []
+);
 
 const imageURL = computed(() => {
   let srcURL = props.block.url;

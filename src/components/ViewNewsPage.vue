@@ -15,18 +15,16 @@ const pageData = usePage(id);
 const {
   page,
   isLoading,
+  isLoadingThrottled,
   error,
   images,
-  warnings,
-  refresh,
-  saveField,
-  saveImageField,
-  syncData,
-  arcData,
-  gdocsData,
-  wordCount,
-  refreshArc,
-  refreshGDocs,
+  setImageProps,
+  deriveSlug,
+  discardChanges,
+  publishNow,
+  updateSchedule,
+  updateOnly,
+  refreshFromSource,
 } = pageData;
 
 const parentPage = computed(() => {

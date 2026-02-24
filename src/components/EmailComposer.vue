@@ -7,7 +7,7 @@ const props = defineProps({
   initialBody: String,
 });
 
-const emit = defineEmits(["hide"]);
+defineEmits(["hide"]);
 
 const rows = Math.max(4, props.initialBody.split("\n").length);
 
@@ -19,8 +19,7 @@ const hasSent = ref(false);
 
 const hasChanged = computed(
   () =>
-    props.initialSubject !== subject.value ||
-    props.initialBody !== body.value
+    props.initialSubject !== subject.value || props.initialBody !== body.value
 );
 
 async function send() {

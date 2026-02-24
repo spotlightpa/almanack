@@ -60,8 +60,7 @@ async function uploadFileInput(ev) {
   uploadError.value = null;
 
   for (let body of files) {
-    let fileURL;
-    [fileURL, uploadError.value] = await uploadFile(body);
+    [, uploadError.value] = await uploadFile(body);
     if (uploadError.value) {
       break;
     }

@@ -7,7 +7,7 @@ const props = defineProps({
   fileProps: Object,
 });
 
-const [data, saveData] = useProps(props.params.data, {
+const [data] = useProps(props.params.data, {
   takeoverActive: ["takeover-active"],
   takeoverHed: ["takeover-hed"],
   takeoverDek: ["takeover-dek"],
@@ -15,7 +15,13 @@ const [data, saveData] = useProps(props.params.data, {
   takeoverLink: ["takeover-link", toAbs, toRel],
 });
 
-const { takeoverActive, takeoverHed, takeoverDek, takeoverImage, takeoverLink } = data;
+const {
+  takeoverActive,
+  takeoverHed,
+  takeoverDek,
+  takeoverImage,
+  takeoverLink,
+} = data;
 </script>
 
 <template>

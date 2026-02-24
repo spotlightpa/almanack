@@ -5,8 +5,12 @@ const props = defineProps({
   block: Object,
 });
 
-const listType = computed(() => props.block.list_type === "unordered" ? "ul" : "ol");
-const items = computed(() => props.block.items.filter((item) => item.type === "text"));
+const listType = computed(() =>
+  props.block.list_type === "unordered" ? "ul" : "ol"
+);
+const items = computed(() =>
+  props.block.items.filter((item) => item.type === "text")
+);
 </script>
 
 <template>

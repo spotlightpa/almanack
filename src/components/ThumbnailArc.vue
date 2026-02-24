@@ -11,10 +11,7 @@ const props = defineProps({
 const correctedCredits = computed(() =>
   commaAnd(
     props.credits.map((credit) =>
-      credit.replace(
-        /\b(staff( photographer)?)\b/gi,
-        "Philadelphia Inquirer"
-      )
+      credit.replace(/\b(staff( photographer)?)\b/gi, "Philadelphia Inquirer")
     )
   )
 );

@@ -10,7 +10,9 @@ onMounted(async () => {
     "mounted",
     Array.from(el.value.children)
       .map((child) =>
-        child.tagName === "RAW-HTML" ? child.getAttribute("block") : child.outerHTML
+        child.tagName === "RAW-HTML"
+          ? child.getAttribute("block")
+          : child.outerHTML
       )
       .join("\n\n")
   );

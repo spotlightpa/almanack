@@ -8,7 +8,7 @@ const props = defineProps({
   fileProps: Object,
 });
 
-const [data, saveData] = useProps(props.params.data, {
+const [data] = useProps(props.params.data, {
   bannerActive: ["banner-active"],
   bannerText: ["banner", undefined, sanitizeText],
   bannerLink: ["banner-link", (v) => toAbs(v), (v) => toRel(v)],
@@ -16,13 +16,8 @@ const [data, saveData] = useProps(props.params.data, {
   bannerTextColor: ["banner-text-color"],
 });
 
-const {
-  bannerActive,
-  bannerText,
-  bannerLink,
-  bannerBgColor,
-  bannerTextColor,
-} = data;
+const { bannerActive, bannerText, bannerLink, bannerBgColor, bannerTextColor } =
+  data;
 </script>
 
 <template>

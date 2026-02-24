@@ -1,4 +1,5 @@
 <script setup>
+/* eslint-disable vue/no-mutating-props */
 const props = defineProps({
   editorsPicks: Object,
   showCallout: Boolean,
@@ -7,7 +8,6 @@ const props = defineProps({
 });
 
 function push(article) {
-  // eslint-disable-next-line vue/no-mutating-props
   props.editorsPicks.featuredStories.push(article.filePath);
 }
 </script>

@@ -50,12 +50,7 @@ const imgSrc = computed(() =>
           style="width: 128px"
         >
           <picture class="image has-ratio">
-            <img
-              class="is-3x4"
-              :src="imgSrc"
-              :alt="imageAlt"
-              loading="lazy"
-            />
+            <img class="is-3x4" :src="imgSrc" :alt="imageAlt" loading="lazy" />
           </picture>
         </div>
       </router-link>

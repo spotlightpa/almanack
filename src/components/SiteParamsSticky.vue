@@ -7,7 +7,7 @@ const props = defineProps({
   fileProps: Object,
 });
 
-const [data, saveData] = useProps(props.params.data, {
+const [data] = useProps(props.params.data, {
   stickyActive: ["sticky-active"],
   stickyImageDescription: ["sticky-image-description"],
   stickyImages: ["sticky-images"],

@@ -6,7 +6,7 @@ const props = defineProps({
   fileProps: Object,
 });
 
-const [data, saveData] = useProps(props.params.data, {
+const [data] = useProps(props.params.data, {
   newsletterActive: ["newsletter-active"],
 });
 

@@ -1,5 +1,5 @@
 <script setup>
-import { onBeforeRouteUpdate, useRouter } from "vue-router";
+import { useRouter } from "vue-router";
 import { useAuth } from "@/api/auth.js";
 
 const router = useRouter();
