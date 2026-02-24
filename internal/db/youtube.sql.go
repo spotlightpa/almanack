@@ -107,7 +107,6 @@ FROM
   feed_items
 ON CONFLICT ("external_id")
   DO UPDATE SET
-    "external_id" = EXCLUDED.external_id,
     "title" = EXCLUDED.title,
     "url" = EXCLUDED.url,
     "thumbnail_url" = EXCLUDED.thumbnail_url,
