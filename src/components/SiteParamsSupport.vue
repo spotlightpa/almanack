@@ -17,7 +17,7 @@ const props = defineProps({
   fileProps: Object,
 });
 
-const [data] = useProps(props.params.data, {
+const [data, saveData] = useProps(props.params.data, {
   supportActive: ["support-active"],
   supportLink: ["support-link", toAbs, toRel],
   supportHed: ["support-hed"],
@@ -44,6 +44,7 @@ const {
 } = data;
 
 const paragraphs = computed(() => supportText.value.split("\n"));
+defineExpose({ saveData });
 </script>
 
 <template>

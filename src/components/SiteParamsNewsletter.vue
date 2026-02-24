@@ -6,11 +6,13 @@ const props = defineProps({
   fileProps: Object,
 });
 
-const [data] = useProps(props.params.data, {
+const [data, saveData] = useProps(props.params.data, {
   newsletterActive: ["newsletter-active"],
 });
 
 const { newsletterActive } = data;
+
+defineExpose({ saveData });
 </script>
 
 <template>

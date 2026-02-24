@@ -8,7 +8,7 @@ const props = defineProps({
   fileProps: Object,
 });
 
-const [data] = useProps(props.params.data, {
+const [data, saveData] = useProps(props.params.data, {
   bannerActive: ["banner-active"],
   bannerText: ["banner", undefined, sanitizeText],
   bannerLink: ["banner-link", (v) => toAbs(v), (v) => toRel(v)],
@@ -18,6 +18,8 @@ const [data] = useProps(props.params.data, {
 
 const { bannerActive, bannerText, bannerLink, bannerBgColor, bannerTextColor } =
   data;
+
+defineExpose({ saveData });
 </script>
 
 <template>

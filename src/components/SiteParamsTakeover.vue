@@ -7,7 +7,7 @@ const props = defineProps({
   fileProps: Object,
 });
 
-const [data] = useProps(props.params.data, {
+const [data, saveData] = useProps(props.params.data, {
   takeoverActive: ["takeover-active"],
   takeoverHed: ["takeover-hed"],
   takeoverDek: ["takeover-dek"],
@@ -22,6 +22,8 @@ const {
   takeoverImage,
   takeoverLink,
 } = data;
+
+defineExpose({ saveData });
 </script>
 
 <template>
