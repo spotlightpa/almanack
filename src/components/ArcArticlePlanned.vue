@@ -1,17 +1,12 @@
-<script>
+<script setup>
+import { computed } from "vue";
 import { formatDate } from "@/utils/time-format.js";
 
-export default {
-  props: {
-    article: { type: Object, required: true },
-  },
-  setup(props) {
-    return {
-      embeds: props.article.embedComponents,
-      formatDate,
-    };
-  },
-};
+const props = defineProps({
+  article: { type: Object, required: true },
+});
+
+const embeds = computed(() => props.article.embedComponents);
 </script>
 
 <template>

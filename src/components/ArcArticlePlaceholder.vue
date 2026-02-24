@@ -1,9 +1,7 @@
-<script>
-export default {
-  props: {
-    block: Object,
-  },
-};
+<script setup>
+defineProps({
+  block: Object,
+});
 </script>
 
 <template>

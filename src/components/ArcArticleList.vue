@@ -1,17 +1,12 @@
-<script>
-export default {
-  props: {
-    block: Object,
-  },
-  computed: {
-    listType() {
-      return this.block.list_type === "unordered" ? "ul" : "ol";
-    },
-    items() {
-      return this.block.items.filter((item) => item.type === "text");
-    },
-  },
-};
+<script setup>
+import { computed } from "vue";
+
+const props = defineProps({
+  block: Object,
+});
+
+const listType = computed(() => props.block.list_type === "unordered" ? "ul" : "ol");
+const items = computed(() => props.block.items.filter((item) => item.type === "text"));
 </script>
 
 <template>
