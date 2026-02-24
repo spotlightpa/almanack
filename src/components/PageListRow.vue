@@ -1,20 +1,25 @@
-<script>
+<script setup>
+import { computed } from "vue";
 import imgproxyURL from "@/api/imgproxy-url.js";
 
-export default {
-  name: "PageListRow",
-  props: ["link", "status", "label", "date", "hed", "dek", "image", "imageAlt"],
+const props = defineProps({
+  link: [String, Object],
+  status: String,
+  label: String,
+  date: Date,
+  hed: String,
+  dek: String,
+  image: String,
+  imageAlt: String,
+});
 
-  computed: {
-    imgproxyURL() {
-      return imgproxyURL(this.image, {
-        width: 256,
-        height: 192,
-        extension: "webp",
-      });
-    },
-  },
-};
+const imgSrc = computed(() =>
+  imgproxyURL(props.image, {
+    width: 256,
+    height: 192,
+    extension: "webp",
+  })
+);
 </script>
 
 <template>
@@ -47,7 +52,7 @@ export default {
           <picture class="image has-ratio">
             <img
               class="is-3x4"
-              :src="imgproxyURL"
+              :src="imgSrc"
               :alt="imageAlt"
               loading="lazy"
             />

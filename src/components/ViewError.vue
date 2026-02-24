@@ -1,7 +1,7 @@
-<script>
-export default {
-  props: { error: { default: null } },
-};
+<script setup>
+defineProps({
+  error: { default: null },
+});
 </script>
 
 <template>

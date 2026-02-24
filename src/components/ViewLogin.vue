@@ -1,23 +1,13 @@
-<script>
+<script setup>
+import { onBeforeRouteUpdate, useRouter } from "vue-router";
 import { useAuth } from "@/api/auth.js";
 
-export default {
-  setup() {
-    let { login, signup, isSignedIn } = useAuth();
-    return {
-      login,
-      signup,
-      isSignedIn,
-    };
-  },
-  beforeRouteEnter(to, from, next) {
-    next((vm) => {
-      if (vm.isSignedIn) {
-        next({ name: "home", replace: true });
-      }
-    });
-  },
-};
+const router = useRouter();
+const { login, signup, isSignedIn } = useAuth();
+
+if (isSignedIn.value) {
+  router.replace({ name: "home" });
+}
 </script>
 
 <template>
