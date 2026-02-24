@@ -1,28 +1,25 @@
-<script>
+<script setup>
 import draggable from "vuedraggable";
 
-export default {
-  components: {
-    draggable,
-  },
-  props: {
-    modelValue: Array,
-  },
-  methods: {
-    remove(i) {
-      let old = this.modelValue;
-      let newArray = [...old.slice(0, i), ...old.slice(i + 1)];
-      this.$emit("update:modelValue", newArray);
+const props = defineProps({
+  modelValue: Array,
+});
+
+const emit = defineEmits(["update:modelValue"]);
+
+function remove(i) {
+  let old = props.modelValue;
+  let newArray = [...old.slice(0, i), ...old.slice(i + 1)];
+  emit("update:modelValue", newArray);
+}
+
+function getComponentData() {
+  return {
+    attrs: {
+      rows: "bulmaoverride",
     },
-    getComponentData() {
-      return {
-        attrs: {
-          rows: "bulmaoverride",
-        },
-      };
-    },
-  },
-};
+  };
+}
 </script>
 
 <template>

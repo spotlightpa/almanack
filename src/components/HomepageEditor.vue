@@ -1,19 +1,15 @@
-<script>
-/* eslint-disable vue/no-mutating-props */
-export default {
-  props: {
-    editorsPicks: Object,
-    showCallout: Boolean,
-    showInvestigation: Boolean,
-    showImpact: Boolean,
-  },
+<script setup>
+const props = defineProps({
+  editorsPicks: Object,
+  showCallout: Boolean,
+  showInvestigation: Boolean,
+  showImpact: Boolean,
+});
 
-  methods: {
-    push(article) {
-      this.editorsPicks.featuredStories.push(article.filePath);
-    },
-  },
-};
+function push(article) {
+  // eslint-disable-next-line vue/no-mutating-props
+  props.editorsPicks.featuredStories.push(article.filePath);
+}
 </script>
 
 <template>
