@@ -13,6 +13,7 @@ import (
 	"github.com/spotlightpa/almanack/internal/index"
 	"github.com/spotlightpa/almanack/internal/jsonfeed"
 	"github.com/spotlightpa/almanack/internal/mailchimp"
+	"github.com/spotlightpa/almanack/internal/youtube"
 )
 
 type Services struct {
@@ -33,4 +34,5 @@ type Services struct {
 	ANF              *anf.Service
 	mailchimp.EmailService
 	HC healthchecksio.Client
+	YT *youtube.Feed
 }

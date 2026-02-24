@@ -1,0 +1,449 @@
+HTTP/2.0 200 OK
+Age: 101
+Alt-Svc: h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
+Cache-Control: public, max-age=900
+Content-Type: text/xml; charset=UTF-8
+Date: Tue, 24 Feb 2026 18:05:05 GMT
+Expires: Tue, 24 Feb 2026 18:20:05 GMT
+Server: YouTube RSS Feeds server
+X-Frame-Options: SAMEORIGIN
+X-Xss-Protection: 0
+
+<?xml version="1.0" encoding="UTF-8"?>
+<feed xmlns:yt="http://www.youtube.com/xml/schemas/2015" xmlns:media="http://search.yahoo.com/mrss/" xmlns="http://www.w3.org/2005/Atom">
+ <link rel="self" href="http://www.youtube.com/feeds/videos.xml?channel_id=UC2RdIuNJ3E2kAELpxo1sFPg"/>
+ <id>yt:channel:2RdIuNJ3E2kAELpxo1sFPg</id>
+ <yt:channelId>2RdIuNJ3E2kAELpxo1sFPg</yt:channelId>
+ <title>Spotlight PA</title>
+ <link rel="alternate" href="https://www.youtube.com/channel/UC2RdIuNJ3E2kAELpxo1sFPg"/>
+ <author>
+  <name>Spotlight PA</name>
+  <uri>https://www.youtube.com/channel/UC2RdIuNJ3E2kAELpxo1sFPg</uri>
+ </author>
+ <published>2024-10-30T17:40:08+00:00</published>
+ <entry>
+  <id>yt:video:oBu25G6OoR8</id>
+  <yt:videoId>oBu25G6OoR8</yt:videoId>
+  <yt:channelId>UC2RdIuNJ3E2kAELpxo1sFPg</yt:channelId>
+  <title>Workforce Development in Berks County, PA</title>
+  <link rel="alternate" href="https://www.youtube.com/watch?v=oBu25G6OoR8"/>
+  <author>
+   <name>Spotlight PA</name>
+   <uri>https://www.youtube.com/channel/UC2RdIuNJ3E2kAELpxo1sFPg</uri>
+  </author>
+  <published>2026-02-20T20:34:06+00:00</published>
+  <updated>2026-02-20T20:53:20+00:00</updated>
+  <media:group>
+   <media:title>Workforce Development in Berks County, PA</media:title>
+   <media:content url="https://www.youtube.com/v/oBu25G6OoR8?version=3" type="application/x-shockwave-flash" width="640" height="390"/>
+   <media:thumbnail url="https://i4.ytimg.com/vi/oBu25G6OoR8/hqdefault.jpg" width="480" height="360"/>
+   <media:description>Amber Columbo, director of Berks’ Workforce Development Board, presents the future workforce as forecast in the Berks County Workforce 2030 plan.
+
+For more information visit https://www.spotlightpa.org
+Subscribe to our channel: https://www.youtube.com/@SpotlightPA
+Subscribe to our newsletters: http://www.spotlightpa.org/newsletters
+Support our newsroom: http://www.spotlightpa.org/donate</media:description>
+   <media:community>
+    <media:starRating count="0" average="0.00" min="1" max="5"/>
+    <media:statistics views="23"/>
+   </media:community>
+  </media:group>
+ </entry>
+ <entry>
+  <id>yt:video:RG2-MAmGCQ0</id>
+  <yt:videoId>RG2-MAmGCQ0</yt:videoId>
+  <yt:channelId>UC2RdIuNJ3E2kAELpxo1sFPg</yt:channelId>
+  <title>Pa. Haitian community navigates immigration uncertainty</title>
+  <link rel="alternate" href="https://www.youtube.com/shorts/RG2-MAmGCQ0"/>
+  <author>
+   <name>Spotlight PA</name>
+   <uri>https://www.youtube.com/channel/UC2RdIuNJ3E2kAELpxo1sFPg</uri>
+  </author>
+  <published>2026-02-20T17:06:10+00:00</published>
+  <updated>2026-02-20T17:10:42+00:00</updated>
+  <media:group>
+   <media:title>Pa. Haitian community navigates immigration uncertainty</media:title>
+   <media:content url="https://www.youtube.com/v/RG2-MAmGCQ0?version=3" type="application/x-shockwave-flash" width="640" height="390"/>
+   <media:thumbnail url="https://i3.ytimg.com/vi/RG2-MAmGCQ0/hqdefault.jpg" width="480" height="360"/>
+   <media:description>Haitians in Berks County, Pennsylvania, have spent decades putting down roots in the region. After a federal judge blocked a Trump admin attempt to remove immigration protections, community members are still grappling with the reality.
+
+For more information visit https://www.spotlightpa.org
+Subscribe to our channel: https://www.youtube.com/@SpotlightPA
+Subscribe to our newsletters: http://www.spotlightpa.org/newsletters
+Support our newsroom: http://www.spotlightpa.org/donate</media:description>
+   <media:community>
+    <media:starRating count="7" average="5.00" min="1" max="5"/>
+    <media:statistics views="307"/>
+   </media:community>
+  </media:group>
+ </entry>
+ <entry>
+  <id>yt:video:rhOAFlhXrzY</id>
+  <yt:videoId>rhOAFlhXrzY</yt:videoId>
+  <yt:channelId>UC2RdIuNJ3E2kAELpxo1sFPg</yt:channelId>
+  <title>Pennsylvania could face a serious housing crisis by 2035.</title>
+  <link rel="alternate" href="https://www.youtube.com/shorts/rhOAFlhXrzY"/>
+  <author>
+   <name>Spotlight PA</name>
+   <uri>https://www.youtube.com/channel/UC2RdIuNJ3E2kAELpxo1sFPg</uri>
+  </author>
+  <published>2026-02-18T18:12:03+00:00</published>
+  <updated>2026-02-21T21:59:45+00:00</updated>
+  <media:group>
+   <media:title>Pennsylvania could face a serious housing crisis by 2035.</media:title>
+   <media:content url="https://www.youtube.com/v/rhOAFlhXrzY?version=3" type="application/x-shockwave-flash" width="640" height="390"/>
+   <media:thumbnail url="https://i3.ytimg.com/vi/rhOAFlhXrzY/hqdefault.jpg" width="480" height="360"/>
+   <media:description>Pennsylvania could be short over 180,000 housing units by 2035. But, what obstacles are in the state’s way of adding more?
+
+For more information visit https://www.spotlightpa.org
+Subscribe to our channel: https://www.youtube.com/@SpotlightPA
+Subscribe to our newsletters: http://www.spotlightpa.org/newsletters
+Support our newsroom: http://www.spotlightpa.org/donate</media:description>
+   <media:community>
+    <media:starRating count="3" average="5.00" min="1" max="5"/>
+    <media:statistics views="404"/>
+   </media:community>
+  </media:group>
+ </entry>
+ <entry>
+  <id>yt:video:51lJ5LvkoIs</id>
+  <yt:videoId>51lJ5LvkoIs</yt:videoId>
+  <yt:channelId>UC2RdIuNJ3E2kAELpxo1sFPg</yt:channelId>
+  <title>BOOKLIGHT PA: WHERE WE KEEP THE LIGHT: Read Josh Shapiro’s memoir with top Pennsylvania journalists</title>
+  <link rel="alternate" href="https://www.youtube.com/watch?v=51lJ5LvkoIs"/>
+  <author>
+   <name>Spotlight PA</name>
+   <uri>https://www.youtube.com/channel/UC2RdIuNJ3E2kAELpxo1sFPg</uri>
+  </author>
+  <published>2026-02-18T12:08:13+00:00</published>
+  <updated>2026-02-18T13:33:41+00:00</updated>
+  <media:group>
+   <media:title>BOOKLIGHT PA: WHERE WE KEEP THE LIGHT: Read Josh Shapiro’s memoir with top Pennsylvania journalists</media:title>
+   <media:content url="https://www.youtube.com/v/51lJ5LvkoIs?version=3" type="application/x-shockwave-flash" width="640" height="390"/>
+   <media:thumbnail url="https://i2.ytimg.com/vi/51lJ5LvkoIs/hqdefault.jpg" width="480" height="360"/>
+   <media:description>For more information visit https://www.spotlightpa.org
+Subscribe to our channel: https://www.youtube.com/@SpotlightPA
+Subscribe to our newsletters: http://www.spotlightpa.org/newsletters
+Support our newsroom: http://www.spotlightpa.org/donate</media:description>
+   <media:community>
+    <media:starRating count="5" average="5.00" min="1" max="5"/>
+    <media:statistics views="275"/>
+   </media:community>
+  </media:group>
+ </entry>
+ <entry>
+  <id>yt:video:JK3D_sbpSVs</id>
+  <yt:videoId>JK3D_sbpSVs</yt:videoId>
+  <yt:channelId>UC2RdIuNJ3E2kAELpxo1sFPg</yt:channelId>
+  <title>Spotlight PA Live Stream</title>
+  <link rel="alternate" href="https://www.youtube.com/watch?v=JK3D_sbpSVs"/>
+  <author>
+   <name>Spotlight PA</name>
+   <uri>https://www.youtube.com/channel/UC2RdIuNJ3E2kAELpxo1sFPg</uri>
+  </author>
+  <published>2026-02-16T20:19:00+00:00</published>
+  <updated>2026-02-16T20:19:03+00:00</updated>
+  <media:group>
+   <media:title>Spotlight PA Live Stream</media:title>
+   <media:content url="https://www.youtube.com/v/JK3D_sbpSVs?version=3" type="application/x-shockwave-flash" width="640" height="390"/>
+   <media:thumbnail url="https://i3.ytimg.com/vi/JK3D_sbpSVs/hqdefault.jpg" width="480" height="360"/>
+   <media:description>For more information visit https://www.spotlightpa.org
+Subscribe to our channel: https://www.youtube.com/@SpotlightPA
+Subscribe to our newsletters: http://www.spotlightpa.org/newsletters
+Support our newsroom: http://www.spotlightpa.org/donate</media:description>
+   <media:community>
+    <media:starRating count="0" average="0.00" min="1" max="5"/>
+    <media:statistics views="0"/>
+   </media:community>
+  </media:group>
+ </entry>
+ <entry>
+  <id>yt:video:LEMfJk5IEvQ</id>
+  <yt:videoId>LEMfJk5IEvQ</yt:videoId>
+  <yt:channelId>UC2RdIuNJ3E2kAELpxo1sFPg</yt:channelId>
+  <title>PA lawmaker walks back comments on removal of slavery exhibit</title>
+  <link rel="alternate" href="https://www.youtube.com/shorts/LEMfJk5IEvQ"/>
+  <author>
+   <name>Spotlight PA</name>
+   <uri>https://www.youtube.com/channel/UC2RdIuNJ3E2kAELpxo1sFPg</uri>
+  </author>
+  <published>2026-02-05T19:12:18+00:00</published>
+  <updated>2026-02-10T09:23:02+00:00</updated>
+  <media:group>
+   <media:title>PA lawmaker walks back comments on removal of slavery exhibit</media:title>
+   <media:content url="https://www.youtube.com/v/LEMfJk5IEvQ?version=3" type="application/x-shockwave-flash" width="640" height="390"/>
+   <media:thumbnail url="https://i1.ytimg.com/vi/LEMfJk5IEvQ/hqdefault.jpg" width="480" height="360"/>
+   <media:description>Rep. Valerie Gaydos, who originally said &quot;Good riddance&quot; to an outdoor exhibit in Philadelphia honoring the lives of nine individuals enslaved by George Washington, is now walking back her comments.
+
+The story is featured in our subscriber-only newsletter Access Harrisburg. Sign up now at http://www.spotlightpa.org/newsletters. 
+
+
+For more information visit https://www.spotlightpa.org
+Subscribe to our channel: https://www.youtube.com/@SpotlightPA
+Subscribe to our newsletters: http://www.spotlightpa.org/newsletters
+Support our newsroom: http://www.spotlightpa.org/donate</media:description>
+   <media:community>
+    <media:starRating count="20" average="5.00" min="1" max="5"/>
+    <media:statistics views="770"/>
+   </media:community>
+  </media:group>
+ </entry>
+ <entry>
+  <id>yt:video:rjE0GK1dc8I</id>
+  <yt:videoId>rjE0GK1dc8I</yt:videoId>
+  <yt:channelId>UC2RdIuNJ3E2kAELpxo1sFPg</yt:channelId>
+  <title>Trump endorses Republican Stacy Garrity for PA governor</title>
+  <link rel="alternate" href="https://www.youtube.com/shorts/rjE0GK1dc8I"/>
+  <author>
+   <name>Spotlight PA</name>
+   <uri>https://www.youtube.com/channel/UC2RdIuNJ3E2kAELpxo1sFPg</uri>
+  </author>
+  <published>2026-01-30T20:32:40+00:00</published>
+  <updated>2026-01-30T20:33:49+00:00</updated>
+  <media:group>
+   <media:title>Trump endorses Republican Stacy Garrity for PA governor</media:title>
+   <media:content url="https://www.youtube.com/v/rjE0GK1dc8I?version=3" type="application/x-shockwave-flash" width="640" height="390"/>
+   <media:thumbnail url="https://i3.ytimg.com/vi/rjE0GK1dc8I/hqdefault.jpg" width="480" height="360"/>
+   <media:description>Garrity, a longtime Trump ally, pledged to work with him this November to defeat incumbent Democratic Gov. Josh Shapiro.
+
+For more information visit https://www.spotlightpa.org
+Subscribe to our channel: https://www.youtube.com/@SpotlightPA
+Subscribe to our newsletters: http://www.spotlightpa.org/newsletters
+Support our newsroom: http://www.spotlightpa.org/donate</media:description>
+   <media:community>
+    <media:starRating count="18" average="5.00" min="1" max="5"/>
+    <media:statistics views="966"/>
+   </media:community>
+  </media:group>
+ </entry>
+ <entry>
+  <id>yt:video:VkYpJEDCjNM</id>
+  <yt:videoId>VkYpJEDCjNM</yt:videoId>
+  <yt:channelId>UC2RdIuNJ3E2kAELpxo1sFPg</yt:channelId>
+  <title>Read with us: Josh Shapiro's &quot;Where We Keep the Light&quot;</title>
+  <link rel="alternate" href="https://www.youtube.com/shorts/VkYpJEDCjNM"/>
+  <author>
+   <name>Spotlight PA</name>
+   <uri>https://www.youtube.com/channel/UC2RdIuNJ3E2kAELpxo1sFPg</uri>
+  </author>
+  <published>2026-01-29T16:00:25+00:00</published>
+  <updated>2026-02-01T21:45:34+00:00</updated>
+  <media:group>
+   <media:title>Read with us: Josh Shapiro's &quot;Where We Keep the Light&quot;</media:title>
+   <media:content url="https://www.youtube.com/v/VkYpJEDCjNM?version=3" type="application/x-shockwave-flash" width="640" height="390"/>
+   <media:thumbnail url="https://i3.ytimg.com/vi/VkYpJEDCjNM/hqdefault.jpg" width="480" height="360"/>
+   <media:description>Booklight PA is back! We're kicking things off with Gov. Josh Shapiro's new memoir &quot;Where We Keep the Light: Stories from a Life of Service.&quot; Read with us, then discuss the book with top reporters on Feb. 17. For more info, head to www.spotlightpa.org/events. 
+
+For more information visit https://www.spotlightpa.org
+Subscribe to our channel: https://www.youtube.com/@SpotlightPA
+Subscribe to our newsletters: http://www.spotlightpa.org/newsletters
+Support our newsroom: http://www.spotlightpa.org/donate</media:description>
+   <media:community>
+    <media:starRating count="1" average="5.00" min="1" max="5"/>
+    <media:statistics views="242"/>
+   </media:community>
+  </media:group>
+ </entry>
+ <entry>
+  <id>yt:video:fYQyyQPBic0</id>
+  <yt:videoId>fYQyyQPBic0</yt:videoId>
+  <yt:channelId>UC2RdIuNJ3E2kAELpxo1sFPg</yt:channelId>
+  <title>100s of rapes unreported by Pa. police department</title>
+  <link rel="alternate" href="https://www.youtube.com/shorts/fYQyyQPBic0"/>
+  <author>
+   <name>Spotlight PA</name>
+   <uri>https://www.youtube.com/channel/UC2RdIuNJ3E2kAELpxo1sFPg</uri>
+  </author>
+  <published>2026-01-20T21:51:56+00:00</published>
+  <updated>2026-02-20T19:00:18+00:00</updated>
+  <media:group>
+   <media:title>100s of rapes unreported by Pa. police department</media:title>
+   <media:content url="https://www.youtube.com/v/fYQyyQPBic0?version=3" type="application/x-shockwave-flash" width="640" height="390"/>
+   <media:thumbnail url="https://i3.ytimg.com/vi/fYQyyQPBic0/hqdefault.jpg" width="480" height="360"/>
+   <media:description>Over nearly a decade, the State College Police Department underreported hundreds of rapes in public data, a Spotlight PA investigation found.
+
+For more information visit https://www.spotlightpa.org
+Subscribe to our channel: https://www.youtube.com/@SpotlightPA
+Subscribe to our newsletters: http://www.spotlightpa.org/newsletters
+Support our newsroom: http://www.spotlightpa.org/donate</media:description>
+   <media:community>
+    <media:starRating count="239" average="5.00" min="1" max="5"/>
+    <media:statistics views="6335"/>
+   </media:community>
+  </media:group>
+ </entry>
+ <entry>
+  <id>yt:video:RMDcQDO1I2A</id>
+  <yt:videoId>RMDcQDO1I2A</yt:videoId>
+  <yt:channelId>UC2RdIuNJ3E2kAELpxo1sFPg</yt:channelId>
+  <title>How Do We Solve Pennsylvania's Teacher Shortage?</title>
+  <link rel="alternate" href="https://www.youtube.com/watch?v=RMDcQDO1I2A"/>
+  <author>
+   <name>Spotlight PA</name>
+   <uri>https://www.youtube.com/channel/UC2RdIuNJ3E2kAELpxo1sFPg</uri>
+  </author>
+  <published>2026-01-16T18:02:19+00:00</published>
+  <updated>2026-02-16T18:44:40+00:00</updated>
+  <media:group>
+   <media:title>How Do We Solve Pennsylvania's Teacher Shortage?</media:title>
+   <media:content url="https://www.youtube.com/v/RMDcQDO1I2A?version=3" type="application/x-shockwave-flash" width="640" height="390"/>
+   <media:thumbnail url="https://i3.ytimg.com/vi/RMDcQDO1I2A/hqdefault.jpg" width="480" height="360"/>
+   <media:description>Laura Boyce, ED of Teach Plus Pennsylvania, shares strategies to restore PA’s teachers pipeline joined by Mary Franciscus, HR director for the BCIU, and Rebecca West Burns, dean of the College of Education at Kutztown University.
+
+For more information visit https://www.spotlightpa.org
+Subscribe to our channel: https://www.youtube.com/@SpotlightPA
+Subscribe to our newsletters: http://www.spotlightpa.org/newsletters
+Support our newsroom: http://www.spotlightpa.org/donate</media:description>
+   <media:community>
+    <media:starRating count="1" average="5.00" min="1" max="5"/>
+    <media:statistics views="77"/>
+   </media:community>
+  </media:group>
+ </entry>
+ <entry>
+  <id>yt:video:GjZ1by7Q-HQ</id>
+  <yt:videoId>GjZ1by7Q-HQ</yt:videoId>
+  <yt:channelId>UC2RdIuNJ3E2kAELpxo1sFPg</yt:channelId>
+  <title>The Famous Farm Show Milkshake is Worth the Wait</title>
+  <link rel="alternate" href="https://www.youtube.com/shorts/GjZ1by7Q-HQ"/>
+  <author>
+   <name>Spotlight PA</name>
+   <uri>https://www.youtube.com/channel/UC2RdIuNJ3E2kAELpxo1sFPg</uri>
+  </author>
+  <published>2026-01-16T16:40:00+00:00</published>
+  <updated>2026-02-16T18:46:07+00:00</updated>
+  <media:group>
+   <media:title>The Famous Farm Show Milkshake is Worth the Wait</media:title>
+   <media:content url="https://www.youtube.com/v/GjZ1by7Q-HQ?version=3" type="application/x-shockwave-flash" width="640" height="390"/>
+   <media:thumbnail url="https://i4.ytimg.com/vi/GjZ1by7Q-HQ/hqdefault.jpg" width="480" height="360"/>
+   <media:description>Each year, the Pennsylvania Dairymen’s Association serves up thousands of gallons of milkshakes at the PA Farm Show, and people wait in long lines to get a taste.
+
+Reporter Asha Prihar went behind the scenes at this year's show to see how it all works.
+
+For more information visit https://www.spotlightpa.org
+Subscribe to our channel: https://www.youtube.com/@SpotlightPA
+Subscribe to our newsletters: http://www.spotlightpa.org/newsletters
+Support our newsroom: http://www.spotlightpa.org/donate</media:description>
+   <media:community>
+    <media:starRating count="11" average="5.00" min="1" max="5"/>
+    <media:statistics views="454"/>
+   </media:community>
+  </media:group>
+ </entry>
+ <entry>
+  <id>yt:video:0nH1hTZ_Kcc</id>
+  <yt:videoId>0nH1hTZ_Kcc</yt:videoId>
+  <yt:channelId>UC2RdIuNJ3E2kAELpxo1sFPg</yt:channelId>
+  <title>Four Local Heroes Changing Lives Across Pennsylvania</title>
+  <link rel="alternate" href="https://www.youtube.com/watch?v=0nH1hTZ_Kcc"/>
+  <author>
+   <name>Spotlight PA</name>
+   <uri>https://www.youtube.com/channel/UC2RdIuNJ3E2kAELpxo1sFPg</uri>
+  </author>
+  <published>2026-01-12T18:02:07+00:00</published>
+  <updated>2026-02-12T23:59:52+00:00</updated>
+  <media:group>
+   <media:title>Four Local Heroes Changing Lives Across Pennsylvania</media:title>
+   <media:content url="https://www.youtube.com/v/0nH1hTZ_Kcc?version=3" type="application/x-shockwave-flash" width="640" height="390"/>
+   <media:thumbnail url="https://i1.ytimg.com/vi/0nH1hTZ_Kcc/hqdefault.jpg" width="480" height="360"/>
+   <media:description>Whether it's helping the unhoused or saving animals from slaughter, these Pennsylvanians are reshaping their communities. Discover how heroism shows up — from Erie to Luzerne County.
+
+For more information visit https://www.spotlightpa.org
+Subscribe to our channel: https://www.youtube.com/@SpotlightPA
+Subscribe to our newsletters: http://www.spotlightpa.org/newsletters
+Support our newsroom: http://www.spotlightpa.org/donate
+
+#PALocalHero #PennsylvaniaStories #CommunityHero #PennsylvaniaLife #EverydayHeroes</media:description>
+   <media:community>
+    <media:starRating count="2" average="5.00" min="1" max="5"/>
+    <media:statistics views="44"/>
+   </media:community>
+  </media:group>
+ </entry>
+ <entry>
+  <id>yt:video:b0amLYD9390</id>
+  <yt:videoId>b0amLYD9390</yt:videoId>
+  <yt:channelId>UC2RdIuNJ3E2kAELpxo1sFPg</yt:channelId>
+  <title>Karen Phillips’ Mission to Save Pennsylvania’s Farm Animals</title>
+  <link rel="alternate" href="https://www.youtube.com/watch?v=b0amLYD9390"/>
+  <author>
+   <name>Spotlight PA</name>
+   <uri>https://www.youtube.com/channel/UC2RdIuNJ3E2kAELpxo1sFPg</uri>
+  </author>
+  <published>2026-01-12T17:56:13+00:00</published>
+  <updated>2026-02-12T23:29:22+00:00</updated>
+  <media:group>
+   <media:title>Karen Phillips’ Mission to Save Pennsylvania’s Farm Animals</media:title>
+   <media:content url="https://www.youtube.com/v/b0amLYD9390?version=3" type="application/x-shockwave-flash" width="640" height="390"/>
+   <media:thumbnail url="https://i3.ytimg.com/vi/b0amLYD9390/hqdefault.jpg" width="480" height="360"/>
+   <media:description>On six acres in western PA, Hope Haven Farm Sanctuary nurtures rescued goats, pigs, horses, and more — all thanks to local hero Karen Phillips.
+
+For more information visit https://www.spotlightpa.org
+Subscribe to our channel: https://www.youtube.com/@SpotlightPA
+Subscribe to our newsletters: http://www.spotlightpa.org/newsletters
+Support our newsroom: http://www.spotlightpa.org/donate
+
+#PALocalHero #AnimalAdvocacy  #AnimalRescuePA #PennsylvaniaLife #EverydayHeroes</media:description>
+   <media:community>
+    <media:starRating count="10" average="5.00" min="1" max="5"/>
+    <media:statistics views="69"/>
+   </media:community>
+  </media:group>
+ </entry>
+ <entry>
+  <id>yt:video:kOVFUzrKX2Y</id>
+  <yt:videoId>kOVFUzrKX2Y</yt:videoId>
+  <yt:channelId>UC2RdIuNJ3E2kAELpxo1sFPg</yt:channelId>
+  <title>2026 PA Governor Race: Shapiro Launches Reelection Campaign</title>
+  <link rel="alternate" href="https://www.youtube.com/shorts/kOVFUzrKX2Y"/>
+  <author>
+   <name>Spotlight PA</name>
+   <uri>https://www.youtube.com/channel/UC2RdIuNJ3E2kAELpxo1sFPg</uri>
+  </author>
+  <published>2026-01-09T17:16:46+00:00</published>
+  <updated>2026-02-09T14:42:04+00:00</updated>
+  <media:group>
+   <media:title>2026 PA Governor Race: Shapiro Launches Reelection Campaign</media:title>
+   <media:content url="https://www.youtube.com/v/kOVFUzrKX2Y?version=3" type="application/x-shockwave-flash" width="640" height="390"/>
+   <media:thumbnail url="https://i4.ytimg.com/vi/kOVFUzrKX2Y/hqdefault.jpg" width="480" height="360"/>
+   <media:description>Gov. Josh Shapiro kicks off his 2026 Pennsylvania reelection campaign in Pittsburgh and Philly as Republican state Treasurer Stacy Garrity lines up to challenge him, setting the stage for a high‑stakes governor’s race.
+
+For more information visit https://www.spotlightpa.org
+Subscribe to our channel: https://www.youtube.com/@SpotlightPA
+Subscribe to our newsletters: http://www.spotlightpa.org/newsletters
+Support our newsroom: http://www.spotlightpa.org/donate</media:description>
+   <media:community>
+    <media:starRating count="45" average="5.00" min="1" max="5"/>
+    <media:statistics views="13705"/>
+   </media:community>
+  </media:group>
+ </entry>
+ <entry>
+  <id>yt:video:2Spd2LJDsUo</id>
+  <yt:videoId>2Spd2LJDsUo</yt:videoId>
+  <yt:channelId>UC2RdIuNJ3E2kAELpxo1sFPg</yt:channelId>
+  <title>Thank You for Supporting Spotlight PA</title>
+  <link rel="alternate" href="https://www.youtube.com/watch?v=2Spd2LJDsUo"/>
+  <author>
+   <name>Spotlight PA</name>
+   <uri>https://www.youtube.com/channel/UC2RdIuNJ3E2kAELpxo1sFPg</uri>
+  </author>
+  <published>2026-01-01T15:11:36+00:00</published>
+  <updated>2026-02-01T15:57:46+00:00</updated>
+  <media:group>
+   <media:title>Thank You for Supporting Spotlight PA</media:title>
+   <media:content url="https://www.youtube.com/v/2Spd2LJDsUo?version=3" type="application/x-shockwave-flash" width="640" height="390"/>
+   <media:thumbnail url="https://i3.ytimg.com/vi/2Spd2LJDsUo/hqdefault.jpg" width="480" height="360"/>
+   <media:description>As a nonprofit, we rely on donors to power our uniquely independent, unbiased reporting for Pennsylvania. If you're not yet a supporter, make a gift now at http://www.spotlightpa.org/donate .
+
+For more information visit https://www.spotlightpa.org
+Subscribe to our channel: https://www.youtube.com/@SpotlightPA
+Subscribe to our newsletters: http://www.spotlightpa.org/newsletters
+Support our newsroom: http://www.spotlightpa.org/donate</media:description>
+   <media:community>
+    <media:starRating count="8" average="5.00" min="1" max="5"/>
+    <media:statistics views="122"/>
+   </media:community>
+  </media:group>
+ </entry>
+</feed>
