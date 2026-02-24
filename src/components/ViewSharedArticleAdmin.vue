@@ -615,7 +615,10 @@ function setImageProps(image) {
             v-model:subject="composerSubject"
             v-model:body="composerBodyText"
             class="mt-5"
-            :can-discard="composerSubject !== initialComposerSubject || composerBodyText !== emailBody"
+            :can-discard="
+              composerSubject !== initialComposerSubject ||
+              composerBodyText !== emailBody
+            "
             @hide="showComposer = false"
             @discard="resetComposer"
           ></EmailComposer>
