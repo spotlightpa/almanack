@@ -70,8 +70,11 @@ let router = createRouter({
       path: "/articles/:id",
       name: "arc-article",
       component: load(() => import("@/components/ViewArticleRedirect.vue")),
-      props: true,
-      meta: { requiresAuth: isEditor },
+      props: (route) => ({
+        id: route.params.id,
+        sourceType: "arc",
+      }),
+      meta: { requiresAuth: isEditor, redirectTo: "shared-article" },
     },
     {
       path: "/admin/article-redirect",
@@ -81,19 +84,20 @@ let router = createRouter({
         id: route.query.id,
         sourceType: route.query.source_type,
       }),
-      meta: { requiresAuth: isEditor },
+      meta: { requiresAuth: isEditor, redirectTo: "shared-article" },
     },
     {
       path: "/admin/article-admin-redirect",
       name: "shared-article-admin-redirect-from-page",
-      component: load(
-        () => import("@/components/ViewArticleAdminRedirect.vue")
-      ),
+      component: load(() => import("@/components/ViewArticleRedirect.vue")),
       props: (route) => ({
         id: route.query.id,
         sourceType: route.query.source_type,
       }),
-      meta: { requiresAuth: isSpotlightPAUser },
+      meta: {
+        requiresAuth: isSpotlightPAUser,
+        redirectTo: "shared-article-admin",
+      },
     },
     {
       path: "/shared-articles/:id",
