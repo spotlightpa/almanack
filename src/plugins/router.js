@@ -70,7 +70,10 @@ let router = createRouter({
       path: "/articles/:id",
       name: "arc-article",
       component: load(() => import("@/components/ViewArticleRedirect.vue")),
-      props: true,
+      props: (route) => ({
+        id: route.params.id,
+        sourceType: "arc",
+      }),
       meta: { requiresAuth: isEditor, redirectTo: "shared-article" },
     },
     {

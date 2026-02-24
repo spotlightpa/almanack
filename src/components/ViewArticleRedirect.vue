@@ -8,9 +8,7 @@ const router = useRouter();
 const route = useRoute();
 const props = defineProps({
   id: String,
-  sourceType: {
-    default: "arc",
-  },
+  sourceType: String,
 });
 
 const isLoading = ref(false);
