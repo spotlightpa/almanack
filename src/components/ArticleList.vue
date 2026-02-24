@@ -1,14 +1,10 @@
-<script>
+<script setup>
 import { formatDate } from "@/utils/time-format.js";
 
-export default {
-  name: "ArticleList",
-  props: {
-    articles: Array,
-    title: String,
-  },
-  methods: { formatDate },
-};
+defineProps({
+  articles: Array,
+  title: String,
+});
 </script>
 <template>
   <nav class="panel is-black">

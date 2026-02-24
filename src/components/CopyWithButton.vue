@@ -1,23 +1,20 @@
-<script>
-export default {
-  name: "CopyWithButton",
-  props: {
-    value: String,
-    label: {
-      type: String,
-      default: "text",
-    },
-    size: {
-      type: String,
-      default: "",
-    },
+<script setup>
+import { ref } from "vue";
+
+defineProps({
+  value: String,
+  label: {
+    type: String,
+    default: "text",
   },
-  data() {
-    return {
-      copied: false,
-    };
+  size: {
+    type: String,
+    default: "",
   },
-};
+});
+
+const copier = ref(null);
+const copied = ref(false);
 </script>
 
 <template>
@@ -39,7 +36,7 @@ export default {
           class="button is-primary has-text-weight-semibold"
           :class="size"
           title="Copy"
-          @click="$refs.copier.copy()"
+          @click="copier.copy()"
         >
           <span class="icon">
             <font-awesome-icon :icon="['far', 'copy']"></font-awesome-icon>

@@ -1,35 +1,32 @@
-<script>
-export default {
-  props: {
-    title: {
-      type: String,
-      required: true,
-    },
-    page: {
-      type: String,
-    },
-    nextPage: {
-      type: Object,
-    },
-    apiState: {
-      type: Object,
-      required: true,
-    },
-    reload: {
-      type: Function,
-      required: true,
-    },
-    pages: {
-      type: Array,
-      required: true,
-    },
+<script setup>
+import { toRefs } from "vue";
+
+const props = defineProps({
+  title: {
+    type: String,
+    required: true,
   },
-  setup(props) {
-    return {
-      ...props.apiState,
-    };
+  page: {
+    type: String,
   },
-};
+  nextPage: {
+    type: Object,
+  },
+  apiState: {
+    type: Object,
+    required: true,
+  },
+  reload: {
+    type: Function,
+    required: true,
+  },
+  pages: {
+    type: Array,
+    required: true,
+  },
+});
+
+const { isLoading, error } = toRefs(props.apiState);
 </script>
 
 <template>
