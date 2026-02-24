@@ -1,12 +1,17 @@
 <script>
 import { computed, reactive, ref, toRefs } from "vue";
 
-import { useClient } from "@/api/client.js";
+import {
+  get,
+  post,
+  listAuthorizedDomains,
+  postAuthorizedDomain,
+  listAuthorizedEmailAddresses,
+  postAuthorizedEmailAddress,
+} from "@/api/client-v2.js";
 import { makeState } from "@/api/service-util.js";
 
 function domainState() {
-  let { listAuthorizedDomains, postAuthorizedDomain } = useClient();
-
   let { apiState: listState, exec: listExec } = makeState();
   let { apiState: addState, exec: addExec } = makeState();
 
@@ -19,11 +24,11 @@ function domainState() {
   });
 
   async function list() {
-    await listExec(listAuthorizedDomains);
+    await listExec(() => get(listAuthorizedDomains));
   }
 
   async function addDomain(domain) {
-    await addExec(() => postAuthorizedDomain({ domain, remove: false }));
+    await addExec(() => post(postAuthorizedDomain, { domain, remove: false }));
     await list();
   }
 
@@ -31,7 +36,7 @@ function domainState() {
     if (!window.confirm(`Are you sure you want to remove ${domain}?`)) {
       return;
     }
-    await addExec(() => postAuthorizedDomain({ domain, remove: true }));
+    await addExec(() => post(postAuthorizedDomain, { domain, remove: true }));
     await list();
   }
 
@@ -46,9 +51,6 @@ function domainState() {
 }
 
 function addressState() {
-  let { listAuthorizedEmailAddresses, postAuthorizedEmailAddress } =
-    useClient();
-
   let { apiState: listState, exec: listExec } = makeState();
   let { apiState: addState, exec: addExec } = makeState();
 
@@ -61,11 +63,13 @@ function addressState() {
   });
 
   async function list() {
-    await listExec(listAuthorizedEmailAddresses);
+    await listExec(() => get(listAuthorizedEmailAddresses));
   }
 
   async function addAddress(address) {
-    await addExec(() => postAuthorizedEmailAddress({ address, remove: false }));
+    await addExec(() =>
+      post(postAuthorizedEmailAddress, { address, remove: false })
+    );
     await list();
   }
 
@@ -73,7 +77,9 @@ function addressState() {
     if (!window.confirm(`Are you sure you want to remove ${address}?`)) {
       return;
     }
-    await addExec(() => postAuthorizedEmailAddress({ address, remove: true }));
+    await addExec(() =>
+      post(postAuthorizedEmailAddress, { address, remove: true })
+    );
     await list();
   }
 

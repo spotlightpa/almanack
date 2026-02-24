@@ -1,7 +1,7 @@
 <script>
 import { reactive, toRefs, computed } from "vue";
 
-import { useClient } from "@/api/client.js";
+import { uploadImage } from "@/api/client-v2.js";
 import imgproxyURL from "@/api/imgproxy-url.js";
 
 let acceptedTypes = [
@@ -16,8 +16,6 @@ let acceptedTypes = [
 export default {
   name: "ImageUploader",
   setup(props, { emit }) {
-    let { uploadImage } = useClient();
-
     let state = reactive({
       isUploading: false,
       filename: "",

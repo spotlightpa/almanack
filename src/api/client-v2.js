@@ -105,3 +105,71 @@ export const getSiteData = `/api/site-data`;
 export const postSiteData = `/api/site-data`;
 export const getSiteParams = `/api/site-params`;
 export const postSiteParams = `/api/site-params`;
+
+export async function uploadImage(body) {
+  let [data, err] = await post(createSignedUpload, { type: body.type });
+  if (err) {
+    return ["", err];
+  }
+  let { "signed-url": signedURL, filename } = data;
+  let rsp;
+  try {
+    rsp = await fetch(signedURL, { method: "PUT", body });
+  } catch (e) {
+    return ["", e];
+  }
+  if (!rsp.ok) {
+    return ["", await responseError(rsp)];
+  }
+  [, err] = await post(postImageUpdate, {
+    path: filename,
+    set_credit: false,
+    set_description: false,
+  });
+  if (err) {
+    return ["", err];
+  }
+  return [filename, null];
+}
+
+export async function uploadFile(body) {
+  let [data, err] = await post(createFile, {
+    filename: body.name,
+    mimeType: body.type,
+  });
+  if (err) {
+    return ["", err];
+  }
+  let {
+    "signed-url": signedURL,
+    "file-url": fileURL,
+    "cache-control": cacheControl,
+    disposition,
+  } = data;
+  let opts = {
+    method: "PUT",
+    body,
+    headers: {
+      "Content-Disposition": disposition,
+      "Cache-Control": cacheControl,
+    },
+  };
+  let rsp;
+  try {
+    rsp = await fetch(signedURL, opts);
+  } catch (e) {
+    return ["", e];
+  }
+  if (!rsp.ok) {
+    return ["", await responseError(rsp)];
+  }
+  [, err] = await post(updateFile, {
+    url: fileURL,
+    description: null,
+    set_description: false,
+  });
+  if (err) {
+    return ["", err];
+  }
+  return [fileURL, null];
+}

@@ -1,10 +1,9 @@
 import { reactive, computed, toRefs } from "vue";
 
-import { useClient } from "./client.js";
+import { get, post, listFiles, updateFile, uploadFile } from "./client-v2.js";
 import { makeState } from "./service-util.js";
 
 export function useFileList() {
-  let { listFiles, updateFile, uploadFile } = useClient();
   let { apiState, exec } = makeState();
 
   let state = reactive({
@@ -18,15 +17,17 @@ export function useFileList() {
 
   let actions = {
     async fetch() {
-      exec(listFiles);
+      exec(() => get(listFiles));
     },
     updateDescription(file) {
       let description = window.prompt("Update description", file.description);
       if (description !== null && description !== file.description) {
         exec(() =>
-          Promise.resolve()
-            .then(() => updateFile(file.url, { description }))
-            .then(listFiles)
+          post(updateFile, {
+            url: file.url,
+            description,
+            set_description: true,
+          }).then(() => get(listFiles))
         );
       }
     },

@@ -1,7 +1,7 @@
 <script>
 import { reactive, computed, toRefs, watch } from "vue";
 
-import { useClient } from "@/api/client.js";
+import { get, post, getSidebar, saveSidebar } from "@/api/client-v2.js";
 import { makeState } from "@/api/service-util.js";
 import { formatDateTime, today, tomorrow } from "@/utils/time-format.js";
 import useScrollTo from "@/utils/use-scroll-to.js";
@@ -82,7 +82,6 @@ export default {
   setup() {
     const [container, scrollTo] = useScrollTo();
 
-    let { getSidebar, saveSidebar } = useClient();
     let { apiState: sidebarState, exec: sidebarExec } = makeState();
     let state = reactive({
       rawSidebars: computed(() => sidebarState.rawData?.configs ?? []),
@@ -91,11 +90,11 @@ export default {
     });
     let actions = {
       reloadSidebars() {
-        return sidebarExec(getSidebar);
+        return sidebarExec(() => get(getSidebar));
       },
       save() {
         return sidebarExec(() =>
-          saveSidebar({
+          post(saveSidebar, {
             configs: state.allSidebars,
           })
         );
