@@ -1,24 +1,25 @@
-<script>
-export default {
-  name: "TagStatus",
-  props: ["status"],
-  computed: {
-    verbose() {
-      return {
-        pub: "Published",
-        sked: "Scheduled",
-        none: "Unpublished",
-      }[this.status];
-    },
-    cssClass() {
-      return {
-        pub: "is-success",
-        sked: "is-warning",
-        none: "is-danger",
-      }[this.status];
-    },
-  },
-};
+<script setup>
+import { computed } from "vue";
+
+const props = defineProps(["status"]);
+
+const verbose = computed(
+  () =>
+    ({
+      pub: "Published",
+      sked: "Scheduled",
+      none: "Unpublished",
+    })[props.status]
+);
+
+const cssClass = computed(
+  () =>
+    ({
+      pub: "is-success",
+      sked: "is-warning",
+      none: "is-danger",
+    })[props.status]
+);
 </script>
 
 <template>

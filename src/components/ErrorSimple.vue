@@ -1,17 +1,12 @@
-<script>
-export default {
-  props: {
-    error: [Error, String],
-  },
-  computed: {
-    name() {
-      return this.error?.name ?? this.error ?? "Error";
-    },
-    message() {
-      return this.error?.message ?? this.error ?? "";
-    },
-  },
-};
+<script setup>
+import { computed } from "vue";
+
+const props = defineProps({
+  error: [Error, String],
+});
+
+const name = computed(() => props.error?.name ?? props.error ?? "Error");
+const message = computed(() => props.error?.message ?? props.error ?? "");
 </script>
 
 <template>

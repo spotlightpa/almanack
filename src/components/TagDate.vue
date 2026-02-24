@@ -1,13 +1,7 @@
-<script>
+<script setup>
 import { formatDate } from "@/utils/time-format.js";
 
-export default {
-  name: "TagDate",
-  props: { date: Date },
-  setup() {
-    return { formatDate };
-  },
-};
+defineProps({ date: Date });
 </script>
 
 <template>
