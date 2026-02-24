@@ -9,6 +9,76 @@ import (
 	"context"
 )
 
+const listYouTubeUpdates = `-- name: ListYouTubeUpdates :many
+SELECT
+  id, external_id, title, url, thumbnail_url, external_published_at, external_updated_at, uploaded_at, created_at, updated_at
+FROM
+  youtube
+WHERE
+  "uploaded_at" IS NULL
+`
+
+func (q *Queries) ListYouTubeUpdates(ctx context.Context) ([]Youtube, error) {
+	rows, err := q.db.Query(ctx, listYouTubeUpdates)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []Youtube
+	for rows.Next() {
+		var i Youtube
+		if err := rows.Scan(
+			&i.ID,
+			&i.ExternalID,
+			&i.Title,
+			&i.URL,
+			&i.ThumbnailUrl,
+			&i.ExternalPublishedAt,
+			&i.ExternalUpdatedAt,
+			&i.UploadedAt,
+			&i.CreatedAt,
+			&i.UpdatedAt,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const updateYouTubeUploaded = `-- name: UpdateYouTubeUploaded :one
+UPDATE
+  youtube
+SET
+  "uploaded_at" = CURRENT_TIMESTAMP,
+  "updated_at" = CURRENT_TIMESTAMP
+WHERE
+  "id" = $1
+RETURNING
+  id, external_id, title, url, thumbnail_url, external_published_at, external_updated_at, uploaded_at, created_at, updated_at
+`
+
+func (q *Queries) UpdateYouTubeUploaded(ctx context.Context, id int64) (Youtube, error) {
+	row := q.db.QueryRow(ctx, updateYouTubeUploaded, id)
+	var i Youtube
+	err := row.Scan(
+		&i.ID,
+		&i.ExternalID,
+		&i.Title,
+		&i.URL,
+		&i.ThumbnailUrl,
+		&i.ExternalPublishedAt,
+		&i.ExternalUpdatedAt,
+		&i.UploadedAt,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+	)
+	return i, err
+}
+
 const upsertYouTubeFeedArchives = `-- name: UpsertYouTubeFeedArchives :execrows
 WITH raw_json AS (
   SELECT
@@ -20,8 +90,8 @@ feed_items AS (
     data ->> 'title' AS title,
     data ->> 'url' AS url,
     data ->> 'thumbnail_url' AS thumbnail_url,
-    data ->> 'external_published_at' AS external_published_at,
-    data ->> 'external_updated_at' AS external_updated_at
+    iso_to_timestamptz (data ->> 'external_updated_at')::timestamptz AS external_updated_at,
+    iso_to_timestamptz (data ->> 'external_published_at')::timestamptz AS external_published_at
   FROM
     raw_json)
 INSERT INTO youtube ("external_id", "title", "url", "thumbnail_url",
@@ -42,8 +112,9 @@ ON CONFLICT ("external_id")
     "url" = EXCLUDED.url,
     "thumbnail_url" = EXCLUDED.thumbnail_url,
     "external_published_at" = EXCLUDED.external_published_at,
-    "external_updated_at" = EXCLUDED.external_updated_at = CASE WHEN
-      youtube.external_updated_at <> EXCLUDED.external_updated_at THEN
+    "external_updated_at" = EXCLUDED.external_updated_at,
+    "uploaded_at" = CASE WHEN youtube.external_updated_at <>
+      EXCLUDED.external_updated_at THEN
       NULL
     ELSE
       youtube.uploaded_at

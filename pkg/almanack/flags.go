@@ -16,6 +16,7 @@ import (
 	"github.com/spotlightpa/almanack/internal/index"
 	"github.com/spotlightpa/almanack/internal/jsonfeed"
 	"github.com/spotlightpa/almanack/internal/mailchimp"
+	"github.com/spotlightpa/almanack/internal/youtube"
 	"github.com/spotlightpa/almanack/pkg/almlog"
 )
 
@@ -39,6 +40,7 @@ func AddFlags(fl *flag.FlagSet) func() (svc Services, err error) {
 	mailServiceAPIKey := fl.String("mc-api-key", "", "API `key` for MailChimp v2")
 	mailServiceListID := fl.String("mc-list-id", "", "List `ID` MailChimp v2 campaign")
 	hc := fl.String("healthchecks-uuid", "", "`UUID` for Healthchecks.io alert")
+	yt := youtube.AddFlags(fl)
 
 	return func() (svc Services, err error) {
 		if err = flagx.MustHave(fl, "postgres"); err != nil {
@@ -71,6 +73,7 @@ func AddFlags(fl *flag.FlagSet) func() (svc Services, err error) {
 			HC:                   healthchecksio.New(*hc, &client),
 			NewsFeed:             newsfeed,
 			ANF:                  anfService,
+			YT:                   yt,
 		}, nil
 	}
 }
