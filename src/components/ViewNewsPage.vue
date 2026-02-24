@@ -1,35 +1,47 @@
-<script>
-import { computed, toRefs } from "vue";
+<script setup>
+import { computed, toRef } from "vue";
 
 import { usePage } from "@/api/spotlightpa-page.js";
 
 import { formatDateTime } from "@/utils/time-format.js";
 
-export default {
-  props: {
-    id: String,
-  },
-  setup(props) {
-    const { id } = toRefs(props);
-    const pageData = usePage(id);
-    return {
-      parentPage: computed(() => {
-        if (!pageData.page.value) {
-          return { name: "Spotlight PA Pages", to: { name: "news-pages" } };
-        }
-        return pageData.page.value.parentPage;
-      }),
-      ...pageData,
-      formatDateTime,
-      title: computed(() => {
-        if (!pageData.page.value) {
-          return `Spotlight PA Page ${id.value}`;
-        }
-        return "Page " + (pageData.page.value.internalID || "Untitled");
-      }),
-    };
-  },
-};
+const props = defineProps({
+  id: String,
+});
+
+const id = toRef(props, "id");
+const pageData = usePage(id);
+
+const {
+  page,
+  isLoading,
+  error,
+  images,
+  warnings,
+  refresh,
+  saveField,
+  saveImageField,
+  syncData,
+  arcData,
+  gdocsData,
+  wordCount,
+  refreshArc,
+  refreshGDocs,
+} = pageData;
+
+const parentPage = computed(() => {
+  if (!page.value) {
+    return { name: "Spotlight PA Pages", to: { name: "news-pages" } };
+  }
+  return page.value.parentPage;
+});
+
+const title = computed(() => {
+  if (!page.value) {
+    return `Spotlight PA Page ${id.value}`;
+  }
+  return "Page " + (page.value.internalID || "Untitled");
+});
 </script>
 
 <template>
