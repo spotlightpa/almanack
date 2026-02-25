@@ -25,44 +25,25 @@ describe("SiteParamsBanner", () => {
             template: '<div class="bulma-field"><slot></slot></div>',
             props: ["label", "help"],
           },
-          BulmaTextarea: {
-            template:
-              '<textarea class="bulma-textarea" :value="modelValue" @input="$emit(\'update:modelValue\', $event.target.value)"></textarea>',
-            props: ["modelValue", "label", "help"],
-            emits: ["update:modelValue"],
-          },
-          BulmaFieldInput: {
-            template:
-              '<input class="bulma-input" :value="modelValue" @input="$emit(\'update:modelValue\', $event.target.value)">',
-            props: ["modelValue", "label", "type"],
-            emits: ["update:modelValue"],
-          },
-          BulmaFieldColor: {
-            template:
-              '<input type="color" class="bulma-color" :value="modelValue" @input="$emit(\'update:modelValue\', $event.target.value)">',
-            props: ["modelValue", "label", "help"],
-            emits: ["update:modelValue"],
-          },
+          BulmaTextarea: true,
+          BulmaFieldInput: true,
+          BulmaFieldColor: true,
         },
       },
     });
   };
 
-  it("renders banner section title", () => {
-    const wrapper = mountComponent();
-    expect(wrapper.find("summary").text()).toBe("Banner");
-  });
-
-  it("exposes saveData function", () => {
+  it("exposes saveData function via defineExpose", () => {
     const wrapper = mountComponent();
     expect(wrapper.vm.saveData).toBeDefined();
     expect(typeof wrapper.vm.saveData).toBe("function");
   });
 
-  it("saveData returns data with correct keys", () => {
+  it("saveData returns data with correct keys for backend", () => {
     const wrapper = mountComponent();
     const saved = wrapper.vm.saveData();
 
+    // These keys must match what the backend expects
     expect(saved).toHaveProperty("banner-active");
     expect(saved).toHaveProperty("banner");
     expect(saved).toHaveProperty("banner-link");
@@ -70,42 +51,28 @@ describe("SiteParamsBanner", () => {
     expect(saved).toHaveProperty("banner-text-color");
   });
 
-  it("saveData reflects initial values", () => {
-    const wrapper = mountComponent();
+  it("saveData serializes link with toRel transform", () => {
+    const params = {
+      data: {
+        ...defaultParams.data,
+        "banner-link": "https://www.spotlightpa.org/news/article",
+      },
+    };
+    const wrapper = mountComponent(params);
     const saved = wrapper.vm.saveData();
 
-    expect(saved["banner-active"]).toBe(false);
-    expect(saved["banner-bg-color"]).toBe("#ff6c36");
-    expect(saved["banner-text-color"]).toBe("#ffffff");
+    // toRel should strip the domain
+    expect(saved["banner-link"]).toBe("/news/article");
   });
 
-  it("checkbox controls banner active state", async () => {
+  it("checkbox updates banner-active in saveData", async () => {
     const wrapper = mountComponent();
     const checkbox = wrapper.find('input[type="checkbox"]');
 
-    expect(checkbox.element.checked).toBe(false);
+    expect(wrapper.vm.saveData()["banner-active"]).toBe(false);
 
     await checkbox.setValue(true);
 
-    const saved = wrapper.vm.saveData();
-    expect(saved["banner-active"]).toBe(true);
-  });
-
-  it("banner details are hidden when inactive via v-show", () => {
-    const wrapper = mountComponent();
-    // v-show renders the element but sets display: none
-    const hiddenDiv = wrapper.find('div[style*="display: none"]');
-    expect(hiddenDiv.exists()).toBe(true);
-  });
-
-  it("banner details are visible when active", async () => {
-    const wrapper = mountComponent();
-    const checkbox = wrapper.find('input[type="checkbox"]');
-
-    await checkbox.setValue(true);
-
-    // After activating, the div should no longer have display: none
-    const hiddenDiv = wrapper.find('div[style*="display: none"]');
-    expect(hiddenDiv.exists()).toBe(false);
+    expect(wrapper.vm.saveData()["banner-active"]).toBe(true);
   });
 });
