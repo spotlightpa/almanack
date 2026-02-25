@@ -1,5 +1,5 @@
 <script setup>
-import { computed, toRef } from "vue";
+import { computed, ref, toRef } from "vue";
 
 import { usePage } from "@/api/spotlightpa-page.js";
 
@@ -10,6 +10,7 @@ const props = defineProps({
 });
 
 const id = toRef(props, "id");
+const form = ref(null);
 const pageData = usePage(id);
 
 const {
@@ -711,7 +712,7 @@ const title = computed(() => {
             class="button is-success has-text-weight-semibold"
             :disabled="isLoading || null"
             type="button"
-            @click="publishNow($refs.form)"
+            @click="publishNow(form)"
           >
             {{ page.status === "pub" ? "Update page" : "Publish now" }}
           </button>
@@ -725,7 +726,7 @@ const title = computed(() => {
               null
             "
             type="button"
-            @click="updateSchedule($refs.form)"
+            @click="updateSchedule(form)"
           >
             {{
               page.status === "none" ? "Schedule to publish" : "Save changes"
