@@ -55,12 +55,12 @@ describe("useProps", () => {
 
     const toAbs = (v) => (v ? `https://example.com${v}` : "");
     const toRel = (v) => v?.replace("https://example.com", "") ?? "";
-    const sanitize = (v) => v?.replace(/<[^>]*>/g, "") ?? "";
+    const transform = (v) => v?.replace(/<[^>]*>/g, "") ?? "";
 
     const [data, saveData] = useProps(src, {
       isActive: ["is-active"],
       link: ["link-url", toAbs, toRel],
-      text: ["text-content", undefined, sanitize],
+      text: ["text-content", undefined, transform],
     });
 
     expect(data.isActive.value).toBe(true);

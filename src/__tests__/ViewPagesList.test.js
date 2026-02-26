@@ -89,10 +89,22 @@ describe("ViewPagesList", () => {
   it("works with different route configurations", () => {
     // Test that the component adapts to different routes
     const routes = [
-      { name: "news-pages", title: "Spotlight PA News Pages", path: "content/news/" },
-      { name: "statecollege-pages", title: "State College Pages", path: "content/statecollege/" },
+      {
+        name: "news-pages",
+        title: "Spotlight PA News Pages",
+        path: "content/news/",
+      },
+      {
+        name: "statecollege-pages",
+        title: "State College Pages",
+        path: "content/statecollege/",
+      },
       { name: "berks-pages", title: "Berks Pages", path: "content/berks/" },
-      { name: "sponsored-pages", title: "Sponsored Content", path: "content/sponsored/" },
+      {
+        name: "sponsored-pages",
+        title: "Sponsored Content",
+        path: "content/sponsored/",
+      },
     ];
 
     for (const routeConfig of routes) {

@@ -97,5 +97,4 @@ describe("EmailComposer", () => {
     expect(input.element.value).toBe("Test Subject");
     expect(textarea.element.value).toBe("Test body content");
   });
-
 });

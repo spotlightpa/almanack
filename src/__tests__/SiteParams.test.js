@@ -22,7 +22,9 @@ describe("SiteParams", () => {
     SiteParamsBanner: createMockChild("banner", { "banner-active": true }),
     SiteParamsHeader: createMockChild("header", { "header-slogan": "test" }),
     SiteParamsRailTop: createMockChild("railTop", { "rail-top": true }),
-    SiteParamsRailSticky: createMockChild("railSticky", { "rail-sticky": true }),
+    SiteParamsRailSticky: createMockChild("railSticky", {
+      "rail-sticky": true,
+    }),
     SiteParamsFooter: createMockChild("footer", { "footer-cta": "test" }),
     SiteParamsFeaturedHomepage: createMockChild("featuredHomepage", {
       "homepage-active": true,
@@ -38,7 +40,9 @@ describe("SiteParams", () => {
     SiteParamsNewsletter: createMockChild("newsletter", {
       "newsletter-active": true,
     }),
-    SiteParamsTakeover: createMockChild("takeover", { "takeover-active": false }),
+    SiteParamsTakeover: createMockChild("takeover", {
+      "takeover-active": false,
+    }),
     ...overrides,
   });
 
