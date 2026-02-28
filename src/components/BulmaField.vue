@@ -1,5 +1,5 @@
 <script setup>
-let labelIDCounter = 0;
+import newID from "@/utils/new-id.js";
 
 defineProps({
   label: String,
@@ -16,7 +16,7 @@ defineProps({
   },
 });
 
-labelIDCounter++;
+let labelIDCounter = newID();
 const idForLabel = `BulmaField-${labelIDCounter}`;
 </script>
 

@@ -1,7 +1,6 @@
 <script setup>
 import { ref, computed } from "vue";
-
-let labelIDCounter = 0;
+import newID from "@/utils/new-id.js";
 
 const props = defineProps({
   label: String,
@@ -26,7 +25,7 @@ const props = defineProps({
 
 const emit = defineEmits(["update:modelValue"]);
 
-labelIDCounter++;
+let labelIDCounter = newID();
 const idForDatalist = `BulmaAutocompleteArray-${labelIDCounter}`;
 
 const currentInput = ref("");
