@@ -13,19 +13,28 @@ const id = toRef(props, "id");
 const form = ref(null);
 const pageData = usePage(id);
 
+console.log(pageData);
+
 const {
-  page,
-  isLoading,
-  isLoadingThrottled,
-  error,
-  images,
-  setImageProps,
   deriveSlug,
   discardChanges,
+  error,
+  fetch,
+  images,
+  isLoading,
+  isLoadingThrottled,
+  page,
   publishNow,
-  updateSchedule,
-  updateOnly,
   refreshFromSource,
+  series,
+  setImageProps,
+  topics,
+  updateOnly,
+  updateSchedule,
+  // imageState,
+  // post,
+  // rawData,
+  // showScheduler,
 } = pageData;
 
 const parentPage = computed(() => {
