@@ -1,4 +1,4 @@
-<script>
+<script setup>
 import { computed, reactive, ref, toRefs } from "vue";
 
 import {
@@ -93,16 +93,10 @@ function addressState() {
   };
 }
 
-export default {
-  setup() {
-    return {
-      newDomainName: ref(""),
-      domain: domainState(),
-      newEmailAddress: ref(""),
-      address: addressState(),
-    };
-  },
-};
+const newDomainName = ref("");
+const domain = domainState();
+const newEmailAddress = ref("");
+const address = addressState();
 </script>
 
 <template>

@@ -1,29 +1,23 @@
-<script>
-let labelIDCounter = 0;
+<script setup>
+import newID from "@/utils/new-id.js";
 
-export default {
-  name: "BulmaField",
-  props: {
-    label: String,
-    labelClass: {
-      type: String,
-      default: "label",
-    },
-    controlClass: String,
-    help: String,
-    validationMessage: String,
-    required: {
-      type: Boolean,
-      default: false,
-    },
+defineProps({
+  label: String,
+  labelClass: {
+    type: String,
+    default: "label",
   },
-  data() {
-    labelIDCounter++;
-    return {
-      idForLabel: `BulmaField-${labelIDCounter}`,
-    };
+  controlClass: String,
+  help: String,
+  validationMessage: String,
+  required: {
+    type: Boolean,
+    default: false,
   },
-};
+});
+
+let labelIDCounter = newID();
+const idForLabel = `BulmaField-${labelIDCounter}`;
 </script>
 
 <template>

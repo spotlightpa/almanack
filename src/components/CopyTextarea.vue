@@ -1,43 +1,45 @@
-<script>
-export default {
-  name: "CopyTextarea",
-  props: {
-    size: {
-      type: String,
-      default: "is-medium",
-    },
+<script setup>
+import { ref, nextTick } from "vue";
+
+defineProps({
+  size: {
+    type: String,
+    default: "is-medium",
   },
-  data() {
-    return {
-      isFocused: false,
-    };
-  },
-  methods: {
-    click() {
-      if (!this.isFocused) {
-        this.isFocused = true;
-        this.select();
-      }
-    },
-    select() {
-      let range = document.createRange();
-      range.selectNodeContents(this.$refs.textarea);
-      let selection = window.getSelection();
-      selection.removeAllRanges();
-      selection.addRange(range);
-    },
-    async copy() {
-      this.select();
-      await this.$nextTick();
-      if (document.execCommand("copy")) {
-        this.$emit("copied", true);
-        window.setTimeout(() => {
-          this.$emit("copied", false);
-        }, 5000); // 5s
-      }
-    },
-  },
-};
+});
+
+const emit = defineEmits(["copied"]);
+
+const textarea = ref(null);
+const isFocused = ref(false);
+
+function click() {
+  if (!isFocused.value) {
+    isFocused.value = true;
+    select();
+  }
+}
+
+function select() {
+  let range = document.createRange();
+  range.selectNodeContents(textarea.value);
+  let selection = window.getSelection();
+  selection.removeAllRanges();
+  selection.addRange(range);
+}
+
+async function copy() {
+  select();
+  await nextTick();
+  if (document.execCommand("copy")) {
+    emit("copied", true);
+    window.setTimeout(() => {
+      emit("copied", false);
+    }, 5000); // 5s
+  }
+}
+
+defineExpose({ copy });
 </script>
 
 <template>

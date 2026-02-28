@@ -1,63 +1,49 @@
-<script>
-import { computed, reactive, toRefs } from "vue";
+<script setup>
+import { computed, ref } from "vue";
 import { post, sendMessage } from "@/api/client-v2.js";
 
-export default {
-  name: "EmailComposer",
+const props = defineProps({
+  initialSubject: String,
+  initialBody: String,
+});
 
-  props: {
-    initialSubject: String,
-    initialBody: String,
-  },
-  setup(props) {
-    // TODO: Fixme
-    let rows = props.initialBody.split("\n").length;
-    if (rows < 4) {
-      rows = 4;
-    }
+defineEmits(["hide"]);
 
-    let emailStatus = reactive({
-      subject: props.initialSubject,
-      body: props.initialBody,
-      error: null,
-      isSending: false,
-      hasSent: false,
+const rows = Math.max(4, props.initialBody.split("\n").length);
+
+const subject = ref(props.initialSubject);
+const body = ref(props.initialBody);
+const error = ref(null);
+const isSending = ref(false);
+const hasSent = ref(false);
+
+const hasChanged = computed(
+  () =>
+    props.initialSubject !== subject.value || props.initialBody !== body.value
+);
+
+async function send() {
+  if (window.confirm("Are you sure you want to send this message?")) {
+    isSending.value = true;
+    [, error.value] = await post(sendMessage, {
+      subject: subject.value,
+      body: body.value,
     });
+    isSending.value = false;
+    if (error.value) return;
+    hasSent.value = true;
+    window.setTimeout(() => {
+      hasSent.value = false;
+    }, 5000);
+  }
+}
 
-    return {
-      ...toRefs(emailStatus),
-
-      rows,
-
-      hasChanged: computed(
-        () =>
-          props.initialSubject !== emailStatus.subject ||
-          props.initialBody !== emailStatus.body
-      ),
-      async send() {
-        if (window.confirm("Are you sure you want to send this message?")) {
-          emailStatus.isSending = true;
-          [, emailStatus.error] = await post(sendMessage, {
-            subject: emailStatus.subject,
-            body: emailStatus.body,
-          });
-          emailStatus.isSending = false;
-          if (emailStatus.error) return;
-          emailStatus.hasSent = true;
-          window.setTimeout(() => {
-            emailStatus.hasSent = false;
-          }, 5000);
-        }
-      },
-      discard() {
-        if (window.confirm("Are you sure you want to discard your changes?")) {
-          emailStatus.subject = props.initialSubject;
-          emailStatus.body = props.initialBody;
-        }
-      },
-    };
-  },
-};
+function discard() {
+  if (window.confirm("Are you sure you want to discard your changes?")) {
+    subject.value = props.initialSubject;
+    body.value = props.initialBody;
+  }
+}
 </script>
 <template>
   <div class="box">

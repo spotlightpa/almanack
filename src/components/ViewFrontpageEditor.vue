@@ -1,4 +1,4 @@
-<script>
+<script setup>
 import { get, post, getSiteData, postSiteData } from "@/api/client-v2.js";
 import usePicks from "@/api/editors-picks.js";
 import { useRoute } from "vue-router";
@@ -6,41 +6,36 @@ import { useRoute } from "vue-router";
 import { formatDateTime, today, tomorrow } from "@/utils/time-format.js";
 import useScrollTo from "@/utils/use-scroll-to.js";
 
-export default {
-  setup() {
-    const route = useRoute();
-    const { dataFile, title, showCallout, showInvestigation, showImpact } =
-      route.meta;
+const route = useRoute();
+const { dataFile, title, showCallout, showInvestigation, showImpact } =
+  route.meta;
 
-    const [container, scrollTo] = useScrollTo();
-    const picks = usePicks({
-      fetchData: () => get(getSiteData + "?location=" + dataFile),
-      saveData: (data) => post(postSiteData + "?location=" + dataFile, data),
-    });
+const [container, scrollTo] = useScrollTo();
+const picks = usePicks({
+  fetchData: () => get(getSiteData + "?location=" + dataFile),
+  saveData: (data) => post(postSiteData + "?location=" + dataFile, data),
+});
 
-    return {
-      container,
-      title,
-      showCallout,
-      showInvestigation,
-      showImpact,
-      ...picks,
-      formatDateTime,
-      async addScheduledPicks() {
-        let lastPick =
-          picks.allEdPicks.value[picks.allEdPicks.value.length - 1];
-        picks.allEdPicks.value.push(lastPick.clone(picks.nextSchedule.value));
-        picks.nextSchedule.value = null;
-        await scrollTo();
-      },
-      removeScheduledPick(i) {
-        picks.allEdPicks.value.splice(i, 1);
-      },
-      today,
-      tomorrow,
-    };
-  },
-};
+const {
+  allEdPicks,
+  nextSchedule,
+  isLoadingThrottled,
+  error,
+  save,
+  reset,
+  reload,
+} = picks;
+
+async function addScheduledPicks() {
+  let lastPick = allEdPicks.value[allEdPicks.value.length - 1];
+  allEdPicks.value.push(lastPick.clone(nextSchedule.value));
+  nextSchedule.value = null;
+  await scrollTo();
+}
+
+function removeScheduledPick(i) {
+  allEdPicks.value.splice(i, 1);
+}
 </script>
 
 <template>

@@ -1,22 +1,14 @@
-<script>
+<script setup>
 import { useAuth } from "@/api/auth.js";
 
-export default {
-  props: {
-    article: {
-      type: Object,
-      required: true,
-    },
+defineProps({
+  article: {
+    type: Object,
+    required: true,
   },
-  setup() {
-    let { isArcUser, isSpotlightPAUser } = useAuth();
+});
 
-    return {
-      isSpotlightPAUser,
-      isArcUser,
-    };
-  },
-};
+const { isArcUser, isSpotlightPAUser } = useAuth();
 </script>
 
 <template>

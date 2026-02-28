@@ -1,21 +1,26 @@
-<script>
-export default {
-  async mounted() {
-    await this.$nextTick();
-    this.$emit(
-      "mounted",
-      Array.from(this.$el.children)
-        .map((el) =>
-          el.tagName === "RAW-HTML" ? el.getAttribute("block") : el.outerHTML
-        )
-        .join("\n\n")
-    );
-  },
-};
+<script setup>
+import { ref, onMounted, nextTick } from "vue";
+
+const emit = defineEmits(["mounted"]);
+const el = ref(null);
+
+onMounted(async () => {
+  await nextTick();
+  emit(
+    "mounted",
+    Array.from(el.value.children)
+      .map((child) =>
+        child.tagName === "RAW-HTML"
+          ? child.getAttribute("block")
+          : child.outerHTML
+      )
+      .join("\n\n")
+  );
+});
 </script>
 
 <template>
-  <div hidden>
+  <div ref="el" hidden>
     <slot></slot>
   </div>
 </template>

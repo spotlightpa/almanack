@@ -1,40 +1,34 @@
-<script>
-export default {
-  props: {
-    label: String,
-    labelClass: {
-      type: String,
-      default: "label",
-    },
-    modelValue: String,
-    placeholder: String,
-    help: String,
-    validator: Function,
-    name: String,
-    required: {
-      type: Boolean,
-      default: false,
-    },
+<script setup>
+import { ref, computed } from "vue";
+
+const props = defineProps({
+  label: String,
+  labelClass: {
+    type: String,
+    default: "label",
   },
-  data() {
-    return {
-      validationMessage: "",
-    };
+  modelValue: String,
+  placeholder: String,
+  help: String,
+  validator: Function,
+  name: String,
+  required: {
+    type: Boolean,
+    default: false,
   },
-  computed: {
-    fieldProps() {
-      return {
-        label: this.label,
-        help: this.help,
-        labelClass: this.labelClass,
-        required: this.required,
-        validationMessage: this.validationMessage,
-      };
-    },
-  },
-  watch: {},
-  methods: {},
-};
+});
+
+defineEmits(["update:modelValue"]);
+
+const validationMessage = ref("");
+
+const fieldProps = computed(() => ({
+  label: props.label,
+  help: props.help,
+  labelClass: props.labelClass,
+  required: props.required,
+  validationMessage: validationMessage.value,
+}));
 </script>
 
 <template>

@@ -1,35 +1,55 @@
-<script>
-import { computed, toRefs } from "vue";
+<script setup>
+import { computed, ref, toRef } from "vue";
 
 import { usePage } from "@/api/spotlightpa-page.js";
 
 import { formatDateTime } from "@/utils/time-format.js";
 
-export default {
-  props: {
-    id: String,
-  },
-  setup(props) {
-    const { id } = toRefs(props);
-    const pageData = usePage(id);
-    return {
-      parentPage: computed(() => {
-        if (!pageData.page.value) {
-          return { name: "Spotlight PA Pages", to: { name: "news-pages" } };
-        }
-        return pageData.page.value.parentPage;
-      }),
-      ...pageData,
-      formatDateTime,
-      title: computed(() => {
-        if (!pageData.page.value) {
-          return `Spotlight PA Page ${id.value}`;
-        }
-        return "Page " + (pageData.page.value.internalID || "Untitled");
-      }),
-    };
-  },
-};
+const props = defineProps({
+  id: String,
+});
+
+const id = toRef(props, "id");
+const form = ref(null);
+const pageData = usePage(id);
+
+console.log(pageData);
+
+const {
+  deriveSlug,
+  discardChanges,
+  error,
+  fetch,
+  images,
+  isLoading,
+  isLoadingThrottled,
+  page,
+  publishNow,
+  refreshFromSource,
+  series,
+  setImageProps,
+  topics,
+  updateOnly,
+  updateSchedule,
+  // imageState,
+  // post,
+  // rawData,
+  // showScheduler,
+} = pageData;
+
+const parentPage = computed(() => {
+  if (!page.value) {
+    return { name: "Spotlight PA Pages", to: { name: "news-pages" } };
+  }
+  return page.value.parentPage;
+});
+
+const title = computed(() => {
+  if (!page.value) {
+    return `Spotlight PA Page ${id.value}`;
+  }
+  return "Page " + (page.value.internalID || "Untitled");
+});
 </script>
 
 <template>
@@ -701,7 +721,7 @@ export default {
             class="button is-success has-text-weight-semibold"
             :disabled="isLoading || null"
             type="button"
-            @click="publishNow($refs.form)"
+            @click="publishNow(form)"
           >
             {{ page.status === "pub" ? "Update page" : "Publish now" }}
           </button>
@@ -715,7 +735,7 @@ export default {
               null
             "
             type="button"
-            @click="updateSchedule($refs.form)"
+            @click="updateSchedule(form)"
           >
             {{
               page.status === "none" ? "Schedule to publish" : "Save changes"

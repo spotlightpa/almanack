@@ -1,21 +1,15 @@
-<script>
-export default {
-  props: {
-    error: [Error, String],
-  },
-  emits: ["reload"],
-  computed: {
-    name() {
-      return this.error?.name ?? this.error ?? "Error";
-    },
-    message() {
-      return this.error?.message ?? this.error ?? "";
-    },
-    details() {
-      return Object.entries(this.error?.details ?? {});
-    },
-  },
-};
+<script setup>
+import { computed } from "vue";
+
+const props = defineProps({
+  error: [Error, String],
+});
+
+defineEmits(["reload"]);
+
+const name = computed(() => props.error?.name ?? props.error ?? "Error");
+const message = computed(() => props.error?.message ?? props.error ?? "");
+const details = computed(() => Object.entries(props.error?.details ?? {}));
 </script>
 
 <template>

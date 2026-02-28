@@ -1,10 +1,8 @@
-<script>
-export default {
-  props: {
-    block: Object,
-    n: Number,
-  },
-};
+<script setup>
+defineProps({
+  block: Object,
+  n: Number,
+});
 </script>
 
 <template>

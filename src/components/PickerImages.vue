@@ -1,14 +1,11 @@
-<script>
+<script setup>
 import imgproxyURL from "@/api/imgproxy-url.js";
 
-export default {
-  props: { images: Array },
-  setup() {
-    return {
-      imgproxyURL,
-    };
-  },
-};
+defineProps({
+  images: Array,
+});
+
+defineEmits(["select-image"]);
 </script>
 
 <template>

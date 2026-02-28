@@ -1,17 +1,12 @@
-<script>
+<script setup>
 import { formatDate, formatTime } from "@/utils/time-format.js";
 import humanSize from "@/utils/human-size.js";
 
-export default {
-  props: { files: Array },
-  setup() {
-    return {
-      formatDate,
-      formatTime,
-      humanSize,
-    };
-  },
-};
+defineProps({
+  files: Array,
+});
+
+defineEmits(["select-file"]);
 </script>
 
 <template>

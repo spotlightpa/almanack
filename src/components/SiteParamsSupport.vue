@@ -1,4 +1,4 @@
-<script>
+<script setup>
 import { computed } from "vue";
 
 import useProps from "@/utils/use-props.js";
@@ -12,30 +12,39 @@ function cleanText(text) {
     .join("\n");
 }
 
-export default {
-  props: { params: Object, fileProps: Object },
-  setup(props) {
-    let [data, saveData] = useProps(props.params.data, {
-      supportActive: ["support-active"],
-      supportLink: ["support-link", toAbs, toRel],
-      supportHed: ["support-hed"],
-      supportText: ["support-text", undefined, cleanText],
-      supportCTA: ["support-cta"],
-      supportHedColor: ["support-hed-color"],
-      supportTextColor: ["support-text-color"],
-      supportBgColor: ["support-bg-color"],
-      supportButtonBgColor: ["support-button-bg-color"],
-      supportButtonTextColor: ["support-button-text-color"],
-    });
-    return {
-      ...data,
-      saveData,
-      paragraphs: computed(() => {
-        return data.supportText.value.split("\n");
-      }),
-    };
-  },
-};
+const props = defineProps({
+  params: Object,
+  fileProps: Object,
+});
+
+const [data, saveData] = useProps(props.params.data, {
+  supportActive: ["support-active"],
+  supportLink: ["support-link", toAbs, toRel],
+  supportHed: ["support-hed"],
+  supportText: ["support-text", undefined, cleanText],
+  supportCTA: ["support-cta"],
+  supportHedColor: ["support-hed-color"],
+  supportTextColor: ["support-text-color"],
+  supportBgColor: ["support-bg-color"],
+  supportButtonBgColor: ["support-button-bg-color"],
+  supportButtonTextColor: ["support-button-text-color"],
+});
+
+const {
+  supportActive,
+  supportLink,
+  supportHed,
+  supportText,
+  supportCTA,
+  supportHedColor,
+  supportTextColor,
+  supportBgColor,
+  supportButtonBgColor,
+  supportButtonTextColor,
+} = data;
+
+const paragraphs = computed(() => supportText.value.split("\n"));
+defineExpose({ saveData });
 </script>
 
 <template>

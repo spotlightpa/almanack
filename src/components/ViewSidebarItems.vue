@@ -1,5 +1,5 @@
-<script>
-import { reactive, computed, toRefs, watch } from "vue";
+<script setup>
+import { reactive, computed, ref, watch } from "vue";
 
 import { get, post, getSidebar, saveSidebar } from "@/api/client-v2.js";
 import { makeState } from "@/api/service-util.js";
@@ -27,7 +27,7 @@ class SidebarData {
 
   add({ filePath }) {
     let item = {
-      label: "Editor’s Pick",
+      label: "Editor's Pick",
       labelColor: "#ff6c36",
       linkColor: "#000000",
       backgroundColor: "#f5f5f5",
@@ -78,63 +78,53 @@ class SidebarData {
   }
 }
 
-export default {
-  setup() {
-    const [container, scrollTo] = useScrollTo();
+const [container, scrollTo] = useScrollTo();
 
-    let { apiState: sidebarState, exec: sidebarExec } = makeState();
-    let state = reactive({
-      rawSidebars: computed(() => sidebarState.rawData?.configs ?? []),
-      allSidebars: [],
-      nextSchedule: null,
-    });
-    let actions = {
-      reloadSidebars() {
-        return sidebarExec(() => get(getSidebar));
-      },
-      save() {
-        return sidebarExec(() =>
-          post(saveSidebar, {
-            configs: state.allSidebars,
-          })
-        );
-      },
-      initSidebars() {
-        let { rawSidebars } = state;
-        if (!rawSidebars.length) {
-          return;
-        }
-        state.allSidebars = rawSidebars.map((data) =>
-          reactive(new SidebarData(data))
-        );
-      },
-    };
-    watch(
-      () => [state.rawSidebars],
-      () => actions.initSidebars(),
-      { deep: true }
-    );
-    actions.reloadSidebars();
-    return {
-      container,
-      today,
-      tomorrow,
-      sidebarState,
-      ...toRefs(state),
-      ...actions,
-      formatDateTime,
-      async addScheduledPicks() {
-        let lastPick = state.allSidebars[state.allSidebars.length - 1];
-        state.allSidebars.push(lastPick.clone(state.nextSchedule));
-        state.nextSchedule = null;
-        await scrollTo();
-      },
-      removeScheduledPick(i) {
-        state.allSidebars.splice(i, 1);
-      },
-    };
-  },
-};
+const { apiState: sidebarState, exec: sidebarExec } = makeState();
+
+const rawSidebars = computed(() => sidebarState.rawData?.configs ?? []);
+const allSidebars = ref([]);
+const nextSchedule = ref(null);
+
+function reloadSidebars() {
+  return sidebarExec(() => get(getSidebar));
+}
+
+function save() {
+  return sidebarExec(() =>
+    post(saveSidebar, {
+      configs: allSidebars.value,
+    })
+  );
+}
+
+function initSidebars() {
+  if (!rawSidebars.value.length) {
+    return;
+  }
+  allSidebars.value = rawSidebars.value.map((data) =>
+    reactive(new SidebarData(data))
+  );
+}
+
+watch(
+  () => [rawSidebars.value],
+  () => initSidebars(),
+  { deep: true }
+);
+
+reloadSidebars();
+
+async function addScheduledPicks() {
+  let lastPick = allSidebars.value[allSidebars.value.length - 1];
+  allSidebars.value.push(lastPick.clone(nextSchedule.value));
+  nextSchedule.value = null;
+  await scrollTo();
+}
+
+function removeScheduledPick(i) {
+  allSidebars.value.splice(i, 1);
+}
 </script>
 
 <template>

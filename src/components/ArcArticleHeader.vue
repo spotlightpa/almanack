@@ -1,13 +1,10 @@
-<script>
-import { h } from "vue";
-
-function ArcArticleHeader(props) {
-  return h(`h${props.block.level}`, { innerHTML: props.block.content });
-}
-
-ArcArticleHeader.props = {
+<script setup>
+defineProps({
   block: Object,
-};
-
-export default ArcArticleHeader;
+});
 </script>
+
+<template>
+  <!-- eslint-disable-next-line vue/no-v-text-v-html-on-component -->
+  <component :is="'h' + block.level" v-html="block.content"></component>
+</template>

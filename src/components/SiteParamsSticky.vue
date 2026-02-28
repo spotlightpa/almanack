@@ -1,22 +1,22 @@
-<script>
+<script setup>
 import useProps from "@/utils/use-props.js";
 import { toRel, toAbs } from "@/utils/link.js";
 
-export default {
-  props: { params: Object, fileProps: Object },
-  setup(props) {
-    let [data, saveData] = useProps(props.params.data, {
-      stickyActive: ["sticky-active"],
-      stickyImageDescription: ["sticky-image-description"],
-      stickyImages: ["sticky-images"],
-      stickyLink: ["sticky-link", toAbs, toRel],
-    });
-    return {
-      ...data,
-      saveData,
-    };
-  },
-};
+const props = defineProps({
+  params: Object,
+  fileProps: Object,
+});
+
+const [data, saveData] = useProps(props.params.data, {
+  stickyActive: ["sticky-active"],
+  stickyImageDescription: ["sticky-image-description"],
+  stickyImages: ["sticky-images"],
+  stickyLink: ["sticky-link", toAbs, toRel],
+});
+
+const { stickyActive, stickyImageDescription, stickyImages, stickyLink } = data;
+
+defineExpose({ saveData });
 </script>
 
 <template>

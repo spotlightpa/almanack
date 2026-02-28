@@ -1,18 +1,16 @@
-<script>
-export default {
-  props: {
-    label: String,
-    icon: Array,
-    size: {
-      type: String,
-      default: "is-small",
-    },
-    color: {
-      type: String,
-      default: "is-light",
-    },
+<script setup>
+defineProps({
+  label: String,
+  icon: Array,
+  size: {
+    type: String,
+    default: "is-small",
   },
-};
+  color: {
+    type: String,
+    default: "is-light",
+  },
+});
 </script>
 
 <template>

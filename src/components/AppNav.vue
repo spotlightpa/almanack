@@ -1,28 +1,13 @@
-<script>
+<script setup>
+import { ref } from "vue";
 import { useAuth } from "@/api/auth.js";
 
-export default {
-  name: "AppNav",
-  data() {
-    return {
-      isOpen: false,
-    };
-  },
-  setup() {
-    let { isSignedIn, login, logout, signup } = useAuth();
-    return {
-      isSignedIn,
-      login,
-      logout,
-      signup,
-    };
-  },
-  methods: {
-    menuToggle() {
-      this.isOpen = !this.isOpen;
-    },
-  },
-};
+const isOpen = ref(false);
+const { isSignedIn, login, logout, signup } = useAuth();
+
+function menuToggle() {
+  isOpen.value = !isOpen.value;
+}
 </script>
 
 <template>

@@ -1,12 +1,9 @@
-<script>
-export default {
-  name: "APILoader",
-  props: {
-    isLoading: Boolean,
-    reload: Function,
-    error: Error,
-  },
-};
+<script setup>
+defineProps({
+  isLoading: Boolean,
+  reload: Function,
+  error: Error,
+});
 </script>
 
 <template>

@@ -1,61 +1,50 @@
-<script>
+<script setup>
+import { ref, computed, watch, onMounted } from "vue";
 import draggable from "vuedraggable";
 
 import { get, listPagesByFTS } from "@/api/client-v2.js";
-
 import { Page } from "@/api/spotlightpa-page.js";
 
-export default {
-  components: {
-    draggable,
-  },
-  data() {
-    return {
-      query: "",
-      rawPages: [],
-      error: null,
-      loading: false,
-      timeout: null,
-      currentRequest: 0,
-    };
-  },
-  computed: {
-    pages() {
-      return this.rawPages.map((data) => new Page(data));
-    },
-  },
-  watch: {
-    async query(val) {
-      this.loading = true;
-      window.clearTimeout(this.timeout);
-      this.timeout = window.setTimeout(() => {
-        this.fetch(val);
-      }, 300);
-    },
-  },
-  created() {
-    this.loading = true;
-    this.fetch(this.query);
-  },
-  methods: {
-    async fetch(query) {
-      let token = ++this.currentRequest;
-      const select = "-body";
-      let [data, err] = await get(listPagesByFTS, { query, select });
-      if (this.currentRequest !== token) {
-        console.warn("discarding stale result");
-        return;
-      }
-      this.loading = false;
-      if (err) {
-        this.error = err;
-      } else {
-        this.error = null;
-        this.rawPages = data ?? [];
-      }
-    },
-  },
-};
+defineEmits(["select-page"]);
+
+const query = ref("");
+const rawPages = ref([]);
+const error = ref(null);
+const loading = ref(false);
+let timeout = null;
+let currentRequest = 0;
+
+const pages = computed(() => rawPages.value.map((data) => new Page(data)));
+
+async function fetchPages(q) {
+  let token = ++currentRequest;
+  const select = "-body";
+  let [data, err] = await get(listPagesByFTS, { query: q, select });
+  if (currentRequest !== token) {
+    console.warn("discarding stale result");
+    return;
+  }
+  loading.value = false;
+  if (err) {
+    error.value = err;
+  } else {
+    error.value = null;
+    rawPages.value = data ?? [];
+  }
+}
+
+watch(query, (val) => {
+  loading.value = true;
+  window.clearTimeout(timeout);
+  timeout = window.setTimeout(() => {
+    fetchPages(val);
+  }, 300);
+});
+
+onMounted(() => {
+  loading.value = true;
+  fetchPages(query.value);
+});
 </script>
 
 <template>

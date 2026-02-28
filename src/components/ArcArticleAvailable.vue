@@ -1,66 +1,53 @@
-<script>
-import { reactive, ref, toRefs } from "vue";
+<script setup>
+import { ref, computed } from "vue";
 import { sendGAEvent } from "@/utils/google-analytics.js";
 import { formatDate, formatDateTime } from "@/utils/time-format.js";
 
-export default {
-  props: {
-    article: { type: Object, required: true },
-  },
-  setup(props) {
-    const htmlArea = ref();
-    const richTextArea = ref();
+const props = defineProps({
+  article: { type: Object, required: true },
+});
 
-    const data = reactive({
-      copied: false,
-      viewHTML: false,
-      articleHTML: "",
-    });
+const htmlArea = ref();
+const richTextArea = ref();
+const copied = ref(false);
+const viewHTML = ref(false);
+const articleHTML = ref("");
 
-    return {
-      htmlArea,
-      richTextArea,
+const embeds = computed(() => props.article.arc.embedComponents);
 
-      ...toRefs(data),
+function showRichText() {
+  viewHTML.value = false;
+  sendGAEvent({
+    eventCategory: "ArticleDetails interaction",
+    eventAction: "Show Rich Text",
+  });
+}
 
-      embeds: props.article.arc.embedComponents,
+function copyRichText() {
+  viewHTML.value = false;
+  richTextArea.value.copy();
+  sendGAEvent({
+    eventCategory: "ArticleDetails interaction",
+    eventAction: "Copy Rich Text",
+  });
+}
 
-      showRichText() {
-        data.viewHTML = false;
-        sendGAEvent({
-          eventCategory: "ArticleDetails interaction",
-          eventAction: "Show Rich Text",
-        });
-      },
-      copyRichText() {
-        data.viewHTML = false;
-        richTextArea.value.copy();
-        sendGAEvent({
-          eventCategory: "ArticleDetails interaction",
-          eventAction: "Copy Rich Text",
-        });
-      },
-      showHTML() {
-        data.viewHTML = true;
-        sendGAEvent({
-          eventCategory: "ArticleDetails interaction",
-          eventAction: "Show HTML",
-        });
-      },
-      copyHTML() {
-        data.viewHTML = true;
-        htmlArea.value.copy();
-        sendGAEvent({
-          eventCategory: "ArticleDetails interaction",
-          eventAction: "Copy HTML",
-        });
-      },
+function showHTML() {
+  viewHTML.value = true;
+  sendGAEvent({
+    eventCategory: "ArticleDetails interaction",
+    eventAction: "Show HTML",
+  });
+}
 
-      formatDate,
-      formatDateTime,
-    };
-  },
-};
+function copyHTML() {
+  viewHTML.value = true;
+  htmlArea.value.copy();
+  sendGAEvent({
+    eventCategory: "ArticleDetails interaction",
+    eventAction: "Copy HTML",
+  });
+}
 </script>
 
 <template>

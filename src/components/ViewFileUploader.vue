@@ -1,5 +1,5 @@
-<script>
-import { reactive, computed, toRefs, watch } from "vue";
+<script setup>
+import { ref, computed, watch } from "vue";
 
 import {
   get,
@@ -13,86 +13,73 @@ import { makeState } from "@/api/service-util.js";
 import { formatDate } from "@/utils/time-format.js";
 import humanSize from "@/utils/human-size.js";
 
-export default {
-  props: { page: { type: String, default: "0" } },
-  setup(props) {
-    let { apiStateRefs, exec } = makeState();
+const props = defineProps({
+  page: { type: String, default: "0" },
+});
 
-    const { rawData } = apiStateRefs;
+const { apiStateRefs, exec } = makeState();
+const { rawData, isLoading, error } = apiStateRefs;
 
-    let state = reactive({
-      files: computed(() => {
-        return rawData.value?.files || [];
-      }),
-      isDragging: false,
-      isUploading: false,
-      uploadError: null,
-      nextPage: computed(() => {
-        if (!rawData.value?.next_page) {
-          return null;
-        }
-        return {
-          name: "file-uploader",
-          query: {
-            page: "" + rawData.value.next_page,
-          },
-        };
-      }),
-    });
+const isDragging = ref(false);
+const isUploading = ref(false);
+const uploadError = ref(null);
 
-    let actions = {
-      async fetch() {
-        exec(() => get(listFiles, { page: props.page }));
-      },
-      updateDescription(file) {
-        let description = window.prompt("Update description", file.description);
-        if (description !== null && description !== file.description) {
-          exec(() =>
-            post(updateFile, {
-              url: file.url,
-              description,
-              set_description: true,
-            }).then(() => get(listFiles, { page: props.page }))
-          );
-        }
-      },
-      async uploadFileInput(ev) {
-        let { files } = ev.target;
-        state.isUploading = true;
-        state.uploadError = null;
+const files = computed(() => rawData.value?.files || []);
+const nextPage = computed(() => {
+  if (!rawData.value?.next_page) {
+    return null;
+  }
+  return {
+    name: "file-uploader",
+    query: {
+      page: "" + rawData.value.next_page,
+    },
+  };
+});
 
-        for (let body of files) {
-          [state.fileURL, state.uploadError] = await uploadFile(body);
-          if (state.uploadError) {
-            break;
-          }
-        }
-        state.isUploading = false;
-        await actions.fetch();
-      },
-      dropFile(ev) {
-        state.isDragging = false;
-        let { files = [] } = ev.dataTransfer;
-        return actions.uploadFileInput({ target: { files } });
-      },
-    };
+async function fetch() {
+  exec(() => get(listFiles, { page: props.page }));
+}
 
-    watch(
-      () => props.page,
-      () => actions.fetch(),
-      { immediate: true }
+function updateDescription(file) {
+  let description = window.prompt("Update description", file.description);
+  if (description !== null && description !== file.description) {
+    exec(() =>
+      post(updateFile, {
+        url: file.url,
+        description,
+        set_description: true,
+      }).then(() => get(listFiles, { page: props.page }))
     );
+  }
+}
 
-    return {
-      ...apiStateRefs,
-      ...toRefs(state),
-      ...actions,
+async function uploadFileInput(ev) {
+  let { files } = ev.target;
+  isUploading.value = true;
+  uploadError.value = null;
 
-      formatDate,
-      humanSize,
-    };
-  },
-};
+  for (let body of files) {
+    [, uploadError.value] = await uploadFile(body);
+    if (uploadError.value) {
+      break;
+    }
+  }
+  isUploading.value = false;
+  await fetch();
+}
+
+function dropFile(ev) {
+  isDragging.value = false;
+  let { files = [] } = ev.dataTransfer;
+  return uploadFileInput({ target: { files } });
+}
+
+watch(
+  () => props.page,
+  () => fetch(),
+  { immediate: true }
+);
 </script>
 
 <template>
