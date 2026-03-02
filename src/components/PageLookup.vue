@@ -13,7 +13,7 @@ async function lookup(fullurl) {
   if (!fullurl) return [null, null];
 
   const select = "-body";
-  let path = null;
+  let path;
   try {
     path = new URL(fullurl).pathname;
   } catch (e) {
