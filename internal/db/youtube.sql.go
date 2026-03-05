@@ -9,7 +9,7 @@ import (
 	"context"
 )
 
-const listYouTubeUpdates = `-- name: ListYouTubeUpdates :many
+const listYouTubeWhereNotUploaded = `-- name: ListYouTubeWhereNotUploaded :many
 SELECT
   id, external_id, title, url, thumbnail_url, external_published_at, external_updated_at, uploaded_at, created_at, updated_at
 FROM
@@ -18,8 +18,56 @@ WHERE
   "uploaded_at" IS NULL
 `
 
-func (q *Queries) ListYouTubeUpdates(ctx context.Context) ([]Youtube, error) {
-	rows, err := q.db.Query(ctx, listYouTubeUpdates)
+func (q *Queries) ListYouTubeWhereNotUploaded(ctx context.Context) ([]Youtube, error) {
+	rows, err := q.db.Query(ctx, listYouTubeWhereNotUploaded)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []Youtube
+	for rows.Next() {
+		var i Youtube
+		if err := rows.Scan(
+			&i.ID,
+			&i.ExternalID,
+			&i.Title,
+			&i.URL,
+			&i.ThumbnailUrl,
+			&i.ExternalPublishedAt,
+			&i.ExternalUpdatedAt,
+			&i.UploadedAt,
+			&i.CreatedAt,
+			&i.UpdatedAt,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const listYouTubeWhereShort = `-- name: ListYouTubeWhereShort :many
+SELECT
+  id, external_id, title, url, thumbnail_url, external_published_at, external_updated_at, uploaded_at, created_at, updated_at
+FROM
+  youtube
+WHERE
+  "url" LIKE '%/shorts/%'
+ORDER BY
+  "external_published_at" DESC
+LIMIT $1 OFFSET $2
+`
+
+type ListYouTubeWhereShortParams struct {
+	Limit  int32 `json:"limit"`
+	Offset int32 `json:"offset"`
+}
+
+func (q *Queries) ListYouTubeWhereShort(ctx context.Context, arg ListYouTubeWhereShortParams) ([]Youtube, error) {
+	rows, err := q.db.Query(ctx, listYouTubeWhereShort, arg.Limit, arg.Offset)
 	if err != nil {
 		return nil, err
 	}
