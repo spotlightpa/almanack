@@ -15,6 +15,7 @@ import (
 	"github.com/spotlightpa/almanack/internal/db"
 	"github.com/spotlightpa/almanack/internal/google"
 	"github.com/spotlightpa/almanack/internal/stringx"
+	"github.com/spotlightpa/almanack/internal/timex"
 	"github.com/spotlightpa/almanack/pkg/almanack"
 	"github.com/spotlightpa/almanack/pkg/almlog"
 	docs "google.golang.org/api/docs/v1"
@@ -90,6 +91,7 @@ func TestProcessGDocsDoc(t *testing.T) {
 			page.ID = 123
 			page.CreatedAt = date
 			page.UpdatedAt = date
+			page.PublicationDate.Time = timex.ToEST(page.PublicationDate.Time)
 			testfile.EqualJSON(rt, path+"/page.json", page)
 		}
 	})
