@@ -39,13 +39,24 @@ ON CONFLICT ("external_id")
     END,
     "updated_at" = CURRENT_TIMESTAMP;
 
--- name: ListYouTubeUpdates :many
+-- name: ListYouTubeWhereNotUploaded :many
 SELECT
   *
 FROM
   youtube
 WHERE
   "uploaded_at" IS NULL;
+
+-- name: ListYouTubeWhereShort :many
+SELECT
+  *
+FROM
+  youtube
+WHERE
+  "url" LIKE '%/shorts/%'
+ORDER BY
+  "external_published_at" DESC
+LIMIT $1 OFFSET $2;
 
 -- name: UpdateYouTubeUploaded :one
 UPDATE

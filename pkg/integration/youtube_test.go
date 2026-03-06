@@ -2,10 +2,13 @@ package integration_test
 
 import (
 	"net/http"
+	"path/filepath"
 	"testing"
 
 	"github.com/carlmjohnson/be"
+	"github.com/carlmjohnson/be/testfile"
 	"github.com/carlmjohnson/requests/reqtest"
+	"github.com/spotlightpa/almanack/internal/aws"
 	"github.com/spotlightpa/almanack/internal/db"
 	"github.com/spotlightpa/almanack/internal/youtube"
 	"github.com/spotlightpa/almanack/pkg/almanack"
@@ -24,10 +27,11 @@ func TestYouTube(t *testing.T) {
 		Client: &http.Client{
 			Transport: reqtest.Replay("testdata/youtube"),
 		},
+		FileStore: aws.NewBlobStore("file://" + t.ArtifactDir()),
 	}
 	ctx := t.Context()
 	{ // Nothing in table initially
-		items, err := q.ListYouTubeUpdates(ctx)
+		items, err := q.ListYouTubeWhereNotUploaded(ctx)
 		be.NilErr(t, err)
 		be.Zero(t, items)
 	}
@@ -37,7 +41,7 @@ func TestYouTube(t *testing.T) {
 	var nItems int
 	var someitem *db.Youtube
 	{ // Should have items loaded
-		items, err := q.ListYouTubeUpdates(ctx)
+		items, err := q.ListYouTubeWhereNotUploaded(ctx)
 		be.NilErr(t, err)
 		be.Nonzero(t, items)
 
@@ -46,7 +50,7 @@ func TestYouTube(t *testing.T) {
 	}
 	{ // Shouldn't get new items from refetching
 		be.NilErr(t, svc.UpdateYouTubeFeed(ctx))
-		items, err := q.ListYouTubeUpdates(ctx)
+		items, err := q.ListYouTubeWhereNotUploaded(ctx)
 		be.NilErr(t, err)
 		be.Nonzero(t, items)
 		be.Equal(t, nItems, len(items))
@@ -60,9 +64,17 @@ func TestYouTube(t *testing.T) {
 	}
 	{ // Should still have the right number of items
 		be.NilErr(t, svc.UpdateYouTubeFeed(ctx))
-		items, err := q.ListYouTubeUpdates(ctx)
+		items, err := q.ListYouTubeWhereNotUploaded(ctx)
 		be.NilErr(t, err)
 		be.Nonzero(t, items)
 		be.Equal(t, nItems, len(items))
+	}
+	{ // Should have uploaded feeds/youtube-shorts.json
+		feedfile := filepath.Join(t.ArtifactDir(), "feeds/youtube-shorts.json")
+		var data struct {
+			Videos []youtube.FeedItem `json:"videos"`
+		}
+		testfile.ReadJSON(t, feedfile, &data)
+		be.EqualLength(t, 8, data.Videos)
 	}
 }
