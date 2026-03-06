@@ -6,6 +6,20 @@ jobs:
   build:
     name: Build
     runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:14
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: postgres
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-go@v5
@@ -17,3 +31,10 @@ jobs:
         run: go mod tidy -diff
       - name: Test
         run: ./run.sh test:backend
+        env:
+          ALMANACK_POSTGRES: postgres://postgres:postgres@localhost:5432/postgres?sslmode=disable
+          PG_LOCAL_URL: postgres://postgres:postgres@localhost:5432/postgres?sslmode=disable
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+            path: "**/-failed-*"
