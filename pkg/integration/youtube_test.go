@@ -2,11 +2,11 @@ package integration_test
 
 import (
 	"net/http"
-	"os"
 	"path/filepath"
 	"testing"
 
 	"github.com/carlmjohnson/be"
+	"github.com/carlmjohnson/be/testfile"
 	"github.com/carlmjohnson/requests/reqtest"
 	"github.com/spotlightpa/almanack/internal/aws"
 	"github.com/spotlightpa/almanack/internal/db"
@@ -70,7 +70,11 @@ func TestYouTube(t *testing.T) {
 		be.Equal(t, nItems, len(items))
 	}
 	{ // Should have uploaded feeds/youtube-shorts.json
-		_, err := os.Stat(filepath.Join(t.ArtifactDir(), "feeds/youtube-shorts.json"))
-		be.NilErr(t, err)
+		feedfile := filepath.Join(t.ArtifactDir(), "feeds/youtube-shorts.json")
+		var data struct {
+			Videos []youtube.FeedItem `json:"videos"`
+		}
+		testfile.ReadJSON(t, feedfile, &data)
+		be.EqualLength(t, 8, data.Videos)
 	}
 }
