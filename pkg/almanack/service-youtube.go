@@ -2,6 +2,7 @@ package almanack
 
 import (
 	"context"
+	"time"
 
 	"github.com/earthboundkid/errorx/v2"
 	"github.com/spotlightpa/almanack/internal/db"
@@ -26,9 +27,10 @@ func (svc Services) UpdateYouTubeFeed(ctx context.Context) (err error) {
 		return err
 	}
 	type video struct {
-		Title     string `json:"title"`
-		URL       string `json:"url"`
-		Thumbnail string `json:"thumbnail"`
+		Title     string    `json:"title"`
+		URL       string    `json:"url"`
+		Thumbnail string    `json:"thumbnail"`
+		PubDate   time.Time `json:"published"`
 	}
 	videos := make([]video, len(data))
 	for i, item := range data {
@@ -36,6 +38,7 @@ func (svc Services) UpdateYouTubeFeed(ctx context.Context) (err error) {
 			Title:     item.Title,
 			URL:       item.URL,
 			Thumbnail: item.ThumbnailUrl,
+			PubDate:   item.ExternalPublishedAt,
 		}
 	}
 	return UploadJSON(
