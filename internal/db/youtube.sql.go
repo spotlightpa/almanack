@@ -49,6 +49,54 @@ func (q *Queries) ListYouTubeWhereNotUploaded(ctx context.Context) ([]Youtube, e
 	return items, nil
 }
 
+const listYouTubeWhereRegular = `-- name: ListYouTubeWhereRegular :many
+SELECT
+  id, external_id, title, url, thumbnail_url, external_published_at, external_updated_at, uploaded_at, created_at, updated_at
+FROM
+  youtube
+WHERE
+  "url" LIKE '%/watch?v=%'
+ORDER BY
+  "external_published_at" DESC
+LIMIT $1 OFFSET $2
+`
+
+type ListYouTubeWhereRegularParams struct {
+	Limit  int32 `json:"limit"`
+	Offset int32 `json:"offset"`
+}
+
+func (q *Queries) ListYouTubeWhereRegular(ctx context.Context, arg ListYouTubeWhereRegularParams) ([]Youtube, error) {
+	rows, err := q.db.Query(ctx, listYouTubeWhereRegular, arg.Limit, arg.Offset)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []Youtube
+	for rows.Next() {
+		var i Youtube
+		if err := rows.Scan(
+			&i.ID,
+			&i.ExternalID,
+			&i.Title,
+			&i.URL,
+			&i.ThumbnailUrl,
+			&i.ExternalPublishedAt,
+			&i.ExternalUpdatedAt,
+			&i.UploadedAt,
+			&i.CreatedAt,
+			&i.UpdatedAt,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const listYouTubeWhereShort = `-- name: ListYouTubeWhereShort :many
 SELECT
   id, external_id, title, url, thumbnail_url, external_published_at, external_updated_at, uploaded_at, created_at, updated_at
@@ -95,6 +143,19 @@ func (q *Queries) ListYouTubeWhereShort(ctx context.Context, arg ListYouTubeWher
 		return nil, err
 	}
 	return items, nil
+}
+
+const resetYouTubeMaxID = `-- name: ResetYouTubeMaxID :exec
+SELECT
+  setval('youtube_id_seq', (
+      SELECT
+        MAX(id)
+      FROM youtube))
+`
+
+func (q *Queries) ResetYouTubeMaxID(ctx context.Context) error {
+	_, err := q.db.Exec(ctx, resetYouTubeMaxID)
+	return err
 }
 
 const updateYouTubeUploaded = `-- name: UpdateYouTubeUploaded :one
