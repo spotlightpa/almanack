@@ -39,6 +39,13 @@ ON CONFLICT ("external_id")
     END,
     "updated_at" = CURRENT_TIMESTAMP;
 
+-- name: ResetYouTubeMaxID :exec
+SELECT
+  setval('youtube_id_seq', (
+      SELECT
+        MAX(id)
+      FROM youtube));
+
 -- name: ListYouTubeWhereNotUploaded :many
 SELECT
   *
@@ -54,6 +61,17 @@ FROM
   youtube
 WHERE
   "url" LIKE '%/shorts/%'
+ORDER BY
+  "external_published_at" DESC
+LIMIT $1 OFFSET $2;
+
+-- name: ListYouTubeWhereRegular :many
+SELECT
+  *
+FROM
+  youtube
+WHERE
+  "url" LIKE '%/watch?v=%'
 ORDER BY
   "external_published_at" DESC
 LIMIT $1 OFFSET $2;

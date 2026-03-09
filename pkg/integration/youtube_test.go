@@ -77,4 +77,12 @@ func TestYouTube(t *testing.T) {
 		testfile.ReadJSON(t, feedfile, &data)
 		be.EqualLength(t, 8, data.Videos)
 	}
+	{ // Should have uploaded feeds/youtube-regular.json
+		feedfile := filepath.Join(t.ArtifactDir(), "feeds/youtube-regular.json")
+		var data struct {
+			Videos []youtube.FeedItem `json:"videos"`
+		}
+		testfile.ReadJSON(t, feedfile, &data)
+		be.EqualLength(t, 7, data.Videos)
+	}
 }
