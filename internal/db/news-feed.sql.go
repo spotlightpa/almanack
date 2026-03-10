@@ -60,6 +60,19 @@ func (q *Queries) ListNewsFeedUpdates(ctx context.Context) ([]NewsFeedItem, erro
 	return items, nil
 }
 
+const resetNewsFeedID = `-- name: ResetNewsFeedID :exec
+SELECT
+  setval('news_feed_item_id_seq', (
+      SELECT
+        MAX(id)
+      FROM youtube))
+`
+
+func (q *Queries) ResetNewsFeedID(ctx context.Context) error {
+	_, err := q.db.Exec(ctx, resetNewsFeedID)
+	return err
+}
+
 const updateFeedAppleID = `-- name: UpdateFeedAppleID :one
 UPDATE
   news_feed_item

@@ -79,6 +79,13 @@ ON CONFLICT ("external_id")
     END,
     "updated_at" = CURRENT_TIMESTAMP;
 
+-- name: ResetNewsFeedID :exec
+SELECT
+  setval('news_feed_item_id_seq', (
+      SELECT
+        MAX(id)
+      FROM youtube));
+
 -- name: ListNewsFeedUpdates :many
 SELECT
   *
