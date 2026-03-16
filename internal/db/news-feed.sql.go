@@ -65,7 +65,7 @@ SELECT
   setval('news_feed_item_id_seq', (
       SELECT
         MAX(id)
-      FROM youtube))
+      FROM news_feed_item))
 `
 
 func (q *Queries) ResetNewsFeedID(ctx context.Context) error {
