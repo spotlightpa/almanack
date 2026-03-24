@@ -721,39 +721,3 @@ func (q *Queries) UpdatePage(ctx context.Context, arg UpdatePageParams) (Page, e
 	)
 	return i, err
 }
-
-const updatePageRawContent = `-- name: UpdatePageRawContent :one
-UPDATE
-  page
-SET
-  frontmatter = frontmatter || jsonb_build_object('raw-content', $1::text)
-WHERE
-  id = $2
-RETURNING
-  id, file_path, frontmatter, body, schedule_for, last_published, created_at, updated_at, url_path, source_type, source_id, publication_date
-`
-
-type UpdatePageRawContentParams struct {
-	RawContent string `json:"raw_content"`
-	ID         int64  `json:"id"`
-}
-
-func (q *Queries) UpdatePageRawContent(ctx context.Context, arg UpdatePageRawContentParams) (Page, error) {
-	row := q.db.QueryRow(ctx, updatePageRawContent, arg.RawContent, arg.ID)
-	var i Page
-	err := row.Scan(
-		&i.ID,
-		&i.FilePath,
-		&i.Frontmatter,
-		&i.Body,
-		&i.ScheduleFor,
-		&i.LastPublished,
-		&i.CreatedAt,
-		&i.UpdatedAt,
-		&i.URLPath,
-		&i.SourceType,
-		&i.SourceID,
-		&i.PublicationDate,
-	)
-	return i, err
-}
