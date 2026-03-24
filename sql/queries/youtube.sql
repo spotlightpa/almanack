@@ -5,19 +5,21 @@ WITH raw_json AS (
 ),
 feed_items AS (
   SELECT
-    data ->> 'external_id' AS external_id,
-    data ->> 'title' AS title,
+    data ->> 'external_id' AS "external_id",
+    data ->> 'title' AS "title",
+    data ->> 'description' AS "description",
     data ->> 'url' AS url,
-    data ->> 'thumbnail_url' AS thumbnail_url,
-    iso_to_timestamptz (data ->> 'external_updated_at')::timestamptz AS external_updated_at,
-    iso_to_timestamptz (data ->> 'external_published_at')::timestamptz AS external_published_at
+    data ->> 'thumbnail_url' AS "thumbnail_url",
+    iso_to_timestamptz (data ->> 'external_updated_at')::timestamptz AS "external_updated_at",
+    iso_to_timestamptz (data ->> 'external_published_at')::timestamptz AS "external_published_at"
   FROM
     raw_json)
-INSERT INTO youtube ("external_id", "title", "url", "thumbnail_url",
-  "external_published_at", "external_updated_at")
+INSERT INTO youtube ("external_id", "title", "description", "url",
+  "thumbnail_url", "external_published_at", "external_updated_at")
 SELECT
   "external_id",
   "title",
+  "description",
   "url",
   "thumbnail_url",
   "external_published_at",

@@ -127,6 +127,7 @@ func (svc Services) CreateYouTubePage(ctx context.Context, video *db.Youtube) (e
 			"published":         video.ExternalPublishedAt,
 			"byline":            "",
 			"title":             video.Title,
+			"description":       video.Description,
 			"blurb":             "",
 			"kicker":            "Video",
 			"video_url":         video.URL,

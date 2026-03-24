@@ -24,6 +24,7 @@ func UpdateCache(ctx context.Context, q db.Queries, entries []Entry) (err error)
 type bulkItem struct {
 	ExternalID          string    `json:"external_id"`
 	Title               string    `json:"title"`
+	Description         string    `json:"description"`
 	URL                 string    `json:"url"`
 	ThumbnailUrl        string    `json:"thumbnail_url"`
 	ExternalPublishedAt time.Time `json:"external_published_at"`
@@ -36,6 +37,7 @@ func convertForDatabase(entries []Entry) []bulkItem {
 		items[i] = bulkItem{
 			ExternalID:          entry.ID,
 			Title:               entry.Title,
+			Description:         entry.MediaGroup.Description,
 			URL:                 entry.Link.Href,
 			ThumbnailUrl:        entry.MediaGroup.Thumbnail.URL,
 			ExternalPublishedAt: entry.Published,
