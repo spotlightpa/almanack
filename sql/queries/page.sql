@@ -202,16 +202,6 @@ FROM
 ORDER BY
   array_position(query_paths.paths, url_path::text);
 
--- name: UpdatePageRawContent :one
-UPDATE
-  page
-SET
-  frontmatter = frontmatter || jsonb_build_object('raw-content', @raw_content::text)
-WHERE
-  id = @id
-RETURNING
-  *;
-
 -- name: ListPagesByFTS :many
 WITH query AS (
   SELECT
