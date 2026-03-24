@@ -65,3 +65,4 @@ dist/
 .netlify
 functions/
 
+_artifacts/
