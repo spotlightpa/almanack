@@ -46,13 +46,13 @@ SELECT
         MAX(id)
       FROM youtube));
 
--- name: ListYouTubeWhereNotUploaded :many
+-- name: ListYouTubeWhereNoPage :many
 SELECT
   *
 FROM
   youtube
 WHERE
-  "uploaded_at" IS NULL;
+  "page_id" IS NULL;
 
 -- name: ListYouTubeWhereShort :many
 SELECT
@@ -76,13 +76,13 @@ ORDER BY
   "external_published_at" DESC
 LIMIT $1 OFFSET $2;
 
--- name: UpdateYouTubeUploaded :one
+-- name: UpdateYouTubePage :one
 UPDATE
   youtube
 SET
-  "uploaded_at" = CURRENT_TIMESTAMP,
+  "page_id" = $1,
   "updated_at" = CURRENT_TIMESTAMP
 WHERE
-  "id" = $1
+  "id" = $2
 RETURNING
   *;

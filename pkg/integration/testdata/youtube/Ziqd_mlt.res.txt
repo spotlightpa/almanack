@@ -64,7 +64,7 @@ Support our newsroom: http://www.spotlightpa.org/donate</media:description>
   <media:group>
    <media:title>Pa. Haitian community navigates immigration uncertainty</media:title>
    <media:content url="https://www.youtube.com/v/RG2-MAmGCQ0?version=3" type="application/x-shockwave-flash" width="640" height="390"/>
-   <media:thumbnail url="https://i3.ytimg.com/vi/RG2-MAmGCQ0/hqdefault.jpg" width="480" height="360"/>
+   <media:thumbnail url="https://i4.ytimg.com/vi/oBu25G6OoR8/hqdefault.jpg" width="480" height="360"/>
    <media:description>Haitians in Berks County, Pennsylvania, have spent decades putting down roots in the region. After a federal judge blocked a Trump admin attempt to remove immigration protections, community members are still grappling with the reality.
 
 For more information visit https://www.spotlightpa.org
@@ -92,7 +92,7 @@ Support our newsroom: http://www.spotlightpa.org/donate</media:description>
   <media:group>
    <media:title>Pennsylvania could face a serious housing crisis by 2035.</media:title>
    <media:content url="https://www.youtube.com/v/rhOAFlhXrzY?version=3" type="application/x-shockwave-flash" width="640" height="390"/>
-   <media:thumbnail url="https://i3.ytimg.com/vi/rhOAFlhXrzY/hqdefault.jpg" width="480" height="360"/>
+   <media:thumbnail url="https://i4.ytimg.com/vi/oBu25G6OoR8/hqdefault.jpg" width="480" height="360"/>
    <media:description>Pennsylvania could be short over 180,000 housing units by 2035. But, what obstacles are in the state’s way of adding more?
 
 For more information visit https://www.spotlightpa.org
@@ -120,7 +120,7 @@ Support our newsroom: http://www.spotlightpa.org/donate</media:description>
   <media:group>
    <media:title>BOOKLIGHT PA: WHERE WE KEEP THE LIGHT: Read Josh Shapiro’s memoir with top Pennsylvania journalists</media:title>
    <media:content url="https://www.youtube.com/v/51lJ5LvkoIs?version=3" type="application/x-shockwave-flash" width="640" height="390"/>
-   <media:thumbnail url="https://i2.ytimg.com/vi/51lJ5LvkoIs/hqdefault.jpg" width="480" height="360"/>
+   <media:thumbnail url="https://i4.ytimg.com/vi/oBu25G6OoR8/hqdefault.jpg" width="480" height="360"/>
    <media:description>For more information visit https://www.spotlightpa.org
 Subscribe to our channel: https://www.youtube.com/@SpotlightPA
 Subscribe to our newsletters: http://www.spotlightpa.org/newsletters
@@ -146,7 +146,7 @@ Support our newsroom: http://www.spotlightpa.org/donate</media:description>
   <media:group>
    <media:title>Spotlight PA Live Stream</media:title>
    <media:content url="https://www.youtube.com/v/JK3D_sbpSVs?version=3" type="application/x-shockwave-flash" width="640" height="390"/>
-   <media:thumbnail url="https://i3.ytimg.com/vi/JK3D_sbpSVs/hqdefault.jpg" width="480" height="360"/>
+   <media:thumbnail url="https://i4.ytimg.com/vi/oBu25G6OoR8/hqdefault.jpg" width="480" height="360"/>
    <media:description>For more information visit https://www.spotlightpa.org
 Subscribe to our channel: https://www.youtube.com/@SpotlightPA
 Subscribe to our newsletters: http://www.spotlightpa.org/newsletters
@@ -172,10 +172,10 @@ Support our newsroom: http://www.spotlightpa.org/donate</media:description>
   <media:group>
    <media:title>PA lawmaker walks back comments on removal of slavery exhibit</media:title>
    <media:content url="https://www.youtube.com/v/LEMfJk5IEvQ?version=3" type="application/x-shockwave-flash" width="640" height="390"/>
-   <media:thumbnail url="https://i1.ytimg.com/vi/LEMfJk5IEvQ/hqdefault.jpg" width="480" height="360"/>
+   <media:thumbnail url="https://i4.ytimg.com/vi/oBu25G6OoR8/hqdefault.jpg" width="480" height="360"/>
    <media:description>Rep. Valerie Gaydos, who originally said &quot;Good riddance&quot; to an outdoor exhibit in Philadelphia honoring the lives of nine individuals enslaved by George Washington, is now walking back her comments.
 
-The story is featured in our subscriber-only newsletter Access Harrisburg. Sign up now at http://www.spotlightpa.org/newsletters. 
+The story is featured in our subscriber-only newsletter Access Harrisburg. Sign up now at http://www.spotlightpa.org/newsletters.
 
 
 For more information visit https://www.spotlightpa.org
@@ -203,7 +203,7 @@ Support our newsroom: http://www.spotlightpa.org/donate</media:description>
   <media:group>
    <media:title>Trump endorses Republican Stacy Garrity for PA governor</media:title>
    <media:content url="https://www.youtube.com/v/rjE0GK1dc8I?version=3" type="application/x-shockwave-flash" width="640" height="390"/>
-   <media:thumbnail url="https://i3.ytimg.com/vi/rjE0GK1dc8I/hqdefault.jpg" width="480" height="360"/>
+   <media:thumbnail url="https://i4.ytimg.com/vi/oBu25G6OoR8/hqdefault.jpg" width="480" height="360"/>
    <media:description>Garrity, a longtime Trump ally, pledged to work with him this November to defeat incumbent Democratic Gov. Josh Shapiro.
 
 For more information visit https://www.spotlightpa.org
@@ -231,8 +231,8 @@ Support our newsroom: http://www.spotlightpa.org/donate</media:description>
   <media:group>
    <media:title>Read with us: Josh Shapiro's &quot;Where We Keep the Light&quot;</media:title>
    <media:content url="https://www.youtube.com/v/VkYpJEDCjNM?version=3" type="application/x-shockwave-flash" width="640" height="390"/>
-   <media:thumbnail url="https://i3.ytimg.com/vi/VkYpJEDCjNM/hqdefault.jpg" width="480" height="360"/>
-   <media:description>Booklight PA is back! We're kicking things off with Gov. Josh Shapiro's new memoir &quot;Where We Keep the Light: Stories from a Life of Service.&quot; Read with us, then discuss the book with top reporters on Feb. 17. For more info, head to www.spotlightpa.org/events. 
+   <media:thumbnail url="https://i4.ytimg.com/vi/oBu25G6OoR8/hqdefault.jpg" width="480" height="360"/>
+   <media:description>Booklight PA is back! We're kicking things off with Gov. Josh Shapiro's new memoir &quot;Where We Keep the Light: Stories from a Life of Service.&quot; Read with us, then discuss the book with top reporters on Feb. 17. For more info, head to www.spotlightpa.org/events.
 
 For more information visit https://www.spotlightpa.org
 Subscribe to our channel: https://www.youtube.com/@SpotlightPA
@@ -259,7 +259,7 @@ Support our newsroom: http://www.spotlightpa.org/donate</media:description>
   <media:group>
    <media:title>100s of rapes unreported by Pa. police department</media:title>
    <media:content url="https://www.youtube.com/v/fYQyyQPBic0?version=3" type="application/x-shockwave-flash" width="640" height="390"/>
-   <media:thumbnail url="https://i3.ytimg.com/vi/fYQyyQPBic0/hqdefault.jpg" width="480" height="360"/>
+   <media:thumbnail url="https://i4.ytimg.com/vi/oBu25G6OoR8/hqdefault.jpg" width="480" height="360"/>
    <media:description>Over nearly a decade, the State College Police Department underreported hundreds of rapes in public data, a Spotlight PA investigation found.
 
 For more information visit https://www.spotlightpa.org
@@ -287,7 +287,7 @@ Support our newsroom: http://www.spotlightpa.org/donate</media:description>
   <media:group>
    <media:title>How Do We Solve Pennsylvania's Teacher Shortage?</media:title>
    <media:content url="https://www.youtube.com/v/RMDcQDO1I2A?version=3" type="application/x-shockwave-flash" width="640" height="390"/>
-   <media:thumbnail url="https://i3.ytimg.com/vi/RMDcQDO1I2A/hqdefault.jpg" width="480" height="360"/>
+   <media:thumbnail url="https://i4.ytimg.com/vi/oBu25G6OoR8/hqdefault.jpg" width="480" height="360"/>
    <media:description>Laura Boyce, ED of Teach Plus Pennsylvania, shares strategies to restore PA’s teachers pipeline joined by Mary Franciscus, HR director for the BCIU, and Rebecca West Burns, dean of the College of Education at Kutztown University.
 
 For more information visit https://www.spotlightpa.org
@@ -315,7 +315,7 @@ Support our newsroom: http://www.spotlightpa.org/donate</media:description>
   <media:group>
    <media:title>The Famous Farm Show Milkshake is Worth the Wait</media:title>
    <media:content url="https://www.youtube.com/v/GjZ1by7Q-HQ?version=3" type="application/x-shockwave-flash" width="640" height="390"/>
-   <media:thumbnail url="https://i4.ytimg.com/vi/GjZ1by7Q-HQ/hqdefault.jpg" width="480" height="360"/>
+   <media:thumbnail url="https://i4.ytimg.com/vi/oBu25G6OoR8/hqdefault.jpg" width="480" height="360"/>
    <media:description>Each year, the Pennsylvania Dairymen’s Association serves up thousands of gallons of milkshakes at the PA Farm Show, and people wait in long lines to get a taste.
 
 Reporter Asha Prihar went behind the scenes at this year's show to see how it all works.
@@ -345,7 +345,7 @@ Support our newsroom: http://www.spotlightpa.org/donate</media:description>
   <media:group>
    <media:title>Four Local Heroes Changing Lives Across Pennsylvania</media:title>
    <media:content url="https://www.youtube.com/v/0nH1hTZ_Kcc?version=3" type="application/x-shockwave-flash" width="640" height="390"/>
-   <media:thumbnail url="https://i1.ytimg.com/vi/0nH1hTZ_Kcc/hqdefault.jpg" width="480" height="360"/>
+   <media:thumbnail url="https://i4.ytimg.com/vi/oBu25G6OoR8/hqdefault.jpg" width="480" height="360"/>
    <media:description>Whether it's helping the unhoused or saving animals from slaughter, these Pennsylvanians are reshaping their communities. Discover how heroism shows up — from Erie to Luzerne County.
 
 For more information visit https://www.spotlightpa.org
@@ -375,7 +375,7 @@ Support our newsroom: http://www.spotlightpa.org/donate
   <media:group>
    <media:title>Karen Phillips’ Mission to Save Pennsylvania’s Farm Animals</media:title>
    <media:content url="https://www.youtube.com/v/b0amLYD9390?version=3" type="application/x-shockwave-flash" width="640" height="390"/>
-   <media:thumbnail url="https://i3.ytimg.com/vi/b0amLYD9390/hqdefault.jpg" width="480" height="360"/>
+   <media:thumbnail url="https://i4.ytimg.com/vi/oBu25G6OoR8/hqdefault.jpg" width="480" height="360"/>
    <media:description>On six acres in western PA, Hope Haven Farm Sanctuary nurtures rescued goats, pigs, horses, and more — all thanks to local hero Karen Phillips.
 
 For more information visit https://www.spotlightpa.org
@@ -405,7 +405,7 @@ Support our newsroom: http://www.spotlightpa.org/donate
   <media:group>
    <media:title>2026 PA Governor Race: Shapiro Launches Reelection Campaign</media:title>
    <media:content url="https://www.youtube.com/v/kOVFUzrKX2Y?version=3" type="application/x-shockwave-flash" width="640" height="390"/>
-   <media:thumbnail url="https://i4.ytimg.com/vi/kOVFUzrKX2Y/hqdefault.jpg" width="480" height="360"/>
+   <media:thumbnail url="https://i4.ytimg.com/vi/oBu25G6OoR8/hqdefault.jpg" width="480" height="360"/>
    <media:description>Gov. Josh Shapiro kicks off his 2026 Pennsylvania reelection campaign in Pittsburgh and Philly as Republican state Treasurer Stacy Garrity lines up to challenge him, setting the stage for a high‑stakes governor’s race.
 
 For more information visit https://www.spotlightpa.org
@@ -433,7 +433,7 @@ Support our newsroom: http://www.spotlightpa.org/donate</media:description>
   <media:group>
    <media:title>Thank You for Supporting Spotlight PA</media:title>
    <media:content url="https://www.youtube.com/v/2Spd2LJDsUo?version=3" type="application/x-shockwave-flash" width="640" height="390"/>
-   <media:thumbnail url="https://i3.ytimg.com/vi/2Spd2LJDsUo/hqdefault.jpg" width="480" height="360"/>
+   <media:thumbnail url="https://i4.ytimg.com/vi/oBu25G6OoR8/hqdefault.jpg" width="480" height="360"/>
    <media:description>As a nonprofit, we rely on donors to power our uniquely independent, unbiased reporting for Pennsylvania. If you're not yet a supporter, make a gift now at http://www.spotlightpa.org/donate .
 
 For more information visit https://www.spotlightpa.org

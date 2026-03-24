@@ -191,14 +191,14 @@ type SiteDatum struct {
 }
 
 type Youtube struct {
-	ID                  int64              `json:"id"`
-	ExternalID          string             `json:"external_id"`
-	Title               string             `json:"title"`
-	URL                 string             `json:"url"`
-	ThumbnailUrl        string             `json:"thumbnail_url"`
-	ExternalPublishedAt time.Time          `json:"external_published_at"`
-	ExternalUpdatedAt   time.Time          `json:"external_updated_at"`
-	UploadedAt          pgtype.Timestamptz `json:"uploaded_at"`
-	CreatedAt           time.Time          `json:"created_at"`
-	UpdatedAt           time.Time          `json:"updated_at"`
+	ID                  int64       `json:"id"`
+	ExternalID          string      `json:"external_id"`
+	Title               string      `json:"title"`
+	URL                 string      `json:"url"`
+	ThumbnailUrl        string      `json:"thumbnail_url"`
+	ExternalPublishedAt time.Time   `json:"external_published_at"`
+	ExternalUpdatedAt   time.Time   `json:"external_updated_at"`
+	CreatedAt           time.Time   `json:"created_at"`
+	UpdatedAt           time.Time   `json:"updated_at"`
+	PageID              pgtype.Int8 `json:"page_id"`
 }
