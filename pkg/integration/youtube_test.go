@@ -28,9 +28,9 @@ func TestYouTube(t *testing.T) {
 		Client: &http.Client{
 			Transport: reqtest.Replay("testdata/youtube"),
 		},
-		FileStore:    aws.NewBlobStore("file://" + t.ArtifactDir()),
-		ImageStore:   aws.NewBlobStore("file://" + t.ArtifactDir()),
-		ContentStore: github.NewMockClient(t.ArtifactDir()),
+		FileStore:    aws.NewTestBlobStore(t.ArtifactDir(), "file"),
+		ImageStore:   aws.NewTestBlobStore(t.ArtifactDir(), "image"),
+		ContentStore: github.NewMockClient(t.ArtifactDir(), "github"),
 	}
 	ctx := t.Context()
 	{ // Should not have pages
@@ -46,7 +46,7 @@ func TestYouTube(t *testing.T) {
 		be.NilErr(t, svc.UpdateYouTubeFeed(ctx))
 	}
 	{ // Should have uploaded feeds/youtube-shorts.json
-		feedfile := filepath.Join(t.ArtifactDir(), "feeds/youtube-shorts.json")
+		feedfile := filepath.Join(t.ArtifactDir(), "file/feeds/youtube-shorts.json")
 		var data struct {
 			Videos []youtube.FeedItem `json:"videos"`
 		}
@@ -55,7 +55,7 @@ func TestYouTube(t *testing.T) {
 		be.Nonzero(t, data.Videos[0].Description)
 	}
 	{ // Should have uploaded feeds/youtube-regular.json
-		feedfile := filepath.Join(t.ArtifactDir(), "feeds/youtube-regular.json")
+		feedfile := filepath.Join(t.ArtifactDir(), "file/feeds/youtube-regular.json")
 		var data struct {
 			Videos []youtube.FeedItem `json:"videos"`
 		}
