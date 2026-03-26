@@ -13,12 +13,12 @@ import (
 
 func TestMD5(t *testing.T) {
 	almlog.UseTestLogger(t)
-	dir := t.TempDir()
+	dir := t.ArtifactDir()
 	const teststr = "Hello, World!"
 	wantMD5 := md5.Sum([]byte(teststr))
 
 	ctx := t.Context()
-	bucket := aws.NewBlobStore("file://" + dir + "/")
+	bucket := aws.NewTestBlobStore(dir)
 	err := bucket.WriteFile(ctx, "hello.txt", nil, []byte(teststr))
 	be.NilErr(t, err)
 
