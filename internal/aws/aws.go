@@ -8,7 +8,9 @@ import (
 	"io"
 	"net/http"
 	"net/url"
+	"os"
 	"path"
+	"path/filepath"
 	"time"
 
 	"github.com/aws/aws-sdk-go-v2/service/s3"
@@ -50,6 +52,12 @@ type BlobStore struct {
 
 func NewBlobStore(s string) BlobStore {
 	return BlobStore{s}
+}
+
+func NewTestBlobStore(dirs ...string) BlobStore {
+	dir := filepath.Join(dirs...)
+	_ = os.MkdirAll(dir, os.ModePerm)
+	return BlobStore{"file://" + dir}
 }
 
 func (bs BlobStore) SignPutURL(ctx context.Context, srcPath string, h http.Header) (signedURL string, err error) {

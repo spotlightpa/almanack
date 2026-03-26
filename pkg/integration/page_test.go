@@ -22,7 +22,7 @@ func TestServicePublish(t *testing.T) {
 	almlog.UseTestLogger(t)
 
 	p := createTestDB(t)
-	tmp := t.TempDir()
+	tmp := t.ArtifactDir()
 	svc := almanack.Services{
 		Queries:      db.New(p),
 		Tx:           db.NewTxable(p),
@@ -190,7 +190,7 @@ func TestServicePopScheduledPages(t *testing.T) {
 	almlog.UseTestLogger(t)
 
 	p := createTestDB(t)
-	tmp := t.TempDir()
+	tmp := t.ArtifactDir()
 	svc := almanack.Services{
 		Queries:      db.New(p),
 		Tx:           db.NewTxable(p),
