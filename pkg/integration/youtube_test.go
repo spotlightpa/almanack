@@ -10,6 +10,7 @@ import (
 	"github.com/carlmjohnson/requests/reqtest"
 	"github.com/spotlightpa/almanack/internal/aws"
 	"github.com/spotlightpa/almanack/internal/db"
+	"github.com/spotlightpa/almanack/internal/github"
 	"github.com/spotlightpa/almanack/internal/youtube"
 	"github.com/spotlightpa/almanack/pkg/almanack"
 	"github.com/spotlightpa/almanack/pkg/almlog"
@@ -27,8 +28,9 @@ func TestYouTube(t *testing.T) {
 		Client: &http.Client{
 			Transport: reqtest.Replay("testdata/youtube"),
 		},
-		FileStore:  aws.NewBlobStore("file://" + t.ArtifactDir()),
-		ImageStore: aws.NewBlobStore("file://" + t.ArtifactDir()),
+		FileStore:    aws.NewBlobStore("file://" + t.ArtifactDir()),
+		ImageStore:   aws.NewBlobStore("file://" + t.ArtifactDir()),
+		ContentStore: github.NewMockClient(t.ArtifactDir()),
 	}
 	ctx := t.Context()
 	{ // Should not have pages

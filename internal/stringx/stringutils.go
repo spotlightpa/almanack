@@ -72,28 +72,6 @@ func SlugifyFilename(s string) string {
 	return strings.Map(f, s)
 }
 
-func SlugifyVideoID(s string) string {
-	s, _ = StripAccents(s)
-	hadDash := false
-	f := func(r rune) rune {
-		switch {
-		case
-			r >= 'A' && r <= 'Z',
-			r >= 'a' && r <= 'z',
-			r >= '0' && r <= '9',
-			r == '.',
-			r == '_':
-			hadDash = false
-			return r
-		case hadDash:
-			return -1
-		}
-		hadDash = true
-		return '-'
-	}
-	return strings.Map(f, s)
-}
-
 func LastCut(s, sep string) (before, after string, found bool) {
 	if i := strings.LastIndex(s, sep); i >= 0 {
 		return s[:i], s[i+len(sep):], true

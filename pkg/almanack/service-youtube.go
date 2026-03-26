@@ -91,9 +91,9 @@ func (svc Services) CreateYouTubePages(ctx context.Context) (err error) {
 }
 func (svc Services) CreateYouTubePage(ctx context.Context, video *db.Youtube) (err error) {
 	isShort := strings.Contains(video.URL, "/shorts/")
-	imageDesc := fmt.Sprint("Video:", video.Title)
+	imageDesc := fmt.Sprintf("Video: %s", video.Title)
 	if isShort {
-		imageDesc = fmt.Sprint("Short:", video.Title)
+		imageDesc = fmt.Sprintf("Short: %s", video.Title)
 	}
 	imagePath, err := svc.ReplaceAndUploadImageURL(ctx, video.ThumbnailUrl, imageDesc, "")
 	if err != nil {
@@ -101,9 +101,8 @@ func (svc Services) CreateYouTubePage(ctx context.Context, video *db.Youtube) (e
 	}
 	return svc.Tx.Begin(ctx, pgx.TxOptions{}, func(q *db.Queries) error {
 		defer errorx.Trace(&err)
-		path := fmt.Sprintf("content/videos/%s.md", stringx.SlugifyVideoID(video.ExternalID))
 		page, err := q.CreatePage(ctx, db.CreatePageParams{
-			FilePath:   path,
+			FilePath:   video.FilePath(),
 			SourceType: "youtube",
 			SourceID:   video.ExternalID,
 		})
@@ -123,19 +122,20 @@ func (svc Services) CreateYouTubePage(ctx context.Context, video *db.Youtube) (e
 			videoType = "youtube-short"
 		}
 		fm := db.Map{
-			"internal-id":       stringx.Truncate(imageDesc, 16),
+			"internal-id":       stringx.Truncate(imageDesc, 20),
 			"published":         video.ExternalPublishedAt,
 			"byline":            "",
 			"title":             video.Title,
 			"description":       video.Description,
 			"blurb":             "",
 			"kicker":            "Video",
-			"video_url":         video.URL,
-			"video_type":        videoType,
+			"youtube-id":        video.YouTubeID(),
+			"video-url":         video.URL,
+			"video-type":        videoType,
 			"image":             imagePath,
 			"image-description": imageDesc,
 		}
-		q.UpdatePage(ctx, db.UpdatePageParams{
+		page, err = q.UpdatePage(ctx, db.UpdatePageParams{
 			ID:               page.ID,
 			SetFrontmatter:   true,
 			Frontmatter:      fm,
@@ -143,6 +143,24 @@ func (svc Services) CreateYouTubePage(ctx context.Context, video *db.Youtube) (e
 			SetScheduleFor:   false,
 			SetLastPublished: false,
 		})
-		return err
+		if err != nil {
+			return err
+		}
+
+		msg := fmt.Sprintf("Content: publishing %q", stringx.Truncate(imageDesc, 25))
+		if err = svc.PublishDataPage(ctx, msg, video.FilePath(), fm); err != nil {
+			return err
+		}
+		page, err = q.UpdatePage(ctx, db.UpdatePageParams{
+			ID:               page.ID,
+			SetFrontmatter:   false,
+			SetBody:          false,
+			SetScheduleFor:   false,
+			SetLastPublished: true,
+		})
+		if err != nil {
+			return err
+		}
+		return nil
 	})
 }
