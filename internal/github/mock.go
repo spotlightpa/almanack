@@ -12,20 +12,9 @@ type MockClient struct {
 	basepath string
 }
 
-func NewMockClient(dir string) *MockClient {
-	almlog.Logger.Warn("mocking Github", "dir", dir)
-	if dir == "" {
-		var err error
-		// we don't clean up temp dir:
-		// good for testing but don't use this in prod!
-		dir, err = os.MkdirTemp("", "example")
-		if err != nil {
-			almlog.Logger.Error("creating temporary directory",
-				"err", err, "dir", dir)
-		}
-	}
-
-	return &MockClient{dir}
+func NewMockClient(dirs ...string) *MockClient {
+	almlog.Logger.Warn("mocking Github", "dir", dirs)
+	return &MockClient{filepath.Join(dirs...)}
 }
 
 func (mc *MockClient) abspath(path string) string {
@@ -34,7 +23,7 @@ func (mc *MockClient) abspath(path string) string {
 
 func (mc *MockClient) ensureParent(fn string) {
 	tmppath := filepath.Dir(fn)
-	os.MkdirAll(tmppath, os.ModePerm)
+	_ = os.MkdirAll(tmppath, os.ModePerm)
 }
 
 func (mc *MockClient) CreateFile(ctx context.Context, msg, path string, content []byte) error {
