@@ -37,7 +37,7 @@ func TestToFromTOML(t *testing.T) {
 			be.NilErr(t, err)
 
 			var p2 db.Page
-			err = p2.FromTOML(toml)
+			err = p2.FromMD(toml)
 			be.NilErr(t, err)
 			be.Equal(t, fmt.Sprint(p1), fmt.Sprint(p2))
 		})
@@ -46,10 +46,10 @@ func TestToFromTOML(t *testing.T) {
 
 func TestFromToTOML(t *testing.T) {
 	testfile.Run(t, "testdata/*.md", func(t *testing.T, path string) {
-		b := testfile.Read(t, path)
+		s := testfile.Read(t, path)
 
 		var page db.Page
-		err := page.FromTOML(string(b))
+		err := page.FromMD(s)
 		be.NilErr(t, err)
 
 		toml, err := page.ToTOML()

@@ -2,6 +2,7 @@ package almanack
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"time"
 
@@ -43,9 +44,18 @@ func (svc Services) PopScheduledSiteChanges(ctx context.Context, loc string) err
 
 func (svc Services) PublishSiteConfig(ctx context.Context, siteConfig *db.SiteDatum) (err error) {
 	defer errorx.Trace(&err)
+
+	data, err := json.MarshalIndent(siteConfig.Data, "", "  ")
+	if err != nil {
+		return err
+	}
+
 	msg := MessageForLoc(siteConfig.Key)
 	path := siteConfig.Key
-	return svc.PublishDataPage(ctx, msg, path, siteConfig.Data)
+	if err = svc.ContentStore.UpdateFile(ctx, msg, path, data); err != nil {
+		return err
+	}
+	return nil
 }
 
 type ScheduledSiteConfig struct {

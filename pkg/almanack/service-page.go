@@ -79,7 +79,7 @@ func (svc Services) RefreshPageFromContentStore(ctx context.Context, page *db.Pa
 	if err != nil {
 		return err
 	}
-	if err = page.FromTOML(content); err != nil {
+	if err = page.FromMD(content); err != nil {
 		return err
 	}
 	return nil
@@ -320,17 +320,4 @@ func (svc Services) Notify(ctx context.Context, page *db.Page, publishingNow boo
 			},
 		},
 	})
-}
-
-func (svc Services) PublishDataPage(ctx context.Context, msg, path string, data any) (err error) {
-	defer errorx.Trace(&err)
-
-	b, err := json.MarshalIndent(data, "", "  ")
-	if err != nil {
-		return err
-	}
-	if err = svc.ContentStore.UpdateFile(ctx, msg, path, b); err != nil {
-		return err
-	}
-	return nil
 }

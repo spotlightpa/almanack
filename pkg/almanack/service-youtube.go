@@ -147,10 +147,16 @@ func (svc Services) CreateYouTubePage(ctx context.Context, video *db.Youtube) (e
 			return err
 		}
 
-		msg := fmt.Sprintf("Content: publishing %q", stringx.Truncate(imageDesc, 25))
-		if err = svc.PublishDataPage(ctx, msg, video.FilePath(), fm); err != nil {
+		data, err := page.ToJSON()
+		if err != nil {
 			return err
 		}
+
+		msg := fmt.Sprintf("Content: publishing %q", stringx.Truncate(imageDesc, 25))
+		if err = svc.ContentStore.UpdateFile(ctx, msg, page.FilePath, data); err != nil {
+			return err
+		}
+
 		page, err = q.UpdatePage(ctx, db.UpdatePageParams{
 			ID:               page.ID,
 			SetFrontmatter:   false,
