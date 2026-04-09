@@ -27,7 +27,7 @@
     {
       "role": "image",
       "layout": "bodyLayout",
-      "URL": "http://www.spotlightpa.com/imgproxy/insecure/rt:fill/w:500/h:333/g:ce/el:1/q:75/MjAyNS8xMS8wMW1oLTl4bW0tNmVmYS1xdGVlLmpwZWc=.jpeg",
+      "URL": "http://www.spotlightpa.org/imgproxy/insecure/rt:fill/w:500/h:333/g:ce/el:1/q:75/MjAyNS8xMS8wMW1oLTl4bW0tNmVmYS1xdGVlLmpwZWc=.jpeg",
       "caption": "A photo illustration of Raymond Hohl encircled by images of the Penn State Cancer Institute, a medical device, and a nurse’s binder of thank you notes."
     },
     {
@@ -384,7 +384,7 @@
     {
       "role": "image",
       "layout": "bodyLayout",
-      "URL": "http://www.spotlightpa.com/imgproxy/insecure/rt:fill/w:500/h:281/g:sm/el:1/q:75/MjAyNS8xMS8wMW1oLTkzdHgtYW5rdC03M3hwLmpwZWc=.jpeg",
+      "URL": "http://www.spotlightpa.org/imgproxy/insecure/rt:fill/w:500/h:281/g:sm/el:1/q:75/MjAyNS8xMS8wMW1oLTkzdHgtYW5rdC03M3hwLmpwZWc=.jpeg",
       "caption": "Tasha Messmer looks through a pink plastic binder stuffed with thank-you notes from patients she had treated over her nearly two decades at Penn State Health."
     },
     {
@@ -921,13 +921,13 @@
     {
       "role": "image",
       "layout": "bodyLayout",
-      "URL": "http://www.spotlightpa.com/imgproxy/insecure/rt:fill/w:256/h:256/g:sm/el:1/q:75/MjAyMi8xMi8wMWhzLW1oNGstc2MxNi10YzA5LmpwZWc=.png",
+      "URL": "http://www.spotlightpa.org/imgproxy/insecure/rt:fill/w:256/h:256/g:sm/el:1/q:75/MjAyMi8xMi8wMWhzLW1oNGstc2MxNi10YzA5LmpwZWc=.png",
       "caption": "Picture of Wyatt Massey"
     },
     {
       "role": "heading",
       "layout": "introLayout",
-      "text": "\n\n      <a href=\"http://www.spotlightpa.com/authors/wyatt-massey/\" class=\"transition-colors duration-500 hover:text-yellow\">\n        Wyatt Massey\n      </a>\n\n  ",
+      "text": "\n\n      <a href=\"http://www.spotlightpa.org/authors/wyatt-massey/\" class=\"transition-colors duration-500 hover:text-yellow\">\n        Wyatt Massey\n      </a>\n\n  ",
       "format": "html",
       "textStyle": "introStyle"
     },
@@ -941,13 +941,13 @@
     {
       "role": "image",
       "layout": "bodyLayout",
-      "URL": "http://www.spotlightpa.com/imgproxy/insecure/rt:fill/w:256/h:256/g:sm/el:1/q:75/MjAyMS8wNi8wMWdkLXBtMTgtYnlxYi1xZngzLmpwZWc=.png",
+      "URL": "http://www.spotlightpa.org/imgproxy/insecure/rt:fill/w:256/h:256/g:sm/el:1/q:75/MjAyMS8wNi8wMWdkLXBtMTgtYnlxYi1xZngzLmpwZWc=.png",
       "caption": "Picture of Charlotte Keith"
     },
     {
       "role": "heading",
       "layout": "introLayout",
-      "text": "\n\n      <a href=\"http://www.spotlightpa.com/authors/charlotte-keith/\" class=\"transition-colors duration-500 hover:text-yellow\">\n        Charlotte Keith\n      </a>\n\n  ",
+      "text": "\n\n      <a href=\"http://www.spotlightpa.org/authors/charlotte-keith/\" class=\"transition-colors duration-500 hover:text-yellow\">\n        Charlotte Keith\n      </a>\n\n  ",
       "format": "html",
       "textStyle": "introStyle"
     },
@@ -961,7 +961,7 @@
     {
       "role": "image",
       "layout": "bodyLayout",
-      "URL": "http://www.spotlightpa.com/imgproxy/insecure/rt:fill/w:256/h:256/g:sm/el:1/q:75/MjAyMy8wMy8wMWowLWNhd3QtbmN5OC1hcW42LmpwZWc=.png",
+      "URL": "http://www.spotlightpa.org/imgproxy/insecure/rt:fill/w:256/h:256/g:sm/el:1/q:75/MjAyMy8wMy8wMWowLWNhd3QtbmN5OC1hcW42LmpwZWc=.png",
       "caption": "Picture of Matt Dempsey"
     },
     {
@@ -981,13 +981,13 @@
     {
       "role": "image",
       "layout": "bodyLayout",
-      "URL": "http://www.spotlightpa.com/imgproxy/insecure/rt:fill/w:256/h:256/g:sm/el:1/q:75/MjAyMi8xMi8wMWhzLWphNTQtZDQ0bS03bWZmLndlYnA=.png",
+      "URL": "http://www.spotlightpa.org/imgproxy/insecure/rt:fill/w:256/h:256/g:sm/el:1/q:75/MjAyMi8xMi8wMWhzLWphNTQtZDQ0bS03bWZmLndlYnA=.png",
       "caption": "Picture of Sarah Rafacz"
     },
     {
       "role": "heading",
       "layout": "introLayout",
-      "text": "\n\n      <a href=\"http://www.spotlightpa.com/authors/sarah-rafacz/\" class=\"transition-colors duration-500 hover:text-yellow\">\n        Sarah Rafacz\n      </a>\n\n  ",
+      "text": "\n\n      <a href=\"http://www.spotlightpa.org/authors/sarah-rafacz/\" class=\"transition-colors duration-500 hover:text-yellow\">\n        Sarah Rafacz\n      </a>\n\n  ",
       "format": "html",
       "textStyle": "introStyle"
     },
@@ -1001,7 +1001,7 @@
     {
       "role": "image",
       "layout": "bodyLayout",
-      "URL": "http://www.spotlightpa.com/imgproxy/insecure/rt:fill/w:256/h:256/g:ce/el:1/q:75/MjAyMS8xMC8wMWduLXZlbmYtN2hobS12ZXIwLmpwZWc=.png",
+      "URL": "http://www.spotlightpa.org/imgproxy/insecure/rt:fill/w:256/h:256/g:ce/el:1/q:75/MjAyMS8xMC8wMWduLXZlbmYtN2hobS12ZXIwLmpwZWc=.png",
       "caption": "Picture of Stephen Kearse"
     },
     {
@@ -1021,13 +1021,13 @@
     {
       "role": "image",
       "layout": "bodyLayout",
-      "URL": "http://www.spotlightpa.com/imgproxy/insecure/rt:fill/w:256/h:256/g:ce/el:1/q:75/MjAyNS8wNC8wMWt5LXRrbnYtMTIxNy1leHF6LmpwZWc=.png",
+      "URL": "http://www.spotlightpa.org/imgproxy/insecure/rt:fill/w:256/h:256/g:ce/el:1/q:75/MjAyNS8wNC8wMWt5LXRrbnYtMTIxNy1leHF6LmpwZWc=.png",
       "caption": "Picture of Carlana Johnson"
     },
     {
       "role": "heading",
       "layout": "introLayout",
-      "text": "\n\n      <a href=\"http://www.spotlightpa.com/authors/carlana-johnson/\" class=\"transition-colors duration-500 hover:text-yellow\">\n        Carlana Johnson\n      </a>\n\n  ",
+      "text": "\n\n      <a href=\"http://www.spotlightpa.org/authors/carlana-johnson/\" class=\"transition-colors duration-500 hover:text-yellow\">\n        Carlana Johnson\n      </a>\n\n  ",
       "format": "html",
       "textStyle": "introStyle"
     },
@@ -1040,13 +1040,13 @@
     {
       "role": "body",
       "layout": "bodyLayout",
-      "text": "\n        Spotlight PA relies on funding from\n        <a class=\"text-navy underline transition-colors duration-500 hover:text-yellow\" href=\"http://www.spotlightpa.com/support/\">foundations and readers like you</a>\n        who are committed to accountability journalism that gets results.\n      ",
+      "text": "\n        Spotlight PA relies on funding from\n        <a class=\"text-navy underline transition-colors duration-500 hover:text-yellow\" href=\"http://www.spotlightpa.org/support/\">foundations and readers like you</a>\n        who are committed to accountability journalism that gets results.\n      ",
       "format": "html"
     },
     {
       "role": "body",
       "layout": "bodyLayout",
-      "text": "\n        If you value this reporting, please give a gift today at\n        <a class=\"text-navy underline transition-colors duration-500 hover:text-yellow\" href=\"http://www.spotlightpa.com/donate/\">spotlightpa.org/donate</a>.\n      ",
+      "text": "\n        If you value this reporting, please give a gift today at\n        <a class=\"text-navy underline transition-colors duration-500 hover:text-yellow\" href=\"http://www.spotlightpa.org/donate/\">spotlightpa.org/donate</a>.\n      ",
       "format": "html"
     }
   ],

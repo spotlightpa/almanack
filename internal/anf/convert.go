@@ -119,7 +119,7 @@ func (c *converter) addImage(n *html.Node) {
 		return
 	}
 	// Apple doesn't understand WEBP
-	if strings.HasPrefix(src, "http://www.spotlightpa.com/imgproxy/insecure") {
+	if strings.HasPrefix(src, "http://www.spotlightpa.org/imgproxy/insecure") {
 		if withoutExt, ok := strings.CutSuffix(src, ".webp"); ok {
 			src = withoutExt + ".png"
 		}
