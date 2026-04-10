@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/earthboundkid/mid"
+	sentryhttp "github.com/getsentry/sentry-go/http"
 	"github.com/go-chi/chi/v5/middleware"
 
 	"github.com/spotlightpa/almanack/internal/httpx"
@@ -100,10 +101,23 @@ func (app *appEnv) routes() http.Handler {
 	standardMW.HandleFunc(mux, "/", app.notFound)
 
 	var baseMW mid.Stack
-	baseMW.Push(middleware.RealIP)
-	baseMW.PushIf(!app.isLambda, middleware.Recoverer)
+
+	corsProtection := http.NewCrossOriginProtection()
+	corsProtection.SetDenyHandler(app.badCORS(corsProtection))
+
 	baseMW.Push(
+		middleware.RealIP,
 		almlog.Middleware,
+	)
+	baseMW.PushIf(!app.isLambda, middleware.Recoverer)
+	baseMW.PushIf(app.isLambda, sentryhttp.
+		New(sentryhttp.Options{
+			WaitForDelivery: true,
+			Timeout:         5 * time.Second,
+			Repanic:         false,
+		}).Handle)
+	baseMW.Push(
+		corsProtection.Handler,
 		app.versionMiddleware,
 		app.maxSizeMiddleware,
 	)
