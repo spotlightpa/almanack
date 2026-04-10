@@ -14,7 +14,6 @@ import (
 	"github.com/earthboundkid/flagx/v2"
 	"github.com/earthboundkid/versioninfo/v2"
 	"github.com/getsentry/sentry-go"
-	sentryhttp "github.com/getsentry/sentry-go/http"
 
 	"github.com/spotlightpa/almanack/internal/netlifyid"
 	"github.com/spotlightpa/almanack/pkg/almanack"
@@ -83,13 +82,7 @@ type appEnv struct {
 }
 
 func (app *appEnv) exec() error {
-	routes := sentryhttp.
-		New(sentryhttp.Options{
-			WaitForDelivery: true,
-			Timeout:         5 * time.Second,
-			Repanic:         !app.isLambda,
-		}).
-		Handle(app.routes())
+	routes := app.routes()
 
 	var host string
 	if app.isLambda {

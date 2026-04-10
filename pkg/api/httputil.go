@@ -331,3 +331,9 @@ func (app *appEnv) htmlBadRequest(err error, format string, args ...any) http.Ha
 		app.replyHTMLErr(w, r, resperr.E{E: err, M: fmt.Sprintf(format, args...)})
 	})
 }
+
+func (app *appEnv) badCORS(c *http.CrossOriginProtection) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		app.htmlBadRequest(c.Check(r), "Cross Origin Request Not Allowed").ServeHTTP(w, r)
+	})
+}
