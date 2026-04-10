@@ -18,7 +18,7 @@ require (
 	github.com/earthboundkid/emailx/v2 v2.24.1
 	github.com/earthboundkid/errorx/v2 v2.25.1
 	github.com/earthboundkid/flagx/v2 v2.25.1
-	github.com/earthboundkid/mid v0.25.1
+	github.com/earthboundkid/mid v0.26.1
 	github.com/earthboundkid/resperr/v2 v2.25.1
 	github.com/earthboundkid/slackhook/v2 v2.25.1
 	github.com/earthboundkid/versioninfo/v2 v2.24.1
@@ -33,9 +33,9 @@ require (
 	github.com/microcosm-cc/bluemonday v1.0.27
 	github.com/tdewolff/minify/v2 v2.24.11
 	gocloud.dev v0.45.0
-	golang.org/x/net v0.52.0
+	golang.org/x/net v0.53.0
 	golang.org/x/oauth2 v0.36.0
-	golang.org/x/text v0.35.0
+	golang.org/x/text v0.36.0
 	google.golang.org/api v0.273.1
 	gopkg.in/Iwark/spreadsheet.v2 v2.0.0-20230915040305-7677e8164883
 )
@@ -97,9 +97,9 @@ require (
 	go.opentelemetry.io/otel/sdk v1.43.0 // indirect
 	go.opentelemetry.io/otel/sdk/metric v1.43.0 // indirect
 	go.opentelemetry.io/otel/trace v1.43.0 // indirect
-	golang.org/x/crypto v0.49.0 // indirect
+	golang.org/x/crypto v0.50.0 // indirect
 	golang.org/x/sync v0.20.0 // indirect
-	golang.org/x/sys v0.42.0 // indirect
+	golang.org/x/sys v0.43.0 // indirect
 	golang.org/x/xerrors v0.0.0-20240903120638-7835f813f4da // indirect
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20260401024825-9d38bb4040a9 // indirect
 	google.golang.org/grpc v1.80.0 // indirect
