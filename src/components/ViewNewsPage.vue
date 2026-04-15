@@ -602,7 +602,7 @@ export default {
         </BulmaFieldCheckbox>
 
         <BulmaFieldCheckbox v-model="page.noIndex" label="No index">
-          Hide page from Google search results
+          Hide page from Google search results and homepage river
         </BulmaFieldCheckbox>
 
         <BulmaFieldCheckbox v-model="page.suppressAds" label="Suppress ads">
