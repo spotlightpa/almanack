@@ -60,6 +60,7 @@ export class Page {
     this.slug = this.frontmatter["slug"] ?? "";
     this.extendedKicker = this.frontmatter["extended-kicker"] ?? "";
     this.modalExclude = this.frontmatter["modal-exclude"] ?? false;
+    this.suppressAds = this.frontmatter["suppress-ads"] ?? false;
     this.suppressDate = this.frontmatter["suppress-date"] ?? false;
     this.isDraft = this.frontmatter["draft"] ?? false;
     this.isPinned = this.frontmatter["pinned"] ?? false;
@@ -241,6 +242,7 @@ export class Page {
         slug: this.slug,
         "extended-kicker": this.extendedKicker,
         "modal-exclude": this.modalExclude,
+        "suppress-ads": this.suppressAds,
         "suppress-date": this.suppressDate,
         draft: this.isDraft,
         pinned: this.isPinned,

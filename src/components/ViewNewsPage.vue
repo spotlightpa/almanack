@@ -605,6 +605,10 @@ export default {
           Hide page from Google search results
         </BulmaFieldCheckbox>
 
+        <BulmaFieldCheckbox v-model="page.suppressAds" label="Suppress ads">
+          Hide ads from header, footer, and sidebar of page
+        </BulmaFieldCheckbox>
+
         <BulmaFieldInput
           v-model="page.overrideURL"
           label="Override URL"
