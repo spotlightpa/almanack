@@ -228,6 +228,15 @@ let router = createRouter({
       },
     },
     {
+      path: "/admin/videos",
+      name: "video-pages",
+      component: load(() => import("@/components/ViewVideoPages.vue")),
+      props: (route) => ({ page: route.query.page }),
+      meta: {
+        requiresAuth: isSpotlightPAUser,
+      },
+    },
+    {
       path: "/admin/sponsored",
       name: "sponsored-pages",
       component: load(() => import("@/components/ViewPagesList.vue")),

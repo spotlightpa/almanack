@@ -138,6 +138,11 @@ const nextPage = computedProp("next_page", (page) => ({
         to="sponsored-pages"
         :icon="['fas', 'file-signature']"
       ></LinkRoute>
+      <LinkRoute
+        label="YouTube Videos"
+        to="video-pages"
+        :icon="['fas', 'video']"
+      ></LinkRoute>
     </LinkButtons>
 
     <LinkButtons label="Uploads">

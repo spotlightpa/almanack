@@ -453,6 +453,31 @@ func (app *appEnv) listPages(w http.ResponseWriter, r *http.Request) {
 
 	prefix := r.URL.Query().Get("path")
 
+	pager := paginate.PageNumber(page)
+	pager.PageSize = 100
+
+	if slices.Contains(r.URL.Query()["select"], "frontmatter") {
+		var resp struct {
+			Pages    []db.Page `json:"pages"`
+			NextPage int32     `json:"next_page,string,omitempty"`
+		}
+		var err error
+		resp.Pages, err = paginate.List(pager, r.Context(),
+			app.svc.Queries.ListPagesWithFrontmatter,
+			db.ListPagesWithFrontmatterParams{
+				FilePath: prefix + "%",
+				Limit:    pager.Limit(),
+				Offset:   pager.Offset(),
+			})
+		resp.NextPage = pager.NextPage
+		if err != nil {
+			app.replyErr(w, r, err)
+			return
+		}
+		app.replyJSON(http.StatusOK, w, &resp)
+		return
+	}
+
 	var (
 		resp struct {
 			Pages    []db.ListPagesRow `json:"pages"`
@@ -460,8 +485,6 @@ func (app *appEnv) listPages(w http.ResponseWriter, r *http.Request) {
 		}
 		err error
 	)
-	pager := paginate.PageNumber(page)
-	pager.PageSize = 100
 	resp.Pages, err = paginate.List(pager, r.Context(),
 		app.svc.Queries.ListPages,
 		db.ListPagesParams{
@@ -574,6 +597,53 @@ func (app *appEnv) postPage(w http.ResponseWriter, r *http.Request) {
 			app.logErr(ctx, err)
 		}
 	}
+	app.replyJSON(http.StatusOK, w, &res)
+}
+
+func (app *appEnv) postPageJSON(w http.ResponseWriter, r *http.Request) {
+	app.logStart(r)
+
+	var userUpdate db.UpdatePageParams
+	if !app.readJSON(w, r, &userUpdate) {
+		return
+	}
+
+	oldPage, err := app.svc.Queries.GetPageByID(r.Context(), userUpdate.ID)
+	if err != nil {
+		err = fmt.Errorf("postPageJSON: could not get page: %w", err)
+		app.replyErr(w, r, err)
+		return
+	}
+
+	ctx := context.WithoutCancel(r.Context())
+
+	// Build a page with the user's updates for publishing
+	pubPage := oldPage
+	if userUpdate.SetFrontmatter {
+		pubPage.Frontmatter = userUpdate.Frontmatter
+	}
+	if userUpdate.SetBody {
+		pubPage.Body = userUpdate.Body
+	}
+
+	// Publish first
+	err = app.svc.Tx.Begin(ctx, pgx.TxOptions{}, func(txq *db.Queries) error {
+		return app.svc.PublishJSONPage(ctx, txq, &pubPage)
+	})
+	if err != nil {
+		err = fmt.Errorf("postPageJSON: publish problem: %w", err)
+		app.replyErr(w, r, err)
+		return
+	}
+
+	// Then persist the user's changes
+	res, err := app.svc.Queries.UpdatePage(ctx, userUpdate)
+	if err != nil {
+		err = fmt.Errorf("postPageJSON: update problem: %w", err)
+		app.replyErr(w, r, err)
+		return
+	}
+
 	app.replyJSON(http.StatusOK, w, &res)
 }
 
