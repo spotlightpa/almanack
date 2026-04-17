@@ -69,35 +69,26 @@ func (svc Services) PublishPage(ctx context.Context, txq *db.Queries, page *db.P
 	return
 }
 
-func (svc Services) PublishJSONPage(ctx context.Context, txq *db.Queries, page *db.Page) (err error) {
+func (svc Services) PublishJSONPage(ctx context.Context, txq *db.Queries, update db.UpdatePageParams) (page *db.Page, err error) {
 	defer errorx.Trace(&err)
 
-	page.SetURLPath()
-	data, err := page.ToJSON()
+	// This will rollback on error
+	updatedPage, err := txq.UpdatePage(ctx, update)
 	if err != nil {
 		return
 	}
 
-	internalID, _ := page.Frontmatter["internal-id"].(string)
-	title := cmp.Or(internalID, page.FilePath)
-	msg := fmt.Sprintf("Content: publishing %q", title)
+	data, err := updatedPage.ToJSON()
+	if err != nil {
+		return
+	}
+
+	msg := fmt.Sprintf("Content: publishing %q", page.FilePath)
 	if err = svc.ContentStore.UpdateFile(ctx, msg, page.FilePath, data); err != nil {
 		return
 	}
 
-	p2, err := txq.UpdatePage(ctx, db.UpdatePageParams{
-		ID:               page.ID,
-		URLPath:          page.URLPath.String,
-		SetLastPublished: true,
-		SetFrontmatter:   false,
-		SetBody:          false,
-		SetScheduleFor:   false,
-		ScheduleFor:      db.NullTime,
-	})
-	if err != nil {
-		return
-	}
-	*page = p2
+	page = &updatedPage
 	return
 }
 
