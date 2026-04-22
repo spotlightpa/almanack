@@ -456,13 +456,13 @@ func (app *appEnv) listPages(w http.ResponseWriter, r *http.Request) {
 
 	pager := paginate.PageNumber(page)
 	pager.PageSize = 100
+	var err error
 
 	if q.Get("select") == "frontmatter" {
 		var resp struct {
 			Pages    []db.Page `json:"pages"`
 			NextPage int32     `json:"next_page,string,omitempty"`
 		}
-		var err error
 		resp.Pages, err = paginate.List(pager, r.Context(),
 			app.svc.Queries.ListPagesWithFrontmatter,
 			db.ListPagesWithFrontmatterParams{
@@ -479,13 +479,10 @@ func (app *appEnv) listPages(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var (
-		resp struct {
-			Pages    []db.ListPagesRow `json:"pages"`
-			NextPage int32             `json:"next_page,string,omitempty"`
-		}
-		err error
-	)
+	var resp struct {
+		Pages    []db.ListPagesRow `json:"pages"`
+		NextPage int32             `json:"next_page,string,omitempty"`
+	}
 	resp.Pages, err = paginate.List(pager, r.Context(),
 		app.svc.Queries.ListPages,
 		db.ListPagesParams{
