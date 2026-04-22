@@ -25,7 +25,6 @@ class VideoPage {
     this.publicationDate = maybeDate(this.frontmatter, "published");
 
     this.title = this.frontmatter["title"] ?? "";
-    this.description = this.frontmatter["description"] ?? "";
     this.blurb = this.frontmatter["blurb"] ?? "";
     this.kicker = this.frontmatter["kicker"] ?? "";
     this.byline = this.frontmatter["byline"] ?? "";
@@ -193,7 +192,6 @@ async function saveVideo() {
         label="Eyebrow"
         help='Small text appearing above the image thumbnail. Defaults to "Video" if blank.'
       ></BulmaFieldInput>
-
       <BulmaField
         label="Photo ID"
         help="Thumbnail shown in article curation"
