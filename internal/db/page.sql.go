@@ -602,13 +602,13 @@ func (q *Queries) ListPagesByURLPaths(ctx context.Context, paths []string) ([]Li
 
 const listPagesWithFrontmatter = `-- name: ListPagesWithFrontmatter :many
 SELECT
-  page.id, page.file_path, page.frontmatter, page.body, page.schedule_for, page.last_published, page.created_at, page.updated_at, page.url_path, page.source_type, page.source_id, page.publication_date
+  id, file_path, frontmatter, body, schedule_for, last_published, created_at, updated_at, url_path, source_type, source_id, publication_date
 FROM
   page
 WHERE
   "file_path" LIKE $1
 ORDER BY
-  publication_date DESC
+  "publication_date" DESC
 LIMIT $2 OFFSET $3
 `
 

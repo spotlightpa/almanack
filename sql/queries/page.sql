@@ -102,13 +102,13 @@ LIMIT $2 OFFSET $3;
 
 -- name: ListPagesWithFrontmatter :many
 SELECT
-  page.*
+  *
 FROM
   page
 WHERE
   "file_path" LIKE $1
 ORDER BY
-  publication_date DESC
+  "publication_date" DESC
 LIMIT $2 OFFSET $3;
 
 -- name: ListPageIDs :many
