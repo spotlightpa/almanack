@@ -1,63 +1,14 @@
 <script setup>
-// import { reactive, ref } from "vue";
+import { watch, ref } from "vue";
 
 import { watchAPI } from "@/api/service-util.js";
 import { get, listPages } from "@/api/client-v2.js";
-import imgproxyURL from "@/api/imgproxy-url.js";
-import maybeDate from "@/utils/maybe-date.js";
-import VideoListRow from "./VideoListRow.vue";
-
-class VideoPage {
-  constructor(data) {
-    this.id = data["id"] ?? "";
-    this.filePath = data["file_path"] ?? "";
-    this.frontmatter = data["frontmatter"] ?? {};
-    this.body = data["body"] ?? "";
-    this.createdAt = data["created_at"] ?? "";
-    this.updatedAt = maybeDate(data, "updated_at");
-    this.lastPublished = maybeDate(data, "last_published");
-    this.publicationDate = maybeDate(this.frontmatter, "published");
-
-    this.title = this.frontmatter["title"] ?? "";
-    this.description = this.frontmatter["description"] ?? "";
-    this.blurb = this.frontmatter["blurb"] ?? "";
-    this.kicker = this.frontmatter["kicker"] ?? "";
-    this.byline = this.frontmatter["byline"] ?? "";
-    this.link = this.frontmatter["link"] ?? "";
-    this.youtubeID = this.frontmatter["youtube-id"] ?? "";
-    this.videoURL = this.frontmatter["video-url"] ?? "";
-    this.videoType = this.frontmatter["video-type"] ?? "";
-    this.image = this.frontmatter["image"] ?? "";
-    this.imageDescription = this.frontmatter["image-description"] ?? "";
-    this.internalID = this.frontmatter["internal-id"] ?? "";
-  }
-
-  get isPublished() {
-    return !!this.lastPublished;
-  }
-
-  get status() {
-    return this.isPublished ? "pub" : "none";
-  }
-
-  get isShort() {
-    return this.videoType === "youtube-short";
-  }
-
-  get thumbnailURL() {
-    return imgproxyURL(this.image, {
-      width: 256,
-      height: 192,
-      extension: "webp",
-    });
-  }
-}
 
 const props = defineProps({
   page: { default: "" },
 });
 
-const { apiState, fetch, computedList, computedProp } = watchAPI(
+const { apiState, fetch, computedProp } = watchAPI(
   () => props.page,
   (page) =>
     get(listPages, {
@@ -67,11 +18,21 @@ const { apiState, fetch, computedList, computedProp } = watchAPI(
     })
 );
 
-const videos = computedList("pages", (page) => new VideoPage(page));
+const pages = ref([]);
+watch(apiState.rawData, (data) => {
+  if (data.pages) {
+    pages.value = data.pages;
+  }
+});
+
 const nextPage = computedProp("next_page", (page) => ({
   name: "video-pages",
   query: { page },
 }));
+
+function swap(event, i) {
+  pages.value[i] = event;
+}
 </script>
 
 <template>
@@ -98,9 +59,12 @@ const nextPage = computedProp("next_page", (page) => ({
     >
       <table class="table is-striped is-narrow is-fullwidth">
         <tbody>
-          <tr v-for="video of videos" :key="video.id">
+          <tr v-for="(video, i) of pages" :key="video.id">
             <td>
-              <VideoListRow :video="video" @refresh-list="fetch" />
+              <VideoListRow
+                :model-value="video"
+                @update:model-value="swap($event, i)"
+              />
             </td>
           </tr>
         </tbody>
@@ -118,17 +82,3 @@ const nextPage = computedProp("next_page", (page) => ({
     </APILoader>
   </div>
 </template>
-
-<style scoped>
-.zebra-row {
-  background-color: #fff;
-}
-
-.zebra-row:nth-child(even) {
-  background-color: #fafafa;
-}
-
-.zebra-row + .zebra-row {
-  border-top: 1px solid #dbdbdb;
-}
-</style>

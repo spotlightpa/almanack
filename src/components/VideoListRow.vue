@@ -1,15 +1,67 @@
 <script setup>
-import { ref } from "vue";
+import { computed, ref } from "vue";
+
 import { post, postPageJSON } from "@/api/client-v2.js";
 import { makeState } from "@/api/service-util.js";
+import imgproxyURL from "@/api/imgproxy-url.js";
+import maybeDate from "@/utils/maybe-date.js";
 
 const props = defineProps({
-  video: {
+  modelValue: {
     type: Object,
     required: true,
   },
 });
-const emit = defineEmits(["refresh-list"]);
+
+class VideoPage {
+  constructor(data) {
+    this.id = data["id"] ?? "";
+    this.filePath = data["file_path"] ?? "";
+    this.frontmatter = data["frontmatter"] ?? {};
+    this.body = data["body"] ?? "";
+    this.createdAt = data["created_at"] ?? "";
+    this.updatedAt = maybeDate(data, "updated_at");
+    this.lastPublished = maybeDate(data, "last_published");
+    this.publicationDate = maybeDate(this.frontmatter, "published");
+
+    this.title = this.frontmatter["title"] ?? "";
+    this.description = this.frontmatter["description"] ?? "";
+    this.blurb = this.frontmatter["blurb"] ?? "";
+    this.kicker = this.frontmatter["kicker"] ?? "";
+    this.byline = this.frontmatter["byline"] ?? "";
+    this.link = this.frontmatter["link"] ?? "";
+    this.youtubeID = this.frontmatter["youtube-id"] ?? "";
+    this.videoURL = this.frontmatter["video-url"] ?? "";
+    this.videoType = this.frontmatter["video-type"] ?? "";
+    this.image = this.frontmatter["image"] ?? "";
+    this.imageDescription = this.frontmatter["image-description"] ?? "";
+    this.internalID = this.frontmatter["internal-id"] ?? "";
+  }
+
+  get isPublished() {
+    return !!this.lastPublished;
+  }
+
+  get status() {
+    return this.isPublished ? "pub" : "none";
+  }
+
+  get isShort() {
+    return this.videoType === "youtube-short";
+  }
+
+  get thumbnailURL() {
+    return imgproxyURL(this.image, {
+      width: 256,
+      height: 192,
+      extension: "webp",
+    });
+  }
+}
+
+const emit = defineEmits(["update:modelValue"]);
+
+const video = computed(() => new VideoPage(props.modelValue));
 
 const isOpen = ref(false);
 let hasOpened = false;
@@ -23,13 +75,13 @@ const imageDescription = ref("");
 const link = ref("");
 
 function initValues() {
-  internalID.value = props.video.internalID;
-  title.value = props.video.title;
-  blurb.value = props.video.blurb;
-  kicker.value = props.video.kicker;
-  image.value = props.video.image;
-  imageDescription.value = props.video.imageDescription;
-  link.value = props.video.link;
+  internalID.value = video.value.internalID;
+  title.value = video.value.title;
+  blurb.value = video.value.blurb;
+  kicker.value = video.value.kicker;
+  image.value = video.value.image;
+  imageDescription.value = video.value.imageDescription;
+  link.value = video.value.link;
 }
 
 function toggle() {
@@ -46,10 +98,10 @@ const { isLoadingThrottled, error } = apiStateRefs;
 
 async function saveVideo() {
   let obj = {
-    id: props.video.id,
+    id: video.value.id,
     set_frontmatter: true,
     frontmatter: {
-      ...props.video.frontmatter,
+      ...video.value.frontmatter,
       "internal-id": internalID.value,
       title: title.value,
       blurb: blurb.value,
@@ -64,7 +116,9 @@ async function saveVideo() {
     set_last_published: true,
   };
   await exec(() => post(postPageJSON, obj));
-  emit("refresh-list", null);
+  if (!apiStateRefs.error.value) {
+    emit("update:modelValue", apiStateRefs.rawData.value);
+  }
 }
 </script>
 
@@ -79,15 +133,16 @@ async function saveVideo() {
             target="_blank"
             :href="video.videoURL"
           >
-            Video {{ video.youtubeID }}
+            {{ video.videoType === "youtube-short" ? "Short" : "Video" }}
+            {{ video.youtubeID }}
           </a>
         </span>
       </span>
       <p class="mt-0 has-text-weight-semibold has-text-black">
-        {{ video.title }}
+        {{ video.internalID }}
       </p>
       <p class="has-text-weight-light has-text-dark">
-        {{ video.description }}
+        {{ video.title }}
       </p>
       <p>
         <button
