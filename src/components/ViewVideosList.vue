@@ -25,14 +25,14 @@ watch(apiState.rawData, (data) => {
   }
 });
 
+function swap(event, i) {
+  pages.value[i] = event;
+}
+
 const nextPage = computedProp("next_page", (page) => ({
   name: "video-pages",
   query: { page },
 }));
-
-function swap(event, i) {
-  pages.value[i] = event;
-}
 </script>
 
 <template>
