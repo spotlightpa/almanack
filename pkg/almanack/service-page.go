@@ -83,13 +83,16 @@ func (svc Services) PublishJSONPage(ctx context.Context, txq *db.Queries, update
 		return
 	}
 
+	if !update.SetLastPublished {
+		return &updatedPage, nil
+	}
+
 	msg := fmt.Sprintf("Content: publishing %q", updatedPage.FilePath)
 	if err = svc.ContentStore.UpdateFile(ctx, msg, updatedPage.FilePath, data); err != nil {
 		return
 	}
 
-	page = &updatedPage
-	return
+	return &updatedPage, nil
 }
 
 func (svc Services) RefreshPageFromContentStore(ctx context.Context, page *db.Page) (err error) {
