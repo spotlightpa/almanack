@@ -201,5 +201,4 @@ type Youtube struct {
 	CreatedAt           time.Time   `json:"created_at"`
 	UpdatedAt           time.Time   `json:"updated_at"`
 	PageID              pgtype.Int8 `json:"page_id"`
-	Description         string      `json:"description"`
 }

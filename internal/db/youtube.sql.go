@@ -13,7 +13,7 @@ import (
 
 const listYouTubeWhereNoPage = `-- name: ListYouTubeWhereNoPage :many
 SELECT
-  id, external_id, title, url, thumbnail_url, external_published_at, external_updated_at, created_at, updated_at, page_id, description
+  id, external_id, title, url, thumbnail_url, external_published_at, external_updated_at, created_at, updated_at, page_id
 FROM
   youtube
 WHERE
@@ -40,7 +40,6 @@ func (q *Queries) ListYouTubeWhereNoPage(ctx context.Context) ([]Youtube, error)
 			&i.CreatedAt,
 			&i.UpdatedAt,
 			&i.PageID,
-			&i.Description,
 		); err != nil {
 			return nil, err
 		}
@@ -54,7 +53,7 @@ func (q *Queries) ListYouTubeWhereNoPage(ctx context.Context) ([]Youtube, error)
 
 const listYouTubeWhereRegular = `-- name: ListYouTubeWhereRegular :many
 SELECT
-  id, external_id, title, url, thumbnail_url, external_published_at, external_updated_at, created_at, updated_at, page_id, description
+  id, external_id, title, url, thumbnail_url, external_published_at, external_updated_at, created_at, updated_at, page_id
 FROM
   youtube
 WHERE
@@ -89,7 +88,6 @@ func (q *Queries) ListYouTubeWhereRegular(ctx context.Context, arg ListYouTubeWh
 			&i.CreatedAt,
 			&i.UpdatedAt,
 			&i.PageID,
-			&i.Description,
 		); err != nil {
 			return nil, err
 		}
@@ -103,7 +101,7 @@ func (q *Queries) ListYouTubeWhereRegular(ctx context.Context, arg ListYouTubeWh
 
 const listYouTubeWhereShort = `-- name: ListYouTubeWhereShort :many
 SELECT
-  id, external_id, title, url, thumbnail_url, external_published_at, external_updated_at, created_at, updated_at, page_id, description
+  id, external_id, title, url, thumbnail_url, external_published_at, external_updated_at, created_at, updated_at, page_id
 FROM
   youtube
 WHERE
@@ -138,7 +136,6 @@ func (q *Queries) ListYouTubeWhereShort(ctx context.Context, arg ListYouTubeWher
 			&i.CreatedAt,
 			&i.UpdatedAt,
 			&i.PageID,
-			&i.Description,
 		); err != nil {
 			return nil, err
 		}
@@ -172,7 +169,7 @@ SET
 WHERE
   "id" = $2
 RETURNING
-  id, external_id, title, url, thumbnail_url, external_published_at, external_updated_at, created_at, updated_at, page_id, description
+  id, external_id, title, url, thumbnail_url, external_published_at, external_updated_at, created_at, updated_at, page_id
 `
 
 type UpdateYouTubePageParams struct {
@@ -194,7 +191,6 @@ func (q *Queries) UpdateYouTubePage(ctx context.Context, arg UpdateYouTubePagePa
 		&i.CreatedAt,
 		&i.UpdatedAt,
 		&i.PageID,
-		&i.Description,
 	)
 	return i, err
 }
@@ -208,19 +204,17 @@ feed_items AS (
   SELECT
     data ->> 'external_id' AS "external_id",
     data ->> 'title' AS "title",
-    data ->> 'description' AS "description",
     data ->> 'url' AS url,
     data ->> 'thumbnail_url' AS "thumbnail_url",
     iso_to_timestamptz (data ->> 'external_updated_at')::timestamptz AS "external_updated_at",
     iso_to_timestamptz (data ->> 'external_published_at')::timestamptz AS "external_published_at"
   FROM
     raw_json)
-INSERT INTO youtube ("external_id", "title", "description", "url",
-  "thumbnail_url", "external_published_at", "external_updated_at")
+INSERT INTO youtube ("external_id", "title", "url", "thumbnail_url",
+  "external_published_at", "external_updated_at")
 SELECT
   "external_id",
   "title",
-  "description",
   "url",
   "thumbnail_url",
   "external_published_at",

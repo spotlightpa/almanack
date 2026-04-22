@@ -1,6 +1,5 @@
 ALTER TABLE youtube
-  ADD COLUMN "page_id" bigint REFERENCES page (id) UNIQUE,
-  ADD COLUMN "description" text NOT NULL DEFAULT '';
+  ADD COLUMN "page_id" bigint REFERENCES page (id) UNIQUE;
 
 ---- create above / drop below ----
 ALTER TABLE youtube
