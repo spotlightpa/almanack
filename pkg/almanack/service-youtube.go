@@ -140,7 +140,7 @@ func (svc Services) CreateYouTubePage(ctx context.Context, video *db.Youtube) (e
 			Frontmatter:      fm,
 			SetBody:          false,
 			SetScheduleFor:   false,
-			SetLastPublished: false,
+			SetLastPublished: true, // Rolls back on error
 		})
 		if err != nil {
 			return err
@@ -156,16 +156,6 @@ func (svc Services) CreateYouTubePage(ctx context.Context, video *db.Youtube) (e
 			return err
 		}
 
-		page, err = q.UpdatePage(ctx, db.UpdatePageParams{
-			ID:               page.ID,
-			SetFrontmatter:   false,
-			SetBody:          false,
-			SetScheduleFor:   false,
-			SetLastPublished: true,
-		})
-		if err != nil {
-			return err
-		}
 		return nil
 	})
 }
