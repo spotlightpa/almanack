@@ -36,3 +36,7 @@ func (video Youtube) FilePath() string {
 func (video Youtube) YouTubeID() string {
 	return strings.TrimPrefix(video.ExternalID, "yt:video:")
 }
+
+func (video Youtube) IsShort() bool {
+	return strings.Contains(video.URL, "/shorts/")
+}

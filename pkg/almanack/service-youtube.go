@@ -3,7 +3,6 @@ package almanack
 import (
 	"context"
 	"fmt"
-	"strings"
 
 	"github.com/carlmjohnson/flowmatic"
 	"github.com/earthboundkid/errorx/v2"
@@ -90,7 +89,7 @@ func (svc Services) CreateYouTubePages(ctx context.Context) (err error) {
 	return
 }
 func (svc Services) CreateYouTubePage(ctx context.Context, video *db.Youtube) (err error) {
-	isShort := strings.Contains(video.URL, "/shorts/")
+	isShort := video.IsShort()
 	imageDesc := fmt.Sprintf("Video: %s", video.Title)
 	if isShort {
 		imageDesc = fmt.Sprintf("Short: %s", video.Title)
