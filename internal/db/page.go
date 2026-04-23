@@ -20,7 +20,7 @@ import (
 
 func CreatePageFromContent(ctx context.Context, tx *Txable, path, content string) (*Page, error) {
 	var p Page
-	if err := p.FromTOML(content); err != nil {
+	if err := p.FromMD(content); err != nil {
 		return nil, err
 	}
 	err := tx.Begin(ctx, pgx.TxOptions{}, func(q *Queries) error {
@@ -103,7 +103,19 @@ func (page *Page) ToTOML() (string, error) {
 	return buf.String(), nil
 }
 
-func (page *Page) FromTOML(content string) (err error) {
+func (page *Page) ToJSON() ([]byte, error) {
+	b, err := json.MarshalIndent(page.Frontmatter, "", "  ")
+	if err != nil {
+		return nil, err
+	}
+	s := string(b)
+	if page.Body != "" {
+		s += "\n\n" + page.Body
+	}
+	return []byte(s), nil
+}
+
+func (page *Page) FromMD(content string) (err error) {
 	defer errorx.Trace(&err)
 
 	const delimiter = "+++\n"

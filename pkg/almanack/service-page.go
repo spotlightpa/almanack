@@ -69,6 +69,32 @@ func (svc Services) PublishPage(ctx context.Context, txq *db.Queries, page *db.P
 	return
 }
 
+func (svc Services) PublishJSONPage(ctx context.Context, txq *db.Queries, update db.UpdatePageParams) (page *db.Page, err error) {
+	defer errorx.Trace(&err)
+
+	// This will rollback on error
+	updatedPage, err := txq.UpdatePage(ctx, update)
+	if err != nil {
+		return
+	}
+
+	data, err := updatedPage.ToJSON()
+	if err != nil {
+		return
+	}
+
+	if !update.SetLastPublished {
+		return &updatedPage, nil
+	}
+
+	msg := fmt.Sprintf("Content: publishing %q", updatedPage.FilePath)
+	if err = svc.ContentStore.UpdateFile(ctx, msg, updatedPage.FilePath, data); err != nil {
+		return
+	}
+
+	return &updatedPage, nil
+}
+
 func (svc Services) RefreshPageFromContentStore(ctx context.Context, page *db.Page) (err error) {
 	defer errorx.Trace(&err)
 
@@ -79,7 +105,7 @@ func (svc Services) RefreshPageFromContentStore(ctx context.Context, page *db.Pa
 	if err != nil {
 		return err
 	}
-	if err = page.FromTOML(content); err != nil {
+	if err = page.FromMD(content); err != nil {
 		return err
 	}
 	return nil

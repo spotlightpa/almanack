@@ -90,6 +90,7 @@ export const listImages = `/api/images`;
 export const sendMessage = `/api/message`;
 export const getPage = `/api/page`;
 export const postPage = `/api/page`;
+export const postPageJSON = `/api/page-json`;
 export const postPageCreate = `/api/page-create`;
 export const postPageLoad = `/api/page-load`;
 export const postPageRefresh = `/api/page-refresh`;

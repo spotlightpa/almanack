@@ -51,7 +51,6 @@ func (svc Services) PublishSiteConfig(ctx context.Context, siteConfig *db.SiteDa
 	}
 	msg := MessageForLoc(siteConfig.Key)
 	if err = svc.ContentStore.UpdateFile(ctx, msg, siteConfig.Key, data); err != nil {
-
 		return err
 	}
 	return nil

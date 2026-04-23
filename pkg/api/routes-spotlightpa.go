@@ -451,17 +451,38 @@ func (app *appEnv) listPages(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	prefix := r.URL.Query().Get("path")
+	q := r.URL.Query()
+	prefix := q.Get("path")
 
-	var (
-		resp struct {
-			Pages    []db.ListPagesRow `json:"pages"`
-			NextPage int32             `json:"next_page,string,omitempty"`
-		}
-		err error
-	)
 	pager := paginate.PageNumber(page)
 	pager.PageSize = 100
+	var err error
+
+	if q.Get("select") == "frontmatter" {
+		var resp struct {
+			Pages    []db.Page `json:"pages"`
+			NextPage int32     `json:"next_page,string,omitempty"`
+		}
+		resp.Pages, err = paginate.List(pager, r.Context(),
+			app.svc.Queries.ListPagesWithFrontmatter,
+			db.ListPagesWithFrontmatterParams{
+				FilePath: prefix + "%",
+				Limit:    pager.Limit(),
+				Offset:   pager.Offset(),
+			})
+		resp.NextPage = pager.NextPage
+		if err != nil {
+			app.replyErr(w, r, err)
+			return
+		}
+		app.replyJSON(http.StatusOK, w, &resp)
+		return
+	}
+
+	var resp struct {
+		Pages    []db.ListPagesRow `json:"pages"`
+		NextPage int32             `json:"next_page,string,omitempty"`
+	}
 	resp.Pages, err = paginate.List(pager, r.Context(),
 		app.svc.Queries.ListPages,
 		db.ListPagesParams{
@@ -575,6 +596,32 @@ func (app *appEnv) postPage(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 	app.replyJSON(http.StatusOK, w, &res)
+}
+
+func (app *appEnv) postPageJSON(w http.ResponseWriter, r *http.Request) {
+	app.logStart(r)
+
+	var userUpdate db.UpdatePageParams
+	if !app.readJSON(w, r, &userUpdate) {
+		return
+	}
+
+	ctx := context.WithoutCancel(r.Context())
+	var (
+		page *db.Page
+		err  error
+	)
+	err = app.svc.Tx.Begin(ctx, pgx.TxOptions{}, func(txq *db.Queries) error {
+		page, err = app.svc.PublishJSONPage(ctx, txq, userUpdate)
+		return err
+	})
+	if err != nil {
+		err = fmt.Errorf("postPageJSON: publish problem: %w", err)
+		app.replyErr(w, r, err)
+		return
+	}
+
+	app.replyJSON(http.StatusOK, w, &page)
 }
 
 func (app *appEnv) postPageRefresh(w http.ResponseWriter, r *http.Request) {

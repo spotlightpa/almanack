@@ -10,6 +10,7 @@ import (
 	"github.com/carlmjohnson/requests/reqtest"
 	"github.com/spotlightpa/almanack/internal/aws"
 	"github.com/spotlightpa/almanack/internal/db"
+	"github.com/spotlightpa/almanack/internal/github"
 	"github.com/spotlightpa/almanack/internal/youtube"
 	"github.com/spotlightpa/almanack/pkg/almanack"
 	"github.com/spotlightpa/almanack/pkg/almlog"
@@ -18,71 +19,56 @@ import (
 func TestYouTube(t *testing.T) {
 	almlog.UseTestLogger(t)
 	p := createTestDB(t)
-	q := db.New(p)
 	svc := almanack.Services{
-		Queries: q,
+		Queries: db.New(p),
+		Tx:      db.NewTxable(p),
 		YT: &youtube.Feed{
 			ChannelID: "abc123",
 		},
 		Client: &http.Client{
 			Transport: reqtest.Replay("testdata/youtube"),
 		},
-		FileStore: aws.NewBlobStore("file://" + t.ArtifactDir()),
+		FileStore:    aws.NewTestBlobStore(t.ArtifactDir(), "file"),
+		ImageStore:   aws.NewTestBlobStore(t.ArtifactDir(), "image"),
+		ContentStore: github.NewMockClient(t.ArtifactDir(), "github"),
 	}
 	ctx := t.Context()
-	{ // Nothing in table initially
-		items, err := q.ListYouTubeWhereNotUploaded(ctx)
+	{ // Should not have pages
+		pages, err := svc.Queries.ListPages(ctx, db.ListPagesParams{
+			FilePath: "content/videos/%",
+			Limit:    20,
+			Offset:   0,
+		})
 		be.NilErr(t, err)
-		be.Zero(t, items)
+		be.Zero(t, pages)
 	}
 	{ // Load initial items
 		be.NilErr(t, svc.UpdateYouTubeFeed(ctx))
 	}
-	var nItems int
-	var someitem *db.Youtube
-	{ // Should have items loaded
-		items, err := q.ListYouTubeWhereNotUploaded(ctx)
-		be.NilErr(t, err)
-		be.Nonzero(t, items)
-
-		nItems = len(items)
-		someitem = &items[0]
-	}
-	{ // Shouldn't get new items from refetching
-		be.NilErr(t, svc.UpdateYouTubeFeed(ctx))
-		items, err := q.ListYouTubeWhereNotUploaded(ctx)
-		be.NilErr(t, err)
-		be.Nonzero(t, items)
-		be.Equal(t, nItems, len(items))
-	}
-	{ // Set one to 'uploaded'
-		item, err := q.UpdateYouTubeUploaded(ctx, someitem.ID)
-		be.NilErr(t, err)
-		be.Equal(t, someitem.ID, item.ID)
-		// One less item remains
-		nItems--
-	}
-	{ // Should still have the right number of items
-		be.NilErr(t, svc.UpdateYouTubeFeed(ctx))
-		items, err := q.ListYouTubeWhereNotUploaded(ctx)
-		be.NilErr(t, err)
-		be.Nonzero(t, items)
-		be.Equal(t, nItems, len(items))
-	}
 	{ // Should have uploaded feeds/youtube-shorts.json
-		feedfile := filepath.Join(t.ArtifactDir(), "feeds/youtube-shorts.json")
+		feedfile := filepath.Join(t.ArtifactDir(), "file/feeds/youtube-shorts.json")
 		var data struct {
 			Videos []youtube.FeedItem `json:"videos"`
 		}
 		testfile.ReadJSON(t, feedfile, &data)
 		be.EqualLength(t, 8, data.Videos)
+		be.Nonzero(t, data.Videos[0].Title)
 	}
 	{ // Should have uploaded feeds/youtube-regular.json
-		feedfile := filepath.Join(t.ArtifactDir(), "feeds/youtube-regular.json")
+		feedfile := filepath.Join(t.ArtifactDir(), "file/feeds/youtube-regular.json")
 		var data struct {
 			Videos []youtube.FeedItem `json:"videos"`
 		}
 		testfile.ReadJSON(t, feedfile, &data)
 		be.EqualLength(t, 7, data.Videos)
+	}
+	{ // Should have pages
+		pages, err := svc.Queries.ListPages(ctx, db.ListPagesParams{
+			FilePath: "content/videos/%",
+			Limit:    20,
+			Offset:   0,
+		})
+		be.NilErr(t, err)
+		be.EqualLength(t, 15, pages)
 	}
 }

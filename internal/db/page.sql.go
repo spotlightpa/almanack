@@ -600,6 +600,57 @@ func (q *Queries) ListPagesByURLPaths(ctx context.Context, paths []string) ([]Li
 	return items, nil
 }
 
+const listPagesWithFrontmatter = `-- name: ListPagesWithFrontmatter :many
+SELECT
+  id, file_path, frontmatter, body, schedule_for, last_published, created_at, updated_at, url_path, source_type, source_id, publication_date
+FROM
+  page
+WHERE
+  "file_path" LIKE $1
+ORDER BY
+  "publication_date" DESC
+LIMIT $2 OFFSET $3
+`
+
+type ListPagesWithFrontmatterParams struct {
+	FilePath string `json:"file_path"`
+	Limit    int32  `json:"limit"`
+	Offset   int32  `json:"offset"`
+}
+
+func (q *Queries) ListPagesWithFrontmatter(ctx context.Context, arg ListPagesWithFrontmatterParams) ([]Page, error) {
+	rows, err := q.db.Query(ctx, listPagesWithFrontmatter, arg.FilePath, arg.Limit, arg.Offset)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []Page
+	for rows.Next() {
+		var i Page
+		if err := rows.Scan(
+			&i.ID,
+			&i.FilePath,
+			&i.Frontmatter,
+			&i.Body,
+			&i.ScheduleFor,
+			&i.LastPublished,
+			&i.CreatedAt,
+			&i.UpdatedAt,
+			&i.URLPath,
+			&i.SourceType,
+			&i.SourceID,
+			&i.PublicationDate,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const popScheduledPages = `-- name: PopScheduledPages :many
 UPDATE
   page

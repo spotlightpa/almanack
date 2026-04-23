@@ -18,3 +18,7 @@ ALTER TABLE image
 DROP TABLE newsletter;
 
 DROP TABLE newsletter_type;
+
+-- TODO: remove from DB
+ALTER TABLE youtube
+  DROP COLUMN "uploaded_at";

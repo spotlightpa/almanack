@@ -63,6 +63,7 @@ func (app *appEnv) routes() http.Handler {
 		HandleFunc(mux, `POST /api/message`, app.postMessage).
 		HandleFunc(mux, `GET /api/page`, app.getPage).
 		HandleFunc(mux, `POST /api/page`, app.postPage).
+		HandleFunc(mux, `POST /api/page-json`, app.postPageJSON).
 		HandleFunc(mux, `POST /api/page-create`, app.postPageCreate).
 		Control(mux, `POST /api/page-load`, app.postPageLoad).
 		HandleFunc(mux, `GET /api/pages`, app.listPages).

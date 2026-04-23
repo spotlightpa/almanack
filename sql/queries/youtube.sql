@@ -5,12 +5,12 @@ WITH raw_json AS (
 ),
 feed_items AS (
   SELECT
-    data ->> 'external_id' AS external_id,
-    data ->> 'title' AS title,
+    data ->> 'external_id' AS "external_id",
+    data ->> 'title' AS "title",
     data ->> 'url' AS url,
-    data ->> 'thumbnail_url' AS thumbnail_url,
-    iso_to_timestamptz (data ->> 'external_updated_at')::timestamptz AS external_updated_at,
-    iso_to_timestamptz (data ->> 'external_published_at')::timestamptz AS external_published_at
+    data ->> 'thumbnail_url' AS "thumbnail_url",
+    iso_to_timestamptz (data ->> 'external_updated_at')::timestamptz AS "external_updated_at",
+    iso_to_timestamptz (data ->> 'external_published_at')::timestamptz AS "external_published_at"
   FROM
     raw_json)
 INSERT INTO youtube ("external_id", "title", "url", "thumbnail_url",
@@ -46,13 +46,13 @@ SELECT
         MAX(id)
       FROM youtube));
 
--- name: ListYouTubeWhereNotUploaded :many
+-- name: ListYouTubeWhereNoPage :many
 SELECT
   *
 FROM
   youtube
 WHERE
-  "uploaded_at" IS NULL;
+  "page_id" IS NULL;
 
 -- name: ListYouTubeWhereShort :many
 SELECT
@@ -76,13 +76,13 @@ ORDER BY
   "external_published_at" DESC
 LIMIT $1 OFFSET $2;
 
--- name: UpdateYouTubeUploaded :one
+-- name: UpdateYouTubePage :one
 UPDATE
   youtube
 SET
-  "uploaded_at" = CURRENT_TIMESTAMP,
+  "page_id" = $1,
   "updated_at" = CURRENT_TIMESTAMP
 WHERE
-  "id" = $1
+  "id" = $2
 RETURNING
   *;

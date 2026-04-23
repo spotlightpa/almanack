@@ -30,6 +30,7 @@ import {
   faTrashAlt,
   faUserCircle,
   faUserClock,
+  faVideo,
 } from "@fortawesome/free-solid-svg-icons";
 
 library.add(
@@ -59,7 +60,8 @@ library.add(
   faTableList,
   faTrashAlt,
   faUserCircle,
-  faUserClock
+  faUserClock,
+  faVideo
 );
 
 export default {

@@ -100,6 +100,17 @@ FROM
   ordered
 LIMIT $2 OFFSET $3;
 
+-- name: ListPagesWithFrontmatter :many
+SELECT
+  *
+FROM
+  page
+WHERE
+  "file_path" LIKE $1
+ORDER BY
+  "publication_date" DESC
+LIMIT $2 OFFSET $3;
+
 -- name: ListPageIDs :many
 SELECT
   "id"
