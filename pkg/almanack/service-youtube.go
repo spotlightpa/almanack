@@ -91,6 +91,7 @@ func (svc Services) CreateYouTubePage(ctx context.Context, video *db.Youtube) (e
 			"video-type":        videoType,
 			"image":             imagePath,
 			"image-description": imageDesc,
+			"draft":             false,
 		}
 		page, err = q.UpdatePage(ctx, db.UpdatePageParams{
 			ID:               page.ID,
