@@ -35,6 +35,7 @@ class VideoPage {
     this.image = this.frontmatter["image"] ?? "";
     this.imageDescription = this.frontmatter["image-description"] ?? "";
     this.internalID = this.frontmatter["internal-id"] ?? "";
+    this.draft = this.frontmatter["draft"] ?? false;
   }
 
   get isPublished() {
@@ -65,6 +66,7 @@ const video = computed(() => new VideoPage(props.modelValue));
 const isOpen = ref(false);
 let hasOpened = false;
 
+const draft = ref(false);
 const internalID = ref("");
 const title = ref("");
 const blurb = ref("");
@@ -74,6 +76,7 @@ const imageDescription = ref("");
 const link = ref("");
 
 function initValues() {
+  draft.value = video.value.draft;
   internalID.value = video.value.internalID;
   title.value = video.value.title;
   blurb.value = video.value.blurb;
@@ -101,6 +104,7 @@ async function saveVideo() {
     set_frontmatter: true,
     frontmatter: {
       ...video.value.frontmatter,
+      draft: draft.value,
       "internal-id": internalID.value,
       title: title.value,
       blurb: blurb.value,
@@ -212,6 +216,10 @@ async function saveVideo() {
         label="Video link"
         type="url"
       ></BulmaFieldInput>
+
+      <BulmaFieldCheckbox v-model="draft" label="Hide video">
+        Remove video from lists on Spotlight PA
+      </BulmaFieldCheckbox>
 
       <ErrorSimple :error="error"></ErrorSimple>
       <div class="buttons">
