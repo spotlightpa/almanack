@@ -611,7 +611,7 @@ export default {
 
         <BulmaFieldInput
           v-model="page.overrideURL"
-          label="Override URL"
+          label="Override URL path"
         ></BulmaFieldInput>
 
         <BulmaAutocompleteArray
