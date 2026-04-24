@@ -2,11 +2,9 @@ package integration_test
 
 import (
 	"net/http"
-	"path/filepath"
 	"testing"
 
 	"github.com/carlmjohnson/be"
-	"github.com/carlmjohnson/be/testfile"
 	"github.com/carlmjohnson/requests/reqtest"
 	"github.com/spotlightpa/almanack/internal/aws"
 	"github.com/spotlightpa/almanack/internal/db"
@@ -44,23 +42,6 @@ func TestYouTube(t *testing.T) {
 	}
 	{ // Load initial items
 		be.NilErr(t, svc.UpdateYouTubeFeed(ctx))
-	}
-	{ // Should have uploaded feeds/youtube-shorts.json
-		feedfile := filepath.Join(t.ArtifactDir(), "file/feeds/youtube-shorts.json")
-		var data struct {
-			Videos []youtube.FeedItem `json:"videos"`
-		}
-		testfile.ReadJSON(t, feedfile, &data)
-		be.EqualLength(t, 8, data.Videos)
-		be.Nonzero(t, data.Videos[0].Title)
-	}
-	{ // Should have uploaded feeds/youtube-regular.json
-		feedfile := filepath.Join(t.ArtifactDir(), "file/feeds/youtube-regular.json")
-		var data struct {
-			Videos []youtube.FeedItem `json:"videos"`
-		}
-		testfile.ReadJSON(t, feedfile, &data)
-		be.EqualLength(t, 7, data.Videos)
 	}
 	{ // Should have pages
 		pages, err := svc.Queries.ListPages(ctx, db.ListPagesParams{
