@@ -82,7 +82,7 @@ function build:frontend() {
 function build:backend() {
 	$GO_EXEC version
 	set -x
-	echo "${DEPLOY_PRIME_URL:-http://local.dev}" >internal/almaservices/deploy-url.txt
+	echo "${DEPLOY_PRIME_URL:-http://local.dev}" >internal/almsvc/deploy-url.txt
 	LDFLAGS="-linkmode external -extldflags -static"
 	GOBIN=$THIS_DIR/functions $GO_EXEC install -ldflags "$LDFLAGS" ./funcs/...
 	cp "$THIS_DIR/functions/almanack-api" "$THIS_DIR/functions/almanack-api-background"

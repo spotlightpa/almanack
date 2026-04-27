@@ -12,7 +12,7 @@ import (
 	"github.com/carlmjohnson/be/testfile"
 	"github.com/carlmjohnson/requests/reqtest"
 	"github.com/spotlightpa/almanack/internal/almlog"
-	"github.com/spotlightpa/almanack/internal/almservices"
+	"github.com/spotlightpa/almanack/internal/almsvc"
 	"github.com/spotlightpa/almanack/internal/db"
 	"github.com/spotlightpa/almanack/internal/services/aws"
 	"github.com/spotlightpa/almanack/internal/services/google"
@@ -28,7 +28,7 @@ func TestProcessGDocsDoc(t *testing.T) {
 	ctx := t.Context()
 	testfile.Run(t, "testdata/gdoc*", func(t *testing.T, path string) {
 		t.Parallel()
-		svc := almservices.Services{
+		svc := almsvc.Services{
 			Queries:    q,
 			Tx:         db.NewTxable(p),
 			ImageStore: aws.NewBlobStore("mem://"),

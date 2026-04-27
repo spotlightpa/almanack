@@ -10,7 +10,7 @@ import (
 	"github.com/carlmjohnson/requests"
 	"github.com/carlmjohnson/requests/reqtest"
 	"github.com/spotlightpa/almanack/internal/almlog"
-	"github.com/spotlightpa/almanack/internal/almservices"
+	"github.com/spotlightpa/almanack/internal/almsvc"
 	"github.com/spotlightpa/almanack/internal/db"
 	"github.com/spotlightpa/almanack/internal/services/anf"
 	"github.com/spotlightpa/almanack/internal/services/jsonfeed"
@@ -37,7 +37,7 @@ func TestPublishAppleNews(t *testing.T) {
 		}
 		return reqtest.ReplayJSON(200, &res).RoundTrip(req)
 	}
-	svc := almservices.Services{
+	svc := almsvc.Services{
 		Client:  cl,
 		Queries: q,
 		NewsFeed: &jsonfeed.NewsFeed{

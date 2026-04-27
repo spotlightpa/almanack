@@ -16,7 +16,7 @@ import (
 	"github.com/getsentry/sentry-go"
 
 	"github.com/spotlightpa/almanack/internal/almlog"
-	"github.com/spotlightpa/almanack/internal/almservices"
+	"github.com/spotlightpa/almanack/internal/almsvc"
 	"github.com/spotlightpa/almanack/internal/services/netlifyid"
 )
 
@@ -50,7 +50,7 @@ func (app *appEnv) parseArgs(args []string) error {
 		fmt.Fprintf(fl.Output(), "almanack-api help\n\n")
 		fl.PrintDefaults()
 	}
-	getService := almservices.AddFlags(fl)
+	getService := almsvc.AddFlags(fl)
 
 	if err := fl.Parse(args); err != nil {
 		return err
@@ -78,7 +78,7 @@ type appEnv struct {
 	port     string
 	isLambda bool
 	auth     netlifyid.AuthService
-	svc      almservices.Services
+	svc      almsvc.Services
 }
 
 func (app *appEnv) exec() error {
@@ -86,7 +86,7 @@ func (app *appEnv) exec() error {
 
 	var host string
 	if app.isLambda {
-		u, _ := url.Parse(almservices.DeployURL)
+		u, _ := url.Parse(almsvc.DeployURL)
 		host = u.Hostname()
 	}
 	almlog.Logger.Info("appEnv.exec",
@@ -113,7 +113,7 @@ func (app *appEnv) initSentry(dsn string) error {
 	}
 	return sentry.Init(sentry.ClientOptions{
 		Dsn:       dsn,
-		Release:   almservices.BuildVersion,
+		Release:   almsvc.BuildVersion,
 		Transport: transport,
 	})
 }

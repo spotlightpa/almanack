@@ -18,7 +18,7 @@ import (
 	"github.com/earthboundkid/resperr/v2"
 	"github.com/jackc/pgx/v5"
 	"github.com/spotlightpa/almanack/internal/almlog"
-	"github.com/spotlightpa/almanack/internal/almservices"
+	"github.com/spotlightpa/almanack/internal/almsvc"
 	"github.com/spotlightpa/almanack/internal/db"
 	"github.com/spotlightpa/almanack/internal/services/gdocs"
 	"github.com/spotlightpa/almanack/internal/services/google"
@@ -84,7 +84,7 @@ func (app *appEnv) postSignedUpload(w http.ResponseWriter, r *http.Request) {
 		res response
 		err error
 	)
-	res.SignedURL, res.FileName, err = almservices.GetSignedImageUpload(
+	res.SignedURL, res.FileName, err = almsvc.GetSignedImageUpload(
 		r.Context(), app.svc.ImageStore, userData.Type)
 	if err != nil {
 		app.replyErr(w, r, err)
@@ -397,7 +397,7 @@ func (app *appEnv) postFileCreate(w http.ResponseWriter, r *http.Request) {
 		err error
 	)
 
-	res.SignedURL, res.FileURL, res.Disposition, res.CacheControl, err = almservices.GetSignedFileUpload(
+	res.SignedURL, res.FileURL, res.Disposition, res.CacheControl, err = almsvc.GetSignedFileUpload(
 		r.Context(),
 		app.svc.FileStore,
 		userData.FileName,
@@ -779,7 +779,7 @@ func (app *appEnv) siteDataSet(loc string) http.HandlerFunc {
 		app.logStart(r, "location", loc)
 
 		var req struct {
-			Configs []almservices.ScheduledSiteConfig `json:"configs"`
+			Configs []almsvc.ScheduledSiteConfig `json:"configs"`
 		}
 		if !app.readJSON(w, r, &req) {
 			return

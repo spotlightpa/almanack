@@ -17,7 +17,7 @@ src/                  # Vue.js frontend ([Vite](https://vite.dev/guide/) + [Bulm
 
 funcs/almanack-api/   # Go backend entry point
 internal/almapp/      # CLI entry, HTTP routing, handlers
-internal/almservices/ # Business logic, Services container
+internal/almsvc/      # Business logic, Services container
 internal/db/          # Database layer ([sqlc](https://docs.sqlc.dev/en/stable/)-generated with some handwriten model methods)
 internal/services/    # Third-party integrations (github, aws, google, mailchimp, youtube, etc.)
 internal/utils/       # General-purpose helpers (httpx, iterx, slicex, stringx, timex, etc.)
@@ -33,7 +33,7 @@ sql/queries/          # SQL queries (sqlc)
 
 **Entry**: `funcs/almanack-api/main.go` → `internal/almapp.CLI()` → routes in `internal/almapp/router.go` (split across `routes-public.go`, `routes-editor.go`, `routes-spotlightpa.go`, `routes-background.go`, `routes-ssr.go`).
 
-**Services**: `internal/almservices.Services` is the dependency container holding database, GitHub, S3, Google, Mailchimp, Slack, YouTube clients, etc. Configured via CLI flags/environment variables in `internal/almservices/flags.go`.
+**Services**: `internal/almsvc.Services` is the dependency container holding database, GitHub, S3, Google, Mailchimp, Slack, YouTube clients, etc. and the business logic to connect them. Configured via CLI flags/environment variables in `internal/almservices/flags.go`.
 
 **Routes** are grouped by auth level:
 - Public: `/api/healthcheck`, `/api/identity-hook`

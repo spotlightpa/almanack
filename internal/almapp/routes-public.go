@@ -12,7 +12,7 @@ import (
 	"github.com/earthboundkid/resperr/v2"
 	"github.com/earthboundkid/slackhook/v2"
 	"github.com/spotlightpa/almanack/internal/almlog"
-	"github.com/spotlightpa/almanack/internal/almservices"
+	"github.com/spotlightpa/almanack/internal/almsvc"
 	"github.com/spotlightpa/almanack/internal/db"
 	"github.com/spotlightpa/almanack/internal/services/jwthook"
 	"github.com/spotlightpa/almanack/internal/services/netlifyid"
@@ -93,7 +93,7 @@ func (app *appEnv) getArcImage(w http.ResponseWriter, r *http.Request) http.Hand
 
 	l.InfoContext(r.Context(), "getProxyImage: proxying", "src", srcURL)
 
-	body, ctype, err := almservices.FetchImageURL(r.Context(), app.svc.Client, u.String())
+	body, ctype, err := almsvc.FetchImageURL(r.Context(), app.svc.Client, u.String())
 	if err != nil {
 		return app.htmlErr(err)
 	}

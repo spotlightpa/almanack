@@ -7,7 +7,7 @@ import (
 	"github.com/carlmjohnson/be"
 	"github.com/carlmjohnson/requests/reqtest"
 	"github.com/spotlightpa/almanack/internal/almlog"
-	"github.com/spotlightpa/almanack/internal/almservices"
+	"github.com/spotlightpa/almanack/internal/almsvc"
 	"github.com/spotlightpa/almanack/internal/db"
 	"github.com/spotlightpa/almanack/internal/services/aws"
 	"github.com/spotlightpa/almanack/internal/services/github"
@@ -17,7 +17,7 @@ import (
 func TestYouTube(t *testing.T) {
 	almlog.UseTestLogger(t)
 	p := createTestDB(t)
-	svc := almservices.Services{
+	svc := almsvc.Services{
 		Queries: db.New(p),
 		Tx:      db.NewTxable(p),
 		YT: &youtube.Feed{

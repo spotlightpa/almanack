@@ -1,4 +1,4 @@
-package almservices
+package almsvc
 
 import (
 	"testing"

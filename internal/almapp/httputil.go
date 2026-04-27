@@ -22,7 +22,7 @@ import (
 	"github.com/getsentry/sentry-go"
 
 	"github.com/spotlightpa/almanack/internal/almlog"
-	"github.com/spotlightpa/almanack/internal/almservices"
+	"github.com/spotlightpa/almanack/internal/almsvc"
 	"github.com/spotlightpa/almanack/internal/layouts"
 	"github.com/spotlightpa/almanack/internal/services/netlifyid"
 	"github.com/spotlightpa/almanack/internal/utils/stringx"
@@ -138,7 +138,7 @@ func (app *appEnv) readJSON(w http.ResponseWriter, r *http.Request, dst any) boo
 
 func (app *appEnv) versionMiddleware(h http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set("Almanack-App-Version", almservices.BuildVersion)
+		w.Header().Set("Almanack-App-Version", almsvc.BuildVersion)
 		h.ServeHTTP(w, r)
 	})
 }
