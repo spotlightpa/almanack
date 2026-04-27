@@ -5,7 +5,7 @@ import (
 
 	"github.com/spotlightpa/almanack/internal/db"
 	"github.com/spotlightpa/almanack/internal/netlifyid"
-	"github.com/spotlightpa/almanack/internal/paginate"
+	"github.com/spotlightpa/almanack/internal/utils/paginate"
 )
 
 func (app *appEnv) userInfo(w http.ResponseWriter, r *http.Request) http.Handler {

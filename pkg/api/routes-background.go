@@ -9,9 +9,9 @@ import (
 
 	"github.com/carlmjohnson/flowmatic"
 	"github.com/spotlightpa/almanack/internal/db"
-	"github.com/spotlightpa/almanack/internal/iterx"
-	"github.com/spotlightpa/almanack/internal/paginate"
-	"github.com/spotlightpa/almanack/internal/timex"
+	"github.com/spotlightpa/almanack/internal/utils/iterx"
+	"github.com/spotlightpa/almanack/internal/utils/paginate"
+	"github.com/spotlightpa/almanack/internal/utils/timex"
 	"github.com/spotlightpa/almanack/pkg/almlog"
 )
 

@@ -5,7 +5,7 @@ import (
 	"testing"
 
 	"github.com/carlmjohnson/be"
-	"github.com/spotlightpa/almanack/internal/stringx"
+	"github.com/spotlightpa/almanack/internal/utils/stringx"
 )
 
 //go:embed testdata/article.txt

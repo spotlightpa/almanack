@@ -5,7 +5,7 @@ import (
 	"strings"
 	"unicode"
 
-	"github.com/spotlightpa/almanack/internal/lazy"
+	"github.com/spotlightpa/almanack/internal/utils/lazy"
 	"golang.org/x/text/runes"
 	"golang.org/x/text/transform"
 	"golang.org/x/text/unicode/norm"

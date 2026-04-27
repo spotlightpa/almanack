@@ -16,8 +16,8 @@ import (
 	"github.com/jackc/pgx/v5/pgconn"
 	"github.com/jackc/pgx/v5/pgtype"
 	"github.com/spotlightpa/almanack/internal/db"
-	"github.com/spotlightpa/almanack/internal/stringx"
-	"github.com/spotlightpa/almanack/internal/timex"
+	"github.com/spotlightpa/almanack/internal/utils/stringx"
+	"github.com/spotlightpa/almanack/internal/utils/timex"
 	"github.com/spotlightpa/almanack/pkg/almlog"
 )
 

@@ -9,8 +9,8 @@ import (
 
 	"github.com/earthboundkid/crockford/v2"
 	"github.com/spotlightpa/almanack/internal/aws"
-	"github.com/spotlightpa/almanack/internal/httpx"
-	"github.com/spotlightpa/almanack/internal/stringx"
+	"github.com/spotlightpa/almanack/internal/utils/httpx"
+	"github.com/spotlightpa/almanack/internal/utils/stringx"
 )
 
 func GetSignedFileUpload(ctx context.Context, is aws.BlobStore, filename, mimetype string) (signedURL, fileURL, disposition, cachecontrol string, err error) {

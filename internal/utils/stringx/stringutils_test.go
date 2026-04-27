@@ -5,7 +5,7 @@ import (
 
 	"github.com/carlmjohnson/be"
 	"github.com/carlmjohnson/be/testfile"
-	"github.com/spotlightpa/almanack/internal/stringx"
+	"github.com/spotlightpa/almanack/internal/utils/stringx"
 )
 
 func TestSlugifyURL(t *testing.T) {

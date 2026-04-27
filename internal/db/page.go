@@ -15,7 +15,7 @@ import (
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgtype"
 	"github.com/microcosm-cc/bluemonday"
-	"github.com/spotlightpa/almanack/internal/timex"
+	"github.com/spotlightpa/almanack/internal/utils/timex"
 )
 
 func CreatePageFromContent(ctx context.Context, tx *Txable, path, content string) (*Page, error) {

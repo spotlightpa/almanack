@@ -6,7 +6,7 @@ import (
 
 	"encoding/json"
 
-	"github.com/spotlightpa/almanack/internal/must"
+	"github.com/spotlightpa/almanack/internal/utils/must"
 )
 
 //go:embed sample/article.json

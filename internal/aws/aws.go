@@ -17,8 +17,8 @@ import (
 	"github.com/earthboundkid/errorx/v2"
 	"gocloud.dev/blob"
 
-	"github.com/spotlightpa/almanack/internal/httpx"
-	"github.com/spotlightpa/almanack/internal/must"
+	"github.com/spotlightpa/almanack/internal/utils/httpx"
+	"github.com/spotlightpa/almanack/internal/utils/must"
 	"github.com/spotlightpa/almanack/pkg/almlog"
 )
 

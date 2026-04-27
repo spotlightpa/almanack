@@ -10,8 +10,8 @@ import (
 	"github.com/earthboundkid/xhtml"
 	"github.com/spotlightpa/almanack/internal/blocko"
 	"github.com/spotlightpa/almanack/internal/db"
-	"github.com/spotlightpa/almanack/internal/lazy"
-	"github.com/spotlightpa/almanack/internal/must"
+	"github.com/spotlightpa/almanack/internal/utils/lazy"
+	"github.com/spotlightpa/almanack/internal/utils/must"
 	"golang.org/x/net/html"
 	"golang.org/x/net/html/atom"
 )

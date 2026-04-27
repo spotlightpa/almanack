@@ -5,7 +5,7 @@ import (
 	"strings"
 
 	"github.com/earthboundkid/xhtml"
-	"github.com/spotlightpa/almanack/internal/stringx"
+	"github.com/spotlightpa/almanack/internal/utils/stringx"
 	"golang.org/x/net/html"
 	"golang.org/x/net/html/atom"
 )

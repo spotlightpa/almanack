@@ -5,7 +5,7 @@ import (
 	"testing"
 
 	"github.com/carlmjohnson/be"
-	"github.com/spotlightpa/almanack/internal/slicex"
+	"github.com/spotlightpa/almanack/internal/utils/slicex"
 )
 
 func TestUniqueFunc(t *testing.T) {

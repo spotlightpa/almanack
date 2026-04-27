@@ -6,7 +6,7 @@ import (
 	"time"
 
 	"github.com/jackc/pgx/v5/pgtype"
-	"github.com/spotlightpa/almanack/internal/must"
+	"github.com/spotlightpa/almanack/internal/utils/must"
 )
 
 var getNewYork = sync.OnceValue(func() *time.Location {

@@ -20,9 +20,9 @@ import (
 	"github.com/spotlightpa/almanack/internal/db"
 	"github.com/spotlightpa/almanack/internal/gdocs"
 	"github.com/spotlightpa/almanack/internal/google"
-	"github.com/spotlightpa/almanack/internal/paginate"
-	"github.com/spotlightpa/almanack/internal/slicex"
-	"github.com/spotlightpa/almanack/internal/stringx"
+	"github.com/spotlightpa/almanack/internal/utils/paginate"
+	"github.com/spotlightpa/almanack/internal/utils/slicex"
+	"github.com/spotlightpa/almanack/internal/utils/stringx"
 	"github.com/spotlightpa/almanack/pkg/almanack"
 	"github.com/spotlightpa/almanack/pkg/almlog"
 )

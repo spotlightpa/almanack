@@ -6,7 +6,7 @@ import (
 
 	"github.com/carlmjohnson/be"
 	"github.com/jackc/pgx/v5/pgtype"
-	"github.com/spotlightpa/almanack/internal/timex"
+	"github.com/spotlightpa/almanack/internal/utils/timex"
 )
 
 func TestEqualish(t *testing.T) {
