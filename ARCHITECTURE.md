@@ -16,9 +16,9 @@ src/                  # Vue.js frontend ([Vite](https://vite.dev/guide/) + [Bulm
   plugins/router.js   # Route definitions with role guards
 
 funcs/almanack-api/   # Go backend entry point
-internal/almapp/      # HTTP handlers, routing, CLI entry
+internal/almapp/      # CLI entry, HTTP routing, handlers
 internal/almservices/ # Business logic, Services container
-internal/db/          # Database layer ([sqlc](https://docs.sqlc.dev/en/stable/)-generated)
+internal/db/          # Database layer ([sqlc](https://docs.sqlc.dev/en/stable/)-generated with some handwriten model methods)
 internal/services/    # Third-party integrations (github, aws, google, mailchimp, youtube, etc.)
 internal/utils/       # General-purpose helpers (httpx, iterx, slicex, stringx, timex, etc.)
 internal/convert/     # Document conversion tools (blocko, tableaux)
@@ -39,6 +39,7 @@ sql/queries/          # SQL queries (sqlc)
 - Public: `/api/healthcheck`, `/api/identity-hook`
 - Partner ("Editor") role: `/api/shared-article(s)`
 - Spotlight PA role: `/api/page*`, `/api/images`, `/api/site-*`, etc.
+- Server Side Rendered routes: `/ssr/redirect/`, `/ssr/download-image`
 - Background tasks: `/api-background/cron` (cron scheduled every 3 min, can have longer execution time than the 15 second window for normal lambda functions)
 
 ## Frontend
@@ -72,6 +73,9 @@ For local development, create a `.env` file with your secrets. The `./run.sh api
 # .env example
 export ALMANACK_POSTGRES="postgres://..."
 export ALMANACK_SLACK_HOOK_URL="https://hooks.slack.com/..."
+export ALMANACK_IMAGE_BUCKET_URL=mem://
+export ALMANACK_FILE_BUCKET_URL=file://./filebucket/
+export ALMANACK_GITHUB_MOCK_PATH=$HOME/code/poor-richard
 ```
 
 ## Development
