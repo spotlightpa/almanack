@@ -8,7 +8,7 @@ import (
 	"github.com/carlmjohnson/be"
 	"github.com/carlmjohnson/be/testfile"
 	"github.com/earthboundkid/xhtml"
-	"github.com/spotlightpa/almanack/internal/tableaux"
+	"github.com/spotlightpa/almanack/internal/convert/tableaux"
 	"golang.org/x/net/html"
 )
 

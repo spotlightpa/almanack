@@ -12,9 +12,9 @@ import (
 
 	"github.com/earthboundkid/bytemap/v2"
 	"github.com/earthboundkid/xhtml"
-	"github.com/spotlightpa/almanack/internal/blocko"
+	"github.com/spotlightpa/almanack/internal/convert/blocko"
+	"github.com/spotlightpa/almanack/internal/convert/tableaux"
 	"github.com/spotlightpa/almanack/internal/db"
-	"github.com/spotlightpa/almanack/internal/tableaux"
 	"github.com/spotlightpa/almanack/internal/utils/must"
 	"github.com/spotlightpa/almanack/internal/utils/stringx"
 	"golang.org/x/net/html"
