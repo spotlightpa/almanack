@@ -1,2 +1,2 @@
-// Package api has CLI setup and routing handlers
+// Package almapp has CLI setup and HTTP routing+handlers
 package almapp
