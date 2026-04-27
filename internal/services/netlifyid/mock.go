@@ -3,7 +3,7 @@ package netlifyid
 import (
 	"net/http"
 
-	"github.com/spotlightpa/almanack/pkg/almlog"
+	"github.com/spotlightpa/almanack/internal/almlog"
 )
 
 type MockAuthService struct{}

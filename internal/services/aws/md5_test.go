@@ -7,8 +7,8 @@ import (
 	"testing"
 
 	"github.com/carlmjohnson/be"
+	"github.com/spotlightpa/almanack/internal/almlog"
 	"github.com/spotlightpa/almanack/internal/services/aws"
-	"github.com/spotlightpa/almanack/pkg/almlog"
 )
 
 func TestMD5(t *testing.T) {

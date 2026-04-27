@@ -11,7 +11,7 @@ import (
 	"net/http"
 	"sync"
 
-	"github.com/spotlightpa/almanack/pkg/almlog"
+	"github.com/spotlightpa/almanack/internal/almlog"
 	"golang.org/x/oauth2"
 	"golang.org/x/oauth2/google"
 )

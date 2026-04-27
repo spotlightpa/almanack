@@ -3,11 +3,11 @@ package main
 import (
 	"os"
 
-	"github.com/spotlightpa/almanack/pkg/api"
+	"github.com/spotlightpa/almanack/internal/almapp"
 )
 
 func main() {
-	if err := api.CLI(os.Args[1:]); err != nil {
+	if err := almapp.CLI(os.Args[1:]); err != nil {
 		os.Exit(1)
 	}
 }

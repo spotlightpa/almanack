@@ -1,4 +1,4 @@
-package api
+package almapp
 
 import (
 	"net/http"

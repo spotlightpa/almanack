@@ -7,7 +7,7 @@ import (
 
 	"github.com/carlmjohnson/requests"
 	"github.com/earthboundkid/errorx/v2"
-	"github.com/spotlightpa/almanack/pkg/almlog"
+	"github.com/spotlightpa/almanack/internal/almlog"
 )
 
 func (gsvc *Service) GAClient(ctx context.Context) (cl *http.Client, err error) {

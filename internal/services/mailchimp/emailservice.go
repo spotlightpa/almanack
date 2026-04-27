@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/spotlightpa/almanack/pkg/almlog"
+	"github.com/spotlightpa/almanack/internal/almlog"
 )
 
 type EmailService interface {

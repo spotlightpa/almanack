@@ -7,8 +7,8 @@ import (
 	"github.com/carlmjohnson/be"
 	"github.com/carlmjohnson/be/testfile"
 	"github.com/carlmjohnson/requests/reqtest"
+	"github.com/spotlightpa/almanack/internal/almlog"
 	"github.com/spotlightpa/almanack/internal/services/google"
-	"github.com/spotlightpa/almanack/pkg/almlog"
 	"gopkg.in/Iwark/spreadsheet.v2"
 )
 

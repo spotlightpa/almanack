@@ -7,7 +7,7 @@ import (
 	"strings"
 
 	"github.com/earthboundkid/resperr/v2"
-	"github.com/spotlightpa/almanack/pkg/almlog"
+	"github.com/spotlightpa/almanack/internal/almlog"
 	spreadsheet "gopkg.in/Iwark/spreadsheet.v2"
 )
 

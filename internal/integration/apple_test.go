@@ -9,11 +9,11 @@ import (
 	"github.com/carlmjohnson/be"
 	"github.com/carlmjohnson/requests"
 	"github.com/carlmjohnson/requests/reqtest"
+	"github.com/spotlightpa/almanack/internal/almlog"
 	"github.com/spotlightpa/almanack/internal/almservices"
 	"github.com/spotlightpa/almanack/internal/db"
 	"github.com/spotlightpa/almanack/internal/services/anf"
 	"github.com/spotlightpa/almanack/internal/services/jsonfeed"
-	"github.com/spotlightpa/almanack/pkg/almlog"
 )
 
 func TestPublishAppleNews(t *testing.T) {

@@ -1,4 +1,4 @@
-package api
+package almapp
 
 import (
 	"net/http"
@@ -8,9 +8,9 @@ import (
 	sentryhttp "github.com/getsentry/sentry-go/http"
 	"github.com/go-chi/chi/v5/middleware"
 
+	"github.com/spotlightpa/almanack/internal/almlog"
 	"github.com/spotlightpa/almanack/internal/almservices"
 	"github.com/spotlightpa/almanack/internal/utils/httpx"
-	"github.com/spotlightpa/almanack/pkg/almlog"
 )
 
 func (app *appEnv) routes() http.Handler {

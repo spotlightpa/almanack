@@ -1,4 +1,4 @@
-package api
+package almapp
 
 import (
 	"bytes"
@@ -21,11 +21,11 @@ import (
 	"github.com/earthboundkid/resperr/v2"
 	"github.com/getsentry/sentry-go"
 
+	"github.com/spotlightpa/almanack/internal/almlog"
 	"github.com/spotlightpa/almanack/internal/almservices"
 	"github.com/spotlightpa/almanack/internal/services/netlifyid"
 	"github.com/spotlightpa/almanack/internal/utils/stringx"
 	"github.com/spotlightpa/almanack/layouts"
-	"github.com/spotlightpa/almanack/pkg/almlog"
 )
 
 func (app *appEnv) replyJSON(statusCode int, w http.ResponseWriter, data any) {

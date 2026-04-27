@@ -1,4 +1,4 @@
-package api
+package almapp
 
 import (
 	"context"
@@ -8,11 +8,11 @@ import (
 	"time"
 
 	"github.com/carlmjohnson/flowmatic"
+	"github.com/spotlightpa/almanack/internal/almlog"
 	"github.com/spotlightpa/almanack/internal/db"
 	"github.com/spotlightpa/almanack/internal/utils/iterx"
 	"github.com/spotlightpa/almanack/internal/utils/paginate"
 	"github.com/spotlightpa/almanack/internal/utils/timex"
-	"github.com/spotlightpa/almanack/pkg/almlog"
 )
 
 func (app *appEnv) backgroundSleep(w http.ResponseWriter, r *http.Request) http.Handler {

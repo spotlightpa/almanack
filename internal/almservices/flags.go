@@ -7,6 +7,7 @@ import (
 	"github.com/earthboundkid/flagx/v2"
 	"github.com/earthboundkid/slackhook/v2"
 
+	"github.com/spotlightpa/almanack/internal/almlog"
 	"github.com/spotlightpa/almanack/internal/db"
 	"github.com/spotlightpa/almanack/internal/services/anf"
 	"github.com/spotlightpa/almanack/internal/services/aws"
@@ -17,7 +18,6 @@ import (
 	"github.com/spotlightpa/almanack/internal/services/jsonfeed"
 	"github.com/spotlightpa/almanack/internal/services/mailchimp"
 	"github.com/spotlightpa/almanack/internal/services/youtube"
-	"github.com/spotlightpa/almanack/pkg/almlog"
 )
 
 func AddFlags(fl *flag.FlagSet) func() (svc Services, err error) {

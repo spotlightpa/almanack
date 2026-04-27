@@ -111,7 +111,7 @@ function test:backend() {
 }
 
 function test:db() {
-	ALMANACK_POSTGRES=$PG_LOCAL_URL $GO_EXEC test "$@" ./pkg/integration
+	ALMANACK_POSTGRES=$PG_LOCAL_URL $GO_EXEC test "$@" ./internal/integration
 }
 
 function test:misc() {

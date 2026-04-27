@@ -10,11 +10,11 @@ import (
 	"github.com/carlmjohnson/be"
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgtype"
+	"github.com/spotlightpa/almanack/internal/almlog"
 	"github.com/spotlightpa/almanack/internal/almservices"
 	"github.com/spotlightpa/almanack/internal/db"
 	"github.com/spotlightpa/almanack/internal/services/github"
 	"github.com/spotlightpa/almanack/internal/services/index"
-	"github.com/spotlightpa/almanack/pkg/almlog"
 )
 
 func TestServicePublish(t *testing.T) {

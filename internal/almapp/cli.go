@@ -1,4 +1,4 @@
-package api
+package almapp
 
 import (
 	"flag"
@@ -15,9 +15,9 @@ import (
 	"github.com/earthboundkid/versioninfo/v2"
 	"github.com/getsentry/sentry-go"
 
+	"github.com/spotlightpa/almanack/internal/almlog"
 	"github.com/spotlightpa/almanack/internal/almservices"
 	"github.com/spotlightpa/almanack/internal/services/netlifyid"
-	"github.com/spotlightpa/almanack/pkg/almlog"
 )
 
 const AppName = "almanack-api"

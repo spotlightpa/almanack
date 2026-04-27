@@ -1,4 +1,4 @@
-package api
+package almapp
 
 import (
 	"cmp"
@@ -17,6 +17,7 @@ import (
 	"github.com/earthboundkid/emailx/v2"
 	"github.com/earthboundkid/resperr/v2"
 	"github.com/jackc/pgx/v5"
+	"github.com/spotlightpa/almanack/internal/almlog"
 	"github.com/spotlightpa/almanack/internal/almservices"
 	"github.com/spotlightpa/almanack/internal/db"
 	"github.com/spotlightpa/almanack/internal/services/gdocs"
@@ -24,7 +25,6 @@ import (
 	"github.com/spotlightpa/almanack/internal/utils/paginate"
 	"github.com/spotlightpa/almanack/internal/utils/slicex"
 	"github.com/spotlightpa/almanack/internal/utils/stringx"
-	"github.com/spotlightpa/almanack/pkg/almlog"
 )
 
 func (app *appEnv) postMessage(w http.ResponseWriter, r *http.Request) {

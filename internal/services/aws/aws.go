@@ -17,9 +17,9 @@ import (
 	"github.com/earthboundkid/errorx/v2"
 	"gocloud.dev/blob"
 
+	"github.com/spotlightpa/almanack/internal/almlog"
 	"github.com/spotlightpa/almanack/internal/utils/httpx"
 	"github.com/spotlightpa/almanack/internal/utils/must"
-	"github.com/spotlightpa/almanack/pkg/almlog"
 )
 
 func AddFlags(fl *flag.FlagSet) func() (imageStore, fileStore BlobStore) {

@@ -5,7 +5,7 @@ import (
 	"flag"
 
 	"github.com/algolia/algoliasearch-client-go/v3/algolia/search"
-	"github.com/spotlightpa/almanack/pkg/almlog"
+	"github.com/spotlightpa/almanack/internal/almlog"
 )
 
 func AddFlags(fl *flag.FlagSet) func() Indexer {

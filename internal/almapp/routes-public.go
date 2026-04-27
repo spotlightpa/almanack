@@ -1,4 +1,4 @@
-package api
+package almapp
 
 import (
 	"fmt"
@@ -11,6 +11,7 @@ import (
 
 	"github.com/earthboundkid/resperr/v2"
 	"github.com/earthboundkid/slackhook/v2"
+	"github.com/spotlightpa/almanack/internal/almlog"
 	"github.com/spotlightpa/almanack/internal/almservices"
 	"github.com/spotlightpa/almanack/internal/db"
 	"github.com/spotlightpa/almanack/internal/services/jwthook"
@@ -18,7 +19,6 @@ import (
 	"github.com/spotlightpa/almanack/internal/utils/httpx"
 	"github.com/spotlightpa/almanack/internal/utils/lazy"
 	"github.com/spotlightpa/almanack/internal/utils/must"
-	"github.com/spotlightpa/almanack/pkg/almlog"
 )
 
 func (app *appEnv) notFound(w http.ResponseWriter, r *http.Request) {

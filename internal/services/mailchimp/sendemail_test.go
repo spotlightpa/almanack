@@ -7,8 +7,8 @@ import (
 
 	"github.com/carlmjohnson/be"
 	"github.com/carlmjohnson/requests/reqtest"
+	"github.com/spotlightpa/almanack/internal/almlog"
 	"github.com/spotlightpa/almanack/internal/services/mailchimp"
-	"github.com/spotlightpa/almanack/pkg/almlog"
 )
 
 func TestSendEmail(t *testing.T) {

@@ -5,8 +5,8 @@ import (
 	"fmt"
 
 	"github.com/earthboundkid/errorx/v2"
+	"github.com/spotlightpa/almanack/internal/almlog"
 	"github.com/spotlightpa/almanack/internal/db"
-	"github.com/spotlightpa/almanack/pkg/almlog"
 )
 
 func (svc Services) UpdateMostPopular(ctx context.Context) (err error) {
