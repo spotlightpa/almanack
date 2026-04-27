@@ -23,9 +23,9 @@ import (
 
 	"github.com/spotlightpa/almanack/internal/almlog"
 	"github.com/spotlightpa/almanack/internal/almservices"
+	"github.com/spotlightpa/almanack/internal/layouts"
 	"github.com/spotlightpa/almanack/internal/services/netlifyid"
 	"github.com/spotlightpa/almanack/internal/utils/stringx"
-	"github.com/spotlightpa/almanack/layouts"
 )
 
 func (app *appEnv) replyJSON(statusCode int, w http.ResponseWriter, data any) {
