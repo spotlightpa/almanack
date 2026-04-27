@@ -10,10 +10,10 @@ import (
 	"github.com/carlmjohnson/be"
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgtype"
+	"github.com/spotlightpa/almanack/internal/almservices"
 	"github.com/spotlightpa/almanack/internal/db"
 	"github.com/spotlightpa/almanack/internal/services/github"
 	"github.com/spotlightpa/almanack/internal/services/index"
-	"github.com/spotlightpa/almanack/pkg/almanack"
 	"github.com/spotlightpa/almanack/pkg/almlog"
 )
 
@@ -23,7 +23,7 @@ func TestServicePublish(t *testing.T) {
 
 	p := createTestDB(t)
 	tmp := t.ArtifactDir()
-	svc := almanack.Services{
+	svc := almservices.Services{
 		Queries:      db.New(p),
 		Tx:           db.NewTxable(p),
 		ContentStore: github.NewMockClient(tmp),
@@ -191,7 +191,7 @@ func TestServicePopScheduledPages(t *testing.T) {
 
 	p := createTestDB(t)
 	tmp := t.ArtifactDir()
-	svc := almanack.Services{
+	svc := almservices.Services{
 		Queries:      db.New(p),
 		Tx:           db.NewTxable(p),
 		ContentStore: github.NewMockClient(tmp),

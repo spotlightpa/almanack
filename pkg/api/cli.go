@@ -15,8 +15,8 @@ import (
 	"github.com/earthboundkid/versioninfo/v2"
 	"github.com/getsentry/sentry-go"
 
+	"github.com/spotlightpa/almanack/internal/almservices"
 	"github.com/spotlightpa/almanack/internal/services/netlifyid"
-	"github.com/spotlightpa/almanack/pkg/almanack"
 	"github.com/spotlightpa/almanack/pkg/almlog"
 )
 
@@ -50,7 +50,7 @@ func (app *appEnv) parseArgs(args []string) error {
 		fmt.Fprintf(fl.Output(), "almanack-api help\n\n")
 		fl.PrintDefaults()
 	}
-	getService := almanack.AddFlags(fl)
+	getService := almservices.AddFlags(fl)
 
 	if err := fl.Parse(args); err != nil {
 		return err
@@ -78,7 +78,7 @@ type appEnv struct {
 	port     string
 	isLambda bool
 	auth     netlifyid.AuthService
-	svc      almanack.Services
+	svc      almservices.Services
 }
 
 func (app *appEnv) exec() error {
@@ -86,7 +86,7 @@ func (app *appEnv) exec() error {
 
 	var host string
 	if app.isLambda {
-		u, _ := url.Parse(almanack.DeployURL)
+		u, _ := url.Parse(almservices.DeployURL)
 		host = u.Hostname()
 	}
 	almlog.Logger.Info("appEnv.exec",
@@ -113,7 +113,7 @@ func (app *appEnv) initSentry(dsn string) error {
 	}
 	return sentry.Init(sentry.ClientOptions{
 		Dsn:       dsn,
-		Release:   almanack.BuildVersion,
+		Release:   almservices.BuildVersion,
 		Transport: transport,
 	})
 }

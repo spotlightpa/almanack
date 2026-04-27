@@ -17,13 +17,13 @@ import (
 	"github.com/earthboundkid/emailx/v2"
 	"github.com/earthboundkid/resperr/v2"
 	"github.com/jackc/pgx/v5"
+	"github.com/spotlightpa/almanack/internal/almservices"
 	"github.com/spotlightpa/almanack/internal/db"
 	"github.com/spotlightpa/almanack/internal/services/gdocs"
 	"github.com/spotlightpa/almanack/internal/services/google"
 	"github.com/spotlightpa/almanack/internal/utils/paginate"
 	"github.com/spotlightpa/almanack/internal/utils/slicex"
 	"github.com/spotlightpa/almanack/internal/utils/stringx"
-	"github.com/spotlightpa/almanack/pkg/almanack"
 	"github.com/spotlightpa/almanack/pkg/almlog"
 )
 
@@ -84,7 +84,7 @@ func (app *appEnv) postSignedUpload(w http.ResponseWriter, r *http.Request) {
 		res response
 		err error
 	)
-	res.SignedURL, res.FileName, err = almanack.GetSignedImageUpload(
+	res.SignedURL, res.FileName, err = almservices.GetSignedImageUpload(
 		r.Context(), app.svc.ImageStore, userData.Type)
 	if err != nil {
 		app.replyErr(w, r, err)
@@ -397,7 +397,7 @@ func (app *appEnv) postFileCreate(w http.ResponseWriter, r *http.Request) {
 		err error
 	)
 
-	res.SignedURL, res.FileURL, res.Disposition, res.CacheControl, err = almanack.GetSignedFileUpload(
+	res.SignedURL, res.FileURL, res.Disposition, res.CacheControl, err = almservices.GetSignedFileUpload(
 		r.Context(),
 		app.svc.FileStore,
 		userData.FileName,
@@ -779,7 +779,7 @@ func (app *appEnv) siteDataSet(loc string) http.HandlerFunc {
 		app.logStart(r, "location", loc)
 
 		var req struct {
-			Configs []almanack.ScheduledSiteConfig `json:"configs"`
+			Configs []almservices.ScheduledSiteConfig `json:"configs"`
 		}
 		if !app.readJSON(w, r, &req) {
 			return

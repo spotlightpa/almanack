@@ -8,8 +8,8 @@ import (
 	sentryhttp "github.com/getsentry/sentry-go/http"
 	"github.com/go-chi/chi/v5/middleware"
 
+	"github.com/spotlightpa/almanack/internal/almservices"
 	"github.com/spotlightpa/almanack/internal/utils/httpx"
-	"github.com/spotlightpa/almanack/pkg/almanack"
 	"github.com/spotlightpa/almanack/pkg/almlog"
 )
 
@@ -71,12 +71,12 @@ func (app *appEnv) routes() http.Handler {
 		HandleFunc(mux, `POST /api/page-refresh`, app.postPageRefresh).
 		HandleFunc(mux, `POST /api/shared-article`, app.postSharedArticle).
 		HandleFunc(mux, `POST /api/shared-article-from-gdocs`, app.postSharedArticleFromGDocs).
-		HandleFunc(mux, `GET /api/sidebar`, app.siteDataGet(almanack.SidebarLoc)).
-		HandleFunc(mux, `POST /api/sidebar`, app.siteDataSet(almanack.SidebarLoc)).
+		HandleFunc(mux, `GET /api/sidebar`, app.siteDataGet(almservices.SidebarLoc)).
+		HandleFunc(mux, `POST /api/sidebar`, app.siteDataSet(almservices.SidebarLoc)).
 		Control(mux, `GET /api/site-data`, app.getSiteData).
 		Control(mux, `POST /api/site-data`, app.postSiteData).
-		HandleFunc(mux, `GET /api/site-params`, app.siteDataGet(almanack.SiteParamsLoc)).
-		HandleFunc(mux, `POST /api/site-params`, app.siteDataSet(almanack.SiteParamsLoc))
+		HandleFunc(mux, `GET /api/site-params`, app.siteDataGet(almservices.SiteParamsLoc)).
+		HandleFunc(mux, `POST /api/site-params`, app.siteDataSet(almservices.SiteParamsLoc))
 	// End spotlight endpoints
 
 	// Don't trust this middleware!

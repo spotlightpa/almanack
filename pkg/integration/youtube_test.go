@@ -6,18 +6,18 @@ import (
 
 	"github.com/carlmjohnson/be"
 	"github.com/carlmjohnson/requests/reqtest"
+	"github.com/spotlightpa/almanack/internal/almservices"
 	"github.com/spotlightpa/almanack/internal/db"
 	"github.com/spotlightpa/almanack/internal/services/aws"
 	"github.com/spotlightpa/almanack/internal/services/github"
 	"github.com/spotlightpa/almanack/internal/services/youtube"
-	"github.com/spotlightpa/almanack/pkg/almanack"
 	"github.com/spotlightpa/almanack/pkg/almlog"
 )
 
 func TestYouTube(t *testing.T) {
 	almlog.UseTestLogger(t)
 	p := createTestDB(t)
-	svc := almanack.Services{
+	svc := almservices.Services{
 		Queries: db.New(p),
 		Tx:      db.NewTxable(p),
 		YT: &youtube.Feed{

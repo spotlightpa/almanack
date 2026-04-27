@@ -11,12 +11,12 @@ import (
 	"github.com/carlmjohnson/be"
 	"github.com/carlmjohnson/be/testfile"
 	"github.com/carlmjohnson/requests/reqtest"
+	"github.com/spotlightpa/almanack/internal/almservices"
 	"github.com/spotlightpa/almanack/internal/db"
 	"github.com/spotlightpa/almanack/internal/services/aws"
 	"github.com/spotlightpa/almanack/internal/services/google"
 	"github.com/spotlightpa/almanack/internal/utils/stringx"
 	"github.com/spotlightpa/almanack/internal/utils/timex"
-	"github.com/spotlightpa/almanack/pkg/almanack"
 	"github.com/spotlightpa/almanack/pkg/almlog"
 	docs "google.golang.org/api/docs/v1"
 )
@@ -28,7 +28,7 @@ func TestProcessGDocsDoc(t *testing.T) {
 	ctx := t.Context()
 	testfile.Run(t, "testdata/gdoc*", func(t *testing.T, path string) {
 		t.Parallel()
-		svc := almanack.Services{
+		svc := almservices.Services{
 			Queries:    q,
 			Tx:         db.NewTxable(p),
 			ImageStore: aws.NewBlobStore("mem://"),

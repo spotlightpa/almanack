@@ -1,4 +1,4 @@
-package almanack
+package almservices
 
 import (
 	"cmp"
