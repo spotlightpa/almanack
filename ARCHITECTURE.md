@@ -16,10 +16,14 @@ src/                  # Vue.js frontend ([Vite](https://vite.dev/guide/) + [Bulm
   plugins/router.js   # Route definitions with role guards
 
 funcs/almanack-api/   # Go backend entry point
-pkg/api/              # HTTP handlers and routing
-pkg/almanack/         # Business logic, Services container
+internal/almapp/      # HTTP handlers, routing, CLI entry
+internal/almservices/ # Business logic, Services container
 internal/db/          # Database layer ([sqlc](https://docs.sqlc.dev/en/stable/)-generated)
-internal/*/           # Integration packages (github, aws, google, etc.)
+internal/services/    # Third-party integrations (github, aws, google, mailchimp, youtube, etc.)
+internal/utils/       # General-purpose helpers (httpx, iterx, slicex, stringx, timex, etc.)
+internal/convert/     # Document conversion tools (blocko, tableaux)
+internal/layouts/     # Server-rendered HTML layouts
+internal/integration/ # Integration tests (require ALMANACK_POSTGRES)
 
 sql/schema/           # Database migrations ([tern](https://github.com/jackc/tern))
 sql/queries/          # SQL queries (sqlc)
@@ -27,9 +31,9 @@ sql/queries/          # SQL queries (sqlc)
 
 ## Backend
 
-**Entry**: `funcs/almanack-api/main.go` → `pkg/api.CLI()` → routes in `pkg/api/router.go`
+**Entry**: `funcs/almanack-api/main.go` → `internal/almapp.CLI()` → routes in `internal/almapp/router.go` (split across `routes-public.go`, `routes-editor.go`, `routes-spotlightpa.go`, `routes-background.go`, `routes-ssr.go`).
 
-**Services**: `pkg/almanack.Services` is the dependency container holding database, GitHub, S3, Google, Mailchimp, Slack clients, etc. Configured via CLI flags/environment variables in `pkg/almanack/flags.go`.
+**Services**: `internal/almservices.Services` is the dependency container holding database, GitHub, S3, Google, Mailchimp, Slack, YouTube clients, etc. Configured via CLI flags/environment variables in `internal/almservices/flags.go`.
 
 **Routes** are grouped by auth level:
 - Public: `/api/healthcheck`, `/api/identity-hook`
