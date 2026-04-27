@@ -5,7 +5,7 @@ import (
 
 	"github.com/carlmjohnson/be"
 	"github.com/carlmjohnson/be/testfile"
-	"github.com/spotlightpa/almanack/internal/anf"
+	"github.com/spotlightpa/almanack/internal/services/anf"
 )
 
 func TestConvert(t *testing.T) {

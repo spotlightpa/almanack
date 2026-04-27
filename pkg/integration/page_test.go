@@ -11,8 +11,8 @@ import (
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgtype"
 	"github.com/spotlightpa/almanack/internal/db"
-	"github.com/spotlightpa/almanack/internal/github"
-	"github.com/spotlightpa/almanack/internal/index"
+	"github.com/spotlightpa/almanack/internal/services/github"
+	"github.com/spotlightpa/almanack/internal/services/index"
 	"github.com/spotlightpa/almanack/pkg/almanack"
 	"github.com/spotlightpa/almanack/pkg/almlog"
 )

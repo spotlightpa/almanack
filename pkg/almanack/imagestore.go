@@ -7,7 +7,7 @@ import (
 	"time"
 
 	"github.com/earthboundkid/crockford/v2"
-	"github.com/spotlightpa/almanack/internal/aws"
+	"github.com/spotlightpa/almanack/internal/services/aws"
 )
 
 func GetSignedImageUpload(ctx context.Context, is aws.BlobStore, ct string) (signedURL, filename string, err error) {

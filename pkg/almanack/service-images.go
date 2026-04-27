@@ -15,7 +15,7 @@ import (
 	"github.com/earthboundkid/resperr/v2"
 	"github.com/gabriel-vasile/mimetype"
 	"github.com/spotlightpa/almanack/internal/db"
-	"github.com/spotlightpa/almanack/internal/google"
+	"github.com/spotlightpa/almanack/internal/services/google"
 )
 
 func FetchImageURL(ctx context.Context, c *http.Client, srcurl string) (body []byte, ctype string, err error) {

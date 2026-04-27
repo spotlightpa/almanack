@@ -15,7 +15,7 @@ import (
 	"github.com/earthboundkid/versioninfo/v2"
 	"github.com/getsentry/sentry-go"
 
-	"github.com/spotlightpa/almanack/internal/netlifyid"
+	"github.com/spotlightpa/almanack/internal/services/netlifyid"
 	"github.com/spotlightpa/almanack/pkg/almanack"
 	"github.com/spotlightpa/almanack/pkg/almlog"
 )

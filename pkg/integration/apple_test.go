@@ -9,9 +9,9 @@ import (
 	"github.com/carlmjohnson/be"
 	"github.com/carlmjohnson/requests"
 	"github.com/carlmjohnson/requests/reqtest"
-	"github.com/spotlightpa/almanack/internal/anf"
 	"github.com/spotlightpa/almanack/internal/db"
-	"github.com/spotlightpa/almanack/internal/jsonfeed"
+	"github.com/spotlightpa/almanack/internal/services/anf"
+	"github.com/spotlightpa/almanack/internal/services/jsonfeed"
 	"github.com/spotlightpa/almanack/pkg/almanack"
 	"github.com/spotlightpa/almanack/pkg/almlog"
 )

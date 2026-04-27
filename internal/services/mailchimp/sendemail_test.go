@@ -7,7 +7,7 @@ import (
 
 	"github.com/carlmjohnson/be"
 	"github.com/carlmjohnson/requests/reqtest"
-	"github.com/spotlightpa/almanack/internal/mailchimp"
+	"github.com/spotlightpa/almanack/internal/services/mailchimp"
 	"github.com/spotlightpa/almanack/pkg/almlog"
 )
 

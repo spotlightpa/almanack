@@ -8,7 +8,7 @@ import (
 	"time"
 
 	"github.com/earthboundkid/crockford/v2"
-	"github.com/spotlightpa/almanack/internal/aws"
+	"github.com/spotlightpa/almanack/internal/services/aws"
 	"github.com/spotlightpa/almanack/internal/utils/httpx"
 	"github.com/spotlightpa/almanack/internal/utils/stringx"
 )

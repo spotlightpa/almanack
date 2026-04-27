@@ -6,10 +6,10 @@ import (
 
 	"github.com/carlmjohnson/be"
 	"github.com/carlmjohnson/requests/reqtest"
-	"github.com/spotlightpa/almanack/internal/aws"
 	"github.com/spotlightpa/almanack/internal/db"
-	"github.com/spotlightpa/almanack/internal/github"
-	"github.com/spotlightpa/almanack/internal/youtube"
+	"github.com/spotlightpa/almanack/internal/services/aws"
+	"github.com/spotlightpa/almanack/internal/services/github"
+	"github.com/spotlightpa/almanack/internal/services/youtube"
 	"github.com/spotlightpa/almanack/pkg/almanack"
 	"github.com/spotlightpa/almanack/pkg/almlog"
 )

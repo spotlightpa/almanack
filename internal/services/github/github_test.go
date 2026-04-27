@@ -6,7 +6,7 @@ import (
 	"time"
 
 	"github.com/carlmjohnson/be"
-	"github.com/spotlightpa/almanack/internal/github"
+	"github.com/spotlightpa/almanack/internal/services/github"
 )
 
 func TestGithub(t *testing.T) {

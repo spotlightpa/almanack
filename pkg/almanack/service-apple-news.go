@@ -6,8 +6,8 @@ import (
 	"fmt"
 
 	"github.com/earthboundkid/errorx/v2"
-	"github.com/spotlightpa/almanack/internal/anf"
 	"github.com/spotlightpa/almanack/internal/db"
+	"github.com/spotlightpa/almanack/internal/services/anf"
 	"github.com/spotlightpa/almanack/pkg/almlog"
 )
 

@@ -9,7 +9,7 @@ import (
 	"net/http"
 
 	"github.com/google/go-github/v53/github"
-	"github.com/spotlightpa/almanack/internal/netlifyid"
+	"github.com/spotlightpa/almanack/internal/services/netlifyid"
 	"github.com/spotlightpa/almanack/pkg/almlog"
 	"golang.org/x/oauth2"
 )

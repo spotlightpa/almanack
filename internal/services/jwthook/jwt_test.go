@@ -8,7 +8,7 @@ import (
 	"time"
 
 	"github.com/carlmjohnson/be"
-	jwt "github.com/spotlightpa/almanack/internal/jwthook"
+	jwt "github.com/spotlightpa/almanack/internal/services/jwthook"
 )
 
 func TestVerifyRequest(t *testing.T) {

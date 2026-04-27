@@ -17,7 +17,7 @@ import (
 	"github.com/spotlightpa/almanack/internal/convert/blocko"
 	"github.com/spotlightpa/almanack/internal/convert/tableaux"
 	"github.com/spotlightpa/almanack/internal/db"
-	"github.com/spotlightpa/almanack/internal/gdocs"
+	"github.com/spotlightpa/almanack/internal/services/gdocs"
 	"github.com/spotlightpa/almanack/internal/utils/must"
 	"github.com/spotlightpa/almanack/internal/utils/stringx"
 	"github.com/spotlightpa/almanack/pkg/almlog"

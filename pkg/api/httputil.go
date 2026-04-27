@@ -21,7 +21,7 @@ import (
 	"github.com/earthboundkid/resperr/v2"
 	"github.com/getsentry/sentry-go"
 
-	"github.com/spotlightpa/almanack/internal/netlifyid"
+	"github.com/spotlightpa/almanack/internal/services/netlifyid"
 	"github.com/spotlightpa/almanack/internal/utils/stringx"
 	"github.com/spotlightpa/almanack/layouts"
 	"github.com/spotlightpa/almanack/pkg/almanack"

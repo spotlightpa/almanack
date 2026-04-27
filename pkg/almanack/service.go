@@ -4,16 +4,16 @@ import (
 	"net/http"
 
 	"github.com/earthboundkid/slackhook/v2"
-	"github.com/spotlightpa/almanack/internal/anf"
-	"github.com/spotlightpa/almanack/internal/aws"
 	"github.com/spotlightpa/almanack/internal/db"
-	"github.com/spotlightpa/almanack/internal/github"
-	"github.com/spotlightpa/almanack/internal/google"
-	"github.com/spotlightpa/almanack/internal/healthchecksio"
-	"github.com/spotlightpa/almanack/internal/index"
-	"github.com/spotlightpa/almanack/internal/jsonfeed"
-	"github.com/spotlightpa/almanack/internal/mailchimp"
-	"github.com/spotlightpa/almanack/internal/youtube"
+	"github.com/spotlightpa/almanack/internal/services/anf"
+	"github.com/spotlightpa/almanack/internal/services/aws"
+	"github.com/spotlightpa/almanack/internal/services/github"
+	"github.com/spotlightpa/almanack/internal/services/google"
+	"github.com/spotlightpa/almanack/internal/services/healthchecksio"
+	"github.com/spotlightpa/almanack/internal/services/index"
+	"github.com/spotlightpa/almanack/internal/services/jsonfeed"
+	"github.com/spotlightpa/almanack/internal/services/mailchimp"
+	"github.com/spotlightpa/almanack/internal/services/youtube"
 )
 
 type Services struct {

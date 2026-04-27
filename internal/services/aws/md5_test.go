@@ -7,7 +7,7 @@ import (
 	"testing"
 
 	"github.com/carlmjohnson/be"
-	"github.com/spotlightpa/almanack/internal/aws"
+	"github.com/spotlightpa/almanack/internal/services/aws"
 	"github.com/spotlightpa/almanack/pkg/almlog"
 )
 

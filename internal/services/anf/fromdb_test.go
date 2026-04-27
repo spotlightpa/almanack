@@ -6,8 +6,8 @@ import (
 
 	"github.com/carlmjohnson/be"
 	"github.com/carlmjohnson/be/testfile"
-	"github.com/spotlightpa/almanack/internal/anf"
 	"github.com/spotlightpa/almanack/internal/db"
+	"github.com/spotlightpa/almanack/internal/services/anf"
 )
 
 func TestFromDB(t *testing.T) {
