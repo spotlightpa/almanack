@@ -31,12 +31,6 @@ ON CONFLICT ("external_id")
     "thumbnail_url" = EXCLUDED.thumbnail_url,
     "external_published_at" = EXCLUDED.external_published_at,
     "external_updated_at" = EXCLUDED.external_updated_at,
-    "uploaded_at" = CASE WHEN youtube.external_updated_at <>
-      EXCLUDED.external_updated_at THEN
-      NULL
-    ELSE
-      youtube.uploaded_at
-    END,
     "updated_at" = CURRENT_TIMESTAMP;
 
 -- name: ResetYouTubeMaxID :exec
