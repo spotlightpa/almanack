@@ -22,7 +22,6 @@ func (app *appEnv) routes() http.Handler {
 
 	// Start public endpoints
 	standardMW.
-		Control(mux, `GET /api/arc-image`, app.getArcImage).
 		HandleFunc(mux, `GET /api/bookmarklet/{slug}`, app.getBookmarklet).
 		HandleFunc(mux, `GET /api/healthcheck`, app.ping).
 		HandleFunc(mux, `GET /api/healthcheck/{code}`, app.pingErr).
