@@ -16,10 +16,10 @@ import (
 
 func TestYouTube(t *testing.T) {
 	almlog.UseTestLogger(t)
-	p := createTestDB(t)
+	dbhandle := createTestDB(t)
 	svc := almsvc.Services{
-		Queries: db.New(p),
-		Tx:      db.NewTxable(p),
+		DB:      dbhandle,
+		Queries: dbhandle.Queries(),
 		YT: &youtube.Feed{
 			ChannelID: "abc123",
 		},

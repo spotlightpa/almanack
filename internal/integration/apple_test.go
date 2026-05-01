@@ -11,15 +11,14 @@ import (
 	"github.com/carlmjohnson/requests/reqtest"
 	"github.com/spotlightpa/almanack/internal/almlog"
 	"github.com/spotlightpa/almanack/internal/almsvc"
-	"github.com/spotlightpa/almanack/internal/db"
 	"github.com/spotlightpa/almanack/internal/services/anf"
 	"github.com/spotlightpa/almanack/internal/services/jsonfeed"
 )
 
 func TestPublishAppleNews(t *testing.T) {
 	almlog.UseTestLogger(t)
-	p := createTestDB(t)
-	q := db.New(p)
+	dbhandle := createTestDB(t)
+	q := dbhandle.Queries()
 	ctx := t.Context()
 	cl := &http.Client{
 		Transport: reqtest.Replay("testdata/anf"),

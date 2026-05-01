@@ -26,7 +26,7 @@ func AddFlags(fl *flag.FlagSet) func() (svc Services, err error) {
 	newsfeed := jsonfeed.AddFlags(fl)
 	anfService := anf.AddFlags(fl)
 
-	pg, tx := db.AddFlags(fl, "postgres", "PostgreSQL database `URL`")
+	dbhandle := db.AddFlags(fl, "postgres", "PostgreSQL database `URL`")
 	slackSocial := slackhook.New(slackhook.MockClient)
 	fl.Var(slackSocial, "slack-social-url", "Slack hook endpoint `URL` for social")
 	slackTech := slackhook.New(slackhook.MockClient)
@@ -59,8 +59,8 @@ func AddFlags(fl *flag.FlagSet) func() (svc Services, err error) {
 			MailchimpSignupURL:   *mailchimpSignupURL,
 			NetlifyWebhookSecret: *netlifyHookSecret,
 			Client:               &client,
-			Queries:              pg,
-			Tx:                   tx,
+			DB:                   dbhandle,
+			Queries:              dbhandle.Queries(),
 			ContentStore:         getGithub(),
 			SlackSocial:          slackSocial,
 			SlackTech:            slackTech,

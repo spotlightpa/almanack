@@ -16,7 +16,7 @@ var (
 	poolErr error
 )
 
-func createTestDB(t *testing.T) *pgxpool.Pool {
+func createTestDB(t *testing.T) *db.Handle {
 	t.Helper()
 	dbURL := os.Getenv("ALMANACK_POSTGRES")
 	if dbURL == "" {
@@ -26,5 +26,5 @@ func createTestDB(t *testing.T) *pgxpool.Pool {
 		pool, poolErr = db.CreateTestDatabase(dbURL)
 	})
 	be.NilErr(t, poolErr)
-	return pool
+	return db.NewHandle(pool)
 }

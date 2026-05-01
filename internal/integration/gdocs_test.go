@@ -23,14 +23,14 @@ import (
 
 func TestProcessGDocsDoc(t *testing.T) {
 	almlog.UseTestLogger(t)
-	p := createTestDB(t)
-	q := db.New(p)
+	dbhandle := createTestDB(t)
+
 	ctx := t.Context()
 	testfile.Run(t, "testdata/gdoc*", func(t *testing.T, path string) {
 		t.Parallel()
 		svc := almsvc.Services{
-			Queries:    q,
-			Tx:         db.NewTxable(p),
+			DB:         dbhandle,
+			Queries:    dbhandle.Queries(),
 			ImageStore: aws.NewBlobStore("mem://"),
 			FileStore:  aws.NewBlobStore("mem://"),
 			Gsvc:       new(google.Service),
