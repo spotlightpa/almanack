@@ -18,12 +18,12 @@ import (
 	"github.com/spotlightpa/almanack/internal/utils/timex"
 )
 
-func CreatePageFromContent(ctx context.Context, tx *Txable, path, content string) (*Page, error) {
+func CreatePageFromContent(ctx context.Context, h *Handle, path, content string) (*Page, error) {
 	var p Page
 	if err := p.FromMD(content); err != nil {
 		return nil, err
 	}
-	err := tx.Begin(ctx, pgx.TxOptions{}, func(q *Queries) error {
+	err := h.Begin(ctx, pgx.TxOptions{}, func(q *Queries) error {
 		dbPage, err := q.CreatePage(ctx, CreatePageParams{
 			FilePath:   path,
 			SourceType: "load",

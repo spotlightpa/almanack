@@ -21,11 +21,12 @@ func TestServicePublish(t *testing.T) {
 	ctx := t.Context()
 	almlog.UseTestLogger(t)
 
-	p := createTestDB(t)
+	dbhandle := createTestDB(t)
+
 	tmp := t.ArtifactDir()
 	svc := almsvc.Services{
-		Queries:      db.New(p),
-		Tx:           db.NewTxable(p),
+		DB:           dbhandle,
+		Queries:      dbhandle.Queries(),
 		ContentStore: github.NewMockClient(tmp),
 		Indexer:      index.MockIndexer{},
 	}
@@ -64,7 +65,7 @@ func TestServicePublish(t *testing.T) {
 			SourceID:        "",
 			PublicationDate: pgtype.Timestamptz{},
 		}
-		err = svc.Tx.Begin(ctx, pgx.TxOptions{}, func(txq *db.Queries) (txerr error) {
+		err = svc.DB.Begin(ctx, pgx.TxOptions{}, func(txq *db.Queries) (txerr error) {
 			err, warning := svc.PublishPage(ctx, txq, p1)
 			be.NilErr(t, warning)
 			return err
@@ -104,7 +105,7 @@ func TestServicePublish(t *testing.T) {
 			SourceID:        "",
 			PublicationDate: pgtype.Timestamptz{},
 		}
-		err = svc.Tx.Begin(ctx, pgx.TxOptions{}, func(txq *db.Queries) (txerr error) {
+		err = svc.DB.Begin(ctx, pgx.TxOptions{}, func(txq *db.Queries) (txerr error) {
 			err, warning := svc.PublishPage(ctx, txq, p2)
 			be.NilErr(t, warning)
 			return err
@@ -130,7 +131,7 @@ func TestServicePublish(t *testing.T) {
 			SourceID:        "",
 			PublicationDate: pgtype.Timestamptz{},
 		}
-		err = svc.Tx.Begin(ctx, pgx.TxOptions{}, func(txq *db.Queries) (txerr error) {
+		err = svc.DB.Begin(ctx, pgx.TxOptions{}, func(txq *db.Queries) (txerr error) {
 			err, warning := svc.PublishPage(ctx, txq, p3)
 			be.NilErr(t, warning)
 			return err
@@ -172,7 +173,7 @@ func TestServicePublish(t *testing.T) {
 		svc.ContentStore = github.ErrorClient{
 			Error: errors.New("bad client"),
 		}
-		err = svc.Tx.Begin(ctx, pgx.TxOptions{}, func(txq *db.Queries) (txerr error) {
+		err = svc.DB.Begin(ctx, pgx.TxOptions{}, func(txq *db.Queries) (txerr error) {
 			err, warning := svc.PublishPage(ctx, txq, p4)
 			be.NilErr(t, warning)
 			return err
@@ -188,12 +189,12 @@ func TestServicePublish(t *testing.T) {
 func TestServicePopScheduledPages(t *testing.T) {
 	ctx := t.Context()
 	almlog.UseTestLogger(t)
+	dbhandle := createTestDB(t)
 
-	p := createTestDB(t)
 	tmp := t.ArtifactDir()
 	svc := almsvc.Services{
-		Queries:      db.New(p),
-		Tx:           db.NewTxable(p),
+		DB:           dbhandle,
+		Queries:      dbhandle.Queries(),
 		ContentStore: github.NewMockClient(tmp),
 		Indexer:      index.MockIndexer{},
 	}

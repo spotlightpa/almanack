@@ -20,8 +20,8 @@ type Services struct {
 	MailchimpSignupURL   string
 	NetlifyWebhookSecret string
 	Client               *http.Client
+	DB                   *db.Handle
 	Queries              *db.Queries
-	Tx                   *db.Txable
 	github.ContentStore
 	ImageStore       aws.BlobStore
 	FileStore        aws.BlobStore

@@ -9,8 +9,8 @@ import (
 )
 
 func TestMap(t *testing.T) {
-	p := createTestDB(t)
-	q := db.New(p)
+	dbhandle := createTestDB(t)
+	q := dbhandle.Queries()
 
 	ctx := t.Context()
 	const testpath = "test/hello.md"

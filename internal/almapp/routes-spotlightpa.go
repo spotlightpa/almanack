@@ -577,7 +577,7 @@ func (app *appEnv) postPage(w http.ResponseWriter, r *http.Request) {
 	shouldPublish := res.ShouldPublish()
 	shouldNotify := res.ShouldNotify(&oldPage)
 	if shouldPublish {
-		err = app.svc.Tx.Begin(ctx, pgx.TxOptions{}, func(txq *db.Queries) (txerr error) {
+		err = app.svc.DB.Begin(ctx, pgx.TxOptions{}, func(txq *db.Queries) (txerr error) {
 			err, warning := app.svc.PublishPage(ctx, txq, &res)
 			if warning != nil {
 				app.logErr(r.Context(), warning)
@@ -611,7 +611,7 @@ func (app *appEnv) postPageJSON(w http.ResponseWriter, r *http.Request) {
 		page *db.Page
 		err  error
 	)
-	err = app.svc.Tx.Begin(ctx, pgx.TxOptions{}, func(txq *db.Queries) error {
+	err = app.svc.DB.Begin(ctx, pgx.TxOptions{}, func(txq *db.Queries) error {
 		page, err = app.svc.PublishJSONPage(ctx, txq, userUpdate)
 		return err
 	})
@@ -1056,7 +1056,7 @@ func (app *appEnv) postPageLoad(w http.ResponseWriter, r *http.Request) http.Han
 	if err != nil {
 		return app.jsonErr(err)
 	}
-	page, err := db.CreatePageFromContent(r.Context(), app.svc.Tx, path, content)
+	page, err := db.CreatePageFromContent(r.Context(), app.svc.DB, path, content)
 	if err != nil {
 		return app.jsonErr(err)
 	}
