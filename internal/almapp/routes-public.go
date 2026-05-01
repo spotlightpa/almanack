@@ -29,7 +29,7 @@ func (app *appEnv) notFound(w http.ResponseWriter, r *http.Request) {
 func (app *appEnv) ping(w http.ResponseWriter, r *http.Request) {
 	app.logStart(r)
 	w.Header().Set("Content-Type", "text/plain")
-	w.Header().Set("Cache-Control", "public, max-age=60")
+	w.Header().Set("Cache-Control", "no-store")
 	b, err := httputil.DumpRequest(r, true)
 	if err != nil {
 		app.replyErr(w, r, err)
