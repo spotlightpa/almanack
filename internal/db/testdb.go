@@ -2,12 +2,10 @@ package db
 
 import (
 	"context"
-	"os"
 	"time"
 
 	"github.com/earthboundkid/errorx/v2"
 	"github.com/jackc/pgx/v5/pgxpool"
-	"github.com/jackc/tern/v2/migrate"
 )
 
 func CreateTestDatabase(dbURL string) (p *pgxpool.Pool, err error) {
@@ -38,19 +36,8 @@ func CreateTestDatabase(dbURL string) (p *pgxpool.Pool, err error) {
 	if err != nil {
 		return nil, err
 	}
-	conn, err := newDB.Acquire(ctx)
-	if err != nil {
-		return nil, err
-	}
-	defer conn.Release()
-	mg, err := migrate.NewMigrator(ctx, conn.Conn(), "schema_version")
-	if err != nil {
-		return nil, err
-	}
-	if err = mg.LoadMigrations(os.DirFS("../../sql/schema")); err != nil {
-		return nil, err
-	}
-	if err = mg.Migrate(ctx); err != nil {
+	h := NewHandle(newDB)
+	if err = h.Migrate(ctx); err != nil {
 		return nil, err
 	}
 	return newDB, nil
