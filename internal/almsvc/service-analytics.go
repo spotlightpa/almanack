@@ -1,0 +1,52 @@
+package almsvc
+
+import (
+	"context"
+	"fmt"
+
+	"github.com/earthboundkid/errorx/v2"
+	"github.com/spotlightpa/almanack/internal/almlog"
+	"github.com/spotlightpa/almanack/internal/db"
+)
+
+func (svc Services) UpdateMostPopular(ctx context.Context) (err error) {
+	defer errorx.Trace(&err)
+
+	l := almlog.FromContext(ctx)
+	l.InfoContext(ctx, "Services.UpdateMostPopular")
+
+	if err := svc.ConfigureGoogleCert(ctx); err != nil {
+		return err
+	}
+
+	cl, err := svc.Gsvc.GAClient(ctx)
+	if err != nil {
+		return err
+	}
+	pages, err := svc.Gsvc.MostPopularNews(ctx, cl)
+	if err != nil {
+		return err
+	}
+	if len(pages) < 5 {
+		return fmt.Errorf("expected more popular pages; got %q", pages)
+	}
+	data, err := svc.Queries.ListPagesByURLPaths(ctx, pages)
+	if err != nil {
+		return err
+	}
+	if len(data) < 5 {
+		return fmt.Errorf("could not find popular pages; got %q from %q",
+			data, pages)
+	}
+	return UploadJSON(
+		ctx,
+		svc.FileStore,
+		"feeds/most-popular-items.json",
+		"public, max-age=300",
+		struct {
+			Pages []db.ListPagesByURLPathsRow `json:"pages"`
+		}{
+			data,
+		},
+	)
+}

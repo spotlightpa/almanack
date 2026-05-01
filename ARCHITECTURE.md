@@ -16,10 +16,14 @@ src/                  # Vue.js frontend ([Vite](https://vite.dev/guide/) + [Bulm
   plugins/router.js   # Route definitions with role guards
 
 funcs/almanack-api/   # Go backend entry point
-pkg/api/              # HTTP handlers and routing
-pkg/almanack/         # Business logic, Services container
-internal/db/          # Database layer ([sqlc](https://docs.sqlc.dev/en/stable/)-generated)
-internal/*/           # Integration packages (github, aws, google, etc.)
+internal/almapp/      # CLI entry, HTTP routing, handlers
+internal/almsvc/      # Business logic, Services container
+internal/db/          # Database layer ([sqlc](https://docs.sqlc.dev/en/stable/)-generated with some handwriten model methods)
+internal/services/    # Third-party integrations (github, aws, google, mailchimp, youtube, etc.)
+internal/utils/       # General-purpose helpers (httpx, iterx, slicex, stringx, timex, etc.)
+internal/convert/     # Document conversion tools (blocko, tableaux)
+internal/layouts/     # Server-rendered HTML layouts
+internal/integration/ # Integration tests (require ALMANACK_POSTGRES)
 
 sql/schema/           # Database migrations ([tern](https://github.com/jackc/tern))
 sql/queries/          # SQL queries (sqlc)
@@ -27,14 +31,15 @@ sql/queries/          # SQL queries (sqlc)
 
 ## Backend
 
-**Entry**: `funcs/almanack-api/main.go` → `pkg/api.CLI()` → routes in `pkg/api/router.go`
+**Entry**: `funcs/almanack-api/main.go` → `internal/almapp.CLI()` → routes in `internal/almapp/router.go` (split across `routes-public.go`, `routes-editor.go`, `routes-spotlightpa.go`, `routes-background.go`, `routes-ssr.go`).
 
-**Services**: `pkg/almanack.Services` is the dependency container holding database, GitHub, S3, Google, Mailchimp, Slack clients, etc. Configured via CLI flags/environment variables in `pkg/almanack/flags.go`.
+**Services**: `internal/almsvc.Services` is the dependency container holding database, GitHub, S3, Google, Mailchimp, Slack, YouTube clients, etc. and the business logic to connect them. Configured via CLI flags/environment variables in `internal/almservices/flags.go`.
 
 **Routes** are grouped by auth level:
 - Public: `/api/healthcheck`, `/api/identity-hook`
 - Partner ("Editor") role: `/api/shared-article(s)`
 - Spotlight PA role: `/api/page*`, `/api/images`, `/api/site-*`, etc.
+- Server Side Rendered routes: `/ssr/redirect/`, `/ssr/download-image`
 - Background tasks: `/api-background/cron` (cron scheduled every 3 min, can have longer execution time than the 15 second window for normal lambda functions)
 
 ## Frontend
@@ -68,6 +73,9 @@ For local development, create a `.env` file with your secrets. The `./run.sh api
 # .env example
 export ALMANACK_POSTGRES="postgres://..."
 export ALMANACK_SLACK_HOOK_URL="https://hooks.slack.com/..."
+export ALMANACK_IMAGE_BUCKET_URL=mem://
+export ALMANACK_FILE_BUCKET_URL=file://./filebucket/
+export ALMANACK_GITHUB_MOCK_PATH=$HOME/code/poor-richard
 ```
 
 ## Development

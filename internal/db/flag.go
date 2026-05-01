@@ -8,7 +8,7 @@ import (
 
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
-	"github.com/spotlightpa/almanack/pkg/almlog"
+	"github.com/spotlightpa/almanack/internal/almlog"
 )
 
 // AddFlags adds an option to the specified FlagSet that creates and tests a DB
