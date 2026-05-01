@@ -105,20 +105,7 @@ export default class ArcArticle {
     return commaAnd(this.authors);
   }
   get featuredImage() {
-    let srcURL = this.getProp("promo_items.basic.url", { fallback: "" });
-    // Some images haven't been published and can't be used
-    if (!srcURL.match(/\/public\//)) {
-      srcURL = this.getProp(
-        "promo_items.basic.additional_properties.resizeUrl",
-        {
-          fallback: "",
-        }
-      );
-    }
-    if (!srcURL) {
-      return "";
-    }
-    return `/api/arc-image?${new URLSearchParams({ src_url: srcURL })}`;
+    return "";
   }
   get featuredImageCredits() {
     return this.getProp("promo_items.basic.credits.by", { fallback: [] }).map(
