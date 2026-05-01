@@ -5,9 +5,12 @@ import (
 	"context"
 	"time"
 
+	"github.com/earthboundkid/errorx/v2"
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
+	"github.com/jackc/tern/v2/migrate"
 	"github.com/spotlightpa/almanack/internal/almlog"
+	"github.com/spotlightpa/almanack/sql/schema"
 )
 
 func Open(dbURL string) (p *pgxpool.Pool, err error) {
@@ -37,10 +40,6 @@ type Handle struct {
 	p *pgxpool.Pool
 }
 
-func (h Handle) Pool() *pgxpool.Pool {
-	return h.p
-}
-
 func (h Handle) Queries() *Queries {
 	return &Queries{logger{h.p}}
 }
@@ -49,4 +48,26 @@ func (h Handle) Begin(ctx context.Context, o pgx.TxOptions, f func(*Queries) err
 	return pgx.BeginTxFunc(ctx, h.p, o, func(tx pgx.Tx) error {
 		return f(New(logger{tx}))
 	})
+}
+
+// Migrate runs pending tern migrations against the underlying pool.
+// It uses the same `schema_version` version table that the `tern migrate` CLI uses.
+func (h Handle) Migrate(ctx context.Context) (err error) {
+	defer errorx.Trace(&err)
+
+	conn, err := h.p.Acquire(ctx)
+	if err != nil {
+		return err
+	}
+	defer conn.Release()
+
+	mg, err := migrate.NewMigrator(ctx, conn.Conn(), "schema_version")
+	if err != nil {
+		return err
+	}
+
+	if err = mg.LoadMigrations(schema.FS); err != nil {
+		return err
+	}
+	return mg.Migrate(ctx)
 }
