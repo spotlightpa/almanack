@@ -56,7 +56,7 @@ func (svc Services) CreateYouTubePage(ctx context.Context, video *db.Youtube) (e
 	if err != nil {
 		return err
 	}
-	return svc.DB.Begin(ctx, pgx.TxOptions{}, func(q *db.Queries) error {
+	return svc.DB.Tx(ctx, pgx.TxOptions{}, func(q *db.Queries) error {
 		defer errorx.Trace(&err)
 		page, err := q.CreatePage(ctx, db.CreatePageParams{
 			FilePath:   video.FilePath(),

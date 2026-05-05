@@ -23,7 +23,7 @@ func CreatePageFromContent(ctx context.Context, h *Handle, path, content string)
 	if err := p.FromMD(content); err != nil {
 		return nil, err
 	}
-	err := h.Begin(ctx, pgx.TxOptions{}, func(q *Queries) error {
+	err := h.Tx(ctx, pgx.TxOptions{}, func(q *Queries) error {
 		dbPage, err := q.CreatePage(ctx, CreatePageParams{
 			FilePath:   path,
 			SourceType: "load",
