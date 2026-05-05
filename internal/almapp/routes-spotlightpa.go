@@ -1052,11 +1052,7 @@ func (app *appEnv) postPageLoad(w http.ResponseWriter, r *http.Request) http.Han
 	if err := v.Err(); err != nil {
 		return app.jsonErr(err)
 	}
-	content, err := app.svc.ContentStore.GetFile(r.Context(), path)
-	if err != nil {
-		return app.jsonErr(err)
-	}
-	page, err := db.CreatePageFromContent(r.Context(), app.svc.DB, path, content)
+	page, err := app.svc.PageLoad(r.Context(), path)
 	if err != nil {
 		return app.jsonErr(err)
 	}
