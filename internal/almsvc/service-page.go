@@ -347,3 +347,17 @@ func (svc Services) Notify(ctx context.Context, page *db.Page, publishingNow boo
 		},
 	})
 }
+
+func (svc Services) PageLoad(ctx context.Context, path string) (page *db.Page, err error) {
+	defer errorx.Trace(&err)
+
+	content, err := svc.ContentStore.GetFile(ctx, path)
+	if err != nil {
+		return nil, err
+	}
+	page, err = db.CreatePageFromContent(ctx, svc.DB, path, content)
+	if err != nil {
+		return nil, err
+	}
+	return page, nil
+}
