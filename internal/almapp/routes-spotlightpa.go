@@ -1064,5 +1064,29 @@ func (app *appEnv) postMigrate(w http.ResponseWriter, r *http.Request) http.Hand
 	if err := app.svc.DB.Migrate(r.Context()); err != nil {
 		return app.jsonErr(err)
 	}
+	topics, err := app.svc.Queries.ListAllTopics(r.Context())
+	if err != nil {
+		return app.jsonErr(err)
+	}
+	series, err := app.svc.Queries.ListAllSeries(r.Context())
+	if err != nil {
+		return app.jsonErr(err)
+	}
+
+	for _, topic := range topics {
+		almlog.FromContext(r.Context()).Info("adding topic", "name", topic)
+		_, err = app.svc.PageLoad(r.Context(), fmt.Sprintf("content/topics/%s/_index.md", topic))
+		if err != nil {
+			return app.jsonErr(err)
+		}
+	}
+	for _, s := range series {
+		almlog.FromContext(r.Context()).Info("adding series", "name", s)
+		_, err = app.svc.PageLoad(r.Context(), fmt.Sprintf("content/series/%s/_index.md", s))
+		if err != nil {
+			return app.jsonErr(err)
+		}
+	}
+
 	return app.jsonOK(http.StatusText(http.StatusOK))
 }
