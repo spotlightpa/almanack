@@ -14,7 +14,7 @@ import (
 
 func (svc Services) PopScheduledSiteChanges(ctx context.Context, loc string) error {
 	l := almlog.FromContext(ctx)
-	err := svc.DB.Begin(ctx, pgx.TxOptions{}, func(q *db.Queries) (txerr error) {
+	err := svc.DB.Tx(ctx, pgx.TxOptions{}, func(q *db.Queries) (txerr error) {
 		defer errorx.Trace(&txerr)
 
 		configs, txerr := q.PopScheduledSiteChanges(ctx, loc)
@@ -63,7 +63,7 @@ type ScheduledSiteConfig struct {
 
 func (svc Services) UpdateSiteConfig(ctx context.Context, loc string, configs []ScheduledSiteConfig) ([]db.SiteDatum, error) {
 	var dbConfigs []db.SiteDatum
-	err := svc.DB.Begin(ctx, pgx.TxOptions{}, func(q *db.Queries) (txerr error) {
+	err := svc.DB.Tx(ctx, pgx.TxOptions{}, func(q *db.Queries) (txerr error) {
 		defer errorx.Trace(&txerr)
 
 		// Clear existing future entries before upserting current/future entries
