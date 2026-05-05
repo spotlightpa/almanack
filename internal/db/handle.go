@@ -40,13 +40,20 @@ type Handle struct {
 	p *pgxpool.Pool
 }
 
-func (h Handle) Queries() *Queries {
-	return &Queries{logger{h.p}}
+// DBTX returns a pgxpool.Pool wrapped in a logger.
+func (h Handle) DBTX() DBTX {
+	return logger{h.p}
 }
 
-func (h Handle) Begin(ctx context.Context, o pgx.TxOptions, f func(*Queries) error) error {
+// Queries is the sqlc wrapper for SQL queries and commands.
+func (h Handle) Queries() *Queries {
+	return New(h.DBTX())
+}
+
+// Tx executes its callback inside a transaction.
+func (h Handle) Tx(ctx context.Context, o pgx.TxOptions, f func(*Queries) error) error {
 	return pgx.BeginTxFunc(ctx, h.p, o, func(tx pgx.Tx) error {
-		return f(New(logger{tx}))
+		return f(h.Queries())
 	})
 }
 

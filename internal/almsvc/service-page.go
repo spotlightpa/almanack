@@ -113,7 +113,7 @@ func (svc Services) RefreshPageFromContentStore(ctx context.Context, page *db.Pa
 
 func (svc Services) PopScheduledPages(ctx context.Context) (err, warning error) {
 	var warnings []error
-	err = svc.DB.Begin(ctx, pgx.TxOptions{}, func(txq *db.Queries) (txerr error) {
+	err = svc.DB.Tx(ctx, pgx.TxOptions{}, func(txq *db.Queries) (txerr error) {
 		defer errorx.Trace(&txerr)
 
 		pages, txerr := txq.PopScheduledPages(ctx)
@@ -251,7 +251,7 @@ func (svc Services) CreatePageFromGDocsDoc(ctx context.Context, shared *db.Share
 
 func (svc Services) createPageForSharedArticle(ctx context.Context, shared *db.SharedArticle, body string, fm map[string]any, filepath string) error {
 	ignoreErr := false
-	err := svc.DB.Begin(ctx, pgx.TxOptions{}, func(q *db.Queries) (txerr error) {
+	err := svc.DB.Tx(ctx, pgx.TxOptions{}, func(q *db.Queries) (txerr error) {
 		defer errorx.Trace(&txerr)
 		p, txerr := q.CreatePage(ctx, db.CreatePageParams{
 			FilePath:   filepath,
