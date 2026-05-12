@@ -1,4 +1,4 @@
-export default function commaAnd(a) {
+export default function commaAnd(a: { toString(): string }[] | null | undefined): string {
   if (!a || !a.length) {
     return "";
   }
@@ -6,6 +6,6 @@ export default function commaAnd(a) {
   if (ss.length < 3) {
     return ss.join(" and ");
   }
-  let commas = a.slice(0, -1).join(", ");
+  let commas = ss.slice(0, -1).join(", ");
   return `${commas} and ${ss[ss.length - 1]}`;
 }
