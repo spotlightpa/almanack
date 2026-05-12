@@ -1,7 +1,7 @@
 import { h } from "vue";
 
 import getProp from "@/utils/getter.js";
-import commaAnd from "@/utils/comma-and.js";
+import commaAnd from "@/utils/comma-and.ts";
 import maybeDate from "@/utils/maybe-date.js";
 
 import ArcArticleDivider from "@/components/ArcArticleDivider.vue";
