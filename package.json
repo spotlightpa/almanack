@@ -30,8 +30,6 @@
     "vuedraggable": "^4.1.0"
   },
   "devDependencies": {
-    "@babel/core": "^7.18.10",
-    "@babel/eslint-parser": "^7.12.16",
     "@eslint/js": "^10.0.1",
     "@vitejs/plugin-vue": "^6.0.5",
     "autoprefixer": "^10.4.20",
