@@ -102,7 +102,7 @@ export default class ArcArticle {
     });
   }
   get byline() {
-    return commaAnd(this.authors);
+    return commaAnd(this.authors ?? []);
   }
   get featuredImage() {
     return "";

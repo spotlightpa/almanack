@@ -1,5 +1,5 @@
-export default function commaAnd(a: { toString(): string }[] | null | undefined): string {
-  if (!a || !a.length) {
+export default function commaAnd(a: readonly { toString(): string }[]): string {
+  if (a.length === 0) {
     return "";
   }
   let ss = a.map((item) => item.toString());
