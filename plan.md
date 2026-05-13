@@ -1,6 +1,6 @@
 # Punchlist: Remove Arc
 
-Shipped as four PRs, each deployable on its own. Order matters: the
+Shipped as three PRs, each deployable on its own. Order matters: the
 user-visible "no longer available" notice goes first so we can verify Arc
 rows are dead before pulling anything out from under the code.
 
@@ -71,31 +71,19 @@ frontend just stops reading it.
 
 ---
 
-## PR 3 — Remove Arc backend Go code
+## PR 3 — Remove Arc backend (Go + sqlc)
 
-Goal: rip out the unused Arc Go package, query, and route arm. `arc` table
-stays; sqlc still generates code for it (we deal with that in PR 4).
+Goal: rip out the unused Arc Go package, query, and route arm, and hide
+the `arc` table from sqlc the same way we did for `newsletter`. Prod data
+is untouched.
 
 - [ ] `rm -r internal/services/arc/`.
 - [ ] In `internal/almapp/routes-spotlightpa.go` `postPageRefresh`
   (~line 694), delete the `case "arc":` arm. The `default` arm returns
   the same conflict error for any straggler.
+- [ ] Delete `sql/queries/arc.sql`.
 - [ ] Delete the `UpsertSharedArticleFromArc` query in
   `sql/queries/shared-article.sql`.
-- [ ] Delete `sql/queries/arc.sql`.
-- [ ] Run `./run.sh sql`. `internal/db/arc.sql.go` regenerates without the
-  upsert query but still has `GetArcByArcID` (we drop the table next PR).
-- [ ] `go test ./...`.
-- [ ] Commit + PR: `go: remove Arc service and queries`.
-- [ ] Deploy.
-
----
-
-## PR 4 — Hide `arc` from sqlc, final cleanup
-
-Goal: stop generating code for the `arc` table without touching prod data.
-Same trick as the old `newsletter` table.
-
 - [ ] Append to `sql/schema-overrides/001.sql`:
   ```sql
   DROP TABLE arc;
@@ -104,6 +92,16 @@ Same trick as the old `newsletter` table.
 - [ ] Run `./run.sh sql`. `internal/db/arc.sql.go` disappears; `Arc` struct
   is gone from `internal/db/models.go`.
 - [ ] `go test ./...`.
+- [ ] Commit + PR: `backend: remove Arc service, queries, and sqlc model`.
+- [ ] Deploy.
+
+---
+
+## Optional follow-up — Audit for leftovers
+
+Do this if anything feels suspect, or skip if the three PRs above land
+clean.
+
 - [ ] Search `internal/integration/` and any `testdata/` for fixtures with
   `source_type="arc"` or `arc_id` and update or drop.
 - [ ] Scrub Arc references from `README.md` and `ARCHITECTURE.md`.
@@ -111,8 +109,6 @@ Same trick as the old `newsletter` table.
   `rg -i "\barc\b" . -g '!dist' -g '!node_modules' -g '!sql/schema/0*' -g '!sql/one-time'`
   should return only unrelated matches.
 - [ ] `./run.sh sql && go test ./... && yarn build`.
-- [ ] Commit + PR: `sql: hide arc table from sqlc; tidy docs`.
-- [ ] Deploy.
 
 ---
 
