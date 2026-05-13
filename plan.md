@@ -19,8 +19,12 @@ What **goes**:
 - The legacy `/articles/:id` -> arc redirect route.
 - The "arc user" role.
 - The `arc` Postgres table and the `arc_id` flavored helpers.
-- Any `shared_article` row whose `source_type='arc'` (there should only be
-  gdocs rows after this).
+
+What we explicitly **do not** delete:
+- `shared_article` rows with `source_type='arc'`. They stay in the list views
+  (`/shared-articles`, `/admin`) so the historical record is intact. Clicking
+  through to such an article shows a "no longer available" message instead of
+  rendering Arc content.
 
 ## What "Arc" currently touches
 
@@ -54,30 +58,34 @@ Frontend (Vue/JS):
 
 ## Step-by-step
 
-### Step 1 — Frontend: prune Arc from shared-article views
-- `src/components/ViewSharedArticle.vue`: remove the `v-if="article.isArc"`
-  branch (both `ArcArticleAvailable` and `ArcArticlePlanned`). The component
-  becomes "render `GDocsDoc`" unconditionally; if `article.isArc` would be
-  true (legacy data only) we can show a small "no longer available"
-  fallback inline rather than crash.
-- `src/components/ViewSharedArticleAdmin.vue`, `ViewAdmin.vue`,
-  `ArticleSlugLine.vue`, `ArticleWordCount.vue`, `ArticleList.vue`: delete
-  every `article.isArc` branch and Arc-only column (`budget` is Arc-only —
-  confirm before stripping, since it's also a gdoc-era column on
-  `shared_article`).
-- `src/api/shared-article.js`: drop `fromArc`, `isArc`, the `arc` field,
-  and the `import ArcArticle`.
+### Step 1 — Frontend: stub Arc detail view, prune Arc UI
+- `src/components/ViewSharedArticle.vue`: replace the `v-if="article.isArc"`
+  branch (which renders `ArcArticleAvailable` / `ArcArticlePlanned`) with an
+  inline "This article is no longer available" notice. Keep `isArc` on the
+  model so we can branch on it. Gdocs path is unchanged.
+- `src/components/ViewSharedArticleAdmin.vue`: same treatment — show a
+  short "Arc article, no longer rendered" notice instead of the Arc-only
+  admin fields. Keep the row visible so admins can still see metadata
+  (status, dates, internal id) and the page link if any.
+- Lists (`ViewAdmin.vue`, `ViewSharedArticles.vue` indirectly via
+  `ArticleList.vue`, `ArticleSlugLine.vue`, `ArticleWordCount.vue`): keep
+  `isArc` rows visible but drop the now-broken sub-components. For
+  example `ArticleWordCount` should just return empty for Arc rows;
+  `ArticleSlugLine`'s `isArcUser && isArc` external-link tag goes away.
+- `src/api/shared-article.js`: keep `isArc` (it's the discriminator for the
+  stub). Drop `fromArc`, the `arc` ArcArticle instance, and the
+  `import ArcArticle`. Anything that read `article.arc.*` is gone (only the
+  Arc components used it).
 - `src/api/auth.js`: drop `isArcUser` / `"arc user"` role.
 - `src/plugins/router.js`: remove the legacy `/articles/:id` (`arc-article`)
   route. Keep `shared-articles`, `shared-article`, and
-  `shared-article-redirect-from-page` — they're partner-visible and serve
-  gdocs.
+  `shared-article-redirect-from-page` — still needed for gdocs.
 - Delete components: `ArcArticleAvailable`, `ArcArticleDivider`,
   `ArcArticleHTML`, `ArcArticleHeader`, `ArcArticleImage`, `ArcArticleList`,
   `ArcArticleOEmbed`, `ArcArticlePlaceholder`, `ArcArticlePlanned`,
   `ArcArticleText`, `ThumbnailArc`.
 - Delete `src/api/arc-article.js`.
-- Audit: `rg -i arc src/` should return nothing meaningful.
+- Audit: `rg -i arc src/` should only show `isArc` discriminator usage.
 
 ### Step 2 — Backend: drop Arc Go code
 - `rm -r internal/services/arc/`.
@@ -88,6 +96,9 @@ Frontend (Vue/JS):
 - In `internal/almapp/routes-spotlightpa.go`, drop the `case "arc":` arm in
   `postPageRefresh` (`default` will catch stragglers and respond with the
   same conflict error).
+- The list/get endpoints (`ListSharedArticles*`, `GetSharedArticleByID`,
+  `GetSharedArticleBySource`) keep working unchanged; the `raw_data` field
+  for Arc rows stays in the response but is unused by the new frontend.
 - Verify: `rg -n '\barc\b' internal/ sql/queries/` (case-sensitive) should
   only show generated files we're about to regen.
 
@@ -95,7 +106,6 @@ Frontend (Vue/JS):
 Add `sql/schema/040_drop_arc.sql`:
 
 ```
-DELETE FROM shared_article WHERE source_type = 'arc';
 DROP TABLE arc;
 
 ---- create above / drop below ----
@@ -104,9 +114,15 @@ CREATE TABLE arc (...);  -- copy from 023, no data restore
 ```
 
 Notes:
+- Arc-sourced `shared_article` rows are **left in place** so partners and
+  admins still see them in list views.
 - No FK between `shared_article` and `arc`; the link is via the free-form
-  `source_type/source_id` strings.
-- Down-migration recreates the empty table for symmetry; tern is
+  `source_type/source_id` strings, so dropping the `arc` table doesn't
+  break referential integrity.
+- `shared_article.raw_data` is a self-contained JSONB column — nothing on
+  the backend needs the `arc` table after we delete
+  `UpsertSharedArticleFromArc`.
+- Down-migration recreates an empty table for symmetry; tern is
   forward-only in prod so this is a courtesy.
 - After applying the schema, run `./run.sh sql` to regenerate
   `internal/db/`.
@@ -126,15 +142,15 @@ Notes:
 - Commit per step:
   1. `frontend: remove Arc components and shared-article branches`
   2. `go: remove Arc service and queries`
-  3. `sql: drop arc table and arc-sourced shared_article rows`
+  3. `sql: drop arc table`
   4. `docs/tests: tidy after Arc removal`
 
 ## Open questions / risks
 
-- **Existing `source_type='arc'` shared_article rows**: deleted by the
-  migration. Confirm via `SELECT count(*) FROM shared_article WHERE
-  source_type='arc';` and snapshot before applying — there are likely
-  hundreds of historical rows.
+- **Existing `source_type='arc'` shared_article rows**: kept. They remain
+  visible in list views; clicking through hits the new "no longer
+  available" stub. `raw_data` is still served by the API but ignored by
+  the frontend.
 - **Linked pages**: `page.source_type='arc'` rows still exist (per migration
   019). They are read-only in the partner UI and the `case "arc":` branch
   was the only refresh handler. After this change, refresh on those pages
