@@ -152,7 +152,4 @@ code for it. Use the same trick that hid the old `newsletter` table.
   behavior. We are **not** deleting `page` rows.
 - **Identity roles**: the Netlify identity "arc user" role lingers on user
   accounts. Harmless after this change; document but no migration needed.
-- **Apple News / mailchimp**: also read from `shared_article`. Confirmed by
-  grep that none of them filter on `source_type='arc'`; still worth a
-  reviewer eyeball.
 
