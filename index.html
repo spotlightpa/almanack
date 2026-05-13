@@ -17,15 +17,18 @@
     <div id="app"></div>
     <script type="module" src="/src/main.js"></script>
     <script>
-      if (window.location.host.match(/spotlightpa\.org$/)) {
-        window.ga = function () {
-          (ga.q = ga.q || []).push(arguments);
-        };
-        ga.l = +new Date();
-        ga("create", "UA-141126362-2", "auto");
+      // Google Analytics 4 (gtag.js)
+      window.dataLayer = window.dataLayer || [];
+      window.gtag = function () {
+        window.dataLayer.push(arguments);
+      };
+      window.gtag("js", new Date());
+      // Disable automatic page_view; the SPA router sends them manually.
+      window.gtag("config", "G-XXXXXXXXXX", { send_page_view: false });
 
+      if (window.location.host.match(/spotlightpa\.org$/)) {
         let script = document.createElement("script");
-        script.src = "//www.google-analytics.com/analytics.js";
+        script.src = "https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX";
         script.async = true;
         document.head.append(script);
       }
