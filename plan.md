@@ -1,17 +1,26 @@
-# Plan: Remove Arc & Retire Partner Pages
+# Plan: Remove Arc
 
 ## Goal
 
-The Arc Publishing integration is dead code — no one uses it. Partners no
-longer consume Almanack's shared-article pages either. We want to:
+The Arc Publishing integration is dead code — no one uses it. Strip out
+everything Arc-specific (DB, Go, Vue, assets) while leaving the rest of the
+shared-article pipeline intact.
 
-1. Strip out everything Arc-specific (DB, Go, Vue, assets).
-2. Replace the partner-facing routes (`/shared-articles`, `/shared-articles/:id`,
-   and partner-bound API endpoints) with a "no longer available" stub.
-3. **Keep** the Spotlight-PA admin side of shared articles
-   (`/admin/shared-articles/:id`, the gdocs ingestion pipeline, and the
-   `shared_article` table) intact — Spotlight editors still use it to manage
-   internal article metadata.
+What **stays**:
+- The `shared_article` table and all gdocs-sourced rows.
+- Spotlight admin pages (`/admin`, `/admin/shared-articles/:id`).
+- **Partner pages** (`/shared-articles`, `/shared-articles/:id`) and their
+  API endpoints (`GET /api/shared-article`, `GET /api/shared-articles`) —
+  partners still use these to read gdocs-sourced shared articles.
+- The `editor` role and `partnerMW` middleware.
+
+What **goes**:
+- Anything that only exists to render or fetch Arc content.
+- The legacy `/articles/:id` -> arc redirect route.
+- The "arc user" role.
+- The `arc` Postgres table and the `arc_id` flavored helpers.
+- Any `shared_article` row whose `source_type='arc'` (there should only be
+  gdocs rows after this).
 
 ## What "Arc" currently touches
 
@@ -43,83 +52,46 @@ Frontend (Vue/JS):
 - Sprinkled `article.isArc` branches in `ViewAdmin.vue`, `ViewSharedArticle.vue`,
   `ViewSharedArticleAdmin.vue`, `ArticleWordCount.vue`, `ArticleList.vue`.
 
-Partner-facing routes/components to gut:
-- Route `shared-articles` (`/shared-articles`, list) →
-  `src/components/ViewSharedArticles.vue`.
-- Route `shared-article` (`/shared-articles/:id`, detail) →
-  `src/components/ViewSharedArticle.vue`.
-- Route `arc-article` (`/articles/:id` legacy redirect).
-- Route `shared-article-redirect-from-page` (`/admin/article-redirect`) — partner
-  redirect target.
-- Home redirect: `isEditor` users currently land on `shared-articles`.
-- API endpoints (partner-gated by `editor` role):
-  `GET /api/shared-article`, `GET /api/shared-articles` →
-  `internal/almapp/routes-editor.go` (`listSharedArticles`, `getSharedArticle`).
-- The `editor` role itself in `partnerMW` / `partnerSSRMW` in `router.go`.
-  (`partnerSSRMW` also exposes `GET /ssr/download-image`; that is editor-only
-  but Spotlight users also have it, since `admin` role bypasses checks.)
-
 ## Step-by-step
 
-### Step 1 — Frontend: stub the partner pages
-Lowest-risk change, ships visible "no longer available" UI immediately.
-
-- Replace `src/components/ViewSharedArticles.vue` and
-  `src/components/ViewSharedArticle.vue` with a single static "This feature is
-  no longer available" page (or point both routes at one new
-  `ViewPartnerGone.vue`).
-- In `src/plugins/router.js`:
-  - Keep `/shared-articles` and `/shared-articles/:id` paths but point them at
-    the new stub. Drop `requiresAuth: isEditor` so unauthenticated visitors see
-    the message too.
-  - Remove the `/articles` and `/articles/:id` (legacy arc-article) routes, or
-    redirect them to the stub.
-  - Remove the `shared-article-redirect-from-page` route (was an Arc-era
-    redirect helper).
-  - Change the `home` redirect: editors should fall through to
-    `unauthorized` (or sign-out) rather than `shared-articles`.
-- Drop `ViewArticleRedirect.vue` if no other route uses it after the above.
-
-### Step 2 — Frontend: rip out Arc UI
-- Delete components: `ArcArticle*.vue`, `ThumbnailArc.vue`.
+### Step 1 — Frontend: prune Arc from shared-article views
+- `src/components/ViewSharedArticle.vue`: remove the `v-if="article.isArc"`
+  branch (both `ArcArticleAvailable` and `ArcArticlePlanned`). The component
+  becomes "render `GDocsDoc`" unconditionally; if `article.isArc` would be
+  true (legacy data only) we can show a small "no longer available"
+  fallback inline rather than crash.
+- `src/components/ViewSharedArticleAdmin.vue`, `ViewAdmin.vue`,
+  `ArticleSlugLine.vue`, `ArticleWordCount.vue`, `ArticleList.vue`: delete
+  every `article.isArc` branch and Arc-only column (`budget` is Arc-only —
+  confirm before stripping, since it's also a gdoc-era column on
+  `shared_article`).
+- `src/api/shared-article.js`: drop `fromArc`, `isArc`, the `arc` field,
+  and the `import ArcArticle`.
+- `src/api/auth.js`: drop `isArcUser` / `"arc user"` role.
+- `src/plugins/router.js`: remove the legacy `/articles/:id` (`arc-article`)
+  route. Keep `shared-articles`, `shared-article`, and
+  `shared-article-redirect-from-page` — they're partner-visible and serve
+  gdocs.
+- Delete components: `ArcArticleAvailable`, `ArcArticleDivider`,
+  `ArcArticleHTML`, `ArcArticleHeader`, `ArcArticleImage`, `ArcArticleList`,
+  `ArcArticleOEmbed`, `ArcArticlePlaceholder`, `ArcArticlePlanned`,
+  `ArcArticleText`, `ThumbnailArc`.
 - Delete `src/api/arc-article.js`.
-- In `src/api/shared-article.js`: drop `fromArc`, `isArc`, `arc` field,
-  the `import ArcArticle`. Anything that used `isArc` on the admin side
-  (`ViewSharedArticleAdmin.vue`, `ViewAdmin.vue`, `ArticleSlugLine.vue`,
-  `ArticleWordCount.vue`, `ArticleList.vue`) becomes simpler — assume
-  every shared article is a gdoc.
-- In `src/api/auth.js`: remove `isArcUser`/`"arc user"` role.
-- In `ArticleSlugLine.vue`: remove the `isArcUser && article.isArc` branch.
-- Audit: `rg -i arc src/` should return nothing meaningful afterward (a couple
-  of unrelated substring hits like `clear`/`search` are fine).
+- Audit: `rg -i arc src/` should return nothing meaningful.
 
-### Step 3 — Backend: remove partner endpoints
-- In `internal/almapp/router.go`:
-  - Delete the `partnerMW` block and its two endpoints
-    (`GET /api/shared-article`, `GET /api/shared-articles`).
-  - Delete `partnerSSRMW` if nothing else needs it.  `GET /ssr/download-image`
-    can move to `spotlightMW`-equivalent SSR (admins still need it).
-- Delete `listSharedArticles` and `getSharedArticle` from
-  `internal/almapp/routes-editor.go`. Rename the file or fold `userInfo` into
-  another route file if it's the last function left.
-- Remove the `editor`-role check helpers if no longer referenced (likely
-  still want them around since `hasRoleMiddleware` is generic — keep, but
-  confirm `"editor"` is unreferenced).
-- Confirm nothing in `internal/almsvc` still cares about `editor` role.
-
-### Step 4 — Backend: drop Arc Go code
-- `rm internal/services/arc/arc-schema.go` and the `internal/services/arc`
-  directory.
-- Delete `sql/queries/arc.sql`, `internal/db/arc.sql.go`, and the `Arc` struct
-  in `internal/db/models.go` (regenerate after Step 5 with `./run.sh sql`).
-- Delete `UpsertSharedArticleFromArc` in `sql/queries/shared-article.sql`
-  (and the generated companion).
+### Step 2 — Backend: drop Arc Go code
+- `rm -r internal/services/arc/`.
+- Delete `sql/queries/arc.sql`; the generated `internal/db/arc.sql.go` and
+  the `Arc` model struct will go away when we regenerate.
+- Delete the `UpsertSharedArticleFromArc` query in
+  `sql/queries/shared-article.sql`.
 - In `internal/almapp/routes-spotlightpa.go`, drop the `case "arc":` arm in
-  `postPageRefresh` (the `default` will catch any straggling rows).
-- `grep -rn arc internal/` should only show acronyms ("Architecture",
-  "archive", etc.) and `arc` in historical migration files.
+  `postPageRefresh` (`default` will catch stragglers and respond with the
+  same conflict error).
+- Verify: `rg -n '\barc\b' internal/ sql/queries/` (case-sensitive) should
+  only show generated files we're about to regen.
 
-### Step 5 — Database migration
+### Step 3 — Database migration
 Add `sql/schema/040_drop_arc.sql`:
 
 ```
@@ -132,48 +104,48 @@ CREATE TABLE arc (...);  -- copy from 023, no data restore
 ```
 
 Notes:
-- The cascade is clean because `shared_article` only references `arc` via the
-  free-form `source_type/source_id` strings; there is no FK.
-- Down-migration recreates the empty table for symmetry but does not
-  resurrect data. Acceptable since prod uses tern forward-only.
-- After migrating, run `./run.sh sql` to regenerate `internal/db/`.
+- No FK between `shared_article` and `arc`; the link is via the free-form
+  `source_type/source_id` strings.
+- Down-migration recreates the empty table for symmetry; tern is
+  forward-only in prod so this is a courtesy.
+- After applying the schema, run `./run.sh sql` to regenerate
+  `internal/db/`.
 
-### Step 6 — Tests & docs
+### Step 4 — Tests & docs
 - Update / delete any fixture that still references arc shared articles
-  (search `testdata/` and `integration/`).
+  (search `testdata/` and `internal/integration/`).
 - `go test ./...` (skips integration without `ALMANACK_POSTGRES`).
-- With `ALMANACK_POSTGRES` set, run integration to confirm migrations apply
-  cleanly to a snapshot.
-- README / ARCHITECTURE: remove Arc references; note partner UI sunset.
+- With `ALMANACK_POSTGRES` set, run integration to confirm the migration
+  applies cleanly against a recent snapshot.
+- README / ARCHITECTURE: remove Arc references.
 
-### Step 7 — Cleanup pass
+### Step 5 — Cleanup pass
 - `rg -i "\barc\b" .` (excluding `dist/`, `node_modules/`, and migration
   history) — expect only unrelated matches.
-- Run `./run.sh check-deps` / `./run.sh build` / `yarn build` to make sure
-  nothing is dangling.
-- Commit per step with clear messages so the change is bisectable:
-  1. `frontend: replace partner pages with sunset notice`
-  2. `frontend: remove Arc components and helpers`
-  3. `api: remove partner-only endpoints`
-  4. `go: remove Arc service and queries`
-  5. `sql: drop arc table and shared_article rows`
-  6. `docs/tests: tidy after Arc removal`
+- `./run.sh sql` + `go test ./...` + `yarn build`.
+- Commit per step:
+  1. `frontend: remove Arc components and shared-article branches`
+  2. `go: remove Arc service and queries`
+  3. `sql: drop arc table and arc-sourced shared_article rows`
+  4. `docs/tests: tidy after Arc removal`
 
 ## Open questions / risks
 
-- **Identity roles**: the Netlify identity "editor" / "arc user" roles still
-  exist on user accounts. Removing the middleware is fine, but consider
-  documenting that Spotlight admin will not change them (no migration
-  needed).
-- **Old bookmarks**: external partners might still hit
-  `/shared-articles/<id>`; keep the path live with the sunset message rather
-  than 404. Step 1 does this.
-- **Netlify role gating**: `netlify.toml` / Identity may have role rules for
-  `/shared-articles*`. Audit before shipping so unauthenticated visitors can
-  see the sunset notice.
-- **Apple News / mailchimp** still reference `shared_article` rows — verify
-  by inspection that none of them depend on `source_type='arc'` (search
-  confirms they don't, but worth eyeballing during PR review).
-- **Down-migration**: prod is forward-only, but if a rollback is needed mid
-  deploy, dropping the table is destructive. Snapshot or `pg_dump arc` before
-  applying.
+- **Existing `source_type='arc'` shared_article rows**: deleted by the
+  migration. Confirm via `SELECT count(*) FROM shared_article WHERE
+  source_type='arc';` and snapshot before applying — there are likely
+  hundreds of historical rows.
+- **Linked pages**: `page.source_type='arc'` rows still exist (per migration
+  019). They are read-only in the partner UI and the `case "arc":` branch
+  was the only refresh handler. After this change, refresh on those pages
+  falls into `default` and returns a conflict, which matches today's
+  behavior. We are **not** deleting `page` rows.
+- **Identity roles**: the Netlify identity "arc user" role lingers on user
+  accounts. Harmless after this change; document but no migration needed.
+- **Apple News / mailchimp**: also read from `shared_article`. Confirmed by
+  grep that none of them filter on `source_type='arc'`; still worth a
+  reviewer eyeball.
+- **Budget field on `shared_article`**: present in the schema and used in
+  the admin UI for Arc only. Decide during step 1 whether to leave the
+  column or drop it in a follow-up migration. (Recommendation: leave it,
+  it's just `text NOT NULL DEFAULT ''`.)
