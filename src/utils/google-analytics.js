@@ -1,9 +1,10 @@
-// Ensure a Google Analytics window func
-if (!window.ga) {
-  window.ga = function () {
-    (window.ga.q = window.ga.q || []).push(arguments);
+// Ensure a gtag stub exists so calls made before gtag.js loads still queue
+// up via the dataLayer.
+if (!window.gtag) {
+  window.dataLayer = window.dataLayer || [];
+  window.gtag = function () {
+    window.dataLayer.push(arguments);
   };
-  window.ga.l = +new Date();
 }
 
 let dnt = !window.location.host.match(/spotlightpa\.org$/);
@@ -13,19 +14,34 @@ export function callGA(...args) {
     console.info("GA", args);
     return;
   }
-  window.ga(...args);
+  window.gtag(...args);
 }
 
-export function sendGAEvent(ev) {
-  callGA("send", "event", ev);
+// `eventAction` becomes the GA4 event name; the rest become event parameters.
+export function sendGAEvent({
+  eventCategory,
+  eventAction,
+  eventLabel,
+  eventValue,
+  ...rest
+} = {}) {
+  let params = { ...rest };
+  if (eventCategory !== undefined) params.event_category = eventCategory;
+  if (eventLabel !== undefined) params.event_label = eventLabel;
+  if (eventValue !== undefined) params.value = eventValue;
+  callGA("event", eventAction, params);
 }
 
 export function sendGAPageview(path) {
-  callGA("send", "pageview", path);
+  callGA("event", "page_view", { page_path: path });
 }
 
+// Register `user_domain`, `user_name`, and `user_role` as user-scoped custom
+// dimensions in the GA4 admin to surface them in reports.
 export function setDimensions({ domain, name, role }) {
-  callGA("set", "dimension1", domain);
-  callGA("set", "dimension2", name);
-  callGA("set", "dimension3", role);
+  callGA("set", "user_properties", {
+    user_domain: domain,
+    user_name: name,
+    user_role: role,
+  });
 }
