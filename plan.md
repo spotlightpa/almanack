@@ -1,6 +1,6 @@
 # Punchlist: Remove Arc
 
-Shipped as three PRs, each deployable on its own. Order matters: the
+Shipped as four PRs, each deployable on its own. Order matters: the
 user-visible "no longer available" notice goes first so we can verify Arc
 rows are dead before pulling anything out from under the code.
 
@@ -97,18 +97,18 @@ is untouched.
 
 ---
 
-## Optional follow-up — Audit for leftovers
+## PR 4 — Documentation and final cleanup
 
-Do this if anything feels suspect, or skip if the three PRs above land
-clean.
+Goal: sweep up anything the earlier PRs didn't catch.
 
+- [ ] Scrub Arc references from `ARCHITECTURE.md` and `README.md`.
 - [ ] Search `internal/integration/` and any `testdata/` for fixtures with
   `source_type="arc"` or `arc_id` and update or drop.
-- [ ] Scrub Arc references from `README.md` and `ARCHITECTURE.md`.
 - [ ] Final audit:
   `rg -i "\barc\b" . -g '!dist' -g '!node_modules' -g '!sql/schema/0*' -g '!sql/one-time'`
   should return only unrelated matches.
 - [ ] `./run.sh sql && go test ./... && yarn build`.
+- [ ] Commit + PR: `docs: tidy after Arc removal`.
 
 ---
 
