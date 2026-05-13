@@ -105,30 +105,21 @@ Frontend (Vue/JS):
 - Verify: `rg -n '\barc\b' internal/ sql/queries/` (case-sensitive) should
   only show generated files we're about to regen.
 
-### Step 3 — Database migration
-Add `sql/schema/040_drop_arc.sql`:
+### Step 3 — Hide `arc` from sqlc via schema override
+We don't need to drop the prod table; we just need sqlc to stop generating
+code for it. Use the same trick that hid the old `newsletter` table.
 
-```
-DROP TABLE arc;
-
----- create above / drop below ----
-
-CREATE TABLE arc (...);  -- copy from 023, no data restore
-```
-
-Notes:
-- Arc-sourced `shared_article` rows are **left in place** so partners and
-  admins still see them in list views.
-- No FK between `shared_article` and `arc`; the link is via the free-form
-  `source_type/source_id` strings, so dropping the `arc` table doesn't
-  break referential integrity.
-- `shared_article.raw_data` is a self-contained JSONB column — nothing on
-  the backend needs the `arc` table after we delete
-  `UpsertSharedArticleFromArc`.
-- Down-migration recreates an empty table for symmetry; tern is
-  forward-only in prod so this is a courtesy.
-- After applying the schema, run `./run.sh sql` to regenerate
-  `internal/db/`.
+- Append to `sql/schema-overrides/001.sql`:
+  ```
+  DROP TABLE arc;
+  ```
+- Remove the `column: arc.raw_data` override in `sql/sqlc.json`.
+- Delete `sql/queries/arc.sql` and the `UpsertSharedArticleFromArc` query in
+  `sql/queries/shared-article.sql` (both reference the now-hidden table).
+- Run `./run.sh sql`. The generated `internal/db/arc.sql.go` and the
+  `Arc` struct in `internal/db/models.go` disappear.
+- No tern migration, no row deletions. The prod `arc` table sits dormant
+  forever, same as `newsletter`.
 
 ### Step 4 — Tests & docs
 - Update / delete any fixture that still references arc shared articles
@@ -145,7 +136,7 @@ Notes:
 - Commit per step:
   1. `frontend: remove Arc components and shared-article branches`
   2. `go: remove Arc service and queries`
-  3. `sql: drop arc table`
+  3. `sql: hide arc table from sqlc`
   4. `docs/tests: tidy after Arc removal`
 
 ## Open questions / risks
