@@ -8,12 +8,16 @@ type Equal<X, Y> =
 // Return type must be string.
 type _r1 = Expect<Equal<ReturnType<typeof commaAnd>, string>>;
 
-// Accepts arrays of values with toString (numbers, strings, objects with toString).
+// Accepts arrays of values with toString.
 const _a: string = commaAnd(["a", "b", "c"]);
 const _b: string = commaAnd([1, 2, 3]);
 const _c: string = commaAnd([]);
-const _d: string = commaAnd(null);
-const _e: string = commaAnd(undefined);
+
+// @ts-expect-error -- null is not an array; callers must coerce.
+commaAnd(null);
+
+// @ts-expect-error -- undefined is not an array; callers must coerce.
+commaAnd(undefined);
 
 // @ts-expect-error -- bare strings are not arrays.
 commaAnd("nope");
