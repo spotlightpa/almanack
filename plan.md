@@ -72,6 +72,9 @@ Frontend (Vue/JS):
   `isArc` rows visible but drop the now-broken sub-components. For
   example `ArticleWordCount` should just return empty for Arc rows;
   `ArticleSlugLine`'s `isArcUser && isArc` external-link tag goes away.
+  Shared fields like `budget`, `internalID`, `hed`, byline, etc. still
+  render for Arc rows — they're populated on the row itself (migration
+  025 back-filled them) and are also used by gdocs articles.
 - `src/api/shared-article.js`: keep `isArc` (it's the discriminator for the
   stub). Drop `fromArc`, the `arc` ArcArticle instance, and the
   `import ArcArticle`. Anything that read `article.arc.*` is gone (only the
@@ -161,7 +164,4 @@ Notes:
 - **Apple News / mailchimp**: also read from `shared_article`. Confirmed by
   grep that none of them filter on `source_type='arc'`; still worth a
   reviewer eyeball.
-- **Budget field on `shared_article`**: present in the schema and used in
-  the admin UI for Arc only. Decide during step 1 whether to leave the
-  column or drop it in a follow-up migration. (Recommendation: leave it,
-  it's just `text NOT NULL DEFAULT ''`.)
+
