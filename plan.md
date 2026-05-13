@@ -66,7 +66,11 @@ Frontend (Vue/JS):
 - `src/components/ViewSharedArticleAdmin.vue`: same treatment — show a
   short "Arc article, no longer rendered" notice instead of the Arc-only
   admin fields. Keep the row visible so admins can still see metadata
-  (status, dates, internal id) and the page link if any.
+  (status, dates, internal id) and the page link if any. Also drop the
+  `a.arc ? "Word count: …" : ""` segment from the `emailBody` computed
+  property that feeds the Mailchimp send (`/api/message`). The rest of
+  the email body — budget, note, embargo, publication date, detail URL —
+  is sourced from `shared_article` columns and stays.
 - Lists (`ViewAdmin.vue`, `ViewSharedArticles.vue` indirectly via
   `ArticleList.vue`, `ArticleSlugLine.vue`, `ArticleWordCount.vue`): keep
   `isArc` rows visible but drop the now-broken sub-components. For
