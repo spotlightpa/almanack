@@ -1,5 +1,5 @@
-// Ensure a Google Analytics 4 gtag stub exists so calls made before the
-// gtag.js script loads still queue up via the dataLayer.
+// Ensure a gtag stub exists so calls made before gtag.js loads still queue
+// up via the dataLayer.
 if (!window.gtag) {
   window.dataLayer = window.dataLayer || [];
   window.gtag = function () {
@@ -17,9 +17,7 @@ export function callGA(...args) {
   window.gtag(...args);
 }
 
-// Translate the legacy `{ eventCategory, eventAction, eventLabel, eventValue }`
-// shape (UA-style) into a GA4 event call: the action becomes the event name
-// and the rest become event parameters.
+// `eventAction` becomes the GA4 event name; the rest become event parameters.
 export function sendGAEvent({
   eventCategory,
   eventAction,
@@ -38,9 +36,8 @@ export function sendGAPageview(path) {
   callGA("event", "page_view", { page_path: path });
 }
 
-// GA4 has no numbered custom dimensions; set user properties instead.
-// Register matching user-properties in the GA4 admin to surface them in
-// reports (Admin → Custom definitions → User properties).
+// Register `user_domain`, `user_name`, and `user_role` as user-scoped custom
+// dimensions in the GA4 admin to surface them in reports.
 export function setDimensions({ domain, name, role }) {
   callGA("set", "user_properties", {
     user_domain: domain,
