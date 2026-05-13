@@ -54,6 +54,8 @@ frontend just stops reading it.
   `shared-article-redirect-from-page`.
 - [ ] Delete files:
   - `src/api/arc-article.js`
+  - `src/utils/comma-and.js` (only used by Arc)
+  - `src/utils/getter.js` (only used by Arc)
   - `src/components/ArcArticleAvailable.vue`
   - `src/components/ArcArticleDivider.vue`
   - `src/components/ArcArticleHTML.vue`
