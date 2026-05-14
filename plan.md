@@ -4,12 +4,12 @@
 
 Today, every authenticated request to Almanack carries a Netlify Identity JWT — either in the `Authorization: Bearer …` header (API calls from the SPA) or in the `nf_jwt` cookie (SSR routes proxied by Netlify's role-gated redirects). The Go server decodes that JWT on every request to learn the user's email and roles.
 
-We want to keep Netlify Identity as the *login* provider (it owns signup, password reset, email verification, and the GoTrue user database), but stop treating its JWT as the request-time credential. Instead, after a successful Netlify login, the SPA hands the JWT to our server exactly once. The server validates it, looks up roles, and creates a server-side session managed by [`github.com/alexedwards/scs/v2`](https://github.com/alexedwards/scs). All subsequent requests authenticate via a normal opaque session cookie.
+We want to keep Netlify Identity as the *login* provider (it owns signup, password reset, email verification, and the GoTrue user database), but stop treating its JWT as the request-time credential. Instead, after a successful Netlify login, the SPA hands the JWT to our server exactly once. The server reads the identity (Netlify already verified it at the CDN — we trust the lambda-injected client context, same as today), looks up roles, and creates a server-side session managed by [`github.com/alexedwards/scs/v2`](https://github.com/alexedwards/scs). All subsequent requests authenticate via a normal opaque session cookie.
 
 Benefits:
 - Roles and other claims live in our database, not in a JWT the user could be holding stale.
 - We can revoke a session immediately.
-- Same auth mechanism works for API (`/api/*`), SSR (`/ssr/*`), and background routes — no more cookie-vs-header split.
+- Same auth mechanism works for API (`/api/*`), SSR (`/ssr/*`) — no more cookie-vs-header split.
 - We can drop the Netlify role-conditioned redirects in `netlify.toml`; authorization is enforced in Go.
 - Easier to add non-Netlify identity providers later.
 
@@ -24,6 +24,20 @@ Benefits:
 - The SPA (`src/api/auth.js`) wraps `netlify-identity-widget`, pulls a JWT via `user.jwt()` on demand, and attaches `Authorization: Bearer <jwt>` to every API call.
 - `netlify.toml` has `[[redirects]]` blocks that gate `/ssr/*` on Netlify Identity roles (`admin`, `Spotlight PA`, `editor`) before the request ever reaches the function.
 
+## Package layout
+
+- `internal/services/netlifyid/` **stays**. It still owns:
+  - The JSON shape of Netlify's GoTrue user (`User`, `AppMetadata`, `UserMetadata`) used by the identity-hook webhook.
+  - `FromLambdaContext` — the one-time exchange handler uses it to read the verified identity that Netlify injects into the lambda invocation.
+  - `FromCookie` — likely still useful for the same one-time exchange when the SPA arrives at `/ssr/*` without a session yet (Netlify already validated the role at the edge before letting the request through).
+  - Removing/shrinking later: the request-time middleware methods (`AuthFromHeader`, `AuthFromCookie`, `HasRole`, `MockAuthService`) move into the session layer.
+- `internal/almuser/` **new**. Owns our application's notion of a logged-in user:
+  - `type User struct { Email, FullName string; Roles []string; … }` with `HasRole(role) bool` (admin override, same semantics as today's `netlifyid.JWT.HasRole`).
+  - Context get/put helpers (`FromContext`, `NewContext`) plus almlog enrichment (currently in `netlifyid/context.go`).
+  - Constructor `FromNetlifyID(ctx, q, *netlifyid.JWT) (User, error)` that pulls roles from the DB via `db.GetRolesForEmail` and merges them with whatever Netlify already attached.
+  - No HTTP or scs imports — this is the pure domain type. `internal/almapp` and `internal/services/session` both depend on it.
+- `internal/services/session/` **new**. Owns scs configuration, the login/logout helpers, the request middleware, and the typed accessor for `*almuser.User` out of the scs session.
+
 ## Target architecture
 
 ```
@@ -31,21 +45,39 @@ Benefits:
      │
      │ POST /api/auth/session   { Authorization: Bearer <netlify JWT> }   (one time)
      ▼
-  Almanack Go server
-     ├── validates the Netlify JWT (signature + exp + iss)
-     ├── loads/refreshes roles from Postgres (db.GetRolesForEmail)
-     ├── scs.SessionManager.RenewToken + Put("user", User{…})
-     └── responds 200 with Set-Cookie: almanack_session=<opaque>; HttpOnly; Secure; SameSite=Lax
+  Almanack Go server (running on Netlify Functions)
+     ├── Netlify already verified the JWT at the edge and base64-injected the
+     │   identity payload into lambda client context. We read that via
+     │   netlifyid.FromLambdaContext — no HMAC verification of our own.
+     ├── db.GetRolesForEmail → build almuser.User
+     ├── session.Login(ctx, user): RenewToken + Put("user", user)
+     └── responds 204 with Set-Cookie: almanack_session=<opaque>; HttpOnly; Secure; SameSite=Lax
 
   Browser ──every subsequent request──> sends almanack_session cookie
      ▼
-  Almanack Go server
      ├── scs LoadAndSave middleware materializes session data into ctx
-     ├── authMiddleware pulls the User struct out, attaches to almlog ctx
-     └── hasRoleMiddleware checks roles from session, not from a JWT
+     ├── requireSessionMiddleware: 401 if no almuser.User in ctx
+     └── hasRoleMiddleware checks almuser.User.HasRole, not a JWT
 ```
 
 Session storage: scs's pgxstore against the existing pgx pool. Sessions table lives in our Postgres database — added via a new tern migration.
+
+## Auth verification: we don't roll our own
+
+In production, Netlify Functions receives the request **after** Netlify Identity has already validated the JWT signature and expiry. The decoded identity comes to us through `lambdacontext.ClientContext.Custom["netlify"]` (for header-auth API calls) or, for SSR routes, has been gated by the role-conditioned redirect at the CDN. That's what we trust today and what we'll keep trusting at the moment of session creation. No HS256 verification, no JWT secret flag, no extra dependency on a JWT library for the auth path.
+
+`internal/services/jwthook` keeps doing HMAC verification — but only for the `POST /api/identity-hook` webhook payload, which is a totally separate concern (server-to-server, signed by Netlify with our webhook secret).
+
+## Dev login
+
+Locally, lambda client context is empty and there's no Netlify edge to gate cookies. Solve this with a dev-only endpoint mounted *only when `app.isLambda == false`*:
+
+- `POST /api/auth/dev-login` — body picks an email (or just hardcodes `dev@spotlightpa.org`); the handler calls `db.GetRolesForEmail` (or grants `admin` outright in dev), builds an `almuser.User`, and `session.Login`s the request. Returns 204.
+- The SPA shows a "dev login" button on the login page when `import.meta.env.DEV` is true (or when a `?dev` flag is present); the button hits `/api/auth/dev-login` and then proceeds as if Netlify Identity had logged the user in.
+- In lambda mode, the handler is not registered at all (router check) — not just refused, so there's no chance of accidentally exposing it.
+- **Belt and suspenders**: the handler function itself begins with `if app.isLambda { app.logErr(ctx, errors.New("dev-login invoked in production")); replyErr 404 }` so that even if a routing mistake exposes it, the call is rejected *and* fires a Sentry error we'll actually notice. The handler also unconditionally logs a warn-level Sentry breadcrumb on every use so we have a paper trail in dev too.
+
+This replaces today's `MockAuthService`.
 
 ## Work plan
 
@@ -53,11 +85,11 @@ Session storage: scs's pgxstore against the existing pgx pool. Sessions table li
 
 - `go get github.com/alexedwards/scs/v2`
 - `go get github.com/alexedwards/scs/pgxstore` (uses `*pgxpool.Pool` — already in `internal/db/handle.go`).
-- Verify no version conflict with our pgx v5.
+- Verify no version conflict with pgx v5.
 
-### 2. Database
+### 2. Database migration
 
-Add `sql/schema/041_sessions.sql` (tern migration):
+`sql/schema/041_sessions.sql`:
 
 ```sql
 CREATE TABLE sessions (
@@ -72,135 +104,137 @@ CREATE INDEX sessions_expiry_idx ON sessions (expiry);
 DROP TABLE sessions;
 ```
 
-(Schema matches what scs's pgxstore expects.) The sessions table is intentionally *not* managed by sqlc — scs owns it.
+Not managed by sqlc — scs owns the table.
 
-### 3. New `internal/services/session` package
+### 3. `internal/almuser` (new package)
 
-Replaces (and ultimately deletes) `internal/services/netlifyid` for request-time use. Responsibilities:
+```go
+package almuser
 
-- Owns a configured `*scs.SessionManager`.
-  - Store: `pgxstore.New(pool)`.
-  - Cookie name: `almanack_session`.
-  - `Lifetime: 30 * 24 * time.Hour`, `IdleTimeout: 7 * 24 * time.Hour` (tweakable).
-  - `Cookie.HttpOnly = true`, `Cookie.Secure = true` in lambda mode, `SameSite = http.SameSiteLaxMode`, `Path = "/"`.
+type User struct {
+    Email    string
+    FullName string
+    Roles    []string
+}
+
+func (u *User) HasRole(role string) bool { /* admin override + match */ }
+func FromContext(ctx context.Context) *User
+func NewContext(ctx context.Context, u *User) context.Context  // also enriches almlog
+func FromNetlifyID(ctx context.Context, q *db.Queries, j *netlifyid.JWT) (User, error)
+```
+
+`gob.Register(User{})` in `init()` so scs can serialize it.
+
+### 4. `internal/services/session` (new package)
+
+- Owns a configured `*scs.SessionManager` (cookie name `almanack_session`, lifetime ~30d, idle 7d, HttpOnly, Secure in lambda, SameSite=Lax, Path=/).
+- Store: `pgxstore.NewWithCleanupInterval(pool, 0)` — disable the goroutine, rely on a periodic background cron (we already have `/api-background/cron`) to call `pgxstore.Cleanup`. Avoids goroutine-in-lambda hazards.
 - Exposes:
-  - `Middleware(http.Handler) http.Handler` — wraps `LoadAndSave`.
-  - `Login(ctx, User) error` — calls `RenewToken` then `Put`.
-  - `Logout(ctx) error` — calls `Destroy`.
-  - `FromContext(ctx) *User` — typed accessor.
-  - `HasRole(ctx, role) error` — replaces `netlifyid.HasRole` at the request level.
-- `User` struct lives here:
-  ```go
-  type User struct {
-      Email    string
-      FullName string
-      Roles    []string
-      // possibly: Provider, NetlifySub, LoggedInAt time.Time
-  }
-  func (u *User) HasRole(role string) bool { /* same logic as JWT.HasRole, admin override */ }
-  ```
-- `gob.Register(User{})` in `init()` so scs can serialize it.
+  - `Middleware(http.Handler) http.Handler` — wraps `scs.LoadAndSave` and also lifts the stored `almuser.User` into ctx via `almuser.NewContext` if present.
+  - `Login(ctx, almuser.User) error` — `RenewToken` then `Put("user", u)`.
+  - `Logout(ctx) error` — `Destroy`.
+  - `Touch(ctx, almuser.User) error` — `Put` without renewing, used by the role-TTL refresh.
+- No JWT or HMAC code here.
 
-### 4. New login/logout endpoints
+### 5. New auth endpoints
 
-In `internal/almapp/routes-auth.go` (new file):
+`internal/almapp/routes-auth.go`:
 
-- `POST /api/auth/session` — accepts `Authorization: Bearer <netlify JWT>`, exchanges it for a session.
-  1. Pull the bearer token.
-  2. Verify it:
-     - Production (lambda): if Netlify already verified and passed us the decoded identity via `lambdacontext.ClientContext.Custom["netlify"]`, prefer that path (no key needed).
-     - Otherwise: verify the JWT signature against Netlify Identity's JWT secret. Add `ALMANACK_NETLIFY_JWT_SECRET` to `almsvc` flags. Use `internal/services/jwthook`'s primitives or a small wrapper (HS256, check `exp`, `iss`).
-  3. Pull email + sub + full_name from the verified payload.
-  4. Call `db.GetRolesForEmail` to compute roles fresh.
-  5. Build `session.User{…}`, call `session.Login(ctx, user)`.
-  6. Respond 204.
-- `POST /api/auth/logout` — calls `session.Logout(ctx)`, responds 204.
-- `GET /api/user-info` and `GET /ssr/user-info` keep working but now read from `session.FromContext`.
+- `POST /api/auth/session` (always mounted):
+  1. `j, err := netlifyid.FromLambdaContext(r.Context())` — fail 401 if not present.
+  2. `user, err := almuser.FromNetlifyID(ctx, app.svc.Queries, j)`.
+  3. `app.session.Login(ctx, user)`.
+  4. 204.
+- `POST /api/auth/logout`: `app.session.Logout(ctx)`; 204.
+- `POST /api/auth/dev-login` (only registered when `!app.isLambda`): first guards `if app.isLambda` and, if true, calls `app.logErr` with a distinct "dev-login invoked in production" error so Sentry alerts and returns 404. Otherwise: build a fake user (admin or DB-resolved roles), `Login`, 204.
+- `GET /api/user-info` and `GET /ssr/user-info` read from `almuser.FromContext`.
 
-### 5. Middleware swap in `internal/almapp/router.go`
+### 6. Router rewiring (`internal/almapp/router.go`)
 
-- Mount the scs middleware in `baseMW` (it must be present on every route that touches sessions, including the public ones, so the Set-Cookie path round-trips correctly on login). It is cheap when no cookie is present.
-- Replace `authHeaderMiddleware` and `authCookieMiddleware` with a single `requireSessionMiddleware` that errors 401 if `session.FromContext(ctx) == nil`.
-- Apply `requireSessionMiddleware` to both `/api/*` (formerly `authMW`) and `/ssr/*` (formerly `ssrMW`).
-- `hasRoleMiddleware` continues to exist but reads from `session.FromContext` instead of `netlifyid.FromContext`.
-- Keep `POST /api/identity-hook` and `POST /api/auth/session` (and healthchecks etc.) in the public/unauthenticated stack.
+- Add `app.session.Middleware` to `baseMW` so every route (public or not) gets `LoadAndSave` semantics — needed for Set-Cookie to round-trip on login.
+- Replace `authHeaderMiddleware` and `authCookieMiddleware` with a single `requireSessionMiddleware` (401 if no user in ctx).
+- Apply `requireSessionMiddleware` to both `/api/*` and `/ssr/*` route groups.
+- `hasRoleMiddleware` reads roles from `almuser.FromContext`.
+- Keep public stack for healthchecks, identity-hook, and the new auth endpoints.
 
-### 6. `internal/almapp/httputil.go` and friends
+### 7. `httputil.go` and other consumers
 
-- `logErr` currently uses `netlifyid.FromContext` for Sentry tags. Switch to `session.FromContext`.
-- Anywhere else in `internal/almapp/` that imports `netlifyid` for the *user* — port to `session`.
-- The identity-hook handler (`postIdentityHook`) continues to use `netlifyid.User` as the JSON shape that GoTrue sends in the webhook payload — that's not request auth, it's webhook payload. Leave it (or move just the `User` struct type to a smaller package like `internal/services/gotrue` to make the layering crisp).
+- `logErr` Sentry tags switch from `netlifyid.FromContext` to `almuser.FromContext`.
+- Anywhere in `internal/almapp/` that calls `netlifyid.FromContext` for user info — switch to `almuser`. (`netlifyid.FromContext` itself can stay for the one-time exchange handler that reads the lambda-injected JWT.)
 
-### 7. Frontend changes (`src/api/auth.js`, callers)
+### 8. `internal/services/netlifyid/`
 
-- After Netlify Identity emits `login` (or on `init` when a session is already present):
-  1. `let token = await user.jwt();`
-  2. `await fetch("/api/auth/session", { method: "POST", headers: { Authorization: "Bearer " + token }, credentials: "include" });`
-  3. From this point forward, every API call uses `credentials: "include"` (or `"same-origin"`) and **omits** the `Authorization` header. The browser supplies the `almanack_session` cookie automatically.
-- `methods.headers()` no longer needs to return an `Authorization` header. It can disappear or return `{}`.
-- On `logout`: call `POST /api/auth/logout` *before* `netlifyIdentity.logout()` so the server-side session is destroyed.
-- If the SPA gets a 401 from any API call, force a re-login (Netlify JWT may have expired between sessions; user goes through the widget again).
-- Keep using `netlify-identity-widget` for the UI flows.
+Keep:
+- `JWT`, `User`, `AppMetadata`, `UserMetadata`, `Identity` structs.
+- `FromLambdaContext`, `FromCookie`.
+- `jwt.go` helpers like `Email`, `Username`, `HasRole` on `*JWT` (still useful when constructing an `almuser.User`).
 
-### 8. `netlify.toml`
+Remove (after rollout):
+- `service.go`'s `AuthService` interface, `NetlifyAuth`, `NewService`.
+- `mock.go` (replaced by dev-login endpoint).
+- `context.go` (moves to `almuser`).
 
-- The `[[redirects]]` rules that gate `/ssr/*` on Netlify Identity roles are no longer load-bearing — our middleware enforces authorization. We can simplify to a single rule that always proxies `/ssr/*` to the function. (Keep the role-conditioned ones for a deploy or two during the transition, then delete.)
+Nothing in `netlifyid/` should be imported by request-time middleware after the migration; only by the auth-exchange endpoint and the identity-hook webhook.
 
-### 9. Roles refresh
+### 9. Frontend (`src/api/auth.js`, callers)
 
-Roles can change in the DB without the user logging out. Options:
+- On `netlifyIdentity.on("init")` and `on("login")`: after `user.jwt()` resolves, `POST /api/auth/session` with `Authorization: Bearer <jwt>` and `credentials: "include"`. From then on, all API calls use `credentials: "include"` and **do not** set `Authorization`.
+- `methods.headers()` becomes a no-op (or is deleted; callers drop the `await auth.headers()` line).
+- On `logout`: `POST /api/auth/logout` (cookie included), then `netlifyIdentity.logout()`.
+- On a 401 from any API call: clear local state and re-open the Netlify Identity widget.
+- Dev login button (vite `import.meta.env.DEV`): a `<button @click="devLogin">` calls `POST /api/auth/dev-login` and refreshes the user-info query. Not bundled into production builds.
 
-- Cheap: refresh roles every time `session.HasRole` is called if `LastRoleRefresh > 5 min`. Implement inside `session.HasRole` by calling `db.GetRolesForEmail` and `Put`ing the updated user back. Avoids stale-role surprises with negligible DB load.
-- Heavier: re-verify on every request. Skip — defeats the point of a session.
+### 10. `netlify.toml`
 
-Go with the cheap option, gated by a `roleTTL` knob.
+- The `/ssr/*` role-conditioned redirects are still useful during transition because they keep `nf_jwt` semantics alive while users have stale tabs open. Plan: leave them in place; after the rollout window, collapse to a single `/ssr/*` redirect with no role conditions and let Go enforce authz.
 
-### 10. Tests
+### 11. Role refresh
 
-- Unit-test `session.User.HasRole` (mirrors existing `netlifyid.JWT.HasRole` semantics — admin override).
-- Integration test (in `pkg/integration/`, gated by `ALMANACK_POSTGRES`):
-  - Run migrations.
-  - POST to `/api/auth/session` with a freshly minted HS256 JWT signed with a test secret; assert `Set-Cookie: almanack_session=…`.
-  - GET `/api/user-info` with that cookie; assert 200 and correct payload.
-  - POST `/api/auth/logout`; assert subsequent `/api/user-info` returns 401.
-  - Assert `hasRoleMiddleware` 401s for missing roles.
-- Keep `MockAuthService` semantics in some form for local dev — likely a `session.LoginDevUser(ctx)` helper or a flag-gated handler that grants a mock session without a JWT.
+Roles can change in the DB without the user logging out. In `requireSessionMiddleware` (or in `hasRoleMiddleware`), if `almuser.User.LastRoleRefresh` is older than e.g. 5 minutes, call `db.GetRolesForEmail`, update the user, `session.Touch`. Cheap and avoids stale-role surprises.
 
-### 11. Rollout
+### 12. Tests
 
-1. Land migration 041 and the new `session` package behind a feature flag (`-session-auth` boolean on `almsvc`); default off.
-2. When off: existing `netlifyid` middleware runs (current behavior).
-3. When on: new middleware runs; `/api/auth/session` is live.
-4. Deploy with flag off, run migration, verify sessions table exists and is empty.
-5. Flip flag on in a preview deploy; smoke test SSR + API.
-6. Flip flag on in production.
+- Unit-test `almuser.User.HasRole` (admin override).
+- Integration test (`pkg/integration/`, gated by `ALMANACK_POSTGRES`):
+  - Migrate.
+  - Hit `/api/auth/dev-login` (dev mode). Assert `Set-Cookie: almanack_session=…`.
+  - `GET /api/user-info` with that cookie → 200 with expected payload.
+  - `POST /api/auth/logout` → subsequent `/api/user-info` returns 401.
+  - `hasRoleMiddleware` 401s for missing roles, 200s when role is granted.
+
+### 13. Rollout
+
+1. Land migration 041 + new packages behind a feature flag (`-session-auth`, default off).
+2. Off → today's `netlifyid` middleware runs.
+3. On → new middleware runs; `/api/auth/session` and `/api/auth/logout` live.
+4. Deploy with flag off, run migration, verify `sessions` table.
+5. Flip on in preview deploy; smoke test SSR + API.
+6. Flip on in production.
 7. Ship the frontend change that calls `/api/auth/session`.
-8. After a week of stability: delete `internal/services/netlifyid`'s request-time code paths (`AuthFromHeader`, `AuthFromCookie`, `HasRole`, `MockAuthService`, `FromCookie`, `FromLambdaContext`), keep only the `User`/`AppMetadata`/`UserMetadata` JSON structs that the identity-hook webhook still uses, or move them to `internal/services/gotrue`.
-9. Remove the role-conditioned `[[redirects]]` from `netlify.toml`.
+8. After a stability window: delete the unused request-time bits of `internal/services/netlifyid/` and collapse `netlify.toml` redirects.
 
-### 12. Open questions
-
-- **JWT verification key in lambda**: can we trust `lambdacontext.Custom["netlify"]` as authoritative (Netlify already verified it before invoking the function), or do we still want to double-check the bearer token's signature ourselves? Leaning yes-trust-it in lambda, verify-the-signature elsewhere.
-- **Cookie domain across `*.spotlightpa.org`**: do we need `Cookie.Domain` set? Probably not — `almanack.data.spotlightpa.org` only.
-- **Background functions** (`/api-background/*`) currently bypass `authMW`. Keep them as-is (they're invoked by Netlify cron, not users).
-- **CSRF**: with `SameSite=Lax` and the existing `http.CrossOriginProtection` already wired into `baseMW`, we should be covered, but worth a once-over for the new login/logout endpoints (they should require same-origin POSTs).
-- **scs and lambda cold starts**: scs's pgxstore opens no long-lived goroutines by default (we'll pass `WithCleanupInterval(0)` and instead clean up via a periodic background cron) — confirm before shipping.
-
-## File-by-file summary of changes
+## File-by-file summary
 
 | Path | Change |
 | --- | --- |
-| `go.mod` / `go.sum` | + scs/v2, scs/pgxstore |
+| `go.mod`/`go.sum` | + scs/v2, scs/pgxstore |
 | `sql/schema/041_sessions.sql` | new migration |
-| `internal/services/session/` | new package: manager, User, middleware, Login/Logout/HasRole |
-| `internal/services/netlifyid/` | shrink: keep JSON structs for the webhook payload; delete request-time auth code after rollout |
-| `internal/almsvc/flags.go` | + `-netlify-jwt-secret` flag, + session manager construction |
-| `internal/almapp/cli.go` | replace `app.auth = netlifyid.NewService(...)` with `app.session = session.New(...)` |
-| `internal/almapp/router.go` | mount scs middleware in `baseMW`; swap auth middleware; add `/api/auth/session` and `/api/auth/logout` |
-| `internal/almapp/routes-auth.go` | new: session login + logout handlers |
-| `internal/almapp/routes-editor.go` | `userInfo` reads from `session.FromContext` |
-| `internal/almapp/routes-public.go` | unchanged except imports |
-| `internal/almapp/httputil.go` | `logErr` Sentry tags read from session; middleware helpers updated |
-| `src/api/auth.js` | exchange JWT for session on login; drop `Authorization` header; call logout endpoint |
+| `internal/almuser/` | **new** package: `User`, `HasRole`, ctx helpers, `FromNetlifyID` |
+| `internal/services/session/` | **new** package: scs config, `Middleware`, `Login`, `Logout` |
+| `internal/services/netlifyid/` | stays; eventually shrinks to JWT structs + lambda/cookie readers |
+| `internal/almsvc/flags.go` | + session manager construction (using existing pgx pool) |
+| `internal/almapp/cli.go` | construct `app.session`; keep `app.auth` until the old paths are deleted |
+| `internal/almapp/router.go` | mount session middleware in `baseMW`; swap auth/role middleware; register `/api/auth/*` |
+| `internal/almapp/routes-auth.go` | **new**: session, logout, dev-login handlers |
+| `internal/almapp/routes-editor.go` | `userInfo` reads from `almuser.FromContext` |
+| `internal/almapp/httputil.go` | Sentry tags + middleware updated |
+| `src/api/auth.js` | exchange JWT once; drop `Authorization` header; logout endpoint; dev-login button |
 | `netlify.toml` | simplify `/ssr/*` redirects after rollout |
 | `pkg/integration/` | new auth flow tests |
+
+## Open questions
+
+- **Cookie domain**: do we need `Cookie.Domain` set, or is host-only fine? Almanack only runs on `almanack.data.spotlightpa.org`. Default to host-only.
+- **CSRF**: `SameSite=Lax` plus the existing `http.CrossOriginProtection` should cover us, but verify it also guards the new `/api/auth/*` POSTs.
+- **scs cleanup in lambda**: confirm `pgxstore.NewWithCleanupInterval(pool, 0)` disables the goroutine; wire `pgxstore.Cleanup` into the `/api-background/cron` job.
+- **Long-lived tabs**: when the scs cookie expires but Netlify still has a session, the 401 → widget re-login flow should transparently re-establish the scs session. Verify the SPA path on first 401.
