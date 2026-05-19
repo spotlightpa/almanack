@@ -352,3 +352,24 @@ func TestShouldPublishShouldNotify(t *testing.T) {
 		})
 	}
 }
+
+func TestSeries(t *testing.T) {
+	cases := []struct {
+		have any
+		want []string
+	}{
+		{nil, nil},
+		{[]any{}, nil},
+		{[]any{""}, nil},
+		{[]any{1, "two"}, []string{"1", "two"}},
+		{[]string{}, nil},
+		{[]string{""}, nil},
+		{[]string{"1", "two"}, []string{"1", "two"}},
+	}
+	for _, tc := range cases {
+		p := db.Page{}
+		p.Frontmatter = make(db.Map)
+		p.Frontmatter["series"] = tc.have
+		be.AllEqual(t, tc.want, p.Series())
+	}
+}

@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"path"
 	"reflect"
+	"slices"
 	"strings"
 	"time"
 
@@ -311,4 +312,29 @@ func (page *Page) ShouldNotify(oldPage *Page) bool {
 	}
 
 	return !timex.Equalish(oldPage.ScheduleFor, page.ScheduleFor)
+}
+
+func (page *Page) Topics() []string {
+	return extractStrings(page.Frontmatter["topics"])
+}
+
+func (page *Page) Series() []string {
+	return extractStrings(page.Frontmatter["series"])
+}
+
+func extractStrings(v any) []string {
+	var ss []string
+	switch vv := v.(type) {
+	case []string:
+		ss = slices.Clone(vv)
+	case []any:
+		ss = make([]string, len(vv))
+		for i := range vv {
+			ss[i] = fmt.Sprint(vv[i])
+		}
+	}
+	ss = slices.DeleteFunc(ss, func(s string) bool {
+		return s == ""
+	})
+	return ss
 }
