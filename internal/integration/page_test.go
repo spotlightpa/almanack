@@ -200,16 +200,17 @@ func TestServicePublishTaxonomyPages(t *testing.T) {
 		Indexer:      index.MockIndexer{},
 	}
 
-	const path = "content/news/taxo.md"
-	_, err := svc.Queries.CreatePage(ctx, db.CreatePageParams{
-		FilePath:   path,
+	const storyPath = "content/news/taxo.md"
+	dbPage, err := svc.Queries.CreatePage(ctx, db.CreatePageParams{
+		FilePath:   storyPath,
 		SourceType: "manual",
 		SourceID:   "n/a",
 	})
 	be.NilErr(t, err)
 
 	p := &db.Page{
-		FilePath: path,
+		ID:       dbPage.ID,
+		FilePath: storyPath,
 		Frontmatter: db.Map{
 			"topics":      []any{"Health", "Education"},
 			"series":      []any{"Capitol Notebook"},
@@ -221,6 +222,15 @@ func TestServicePublishTaxonomyPages(t *testing.T) {
 			String: "/news/taxo", Valid: true,
 		},
 	}
+	_, err = svc.Queries.UpdatePage(ctx, db.UpdatePageParams{
+		ID:             dbPage.ID,
+		SetFrontmatter: true,
+		Frontmatter:    p.Frontmatter,
+		SetBody:        true,
+		Body:           p.Body,
+	})
+	be.NilErr(t, err)
+
 	err = svc.DB.Tx(ctx, pgx.TxOptions{}, func(txq *db.Queries) (txerr error) {
 		err, warning := svc.PublishPage(ctx, txq, p)
 		be.NilErr(t, warning)
@@ -229,7 +239,7 @@ func TestServicePublishTaxonomyPages(t *testing.T) {
 	be.NilErr(t, err)
 
 	// Source page was published.
-	_, err = os.Stat(filepath.Join(tmp, path))
+	_, err = os.Stat(filepath.Join(tmp, storyPath))
 	be.NilErr(t, err)
 
 	// Taxonomy pages were created in the DB and in the content store.
@@ -238,13 +248,13 @@ func TestServicePublishTaxonomyPages(t *testing.T) {
 		"content/topic/Education/_index.md",
 		"content/series/Capitol Notebook/_index.md",
 	}
-	for _, wp := range wantPaths {
-		tp, err := svc.Queries.GetPageByFilePath(ctx, wp)
+	for _, path := range wantPaths {
+		tp, err := svc.Queries.GetPageByFilePath(ctx, path)
 		be.NilErr(t, err)
 		be.Equal(t, "taxonomy", tp.SourceType)
-		be.Equal(t, path, tp.SourceID)
+		be.Equal(t, storyPath, tp.SourceID)
 		be.True(t, tp.LastPublished.Valid)
-		_, err = os.Stat(filepath.Join(tmp, wp))
+		_, err = os.Stat(filepath.Join(tmp, path))
 		be.NilErr(t, err)
 	}
 
