@@ -7,6 +7,7 @@ import (
 	"errors"
 	"fmt"
 	"strings"
+	"time"
 
 	"github.com/carlmjohnson/flowmatic"
 	"github.com/earthboundkid/errorx/v2"
@@ -50,6 +51,10 @@ func (svc Services) PublishPage(ctx context.Context, txq *db.Queries, page *db.P
 				ScheduleFor:      db.NullTime,
 			})
 			if txerr != nil {
+				return txerr
+			}
+
+			if txerr = svc.EnsureTaxonomyPages(ctx, txq, &p2); txerr != nil {
 				return txerr
 			}
 
@@ -129,6 +134,103 @@ func (svc Services) PopScheduledPages(ctx context.Context) (err, warning error) 
 		return errors.Join(errs...)
 	})
 	return err, errors.Join(warnings...)
+}
+
+func (svc Services) EnsureTaxonomyPages(ctx context.Context, txq *db.Queries, page *db.Page) (err error) {
+	var errs []error
+	for _, name := range page.Series() {
+		path := fmt.Sprintf("content/series/%s/_index.md", name)
+		if e := svc.EnsureTaxonomyPage(ctx, path, name, txq, page); e != nil {
+			errs = append(errs, e)
+		}
+	}
+	for _, name := range page.Topics() {
+		path := fmt.Sprintf("content/topic/%s/_index.md", name)
+		if e := svc.EnsureTaxonomyPage(ctx, path, name, txq, page); e != nil {
+			errs = append(errs, e)
+		}
+	}
+	return errors.Join(errs...)
+}
+
+func (svc Services) EnsureTaxonomyPage(ctx context.Context, path, name string, txq *db.Queries, src *db.Page) (err error) {
+	defer errorx.Trace(&err)
+
+	// Skip if a row already exists.
+	_, err = svc.Queries.GetPageByFilePath(ctx, path)
+	switch {
+	case err == nil:
+		return nil
+	case !db.IsNotFound(err):
+		return err
+	}
+
+	// Build a minimal _index.md from the source page's image-ish fields.
+	index := &db.Page{
+		FilePath: path,
+		Frontmatter: db.Map{
+			// "aliases": []string{},
+			// "author":            "",
+			// "callout-title":     "",
+			// "credits":           "",
+			// "dek":               "",
+			"description":       src.Frontmatter["description"],
+			"image":             src.Frontmatter["image"],
+			"image-caption":     src.Frontmatter["image-caption"],
+			"image-credit":      src.Frontmatter["image-credit"],
+			"image-description": src.Frontmatter["image-description"],
+			"image-gravity":     src.Frontmatter["image-gravity"],
+			// "image-size":        "",
+			// "kicker":            "",
+			// "layout":            "",
+			// "link":              "",
+			"linktitle": src.Frontmatter["description"],
+			"published": src.Frontmatter["published"],
+			// "related-topic":     "",
+			"slug": stringx.SlugifyURL(name),
+			// "subhed":            "",
+			"title": name,
+			// "title-tag":         "",
+		}}
+
+	dbPage, err := txq.CreatePage(ctx, db.CreatePageParams{
+		FilePath:   path,
+		SourceType: "taxonomy",
+		SourceID:   src.FilePath,
+	})
+	if err != nil {
+		return err
+	}
+	// Fix p fields
+	index.SetURLPath()
+
+	pubDate, ok := timex.Unwrap(index.Frontmatter["published"])
+	if !ok {
+		pubDate = time.Now()
+	}
+	pubDate = timex.ToEST(pubDate)
+	index.Frontmatter["published"] = pubDate
+
+	dbPage, err = txq.UpdatePage(ctx, db.UpdatePageParams{
+		ID:               dbPage.ID,
+		SetFrontmatter:   true,
+		Frontmatter:      index.Frontmatter,
+		SetBody:          true,
+		Body:             index.Body,
+		URLPath:          index.URLPath.String,
+		SetScheduleFor:   false,
+		ScheduleFor:      db.NullTime,
+		SetLastPublished: true,
+	})
+	if err != nil {
+		return err
+	}
+	data, err := index.ToTOML()
+
+	internalID, _ := index.Frontmatter["internal-id"].(string)
+	title := cmp.Or(internalID, index.FilePath)
+	msg := fmt.Sprintf("Content: publishing %q", title)
+	return svc.ContentStore.UpdateFile(ctx, msg, index.FilePath, []byte(data))
 }
 
 func (svc Services) RefreshPageContents(ctx context.Context, id int64) (err error) {
