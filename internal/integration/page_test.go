@@ -186,6 +186,78 @@ func TestServicePublish(t *testing.T) {
 	}
 }
 
+func TestServicePublishTaxonomyPages(t *testing.T) {
+	ctx := t.Context()
+	almlog.UseTestLogger(t)
+
+	dbhandle := createTestDB(t)
+
+	tmp := t.ArtifactDir()
+	svc := almsvc.Services{
+		DB:           dbhandle,
+		Queries:      dbhandle.Queries(),
+		ContentStore: github.NewMockClient(tmp),
+		Indexer:      index.MockIndexer{},
+	}
+
+	const path = "content/news/taxo.md"
+	_, err := svc.Queries.CreatePage(ctx, db.CreatePageParams{
+		FilePath:   path,
+		SourceType: "manual",
+		SourceID:   "n/a",
+	})
+	be.NilErr(t, err)
+
+	p := &db.Page{
+		FilePath: path,
+		Frontmatter: db.Map{
+			"topics":      []any{"Health", "Education"},
+			"series":      []any{"Capitol Notebook"},
+			"description": "a desc",
+			"image":       "img.jpg",
+		},
+		Body: "hello",
+		URLPath: pgtype.Text{
+			String: "/news/taxo", Valid: true,
+		},
+	}
+	err = svc.DB.Tx(ctx, pgx.TxOptions{}, func(txq *db.Queries) (txerr error) {
+		err, warning := svc.PublishPage(ctx, txq, p)
+		be.NilErr(t, warning)
+		return err
+	})
+	be.NilErr(t, err)
+
+	// Source page was published.
+	_, err = os.Stat(filepath.Join(tmp, path))
+	be.NilErr(t, err)
+
+	// Taxonomy pages were created in the DB and in the content store.
+	wantPaths := []string{
+		"content/topic/Health/_index.md",
+		"content/topic/Education/_index.md",
+		"content/series/Capitol Notebook/_index.md",
+	}
+	for _, wp := range wantPaths {
+		tp, err := svc.Queries.GetPageByFilePath(ctx, wp)
+		be.NilErr(t, err)
+		be.Equal(t, "taxonomy", tp.SourceType)
+		be.Equal(t, path, tp.SourceID)
+		be.True(t, tp.LastPublished.Valid)
+		_, err = os.Stat(filepath.Join(tmp, wp))
+		be.NilErr(t, err)
+	}
+
+	// Republishing the page should not produce duplicate taxonomy pages
+	// or error out.
+	err = svc.DB.Tx(ctx, pgx.TxOptions{}, func(txq *db.Queries) (txerr error) {
+		err, warning := svc.PublishPage(ctx, txq, p)
+		be.NilErr(t, warning)
+		return err
+	})
+	be.NilErr(t, err)
+}
+
 func TestServicePopScheduledPages(t *testing.T) {
 	ctx := t.Context()
 	almlog.UseTestLogger(t)
