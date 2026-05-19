@@ -160,7 +160,7 @@ func (page *Page) SetURLPath() {
 	}
 	upath := page.FilePath
 	upath = strings.TrimPrefix(upath, "content")
-	upath = strings.TrimSuffix(upath, ".md")
+	upath = strings.TrimSuffix(upath, "/_index.md")
 	dir, fname := path.Split(upath)
 	switch dir {
 	case "/news/", "/statecollege/", "/berks/", "/sponsored/":
@@ -171,13 +171,16 @@ func (page *Page) SetURLPath() {
 	}
 	if slug, _ := page.Frontmatter["slug"].(string); slug != "" {
 		fname = slug
+	} else {
+		fname = strings.TrimSuffix(fname, ".md")
 	}
 
 	upath = path.Join(dir, fname)
 	if upath != "" && !strings.HasSuffix(upath, "/") {
 		upath += "/"
 	}
-	page.URLPath.String = strings.ToLower(upath)
+	upath = strings.ToLower(strings.ReplaceAll(upath, " ", "-"))
+	page.URLPath.String = upath
 	page.URLPath.Valid = upath != ""
 }
 
