@@ -13,14 +13,14 @@ jobs:
     timeout-minutes: 10
 
     steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
       - name: Install Go
-        uses: actions/setup-go@v5
+        uses: actions/setup-go@v6
         with:
           go-version: ${{ env.GO_VERSION }}
           cache: true
-
-      - name: Checkout
-        uses: actions/checkout@v4
 
       - name: Update minor and patch-level dependencies
         run: go get -t -u ./...
@@ -29,7 +29,7 @@ jobs:
         run: go mod tidy
 
       - name: Create pull request
-        uses: peter-evans/create-pull-request@v4
+        uses: peter-evans/create-pull-request@v8
         with:
           title: "Update package dependencies + tidy"
           body: Update package dependencies + tidy
