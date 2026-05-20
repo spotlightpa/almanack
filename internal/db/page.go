@@ -275,6 +275,9 @@ func (page *Page) ToIndex() any {
 }
 
 func (page *Page) ShouldPublish() bool {
+	if page.LastPublished.Valid {
+		return true
+	}
 	soon := time.Now().Add(5 * time.Minute)
 	isScheduled := page.ScheduleFor.Valid
 	return isScheduled && page.ScheduleFor.Time.Before(soon)
