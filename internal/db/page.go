@@ -7,7 +7,6 @@ import (
 	"fmt"
 	"path"
 	"reflect"
-	"slices"
 	"strings"
 	"time"
 
@@ -16,6 +15,7 @@ import (
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgtype"
 	"github.com/microcosm-cc/bluemonday"
+	"github.com/spotlightpa/almanack/internal/utils/stringx"
 	"github.com/spotlightpa/almanack/internal/utils/timex"
 )
 
@@ -315,26 +315,9 @@ func (page *Page) ShouldNotify(oldPage *Page) bool {
 }
 
 func (page *Page) Topics() []string {
-	return extractStrings(page.Frontmatter["topics"])
+	return stringx.UnwrapSlice(page.Frontmatter["topics"])
 }
 
 func (page *Page) Series() []string {
-	return extractStrings(page.Frontmatter["series"])
-}
-
-func extractStrings(v any) []string {
-	var ss []string
-	switch vv := v.(type) {
-	case []string:
-		ss = slices.Clone(vv)
-	case []any:
-		ss = make([]string, len(vv))
-		for i := range vv {
-			ss[i] = fmt.Sprint(vv[i])
-		}
-	}
-	ss = slices.DeleteFunc(ss, func(s string) bool {
-		return s == ""
-	})
-	return ss
+	return stringx.UnwrapSlice(page.Frontmatter["series"])
 }
