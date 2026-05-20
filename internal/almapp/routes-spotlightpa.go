@@ -1075,25 +1075,25 @@ func (app *appEnv) postMigrate(w http.ResponseWriter, r *http.Request) http.Hand
 	l := almlog.FromContext(r.Context())
 
 	for _, topic := range topics {
-		l.Info("adding topic", "name", topic)
+		l.InfoContext(r.Context(), "postMigrate: adding topic", "name", topic)
 		path := fmt.Sprintf("content/topics/%s/_index.md", topic)
 		_, err = app.svc.PageLoad(r.Context(), path)
 		switch {
 		case db.IsUniquenessViolation(err, "page_path_key"):
-			l.WarnContext(r.Context(), "page already exists", "path", path)
+			l.WarnContext(r.Context(), "postMigrate: page already exists", "path", path)
 		case err != nil:
-			return app.jsonErr(err)
+			l.ErrorContext(r.Context(), "postMigrate: error", "error", err)
 		}
 	}
 	for _, s := range series {
-		l.Info("adding series", "name", s)
+		l.InfoContext(r.Context(), "postMigrate: adding series", "name", s)
 		path := fmt.Sprintf("content/series/%s/_index.md", s)
 		_, err = app.svc.PageLoad(r.Context(), path)
 		switch {
 		case db.IsUniquenessViolation(err, "page_path_key"):
-			l.WarnContext(r.Context(), "page already exists", "path", path)
+			l.WarnContext(r.Context(), "postMigrate: page already exists", "path", path)
 		case err != nil:
-			return app.jsonErr(err)
+			l.ErrorContext(r.Context(), "postMigrate: error", "error", err)
 		}
 	}
 
