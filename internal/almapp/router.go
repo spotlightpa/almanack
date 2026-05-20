@@ -107,7 +107,7 @@ func (app *appEnv) routes() http.Handler {
 			app.authHeaderMiddleware,
 			app.hasRoleMiddleware("Spotlight PA"),
 		).
-		Control(mux, `POST /api/migrate`, app.postMigrate)
+		Control(mux, `POST /api-background/migrate`, app.postMigrate)
 	// End background API endpoints
 
 	standardMW.HandleFunc(mux, "/", app.notFound)
