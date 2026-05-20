@@ -104,7 +104,7 @@ func (app *appEnv) routes() http.Handler {
 		Control(mux, `GET /api-background/sleep/{duration}`, app.backgroundSleep)
 	backgroundMW.
 		With(
-			app.authHeaderMiddleware,
+			app.authCookieMiddleware,
 			app.hasRoleMiddleware("Spotlight PA"),
 		).
 		Control(mux, `POST /api-background/migrate`, app.postMigrate)
