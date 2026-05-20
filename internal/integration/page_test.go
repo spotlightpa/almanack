@@ -244,8 +244,8 @@ func TestServicePublishTaxonomyPages(t *testing.T) {
 
 	// Taxonomy pages were created in the DB and in the content store.
 	wantPaths := []string{
-		"content/topic/Health/_index.md",
-		"content/topic/Education/_index.md",
+		"content/topics/Health/_index.md",
+		"content/topics/Education/_index.md",
 		"content/series/Capitol Notebook/_index.md",
 	}
 	for _, path := range wantPaths {

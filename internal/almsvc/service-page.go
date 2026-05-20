@@ -145,7 +145,7 @@ func (svc Services) EnsureTaxonomyPages(ctx context.Context, txq *db.Queries, pa
 		}
 	}
 	for _, name := range page.Topics() {
-		path := fmt.Sprintf("content/topic/%s/_index.md", name)
+		path := fmt.Sprintf("content/topics/%s/_index.md", name)
 		if e := svc.EnsureTaxonomyPage(ctx, path, name, txq, page); e != nil {
 			errs = append(errs, e)
 		}
