@@ -449,12 +449,13 @@ func (svc Services) PageLoad(ctx context.Context, path string) (page *db.Page, e
 
 func NewPageFromContent(path, content string) (page *db.Page, err error) {
 	defer errorx.Trace(&err)
-
+	page = new(db.Page)
 	if err := page.FromMD(content); err != nil {
 		return nil, err
 	}
-	page.SourceID = path
+	page.FilePath = path
 	page.SourceType = "load"
+	page.SourceID = path
 	page.SetURLPath()
 	return page, nil
 }
