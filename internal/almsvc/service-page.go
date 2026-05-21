@@ -22,124 +22,6 @@ import (
 	"github.com/spotlightpa/almanack/internal/utils/timex"
 )
 
-func (svc Services) SavePageTOML(ctx context.Context, txq *db.Queries, page *db.Page) (err, warning error) {
-	defer errorx.Trace(&err)
-
-	data, err := page.ToTOML()
-	if err != nil {
-		return
-	}
-
-	if page.ID == 0 {
-		dbPage, err := txq.CreatePage(ctx, db.CreatePageParams{
-			FilePath:   page.FilePath,
-			SourceType: page.SourceType,
-			SourceID:   page.SourceID,
-		})
-		if err != nil {
-			return err, nil
-		}
-		page.ID = dbPage.ID
-	}
-
-	page.SetURLPath()
-
-	if !page.ShouldPublish() {
-		dbPage, err := txq.UpdatePage(ctx, db.UpdatePageParams{
-			ID:             page.ID,
-			SetFrontmatter: len(page.Frontmatter) != 0,
-			Frontmatter:    page.Frontmatter,
-			SetBody:        len(page.Body) != 0,
-			Body:           page.Body,
-			SetScheduleFor: page.ScheduleFor.Valid,
-			ScheduleFor: pgtype.Timestamptz{
-				Time:  page.ScheduleFor.Time,
-				Valid: page.ScheduleFor.Valid,
-			},
-			URLPath:          page.URLPath.String,
-			SetLastPublished: false,
-		})
-		if err != nil {
-			return err, nil
-		}
-		*page = dbPage
-		return nil, nil
-	}
-
-	// If it's not newsy, then don't index it or add taxonomy pages
-	if !page.IsNewsyPage() {
-		dbPage, err := txq.UpdatePage(ctx, db.UpdatePageParams{
-			ID:             page.ID,
-			SetFrontmatter: len(page.Frontmatter) != 0,
-			Frontmatter:    page.Frontmatter,
-			SetBody:        len(page.Body) != 0,
-			Body:           page.Body,
-			SetScheduleFor: page.ScheduleFor.Valid,
-			ScheduleFor: pgtype.Timestamptz{
-				Time:  page.ScheduleFor.Time,
-				Valid: page.ScheduleFor.Valid,
-			},
-			URLPath:          page.URLPath.String,
-			SetLastPublished: true,
-		})
-		if err != nil {
-			return err, nil
-		}
-		pageTitle, _ := page.Frontmatter["title"].(string)
-		title := cmp.Or(pageTitle, page.FilePath)
-		msg := fmt.Sprintf("Content: publishing %q", title)
-		err = svc.ContentStore.UpdateFile(ctx, msg, page.FilePath, []byte(data))
-		if err != nil {
-			return err, nil
-		}
-		*page = dbPage
-		return nil, nil
-	}
-
-	// Start two goroutines.
-	// In one, try the update while holding a lock.
-	// If the update succeeds, also do the GitHub publish.
-	// If it publishes, commit the locked update. If not, rollback.
-	// In the background, do the index and issue a warning if it fails.
-	// If all this goes well, swap in the db.Page to the pointer
-	var dbPage db.Page
-	err = flowmatic.Do(
-		func() (txerr error) {
-			defer errorx.Trace(&txerr)
-
-			dbPage, txerr = txq.UpdatePage(ctx, db.UpdatePageParams{
-				ID:               page.ID,
-				URLPath:          page.URLPath.String,
-				SetLastPublished: true,
-				SetFrontmatter:   false,
-				SetBody:          false,
-				SetScheduleFor:   false,
-				ScheduleFor:      db.NullTime,
-			})
-			if txerr != nil {
-				return txerr
-			}
-
-			if txerr = svc.EnsureTaxonomyPages(ctx, txq, &dbPage); txerr != nil {
-				return txerr
-			}
-
-			internalID, _ := page.Frontmatter["internal-id"].(string)
-			title := cmp.Or(internalID, page.FilePath)
-			msg := fmt.Sprintf("Content: publishing %q", title)
-			return svc.ContentStore.UpdateFile(ctx, msg, page.FilePath, []byte(data))
-		},
-		func() error {
-			_, warning = svc.Indexer.SaveObject(page.ToIndex(), ctx)
-			return nil
-		})
-	if err != nil {
-		return
-	}
-	*page = dbPage
-	return
-}
-
 func (svc Services) PublishPage(ctx context.Context, txq *db.Queries, page *db.Page) (err, warning error) {
 	defer errorx.Trace(&err)
 
@@ -283,9 +165,17 @@ func (svc Services) EnsureTaxonomyPage(ctx context.Context, path, name string, t
 		return err
 	}
 
+	pubDate, ok := timex.Unwrap(src.Frontmatter["published"])
+	if !ok {
+		pubDate = time.Now()
+	}
+	pubDate = timex.ToEST(pubDate)
+
 	// Build a minimal _index.md from the source page's image-ish fields.
 	index := &db.Page{
-		FilePath: path,
+		FilePath:   path,
+		SourceType: "taxonomy",
+		SourceID:   src.FilePath,
 		Frontmatter: db.Map{
 			// "aliases": []string{},
 			// "author":            "",
@@ -303,7 +193,7 @@ func (svc Services) EnsureTaxonomyPage(ctx context.Context, path, name string, t
 			// "layout":            "",
 			// "link":              "",
 			"linktitle": cmp.Or(src.Frontmatter["blurb"], src.Frontmatter["description"]),
-			"published": src.Frontmatter["published"],
+			"published": pubDate,
 			// "related-topic":     "",
 			"slug": stringx.SlugifyURL(name),
 			// "subhed":            "",
@@ -311,43 +201,12 @@ func (svc Services) EnsureTaxonomyPage(ctx context.Context, path, name string, t
 			// "title-tag":         "",
 		}}
 
-	dbPage, err := txq.CreatePage(ctx, db.CreatePageParams{
-		FilePath:   path,
-		SourceType: "taxonomy",
-		SourceID:   src.FilePath,
-	})
-	if err != nil {
+	if err := index.Save(ctx, txq, true); err != nil {
 		return err
 	}
-	// Fix p fields
-	index.SetURLPath()
 
-	pubDate, ok := timex.Unwrap(index.Frontmatter["published"])
-	if !ok {
-		pubDate = time.Now()
-	}
-	pubDate = timex.ToEST(pubDate)
-	index.Frontmatter["published"] = pubDate
-
-	dbPage, err = txq.UpdatePage(ctx, db.UpdatePageParams{
-		ID:               dbPage.ID,
-		SetFrontmatter:   true,
-		Frontmatter:      index.Frontmatter,
-		SetBody:          true,
-		Body:             index.Body,
-		URLPath:          index.URLPath.String,
-		SetScheduleFor:   false,
-		ScheduleFor:      db.NullTime,
-		SetLastPublished: true,
-	})
-	if err != nil {
-		return err
-	}
 	data, err := index.ToTOML()
-
-	internalID, _ := index.Frontmatter["internal-id"].(string)
-	title := cmp.Or(internalID, index.FilePath)
-	msg := fmt.Sprintf("Content: publishing %q", title)
+	msg := fmt.Sprintf("Content: publishing %q", name)
 	return svc.ContentStore.UpdateFile(ctx, msg, index.FilePath, []byte(data))
 }
 
@@ -575,9 +434,27 @@ func (svc Services) PageLoad(ctx context.Context, path string) (page *db.Page, e
 	if err != nil {
 		return nil, err
 	}
-	page, err = db.CreatePageFromContent(ctx, svc.DB, path, content)
+
+	if page, err = NewPageFromContent(path, content); err != nil {
+		return nil, err
+	}
+	err = svc.DB.Tx(ctx, pgx.TxOptions{}, func(txq *db.Queries) error {
+		return page.Save(ctx, txq, true)
+	})
 	if err != nil {
 		return nil, err
 	}
+	return page, nil
+}
+
+func NewPageFromContent(path, content string) (page *db.Page, err error) {
+	defer errorx.Trace(&err)
+
+	if err := page.FromMD(content); err != nil {
+		return nil, err
+	}
+	page.SourceID = path
+	page.SourceType = "load"
+	page.SetURLPath()
 	return page, nil
 }
