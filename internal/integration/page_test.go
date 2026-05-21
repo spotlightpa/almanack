@@ -201,16 +201,11 @@ func TestServicePublishTaxonomyPages(t *testing.T) {
 	}
 
 	const storyPath = "content/news/taxo.md"
-	dbPage, err := svc.Queries.CreatePage(ctx, db.CreatePageParams{
+
+	p := &db.Page{
 		FilePath:   storyPath,
 		SourceType: "manual",
 		SourceID:   "n/a",
-	})
-	be.NilErr(t, err)
-
-	p := &db.Page{
-		ID:       dbPage.ID,
-		FilePath: storyPath,
 		Frontmatter: db.Map{
 			"topics":      []any{"Health", "Education"},
 			"series":      []any{"Capitol Notebook"},
@@ -218,20 +213,12 @@ func TestServicePublishTaxonomyPages(t *testing.T) {
 			"image":       "img.jpg",
 		},
 		Body: "hello",
-		URLPath: pgtype.Text{
-			String: "/news/taxo", Valid: true,
-		},
 	}
-	_, err = svc.Queries.UpdatePage(ctx, db.UpdatePageParams{
-		ID:             dbPage.ID,
-		SetFrontmatter: true,
-		Frontmatter:    p.Frontmatter,
-		SetBody:        true,
-		Body:           p.Body,
-	})
-	be.NilErr(t, err)
 
-	err = svc.DB.Tx(ctx, pgx.TxOptions{}, func(txq *db.Queries) (txerr error) {
+	err := svc.DB.Tx(ctx, pgx.TxOptions{}, func(txq *db.Queries) (txerr error) {
+		txerr = p.Save(ctx, txq, false)
+		be.NilErr(t, txerr)
+
 		err, warning := svc.PublishPage(ctx, txq, p)
 		be.NilErr(t, warning)
 		return err
@@ -254,6 +241,7 @@ func TestServicePublishTaxonomyPages(t *testing.T) {
 		be.Equal(t, "taxonomy", tp.SourceType)
 		be.Equal(t, storyPath, tp.SourceID)
 		be.True(t, tp.LastPublished.Valid)
+		be.Nonzero(t, tp.URLPath)
 		_, err = os.Stat(filepath.Join(tmp, path))
 		be.NilErr(t, err)
 	}
