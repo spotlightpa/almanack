@@ -239,7 +239,7 @@ func (app *appEnv) postMigrate(w http.ResponseWriter, r *http.Request) http.Hand
 	for _, topic := range topics {
 		l.InfoContext(r.Context(), "postMigrate: adding topic", "name", topic)
 		path := fmt.Sprintf("content/topics/%s/_index.md", topic)
-		_, err = app.svc.PageLoad(r.Context(), path)
+		_, err = app.svc.PageLoadFromContentStore(r.Context(), path)
 		switch {
 		case db.IsUniquenessViolation(err, "page_path_key"):
 			l.WarnContext(r.Context(), "postMigrate: page already exists", "path", path)
@@ -250,7 +250,7 @@ func (app *appEnv) postMigrate(w http.ResponseWriter, r *http.Request) http.Hand
 	for _, s := range series {
 		l.InfoContext(r.Context(), "postMigrate: adding series", "name", s)
 		path := fmt.Sprintf("content/series/%s/_index.md", s)
-		_, err = app.svc.PageLoad(r.Context(), path)
+		_, err = app.svc.PageLoadFromContentStore(r.Context(), path)
 		switch {
 		case db.IsUniquenessViolation(err, "page_path_key"):
 			l.WarnContext(r.Context(), "postMigrate: page already exists", "path", path)

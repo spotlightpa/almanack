@@ -427,7 +427,7 @@ func (svc Services) Notify(ctx context.Context, page *db.Page, publishingNow boo
 	})
 }
 
-func (svc Services) PageLoad(ctx context.Context, path string) (page *db.Page, err error) {
+func (svc Services) PageLoadFromContentStore(ctx context.Context, path string) (page *db.Page, err error) {
 	defer errorx.Trace(&err)
 
 	content, err := svc.ContentStore.GetFile(ctx, path)
@@ -435,20 +435,6 @@ func (svc Services) PageLoad(ctx context.Context, path string) (page *db.Page, e
 		return nil, err
 	}
 
-	if page, err = NewPageFromContent(path, content); err != nil {
-		return nil, err
-	}
-	err = svc.DB.Tx(ctx, pgx.TxOptions{}, func(txq *db.Queries) error {
-		return page.Save(ctx, txq, true)
-	})
-	if err != nil {
-		return nil, err
-	}
-	return page, nil
-}
-
-func NewPageFromContent(path, content string) (page *db.Page, err error) {
-	defer errorx.Trace(&err)
 	page = new(db.Page)
 	if err := page.FromMD(content); err != nil {
 		return nil, err
@@ -457,5 +443,12 @@ func NewPageFromContent(path, content string) (page *db.Page, err error) {
 	page.SourceType = "load"
 	page.SourceID = path
 	page.SetURLPath()
+
+	err = svc.DB.Tx(ctx, pgx.TxOptions{}, func(txq *db.Queries) error {
+		return page.Save(ctx, txq, true)
+	})
+	if err != nil {
+		return nil, err
+	}
 	return page, nil
 }
