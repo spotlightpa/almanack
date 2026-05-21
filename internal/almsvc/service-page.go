@@ -201,11 +201,14 @@ func (svc Services) EnsureTaxonomyPage(ctx context.Context, path, name string, t
 			// "title-tag":         "",
 		}}
 
-	if err := index.Save(ctx, txq, true); err != nil {
+	data, err := index.ToTOML()
+	if err != nil {
 		return err
 	}
 
-	data, err := index.ToTOML()
+	if err := index.Save(ctx, txq, true); err != nil {
+		return err
+	}
 	msg := fmt.Sprintf("Content: publishing %q", name)
 	return svc.ContentStore.UpdateFile(ctx, msg, index.FilePath, []byte(data))
 }
