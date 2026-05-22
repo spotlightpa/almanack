@@ -452,6 +452,8 @@ SELECT
   id, file_path, frontmatter, body, schedule_for, last_published, created_at, updated_at, url_path, source_type, source_id, publication_date
 FROM
   page
+WHERE
+  publication_date IS NOT NULL
 ORDER BY
   publication_date DESC
 LIMIT $1 OFFSET $2
