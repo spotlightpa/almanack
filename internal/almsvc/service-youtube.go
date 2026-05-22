@@ -56,56 +56,47 @@ func (svc Services) CreateYouTubePage(ctx context.Context, video *db.Youtube) (e
 	if err != nil {
 		return err
 	}
-	return svc.DB.Tx(ctx, pgx.TxOptions{}, func(q *db.Queries) error {
+	return svc.DB.Tx(ctx, pgx.TxOptions{}, func(txq *db.Queries) error {
 		defer errorx.Trace(&err)
-		page, err := q.CreatePage(ctx, db.CreatePageParams{
-			FilePath:   video.FilePath(),
-			SourceType: "youtube",
-			SourceID:   video.ExternalID,
-		})
-		if err != nil {
-			return err
-		}
-		pageID := pgtype.Int8{Int64: page.ID, Valid: true}
-		_, err = q.UpdateYouTubePage(ctx, db.UpdateYouTubePageParams{
-			ID:     video.ID,
-			PageID: pageID,
-		})
-		if err != nil {
-			return err
-		}
 		videoType := "youtube-regular"
 		if isShort {
 			videoType = "youtube-short"
 		}
-		fm := db.Map{
-			"internal-id":       stringx.Truncate(imageDesc, 20),
-			"published":         video.ExternalPublishedAt,
-			"byline":            "",
-			"title":             video.Title,
-			"blurb":             "",
-			"kicker":            "",
-			"youtube-id":        video.YouTubeID(),
-			"link":              video.URL,
-			"video-url":         video.URL,
-			"video-type":        videoType,
-			"image":             imagePath,
-			"image-description": imageDesc,
-			"draft":             false,
+		page := &db.Page{
+			FilePath:   video.FilePath(),
+			SourceType: "youtube",
+			SourceID:   video.ExternalID,
+			Frontmatter: db.Map{
+				"internal-id":       stringx.Truncate(imageDesc, 20),
+				"published":         video.ExternalPublishedAt,
+				"byline":            "",
+				"title":             video.Title,
+				"blurb":             "",
+				"kicker":            "",
+				"youtube-id":        video.YouTubeID(),
+				"link":              video.URL,
+				"video-url":         video.URL,
+				"video-type":        videoType,
+				"image":             imagePath,
+				"image-description": imageDesc,
+				"draft":             false,
+			},
 		}
-		page, err = q.UpdatePage(ctx, db.UpdatePageParams{
-			ID:               page.ID,
-			SetFrontmatter:   true,
-			Frontmatter:      fm,
-			SetBody:          false,
-			SetScheduleFor:   false,
-			SetLastPublished: true, // Rolls back on error
-		})
+
+		data, err := page.ToJSON()
 		if err != nil {
 			return err
 		}
 
-		data, err := page.ToJSON()
+		// Rolls back on error
+		if err = page.Save(ctx, txq, true); err != nil {
+			return err
+		}
+
+		_, err = txq.UpdateYouTubePage(ctx, db.UpdateYouTubePageParams{
+			ID:     video.ID,
+			PageID: pgtype.Int8{Int64: page.ID, Valid: true},
+		})
 		if err != nil {
 			return err
 		}
