@@ -36,7 +36,9 @@ func (page *Page) Save(ctx context.Context, txq *Queries, setLastPublished bool)
 		}
 		page.ID = created.ID
 	}
-	page.SetURLPath()
+	if setLastPublished || page.LastPublished.Valid {
+		page.SetURLPath()
+	}
 	updated, err := txq.UpdatePage(ctx, UpdatePageParams{
 		ID:               page.ID,
 		SetFrontmatter:   len(page.Frontmatter) != 0,

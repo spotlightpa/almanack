@@ -14,7 +14,6 @@ import (
 	"github.com/earthboundkid/resperr/v2"
 	"github.com/earthboundkid/slackhook/v2"
 	"github.com/jackc/pgx/v5"
-	"github.com/jackc/pgx/v5/pgconn"
 	"github.com/jackc/pgx/v5/pgtype"
 	"github.com/spotlightpa/almanack/internal/almlog"
 	"github.com/spotlightpa/almanack/internal/db"
@@ -328,41 +327,22 @@ func (svc Services) CreatePageFromGDocsDoc(ctx context.Context, shared *db.Share
 
 	filepath := buildFilePath(fm, kind)
 
-	return svc.createPageForSharedArticle(ctx, shared, body, fm, filepath)
-}
-
-func (svc Services) createPageForSharedArticle(ctx context.Context, shared *db.SharedArticle, body string, fm map[string]any, filepath string) error {
-	ignoreErr := false
-	err := svc.DB.Tx(ctx, pgx.TxOptions{}, func(q *db.Queries) (txerr error) {
-		defer errorx.Trace(&txerr)
-		p, txerr := q.CreatePage(ctx, db.CreatePageParams{
-			FilePath:   filepath,
-			SourceType: shared.SourceType,
-			SourceID:   shared.SourceID,
-		})
-		if txerr != nil {
+	return svc.DB.Tx(ctx, pgx.TxOptions{}, func(txq *db.Queries) (txerr error) {
+		page := db.Page{
+			FilePath:    filepath,
+			Frontmatter: fm,
+			Body:        body,
+			SourceType:  shared.SourceType,
+			SourceID:    shared.SourceID,
+		}
+		if err = page.Save(ctx, txq, false); err != nil {
 			// If the page already exists, just keep going
-			if perr, ok := txerr.(*pgconn.PgError); ok &&
-				perr.Code == "23505" && perr.ConstraintName == "page_path_key" {
-				ignoreErr = true
+			if db.IsUniquenessViolation(err, "page_path_key") {
+				return nil
 			}
-			return txerr
+			return err
 		}
-		page, txerr := q.UpdatePage(ctx, db.UpdatePageParams{
-			ID:               p.ID,
-			SetFrontmatter:   true,
-			Frontmatter:      fm,
-			SetBody:          true,
-			Body:             body,
-			SetScheduleFor:   false,
-			ScheduleFor:      db.NullTime,
-			SetLastPublished: false,
-		})
-		if txerr != nil {
-			return txerr
-		}
-
-		newSharedArt, txerr := q.UpdateSharedArticlePage(ctx, db.UpdateSharedArticlePageParams{
+		newSharedArt, txerr := txq.UpdateSharedArticlePage(ctx, db.UpdateSharedArticlePageParams{
 			PageID:          pgtype.Int8{Int64: page.ID, Valid: true},
 			SharedArticleID: shared.ID,
 		})
@@ -371,12 +351,8 @@ func (svc Services) createPageForSharedArticle(ctx context.Context, shared *db.S
 		}
 
 		*shared = newSharedArt
-		return nil
+		return txerr
 	})
-	if !ignoreErr {
-		return err
-	}
-	return nil
 }
 
 func buildFilePath(fm map[string]any, kind string) string {
