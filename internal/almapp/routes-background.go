@@ -3,7 +3,6 @@ package almapp
 import (
 	"context"
 	"errors"
-	"fmt"
 	"net/http"
 	"strings"
 	"time"
@@ -225,38 +224,6 @@ func (app *appEnv) postMigrate(w http.ResponseWriter, r *http.Request) http.Hand
 	app.logStart(r)
 	if err := app.svc.DB.Migrate(r.Context()); err != nil {
 		return app.jsonErr(err)
-	}
-	topics, err := app.svc.Queries.ListAllTopics(r.Context())
-	if err != nil {
-		return app.jsonErr(err)
-	}
-	series, err := app.svc.Queries.ListAllSeries(r.Context())
-	if err != nil {
-		return app.jsonErr(err)
-	}
-	l := almlog.FromContext(r.Context())
-
-	for _, topic := range topics {
-		l.InfoContext(r.Context(), "postMigrate: adding topic", "name", topic)
-		path := fmt.Sprintf("content/topics/%s/_index.md", topic)
-		_, err = app.svc.PageLoadFromContentStore(r.Context(), path)
-		switch {
-		case db.IsUniquenessViolation(err, "page_path_key"):
-			l.WarnContext(r.Context(), "postMigrate: page already exists", "path", path)
-		case err != nil:
-			l.ErrorContext(r.Context(), "postMigrate: error", "error", err)
-		}
-	}
-	for _, s := range series {
-		l.InfoContext(r.Context(), "postMigrate: adding series", "name", s)
-		path := fmt.Sprintf("content/series/%s/_index.md", s)
-		_, err = app.svc.PageLoadFromContentStore(r.Context(), path)
-		switch {
-		case db.IsUniquenessViolation(err, "page_path_key"):
-			l.WarnContext(r.Context(), "postMigrate: page already exists", "path", path)
-		case err != nil:
-			l.ErrorContext(r.Context(), "postMigrate: error", "error", err)
-		}
 	}
 
 	return app.jsonOK(http.StatusText(http.StatusOK))
