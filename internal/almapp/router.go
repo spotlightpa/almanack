@@ -59,7 +59,6 @@ func (app *appEnv) routes() http.Handler {
 		HandleFunc(mux, `POST /api/gdocs-doc`, app.postGDocsDoc).
 		HandleFunc(mux, `POST /api/image-update`, app.postImageUpdate).
 		HandleFunc(mux, `GET /api/images`, app.listImages).
-		Control(mux, `POST /api/migrate`, app.postMigrate).
 		HandleFunc(mux, `POST /api/message`, app.postMessage).
 		HandleFunc(mux, `GET /api/page`, app.getPage).
 		HandleFunc(mux, `POST /api/page`, app.postPage).
@@ -103,6 +102,12 @@ func (app *appEnv) routes() http.Handler {
 		Control(mux, `GET /api-background/images`, app.backgroundImages).
 		Control(mux, `GET /api-background/refresh-pages`, app.backgroundRefreshPages).
 		Control(mux, `GET /api-background/sleep/{duration}`, app.backgroundSleep)
+	backgroundMW.
+		With(
+			app.authCookieMiddleware,
+			app.hasRoleMiddleware("Spotlight PA"),
+		).
+		Control(mux, `POST /api-background/migrate`, app.postMigrate)
 	// End background API endpoints
 
 	standardMW.HandleFunc(mux, "/", app.notFound)

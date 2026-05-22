@@ -138,6 +138,96 @@ func TestSetURLPath(t *testing.T) {
 			},
 			"/hello-world",
 		},
+		"statecollege-date": {
+			db.Page{
+				FilePath: "content/statecollege/foo.md",
+				Frontmatter: db.Map{
+					// Mid-year UTC instant still resolves to the same EST month.
+					"published": time.Date(2023, 6, 15, 12, 0, 0, 0, time.UTC),
+				},
+			},
+			"/statecollege/2023/06/foo/",
+		},
+		"berks-date": {
+			db.Page{
+				FilePath: "content/berks/foo.md",
+				Frontmatter: db.Map{
+					"published": time.Date(2023, 6, 15, 12, 0, 0, 0, time.UTC),
+				},
+			},
+			"/berks/2023/06/foo/",
+		},
+		"sponsored-date": {
+			db.Page{
+				FilePath: "content/sponsored/foo.md",
+				Frontmatter: db.Map{
+					"published": time.Date(2023, 6, 15, 12, 0, 0, 0, time.UTC),
+				},
+			},
+			"/sponsored/2023/06/foo/",
+		},
+		"topics-index": {
+			// Section landing pages (_index.md) keep the bare directory.
+			db.Page{FilePath: "content/topics/elections/_index.md"},
+			"/topics/elections/",
+		},
+		"series-index": {
+			// Names get slugified
+			db.Page{FilePath: "content/series/An Investigation/_index.md"},
+			"/series/an-investigation/",
+		},
+		"index-slug": {
+			// Slug+_index.md
+			db.Page{
+				FilePath: "content/series/An Investigation/_index.md",
+				Frontmatter: db.Map{
+					"slug": "investigation",
+				},
+			},
+			"/series/investigation/",
+		},
+		"url-uppercased": {
+			db.Page{
+				FilePath: "content/abc/123.md",
+				Frontmatter: db.Map{
+					"url": "/Hello-World/",
+				},
+			},
+			"/hello-world/",
+		},
+		"url-blank-fallback": {
+			// An empty url falls through to the slug/path logic.
+			db.Page{
+				FilePath: "content/abc/123.md",
+				Frontmatter: db.Map{
+					"url":  "",
+					"slug": "xyz",
+				},
+			},
+			"/abc/xyz/",
+		},
+		"already-set-blank": {
+			// A URLPath flagged Valid but empty is treated as unset.
+			db.Page{
+				FilePath: "content/abc/123.md",
+				URLPath:  pgtype.Text{String: "", Valid: true},
+			},
+			"/abc/123/",
+		},
+		"nested-path": {
+			db.Page{FilePath: "content/projects/series-a/part-1.md"},
+			"/projects/series-a/part-1/",
+		},
+		"news-pubdate-jan-est-rolls-back": {
+			// Jan 1 UTC midnight is Dec 31 EST, so the month should roll back.
+			db.Page{
+				FilePath: "content/news/abc.md",
+				Frontmatter: db.Map{
+					"published": time.Date(2020, 1, 1, 0, 0, 0, 0, time.UTC),
+				},
+			},
+			"/news/2019/12/abc/",
+		},
 	}
 	for name, tc := range cases {
 		t.Run(name, func(t *testing.T) {
@@ -260,5 +350,26 @@ func TestShouldPublishShouldNotify(t *testing.T) {
 			be.Equal(t, tc.pub, pub)
 			be.Equal(t, tc.notify, notify)
 		})
+	}
+}
+
+func TestSeries(t *testing.T) {
+	cases := []struct {
+		have any
+		want []string
+	}{
+		{nil, nil},
+		{[]any{}, nil},
+		{[]any{""}, nil},
+		{[]any{1, "two"}, []string{"1", "two"}},
+		{[]string{}, nil},
+		{[]string{""}, nil},
+		{[]string{"1", "two"}, []string{"1", "two"}},
+	}
+	for _, tc := range cases {
+		p := db.Page{}
+		p.Frontmatter = make(db.Map)
+		p.Frontmatter["series"] = tc.have
+		be.AllEqual(t, tc.want, p.Series())
 	}
 }

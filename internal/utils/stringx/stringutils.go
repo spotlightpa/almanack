@@ -2,6 +2,8 @@
 package stringx
 
 import (
+	"fmt"
+	"slices"
 	"strings"
 	"unicode"
 
@@ -156,4 +158,22 @@ func Truncate(s string, maximum int) string {
 	}
 	truncated := r[:max(maximum-3, 0)]
 	return string(truncated) + "…"
+}
+
+// UnwrapSlice unwraps and copies a slice of strings from an untyped map.
+func UnwrapSlice(v any) []string {
+	var ss []string
+	switch vv := v.(type) {
+	case []string:
+		ss = slices.Clone(vv)
+	case []any:
+		ss = make([]string, len(vv))
+		for i := range vv {
+			ss[i] = fmt.Sprint(vv[i])
+		}
+	}
+	ss = slices.DeleteFunc(ss, func(s string) bool {
+		return s == ""
+	})
+	return ss
 }

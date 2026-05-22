@@ -1052,17 +1052,9 @@ func (app *appEnv) postPageLoad(w http.ResponseWriter, r *http.Request) http.Han
 	if err := v.Err(); err != nil {
 		return app.jsonErr(err)
 	}
-	page, err := app.svc.PageLoad(r.Context(), path)
+	page, err := app.svc.PageLoadFromContentStore(r.Context(), path)
 	if err != nil {
 		return app.jsonErr(err)
 	}
 	return app.jsonOK(page.ID)
-}
-
-func (app *appEnv) postMigrate(w http.ResponseWriter, r *http.Request) http.Handler {
-	app.logStart(r)
-	if err := app.svc.DB.Migrate(r.Context()); err != nil {
-		return app.jsonErr(err)
-	}
-	return app.jsonOK(http.StatusText(http.StatusOK))
 }

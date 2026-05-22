@@ -12,55 +12,47 @@ import (
 
 	"github.com/BurntSushi/toml"
 	"github.com/earthboundkid/errorx/v2"
-	"github.com/jackc/pgx/v5"
-	"github.com/jackc/pgx/v5/pgtype"
 	"github.com/microcosm-cc/bluemonday"
+	"github.com/spotlightpa/almanack/internal/utils/stringx"
 	"github.com/spotlightpa/almanack/internal/utils/timex"
 )
 
-func CreatePageFromContent(ctx context.Context, h *Handle, path, content string) (*Page, error) {
-	var p Page
-	if err := p.FromMD(content); err != nil {
-		return nil, err
-	}
-	err := h.Tx(ctx, pgx.TxOptions{}, func(q *Queries) error {
-		dbPage, err := q.CreatePage(ctx, CreatePageParams{
-			FilePath:   path,
-			SourceType: "load",
-			SourceID:   path,
+// Save persists the page to the database.
+// If page.ID is zero, a row is inserted via [Queries.CreatePage];
+// otherwise it updates the existing row by ID.
+// Editable fields are set if not blank.
+// On success, page pointer is updated with the returned row.
+func (page *Page) Save(ctx context.Context, txq *Queries, setLastPublished bool) (err error) {
+	defer errorx.Trace(&err)
+
+	if page.ID == 0 {
+		created, err := txq.CreatePage(ctx, CreatePageParams{
+			FilePath:   page.FilePath,
+			SourceType: page.SourceType,
+			SourceID:   page.SourceID,
 		})
 		if err != nil {
 			return err
 		}
-
-		// Fix p fields
-		p.SetURLPath()
-
-		pubDate, ok := timex.Unwrap(p.Frontmatter["published"])
-		if !ok {
-			pubDate = time.Now()
-		}
-		pubDate = timex.ToEST(pubDate)
-		p.Frontmatter["published"] = pubDate
-
-		dbPage, err = q.UpdatePage(ctx, UpdatePageParams{
-			ID:               dbPage.ID,
-			SetFrontmatter:   true,
-			Frontmatter:      p.Frontmatter,
-			SetBody:          true,
-			Body:             p.Body,
-			URLPath:          p.URLPath.String,
-			SetScheduleFor:   true,
-			ScheduleFor:      pgtype.Timestamptz{Time: pubDate, Valid: true},
-			SetLastPublished: true,
-		})
-		p = dbPage
-		return err
+		page.ID = created.ID
+	}
+	page.SetURLPath()
+	updated, err := txq.UpdatePage(ctx, UpdatePageParams{
+		ID:               page.ID,
+		SetFrontmatter:   len(page.Frontmatter) != 0,
+		Frontmatter:      page.Frontmatter,
+		SetBody:          len(page.Body) != 0,
+		Body:             page.Body,
+		SetScheduleFor:   page.ScheduleFor.Valid,
+		ScheduleFor:      page.ScheduleFor,
+		URLPath:          page.URLPath.String,
+		SetLastPublished: setLastPublished,
 	})
 	if err != nil {
-		return nil, err
+		return err
 	}
-	return &p, nil
+	*page = updated
+	return nil
 }
 
 func (page *Page) ToTOML() (string, error) {
@@ -160,7 +152,7 @@ func (page *Page) SetURLPath() {
 	}
 	upath := page.FilePath
 	upath = strings.TrimPrefix(upath, "content")
-	upath = strings.TrimSuffix(upath, ".md")
+	upath = strings.TrimSuffix(upath, "/_index.md")
 	dir, fname := path.Split(upath)
 	switch dir {
 	case "/news/", "/statecollege/", "/berks/", "/sponsored/":
@@ -171,13 +163,16 @@ func (page *Page) SetURLPath() {
 	}
 	if slug, _ := page.Frontmatter["slug"].(string); slug != "" {
 		fname = slug
+	} else {
+		fname = strings.TrimSuffix(fname, ".md")
 	}
 
 	upath = path.Join(dir, fname)
 	if upath != "" && !strings.HasSuffix(upath, "/") {
 		upath += "/"
 	}
-	page.URLPath.String = strings.ToLower(upath)
+	upath = strings.ToLower(strings.ReplaceAll(upath, " ", "-"))
+	page.URLPath.String = upath
 	page.URLPath.Valid = upath != ""
 }
 
@@ -271,6 +266,9 @@ func (page *Page) ToIndex() any {
 }
 
 func (page *Page) ShouldPublish() bool {
+	if page.LastPublished.Valid {
+		return true
+	}
 	soon := time.Now().Add(5 * time.Minute)
 	isScheduled := page.ScheduleFor.Valid
 	return isScheduled && page.ScheduleFor.Time.Before(soon)
@@ -308,4 +306,12 @@ func (page *Page) ShouldNotify(oldPage *Page) bool {
 	}
 
 	return !timex.Equalish(oldPage.ScheduleFor, page.ScheduleFor)
+}
+
+func (page *Page) Topics() []string {
+	return stringx.UnwrapSlice(page.Frontmatter["topics"])
+}
+
+func (page *Page) Series() []string {
+	return stringx.UnwrapSlice(page.Frontmatter["series"])
 }
