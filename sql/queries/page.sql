@@ -132,54 +132,24 @@ WHERE
   ILIKE RTRIM(@url_path::text, '/');
 
 -- name: ListAllTopics :many
-WITH topics AS (
-  SELECT
-    json_array_elements_text( --
-      coalesce((frontmatter ->> 'topics'), '[]')::json) AS topic
-  FROM
-    page
-)
-SELECT DISTINCT ON (upper(topic)
-)
-  topic::text
+SELECT
+  (frontmatter ->> 'title')::text AS topic
 FROM
-  topics
+  page
+WHERE
+  "file_path" LIKE 'content/topics/%/_index.md'
 ORDER BY
-  upper(topic) ASC;
+  topic ASC;
 
 -- name: ListAllSeries :many
-WITH page_series AS (
-  SELECT
-    json_array_elements_text( --
-      coalesce((frontmatter ->> 'series'), '[]')::json) AS series,
-    publication_date
-  FROM
-    page
-),
-series_dates AS (
-  SELECT
-    *
-  FROM
-    page_series
-  ORDER BY
-    publication_date DESC,
-    series DESC
-),
-distinct_series_dates AS (
-  SELECT DISTINCT ON (series)
-    *
-  FROM
-    series_dates
-  ORDER BY
-    series DESC,
-    publication_date DESC
-)
 SELECT
-  series::text
+  (frontmatter ->> 'title')::text AS series
 FROM
-  distinct_series_dates
+  page
+WHERE
+  "file_path" LIKE 'content/series/%/_index.md'
 ORDER BY
-  publication_date DESC;
+  "publication_date" DESC;
 
 -- name: ListPagesByURLPaths :many
 WITH query_paths AS (
