@@ -210,6 +210,8 @@ SELECT
   *
 FROM
   page
+WHERE
+  publication_date IS NOT NULL
 ORDER BY
   publication_date DESC
 LIMIT $1 OFFSET $2;
