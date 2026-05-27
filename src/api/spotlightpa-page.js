@@ -1,6 +1,6 @@
 import { computed, reactive, ref, toRefs, watch } from "vue";
 
-import { makeState } from "@/api/service-util.js";
+import { makeState, watchAPI } from "@/api/service-util.js";
 import {
   get as clientGet,
   post as clientPost,
@@ -265,26 +265,20 @@ export class Page {
   }
 }
 
-function useAutocompletions() {
-  const autocomplete = reactive({
-    topics: [],
-    series: [],
-  });
-  clientGet(listAllTopics).then(([data, err]) => {
-    if (!err) {
-      autocomplete.topics = data.topics || [];
-    } else {
-      console.warn(err);
-    }
-  });
-  clientGet(listAllSeries).then(([data, err]) => {
-    if (!err) {
-      autocomplete.series = data.series || [];
-    } else {
-      console.warn(err);
-    }
-  });
-  return autocomplete;
+function useTopics() {
+  const { computedObj } = watchAPI(
+    () => null,
+    () => clientGet(listAllTopics)
+  );
+  return computedObj((obj) => obj.topics);
+}
+
+function useSeries() {
+  const { computedObj } = watchAPI(
+    () => null,
+    () => clientGet(listAllSeries)
+  );
+  return computedObj((obj) => obj.series);
 }
 
 export function usePage(id) {
@@ -311,8 +305,8 @@ export function usePage(id) {
     showScheduler: ref(false),
 
     ...toRefs(apiState),
-    ...toRefs(useAutocompletions()),
-
+    topics: useTopics(),
+    series: useSeries(),
     fetch,
     post,
     page,
