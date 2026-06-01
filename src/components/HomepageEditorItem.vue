@@ -12,12 +12,16 @@ const { computedObj } = watchAPI(
   (path) => get(getPage, { by: "filepath", value: path, select: "-body" })
 );
 
-const page = computedObj((obj) => new Page(obj));
+const name = computedObj((obj) => {
+  if (!obj) return "";
+  let page = new Page(obj);
+  return page.internalID || page.title || "<no title>";
+});
 </script>
 
 <template>
   <span class="tag is-medium spacer select-none">
-    {{ (page && page.internalID) || "" }}
+    {{ name }}
     <button class="delete" @click="$emit('remove')"></button>
   </span>
 </template>

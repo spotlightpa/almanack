@@ -81,8 +81,11 @@ export default {
           @click="$emit('select-page', article)"
         >
           <span class="overflow">
-            <b>{{ article.internalID }}</b
-            >: {{ article.title }}
+            <template v-if="article.internalID">
+              <b>{{ article.internalID }}</b
+              >:</template
+            >
+            {{ article.title }}
           </span>
         </a>
       </template>
