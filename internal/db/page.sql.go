@@ -135,7 +135,7 @@ func (q *Queries) GetPageByURLPath(ctx context.Context, urlPath string) (Page, e
 
 const listAllSeries = `-- name: ListAllSeries :many
 SELECT
-  (frontmatter ->> 'title')::text AS series
+  file_path
 FROM
   page
 WHERE
@@ -152,11 +152,11 @@ func (q *Queries) ListAllSeries(ctx context.Context) ([]string, error) {
 	defer rows.Close()
 	var items []string
 	for rows.Next() {
-		var series string
-		if err := rows.Scan(&series); err != nil {
+		var file_path string
+		if err := rows.Scan(&file_path); err != nil {
 			return nil, err
 		}
-		items = append(items, series)
+		items = append(items, file_path)
 	}
 	if err := rows.Err(); err != nil {
 		return nil, err
@@ -166,13 +166,13 @@ func (q *Queries) ListAllSeries(ctx context.Context) ([]string, error) {
 
 const listAllTopics = `-- name: ListAllTopics :many
 SELECT
-  (frontmatter ->> 'title')::text AS topic
+  file_path
 FROM
   page
 WHERE
   "file_path" LIKE 'content/topics/%/_index.md'
 ORDER BY
-  topic ASC
+  file_path ASC
 `
 
 func (q *Queries) ListAllTopics(ctx context.Context) ([]string, error) {
@@ -183,11 +183,11 @@ func (q *Queries) ListAllTopics(ctx context.Context) ([]string, error) {
 	defer rows.Close()
 	var items []string
 	for rows.Next() {
-		var topic string
-		if err := rows.Scan(&topic); err != nil {
+		var file_path string
+		if err := rows.Scan(&file_path); err != nil {
 			return nil, err
 		}
-		items = append(items, topic)
+		items = append(items, file_path)
 	}
 	if err := rows.Err(); err != nil {
 		return nil, err
