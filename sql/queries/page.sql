@@ -133,17 +133,17 @@ WHERE
 
 -- name: ListAllTopics :many
 SELECT
-  (frontmatter ->> 'title')::text AS topic
+  file_path
 FROM
   page
 WHERE
   "file_path" LIKE 'content/topics/%/_index.md'
 ORDER BY
-  topic ASC;
+  file_path ASC;
 
 -- name: ListAllSeries :many
 SELECT
-  (frontmatter ->> 'title')::text AS series
+  file_path
 FROM
   page
 WHERE
