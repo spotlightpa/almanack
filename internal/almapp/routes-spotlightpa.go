@@ -324,14 +324,8 @@ func (app *appEnv) listAllTopics(w http.ResponseWriter, r *http.Request) {
 		app.replyErr(w, r, err)
 		return
 	}
-	for i := range t {
-		topic := t[i]
-		topic = strings.TrimPrefix(topic, "content/topics/")
-		topic = strings.TrimSuffix(topic, "/_index.md")
-		t[i] = topic
-	}
 	app.replyJSON(http.StatusOK, w, struct {
-		Topics []string `json:"topics"`
+		Pages []db.Page `json:"pages"`
 	}{t})
 }
 

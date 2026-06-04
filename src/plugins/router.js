@@ -228,6 +228,14 @@ let router = createRouter({
       },
     },
     {
+      path: "/admin/topics",
+      name: "topics",
+      component: load(() => import("@/components/ViewTopicsList.vue")),
+      meta: {
+        requiresAuth: isSpotlightPAUser,
+      },
+    },
+    {
       path: "/admin/videos",
       name: "video-pages",
       component: load(() => import("@/components/ViewVideosList.vue")),

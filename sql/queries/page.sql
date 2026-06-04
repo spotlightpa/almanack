@@ -133,7 +133,7 @@ WHERE
 
 -- name: ListAllTopics :many
 SELECT
-  file_path
+  *
 FROM
   page
 WHERE

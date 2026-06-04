@@ -166,7 +166,7 @@ func (q *Queries) ListAllSeries(ctx context.Context) ([]string, error) {
 
 const listAllTopics = `-- name: ListAllTopics :many
 SELECT
-  file_path
+  id, file_path, frontmatter, body, schedule_for, last_published, created_at, updated_at, url_path, source_type, source_id, publication_date
 FROM
   page
 WHERE
@@ -175,19 +175,32 @@ ORDER BY
   file_path ASC
 `
 
-func (q *Queries) ListAllTopics(ctx context.Context) ([]string, error) {
+func (q *Queries) ListAllTopics(ctx context.Context) ([]Page, error) {
 	rows, err := q.db.Query(ctx, listAllTopics)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
-	var items []string
+	var items []Page
 	for rows.Next() {
-		var file_path string
-		if err := rows.Scan(&file_path); err != nil {
+		var i Page
+		if err := rows.Scan(
+			&i.ID,
+			&i.FilePath,
+			&i.Frontmatter,
+			&i.Body,
+			&i.ScheduleFor,
+			&i.LastPublished,
+			&i.CreatedAt,
+			&i.UpdatedAt,
+			&i.URLPath,
+			&i.SourceType,
+			&i.SourceID,
+			&i.PublicationDate,
+		); err != nil {
 			return nil, err
 		}
-		items = append(items, file_path)
+		items = append(items, i)
 	}
 	if err := rows.Err(); err != nil {
 		return nil, err

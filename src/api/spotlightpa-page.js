@@ -266,11 +266,13 @@ export class Page {
 }
 
 function useTopics() {
-  const { computedObj } = watchAPI(
+  const { computedList } = watchAPI(
     () => null,
     () => clientGet(listAllTopics)
   );
-  return computedObj((obj) => obj.topics);
+  return computedList("pages", (obj) =>
+    obj.file_path?.replace(/^content\/topics\/(.+)\/_index\.md$/, "$1")
+  );
 }
 
 function useSeries() {
