@@ -229,7 +229,7 @@ let router = createRouter({
     },
     {
       path: "/admin/topics",
-      name: "topics-pages",
+      name: "topic-pages",
       component: load(() => import("@/components/ViewTopicsList.vue")),
       meta: {
         requiresAuth: isSpotlightPAUser,
@@ -237,7 +237,7 @@ let router = createRouter({
     },
     {
       path: "/admin/topics/:id",
-      name: "topics-page",
+      name: "topic-page",
       component: load(() => import("@/components/ViewTopicsPage.vue")),
       props: true,
       meta: {
