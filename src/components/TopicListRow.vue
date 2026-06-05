@@ -43,7 +43,7 @@ class TaxonomyPage {
   }
   get editLink() {
     return {
-      name: "news-page",
+      name: "topics-page",
       params: {
         id: "" + this.id,
       },
