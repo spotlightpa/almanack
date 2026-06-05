@@ -236,9 +236,9 @@ export default {
       ]"
     ></BulmaBreadcrumbs>
 
-    <h2 class="mb-2 is-spaced title">
+    <h1 class="mb-2 is-spaced title">
       {{ title }}
-    </h2>
+    </h1>
     <div v-if="page && page.link" class="mb-4">
       <a
         :href="page.link"
