@@ -13,7 +13,7 @@ import imgproxyURL from "@/api/imgproxy-url.js";
 import { toRel } from "@/utils/link.js";
 import maybeDate from "@/utils/maybe-date.js";
 
-class Page {
+class TopicPage {
   constructor(data) {
     this.id = data["id"] ?? "";
     this.body = data["body"] ?? "";
@@ -27,7 +27,6 @@ class Page {
     this.linkTitle = this.frontmatter["linktitle"] ?? "";
     this.titleTag = this.frontmatter["title-tag"] ?? "";
     this.summary = this.frontmatter["description"] ?? "";
-    this.blurb = this.frontmatter["blurb"] ?? "";
     this.appImage = this.frontmatter["app-image"] ?? "";
     this.appImageGravity = this.frontmatter["app-image-gravity"] ?? "";
     this.appImageDescription = this.frontmatter["app-image-description"] ?? "";
@@ -35,7 +34,6 @@ class Page {
     this.image = this.frontmatter["image"] ?? "";
     this.imageGravity = this.frontmatter["image-gravity"] ?? "";
     this.imageDescription = this.frontmatter["image-description"] ?? "";
-    this.imageCaption = this.frontmatter["image-caption"] ?? "";
     this.imageCredit = this.frontmatter["image-credit"] ?? "";
     this.imageSize = this.frontmatter["image-size"] ?? "";
     this.modalExclude = this.frontmatter["modal-exclude"] ?? false;
@@ -49,10 +47,7 @@ class Page {
   }
 
   get topicName() {
-    return (
-      this.filePath.replace(/^content\/topics\/(.+)\/_index\.md$/, "$1") ||
-      this.filePath
-    );
+    return this.filePath?.replace(/^content\/topics\/(.+)\/_index\.md$/, "$1");
   }
 
   get isPublished() {
@@ -127,7 +122,6 @@ class Page {
         linktitle: this.linkTitle,
         "title-tag": this.titleTag,
         description: this.summary,
-        blurb: this.blurb,
         "app-image": this.appImage,
         "app-image-gravity": this.appImageGravity,
         "app-image-description": this.appImageDescription,
@@ -164,7 +158,7 @@ function usePage(id) {
   const post = (page) => exec(() => clientPost(postPage, page));
 
   const page = computed(() =>
-    apiState.rawData ? reactive(new Page(apiState.rawData)) : null
+    apiState.rawData ? reactive(new TopicPage(apiState.rawData)) : null
   );
 
   watch(() => id.value, fetch, {
@@ -223,6 +217,7 @@ export default {
   },
 };
 </script>
+
 <template>
   <div>
     <MetaHead>
@@ -239,80 +234,61 @@ export default {
     <h1 class="mb-2 is-spaced title">
       {{ title }}
     </h1>
-    <div v-if="page && page.link" class="mb-4">
-      <a
-        :href="page.link"
-        class="tag is-primary has-text-weight-semibold"
-        target="_blank"
-      >
-        <span class="icon is-size-6">
-          <font-awesome-icon :icon="['fas', 'link']"></font-awesome-icon>
-        </span>
-        <span>Live URL</span>
-      </a>
-    </div>
 
     <form v-if="page" ref="form">
-      <BulmaDateTime
-        v-model="page.publicationDate"
-        label="Publication Date"
-        :icon="['fas', 'user-clock']"
-        help="Page will be listed on the site under this date"
-      >
-        <p class="content is-small">
-          <a
-            href="#"
-            class="has-text-info"
-            @click.prevent="page.publicationDate = new Date()"
-          >
-            Set to now
-          </a>
-        </p>
-      </BulmaDateTime>
+      <CopyWithButton
+        v-if="page.link"
+        :value="page.link"
+        label="Page URL"
+      ></CopyWithButton>
 
-      <p v-if="page.isFutureDated" class="content has-text-warning is-small">
-        Publication date is in the future.
-      </p>
-
-      <BulmaFieldInput
-        id="eyebrow"
-        v-model="page.kicker"
-        label="Eyebrow"
-        help="Small text appearing above the page hed"
-        autocomplete="off"
-      ></BulmaFieldInput>
-      <BulmaCharLimit
-        :warn="15"
-        :max="20"
-        :value="page.kicker"
-        class="mt-1 mb-4"
-      ></BulmaCharLimit>
+      <div v-if="page.isPublished && page.link" class="buttons">
+        <a
+          :href="page.link"
+          class="button is-success has-text-weight-semibold"
+          target="_blank"
+        >
+          <span class="icon is-size-6">
+            <font-awesome-icon :icon="['fas', 'link']"></font-awesome-icon>
+          </span>
+          <span> Open live URL </span>
+        </a>
+        <button
+          class="button is-light has-text-weight-semibold"
+          type="button"
+          @click="page.changeURL()"
+        >
+          Change URL
+        </button>
+      </div>
 
       <BulmaFieldInput
         id="hed"
         v-model="page.title"
-        label="Hed"
-        help="Hed on the page and the default value for link title and SEO title"
+        label="Title"
+        help="Title on the topics landing page"
         :required="true"
       ></BulmaFieldInput>
-      <BulmaCharLimit
-        :warn="90"
-        :max="100"
-        :value="page.title"
-        class="mt-1 mb-4"
-      ></BulmaCharLimit>
+
+      <BulmaFieldInput
+        id="eyebrow"
+        v-model="page.kicker"
+        label="Eyebrow on topics page"
+        help="This should be a short version of the title for the list of all topics page"
+        autocomplete="off"
+      ></BulmaFieldInput>
 
       <BulmaFieldInput
         v-model="page.linkTitle"
-        label="Link to as"
-        help="When linking to this page from the homepage or an article list, use this as the link title instead of the hed"
+        label="Topics page dek"
+        help="Dek used on the list of all topics page"
       ></BulmaFieldInput>
 
       <BulmaFieldInput
         id="seo"
         v-model="page.titleTag"
         label="SEO Hed"
-        help="If set, this is the title seen by search engines"
+        help="If set, this is the land page title seen by search engines"
       ></BulmaFieldInput>
       <BulmaCharLimit
         :warn="40"
@@ -331,19 +307,6 @@ export default {
         :warn="135"
         :max="150"
         :value="page.summary"
-        class="mt-1 mb-4"
-      ></BulmaCharLimit>
-
-      <BulmaTextarea
-        id="blurb"
-        v-model="page.blurb"
-        label="Blurb"
-        help="Short summary to appear in article rivers"
-      ></BulmaTextarea>
-      <BulmaCharLimit
-        :warn="190"
-        :max="200"
-        :value="page.blurb"
         class="mt-1 mb-4"
       ></BulmaCharLimit>
 
@@ -449,187 +412,63 @@ export default {
       ></BulmaFieldInput>
 
       <BulmaTextarea
-        id="caption"
-        v-model="page.imageCaption"
-        label="Image Caption"
-        help="If set, captions appear as an overlay on top of the image on the article page"
-      ></BulmaTextarea>
-
-      <BulmaField label="Image size">
-        <div class="control is-expanded">
-          <span class="select is-fullwidth">
-            <select v-model="page.imageSize">
-              <option
-                v-for="[val, desc] in [
-                  ['inline', 'Normal'],
-                  ['hidden', 'Hidden'],
-                  ['wide', 'Suppress Right Rail'],
-                ]"
-                :key="val"
-                :value="val"
-              >
-                {{ desc }}
-              </option>
-            </select>
-          </span>
-        </div>
-      </BulmaField>
-
-      <details class="my-5">
-        <summary>Mobile App Photo Override</summary>
-        <BulmaField
-          label="Mobile app photo ID"
-          help="If present, overrides default photo in the mobile app."
-          v-slot="{ idForLabel }"
-        >
-          <div class="is-flex">
-            <input :id="idForLabel" v-model="page.appImage" class="input" />
-            <BulmaPaste @paste="page.appImage = $event"></BulmaPaste>
-          </div>
-        </BulmaField>
-
-        <div v-if="page.appImage" class="is-flex">
-          <div>
-            <picture class="has-ratio" style="aspect-ratio: 5/4">
-              <img
-                :src="page.getAppImagePreviewURL()"
-                class="border-thick"
-                width="200"
-              />
-            </picture>
-            <p class="has-text-centered">4 x 5</p>
-          </div>
-        </div>
-
-        <BulmaField label="Mobile app image focus">
-          <div class="control is-expanded">
-            <span class="select is-fullwidth">
-              <select v-model="page.appImageGravity">
-                <option
-                  v-for="[val, desc] in [
-                    ['', 'Auto'],
-                    ['we', 'Left'],
-                    ['no', 'Top'],
-                    ['ea', 'Right'],
-                    ['so', 'Bottom'],
-                    ['ce', 'Center'],
-                  ]"
-                  :key="val"
-                  :value="val"
-                >
-                  {{ desc }}
-                </option>
-              </select>
-            </span>
-          </div>
-        </BulmaField>
-
-        <BulmaTextarea
-          v-model="page.appImageDescription"
-          label="Mobile app image alt text"
-        ></BulmaTextarea>
-
-        <BulmaFieldInput
-          class="mb-6"
-          v-model="page.appImageCredit"
-          label="Mobile app image credit"
-        ></BulmaFieldInput>
-      </details>
-
-      <CopyWithButton
-        v-if="page.link"
-        :value="page.link"
-        label="Page URL"
-      ></CopyWithButton>
-
-      <div v-if="page.isPublished && page.link" class="buttons">
-        <a
-          :href="page.link"
-          class="button is-success has-text-weight-semibold"
-          target="_blank"
-        >
-          <span class="icon is-size-6">
-            <font-awesome-icon :icon="['fas', 'link']"></font-awesome-icon>
-          </span>
-          <span> Open live URL </span>
-        </a>
-        <button
-          class="button is-light has-text-weight-semibold"
-          type="button"
-          @click="page.changeURL()"
-        >
-          Change URL
-        </button>
-      </div>
-
-      <BulmaTextarea
         v-model="page.body"
         label="Content"
         :rows="8"
       ></BulmaTextarea>
 
-      <details class="field">
-        <summary class="has-text-weight-semibold">Advanced options</summary>
+      <BulmaFieldCheckbox v-model="page.modalExclude" label="Hide pop-up ads">
+        Don't trigger Wisepops and newsletter modal screens on this page
+      </BulmaFieldCheckbox>
 
-        <BulmaFieldCheckbox v-model="page.modalExclude" label="Hide pop-up ads">
-          Don't trigger Wisepops and newsletter modal screens on this page
-        </BulmaFieldCheckbox>
+      <BulmaFieldCheckbox v-model="page.noIndex" label="No index">
+        Hide page from Google search results and homepage river
+      </BulmaFieldCheckbox>
 
-        <BulmaFieldCheckbox v-model="page.noIndex" label="No index">
-          Hide page from Google search results and homepage river
-        </BulmaFieldCheckbox>
+      <BulmaFieldCheckbox v-model="page.suppressAds" label="Suppress ads">
+        Hide ads from header, footer, and sidebar of page
+      </BulmaFieldCheckbox>
 
-        <BulmaFieldCheckbox v-model="page.suppressAds" label="Suppress ads">
-          Hide ads from header, footer, and sidebar of page
-        </BulmaFieldCheckbox>
+      <BulmaFieldInput
+        v-model="page.overrideURL"
+        label="Override URL path"
+      ></BulmaFieldInput>
 
-        <BulmaFieldInput
-          v-model="page.overrideURL"
-          label="Override URL path"
-        ></BulmaFieldInput>
+      <BulmaAutocompleteArray
+        v-model="page.aliases"
+        label="URL Aliases"
+        help="Redirect these URLs to the page"
+        :options="[]"
+      ></BulmaAutocompleteArray>
 
-        <BulmaAutocompleteArray
-          v-model="page.aliases"
-          label="URL Aliases"
-          help="Redirect these URLs to the page"
-          :options="[]"
-        ></BulmaAutocompleteArray>
+      <BulmaField v-slot="{ idForLabel }" label="Layout override">
+        <input v-model="page.layout" class="input" :list="idForLabel" />
+        <datalist :id="idForLabel">
+          <option value="blank"></option>
+          <option value="featured"></option>
+        </datalist>
+      </BulmaField>
 
-        <BulmaField v-slot="{ idForLabel }" label="Layout override">
-          <input v-model="page.layout" class="input" :list="idForLabel" />
-          <datalist :id="idForLabel">
-            <option value="blank"></option>
-            <option value="featured"></option>
-          </datalist>
-        </BulmaField>
-      </details>
+      <BulmaDateTime
+        v-model="page.publicationDate"
+        label="Publication Date"
+        :icon="['fas', 'user-clock']"
+        help="Page will be listed on the site under this date"
+      >
+        <p class="content is-small">
+          <a
+            href="#"
+            class="has-text-info"
+            @click.prevent="page.publicationDate = new Date()"
+          >
+            Set to now
+          </a>
+        </p>
+      </BulmaDateTime>
 
-      <BulmaWarnings
-        :values="[
-          [page.kicker.length < 1, '#eyebrow', 'Eyebrow is unset'],
-          [page.kicker.length > 20, '#eyebrow', 'Eyebrow is long'],
-          [page.title.length < 1, '#hed', 'Hed is unset'],
-          [page.title.length > 100, '#hed', 'Hed is long'],
-          [page.titleTag.length < 1, '#seo', 'SEO hed is unset'],
-          [page.titleTag.length > 55, '#seo', 'SEO hed is long'],
-          [page.summary.length < 1, '#description', 'SEO description is unset'],
-          [
-            page.summary.length > 150,
-            '#description',
-            'SEO description is long',
-          ],
-          [
-            page.imageDescription.length < 1,
-            '#alt',
-            'Image description is unset',
-          ],
-          [
-            page.imageDescription.length > 120,
-            '#alt',
-            'Image description is long',
-          ],
-        ]"
-      ></BulmaWarnings>
+      <p v-if="page.isFutureDated" class="content has-text-warning is-small">
+        Publication date is in the future.
+      </p>
 
       <div class="field">
         <div class="buttons">
