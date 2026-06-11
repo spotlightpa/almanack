@@ -236,9 +236,17 @@ let router = createRouter({
       },
     },
     {
-      path: "/admin/topics/:id",
-      name: "topic-page",
-      component: load(() => import("@/components/ViewTopicPage.vue")),
+      path: "/admin/series",
+      name: "series-pages",
+      component: load(() => import("@/components/ViewSeriesList.vue")),
+      meta: {
+        requiresAuth: isSpotlightPAUser,
+      },
+    },
+    {
+      path: "/admin/landing/:id",
+      name: "taxonomy-page",
+      component: load(() => import("@/components/ViewTaxonomyPage.vue")),
       props: true,
       meta: {
         requiresAuth: isSpotlightPAUser,

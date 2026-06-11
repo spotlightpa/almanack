@@ -276,11 +276,13 @@ function useTopics() {
 }
 
 function useSeries() {
-  const { computedObj } = watchAPI(
+  const { computedList } = watchAPI(
     () => null,
     () => clientGet(listAllSeries)
   );
-  return computedObj((obj) => obj.series);
+  return computedList("pages", (obj) =>
+    obj.file_path?.replace(/^content\/series\/(.+)\/_index\.md$/, "$1")
+  );
 }
 
 export function usePage(id) {

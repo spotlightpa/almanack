@@ -49,8 +49,11 @@ class TopicPage {
     this.shouldUpdateURLPath = false;
   }
 
-  get topicName() {
-    return this.filePath?.replace(/^content\/topics\/(.+)\/_index\.md$/, "$1");
+  get taxoName() {
+    return this.filePath?.replace(
+      /^content\/(topics|series)\/(.+)\/_index\.md$/,
+      "$2"
+    );
   }
 
   get isPublished() {
@@ -217,7 +220,7 @@ export default {
         if (!pageData.page.value) {
           return `Topic ${id.value}`;
         }
-        return pageData.page.value.topicName || "Untitled";
+        return pageData.page.value.taxoName || "Untitled";
       }),
     };
   },
@@ -233,7 +236,7 @@ export default {
       :links="[
         { name: 'Admin', to: { name: 'admin' } },
         { name: 'Topic Pages', to: { name: 'topic-pages' } },
-        { name: title, to: { name: 'topic-page', params: { id } } },
+        { name: title, to: { name: 'taxonomy-page', params: { id } } },
       ]"
     ></BulmaBreadcrumbs>
 
