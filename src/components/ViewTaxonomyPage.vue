@@ -13,7 +13,7 @@ import imgproxyURL from "@/api/imgproxy-url.js";
 import { toRel } from "@/utils/link.js";
 import maybeDate from "@/utils/maybe-date.js";
 
-class TopicPage {
+class TaxonomyPage {
   constructor(data) {
     this.id = data["id"] ?? "";
     this.body = data["body"] ?? "";
@@ -54,6 +54,23 @@ class TopicPage {
       /^content\/(topics|series)\/(.+)\/_index\.md$/,
       "$2"
     );
+  }
+
+  get taxoKind() {
+    return this.filePath?.replace(
+      /^content\/(topics|series)\/(.+)\/_index\.md$/,
+      "$1"
+    );
+  }
+
+  get taxoLink() {
+    if (this.taxoKind === "topics") {
+      return { name: "Topic Pages", to: { name: "topic-pages" } };
+    }
+    return {
+      name: "Investigation Series Pages",
+      to: { name: "series-pages" },
+    };
   }
 
   get isPublished() {
@@ -167,7 +184,7 @@ function usePage(id) {
   const post = (page) => exec(() => clientPost(postPage, page));
 
   const page = computed(() =>
-    apiState.rawData ? reactive(new TopicPage(apiState.rawData)) : null
+    apiState.rawData ? reactive(new TaxonomyPage(apiState.rawData)) : null
   );
 
   watch(() => id.value, fetch, {
@@ -214,14 +231,28 @@ export default {
   setup(props) {
     const { id } = toRefs(props);
     const pageData = usePage(id);
+    const title = computed(() => {
+      if (!pageData.page.value) {
+        return `Landing page ${id.value}`;
+      }
+      return pageData.page.value.taxoName || "Untitled";
+    });
+    const breadcrumbs = computed(() => {
+      return pageData.page.value
+        ? [
+            { name: "Admin", to: { name: "admin" } },
+            pageData.page.value.taxoLink,
+            { name: title, to: { name: "taxonomy-page", params: { id } } },
+          ]
+        : [
+            { name: "Admin", to: { name: "admin" } },
+            { name: title, to: { name: "taxonomy-page", params: { id } } },
+          ];
+    });
     return {
       ...pageData,
-      title: computed(() => {
-        if (!pageData.page.value) {
-          return `Topic ${id.value}`;
-        }
-        return pageData.page.value.taxoName || "Untitled";
-      }),
+      title,
+      breadcrumbs,
     };
   },
 };
@@ -232,13 +263,7 @@ export default {
     <MetaHead>
       <title>{{ title }} • Spotlight PA Almanack</title>
     </MetaHead>
-    <BulmaBreadcrumbs
-      :links="[
-        { name: 'Admin', to: { name: 'admin' } },
-        { name: 'Topic Pages', to: { name: 'topic-pages' } },
-        { name: title, to: { name: 'taxonomy-page', params: { id } } },
-      ]"
-    ></BulmaBreadcrumbs>
+    <BulmaBreadcrumbs :links="breadcrumbs"></BulmaBreadcrumbs>
 
     <h1 class="mb-2 is-spaced title">
       {{ title }}
@@ -275,22 +300,22 @@ export default {
         id="hed"
         v-model="page.title"
         label="Title"
-        help="Title on the topics landing page"
+        :help="`Title on the ${page.taxoKind} landing page`"
         :required="true"
       ></BulmaFieldInput>
 
       <BulmaFieldInput
         id="eyebrow"
         v-model="page.kicker"
-        label="Eyebrow on topics page"
-        help="This should be a short version of the title for the list of all topics page"
+        :label="`Eyebrow on the ${page.taxoKind} landing page`"
+        :help="`This should be a short version of the title for the list of all ${page.taxoKind} page`"
         autocomplete="off"
       ></BulmaFieldInput>
 
       <BulmaFieldInput
         v-model="page.linkTitle"
-        label="Topics page dek"
-        help="Dek used on the list of all topics page"
+        label="Landing page dek"
+        :help="`Dek used on the list of all ${page.taxoKind} page`"
       ></BulmaFieldInput>
 
       <BulmaFieldInput
