@@ -42,6 +42,9 @@ class TopicPage {
     this.overrideURL = this.frontmatter["url"] ?? "";
     this.aliases = this.frontmatter["aliases"] ?? [];
     this.layout = this.frontmatter["layout"] ?? "";
+    this.hideDescription = this.frontmatter["hide-description"] ?? false;
+    this.descriptionHed = this.frontmatter["description-hed"] ?? "";
+    this.descriptionDek = this.frontmatter["description-dek"] ?? "";
 
     this.shouldUpdateURLPath = false;
   }
@@ -138,6 +141,9 @@ class TopicPage {
         url: toRel(this.overrideURL),
         aliases: this.aliases,
         layout: this.layout,
+        "hide-description": this.hideDescription,
+        "description-hed": this.descriptionHed,
+        "description-dek": this.descriptionDek,
       },
       set_body: true,
       body: this.body,
@@ -309,6 +315,23 @@ export default {
         :value="page.summary"
         class="mt-1 mb-4"
       ></BulmaCharLimit>
+
+      <BulmaFieldCheckbox
+        v-model="page.hideDescription"
+        label="Hide description box"
+      >
+        Hide the black description box on the landing page
+      </BulmaFieldCheckbox>
+      <BulmaFieldInput
+        v-model="page.descriptionHed"
+        label="Description box hed"
+        help='Hed used in the black description box on the landing page. Defaults to "About our TITLE coverage" if blank.'
+      ></BulmaFieldInput>
+      <BulmaTextarea
+        v-model="page.descriptionDek"
+        label="Description box dek"
+        help="Dek used in the black description box on the landing page. Defaults to SEO Description if blank. Markdown okay."
+      ></BulmaTextarea>
 
       <PickerImages
         :images="images"
