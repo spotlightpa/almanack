@@ -23,7 +23,7 @@ const page = computed(() => new TaxonomyPage(props.modelValue));
         {{ page.title }}
       </p>
       <p class="has-text-weight-light has-text-dark">
-        {{ page.linktitle }}
+        {{ page.linkTitle }}
       </p>
     </div>
     <div
