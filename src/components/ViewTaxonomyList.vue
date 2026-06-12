@@ -1,10 +1,21 @@
 <script setup>
 import { watchAPI } from "@/api/service-util.js";
-import { get, listAllSeries } from "@/api/client-v2.js";
+import { get } from "@/api/client-v2.js";
+
+const props = defineProps({
+  title: {
+    type: String,
+    required: true,
+  },
+  apiPath: {
+    type: String,
+    required: true,
+  },
+});
 
 const { apiState, fetch, computedList } = watchAPI(
   () => null,
-  () => get(listAllSeries)
+  () => get(props.apiPath)
 );
 
 const pages = computedList("pages", (page) => page);
@@ -16,17 +27,17 @@ function swap(event, i) {
 
 <template>
   <MetaHead>
-    <title>Investigation Series • Spotlight PA Almanack</title>
+    <title>{{ title }} • Spotlight PA Almanack</title>
   </MetaHead>
 
   <div>
     <BulmaBreadcrumbs
       :links="[
         { name: 'Admin', to: { name: 'admin' } },
-        { name: 'Investigation Series', to: {} },
+        { name: title, to: {} },
       ]"
     ></BulmaBreadcrumbs>
-    <h1 class="title">Investigation Series</h1>
+    <h1 class="title">{{ title }}</h1>
 
     <APILoader
       :is-loading="apiState.isLoading.value"
