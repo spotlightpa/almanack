@@ -62,7 +62,7 @@ export class TaxonomyPage {
     };
   }
 
-  get editLink() {
+  get taxoPage() {
     return { name: "taxonomy-page", params: { id: "" + this.id } };
   }
 

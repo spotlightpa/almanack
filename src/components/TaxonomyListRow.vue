@@ -16,7 +16,7 @@ const page = computed(() => new TaxonomyPage(props.modelValue));
 <template>
   <router-link
     class="is-flex-tablet my-2 is-align-items-center"
-    :to="page.editLink"
+    :to="page.taxoPage"
   >
     <div class="is-flex-grow-1">
       <p class="mt-0 has-text-weight-semibold has-text-black">
