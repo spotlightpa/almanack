@@ -156,7 +156,7 @@ func (svc Services) EnsureTaxonomyPage(ctx context.Context, path, name string, t
 	defer errorx.Trace(&err)
 
 	// Skip if a row already exists.
-	_, err = svc.Queries.GetPageByFilePath(ctx, path)
+	_, err = txq.GetPageByFilePath(ctx, path)
 	switch {
 	case err == nil:
 		return nil

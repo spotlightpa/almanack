@@ -35,10 +35,10 @@ function swap(event, i) {
     >
       <table class="table is-striped is-narrow is-fullwidth">
         <tbody>
-          <tr v-for="(video, i) of pages" :key="video.id">
+          <tr v-for="(page, i) of pages" :key="page.id">
             <td>
               <TaxonomyListRow
-                :model-value="video"
+                :model-value="page"
                 @update:model-value="swap($event, i)"
               />
             </td>

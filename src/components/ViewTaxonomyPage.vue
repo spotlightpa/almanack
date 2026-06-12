@@ -152,7 +152,6 @@ class TaxonomyPage {
         image: this.image,
         "image-gravity": this.imageGravity,
         "image-description": this.imageDescription,
-        "image-caption": this.imageCaption,
         "image-credit": this.imageCredit,
         "image-size": this.imageSize,
         "modal-exclude": this.modalExclude,
@@ -242,11 +241,17 @@ export default {
         ? [
             { name: "Admin", to: { name: "admin" } },
             pageData.page.value.taxoLink,
-            { name: title, to: { name: "taxonomy-page", params: { id } } },
+            {
+              name: title.value,
+              to: { name: "taxonomy-page", params: { id: id.value } },
+            },
           ]
         : [
             { name: "Admin", to: { name: "admin" } },
-            { name: title, to: { name: "taxonomy-page", params: { id } } },
+            {
+              name: title.value,
+              to: { name: "taxonomy-page", params: { id: id.value } },
+            },
           ];
     });
     return {
