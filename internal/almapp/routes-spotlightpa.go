@@ -324,14 +324,8 @@ func (app *appEnv) listAllTopics(w http.ResponseWriter, r *http.Request) {
 		app.replyErr(w, r, err)
 		return
 	}
-	for i := range t {
-		topic := t[i]
-		topic = strings.TrimPrefix(topic, "content/topics/")
-		topic = strings.TrimSuffix(topic, "/_index.md")
-		t[i] = topic
-	}
 	app.replyJSON(http.StatusOK, w, struct {
-		Topics []string `json:"topics"`
+		Pages []db.Page `json:"pages"`
 	}{t})
 }
 
@@ -343,15 +337,9 @@ func (app *appEnv) listAllSeries(w http.ResponseWriter, r *http.Request) {
 		app.replyErr(w, r, err)
 		return
 	}
-	for i := range s {
-		series := s[i]
-		series = strings.TrimPrefix(series, "content/series/")
-		series = strings.TrimSuffix(series, "/_index.md")
-		s[i] = series
-	}
 
 	app.replyJSON(http.StatusOK, w, struct {
-		Series []string `json:"series"`
+		Pages []db.Page `json:"pages"`
 	}{s})
 }
 

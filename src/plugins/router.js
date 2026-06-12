@@ -3,6 +3,7 @@ import { defineAsyncComponent, nextTick, watch } from "vue";
 import { createRouter, createWebHistory } from "vue-router";
 
 import { useAuth } from "@/api/auth.js";
+import { listAllTopics, listAllSeries } from "@/api/client-v2.js";
 import { setDimensions, sendGAPageview } from "@/utils/google-analytics.js";
 
 import AsyncSpinner from "@/components/AsyncSpinner.vue";
@@ -225,6 +226,33 @@ let router = createRouter({
         requiresAuth: isSpotlightPAUser,
         contentPath: "content/berks/",
         title: "Berks County Articles",
+      },
+    },
+    {
+      path: "/admin/topics",
+      name: "topic-pages",
+      component: load(() => import("@/components/ViewTaxonomyList.vue")),
+      props: { title: "Topics", apiPath: listAllTopics },
+      meta: {
+        requiresAuth: isSpotlightPAUser,
+      },
+    },
+    {
+      path: "/admin/series",
+      name: "series-pages",
+      component: load(() => import("@/components/ViewTaxonomyList.vue")),
+      props: { title: "Investigation Series", apiPath: listAllSeries },
+      meta: {
+        requiresAuth: isSpotlightPAUser,
+      },
+    },
+    {
+      path: "/admin/landing/:id",
+      name: "taxonomy-page",
+      component: load(() => import("@/components/ViewTaxonomyPage.vue")),
+      props: true,
+      meta: {
+        requiresAuth: isSpotlightPAUser,
       },
     },
     {

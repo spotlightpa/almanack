@@ -133,7 +133,7 @@ WHERE
 
 -- name: ListAllTopics :many
 SELECT
-  file_path
+  *
 FROM
   page
 WHERE
@@ -143,7 +143,7 @@ ORDER BY
 
 -- name: ListAllSeries :many
 SELECT
-  file_path
+  *
 FROM
   page
 WHERE
