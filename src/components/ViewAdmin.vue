@@ -99,7 +99,7 @@ const nextPage = computedProp("next_page", (page) => ({
       ></LinkRoute>
     </LinkButtons>
 
-    <LinkButtons label="Landing pages">
+    <LinkButtons label="Frontpages">
       <LinkRoute
         label="Homepage Editor"
         to="homepage-editor"
@@ -133,6 +133,18 @@ const nextPage = computedProp("next_page", (page) => ({
         to="berks-pages"
         :icon="['fas', 'file-signature']"
       ></LinkRoute>
+    </LinkButtons>
+    <LinkButtons label="Other Spotlight PA pages">
+      <LinkRoute
+        label="Investigation Series"
+        to="series-pages"
+        :icon="['fas', 'file-signature']"
+      ></LinkRoute>
+      <LinkRoute
+        label="Topics"
+        to="topic-pages"
+        :icon="['fas', 'file-signature']"
+      ></LinkRoute>
       <LinkRoute
         label="Sponsored Content"
         to="sponsored-pages"
@@ -144,7 +156,6 @@ const nextPage = computedProp("next_page", (page) => ({
         :icon="['fas', 'video']"
       ></LinkRoute>
     </LinkButtons>
-
     <LinkButtons label="Uploads">
       <LinkRoute
         label="Photo manager"
@@ -174,10 +185,6 @@ const nextPage = computedProp("next_page", (page) => ({
       <LinkHref
         label="Embeds"
         href="https://www.spotlightpa.org/embeds/"
-      ></LinkHref>
-      <LinkHref
-        label="Legacy admin"
-        href="https://www.spotlightpa.org/admin/"
       ></LinkHref>
       <LinkHref
         label="Set up Gmail signature"
