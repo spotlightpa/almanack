@@ -1,5 +1,7 @@
 <script setup>
-import { computed, ref } from "vue";
+import { computed } from "vue";
+
+import { apAgreed } from "@/api/ap-agreed.js";
 
 const props = defineProps({
   imageUrl: { type: String, default: "" },
@@ -10,7 +12,6 @@ const props = defineProps({
 });
 
 const isAP = computed(() => /\bAP\b/.test(props.credit));
-const apAgreed = ref(false);
 const canDownload = computed(() => !isAP.value || apAgreed.value);
 </script>
 
