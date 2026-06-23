@@ -29,15 +29,6 @@ const canDownload = computed(() => !isAP.value || apAgreed.value);
       </component>
     </div>
     <figcaption>
-      <template v-if="isAP">
-        <label
-          class="checkbox has-margin-bottom is-flex is-align-items-center"
-          style="gap: 0.5rem"
-        >
-          <input type="checkbox" v-model="apAgreed" />
-          I affirm that my organization has permission to use AP images
-        </label>
-      </template>
       <p class="has-margin-bottom">
         <component
           :is="canDownload ? 'a' : 'button'"
@@ -56,15 +47,13 @@ const canDownload = computed(() => !isAP.value || apAgreed.value);
           <span>Download image</span>
         </component>
       </p>
-      <template v-if="description">
-        <p class="has-margin-bottom-thin">
-          <strong>Description (“alt” text):</strong>
-        </p>
-        <CopyWithButton
-          :value="description"
-          label="description"
-        ></CopyWithButton>
-      </template>
+      <BulmaFieldCheckbox
+        v-if="isAP"
+        v-model="apAgreed"
+        label="Image credit belongs to Associated Press"
+      >
+        I affirm that my organization has permission to use AP images
+      </BulmaFieldCheckbox>
       <template v-if="credit">
         <p class="has-margin-bottom-thin">
           <strong>Credit:</strong>
@@ -76,6 +65,15 @@ const canDownload = computed(() => !isAP.value || apAgreed.value);
           <strong>Caption:</strong>
         </p>
         <CopyWithButton :value="caption" label="caption"></CopyWithButton>
+      </template>
+      <template v-if="description">
+        <p class="has-margin-bottom-thin">
+          <strong>Description (“alt” text):</strong>
+        </p>
+        <CopyWithButton
+          :value="description"
+          label="description"
+        ></CopyWithButton>
       </template>
     </figcaption>
   </figure>
