@@ -1,11 +1,16 @@
 <script setup>
-defineProps({
+import { computed, ref } from "vue";
+
+const props = defineProps({
   imageUrl: { type: String, default: "" },
   downloadUrl: { type: String, default: "" },
   description: { type: String, default: "" },
   credit: { type: String, default: "" },
   caption: { type: String, default: "" },
 });
+
+const isAP = computed(() => /\bAP\b/.test(props.credit));
+const apAgreed = ref(false);
 </script>
 
 <template>
@@ -21,8 +26,15 @@ defineProps({
       </a>
     </div>
     <figcaption>
+      <template v-if="isAP">
+        <label class="checkbox has-margin-bottom is-flex is-align-items-center" style="gap: 0.5rem">
+          <input type="checkbox" v-model="apAgreed" />
+          I agree that my organization has permission to use AP images
+        </label>
+      </template>
       <p class="has-margin-bottom">
         <a
+          v-if="!isAP || apAgreed"
           :href="downloadUrl"
           class="button is-danger has-text-weight-semibold"
           target="_blank"
@@ -35,6 +47,19 @@ defineProps({
           </span>
           <span>Download image</span>
         </a>
+        <button
+          v-else
+          class="button is-danger has-text-weight-semibold"
+          type="button"
+          disabled
+        >
+          <span class="icon">
+            <font-awesome-icon
+              :icon="['fas', 'file-download']"
+            ></font-awesome-icon>
+          </span>
+          <span>Download image</span>
+        </button>
       </p>
       <template v-if="description">
         <p class="has-margin-bottom-thin">
