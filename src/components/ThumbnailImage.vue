@@ -11,34 +11,41 @@ const props = defineProps({
 
 const isAP = computed(() => /\bAP\b/.test(props.credit));
 const apAgreed = ref(false);
+const canDownload = computed(() => !isAP.value || apAgreed.value);
 </script>
 
 <template>
   <figure>
     <div class="has-margin-bottom">
-      <a
+      <component
+        :is="canDownload ? 'a' : 'span'"
         :href="downloadUrl"
         class="is-inline-flex max-256 has-background-grey-lighter"
         target="_blank"
         download
       >
         <img class="max-256" :src="imageUrl" width="256" height="192" />
-      </a>
+      </component>
     </div>
     <figcaption>
       <template v-if="isAP">
-        <label class="checkbox has-margin-bottom is-flex is-align-items-center" style="gap: 0.5rem">
+        <label
+          class="checkbox has-margin-bottom is-flex is-align-items-center"
+          style="gap: 0.5rem"
+        >
           <input type="checkbox" v-model="apAgreed" />
-          I agree that my organization has permission to use AP images
+          I affirm that my organization has permission to use AP images
         </label>
       </template>
       <p class="has-margin-bottom">
-        <a
-          v-if="!isAP || apAgreed"
+        <component
+          :is="canDownload ? 'a' : 'button'"
           :href="downloadUrl"
           class="button is-danger has-text-weight-semibold"
           target="_blank"
-          download
+          :download="canDownload || null"
+          :type="canDownload ? null : 'button'"
+          :disabled="!canDownload || null"
         >
           <span class="icon">
             <font-awesome-icon
@@ -46,20 +53,7 @@ const apAgreed = ref(false);
             ></font-awesome-icon>
           </span>
           <span>Download image</span>
-        </a>
-        <button
-          v-else
-          class="button is-danger has-text-weight-semibold"
-          type="button"
-          disabled
-        >
-          <span class="icon">
-            <font-awesome-icon
-              :icon="['fas', 'file-download']"
-            ></font-awesome-icon>
-          </span>
-          <span>Download image</span>
-        </button>
+        </component>
       </p>
       <template v-if="description">
         <p class="has-margin-bottom-thin">
