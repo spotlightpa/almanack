@@ -11,7 +11,7 @@ const props = defineProps({
   caption: { type: String, default: "" },
 });
 
-const isAP = computed(() => /\bAP\b/.test(props.credit));
+const isAP = computed(() => /\bAP|Associated Press\b/.test(props.credit));
 const canDownload = computed(() => !isAP.value || apAgreed.value);
 </script>
 
