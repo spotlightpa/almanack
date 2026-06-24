@@ -1,32 +1,43 @@
 <script setup>
-defineProps({
+import { computed } from "vue";
+
+import { apAgreed } from "@/api/ap-agreed.js";
+
+const props = defineProps({
   imageUrl: { type: String, default: "" },
   downloadUrl: { type: String, default: "" },
   description: { type: String, default: "" },
   credit: { type: String, default: "" },
   caption: { type: String, default: "" },
 });
+
+const isAP = computed(() => /\bAP|Associated Press\b/.test(props.credit));
+const canDownload = computed(() => !isAP.value || apAgreed.value);
 </script>
 
 <template>
   <figure>
     <div class="has-margin-bottom">
-      <a
+      <component
+        :is="canDownload ? 'a' : 'span'"
         :href="downloadUrl"
         class="is-inline-flex max-256 has-background-grey-lighter"
         target="_blank"
         download
       >
         <img class="max-256" :src="imageUrl" width="256" height="192" />
-      </a>
+      </component>
     </div>
     <figcaption>
       <p class="has-margin-bottom">
-        <a
+        <component
+          :is="canDownload ? 'a' : 'button'"
           :href="downloadUrl"
           class="button is-danger has-text-weight-semibold"
           target="_blank"
-          download
+          :download="canDownload || null"
+          :type="canDownload ? null : 'button'"
+          :disabled="!canDownload || null"
         >
           <span class="icon">
             <font-awesome-icon
@@ -34,17 +45,15 @@ defineProps({
             ></font-awesome-icon>
           </span>
           <span>Download image</span>
-        </a>
+        </component>
       </p>
-      <template v-if="description">
-        <p class="has-margin-bottom-thin">
-          <strong>Description (“alt” text):</strong>
-        </p>
-        <CopyWithButton
-          :value="description"
-          label="description"
-        ></CopyWithButton>
-      </template>
+      <BulmaFieldCheckbox
+        v-if="isAP"
+        v-model="apAgreed"
+        label="Image credit belongs to Associated Press"
+      >
+        I affirm that my organization has permission to use AP images.
+      </BulmaFieldCheckbox>
       <template v-if="credit">
         <p class="has-margin-bottom-thin">
           <strong>Credit:</strong>
@@ -56,6 +65,15 @@ defineProps({
           <strong>Caption:</strong>
         </p>
         <CopyWithButton :value="caption" label="caption"></CopyWithButton>
+      </template>
+      <template v-if="description">
+        <p class="has-margin-bottom-thin">
+          <strong>Description (“alt” text):</strong>
+        </p>
+        <CopyWithButton
+          :value="description"
+          label="description"
+        ></CopyWithButton>
       </template>
     </figcaption>
   </figure>
