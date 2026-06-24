@@ -52,7 +52,7 @@ const canDownload = computed(() => !isAP.value || apAgreed.value);
         v-model="apAgreed"
         label="Image credit belongs to Associated Press"
       >
-        I affirm that my organization has permission to use AP images
+        I affirm that my organization has permission to use AP images.
       </BulmaFieldCheckbox>
       <template v-if="credit">
         <p class="has-margin-bottom-thin">
