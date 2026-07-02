@@ -1,5 +1,5 @@
 <script>
-import commaAnd from "@/utils/comma-and.js";
+import commaAnd from "@/utils/comma-and.ts";
 export default {
   name: "ImageThumbnail",
   props: {
