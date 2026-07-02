@@ -21,7 +21,6 @@
     "@sentry/vue": "^10.0.0",
     "@unhead/vue": "^3.1.0",
     "bulma": "^0.9.4",
-    "core-js": "^3.38.0",
     "journalize": "^2.5.1",
     "netlify-identity-widget": "^1.9.2",
     "vue": "^3.5.16",
@@ -29,8 +28,6 @@
     "vuedraggable": "^4.1.0"
   },
   "devDependencies": {
-    "@babel/core": "^7.18.10",
-    "@babel/eslint-parser": "^7.12.16",
     "@eslint/js": "^10.0.1",
     "@vitejs/plugin-vue": "^6.0.5",
     "autoprefixer": "^10.4.20",
