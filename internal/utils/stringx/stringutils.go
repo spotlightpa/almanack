@@ -131,6 +131,14 @@ var (
 )
 
 func ExtractNames(s string) []string {
+	if result, _, err := transform.String(transform.Chain(
+		norm.NFKD,
+		runes.Remove(runes.In(unicode.Cf)),
+		norm.NFC,
+	), s); err == nil {
+		s = result
+	}
+
 	nameParts := extractSplitRe().Split(s, -1)
 
 	var names []string
