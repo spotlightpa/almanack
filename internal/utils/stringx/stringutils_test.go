@@ -101,6 +101,7 @@ func TestExtractName(t *testing.T) {
 		{"Danielle Ohl of Spotlight PA; Jessica Lussenhop of ProPublica; and Irina Bucur, Tracy Leturgey and Eddie Trizzino of The Butler Eagle", []string{"Danielle Ohl", "Jessica Lussenhop", "Irina Bucur", "Tracy Leturgey", "Eddie Trizzino"}},
 		{"Amanda Fries / For Spotlight PA", []string{"Amanda Fries"}},
 		{"\uFEFFAmanda \u200dFries / For Spotlight PA", []string{"Amanda Fries"}},
+		{"Mari\u0301a", []string{"Mar\u00EDa"}},
 	}
 	for _, tc := range cases {
 		be.AllEqual(rt, tc.Want, stringx.ExtractNames(tc.Input))
