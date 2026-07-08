@@ -318,12 +318,12 @@ export default {
         label="Override URL path"
       ></BulmaFieldInput>
 
-      <BulmaAutocompleteArray
+      <BulmaURLPaths
         v-model="page.aliases"
         label="URL Aliases"
         help="Redirect these URLs to the page"
         :options="[]"
-      ></BulmaAutocompleteArray>
+      ></BulmaURLPaths>
 
       <BulmaField v-slot="{ idForLabel }" label="Layout override">
         <input v-model="page.layout" class="input" :list="idForLabel" />

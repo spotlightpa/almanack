@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { toRel } from "@/utils/link.ts";
+
 const props = defineProps<{
   label?: string;
   labelClass?: string;
@@ -15,12 +17,8 @@ const emit = defineEmits<{
   (e: "update:modelValue", value: string[]): void;
 }>();
 
-function ensureLeadingSlash(value: string): string {
-  return value.startsWith("/") ? value : "/" + value;
-}
-
 function onUpdate(vals: string[]): void {
-  emit("update:modelValue", vals.map(ensureLeadingSlash));
+  emit("update:modelValue", vals.map(toRel));
 }
 </script>
 
