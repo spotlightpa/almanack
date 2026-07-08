@@ -13,23 +13,25 @@ import (
 )
 
 type MapPage struct {
-	Slug        string
-	Section     string
-	Headline    string
-	Eyebrow     string
-	Dek         string
-	Byline      string
-	Date        string
-	PublishedAt time.Time
-	GeoJSON     string
-	Color       string
-	Blurb       string
-	Description string
-	InternalID  string
-	Kicker      string
-	Topics      []string
-	Body        string
-	Credits     []MapCredit
+	Slug         string
+	Section      string
+	Headline     string
+	Eyebrow      string
+	Dek          string
+	Byline       string
+	Date         string
+	PublishedAt  time.Time
+	GeoJSON      string
+	Color        string
+	Blurb        string
+	Description  string
+	InternalID   string
+	Kicker       string
+	Topics       []string
+	Body         string
+	Layout       string
+	MobileLayout string
+	Credits      []MapCredit
 }
 
 type MapCredit struct {
@@ -112,13 +114,19 @@ func (m MapPage) ToMarkdown() string {
 		fmt.Fprintf(&sb, "  dek=%q\n", m.Dek)
 	}
 	if m.Date != "" {
-		fmt.Fprintf(&sb, "  date=%q\n", m.Date)
+		fmt.Fprintf(&sb, "  display-date=%q\n", m.Date)
 	}
 	if m.Byline != "" {
 		fmt.Fprintf(&sb, "  byline=%q\n", m.Byline)
 	}
 	if m.Color != "" {
 		fmt.Fprintf(&sb, "  color=%q\n", m.Color)
+	}
+	if m.Layout != "" {
+		fmt.Fprintf(&sb, "  layout=%q\n", m.Layout)
+	}
+	if m.MobileLayout != "" {
+		fmt.Fprintf(&sb, "  mobile-layout=%q\n", m.MobileLayout)
 	}
 	sb.WriteString("  outlet=\"Spotlight PA\"\n")
 	if m.GeoJSON != "" {
@@ -291,23 +299,25 @@ func SheetToMapPages(ctx context.Context, cl *http.Client, sheetID string) ([]Ma
 	}
 
 	page := MapPage{
-		Slug:        slug,
-		Section:     hdr.Field("Section"),
-		Headline:    hdr.Field("Headline"),
-		Eyebrow:     hdr.Field("Eyebrow"),
-		Dek:         hdr.Field("Deck"),
-		Byline:      hdr.Field("Author"),
-		Date:        hdr.Field("Date"),
-		Body:        hdr.Field("Introduction"),
-		PublishedAt: publishedAt,
-		Color:       set.Field("Map Color"),
-		Blurb:       hdr.Field("Blurb"),
-		Description: hdr.Field("Description"),
-		InternalID:  hdr.Field("Internal ID"),
-		Kicker:      hdr.Field("Kicker"),
-		Topics:      topics,
-		GeoJSON:     geojson,
-		Credits:     credits,
+		Slug:         slug,
+		Section:      hdr.Field("Section"),
+		Headline:     hdr.Field("Headline"),
+		Eyebrow:      hdr.Field("Eyebrow"),
+		Dek:          hdr.Field("Deck"),
+		Byline:       hdr.Field("Author"),
+		Date:         hdr.Field("Display Date"),
+		Layout:       hdr.Field("Map Layout"),
+		MobileLayout: hdr.Field("Mobile Map Layout"),
+		Body:         hdr.Field("Introduction"),
+		PublishedAt:  publishedAt,
+		Color:        set.Field("Map Color"),
+		Blurb:        hdr.Field("Blurb"),
+		Description:  hdr.Field("Description"),
+		InternalID:   hdr.Field("Internal ID"),
+		Kicker:       hdr.Field("Kicker"),
+		Topics:       topics,
+		GeoJSON:      geojson,
+		Credits:      credits,
 	}
 
 	return []MapPage{page}, nil
