@@ -58,7 +58,7 @@ class SidebarData {
 
   clone(scheduleFor) {
     let { data } = JSON.parse(JSON.stringify(this));
-    let newPicks = reactive(
+    const newPicks = reactive(
       new SidebarData({
         schedule_for: scheduleFor,
         data,
@@ -83,7 +83,7 @@ export default {
     const [container, scrollTo] = useScrollTo();
 
     let { apiState: sidebarState, exec: sidebarExec } = makeState();
-    let state = reactive({
+    const state = reactive({
       rawSidebars: computed(() => sidebarState.rawData?.configs ?? []),
       allSidebars: [],
       nextSchedule: null,

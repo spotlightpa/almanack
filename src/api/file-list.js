@@ -6,7 +6,7 @@ import { makeState } from "./service-util.js";
 export function useFileList() {
   let { apiState, exec } = makeState();
 
-  let state = reactive({
+  const state = reactive({
     files: computed(() => {
       return apiState.rawData?.files || [];
     }),
