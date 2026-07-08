@@ -3,7 +3,7 @@ import { reactive, computed, toRefs } from "vue";
 import netlifyIdentity from "netlify-identity-widget";
 
 function makeAuth() {
-  const authState = reactive({
+  let authState = reactive({
     user: null,
   });
 
@@ -27,13 +27,11 @@ function makeAuth() {
     authState.user = null;
   });
 
-  const token = computed(() => authState.user?.token?.access_token ?? null);
-  const isSignedIn = computed(() => !!token.value);
-  const roles = computed(() => authState.user?.app_metadata?.roles ?? []);
-  const fullName = computed(
-    () => authState.user?.user_metadata?.full_name ?? ""
-  );
-  const email = computed(() => authState.user?.email ?? "");
+  let token = computed(() => authState.user?.token?.access_token ?? null);
+  let isSignedIn = computed(() => !!token.value);
+  let roles = computed(() => authState.user?.app_metadata?.roles ?? []);
+  let fullName = computed(() => authState.user?.user_metadata?.full_name ?? "");
+  let email = computed(() => authState.user?.email ?? "");
 
   function hasRole(name) {
     return computed(() => {

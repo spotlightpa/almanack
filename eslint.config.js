@@ -2,15 +2,9 @@ import globals from "globals";
 import pluginJs from "@eslint/js";
 import pluginVue from "eslint-plugin-vue";
 import tseslint from "typescript-eslint";
-import vueRefConst from "./eslint-rules/vue-ref-const.js";
 
 import eslintConfigPrettier from "eslint-config-prettier";
 import eslintPluginPrettierRecommended from "eslint-plugin-prettier/recommended";
-
-const localRules = {
-  plugins: { local: { rules: { "vue-ref-const": vueRefConst } } },
-  rules: { "local/vue-ref-const": "error" },
-};
 
 export default [
   { files: ["**/*.{js,mjs,cjs,vue,ts}"] },
@@ -26,7 +20,6 @@ export default [
       },
     },
   },
-  localRules,
   eslintPluginPrettierRecommended,
   eslintConfigPrettier,
   {

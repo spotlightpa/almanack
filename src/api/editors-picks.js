@@ -52,7 +52,7 @@ class EditorsPicksData {
 
 export default function usePicks({ fetchData, saveData }) {
   let { apiStateRefs: edPicksState, exec: edPickExec } = makeState();
-  const state = reactive({
+  let state = reactive({
     rawPicks: computed(() => edPicksState.rawData.value?.configs ?? []),
     allEdPicks: [],
     nextSchedule: null,

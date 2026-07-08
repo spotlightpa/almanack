@@ -20,7 +20,7 @@ export default {
 
     const { rawData } = apiStateRefs;
 
-    const state = reactive({
+    let state = reactive({
       files: computed(() => {
         return rawData.value?.files || [];
       }),
