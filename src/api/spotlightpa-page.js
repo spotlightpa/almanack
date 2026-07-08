@@ -249,7 +249,7 @@ export class Page {
         pinned: this.isPinned,
         "no-index": this.noIndex,
         url: toRel(this.overrideURL),
-        aliases: this.aliases,
+        aliases: this.aliases.map(toRel),
         layout: this.layout,
         "feed-exclude": this.feedExclude,
         "content-source": this.contentSource,
