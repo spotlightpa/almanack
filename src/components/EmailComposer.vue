@@ -16,7 +16,7 @@ export default {
       rows = 4;
     }
 
-    let emailStatus = reactive({
+    const emailStatus = reactive({
       subject: props.initialSubject,
       body: props.initialBody,
       error: null,
