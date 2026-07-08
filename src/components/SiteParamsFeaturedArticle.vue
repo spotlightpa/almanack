@@ -1,6 +1,6 @@
 <script setup>
 import useProps from "@/utils/use-props.js";
-import { toRel, toAbs } from "@/utils/link.js";
+import { toRel, toAbs } from "@/utils/link.ts";
 
 const props = defineProps({
   params: Object,
