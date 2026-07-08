@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/earthboundkid/resperr/v2"
+	"github.com/spotlightpa/almanack/internal/utils/stringx"
 	spreadsheet "gopkg.in/Iwark/spreadsheet.v2"
 )
 
@@ -51,7 +52,7 @@ func (m MapPage) ToMarkdown() string {
 
 	sb.WriteString("+++\n")
 	if m.Byline != "" {
-		parts := splitByline(m.Byline)
+		parts := stringx.ExtractNames(m.Byline)
 		sb.WriteString("authors = [")
 		for i, p := range parts {
 			if i > 0 {
@@ -152,16 +153,6 @@ func (m MapPage) ToMarkdown() string {
 	}
 
 	return sb.String()
-}
-
-func splitByline(byline string) []string {
-	byline = strings.TrimPrefix(byline, "By ")
-	byline = strings.TrimPrefix(byline, "by ")
-	parts := strings.Split(byline, " and ")
-	for i, p := range parts {
-		parts[i] = strings.TrimSpace(p)
-	}
-	return parts
 }
 
 type sheetMapSkipDescription struct {
