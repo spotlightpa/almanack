@@ -1,17 +1,17 @@
-export function toAbs(relurl) {
+export function toAbs(relurl: string): string {
   if (!relurl || !URL.canParse(relurl, "https://www.spotlightpa.org")) {
     return relurl;
   }
   return new URL(relurl, "https://www.spotlightpa.org").href;
 }
 
-export function toRel(url) {
+export function toRel(url: string): string {
   if (!url) {
     return "";
   }
-  let u;
+  let u: URL;
   try {
-    u = new URL(url);
+    u = new URL(url, "https://www.spotlightpa.org");
   } catch (e) {
     return url;
   }

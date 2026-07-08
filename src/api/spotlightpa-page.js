@@ -13,7 +13,7 @@ import {
 } from "@/api/client-v2.js";
 import { processGDocsDoc } from "@/api/gdocs.js";
 import imgproxyURL from "@/api/imgproxy-url.js";
-import { toRel } from "@/utils/link.js";
+import { toRel } from "@/utils/link.ts";
 import maybeDate from "@/utils/maybe-date.js";
 
 export class Page {
@@ -249,7 +249,7 @@ export class Page {
         pinned: this.isPinned,
         "no-index": this.noIndex,
         url: toRel(this.overrideURL),
-        aliases: this.aliases,
+        aliases: this.aliases.map(toRel),
         layout: this.layout,
         "feed-exclude": this.feedExclude,
         "content-source": this.contentSource,
