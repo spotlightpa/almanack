@@ -4,6 +4,7 @@ import { computed, toRefs } from "vue";
 import { usePage } from "@/api/spotlightpa-page.js";
 
 import { formatDateTime } from "@/utils/time-format.js";
+import BulmaURLPaths from "./BulmaURLPaths.vue";
 
 export default {
   props: {
@@ -614,12 +615,12 @@ export default {
           label="Override URL path"
         ></BulmaFieldInput>
 
-        <BulmaAutocompleteArray
+        <BulmaURLPaths
           v-model="page.aliases"
           label="URL Aliases"
           help="Redirect these URLs to the story"
           :options="[]"
-        ></BulmaAutocompleteArray>
+        ></BulmaURLPaths>
 
         <BulmaField v-slot="{ idForLabel }" label="Layout override">
           <input v-model="page.layout" class="input" :list="idForLabel" />
