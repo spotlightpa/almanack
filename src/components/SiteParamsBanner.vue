@@ -1,7 +1,7 @@
 <script>
 import useProps from "@/utils/use-props.js";
 import sanitizeText from "@/utils/sanitize-text.js";
-import { toRel, toAbs } from "@/utils/link.js";
+import { toRel, toAbs } from "@/utils/link.ts";
 
 export default {
   props: { params: Object, fileProps: Object },
