@@ -1,34 +1,27 @@
-<script setup>
+<script setup lang="ts">
 import BulmaAutocompleteArray from "./BulmaAutocompleteArray.vue";
 
-const props = defineProps({
-  label: String,
-  labelClass: {
-    type: String,
-    default: "label",
-  },
-  modelValue: Array,
-  options: Array,
-  placeholder: String,
-  help: String,
-  validator: Function,
-  required: {
-    type: Boolean,
-    default: false,
-  },
-  readonly: {
-    type: Boolean,
-    default: false,
-  },
-});
+const props = defineProps<{
+  label?: string;
+  labelClass?: string;
+  modelValue: string[];
+  options?: string[];
+  placeholder?: string;
+  help?: string;
+  validator?: (value: string) => boolean;
+  required?: boolean;
+  readonly?: boolean;
+}>();
 
-const emit = defineEmits(["update:modelValue"]);
+const emit = defineEmits<{
+  (e: "update:modelValue", value: string[]): void;
+}>();
 
-function ensureLeadingSlash(value) {
+function ensureLeadingSlash(value: string): string {
   return value.startsWith("/") ? value : "/" + value;
 }
 
-function onUpdate(vals) {
+function onUpdate(vals: string[]): void {
   emit("update:modelValue", vals.map(ensureLeadingSlash));
 }
 </script>

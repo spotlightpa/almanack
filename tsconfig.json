@@ -8,6 +8,7 @@
     "noEmit": true,
     "allowJs": false,
     "skipLibCheck": true,
+    "plugins": [{"name": "typescript-vue-plugin"}],
     "esModuleInterop": true,
     "isolatedModules": true,
     "allowImportingTsExtensions": true,
@@ -15,5 +16,5 @@
       "@/*": ["./src/*"]
     }
   },
-  "include": ["src/**/*.ts"]
+  "include": ["src/**/*.ts", "src/**/*.vue"]
 }
