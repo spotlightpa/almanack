@@ -11,7 +11,7 @@ export function toRel(url: string): string {
   }
   let u: URL;
   try {
-    u = new URL(url);
+    u = new URL(url, "https://www.spotlightpa.org");
   } catch (e) {
     return url;
   }
