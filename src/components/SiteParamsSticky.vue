@@ -1,6 +1,6 @@
 <script>
 import useProps from "@/utils/use-props.js";
-import { toRel, toAbs } from "@/utils/link.js";
+import { toRel, toAbs } from "@/utils/link.ts";
 
 export default {
   props: { params: Object, fileProps: Object },
