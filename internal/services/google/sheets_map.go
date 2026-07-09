@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"net/http"
+	"strconv"
 	"strings"
 	"time"
 
@@ -13,25 +14,30 @@ import (
 )
 
 type MapPage struct {
-	Slug         string
-	Section      string
-	Headline     string
-	Eyebrow      string
-	Dek          string
-	Byline       string
-	Date         string
-	PublishedAt  time.Time
-	GeoJSON      string
-	Color        string
-	Blurb        string
-	Description  string
-	InternalID   string
-	Kicker       string
-	Topics       []string
-	Body         string
-	Layout       string
-	MobileLayout string
-	Credits      []MapCredit
+	Slug            string
+	Section         string
+	Headline        string
+	Eyebrow         string
+	Dek             string
+	Byline          string
+	Date            string
+	PublishedAt     time.Time
+	GeoJSON         string
+	Color           string
+	ColorOpacity    string
+	MapType         string
+	SearchEnabled   bool
+	SearchText      string
+	ReadMoreEnabled bool
+	Blurb           string
+	Description     string
+	InternalID      string
+	Kicker          string
+	Topics          []string
+	Body            string
+	Layout          string
+	MobileLayout    string
+	Credits         []MapCredit
 }
 
 type MapCredit struct {
@@ -46,7 +52,17 @@ func (m MapPage) FilePath() string {
 	if section == "" {
 		section = "news"
 	}
-	return fmt.Sprintf("content/%s/%s.md", section, m.Slug)
+	section = strings.ToLower(section)
+
+	name := m.Slug
+	if m.InternalID != "" && !m.PublishedAt.IsZero() {
+		name = fmt.Sprintf("%s-%s",
+			m.PublishedAt.Format("2006-01-02"),
+			strings.ToUpper(m.InternalID),
+		)
+	}
+
+	return fmt.Sprintf("content/%s/%s.md", section, name)
 }
 
 func (m MapPage) ToMarkdown() string {
@@ -128,6 +144,18 @@ func (m MapPage) ToMarkdown() string {
 	if m.MobileLayout != "" {
 		fmt.Fprintf(&sb, "  mobile-layout=%q\n", m.MobileLayout)
 	}
+	if m.ColorOpacity != "" {
+		fmt.Fprintf(&sb, "  color-opacity=%q\n", m.ColorOpacity)
+	}
+	if m.SearchEnabled {
+		sb.WriteString("  search=\"true\"\n")
+	}
+	if m.SearchText != "" {
+		fmt.Fprintf(&sb, "  search-text=%q\n", m.SearchText)
+	}
+	if m.ReadMoreEnabled {
+		sb.WriteString("  read-more=\"true\"\n")
+	}
 	sb.WriteString("  outlet=\"Spotlight PA\"\n")
 	if m.GeoJSON != "" {
 		fmt.Fprintf(&sb, "  geojson=%q\n", m.GeoJSON)
@@ -161,6 +189,34 @@ func (m MapPage) ToMarkdown() string {
 	}
 
 	return sb.String()
+}
+
+func sheetBool(s string) bool {
+	return strings.EqualFold(strings.TrimSpace(s), "TRUE")
+}
+
+// sheetPercent converts a value like "50%" or "50" or "0.5" into a
+// CSS-friendly opacity string like "0.5". Returns "" if unparseable.
+func sheetPercent(s string) string {
+	s = strings.TrimSpace(s)
+	if s == "" {
+		return ""
+	}
+	if strings.HasSuffix(s, "%") {
+		n, err := strconv.ParseFloat(strings.TrimSuffix(s, "%"), 64)
+		if err != nil {
+			return ""
+		}
+		return strconv.FormatFloat(n/100, 'f', -1, 64)
+	}
+	n, err := strconv.ParseFloat(s, 64)
+	if err != nil {
+		return ""
+	}
+	if n > 1 {
+		n = n / 100
+	}
+	return strconv.FormatFloat(n, 'f', -1, 64)
 }
 
 type sheetMapSkipDescription struct {
@@ -293,31 +349,33 @@ func SheetToMapPages(ctx context.Context, cl *http.Client, sheetID string) ([]Ma
 		})
 	}
 
-	geojson := ""
-	if len(dataSheet.Rows) > 2 && len(dataSheet.Rows[2]) > 0 {
-		geojson = strings.TrimSpace(dataSheet.Rows[2][0].Value)
-	}
+	geojson := dat.Field("Map Data")
 
 	page := MapPage{
-		Slug:         slug,
-		Section:      hdr.Field("Section"),
-		Headline:     hdr.Field("Headline"),
-		Eyebrow:      hdr.Field("Eyebrow"),
-		Dek:          hdr.Field("Deck"),
-		Byline:       hdr.Field("Author"),
-		Date:         hdr.Field("Display Date"),
-		Layout:       hdr.Field("Map Layout"),
-		MobileLayout: hdr.Field("Mobile Map Layout"),
-		Body:         hdr.Field("Introduction"),
-		PublishedAt:  publishedAt,
-		Color:        set.Field("Map Color"),
-		Blurb:        hdr.Field("Blurb"),
-		Description:  hdr.Field("Description"),
-		InternalID:   hdr.Field("Internal ID"),
-		Kicker:       hdr.Field("Kicker"),
-		Topics:       topics,
-		GeoJSON:      geojson,
-		Credits:      credits,
+		Slug:            slug,
+		Section:         hdr.Field("Section"),
+		Headline:        hdr.Field("Headline"),
+		Eyebrow:         hdr.Field("Eyebrow"),
+		Dek:             hdr.Field("Deck"),
+		Byline:          hdr.Field("Author"),
+		Date:            hdr.Field("Display Date"),
+		Layout:          hdr.Field("Map Layout"),
+		MobileLayout:    hdr.Field("Mobile Map Layout"),
+		Body:            hdr.Field("Introduction"),
+		PublishedAt:     publishedAt,
+		Color:           set.Field("Map Color"),
+		ColorOpacity:    sheetPercent(set.Field("Map Color Opacity")),
+		MapType:         set.Field("Map Type"),
+		SearchEnabled:   sheetBool(set.Field("Search Bar")),
+		SearchText:      set.Field("Search Bar Text"),
+		ReadMoreEnabled: sheetBool(set.Field("Read More")),
+		Blurb:           hdr.Field("Blurb"),
+		Description:     hdr.Field("Description"),
+		InternalID:      hdr.Field("Internal ID"),
+		Kicker:          hdr.Field("Kicker"),
+		Topics:          topics,
+		GeoJSON:         geojson,
+		Credits:         credits,
 	}
 
 	return []MapPage{page}, nil
