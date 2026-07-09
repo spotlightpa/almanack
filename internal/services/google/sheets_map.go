@@ -29,6 +29,9 @@ type MapPage struct {
 	SearchEnabled   bool
 	SearchText      string
 	ReadMoreEnabled bool
+	TooltipsEnabled bool
+	TooltipHeader   string
+	TooltipValue    string
 	Blurb           string
 	Description     string
 	InternalID      string
@@ -155,6 +158,15 @@ func (m MapPage) ToMarkdown() string {
 	}
 	if m.ReadMoreEnabled {
 		sb.WriteString("  read-more=\"true\"\n")
+	}
+	if m.TooltipsEnabled {
+		sb.WriteString("  tooltips=\"true\"\n")
+	}
+	if m.TooltipHeader != "" {
+		fmt.Fprintf(&sb, "  tooltip-header=%q\n", m.TooltipHeader)
+	}
+	if m.TooltipValue != "" {
+		fmt.Fprintf(&sb, "  tooltip-value=%q\n", m.TooltipValue)
 	}
 	sb.WriteString("  outlet=\"Spotlight PA\"\n")
 	if m.GeoJSON != "" {
@@ -297,9 +309,15 @@ func SheetToMapPages(ctx context.Context, cl *http.Client, sheetID string) ([]Ma
 		return nil, resperr.E{E: err, M: "Spreadsheet missing 'Credits' sheet"}
 	}
 
+	tooltipSheet, err := doc.SheetByTitle("Map Tooltips")
+	if err != nil {
+		return nil, resperr.E{E: err, M: "Spreadsheet missing 'Map Tooltips' sheet"}
+	}
+
 	hdr := newSheetMapSkipDescription(headerSheet)
 	set := newSheetMapSkipDescription(settingsSheet)
 	dat := newSheetMapSkipDescription(dataSheet)
+	tip := newSheetMapSkipDescription(tooltipSheet)
 
 	if !hdr.Next() {
 		return nil, resperr.E{M: "No data rows in Header sheet"}
@@ -309,6 +327,9 @@ func SheetToMapPages(ctx context.Context, cl *http.Client, sheetID string) ([]Ma
 	}
 	if !dat.Next() {
 		return nil, resperr.E{M: "No data rows in Map Data sheet"}
+	}
+	if !tip.Next() {
+		return nil, resperr.E{M: "No data rows in Map Tooltips sheet"}
 	}
 
 	slug := hdr.Field("Slug")
@@ -369,6 +390,9 @@ func SheetToMapPages(ctx context.Context, cl *http.Client, sheetID string) ([]Ma
 		SearchEnabled:   sheetBool(set.Field("Search Bar")),
 		SearchText:      set.Field("Search Bar Text"),
 		ReadMoreEnabled: sheetBool(set.Field("Read More")),
+		TooltipsEnabled: sheetBool(tip.Field("Tooltips Enabled")),
+		TooltipHeader:   tip.Field("Tooltip Header"),
+		TooltipValue:    tip.Field("Tooltip Value"),
 		Blurb:           hdr.Field("Blurb"),
 		Description:     hdr.Field("Description"),
 		InternalID:      hdr.Field("Internal ID"),
