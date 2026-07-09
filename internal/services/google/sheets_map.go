@@ -32,6 +32,7 @@ type MapPage struct {
 	TooltipsEnabled bool
 	TooltipHeader   string
 	TooltipValue    string
+	FeaturedDocLink string
 	Blurb           string
 	Description     string
 	InternalID      string
@@ -68,7 +69,7 @@ func (m MapPage) FilePath() string {
 	return fmt.Sprintf("content/%s/%s.md", section, name)
 }
 
-func (m MapPage) ToMarkdown() string {
+func (m MapPage) ToMarkdown(featuredMD string) string {
 	var sb strings.Builder
 
 	sb.WriteString("+++\n")
@@ -178,6 +179,11 @@ func (m MapPage) ToMarkdown() string {
 		sb.WriteString("\n")
 	}
 	sb.WriteString("{{</featured/map-header>}}\n\n")
+
+	if featuredMD != "" {
+		sb.WriteString(featuredMD)
+		sb.WriteString("\n")
+	}
 
 	if len(m.Credits) > 0 {
 		sb.WriteString("{{<featured/footer>}}\n")
@@ -393,6 +399,7 @@ func SheetToMapPages(ctx context.Context, cl *http.Client, sheetID string) ([]Ma
 		TooltipsEnabled: sheetBool(tip.Field("Tooltips Enabled")),
 		TooltipHeader:   tip.Field("Tooltip Header"),
 		TooltipValue:    tip.Field("Tooltip Value"),
+		FeaturedDocLink: set.Field("Featured Story Document Link"),
 		Blurb:           hdr.Field("Blurb"),
 		Description:     hdr.Field("Description"),
 		InternalID:      hdr.Field("Internal ID"),

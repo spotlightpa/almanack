@@ -1066,7 +1066,8 @@ func (app *appEnv) postMapSheet(w http.ResponseWriter, r *http.Request) http.Han
 	if err != nil {
 		return app.jsonErr(err)
 	}
-	if err := app.svc.SyncMapSheet(r.Context(), sheetID); err != nil {
+	ctx := context.WithoutCancel(r.Context())
+	if err := app.svc.SyncMapSheet(ctx, sheetID); err != nil {
 		return app.jsonErr(err)
 	}
 	app.replyJSON(http.StatusAccepted, w, http.StatusText(http.StatusAccepted))
