@@ -30,9 +30,9 @@ type MapPage struct {
 	SearchText      string
 	ReadMoreEnabled bool
 	TooltipsEnabled bool
-	TooltipHeader   string
 	TooltipValue    string
 	FeaturedDocLink string
+	CustomCodeURL   string
 	Blurb           string
 	Description     string
 	InternalID      string
@@ -163,11 +163,15 @@ func (m MapPage) ToMarkdown(featuredMD string) string {
 	if m.TooltipsEnabled {
 		sb.WriteString("  tooltips=\"true\"\n")
 	}
-	if m.TooltipHeader != "" {
-		fmt.Fprintf(&sb, "  tooltip-header=%q\n", m.TooltipHeader)
-	}
 	if m.TooltipValue != "" {
-		fmt.Fprintf(&sb, "  tooltip-value=%q\n", m.TooltipValue)
+		tv := strings.NewReplacer("\r\n", "<br>", "\n", "<br>", "\r", "<br>").Replace(m.TooltipValue)
+		tv = strings.ReplaceAll(tv, `\n`, "<br>")
+		tv = trimBR(tv)
+		tv = strings.ReplaceAll(tv, `"`, "'")
+		fmt.Fprintf(&sb, "  tooltip-value=%q\n", tv)
+	}
+	if m.CustomCodeURL != "" {
+		fmt.Fprintf(&sb, "  custom-code=%q\n", m.CustomCodeURL)
 	}
 	sb.WriteString("  outlet=\"Spotlight PA\"\n")
 	if m.GeoJSON != "" {
@@ -213,8 +217,16 @@ func sheetBool(s string) bool {
 	return strings.EqualFold(strings.TrimSpace(s), "TRUE")
 }
 
-// sheetPercent converts a value like "50%" or "50" or "0.5" into a
-// CSS-friendly opacity string like "0.5". Returns "" if unparseable.
+func trimBR(s string) string {
+	for strings.HasPrefix(s, "<br>") {
+		s = strings.TrimPrefix(s, "<br>")
+	}
+	for strings.HasSuffix(s, "<br>") {
+		s = strings.TrimSuffix(s, "<br>")
+	}
+	return strings.TrimSpace(s)
+}
+
 func sheetPercent(s string) string {
 	s = strings.TrimSpace(s)
 	if s == "" {
@@ -397,9 +409,9 @@ func SheetToMapPages(ctx context.Context, cl *http.Client, sheetID string) ([]Ma
 		SearchText:      set.Field("Search Bar Text"),
 		ReadMoreEnabled: sheetBool(set.Field("Read More")),
 		TooltipsEnabled: sheetBool(tip.Field("Tooltips Enabled")),
-		TooltipHeader:   tip.Field("Tooltip Header"),
 		TooltipValue:    tip.Field("Tooltip Value"),
 		FeaturedDocLink: set.Field("Featured Story Document Link"),
+		CustomCodeURL:   set.Field("Custom Code"),
 		Blurb:           hdr.Field("Blurb"),
 		Description:     hdr.Field("Description"),
 		InternalID:      hdr.Field("Internal ID"),
