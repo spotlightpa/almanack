@@ -14,34 +14,35 @@ import (
 )
 
 type MapPage struct {
-	Slug            string
-	Section         string
-	Headline        string
-	Eyebrow         string
-	Dek             string
-	Byline          string
-	Date            string
-	PublishedAt     time.Time
-	GeoJSON         string
-	Color           string
-	ColorOpacity    string
-	MapType         string
-	SearchEnabled   bool
-	SearchText      string
-	ReadMoreEnabled bool
-	TooltipsEnabled bool
-	TooltipValue    string
-	FeaturedDocLink string
-	CustomCodeURL   string
-	Blurb           string
-	Description     string
-	InternalID      string
-	Kicker          string
-	Topics          []string
-	Body            string
-	Layout          string
-	MobileLayout    string
-	Credits         []MapCredit
+	Slug              string
+	Section           string
+	Headline          string
+	Eyebrow           string
+	Dek               string
+	Byline            string
+	Date              string
+	PublishedAt       time.Time
+	GeoJSON           string
+	Color             string
+	ColorOpacity      string
+	MapType           string
+	SearchEnabled     bool
+	SearchText        string
+	SearchUseLocation bool
+	ReadMoreEnabled   bool
+	TooltipsEnabled   bool
+	TooltipValue      string
+	FeaturedDocLink   string
+	CustomCodeURL     string
+	Blurb             string
+	Description       string
+	InternalID        string
+	Kicker            string
+	Topics            []string
+	Body              string
+	Layout            string
+	MobileLayout      string
+	Credits           []MapCredit
 }
 
 type MapCredit struct {
@@ -156,6 +157,9 @@ func (m MapPage) ToMarkdown(featuredMD string) string {
 	}
 	if m.SearchText != "" {
 		fmt.Fprintf(&sb, "  search-text=%q\n", m.SearchText)
+	}
+	if m.SearchUseLocation {
+		sb.WriteString("  search-use-location=\"true\"\n")
 	}
 	if m.ReadMoreEnabled {
 		sb.WriteString("  read-more=\"true\"\n")
@@ -391,34 +395,35 @@ func SheetToMapPages(ctx context.Context, cl *http.Client, sheetID string) ([]Ma
 	geojson := dat.Field("Map Data")
 
 	page := MapPage{
-		Slug:            slug,
-		Section:         hdr.Field("Section"),
-		Headline:        hdr.Field("Headline"),
-		Eyebrow:         hdr.Field("Eyebrow"),
-		Dek:             hdr.Field("Deck"),
-		Byline:          hdr.Field("Author"),
-		Date:            hdr.Field("Display Date"),
-		Layout:          hdr.Field("Map Layout"),
-		MobileLayout:    hdr.Field("Mobile Map Layout"),
-		Body:            hdr.Field("Introduction"),
-		PublishedAt:     publishedAt,
-		Color:           set.Field("Map Color"),
-		ColorOpacity:    sheetPercent(set.Field("Map Color Opacity")),
-		MapType:         set.Field("Map Type"),
-		SearchEnabled:   sheetBool(set.Field("Search Bar")),
-		SearchText:      set.Field("Search Bar Text"),
-		ReadMoreEnabled: sheetBool(set.Field("Read More")),
-		TooltipsEnabled: sheetBool(tip.Field("Tooltips Enabled")),
-		TooltipValue:    tip.Field("Tooltip Value"),
-		FeaturedDocLink: set.Field("Featured Story Document Link"),
-		CustomCodeURL:   set.Field("Custom Code"),
-		Blurb:           hdr.Field("Blurb"),
-		Description:     hdr.Field("Description"),
-		InternalID:      hdr.Field("Internal ID"),
-		Kicker:          hdr.Field("Kicker"),
-		Topics:          topics,
-		GeoJSON:         geojson,
-		Credits:         credits,
+		Slug:              slug,
+		Section:           hdr.Field("Section"),
+		Headline:          hdr.Field("Headline"),
+		Eyebrow:           hdr.Field("Eyebrow"),
+		Dek:               hdr.Field("Deck"),
+		Byline:            hdr.Field("Author"),
+		Date:              hdr.Field("Display Date"),
+		Layout:            hdr.Field("Map Layout"),
+		MobileLayout:      hdr.Field("Mobile Map Layout"),
+		Body:              hdr.Field("Introduction"),
+		PublishedAt:       publishedAt,
+		Color:             set.Field("Map Color"),
+		ColorOpacity:      sheetPercent(set.Field("Map Color Opacity")),
+		MapType:           set.Field("Map Type"),
+		SearchEnabled:     sheetBool(set.Field("Search Bar")),
+		SearchText:        set.Field("Search Bar Text"),
+		SearchUseLocation: sheetBool(set.Field("Search Bar Use Location")),
+		ReadMoreEnabled:   sheetBool(set.Field("Read More")),
+		TooltipsEnabled:   sheetBool(tip.Field("Tooltips Enabled")),
+		TooltipValue:      tip.Field("Tooltip Value"),
+		FeaturedDocLink:   set.Field("Featured Story Document Link"),
+		CustomCodeURL:     set.Field("Custom Code"),
+		Blurb:             hdr.Field("Blurb"),
+		Description:       hdr.Field("Description"),
+		InternalID:        hdr.Field("Internal ID"),
+		Kicker:            hdr.Field("Kicker"),
+		Topics:            topics,
+		GeoJSON:           geojson,
+		Credits:           credits,
 	}
 
 	return []MapPage{page}, nil
