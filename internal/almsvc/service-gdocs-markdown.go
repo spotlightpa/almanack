@@ -2,9 +2,9 @@ package almsvc
 
 import (
 	"fmt"
-	"maps"
 	"net/url"
 	"slices"
+	"strconv"
 	"strings"
 
 	"github.com/earthboundkid/xhtml"
@@ -12,6 +12,7 @@ import (
 	"github.com/spotlightpa/almanack/internal/db"
 	"github.com/spotlightpa/almanack/internal/utils/lazy"
 	"github.com/spotlightpa/almanack/internal/utils/must"
+	"github.com/spotlightpa/almanack/internal/utils/shortcode"
 	"golang.org/x/net/html"
 	"golang.org/x/net/html/atom"
 )
@@ -82,29 +83,28 @@ func intermediateDocToMarkdown(doc *html.Node) string {
 			default:
 				tag = "picture"
 			}
-			var widthHeight string
+
+			attrs := []string{
+				"src", image.Path,
+			}
 			if image.Width != 0 {
-				widthHeight = fmt.Sprintf(`width-ratio="%d" height-ratio="%d" `,
-					image.Width, image.Height,
-				)
+				attrs = append(attrs,
+					"width-ratio", strconv.Itoa(image.Width),
+					"height-ratio", strconv.Itoa(image.Height))
 			}
-			focus := ""
+
 			if image.Focus != "" {
-				focus = fmt.Sprintf(`focus="%s" `, html.EscapeString(image.Focus))
+				attrs = append(attrs, "focus", image.Focus)
 			}
-			data := fmt.Sprintf(
-				`{{<%s src="%s" %s%sdescription="%s" caption="%s" credit="%s">}}`,
-				tag,
-				image.Path,
-				widthHeight,
-				focus,
-				html.EscapeString(strings.TrimSpace(image.Description)),
-				html.EscapeString(strings.TrimSpace(image.Caption)),
-				html.EscapeString(strings.TrimSpace(image.Credit)),
+			attrs = append(attrs,
+				"description", image.Description,
+				"caption", image.Caption,
+				"credit", image.Credit,
 			)
+
 			xhtml.ReplaceWith(dataEl, &html.Node{
 				Type: html.RawNode,
-				Data: data,
+				Data: shortcode.New(tag, attrs...),
 			})
 		default:
 			panic("unknown embed type: " + dbembed.Type)
@@ -171,20 +171,7 @@ func replaceSpotlightShortcodes(s string) string {
 			return s
 		}
 		tag = strings.TrimPrefix(tag, "embeds/")
-		q := u.Query()
-		buf.WriteString("{{<embed/")
-		buf.WriteString(tag)
-		for _, k := range slices.Sorted(maps.Keys(q)) {
-			vv := q[k]
-			for _, v := range vv {
-				buf.WriteString(" ")
-				buf.WriteString(k)
-				buf.WriteString("=\"")
-				buf.WriteString(escapeAttr(v))
-				buf.WriteString("\"")
-			}
-		}
-		buf.WriteString(">}}")
+		buf.WriteString(shortcode.NewMapAttrs("embed/"+tag, u.Query()))
 	}
 
 	// $("iframe[src~=vimeo]")
