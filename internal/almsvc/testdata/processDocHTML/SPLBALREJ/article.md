@@ -44,7 +44,7 @@ But Dennis Wright, a Black resident of West Oak Lane, said he takes responsibili
 
 “I’ve been voting my whole life and I’m 79 years old. And I did miss something on my ballot. So I chalk it up to that,” he said.
 
-{{<datawrapper src="https://datawrapper.dwcdn.net/auiXw/6/" height="380" >}}
+{{<datawrapper src="https://datawrapper.dwcdn.net/auiXw/6/" height="380">}}
 
 ## Legal saga continues
 

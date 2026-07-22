@@ -61,7 +61,7 @@ func TestReplaceSpotlightShortcodes(t *testing.T) {
 		{
 			`<div style="padding:56.25% 0 0 0;position:relative;"><iframe src="https://player.vimeo.com/video/990627534?h=89f8de8242&color=ffcb05&title=0&byline=0" style="position:absolute;top:0;left:0;width:100%;height:100%;" frameborder="0" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen></iframe></div><script src="https://player.vimeo.com/api/player.js"></script>
 			`,
-			`{{<vimeo id="990627534" secret="89f8de8242" >}}`,
+			`{{<vimeo id="990627534" secret="89f8de8242">}}`,
 		},
 		{
 			`<script src="https://www.spotlightpa.org/embed.js" async></script><div data-spl-embed-version="1" data-spl-src="https://www.spotlightpa.org/embeds/cta/?body=It's%20%3Cb%3Ecool%3C%2Fb%3E."></div>` +
@@ -72,11 +72,11 @@ func TestReplaceSpotlightShortcodes(t *testing.T) {
 				`<iframe class="scribd_iframe_embed" title="GOP Senate letter to Congress" src="https://www.scribd.com/embeds/489945100/content?start_page=1&view_mode=scroll&access_key=key-29gXRO2IEpbetVJqdcQL" data-auto-height="true" data-aspect-ratio="0.7729220222793488" scrolling="no" width="100%" height="600" frameborder="0"></iframe><p  style="   margin: 12px auto 6px auto;   font-family: Helvetica,Arial,Sans-serif;   font-style: normal;   font-variant: normal;   font-weight: normal;   font-size: 14px;   line-height: normal;   font-size-adjust: none;   font-stretch: normal;   -x-system-font: none;   display: block;"   ><a title="View GOP Senate letter to Congress on Scribd" href="https://www.scribd.com/document/489945100/GOP-Senate-letter-to-Congress"  style="text-decoration: underline;">GOP Senate letter to Congress</a> by <a title="View Sarah Anne Hughes's profile on Scribd" href="https://www.scribd.com/user/507961525/Sarah-Anne-Hughes"  style="text-decoration: underline;">Sarah Anne Hughes</a></p>` +
 				`<div data-tf-live="01HFS5TPTDZNNK7PV48PN752KC"></div><script src="//embed.typeform.com/next/embed.js"></script>`,
 			`{{<embed/cta body="It&#39;s &lt;b&gt;cool&lt;/b&gt;.">}}` + "\n" +
-				`{{<vimeo id="990627534" secret="89f8de8242" >}}` + "\n" +
-				`{{<flourish src="visualisation/18665405" >}}` + "\n" +
-				`{{<datawrapper src="https://datawrapper.dwcdn.net/8hdP8/5/" height="650" >}}` + "\n" +
-				`{{<scribd src="https://www.scribd.com/embeds/489945100/content?start_page=1&amp;view_mode=scroll&amp;access_key=key-29gXRO2IEpbetVJqdcQL" >}}` + "\n" +
-				`{{<typeform id="01HFS5TPTDZNNK7PV48PN752KC" >}}`,
+				`{{<vimeo id="990627534" secret="89f8de8242">}}` + "\n" +
+				`{{<flourish src="visualisation/18665405">}}` + "\n" +
+				`{{<datawrapper src="https://datawrapper.dwcdn.net/8hdP8/5/" height="650">}}` + "\n" +
+				`{{<scribd src="https://www.scribd.com/embeds/489945100/content?start_page=1&amp;view_mode=scroll&amp;access_key=key-29gXRO2IEpbetVJqdcQL">}}` + "\n" +
+				`{{<typeform id="01HFS5TPTDZNNK7PV48PN752KC">}}`,
 		},
 		{
 			`
@@ -142,7 +142,7 @@ var deweyConfig = {
 		},
 		{
 			`<div style="min-height:609px;" id="datawrapper-vis-R2dcp"><script type="text/javascript" defer src="https://datawrapper.dwcdn.net/R2dcp/embed.js" charset="utf-8" data-target="#datawrapper-vis-R2dcp"></script><noscript><img src="https://datawrapper.dwcdn.net/R2dcp/full.png" alt="" /></noscript></div>`,
-			`{{<datawrapper src="https://datawrapper.dwcdn.net/R2dcp/" height="609" >}}`,
+			`{{<datawrapper src="https://datawrapper.dwcdn.net/R2dcp/" height="609">}}`,
 		},
 	}
 	for _, tc := range cases {
