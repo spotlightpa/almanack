@@ -18,6 +18,6 @@ Spotlight PA held a free panel discussion on the major components of the budget,
 
 - <strong>Stan Saylor,</strong> former House GOP appropriations chair
 
-{{<vimeo id="990627534" secret="89f8de8242" >}}
+{{<vimeo id="990627534" secret="89f8de8242">}}
 
 <strong>» Spotlight PA’s events operate on a “pay-what-you-can” honor system.</strong> If you value this public-service event, pay it forward and contribute any amount to Spotlight PA now so we can keep our programming free for everyone: <a href="http://spotlightpa.org/donate">spotlightpa.org/donate</a>.

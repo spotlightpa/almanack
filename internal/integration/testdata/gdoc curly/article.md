@@ -38,7 +38,7 @@ The most high-profile problem stemmed from a human error programming Northampton
 
 Coulter said ballot-printing errors can shake voter trust. “You have \[paper ballots\] because they are a verifiable record of the election,” Coulter said. “If you&#39;re going to audit elections after, like in a <a href="https://www.spotlightpa.org/news/2022/11/pa-election-2022-results-audit-governors-race/">risk-limiting audit</a>, to make sure everything is correct, what are you going to do if the ballot itself is not correct?”
 
-{{<datawrapper src="“https://datawrapper.dwcdn.net/IuQva/6/”" height="“351&#34;" >}}
+{{<datawrapper src="“https://datawrapper.dwcdn.net/IuQva/6/”" height="“351&#34;">}}
 
 ## ‘A perfect storm’
 

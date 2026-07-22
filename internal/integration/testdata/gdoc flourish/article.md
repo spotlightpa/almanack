@@ -28,7 +28,7 @@ These two trends form a perfect storm for Democratic registration to dip, but do
 
 With Pennsylvania’s Oct. 21 registration deadline fast approaching, Republicans have nearly 40,000 more voters than they had in November 2020. Democrats, on the other hand, are roughly 303,000 voters behind their 2020 status.
 
-{{<flourish src="visualisation/19446355" >}}
+{{<flourish src="visualisation/19446355">}}
 
 ## The push to win Pennsylvania voters
 
@@ -48,7 +48,7 @@ Jondavid Longo, Early Vote Action’s Pennsylvania director, said the group some
 
 “In almost every county, consistently, for almost an entire year, since January, Republicans have outperformed Democrats in voter registration numbers nearly every month or and in nearly every county,” Longo said.
 
-{{<flourish src="story/2611254" >}}
+{{<flourish src="story/2611254">}}
 
 But registration isn’t the only factor the parties care about.
 
