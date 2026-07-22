@@ -169,8 +169,8 @@ func replaceSpotlightShortcodes(s string) string {
 		}, tag) {
 			return s
 		}
-		tag = strings.TrimPrefix(tag, "embeds/")
-		buf.WriteString(shortcode.NewMapAttrs("embed/"+tag, u.Query()))
+		tag = strings.Replace(tag, "embeds/", "embed/", 1)
+		buf.WriteString(shortcode.NewMapAttrs(tag, u.Query()))
 	}
 
 	// $("iframe[src~=vimeo]")
