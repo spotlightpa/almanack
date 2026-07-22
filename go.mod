@@ -107,3 +107,9 @@ require (
 )
 
 exclude github.com/imdario/mergo v1.0.0
+
+ignore (
+	node_modules
+	public
+	src
+)
