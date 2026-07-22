@@ -1,7 +1,6 @@
 package almsvc
 
 import (
-	"fmt"
 	"net/url"
 	"slices"
 	"strconv"
@@ -138,7 +137,7 @@ func replaceSpotlightShortcodes(s string) string {
 
 	// Fundraise Up psuedolink
 	if matches := fruRe().FindStringSubmatch(s); len(matches) == 2 {
-		return fmt.Sprintf(`{{<fundraiseup id="%s">}}`, matches[1])
+		return shortcode.New("fundraiseup", "id", matches[1])
 	}
 	n, err := html.Parse(strings.NewReader(s))
 	if err != nil {
@@ -225,7 +224,9 @@ func replaceSpotlightShortcodes(s string) string {
 		isFirst = false
 		src := xhtml.Attr(el, "src")
 		height := xhtml.Attr(el, "height")
-		buf.WriteString(shortcode.New("datawrapper", "src", src, "height", height))
+		buf.WriteString(shortcode.New("datawrapper",
+			"src", src,
+			"height", height))
 	}
 
 	// $("script[src~=datawrapper.dwcdn.net]")
@@ -245,7 +246,9 @@ func replaceSpotlightShortcodes(s string) string {
 		// We're lazy and just look for digits.
 		parentStyle := xhtml.Attr(el.Parent, "style")
 		height := digitsRe().FindString(parentStyle)
-		buf.WriteString(shortcode.New("datawrapper", "src", src, "height", height))
+		buf.WriteString(shortcode.New("datawrapper",
+			"src", src,
+			"height", height))
 	}
 
 	// $("iframe[src~=https://www.scribd.com/embeds/]")
