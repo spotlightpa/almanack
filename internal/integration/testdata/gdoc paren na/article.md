@@ -10,12 +10,12 @@ This is my \_<a href="https://docs.google.com/document/d/103kCeBG2OQS_ZHkHUyKpT9
 
 {{<embed/raw srcdoc="&lt;script src=&#34;http://example.com/&#34;&gt;&lt;/script&gt;">}}
 
-{{<picture src="external/cwp3y3z5x8svbtsfv7t68hggc0.png" description="Blah blah blah." caption="Here is a caption" credit="CarlCo">}}
+{{<picture caption="Here is a caption" credit="CarlCo" description="Blah blah blah." src="external/cwp3y3z5x8svbtsfv7t68hggc0.png">}}
 
 Here is <em>some</em> <strong>text</strong>. Lorem ipsum.
 
-{{<picture src="external/75h9dj4qkszh2ydb6e3h9pn2r0.jpeg" description="" caption="Overdose awareness" credit="Amanda Berg">}}
+{{<picture caption="Overdose awareness" credit="Amanda Berg" description="" src="external/75h9dj4qkszh2ydb6e3h9pn2r0.jpeg">}}
 
 And here’s another image:
 
-{{<picture src="external/08v6tmkadg07fyknwy3pb8sm3m.jpeg" description="The House floor in the Pa. Capitol. The chamber is controlled by Democrats for the first session in more than a &#34;decade.&#34;" caption="" credit="Amanda Berg / For Spotlight PA">}}
+{{<picture caption="" credit="Amanda Berg / For Spotlight PA" description="The House floor in the Pa. Capitol. The chamber is controlled by Democrats for the first session in more than a &#34;decade.&#34;" src="external/08v6tmkadg07fyknwy3pb8sm3m.jpeg">}}

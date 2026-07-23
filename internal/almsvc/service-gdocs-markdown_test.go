@@ -94,7 +94,7 @@ func TestReplaceSpotlightShortcodes(t *testing.T) {
 		},
 		{
 			`<iframe width="560" height="315" src="https://www.youtube-nocookie.com/embed/XbnubJm-ofk?si=QdOwK7Cv4oF3QNb_&amp;start=11" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>`,
-			`{{<youtube id="XbnubJm-ofk" start="11" loading="lazy">}}`,
+			`{{<youtube id="XbnubJm-ofk" loading="lazy" start="11">}}`,
 		},
 		{
 			`<script type="text/javascript">

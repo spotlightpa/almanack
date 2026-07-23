@@ -84,27 +84,23 @@ func intermediateDocToMarkdown(doc *html.Node) string {
 				tag = "picture"
 			}
 
-			attrs := []string{
-				"src", image.Path,
+			attrs := map[string]string{
+				"src":         image.Path,
+				"description": image.Description,
+				"caption":     image.Caption,
+				"credit":      image.Credit,
 			}
 			if image.Width != 0 {
-				attrs = append(attrs,
-					"width-ratio", strconv.Itoa(image.Width),
-					"height-ratio", strconv.Itoa(image.Height))
+				attrs["width-ratio"] = strconv.Itoa(image.Width)
+				attrs["height-ratio"] = strconv.Itoa(image.Height)
 			}
-
 			if image.Focus != "" {
-				attrs = append(attrs, "focus", image.Focus)
+				attrs["focus"] = image.Focus
 			}
-			attrs = append(attrs,
-				"description", image.Description,
-				"caption", image.Caption,
-				"credit", image.Credit,
-			)
 
 			xhtml.ReplaceWith(dataEl, &html.Node{
 				Type: html.RawNode,
-				Data: shortcode.New(tag, attrs...),
+				Data: shortcode.New(tag, stringx.FlattenMap(attrs)...),
 			})
 		default:
 			panic("unknown embed type: " + dbembed.Type)
@@ -297,12 +293,14 @@ func replaceSpotlightShortcodes(s string) string {
 		src := xhtml.Attr(el, "src")
 		u := must.Get(url.Parse(src))
 		id := strings.TrimPrefix(u.Path, "/embed/")
-		attrs := []string{"id", id}
-		if start := u.Query().Get("start"); start != "" {
-			attrs = append(attrs, "start", start)
+		attrs := map[string]string{
+			"id":      id,
+			"loading": "lazy",
 		}
-		attrs = append(attrs, "loading", "lazy")
-		buf.WriteString(shortcode.New("youtube", attrs...))
+		if start := u.Query().Get("start"); start != "" {
+			attrs["start"] = start
+		}
+		buf.WriteString(shortcode.New("youtube", stringx.FlattenMap(attrs)...))
 	}
 
 	if buf.Len() > 0 {
