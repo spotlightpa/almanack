@@ -10,6 +10,7 @@ import (
 	"github.com/spotlightpa/almanack/internal/convert/blocko"
 	"github.com/spotlightpa/almanack/internal/db"
 	"github.com/spotlightpa/almanack/internal/utils/lazy"
+	"github.com/spotlightpa/almanack/internal/utils/mapx"
 	"github.com/spotlightpa/almanack/internal/utils/must"
 	"github.com/spotlightpa/almanack/internal/utils/shortcode"
 	"golang.org/x/net/html"
@@ -170,7 +171,7 @@ func replaceSpotlightShortcodes(s string) string {
 			return s
 		}
 		tag = strings.Replace(tag, "embeds/", "embed/", 1)
-		buf.WriteString(shortcode.NewMapAttrs(tag, u.Query()))
+		buf.WriteString(shortcode.New(tag, mapx.FlattenMulti(u.Query())...))
 	}
 
 	// $("iframe[src~=vimeo]")

@@ -58,32 +58,3 @@ func TestNewPanicsOnOddAttrs(t *testing.T) {
 	})
 	be.Nonzero(t, r)
 }
-
-func TestNewMapAttrs(t *testing.T) {
-	cases := []struct {
-		tag   string
-		attrs map[string][]string
-		want  string
-	}{
-		{
-			tag:  "embed/donate",
-			want: `{{<embed/donate>}}`,
-		},
-		{
-			// Keys are sorted
-			tag:   "embed/newsletter",
-			attrs: map[string][]string{"preselect": {"palocal"}, "button": {"Sign Up"}},
-			want:  `{{<embed/newsletter button="Sign Up" preselect="palocal">}}`,
-		},
-		{
-			// Multi-value keys repeat the key
-			tag:   "multi",
-			attrs: map[string][]string{"k": {"a", "b"}},
-			want:  `{{<multi k="a" k="b">}}`,
-		},
-	}
-	for _, tc := range cases {
-		got := shortcode.NewMapAttrs(tc.tag, tc.attrs)
-		be.Equal(t, tc.want, got)
-	}
-}
