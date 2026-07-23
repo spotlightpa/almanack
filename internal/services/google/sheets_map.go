@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/earthboundkid/resperr/v2"
+	"github.com/spotlightpa/almanack/internal/almlog"
 	"github.com/spotlightpa/almanack/internal/db"
 	"github.com/spotlightpa/almanack/internal/utils/stringx"
 	spreadsheet "gopkg.in/Iwark/spreadsheet.v2"
@@ -302,12 +303,19 @@ func SheetToMapPages(ctx context.Context, cl *http.Client, sheetID string) ([]Ma
 	}
 
 	publishedStr := hdr.Field("Published")
-	var publishedAt time.Time
+	publishedAt := time.Now()
 	if publishedStr != "" {
-		publishedAt, _ = time.Parse("2006-01-02", publishedStr)
-	}
-	if publishedAt.IsZero() {
-		publishedAt = time.Now()
+		loc, lerr := time.LoadLocation("America/New_York")
+		if lerr != nil {
+			return nil, lerr
+		}
+		parsed, perr := time.ParseInLocation("2006-01-02", publishedStr, loc)
+		if perr != nil {
+			l := almlog.FromContext(ctx)
+			l.ErrorContext(ctx, "SheetToMapPages: invalid Published date", "value", publishedStr, "err", perr)
+		} else {
+			publishedAt = parsed
+		}
 	}
 
 	topicsStr := hdr.Field("Topics")
