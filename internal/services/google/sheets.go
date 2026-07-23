@@ -133,7 +133,9 @@ func (sm *SheetMap) Next() bool {
 func (sm *SheetMap) Field(fieldname string) string {
 	fieldname = strings.ToLower(fieldname)
 	if idx, ok := sm.idx[fieldname]; ok {
-		return strings.TrimSpace(sm.sheet.Rows[sm.row][idx].Value)
+		if idx < len(sm.sheet.Rows[sm.row]) {
+			return strings.TrimSpace(sm.sheet.Rows[sm.row][idx].Value)
+		}
 	}
 	return ""
 }

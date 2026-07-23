@@ -229,54 +229,21 @@ func sheetPercent(s string) string {
 }
 
 type sheetMapSkipDescription struct {
-	sheet *spreadsheet.Sheet
-	idx   map[string]int
-	row   int
+	SheetMap
 }
 
 func newSheetMapSkipDescription(sheet *spreadsheet.Sheet) *sheetMapSkipDescription {
-	return &sheetMapSkipDescription{sheet: sheet, row: 0}
+	return &sheetMapSkipDescription{SheetMap: *NewSheetMap(sheet)}
 }
 
 func (sm *sheetMapSkipDescription) Next() bool {
-	if sm.idx == nil {
-		if len(sm.sheet.Rows) < 1 {
-			return false
-		}
-		sm.idx = make(map[string]int)
-		for i, cell := range sm.sheet.Rows[0] {
-			s := strings.ToLower(strings.TrimSpace(cell.Value))
-			if s == "" {
-				continue
-			}
-			sm.idx[s] = i
-		}
+	if !sm.SheetMap.Next() {
+		return false
 	}
-	for {
-		sm.row++
-		if len(sm.sheet.Rows) <= sm.row {
-			return false
-		}
-		// skip the description row (row index 1)
-		if sm.row == 1 {
-			continue
-		}
-		for _, cell := range sm.sheet.Rows[sm.row] {
-			if strings.TrimSpace(cell.Value) != "" {
-				return true
-			}
-		}
+	if sm.row == 1 {
+		return sm.SheetMap.Next()
 	}
-}
-
-func (sm *sheetMapSkipDescription) Field(fieldname string) string {
-	fieldname = strings.ToLower(fieldname)
-	if idx, ok := sm.idx[fieldname]; ok {
-		if idx < len(sm.sheet.Rows[sm.row]) {
-			return strings.TrimSpace(sm.sheet.Rows[sm.row][idx].Value)
-		}
-	}
-	return ""
+	return true
 }
 
 func SheetToMapPages(ctx context.Context, cl *http.Client, sheetID string) ([]MapPage, error) {
