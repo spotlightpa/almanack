@@ -1059,17 +1059,3 @@ func (app *appEnv) postPageLoad(w http.ResponseWriter, r *http.Request) http.Han
 	}
 	return app.jsonOK(page.ID)
 }
-
-func (app *appEnv) postMapSheet(w http.ResponseWriter, r *http.Request) http.Handler {
-	app.logStart(r)
-	sheetID, err := app.svc.Queries.GetOption(r.Context(), "map-sheet")
-	if err != nil {
-		return app.jsonErr(err)
-	}
-	ctx := context.WithoutCancel(r.Context())
-	if err := app.svc.SyncMapSheet(ctx, sheetID); err != nil {
-		return app.jsonErr(err)
-	}
-	app.replyJSON(http.StatusAccepted, w, http.StatusText(http.StatusAccepted))
-	return nil
-}

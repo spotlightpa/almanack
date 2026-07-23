@@ -52,7 +52,6 @@ func (app *appEnv) routes() http.Handler {
 		HandleFunc(mux, `POST /api/authorized-domains`, app.postDomain).
 		HandleFunc(mux, `POST /api/create-signed-upload`, app.postSignedUpload).
 		Control(mux, `POST /api/donor-wall`, app.postDonorWall).
-		Control(mux, `POST /api/map-sheet`, app.postMapSheet).
 		HandleFunc(mux, `POST /api/files-create`, app.postFileCreate).
 		HandleFunc(mux, `GET /api/files-list`, app.listFiles).
 		HandleFunc(mux, `POST /api/files-update`, app.postFileUpdate).
@@ -109,6 +108,12 @@ func (app *appEnv) routes() http.Handler {
 			app.hasRoleMiddleware("Spotlight PA"),
 		).
 		Control(mux, `POST /api-background/migrate`, app.postMigrate)
+	backgroundMW.
+		With(
+			app.authHeaderMiddleware,
+			app.hasRoleMiddleware("Spotlight PA"),
+		).
+		Control(mux, `POST /api-background/map-sheet`, app.postMapSheet)
 	// End background API endpoints
 
 	standardMW.HandleFunc(mux, "/", app.notFound)
