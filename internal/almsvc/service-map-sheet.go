@@ -38,7 +38,12 @@ func (svc Services) SyncMapSheet(ctx context.Context, sheetID string) (err error
 			}
 		}
 
-		content := page.ToMarkdown(featured)
+		content, mderr := page.ToMarkdown(featured)
+		if mderr != nil {
+			l.ErrorContext(ctx, "SyncMapSheet: ToMarkdown", "slug", page.Slug, "err", mderr)
+			err = mderr
+			continue
+		}
 		path := page.FilePath()
 		msg := fmt.Sprintf("Maps: publish %q from sheet", page.Slug)
 		if writeErr := svc.ContentStore.UpdateFile(ctx, msg, path, []byte(content)); writeErr != nil {

@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/earthboundkid/resperr/v2"
+	"github.com/spotlightpa/almanack/internal/db"
 	"github.com/spotlightpa/almanack/internal/utils/stringx"
 	spreadsheet "gopkg.in/Iwark/spreadsheet.v2"
 )
@@ -70,59 +71,33 @@ func (m MapPage) FilePath() string {
 	return fmt.Sprintf("content/%s/%s.md", section, name)
 }
 
-func (m MapPage) ToMarkdown(featuredMD string) string {
-	var sb strings.Builder
+func (m MapPage) ToMarkdown(featuredMD string) (string, error) {
+	var authors []string
+	if m.Byline != "" {
+		authors = stringx.ExtractNames(m.Byline)
+	}
+	fm, err := db.FrontmatterTOML(map[string]any{
+		"authors":      authors,
+		"blurb":        m.Blurb,
+		"byline":       m.Byline,
+		"description":  m.Description,
+		"internal-id":  m.InternalID,
+		"kicker":       m.Kicker,
+		"layout":       "searchable-map",
+		"published":    m.PublishedAt,
+		"slug":         m.Slug,
+		"suppress-ads": true,
+		"title":        m.Headline,
+		"title-tag":    m.Headline,
+		"topics":       m.Topics,
+	})
+	if err != nil {
+		return "", err
+	}
 
-	sb.WriteString("+++\n")
-	if m.Byline != "" {
-		parts := stringx.ExtractNames(m.Byline)
-		sb.WriteString("authors = [")
-		for i, p := range parts {
-			if i > 0 {
-				sb.WriteString(", ")
-			}
-			fmt.Fprintf(&sb, "%q", p)
-		}
-		sb.WriteString("]\n")
-	}
-	if m.Blurb != "" {
-		fmt.Fprintf(&sb, "blurb = %q\n", m.Blurb)
-	}
-	if m.Byline != "" {
-		fmt.Fprintf(&sb, "byline = %q\n", m.Byline)
-	}
-	if m.Description != "" {
-		fmt.Fprintf(&sb, "description = %q\n", m.Description)
-	}
-	if m.InternalID != "" {
-		fmt.Fprintf(&sb, "internal-id = %q\n", m.InternalID)
-	}
-	if m.Kicker != "" {
-		fmt.Fprintf(&sb, "kicker = %q\n", m.Kicker)
-	}
-	sb.WriteString("layout = \"searchable-map\"\n")
-	if !m.PublishedAt.IsZero() {
-		fmt.Fprintf(&sb, "published = %s\n", m.PublishedAt.Format(time.RFC3339))
-	}
-	if m.Slug != "" {
-		fmt.Fprintf(&sb, "slug = %q\n", m.Slug)
-	}
-	sb.WriteString("suppress-ads = true\n")
-	if m.Headline != "" {
-		fmt.Fprintf(&sb, "title = %q\n", m.Headline)
-		fmt.Fprintf(&sb, "title-tag = %q\n", m.Headline)
-	}
-	if len(m.Topics) > 0 {
-		sb.WriteString("topics = [")
-		for i, t := range m.Topics {
-			if i > 0 {
-				sb.WriteString(", ")
-			}
-			fmt.Fprintf(&sb, "%q", t)
-		}
-		sb.WriteString("]\n")
-	}
-	sb.WriteString("+++\n\n")
+	var sb strings.Builder
+	sb.WriteString(fm)
+	sb.WriteString("\n")
 
 	sb.WriteString("{{<featured/map-header\n")
 	if m.Eyebrow != "" {
@@ -214,7 +189,7 @@ func (m MapPage) ToMarkdown(featuredMD string) string {
 		sb.WriteString("{{</featured/footer>}}\n")
 	}
 
-	return sb.String()
+	return sb.String(), nil
 }
 
 func sheetBool(s string) bool {
