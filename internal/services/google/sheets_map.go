@@ -312,7 +312,7 @@ func SheetToMapPages(ctx context.Context, cl *http.Client, sheetID string) ([]Ma
 
 	topicsStr := hdr.Field("Topics")
 	var topics []string
-	for _, t := range strings.Split(topicsStr, ",") {
+	for t := range strings.SplitSeq(topicsStr, ",") {
 		t = strings.TrimSpace(t)
 		if t != "" {
 			topics = append(topics, t)
