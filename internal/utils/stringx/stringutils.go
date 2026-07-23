@@ -3,6 +3,7 @@ package stringx
 
 import (
 	"fmt"
+	"maps"
 	"slices"
 	"strings"
 	"unicode"
@@ -166,6 +167,32 @@ func Truncate(s string, maximum int) string {
 	}
 	truncated := r[:max(maximum-3, 0)]
 	return string(truncated) + "…"
+}
+
+// FlattenMap converts a map[string]string to a []string of alternating
+// key-value pairs sorted by key.
+func FlattenMap(m map[string]string) []string {
+	result := make([]string, 0, len(m)*2)
+	for _, k := range slices.Sorted(maps.Keys(m)) {
+		result = append(result, k, m[k])
+	}
+	return result
+}
+
+// FlattenMultimap converts a map[string][]string to a []string of alternating
+// key-value pairs sorted by key, repeating the key for each value.
+func FlattenMultimap(m map[string][]string) []string {
+	size := 0
+	for _, vs := range m {
+		size += len(vs)
+	}
+	result := make([]string, 0, size*2)
+	for _, k := range slices.Sorted(maps.Keys(m)) {
+		for _, v := range m[k] {
+			result = append(result, k, v)
+		}
+	}
+	return result
 }
 
 // UnwrapSlice unwraps and copies a slice of strings from an untyped map.
