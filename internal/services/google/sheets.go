@@ -3,6 +3,7 @@ package google
 import (
 	"context"
 	"fmt"
+	"iter"
 	"net/http"
 	"strings"
 
@@ -123,6 +124,16 @@ func (sm *SheetMap) Next() bool {
 			s := strings.TrimSpace(cell.Value)
 			if s != "" {
 				return true
+			}
+		}
+	}
+}
+
+func (sm *SheetMap) Rows() iter.Seq[int] {
+	return func(yield func(int) bool) {
+		for sm.Next() {
+			if !yield(sm.row) {
+				return
 			}
 		}
 	}

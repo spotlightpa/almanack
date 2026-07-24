@@ -3,6 +3,7 @@ package google
 import (
 	"context"
 	"fmt"
+	"iter"
 	"net/http"
 	"strconv"
 	"strings"
@@ -238,14 +239,24 @@ func newSheetMapSkipDescription(sheet *spreadsheet.Sheet) *sheetMapSkipDescripti
 	return &sheetMapSkipDescription{SheetMap: *NewSheetMap(sheet)}
 }
 
-func (sm *sheetMapSkipDescription) Next() bool {
-	if !sm.SheetMap.Next() {
-		return false
+func (sm *sheetMapSkipDescription) Rows() iter.Seq[int] {
+	return func(yield func(int) bool) {
+		for row := range sm.SheetMap.Rows() {
+			if row == 1 {
+				continue
+			}
+			if !yield(row) {
+				return
+			}
+		}
 	}
-	if sm.row == 1 {
-		return sm.SheetMap.Next()
+}
+
+func hasRow(seq iter.Seq[int]) bool {
+	for range seq {
+		return true
 	}
-	return true
+	return false
 }
 
 func SheetToMapPages(ctx context.Context, cl *http.Client, sheetID string) ([]MapPage, error) {
@@ -285,16 +296,16 @@ func SheetToMapPages(ctx context.Context, cl *http.Client, sheetID string) ([]Ma
 	dat := newSheetMapSkipDescription(dataSheet)
 	tip := newSheetMapSkipDescription(tooltipSheet)
 
-	if !hdr.Next() {
+	if !hasRow(hdr.Rows()) {
 		return nil, resperr.E{M: "No data rows in Header sheet"}
 	}
-	if !set.Next() {
+	if !hasRow(set.Rows()) {
 		return nil, resperr.E{M: "No data rows in Map Settings sheet"}
 	}
-	if !dat.Next() {
+	if !hasRow(dat.Rows()) {
 		return nil, resperr.E{M: "No data rows in Map Data sheet"}
 	}
-	if !tip.Next() {
+	if !hasRow(tip.Rows()) {
 		return nil, resperr.E{M: "No data rows in Map Tooltips sheet"}
 	}
 
@@ -330,7 +341,7 @@ func SheetToMapPages(ctx context.Context, cl *http.Client, sheetID string) ([]Ma
 
 	var credits []MapCredit
 	cred := newSheetMapSkipDescription(creditsSheet)
-	for cred.Next() {
+	for range cred.Rows() {
 		name := cred.Field("Name")
 		if name == "" {
 			continue
