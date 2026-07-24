@@ -148,7 +148,7 @@ func TestFlattenMap(t *testing.T) {
 		},
 	}
 	for _, tc := range cases {
-		be.DeepEqual(t, tc.want, stringx.FlattenMap(tc.in))
+		be.AllEqual(t, tc.want, stringx.FlattenMap(tc.in))
 	}
 }
 
@@ -174,6 +174,6 @@ func TestFlattenMultimap(t *testing.T) {
 		},
 	}
 	for _, tc := range cases {
-		be.DeepEqual(t, tc.want, stringx.FlattenMultimap(tc.in))
+		be.AllEqual(t, tc.want, stringx.FlattenMultimap(tc.in))
 	}
 }
