@@ -10,7 +10,6 @@ import (
 
 	"github.com/earthboundkid/resperr/v2"
 	"github.com/spotlightpa/almanack/internal/almlog"
-	"github.com/spotlightpa/almanack/internal/db"
 	"github.com/spotlightpa/almanack/internal/utils/stringx"
 	spreadsheet "gopkg.in/Iwark/spreadsheet.v2"
 )
@@ -77,7 +76,7 @@ func (m MapPage) ToMarkdown(featuredMD string) (string, error) {
 	if m.Byline != "" {
 		authors = stringx.ExtractNames(m.Byline)
 	}
-	fm, err := db.FrontmatterTOML(map[string]any{
+	fm, err := stringx.ToToml(map[string]any{
 		"authors":      authors,
 		"blurb":        m.Blurb,
 		"byline":       m.Byline,
@@ -97,7 +96,9 @@ func (m MapPage) ToMarkdown(featuredMD string) (string, error) {
 	}
 
 	var sb strings.Builder
+	sb.WriteString("+++\n")
 	sb.WriteString(fm)
+	sb.WriteString("+++\n")
 	sb.WriteString("\n")
 
 	sb.WriteString("{{<featured/map-header\n")

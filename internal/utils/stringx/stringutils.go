@@ -4,11 +4,15 @@ package stringx
 import (
 	"fmt"
 	"maps"
+	"reflect"
 	"slices"
 	"strings"
+	"time"
 	"unicode"
 
+	"github.com/BurntSushi/toml"
 	"github.com/spotlightpa/almanack/internal/utils/lazy"
+	"github.com/spotlightpa/almanack/internal/utils/timex"
 	"golang.org/x/text/runes"
 	"golang.org/x/text/transform"
 	"golang.org/x/text/unicode/norm"
@@ -211,4 +215,39 @@ func UnwrapSlice(v any) []string {
 		return s == ""
 	})
 	return ss
+}
+
+func ToToml(m map[string]any) (string, error) {
+	var buf strings.Builder
+	enc := toml.NewEncoder(&buf)
+	cleaned := map[string]any{}
+	for key, val := range m {
+		if val == nil {
+			continue
+		}
+		if s, ok := val.(string); ok && s == "" {
+			continue
+		}
+		if t, ok := val.(time.Time); ok && t.IsZero() {
+			continue
+		}
+		if n, ok := val.(float64); ok && n == 0.0 {
+			continue
+		}
+		if n, ok := val.(int64); ok && n == 0 {
+			continue
+		}
+		if v := reflect.ValueOf(val); v.Kind() == reflect.Slice &&
+			v.Len() == 0 {
+			continue
+		}
+		if t, ok := timex.Unwrap(val); ok {
+			val = timex.ToEST(t)
+		}
+		cleaned[key] = val
+	}
+	if err := enc.Encode(cleaned); err != nil {
+		return "", err
+	}
+	return buf.String(), nil
 }
