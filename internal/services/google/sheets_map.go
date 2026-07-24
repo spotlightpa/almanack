@@ -11,6 +11,7 @@ import (
 
 	"github.com/earthboundkid/resperr/v2"
 	"github.com/spotlightpa/almanack/internal/almlog"
+	"github.com/spotlightpa/almanack/internal/utils/shortcode"
 	"github.com/spotlightpa/almanack/internal/utils/stringx"
 	spreadsheet "gopkg.in/Iwark/spreadsheet.v2"
 )
@@ -102,64 +103,65 @@ func (m MapPage) ToMarkdown(featuredMD string) (string, error) {
 	sb.WriteString("+++\n")
 	sb.WriteString("\n")
 
-	sb.WriteString("{{<featured/map-header\n")
+	var attrs []string
 	if m.Eyebrow != "" {
-		fmt.Fprintf(&sb, "  eyebrow=%q\n", m.Eyebrow)
+		attrs = append(attrs, "eyebrow", m.Eyebrow)
 	}
 	if m.Headline != "" {
-		fmt.Fprintf(&sb, "  hed=%q\n", m.Headline)
+		attrs = append(attrs, "hed", m.Headline)
 	}
 	if m.Dek != "" {
-		fmt.Fprintf(&sb, "  dek=%q\n", m.Dek)
+		attrs = append(attrs, "dek", m.Dek)
 	}
 	if m.Date != "" {
-		fmt.Fprintf(&sb, "  display-date=%q\n", m.Date)
+		attrs = append(attrs, "display-date", m.Date)
 	}
 	if m.Byline != "" {
-		fmt.Fprintf(&sb, "  byline=%q\n", m.Byline)
+		attrs = append(attrs, "byline", m.Byline)
 	}
 	if m.Color != "" {
-		fmt.Fprintf(&sb, "  color=%q\n", m.Color)
+		attrs = append(attrs, "color", m.Color)
 	}
 	if m.Layout != "" {
-		fmt.Fprintf(&sb, "  layout=%q\n", m.Layout)
+		attrs = append(attrs, "layout", m.Layout)
 	}
 	if m.MobileLayout != "" {
-		fmt.Fprintf(&sb, "  mobile-layout=%q\n", m.MobileLayout)
+		attrs = append(attrs, "mobile-layout", m.MobileLayout)
 	}
 	if m.ColorOpacity != "" {
-		fmt.Fprintf(&sb, "  color-opacity=%q\n", m.ColorOpacity)
+		attrs = append(attrs, "color-opacity", m.ColorOpacity)
 	}
 	if m.SearchEnabled {
-		sb.WriteString("  search=\"true\"\n")
+		attrs = append(attrs, "search", "true")
 	}
 	if m.SearchText != "" {
-		fmt.Fprintf(&sb, "  search-text=%q\n", m.SearchText)
+		attrs = append(attrs, "search-text", m.SearchText)
 	}
 	if m.SearchUseLocation {
-		sb.WriteString("  search-use-location=\"true\"\n")
+		attrs = append(attrs, "search-use-location", "true")
 	}
 	if m.ReadMoreEnabled {
-		sb.WriteString("  read-more=\"true\"\n")
+		attrs = append(attrs, "read-more", "true")
 	}
 	if m.TooltipsEnabled {
-		sb.WriteString("  tooltips=\"true\"\n")
+		attrs = append(attrs, "tooltips", "true")
 	}
 	if m.TooltipValue != "" {
 		tv := strings.NewReplacer("\r\n", "<br>", "\n", "<br>", "\r", "<br>").Replace(m.TooltipValue)
 		tv = strings.ReplaceAll(tv, `\n`, "<br>")
 		tv = trimBR(tv)
 		tv = strings.ReplaceAll(tv, `"`, "'")
-		fmt.Fprintf(&sb, "  tooltip-value=%q\n", tv)
+		attrs = append(attrs, "tooltip-value", tv)
 	}
 	if m.CustomCodeURL != "" {
-		fmt.Fprintf(&sb, "  custom-code=%q\n", m.CustomCodeURL)
+		attrs = append(attrs, "custom-code", m.CustomCodeURL)
 	}
-	sb.WriteString("  outlet=\"Spotlight PA\"\n")
+	attrs = append(attrs, "outlet", "Spotlight PA")
 	if m.GeoJSON != "" {
-		fmt.Fprintf(&sb, "  geojson=%q\n", m.GeoJSON)
+		attrs = append(attrs, "geojson", m.GeoJSON)
 	}
-	sb.WriteString(">}}\n")
+	sb.WriteString(shortcode.New("featured/map-header", attrs...))
+	sb.WriteString("\n")
 	if m.Body != "" {
 		sb.WriteString(m.Body)
 		sb.WriteString("\n")
@@ -172,22 +174,24 @@ func (m MapPage) ToMarkdown(featuredMD string) (string, error) {
 	}
 
 	if len(m.Credits) > 0 {
-		sb.WriteString("{{<featured/footer>}}\n")
+		sb.WriteString(shortcode.New("featured/footer"))
+		sb.WriteString("\n")
 		for _, c := range m.Credits {
-			sb.WriteString("{{<featured/credit\n")
+			var cattrs []string
 			if c.Eyebrow != "" {
-				fmt.Fprintf(&sb, "  eyebrow=%q\n", c.Eyebrow)
+				cattrs = append(cattrs, "eyebrow", c.Eyebrow)
 			}
 			if c.Name != "" {
-				fmt.Fprintf(&sb, "  name=%q\n", c.Name)
+				cattrs = append(cattrs, "name", c.Name)
 			}
 			if c.Role != "" {
-				fmt.Fprintf(&sb, "  role=%q\n", c.Role)
+				cattrs = append(cattrs, "role", c.Role)
 			}
 			if c.Email != "" {
-				fmt.Fprintf(&sb, "  email=%q\n", c.Email)
+				cattrs = append(cattrs, "email", c.Email)
 			}
-			sb.WriteString(">}}\n")
+			sb.WriteString(shortcode.New("featured/credit", cattrs...))
+			sb.WriteString("\n")
 		}
 		sb.WriteString("{{</featured/footer>}}\n")
 	}
