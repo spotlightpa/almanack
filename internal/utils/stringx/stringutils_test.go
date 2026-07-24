@@ -130,3 +130,50 @@ func TestTruncate(t *testing.T) {
 		})
 	}
 }
+
+func TestFlattenMap(t *testing.T) {
+	cases := []struct {
+		in   map[string]string
+		want []string
+	}{
+		{nil, []string{}},
+		{
+			map[string]string{"a": "1"},
+			[]string{"a", "1"},
+		},
+		{
+			// Keys are sorted
+			map[string]string{"b": "2", "a": "1"},
+			[]string{"a", "1", "b", "2"},
+		},
+	}
+	for _, tc := range cases {
+		be.AllEqual(t, tc.want, stringx.FlattenMap(tc.in))
+	}
+}
+
+func TestFlattenMultimap(t *testing.T) {
+	cases := []struct {
+		in   map[string][]string
+		want []string
+	}{
+		{nil, []string{}},
+		{
+			map[string][]string{"a": {"1"}},
+			[]string{"a", "1"},
+		},
+		{
+			// Keys are sorted
+			map[string][]string{"b": {"2"}, "a": {"1"}},
+			[]string{"a", "1", "b", "2"},
+		},
+		{
+			// Multi-value keys repeat the key
+			map[string][]string{"k": {"a", "b"}},
+			[]string{"k", "a", "k", "b"},
+		},
+	}
+	for _, tc := range cases {
+		be.AllEqual(t, tc.want, stringx.FlattenMultimap(tc.in))
+	}
+}

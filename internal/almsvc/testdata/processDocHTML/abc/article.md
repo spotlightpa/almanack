@@ -2,6 +2,6 @@
 
 HARRISBURG —
 
-{{<picture src="abc/123.jpeg" width-ratio="640" height-ratio="480" description="Desc 2" caption="Cap 1" credit="Cred 3">}}
+{{<picture caption="Cap 1" credit="Cred 3" description="Desc 2" height-ratio="480" src="abc/123.jpeg" width-ratio="640">}}
 
 <strong><em>BEFORE YOU GO…</em></strong><em> If you learned something from this article, pay it forward and contribute to Spotlight PA at </em><a href="http://spotlightpa.org/donate"><em>spotlightpa.org/donate</em></a><em>. Spotlight PA is funded by</em><a href="https://www.spotlightpa.org/support"><em> foundations and readers like you</em></a><em> who are committed to accountability journalism that gets results.</em>

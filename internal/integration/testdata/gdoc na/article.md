@@ -24,7 +24,7 @@ TO EMBED HTML
 
 TO ADD ADDITIONAL IMAGE
 
-{{<picture src="external/08v6tmkadg07fyknwy3pb8sm3m.jpeg" description="The House floor in the Pa. Capitol." caption="The House floor in the Pa. Capitol. The chamber is controlled by Democrats for the first session in more than a decade." credit="Amanda Berg / For Spotlight PA">}}
+{{<picture caption="The House floor in the Pa. Capitol. The chamber is controlled by Democrats for the first session in more than a decade." credit="Amanda Berg / For Spotlight PA" description="The House floor in the Pa. Capitol." src="external/08v6tmkadg07fyknwy3pb8sm3m.jpeg">}}
 
 TO HIDE TEXT FROM FINAL COPY:
 

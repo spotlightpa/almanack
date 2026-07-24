@@ -1,10 +1,9 @@
 package almsvc
 
 import (
-	"fmt"
-	"maps"
 	"net/url"
 	"slices"
+	"strconv"
 	"strings"
 
 	"github.com/earthboundkid/xhtml"
@@ -12,6 +11,8 @@ import (
 	"github.com/spotlightpa/almanack/internal/db"
 	"github.com/spotlightpa/almanack/internal/utils/lazy"
 	"github.com/spotlightpa/almanack/internal/utils/must"
+	"github.com/spotlightpa/almanack/internal/utils/shortcode"
+	"github.com/spotlightpa/almanack/internal/utils/stringx"
 	"golang.org/x/net/html"
 	"golang.org/x/net/html/atom"
 )
@@ -82,29 +83,24 @@ func intermediateDocToMarkdown(doc *html.Node) string {
 			default:
 				tag = "picture"
 			}
-			var widthHeight string
+
+			attrs := map[string]string{
+				"src":         image.Path,
+				"description": image.Description,
+				"caption":     image.Caption,
+				"credit":      image.Credit,
+			}
 			if image.Width != 0 {
-				widthHeight = fmt.Sprintf(`width-ratio="%d" height-ratio="%d" `,
-					image.Width, image.Height,
-				)
+				attrs["width-ratio"] = strconv.Itoa(image.Width)
+				attrs["height-ratio"] = strconv.Itoa(image.Height)
 			}
-			focus := ""
 			if image.Focus != "" {
-				focus = fmt.Sprintf(`focus="%s" `, html.EscapeString(image.Focus))
+				attrs["focus"] = image.Focus
 			}
-			data := fmt.Sprintf(
-				`{{<%s src="%s" %s%sdescription="%s" caption="%s" credit="%s">}}`,
-				tag,
-				image.Path,
-				widthHeight,
-				focus,
-				html.EscapeString(strings.TrimSpace(image.Description)),
-				html.EscapeString(strings.TrimSpace(image.Caption)),
-				html.EscapeString(strings.TrimSpace(image.Credit)),
-			)
+
 			xhtml.ReplaceWith(dataEl, &html.Node{
 				Type: html.RawNode,
-				Data: data,
+				Data: shortcode.New(tag, stringx.FlattenMap(attrs)...),
 			})
 		default:
 			panic("unknown embed type: " + dbembed.Type)
@@ -138,7 +134,7 @@ func replaceSpotlightShortcodes(s string) string {
 
 	// Fundraise Up psuedolink
 	if matches := fruRe().FindStringSubmatch(s); len(matches) == 2 {
-		return fmt.Sprintf(`{{<fundraiseup id="%s">}}`, matches[1])
+		return shortcode.New("fundraiseup", "id", matches[1])
 	}
 	n, err := html.Parse(strings.NewReader(s))
 	if err != nil {
@@ -170,21 +166,8 @@ func replaceSpotlightShortcodes(s string) string {
 		}, tag) {
 			return s
 		}
-		tag = strings.TrimPrefix(tag, "embeds/")
-		q := u.Query()
-		buf.WriteString("{{<embed/")
-		buf.WriteString(tag)
-		for _, k := range slices.Sorted(maps.Keys(q)) {
-			vv := q[k]
-			for _, v := range vv {
-				buf.WriteString(" ")
-				buf.WriteString(k)
-				buf.WriteString("=\"")
-				buf.WriteString(escapeAttr(v))
-				buf.WriteString("\"")
-			}
-		}
-		buf.WriteString(">}}")
+		tag = strings.Replace(tag, "embeds/", "embed/", 1)
+		buf.WriteString(shortcode.New(tag, stringx.FlattenMultimap(u.Query())...))
 	}
 
 	// $("iframe[src~=vimeo]")
@@ -205,13 +188,11 @@ func replaceSpotlightShortcodes(s string) string {
 		secret := u.Query().Get("h")
 		id := strings.TrimPrefix(u.Path, "/video/")
 
-		buf.WriteString("{{<vimeo id=\"")
-		buf.WriteString(escapeAttr(id))
+		attrs := []string{"id", id}
 		if secret != "" {
-			buf.WriteString("\" secret=\"")
-			buf.WriteString(escapeAttr(secret))
+			attrs = append(attrs, "secret", secret)
 		}
-		buf.WriteString("\" >}}")
+		buf.WriteString(shortcode.New("vimeo", attrs...))
 	}
 
 	// $("div.flourish-embed.flourish-table")
@@ -225,9 +206,7 @@ func replaceSpotlightShortcodes(s string) string {
 		}
 		isFirst = false
 		src := xhtml.Attr(el, "data-src")
-		buf.WriteString(`{{<flourish src="`)
-		buf.WriteString(escapeAttr(src))
-		buf.WriteString(`" >}}`)
+		buf.WriteString(shortcode.New("flourish", "src", src))
 	}
 
 	// $("iframe[src~=datawrapper.dwcdn.net]")
@@ -242,11 +221,9 @@ func replaceSpotlightShortcodes(s string) string {
 		isFirst = false
 		src := xhtml.Attr(el, "src")
 		height := xhtml.Attr(el, "height")
-		buf.WriteString(`{{<datawrapper src="`)
-		buf.WriteString(escapeAttr(src))
-		buf.WriteString(`" height="`)
-		buf.WriteString(escapeAttr(height))
-		buf.WriteString(`" >}}`)
+		buf.WriteString(shortcode.New("datawrapper",
+			"src", src,
+			"height", height))
 	}
 
 	// $("script[src~=datawrapper.dwcdn.net]")
@@ -266,11 +243,9 @@ func replaceSpotlightShortcodes(s string) string {
 		// We're lazy and just look for digits.
 		parentStyle := xhtml.Attr(el.Parent, "style")
 		height := digitsRe().FindString(parentStyle)
-		buf.WriteString(`{{<datawrapper src="`)
-		buf.WriteString(escapeAttr(src))
-		buf.WriteString(`" height="`)
-		buf.WriteString(escapeAttr(height))
-		buf.WriteString(`" >}}`)
+		buf.WriteString(shortcode.New("datawrapper",
+			"src", src,
+			"height", height))
 	}
 
 	// $("iframe[src~=https://www.scribd.com/embeds/]")
@@ -284,9 +259,7 @@ func replaceSpotlightShortcodes(s string) string {
 		}
 		isFirst = false
 		src := xhtml.Attr(el, "src")
-		buf.WriteString(`{{<scribd src="`)
-		buf.WriteString(escapeAttr(src))
-		buf.WriteString(`" >}}`)
+		buf.WriteString(shortcode.New("scribd", "src", src))
 	}
 
 	// $("div[data-tf-live]")
@@ -300,9 +273,7 @@ func replaceSpotlightShortcodes(s string) string {
 		}
 		isFirst = false
 		id := xhtml.Attr(el, "data-tf-live")
-		buf.WriteString(`{{<typeform id="`)
-		buf.WriteString(escapeAttr(id))
-		buf.WriteString(`" >}}`)
+		buf.WriteString(shortcode.New("typeform", "id", id))
 	}
 
 	// $("iframe[src^=https://youtube.com/embeds/]")
@@ -322,25 +293,19 @@ func replaceSpotlightShortcodes(s string) string {
 		src := xhtml.Attr(el, "src")
 		u := must.Get(url.Parse(src))
 		id := strings.TrimPrefix(u.Path, "/embed/")
-		buf.WriteString(`{{<youtube id="`)
-		buf.WriteString(escapeAttr(id))
-		if start := u.Query().Get("start"); start != "" {
-			buf.WriteString(`" start="`)
-			buf.WriteString(escapeAttr(start))
+		attrs := map[string]string{
+			"id":      id,
+			"loading": "lazy",
 		}
-		buf.WriteString(`" loading="lazy">}}`)
+		if start := u.Query().Get("start"); start != "" {
+			attrs["start"] = start
+		}
+		buf.WriteString(shortcode.New("youtube", stringx.FlattenMap(attrs)...))
 	}
 
 	if buf.Len() > 0 {
 		return buf.String()
 	}
 	// Unknown embed type
-	attr := escapeAttr(s)
-	return fmt.Sprintf(`{{<embed/raw srcdoc="%s">}}`, attr)
-}
-
-func escapeAttr(s string) string {
-	attr := html.EscapeString(s)
-	attr = strings.ReplaceAll(attr, "\n", "&#10;")
-	return attr
+	return shortcode.New("embed/raw", "srcdoc", s)
 }
