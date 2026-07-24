@@ -6,7 +6,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"path"
-	"reflect"
 	"strings"
 	"time"
 
@@ -58,40 +57,15 @@ func (page *Page) Save(ctx context.Context, txq *Queries, setLastPublished bool)
 }
 
 func (page *Page) ToTOML() (string, error) {
-	var buf strings.Builder
-	buf.WriteString("+++\n")
-	enc := toml.NewEncoder(&buf)
-	// Remove blank values
-	frontmatter := Map{}
-	for key, val := range page.Frontmatter {
-		if val == nil {
-			continue
-		}
-		if s, ok := val.(string); ok && s == "" {
-			continue
-		}
-		if t, ok := val.(time.Time); ok && t.IsZero() {
-			continue
-		}
-		if n, ok := val.(float64); ok && n == 0.0 {
-			continue
-		}
-		if n, ok := val.(int64); ok && n == 0 {
-			continue
-		}
-		if v := reflect.ValueOf(val); v.Kind() == reflect.Slice &&
-			v.Len() == 0 {
-			continue
-		}
-		if t, ok := timex.Unwrap(page.Frontmatter[key]); ok {
-			val = timex.ToEST(t)
-		}
-		frontmatter[key] = val
-	}
-	if err := enc.Encode(frontmatter); err != nil {
+	fm, err := stringx.ToToml(page.Frontmatter)
+	if err != nil {
 		return "", err
 	}
-	buf.WriteString("+++\n\n")
+	var buf strings.Builder
+	buf.WriteString("+++\n")
+	buf.WriteString(fm)
+	buf.WriteString("+++\n")
+	buf.WriteString("\n")
 	buf.WriteString(page.Body)
 	buf.WriteString("\n")
 	return buf.String(), nil
