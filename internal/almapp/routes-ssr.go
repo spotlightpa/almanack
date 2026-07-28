@@ -38,7 +38,7 @@ func (app *appEnv) redirectSSR(w http.ResponseWriter, r *http.Request) http.Hand
 	}
 	for _, role := range redirectInfo.Roles {
 
-		if err := app.auth.HasRole(r, role); err == nil {
+		if err := app.svc.Auth.HasRole(r, role); err == nil {
 			http.Redirect(w, r, redirectInfo.To, int(redirectInfo.Code))
 			return nil
 		}

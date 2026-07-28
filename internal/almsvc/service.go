@@ -13,10 +13,12 @@ import (
 	"github.com/spotlightpa/almanack/internal/services/index"
 	"github.com/spotlightpa/almanack/internal/services/jsonfeed"
 	"github.com/spotlightpa/almanack/internal/services/mailchimp"
+	"github.com/spotlightpa/almanack/internal/services/netlifyid"
 	"github.com/spotlightpa/almanack/internal/services/youtube"
 )
 
 type Services struct {
+	isLambda             bool
 	MailchimpSignupURL   string
 	NetlifyWebhookSecret string
 	Client               *http.Client
@@ -33,6 +35,11 @@ type Services struct {
 	NewsFeed         *jsonfeed.NewsFeed
 	ANF              *anf.Service
 	mailchimp.EmailService
-	HC healthchecksio.Client
-	YT *youtube.Feed
+	HC   healthchecksio.Client
+	YT   *youtube.Feed
+	Auth netlifyid.AuthService
+}
+
+func (svc Services) IsLambda() bool {
+	return svc.isLambda
 }

@@ -25,7 +25,7 @@ func (app *appEnv) listSharedArticles(w http.ResponseWriter, r *http.Request) ht
 
 	// Spotlight PA users can add ?show=all
 	if r.URL.Query().Get("show") == "all" {
-		if err := app.auth.HasRole(r, "Spotlight PA"); err != nil {
+		if err := app.svc.Auth.HasRole(r, "Spotlight PA"); err != nil {
 			return app.jsonErr(err)
 		}
 
@@ -101,7 +101,7 @@ func (app *appEnv) getSharedArticle(w http.ResponseWriter, r *http.Request) http
 	if article.Status != "S" &&
 		article.Status != "P" {
 		// Let Spotlight PA users get article regardless of its status
-		if err := app.auth.HasRole(r, "Spotlight PA"); err != nil {
+		if err := app.svc.Auth.HasRole(r, "Spotlight PA"); err != nil {
 			return app.jsonNewErr(http.StatusNotFound,
 				"user unauthorized to view article: %w", err)
 		}

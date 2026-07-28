@@ -17,7 +17,6 @@ import (
 
 	"github.com/spotlightpa/almanack/internal/almlog"
 	"github.com/spotlightpa/almanack/internal/almsvc"
-	"github.com/spotlightpa/almanack/internal/services/netlifyid"
 )
 
 const AppName = "almanack-api"
@@ -66,7 +65,6 @@ func (app *appEnv) parseArgs(args []string) error {
 	if err := app.initSentry(*sentryDSN); err != nil {
 		return err
 	}
-	app.auth = netlifyid.NewService(app.isLambda)
 	var err error
 	if app.svc, err = getService(); err != nil {
 		return err
@@ -77,7 +75,6 @@ func (app *appEnv) parseArgs(args []string) error {
 type appEnv struct {
 	port     string
 	isLambda bool
-	auth     netlifyid.AuthService
 	svc      almsvc.Services
 }
 

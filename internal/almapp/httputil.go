@@ -145,7 +145,7 @@ func (app *appEnv) versionMiddleware(h http.Handler) http.Handler {
 
 func (app *appEnv) authHeaderMiddleware(h http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		r2, err := app.auth.AuthFromHeader(r)
+		r2, err := app.svc.Auth.AuthFromHeader(r)
 		if err != nil {
 			app.replyErr(w, r, err)
 			return
@@ -156,7 +156,7 @@ func (app *appEnv) authHeaderMiddleware(h http.Handler) http.Handler {
 
 func (app *appEnv) authCookieMiddleware(h http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		r2, err := app.auth.AuthFromCookie(r)
+		r2, err := app.svc.Auth.AuthFromCookie(r)
 		if err != nil {
 			app.replyErr(w, r, err)
 			return
@@ -168,7 +168,7 @@ func (app *appEnv) authCookieMiddleware(h http.Handler) http.Handler {
 func (app *appEnv) hasRoleMiddleware(role string) func(next http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			if err := app.auth.HasRole(r, role); err != nil {
+			if err := app.svc.Auth.HasRole(r, role); err != nil {
 				app.replyErr(w, r, err)
 				return
 			}
