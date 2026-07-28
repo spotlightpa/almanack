@@ -58,7 +58,7 @@ func AddFlags(fl *flag.FlagSet) func() (svc Services, err error) {
 		anfService.Client = &client
 
 		return Services{
-			isLambda:             *isLambda,
+			IsLambda:             *isLambda,
 			MailchimpSignupURL:   *mailchimpSignupURL,
 			NetlifyWebhookSecret: *netlifyHookSecret,
 			Client:               &client,

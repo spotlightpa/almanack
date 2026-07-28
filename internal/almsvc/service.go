@@ -18,7 +18,7 @@ import (
 )
 
 type Services struct {
-	isLambda             bool
+	IsLambda             bool
 	MailchimpSignupURL   string
 	NetlifyWebhookSecret string
 	Client               *http.Client
@@ -38,8 +38,4 @@ type Services struct {
 	HC   healthchecksio.Client
 	YT   *youtube.Feed
 	Auth netlifyid.AuthService
-}
-
-func (svc Services) IsLambda() bool {
-	return svc.isLambda
 }

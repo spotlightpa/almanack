@@ -121,8 +121,8 @@ func (app *appEnv) routes() http.Handler {
 		middleware.RealIP,
 		almlog.Middleware,
 	)
-	baseMW.PushIf(!app.isLambda, middleware.Recoverer)
-	baseMW.PushIf(app.isLambda, sentryhttp.
+	baseMW.PushIf(!app.svc.IsLambda, middleware.Recoverer)
+	baseMW.PushIf(app.svc.IsLambda, sentryhttp.
 		New(sentryhttp.Options{
 			WaitForDelivery: true,
 			Timeout:         5 * time.Second,
