@@ -581,6 +581,13 @@ export default {
           Don't show article in mobile app list of articles
         </BulmaFieldCheckbox>
 
+        <BulmaFieldCheckbox
+          v-model="page.riverExclude"
+          label="Exclude from homepage river"
+        >
+          Don't show article in river of news on the homepage
+        </BulmaFieldCheckbox>
+
         <BulmaField v-slot="{ idForLabel }" label="Language">
           <div class="select is-fullwidth">
             <select :id="idForLabel" v-model="page.languageCode" class="select">

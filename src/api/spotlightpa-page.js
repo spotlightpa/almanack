@@ -71,6 +71,7 @@ export class Page {
     this.layout = this.frontmatter["layout"] ?? "";
     this.feedExclude = this.frontmatter["feed-exclude"] ?? false;
     this.contentSource = this.frontmatter["content-source"] ?? "";
+    this.riverExclude = this.frontmatter["river-exclude"] ?? false;
 
     // not a getter so it won't react to changes
     this.status = "pub";
@@ -253,6 +254,7 @@ export class Page {
         layout: this.layout,
         "feed-exclude": this.feedExclude,
         "content-source": this.contentSource,
+        "river-exclude": this.riverExclude,
       },
       set_body: true,
       body: this.body,
