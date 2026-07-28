@@ -574,6 +574,16 @@ export default {
             </span>
           </div>
         </BulmaField>
+
+        <BulmaField v-slot="{ idForLabel }" label="Language">
+          <div class="select is-fullwidth">
+            <select :id="idForLabel" v-model="page.languageCode" class="select">
+              <option value="">English</option>
+              <option value="es">Spanish</option>
+            </select>
+          </div>
+        </BulmaField>
+
         <BulmaFieldCheckbox
           v-model="page.feedExclude"
           label="Exclude from mobile app feed"
@@ -588,14 +598,9 @@ export default {
           Don't show article in river of news on the homepage
         </BulmaFieldCheckbox>
 
-        <BulmaField v-slot="{ idForLabel }" label="Language">
-          <div class="select is-fullwidth">
-            <select :id="idForLabel" v-model="page.languageCode" class="select">
-              <option value="">English</option>
-              <option value="es">Spanish</option>
-            </select>
-          </div>
-        </BulmaField>
+        <BulmaFieldCheckbox v-model="page.noIndex" label="No index">
+          Hide page from Google search results and homepage river
+        </BulmaFieldCheckbox>
 
         <BulmaFieldCheckbox
           v-model="page.suppressDate"
@@ -606,10 +611,6 @@ export default {
 
         <BulmaFieldCheckbox v-model="page.modalExclude" label="Hide pop-up ads">
           Don't trigger Wisepops and newsletter modal screens on this article
-        </BulmaFieldCheckbox>
-
-        <BulmaFieldCheckbox v-model="page.noIndex" label="No index">
-          Hide page from Google search results and homepage river
         </BulmaFieldCheckbox>
 
         <BulmaFieldCheckbox v-model="page.suppressAds" label="Suppress ads">
