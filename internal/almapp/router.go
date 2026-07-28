@@ -81,7 +81,9 @@ func (app *appEnv) routes() http.Handler {
 		Control(mux, `GET /api/site-data`, app.getSiteData).
 		Control(mux, `POST /api/site-data`, app.postSiteData).
 		HandleFunc(mux, `GET /api/site-params`, app.siteDataGet(almsvc.SiteParamsLoc)).
-		HandleFunc(mux, `POST /api/site-params`, app.siteDataSet(almsvc.SiteParamsLoc))
+		HandleFunc(mux, `POST /api/site-params`, app.siteDataSet(almsvc.SiteParamsLoc)).
+		Control(mux, `GET /api/promotion`, app.listPromotions).
+		Control(mux, `POST /api/promotion`, app.postPromotion)
 	// End spotlight endpoints
 
 	// Don't trust this middleware!
