@@ -18,3 +18,6 @@ ALTER TABLE image
 DROP TABLE newsletter;
 
 DROP TABLE newsletter_type;
+
+ALTER TABLE promotion
+  DROP COLUMN fts_doc_en;
