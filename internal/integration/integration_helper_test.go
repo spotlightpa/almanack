@@ -21,6 +21,8 @@ var (
 	poolErr error
 )
 
+// createTestDB checks ALMANACK_POSTGRES and
+// creates a database called almanack_test at the provided address.
 func createTestDB(t *testing.T) *db.Handle {
 	t.Helper()
 	dbURL := os.Getenv("ALMANACK_POSTGRES")
@@ -34,8 +36,8 @@ func createTestDB(t *testing.T) *db.Handle {
 	return db.NewHandle(pool)
 }
 
-// newTestServer starts an httptest.Server backed by the real router and a
-// mock auth service. It registers cleanup and returns a *requests.Builder
+// newTestServer starts an httptest.Server backed by svc.
+// It registers cleanup and returns a *requests.Builder
 // pre-configured with the server's base URL and a mock Authorization header.
 func newTestServer(t *testing.T, svc almsvc.Services) *requests.Builder {
 	t.Helper()
