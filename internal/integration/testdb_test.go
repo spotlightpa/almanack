@@ -1,13 +1,19 @@
 package integration_test
 
 import (
+	"net/http/httptest"
 	"os"
 	"sync"
 	"testing"
 
 	"github.com/carlmjohnson/be"
+	"github.com/carlmjohnson/requests"
+	"github.com/carlmjohnson/requests/reqtest"
 	"github.com/jackc/pgx/v5/pgxpool"
+	"github.com/spotlightpa/almanack/internal/almapp"
+	"github.com/spotlightpa/almanack/internal/almsvc"
 	"github.com/spotlightpa/almanack/internal/db"
+	"github.com/spotlightpa/almanack/internal/services/netlifyid"
 )
 
 var (
@@ -27,4 +33,19 @@ func createTestDB(t *testing.T) *db.Handle {
 	})
 	be.NilErr(t, poolErr)
 	return db.NewHandle(pool)
+}
+
+// newTestServer starts an httptest.Server backed by the real router and a
+// mock auth service. It registers cleanup and returns a *requests.Builder
+// pre-configured with the server's base URL and a mock Authorization header.
+func newTestServer(t *testing.T) *requests.Builder {
+	t.Helper()
+	dbhandle := createTestDB(t)
+	srv := httptest.NewServer(almapp.NewHandler(almsvc.Services{
+		DB:      dbhandle,
+		Queries: dbhandle.Queries(),
+		Auth:    netlifyid.MockAuthService{},
+	}))
+	t.Cleanup(srv.Close)
+	return requests.New(reqtest.Server(srv)).Header("Authorization", "Bearer mock")
 }

@@ -2,32 +2,17 @@ package integration_test
 
 import (
 	"net/http"
-	"net/http/httptest"
 	"slices"
 	"testing"
 
 	"github.com/carlmjohnson/be"
-	"github.com/carlmjohnson/requests"
-	"github.com/carlmjohnson/requests/reqtest"
-	"github.com/spotlightpa/almanack/internal/almapp"
 	"github.com/spotlightpa/almanack/internal/almlog"
-	"github.com/spotlightpa/almanack/internal/almsvc"
-	"github.com/spotlightpa/almanack/internal/services/netlifyid"
 )
 
 func TestAuthorizedAddressesEndpoints(t *testing.T) {
 	almlog.UseTestLogger(t)
-	dbhandle := createTestDB(t)
 	ctx := t.Context()
-
-	srv := httptest.NewServer(almapp.NewHandler(almsvc.Services{
-		DB:      dbhandle,
-		Queries: dbhandle.Queries(),
-		Auth:    netlifyid.MockAuthService{},
-	}))
-	t.Cleanup(srv.Close)
-
-	base := requests.New(reqtest.Server(srv)).Header("Authorization", "Bearer mock")
+	base := newTestServer(t)
 
 	var addrResp struct {
 		Addresses []string `json:"addresses"`
