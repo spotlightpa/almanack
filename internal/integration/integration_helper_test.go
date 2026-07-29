@@ -43,5 +43,7 @@ func newTestServer(t *testing.T, svc almsvc.Services) *requests.Builder {
 	t.Helper()
 	srv := httptest.NewServer(almapp.NewHandler(svc))
 	t.Cleanup(srv.Close)
-	return requests.New(reqtest.Server(srv)).Header("Authorization", "Bearer mock")
+	return requests.
+		New(reqtest.Server(srv)).
+		Header("Authorization", "Bearer mock")
 }
