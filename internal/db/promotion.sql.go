@@ -10,8 +10,8 @@ import (
 )
 
 const createPromotion = `-- name: CreatePromotion :one
-INSERT INTO "promotion" ("name", "description", "data", "width", "height")
-  VALUES ($1, $2, $3, $4, $5)
+INSERT INTO "promotion" ("name", "description", "data")
+  VALUES ($1, $2, $3)
 RETURNING
   id, name, description, data, width, height, created_at, updated_at
 `
@@ -20,18 +20,10 @@ type CreatePromotionParams struct {
 	Name        string `json:"name"`
 	Description string `json:"description"`
 	Data        []byte `json:"data"`
-	Width       int64  `json:"width"`
-	Height      int64  `json:"height"`
 }
 
 func (q *Queries) CreatePromotion(ctx context.Context, arg CreatePromotionParams) (Promotion, error) {
-	row := q.db.QueryRow(ctx, createPromotion,
-		arg.Name,
-		arg.Description,
-		arg.Data,
-		arg.Width,
-		arg.Height,
-	)
+	row := q.db.QueryRow(ctx, createPromotion, arg.Name, arg.Description, arg.Data)
 	var i Promotion
 	err := row.Scan(
 		&i.ID,
@@ -169,11 +161,9 @@ UPDATE
 SET
   "name" = $1,
   "description" = $2,
-  "data" = $3,
-  "width" = $4,
-  "height" = $5
+  "data" = $3
 WHERE
-  "id" = $6
+  "id" = $4
 RETURNING
   id, name, description, data, width, height, created_at, updated_at
 `
@@ -182,8 +172,6 @@ type UpdatePromotionParams struct {
 	Name        string `json:"name"`
 	Description string `json:"description"`
 	Data        []byte `json:"data"`
-	Width       int64  `json:"width"`
-	Height      int64  `json:"height"`
 	ID          int64  `json:"id"`
 }
 
@@ -192,8 +180,6 @@ func (q *Queries) UpdatePromotion(ctx context.Context, arg UpdatePromotionParams
 		arg.Name,
 		arg.Description,
 		arg.Data,
-		arg.Width,
-		arg.Height,
 		arg.ID,
 	)
 	var i Promotion
