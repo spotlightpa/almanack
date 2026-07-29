@@ -25,6 +25,7 @@ func TestAuthorizedAddressesEndpoints(t *testing.T) {
 		Addresses []string `json:"addresses"`
 	}
 
+	// Initially empty
 	be.NilErr(t, rb.Clone().
 		Path("/api/authorized-addresses").
 		ToJSON(&list).
