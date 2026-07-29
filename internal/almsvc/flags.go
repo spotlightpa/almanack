@@ -59,6 +59,7 @@ func AddFlags(fl *flag.FlagSet) func() (svc Services, err error) {
 
 		return Services{
 			IsLambda:             *isLambda,
+			Auth:                 netlifyid.NewService(*isLambda),
 			MailchimpSignupURL:   *mailchimpSignupURL,
 			NetlifyWebhookSecret: *netlifyHookSecret,
 			Client:               &client,
@@ -77,7 +78,6 @@ func AddFlags(fl *flag.FlagSet) func() (svc Services, err error) {
 			NewsFeed:             newsfeed,
 			ANF:                  anfService,
 			YT:                   yt,
-			Auth:                 netlifyid.NewService(*isLambda),
 		}, nil
 	}
 }

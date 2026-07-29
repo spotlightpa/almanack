@@ -19,6 +19,7 @@ import (
 
 type Services struct {
 	IsLambda             bool
+	Auth                 netlifyid.AuthService
 	MailchimpSignupURL   string
 	NetlifyWebhookSecret string
 	Client               *http.Client
@@ -35,7 +36,6 @@ type Services struct {
 	NewsFeed         *jsonfeed.NewsFeed
 	ANF              *anf.Service
 	mailchimp.EmailService
-	HC   healthchecksio.Client
-	YT   *youtube.Feed
-	Auth netlifyid.AuthService
+	HC healthchecksio.Client
+	YT *youtube.Feed
 }
