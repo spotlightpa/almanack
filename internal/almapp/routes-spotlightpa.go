@@ -1131,8 +1131,6 @@ func (app *appEnv) postPromotion(w http.ResponseWriter, r *http.Request) http.Ha
 			Name:        req.Name,
 			Description: req.Description,
 			Data:        req.Data,
-			Width:       req.Width,
-			Height:      req.Height,
 		})
 	} else {
 		promo, err = app.svc.Queries.UpdatePromotion(r.Context(), db.UpdatePromotionParams{
@@ -1140,8 +1138,6 @@ func (app *appEnv) postPromotion(w http.ResponseWriter, r *http.Request) http.Ha
 			Name:        req.Name,
 			Description: req.Description,
 			Data:        req.Data,
-			Width:       req.Width,
-			Height:      req.Height,
 		})
 	}
 	if err != nil {
