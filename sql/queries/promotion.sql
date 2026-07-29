@@ -1,6 +1,6 @@
 -- name: CreatePromotion :one
-INSERT INTO "promotion" ("name", "description", "data", "width", "height")
-  VALUES (@name, @description, @data, @width, @height)
+INSERT INTO "promotion" ("name", "description", "data")
+  VALUES (@name, @description, @data)
 RETURNING
   *;
 
@@ -10,9 +10,7 @@ UPDATE
 SET
   "name" = @name,
   "description" = @description,
-  "data" = @data,
-  "width" = @width,
-  "height" = @height
+  "data" = @data
 WHERE
   "id" = @id
 RETURNING
