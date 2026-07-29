@@ -116,7 +116,9 @@ async function save() {
     <!-- ── editor panel ───────────────────────────────────────────── -->
     <div v-if="editing" class="box mb-5">
       <h2 class="subtitle mb-4">
-        {{ editing.id ? `Edit promotion set #${editing.id}` : "New promotion set" }}
+        {{
+          editing.id ? `Edit promotion set #${editing.id}` : "New promotion set"
+        }}
       </h2>
 
       <BulmaFieldInput
@@ -265,7 +267,9 @@ async function save() {
       :reload="reload"
       :error="listState.error"
     >
-      <p v-if="!promotions.length" class="has-text-grey">No promotion sets yet.</p>
+      <p v-if="!promotions.length" class="has-text-grey">
+        No promotion sets yet.
+      </p>
 
       <table v-else class="table is-bordered is-striped is-narrow is-fullwidth">
         <thead>
