@@ -25,7 +25,10 @@ export default [
   {
     rules: {
       "no-unused-vars": "off",
-      "@typescript-eslint/no-unused-vars": ["error", { caughtErrors: "none" }],
+      "@typescript-eslint/no-unused-vars": [
+        "error",
+        { caughtErrors: "none", ignoreRestSiblings: true },
+      ],
       "prefer-const": "off",
     },
   },
