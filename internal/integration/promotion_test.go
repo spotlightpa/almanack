@@ -31,9 +31,7 @@ func TestPromotionEndpoints(t *testing.T) {
 			BodyJSON(db.Promotion{
 				Name:        "Banner Ad",
 				Description: "A test banner",
-				Data:        []byte(`{"url":"https://example.com"}`),
-				Width:       728,
-				Height:      90,
+				Data:        []byte(`{"url":"https://example.com","width":728,"height":90}`),
 			}).
 			ToJSON(&created).
 			Fetch(ctx))
@@ -49,9 +47,7 @@ func TestPromotionEndpoints(t *testing.T) {
 			BodyJSON(db.Promotion{
 				Name:        "Sidebar Ad",
 				Description: "A sidebar promotion",
-				Data:        []byte(`{"url":"https://example.org"}`),
-				Width:       300,
-				Height:      250,
+				Data:        []byte(`{"url":"https://example.org","width":300,"height":250}`),
 			}).
 			ToJSON(&created).
 			Fetch(ctx))

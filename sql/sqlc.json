@@ -93,6 +93,14 @@
       "go_type": {
         "type": "Map"
       }
+    },
+    {
+      "column": "promotion.width",
+      "go_type": "int64"
+    },
+    {
+      "column": "promotion.height",
+      "go_type": "int64"
     }
   ],
   "version": "1"
