@@ -106,6 +106,8 @@ export const getSiteData = `/api/site-data`;
 export const postSiteData = `/api/site-data`;
 export const getSiteParams = `/api/site-params`;
 export const postSiteParams = `/api/site-params`;
+export const listPromotions = `/api/promotion`;
+export const postPromotion = `/api/promotion`;
 
 export async function uploadImage(body) {
   let [data, err] = await post(createSignedUpload, { type: body.type });
