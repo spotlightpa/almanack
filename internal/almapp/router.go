@@ -13,6 +13,12 @@ import (
 	"github.com/spotlightpa/almanack/internal/utils/httpx"
 )
 
+// NewHandler builds an http.Handler for use in tests.
+func NewHandler(svc almsvc.Services) http.Handler {
+	app := &appEnv{svc: svc}
+	return app.routes()
+}
+
 func (app *appEnv) routes() http.Handler {
 	mux := http.NewServeMux()
 
