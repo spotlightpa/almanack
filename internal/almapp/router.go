@@ -135,3 +135,9 @@ func (app *appEnv) routes() http.Handler {
 	)
 	return baseMW.Handler(mux)
 }
+
+// NewHandler builds an http.Handler for use in tests.
+func NewHandler(svc almsvc.Services) http.Handler {
+	app := &appEnv{svc: svc}
+	return app.routes()
+}
