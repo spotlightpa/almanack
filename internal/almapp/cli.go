@@ -17,7 +17,6 @@ import (
 
 	"github.com/spotlightpa/almanack/internal/almlog"
 	"github.com/spotlightpa/almanack/internal/almsvc"
-	"github.com/spotlightpa/almanack/internal/services/netlifyid"
 )
 
 const AppName = "almanack-api"
@@ -38,7 +37,6 @@ func CLI(args []string) error {
 func (app *appEnv) parseArgs(args []string) error {
 	fl := flag.NewFlagSet(AppName, flag.ContinueOnError)
 
-	fl.BoolVar(&app.isLambda, "lambda", false, "use AWS Lambda rather than HTTP")
 	fl.StringVar(&app.port, "port", ":33160", "listen on port (HTTP only)")
 	fl.Func("level", "log level", func(s string) error {
 		l, _ := strconv.Atoi(s)
@@ -58,7 +56,7 @@ func (app *appEnv) parseArgs(args []string) error {
 	if err := flagx.ParseEnv(fl, "almanack"); err != nil {
 		return err
 	}
-	if app.isLambda {
+	if app.svc.IsLambda {
 		almlog.UseLambdaLogger()
 	} else {
 		almlog.UseDevLogger()
@@ -66,7 +64,6 @@ func (app *appEnv) parseArgs(args []string) error {
 	if err := app.initSentry(*sentryDSN); err != nil {
 		return err
 	}
-	app.auth = netlifyid.NewService(app.isLambda)
 	var err error
 	if app.svc, err = getService(); err != nil {
 		return err
@@ -75,28 +72,26 @@ func (app *appEnv) parseArgs(args []string) error {
 }
 
 type appEnv struct {
-	port     string
-	isLambda bool
-	auth     netlifyid.AuthService
-	svc      almsvc.Services
+	port string
+	svc  almsvc.Services
 }
 
 func (app *appEnv) exec() error {
 	routes := app.routes()
 
 	var host string
-	if app.isLambda {
+	if app.svc.IsLambda {
 		u, _ := url.Parse(almsvc.DeployURL)
 		host = u.Hostname()
 	}
 	almlog.Logger.Info("appEnv.exec",
 		"app", AppName,
 		"version", versioninfo.Short(),
-		"is-lambda", app.isLambda,
+		"is-lambda", app.svc.IsLambda,
 		"host", host,
 		"port", app.port,
 	)
-	if app.isLambda {
+	if app.svc.IsLambda {
 		return gateway.ListenAndServe(host, routes)
 	}
 
@@ -105,7 +100,7 @@ func (app *appEnv) exec() error {
 
 func (app *appEnv) initSentry(dsn string) error {
 	var transport sentry.Transport
-	if app.isLambda {
+	if app.svc.IsLambda {
 		almlog.Logger.Debug("initSentry", "sync", true, "timeout", 5*time.Second)
 		transport = &sentry.HTTPSyncTransport{Timeout: 5 * time.Second}
 	} else {

@@ -13,10 +13,13 @@ import (
 	"github.com/spotlightpa/almanack/internal/services/index"
 	"github.com/spotlightpa/almanack/internal/services/jsonfeed"
 	"github.com/spotlightpa/almanack/internal/services/mailchimp"
+	"github.com/spotlightpa/almanack/internal/services/netlifyid"
 	"github.com/spotlightpa/almanack/internal/services/youtube"
 )
 
 type Services struct {
+	IsLambda             bool
+	Auth                 netlifyid.AuthService
 	MailchimpSignupURL   string
 	NetlifyWebhookSecret string
 	Client               *http.Client

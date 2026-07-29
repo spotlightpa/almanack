@@ -17,10 +17,12 @@ import (
 	"github.com/spotlightpa/almanack/internal/services/index"
 	"github.com/spotlightpa/almanack/internal/services/jsonfeed"
 	"github.com/spotlightpa/almanack/internal/services/mailchimp"
+	"github.com/spotlightpa/almanack/internal/services/netlifyid"
 	"github.com/spotlightpa/almanack/internal/services/youtube"
 )
 
 func AddFlags(fl *flag.FlagSet) func() (svc Services, err error) {
+	isLambda := fl.Bool("lambda", false, "use AWS Lambda rather than HTTP")
 	mailchimpSignupURL := fl.String("mc-signup-url", "http://example.com", "`URL` to redirect users to for MailChimp signup")
 	netlifyHookSecret := fl.String("netlify-webhook-secret", "", "`shared secret` to authorize Netlify identity webhook")
 	newsfeed := jsonfeed.AddFlags(fl)
@@ -56,6 +58,8 @@ func AddFlags(fl *flag.FlagSet) func() (svc Services, err error) {
 		anfService.Client = &client
 
 		return Services{
+			IsLambda:             *isLambda,
+			Auth:                 netlifyid.NewService(*isLambda),
 			MailchimpSignupURL:   *mailchimpSignupURL,
 			NetlifyWebhookSecret: *netlifyHookSecret,
 			Client:               &client,
