@@ -27,7 +27,7 @@ func TestAuthorizedAddressesEndpoints(t *testing.T) {
 	}))
 	t.Cleanup(srv.Close)
 
-	base := requests.New().Config(reqtest.Server(srv)).Header("Authorization", "Bearer mock")
+	base := requests.New(reqtest.Server(srv)).Header("Authorization", "Bearer mock")
 
 	var addrResp struct {
 		Addresses []string `json:"addresses"`
