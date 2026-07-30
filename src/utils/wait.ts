@@ -17,7 +17,7 @@ export function wait(ms: number): Promise<void> {
 export function debounce<A extends unknown[]>(
   ms: number,
   fn: (...args: A) => void
-): (...args: A) => void {
+) {
   let timer: Timer | undefined;
   return (...args: A) => {
     window.clearTimeout(timer);
