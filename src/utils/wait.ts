@@ -19,9 +19,9 @@ export function debounce<A extends unknown[]>(
   fn: (...args: A) => void
 ): (...args: A) => void {
   let timer: Timer | undefined;
-  return function (this: unknown, ...args: A) {
+  return (...args: A) => {
     window.clearTimeout(timer);
-    timer = window.setTimeout(() => fn.apply(this, args), ms);
+    timer = window.setTimeout(() => fn(...args), ms);
   };
 }
 
