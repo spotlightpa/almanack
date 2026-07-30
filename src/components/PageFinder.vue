@@ -25,7 +25,7 @@ export default {
     },
   },
   watch: {
-    query: debounce(300, function (val) {
+    query: debounce(300 /* ms */, function (val) {
       this.loading = true;
       this.fetch(val);
     }),
