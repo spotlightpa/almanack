@@ -1,6 +1,6 @@
 import { computed, reactive, toRefs, watch } from "vue";
 
-import { useThrottleToggle } from "@/utils/throttle.js";
+import { useThrottleToggle } from "@/utils/wait.ts";
 
 export function makeState() {
   const apiState = reactive({
