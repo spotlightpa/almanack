@@ -31,13 +31,16 @@ export function useThrottleToggle<T>(
   { timeout = 1000 } = {}
 ) {
   const recentlyChanged = ref(false);
+  let timer: ReturnType<typeof window.setTimeout> | null = null;
   watch(
     watchedRef,
     (val) => {
       if (val) {
+        window.clearTimeout(timer ?? undefined);
         recentlyChanged.value = true;
-        window.setTimeout(() => {
+        timer = window.setTimeout(() => {
           recentlyChanged.value = false;
+          timer = null;
         }, timeout);
       }
     },
