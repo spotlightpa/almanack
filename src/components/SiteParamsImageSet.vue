@@ -1,5 +1,8 @@
 <script setup>
+import { ref } from "vue";
 import useProps from "@/utils/use-props.js";
+
+const showPromoSelector = ref(false);
 
 const props = defineProps({
   params: Object,
@@ -53,6 +56,18 @@ function pushImage() {
 
 function removeImage(n) {
   imageSet.value.splice(n, 1);
+}
+
+function applyPromoSet(promo) {
+  const items = promo.data?.items ?? [];
+  items.forEach((item) => {
+    imageSet.value.push({ ...item, id: n++ });
+  });
+  if (props.showWidthHeight) {
+    if (promo.data?.width) width.value = promo.data.width;
+    if (promo.data?.height) height.value = promo.data.height;
+  }
+  showPromoSelector.value = false;
 }
 
 defineExpose({
@@ -142,14 +157,28 @@ defineExpose({
         </div>
       </li>
     </ul>
-    <div class="my-5 buttons">
-      <button
-        type="button"
-        class="button is-success has-text-weight-semibold"
-        @click="pushImage"
-      >
-        Add promotion to set
-      </button>
+    <div class="my-4">
+      <SiteParamsPromoSelector
+        v-if="showPromoSelector"
+        class="mb-3"
+        @select="applyPromoSet"
+      />
+      <div class="buttons">
+        <button
+          type="button"
+          class="button is-success has-text-weight-semibold"
+          @click="pushImage"
+        >
+          Add promotion to set
+        </button>
+        <button
+          type="button"
+          class="button is-link has-text-weight-semibold"
+          @click="showPromoSelector = !showPromoSelector"
+        >
+          {{ showPromoSelector ? "Cancel" : "Copy from promotion set…" }}
+        </button>
+      </div>
     </div>
   </div>
 </template>
