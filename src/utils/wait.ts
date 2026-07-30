@@ -18,9 +18,9 @@ export function debounce<A extends unknown[]>(
   ms: number,
   fn: (...args: A) => void
 ): (...args: A) => void {
-  let timer: Timer | null = null;
+  let timer: Timer | undefined;
   return function (this: unknown, ...args: A) {
-    window.clearTimeout(timer ?? undefined);
+    window.clearTimeout(timer);
     timer = window.setTimeout(() => fn.apply(this, args), ms);
   };
 }
@@ -33,16 +33,16 @@ export function useThrottleToggle<T>(
   { timeout = 1000 } = {}
 ) {
   const recentlyChanged = ref(false);
-  let timer: Timer | null = null;
+  let timer: Timer | undefined;
   watch(
     watchedRef,
     (val) => {
       if (val) {
-        window.clearTimeout(timer ?? undefined);
+        window.clearTimeout(timer);
         recentlyChanged.value = true;
         timer = window.setTimeout(() => {
           recentlyChanged.value = false;
-          timer = null;
+          timer = undefined;
         }, timeout);
       }
     },
