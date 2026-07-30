@@ -42,7 +42,6 @@ export function useThrottleToggle<T>(
         recentlyChanged.value = true;
         timer = window.setTimeout(() => {
           recentlyChanged.value = false;
-          timer = undefined;
         }, timeout);
       }
     },
