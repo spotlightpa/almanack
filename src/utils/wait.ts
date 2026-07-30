@@ -1,5 +1,8 @@
 import { computed, ref, watch, type Ref } from "vue";
 
+// Timer is the return type of window.setTimeout.
+type Timer = ReturnType<typeof window.setTimeout>;
+
 // seconds converts a duration in seconds to milliseconds.
 export const seconds = (s: number): number => 1_000 * s;
 
@@ -16,7 +19,7 @@ export function debounce<A extends unknown[]>(
   ms: number,
   fn: (...args: A) => void
 ): (...args: A) => void {
-  let timer: ReturnType<typeof window.setTimeout> | null = null;
+  let timer: Timer | null = null;
   return function (this: unknown, ...args: A) {
     window.clearTimeout(timer ?? undefined);
     timer = window.setTimeout(() => fn.apply(this, args), ms);
@@ -31,7 +34,7 @@ export function useThrottleToggle<T>(
   { timeout = 1000 } = {}
 ) {
   const recentlyChanged = ref(false);
-  let timer: ReturnType<typeof window.setTimeout> | null = null;
+  let timer: Timer | null = null;
   watch(
     watchedRef,
     (val) => {
