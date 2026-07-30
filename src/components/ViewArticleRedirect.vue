@@ -1,5 +1,6 @@
 <script setup>
 import { ref } from "vue";
+import { wait, seconds } from "@/utils/wait.ts";
 import { useRouter, useRoute } from "vue-router";
 
 import { get, getSharedArticle } from "@/api/client-v2.js";
@@ -13,9 +14,9 @@ const props = defineProps({
 
 const isLoading = ref(false);
 const isLoadingDebounced = ref(false);
-window.setTimeout(() => {
+wait(seconds(0.5)).then(() => {
   isLoadingDebounced.value = true;
-}, 500);
+});
 const error = ref(null);
 
 async function load() {

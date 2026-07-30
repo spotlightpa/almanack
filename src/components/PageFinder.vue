@@ -2,6 +2,7 @@
 import draggable from "vuedraggable";
 
 import { get, listPagesByFTS } from "@/api/client-v2.js";
+import { debounce } from "@/utils/wait.ts";
 
 import { Page } from "@/api/spotlightpa-page.js";
 
@@ -15,7 +16,6 @@ export default {
       rawPages: [],
       error: null,
       loading: false,
-      timeout: null,
       currentRequest: 0,
     };
   },
@@ -25,13 +25,10 @@ export default {
     },
   },
   watch: {
-    async query(val) {
+    query: debounce(function (val) {
       this.loading = true;
-      window.clearTimeout(this.timeout);
-      this.timeout = window.setTimeout(() => {
-        this.fetch(val);
-      }, 300);
-    },
+      this.fetch(val);
+    }, 300),
   },
   created() {
     this.loading = true;

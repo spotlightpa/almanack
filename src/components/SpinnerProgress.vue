@@ -1,5 +1,6 @@
 <script setup>
 import { ref, watch } from "vue";
+import { debounce as makeDebounce } from "@/utils/wait.ts";
 
 const props = defineProps({
   isLoading: Boolean,
@@ -7,16 +8,15 @@ const props = defineProps({
 });
 
 const debouncedLoading = ref(true);
-let timeout = null;
+const setLoadingTrue = makeDebounce(() => {
+  debouncedLoading.value = true;
+}, props.debounce ?? 0);
 watch(
   () => props.isLoading,
   (val) => {
     if (!props.debounce || !val) return;
-    window.clearTimeout(timeout);
     debouncedLoading.value = false;
-    timeout = window.setTimeout(() => {
-      debouncedLoading.value = true;
-    }, props.debounce);
+    setLoadingTrue();
   }
 );
 </script>

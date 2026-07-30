@@ -1,5 +1,6 @@
 <script>
 import { computed, reactive, toRefs } from "vue";
+import { wait, seconds } from "@/utils/wait.ts";
 import { post, sendMessage } from "@/api/client-v2.js";
 
 export default {
@@ -44,9 +45,8 @@ export default {
           emailStatus.isSending = false;
           if (emailStatus.error) return;
           emailStatus.hasSent = true;
-          window.setTimeout(() => {
-            emailStatus.hasSent = false;
-          }, 5000);
+          await wait(seconds(5));
+          emailStatus.hasSent = false;
         }
       },
       discard() {
