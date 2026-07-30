@@ -122,10 +122,12 @@ function updateIsLicensed(image) {
 }
 
 const rawQuery = ref("");
-const applyQuery = debounce((val) => {
-  query.value = val;
-}, seconds(1));
-watch(rawQuery, applyQuery);
+watch(
+  rawQuery,
+  debounce((val) => {
+    query.value = val;
+  }, seconds(1))
+);
 </script>
 
 <template>
