@@ -124,9 +124,9 @@ function updateIsLicensed(image) {
 const rawQuery = ref("");
 watch(
   rawQuery,
-  debounce((val) => {
+  debounce(seconds(1), (val) => {
     query.value = val;
-  }, seconds(1))
+  })
 );
 </script>
 

@@ -13,8 +13,8 @@ export function wait(ms: number): Promise<void> {
 // debounce wraps `fn` so it is only called after `ms` milliseconds of
 // inactivity. Each new call resets the timer.
 export function debounce<A extends unknown[]>(
-  fn: (...args: A) => void,
-  ms: number
+  ms: number,
+  fn: (...args: A) => void
 ): (...args: A) => void {
   let timer: ReturnType<typeof window.setTimeout> | null = null;
   return function (this: unknown, ...args: A) {

@@ -8,9 +8,9 @@ const props = defineProps({
 });
 
 const debouncedLoading = ref(true);
-const setLoadingTrue = makeDebounce(() => {
+const setLoadingTrue = makeDebounce(props.debounce ?? 0, () => {
   debouncedLoading.value = true;
-}, props.debounce ?? 0);
+});
 watch(
   () => props.isLoading,
   (val) => {

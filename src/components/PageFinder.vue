@@ -25,10 +25,10 @@ export default {
     },
   },
   watch: {
-    query: debounce(function (val) {
+    query: debounce(300, function (val) {
       this.loading = true;
       this.fetch(val);
-    }, 300),
+    }),
   },
   created() {
     this.loading = true;
