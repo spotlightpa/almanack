@@ -1,6 +1,5 @@
 import { computed, ref, watch, type Ref } from "vue";
 
-// Timer is the return type of window.setTimeout.
 type Timer = ReturnType<typeof window.setTimeout>;
 
 // seconds converts a duration in seconds to milliseconds.
