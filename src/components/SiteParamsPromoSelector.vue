@@ -14,9 +14,9 @@ const searchText = ref("");
 const debouncedSearch = ref("");
 watch(
   searchText,
-  debounce((val) => {
+  debounce(400, (val) => {
     debouncedSearch.value = val.trim();
-  }, 400)
+  })
 );
 
 const { apiState } = watchAPI(
