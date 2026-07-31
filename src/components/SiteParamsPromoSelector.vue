@@ -14,7 +14,7 @@ const searchText = ref("");
 const debouncedSearch = ref("");
 watch(
   searchText,
-  debounce(400, (val) => {
+  debounce(400 /* ms */, (val) => {
     debouncedSearch.value = val.trim();
   })
 );
