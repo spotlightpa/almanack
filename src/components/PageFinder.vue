@@ -25,15 +25,12 @@ export default {
     },
   },
   created() {
-    this.$watch(
-      "query",
-      debounce(300 /* ms */, (val) => {
-        this.loading = true;
-        this.fetch(val);
-      })
-    );
-    this.loading = true;
-    this.fetch(this.query);
+    const load = (val) => {
+      this.loading = true;
+      this.fetch(val);
+    };
+    load(this.query);
+    this.$watch("query", debounce(300 /* ms */, load));
   },
   methods: {
     async fetch(query) {
