@@ -1,5 +1,6 @@
 <script setup>
 import { ref, watch } from "vue";
+import { debounce, seconds } from "@/utils/wait.ts";
 
 import { get, post, listImages, postImageUpdate } from "@/api/client-v2.js";
 import { makeState, watchAPI } from "@/api/service-util.js";
@@ -121,13 +122,12 @@ function updateIsLicensed(image) {
 }
 
 const rawQuery = ref("");
-let timeout = null;
-watch(rawQuery, (val) => {
-  window.clearTimeout(timeout);
-  timeout = window.setTimeout(() => {
+watch(
+  rawQuery,
+  debounce(seconds(1), (val) => {
     query.value = val;
-  }, 1000);
-});
+  })
+);
 </script>
 
 <template>

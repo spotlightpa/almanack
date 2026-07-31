@@ -2,6 +2,7 @@
 import draggable from "vuedraggable";
 
 import { get, listPagesByFTS } from "@/api/client-v2.js";
+import { debounce } from "@/utils/wait.ts";
 
 import { Page } from "@/api/spotlightpa-page.js";
 
@@ -15,7 +16,6 @@ export default {
       rawPages: [],
       error: null,
       loading: false,
-      timeout: null,
       currentRequest: 0,
     };
   },
@@ -24,18 +24,13 @@ export default {
       return this.rawPages.map((data) => new Page(data));
     },
   },
-  watch: {
-    async query(val) {
-      this.loading = true;
-      window.clearTimeout(this.timeout);
-      this.timeout = window.setTimeout(() => {
-        this.fetch(val);
-      }, 300);
-    },
-  },
   created() {
-    this.loading = true;
-    this.fetch(this.query);
+    const load = (val) => {
+      this.loading = true;
+      this.fetch(val);
+    };
+    load(this.query);
+    this.$watch("query", debounce(300 /* ms */, load));
   },
   methods: {
     async fetch(query) {

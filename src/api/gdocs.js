@@ -1,10 +1,5 @@
 import { getGDocsDoc, postGDocsDoc, get, post } from "./client-v2";
-
-function wait(milliseconds) {
-  return new Promise((resolve) => {
-    window.setTimeout(resolve, milliseconds);
-  });
-}
+import { wait } from "@/utils/wait.ts";
 
 export async function processGDocsDoc(externalGDocsID) {
   // Create job
