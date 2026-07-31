@@ -24,13 +24,14 @@ export default {
       return this.rawPages.map((data) => new Page(data));
     },
   },
-  watch: {
-    query: debounce(300 /* ms */, (val) => {
-      this.loading = true;
-      this.fetch(val);
-    }),
-  },
   created() {
+    this.$watch(
+      "query",
+      debounce(300 /* ms */, (val) => {
+        this.loading = true;
+        this.fetch(val);
+      })
+    );
     this.loading = true;
     this.fetch(this.query);
   },
