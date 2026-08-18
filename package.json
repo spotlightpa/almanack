@@ -49,5 +49,6 @@
   },
   "prettier": {
     "trailingComma": "es5"
-  }
+  },
+  "private": true
 }
