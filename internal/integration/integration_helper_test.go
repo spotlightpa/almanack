@@ -41,9 +41,10 @@ func createTestDB(t *testing.T) *db.Handle {
 func newTestServer(t *testing.T, svc almsvc.Services) *requests.Builder {
 	t.Helper()
 	srv := httptest.NewTestServer(t, almapp.NewHandler(svc))
+	cl := srv.Client()
 	return requests.
 		New().
-		BaseURL("https://example.com").
-		Client(srv.Client()).
+		BaseURL(srv.URL).
+		Client(cl).
 		Header("Authorization", "Bearer mock")
 }
