@@ -36,25 +36,32 @@ function blankItem() {
   };
 }
 
-function deserializeItems(data) {
-  // data may be an array (the image-set list) or a legacy object/null
-  let arr = Array.isArray(data) ? data : [];
-  return arr.map((o) => ({ ...o, _id: itemCounter++ }));
+function deserializeData(data) {
+  return {
+    width: data?.width ?? 0,
+    height: data?.height ?? 0,
+    items: (data?.items ?? []).map((o) => ({ ...o, _id: itemCounter++ })),
+  };
 }
 
-function serializeItems(items) {
-  // strip the internal _id before sending
-  return items.map(({ _id, ...rest }) => rest);
+function serializeData(editing) {
+  // Pack width/height into data so DB generated columns can extract them
+  return {
+    width: Number(editing.width),
+    height: Number(editing.height),
+    items: editing.items.map(({ _id, ...rest }) => rest),
+  };
 }
 
 function startEdit(promo) {
+  const { width, height, items } = deserializeData(promo.data);
   editing.value = reactive({
     id: promo.id,
     name: promo.name,
     description: promo.description,
-    width: promo.width,
-    height: promo.height,
-    items: deserializeItems(promo.data),
+    width,
+    height,
+    items,
   });
 }
 
@@ -86,9 +93,7 @@ async function save() {
     id: editing.value.id,
     name: editing.value.name,
     description: editing.value.description,
-    width: Number(editing.value.width),
-    height: Number(editing.value.height),
-    data: serializeItems(editing.value.items),
+    data: serializeData(editing.value),
   };
 
   await saveExec(() => post(postPromotion, payload));
@@ -290,7 +295,7 @@ async function save() {
             <td>{{ promo.name }}</td>
             <td>{{ promo.description }}</td>
             <td class="is-narrow">
-              {{ Array.isArray(promo.data) ? promo.data.length : 0 }}
+              {{ promo.data?.items?.length ?? 0 }}
             </td>
             <td class="is-narrow">{{ promo.width || "—" }}</td>
             <td class="is-narrow">{{ promo.height || "—" }}</td>

@@ -22,21 +22,35 @@ func TestPromotionEndpoints(t *testing.T) {
 		Auth:    netlifyid.MockAuthService{},
 	}
 	rb := newTestServer(t, svc)
+	type promoReq struct {
+		ID          int64  `json:"id"`
+		Name        string `json:"name"`
+		Description string `json:"description"`
+		Data        any    `json:"data"`
+	}
+	type promoData struct {
+		Width  int64 `json:"width"`
+		Height int64 `json:"height"`
+		Items  []any `json:"items"`
+	}
+
 	var created1 db.Promotion
 	{ // Create first promotion
 		var created db.Promotion
 		be.NilErr(t, rb.Clone().
 			Path("/api/promotion").
 			Method(http.MethodPost).
-			BodyJSON(db.Promotion{
+			BodyJSON(promoReq{
 				Name:        "Banner Ad",
 				Description: "A test banner",
-				Data:        []byte(`{"url":"https://example.com","width":728,"height":90}`),
+				Data:        promoData{Width: 728, Height: 90, Items: []any{}},
 			}).
 			ToJSON(&created).
 			Fetch(ctx))
 		be.Nonzero(t, created.ID)
 		be.Equal(t, "Banner Ad", created.Name)
+		be.Equal(t, int64(728), created.Width)
+		be.Equal(t, int64(90), created.Height)
 		created1 = created
 	}
 	{ // Create second promotion
@@ -44,10 +58,10 @@ func TestPromotionEndpoints(t *testing.T) {
 		be.NilErr(t, rb.Clone().
 			Path("/api/promotion").
 			Method(http.MethodPost).
-			BodyJSON(db.Promotion{
+			BodyJSON(promoReq{
 				Name:        "Sidebar Ad",
 				Description: "A sidebar promotion",
-				Data:        []byte(`{"url":"https://example.org","width":300,"height":250}`),
+				Data:        promoData{Width: 300, Height: 250, Items: []any{}},
 			}).
 			ToJSON(&created).
 			Fetch(ctx))
@@ -96,17 +110,16 @@ func TestPromotionEndpoints(t *testing.T) {
 		be.NilErr(t, rb.Clone().
 			Path("/api/promotion").
 			Method(http.MethodPost).
-			BodyJSON(db.Promotion{
+			BodyJSON(promoReq{
 				ID:          created1.ID,
 				Name:        "Banner Ad Updated",
 				Description: created1.Description,
-				Data:        created1.Data,
-				Width:       created1.Width,
-				Height:      created1.Height,
+				Data:        promoData{Width: created1.Width, Height: created1.Height, Items: []any{}},
 			}).
 			ToJSON(&updated).
 			Fetch(ctx))
 		be.Equal(t, created1.ID, updated.ID)
 		be.Equal(t, "Banner Ad Updated", updated.Name)
+		be.Equal(t, int64(728), updated.Width)
 	}
 }
