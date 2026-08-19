@@ -25,7 +25,6 @@ import (
 	"github.com/spotlightpa/almanack/internal/almsvc"
 	"github.com/spotlightpa/almanack/internal/layouts"
 	"github.com/spotlightpa/almanack/internal/services/netlifyid"
-	"github.com/spotlightpa/almanack/internal/utils/stringx"
 )
 
 func (app *appEnv) replyJSON(statusCode int, w http.ResponseWriter, data any) {
@@ -277,7 +276,7 @@ func (app *appEnv) logStart(r *http.Request, args ...any) {
 	if ok {
 		f := runtime.FuncForPC(pc)
 		file = filepath.Base(file)
-		_, name, _ := stringx.LastCut(f.Name(), ".")
+		_, name, _ := strings.CutLast(f.Name(), ".")
 		route = fmt.Sprintf("%s(%s:%d)", name, file, line)
 	}
 	l := almlog.FromContext(r.Context())

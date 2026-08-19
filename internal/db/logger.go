@@ -6,12 +6,12 @@ import (
 	"log/slog"
 	"path/filepath"
 	"runtime"
+	"strings"
 	"time"
 
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgconn"
 	"github.com/spotlightpa/almanack/internal/almlog"
-	"github.com/spotlightpa/almanack/internal/utils/stringx"
 )
 
 type logger struct {
@@ -45,7 +45,7 @@ func (l logger) log(ctx context.Context, kind string, d time.Duration, err error
 	if ok {
 		f := runtime.FuncForPC(pc)
 		file = filepath.Base(file)
-		_, name, _ := stringx.LastCut(f.Name(), ".")
+		_, name, _ := strings.CutLast(f.Name(), ".")
 		prefix = fmt.Sprintf("%s(%s:%d)", name, file, line)
 	}
 	level := almlog.LevelThreshold(d, 200*time.Millisecond, 1*time.Second)

@@ -75,13 +75,6 @@ func SlugifyFilename(s string) string {
 	return strings.Map(f, s)
 }
 
-func LastCut(s, sep string) (before, after string, found bool) {
-	if i := strings.LastIndex(s, sep); i >= 0 {
-		return s[:i], s[i+len(sep):], true
-	}
-	return "", s, false
-}
-
 // RemoveParens removes parentheses and any text that is inside of them.
 func RemoveParens(s string) string {
 	if !strings.Contains(s, "(") {
