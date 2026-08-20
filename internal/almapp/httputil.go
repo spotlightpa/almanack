@@ -4,11 +4,11 @@ import (
 	"bytes"
 	"cmp"
 	"context"
-	"encoding/json"
+	"encoding/json/jsontext"
+	jsonv2 "encoding/json/v2"
 	"errors"
 	"fmt"
 	"html/template"
-	"io"
 	"maps"
 	"mime"
 	"net/http"
@@ -30,8 +30,7 @@ import (
 func (app *appEnv) replyJSON(statusCode int, w http.ResponseWriter, data any) {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(statusCode)
-	enc := json.NewEncoder(w)
-	if err := enc.Encode(data); err != nil {
+	if err := jsonv2.MarshalWrite(w, data, jsontext.WithIndent("")); err != nil {
 		// TODO: Log to Sentry
 		almlog.Logger.Error("replyJSON", "err", err)
 	}
@@ -81,47 +80,27 @@ func (app *appEnv) tryReadJSON(w http.ResponseWriter, r *http.Request, dst any) 
 		}
 	}
 
-	dec := json.NewDecoder(r.Body)
-	dec.DisallowUnknownFields()
-
-	err := dec.Decode(&dst)
+	err := jsonv2.UnmarshalRead(r.Body, dst, jsonv2.RejectUnknownMembers(true))
 	if err != nil {
 		var (
-			syntaxError        *json.SyntaxError
-			unmarshalTypeError *json.UnmarshalTypeError
-			maxBytesError      *http.MaxBytesError
+			syntaxError   *jsontext.SyntacticError
+			semanticError *jsonv2.SemanticError
+			maxBytesError *http.MaxBytesError
 		)
-
 		switch {
 		case errors.As(err, &syntaxError):
-			return resperr.E{E: err, M: fmt.Sprintf("Request body contains badly-formed JSON (at position %d)", syntaxError.Offset)}
-
-		case errors.Is(err, io.ErrUnexpectedEOF):
-			return resperr.E{E: err, M: "Request body contains badly-formed JSON"}
-
-		case errors.As(err, &unmarshalTypeError):
-			return resperr.E{E: err, M: fmt.Sprintf("Request body contains an invalid value for the %q field (at position %d)", unmarshalTypeError.Field, unmarshalTypeError.Offset)}
-
-		case strings.HasPrefix(err.Error(), "json: unknown field "):
-			fieldName := strings.TrimPrefix(err.Error(), "json: unknown field ")
-			return resperr.E{E: err, M: fmt.Sprintf("Request body contains unknown field %s", fieldName)}
-
-		case errors.Is(err, io.EOF):
-			return resperr.E{M: "Request body contains badly-formed JSON"}
-
+			return resperr.E{E: err, M: fmt.Sprintf("Request body contains badly-formed JSON (at position %d)", syntaxError.ByteOffset)}
+		case errors.As(err, &semanticError) && errors.Is(semanticError.Err, jsonv2.ErrUnknownName):
+			return resperr.E{E: err, M: fmt.Sprintf("Request body contains unknown field %s", semanticError.JSONPointer.LastToken())}
+		case errors.As(err, &semanticError):
+			return resperr.E{E: err, M: fmt.Sprintf("Request body contains an invalid value (at %s)", semanticError.JSONPointer)}
 		case errors.As(err, &maxBytesError):
 			return resperr.New(http.StatusRequestEntityTooLarge,
 				"request body exceeds max size %d: %w",
 				maxBytesError.Limit, err)
-
 		default:
 			return resperr.New(http.StatusBadRequest, "tryReadJSON: %w", err)
 		}
-	}
-
-	var discard any
-	if err := dec.Decode(&discard); !errors.Is(err, io.EOF) {
-		return resperr.E{M: "Request body must only contain a single JSON object"}
 	}
 
 	return nil
