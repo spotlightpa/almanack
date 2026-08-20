@@ -5,7 +5,7 @@ import (
 	"cmp"
 	"context"
 	"encoding/json/jsontext"
-	jsonv2 "encoding/json/v2"
+	"encoding/json/v2"
 	"errors"
 	"fmt"
 	"html/template"
@@ -30,7 +30,7 @@ import (
 func (app *appEnv) replyJSON(statusCode int, w http.ResponseWriter, data any) {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(statusCode)
-	if err := jsonv2.MarshalWrite(w, data, jsontext.WithIndent("")); err != nil {
+	if err := json.MarshalWrite(w, data); err != nil {
 		// TODO: Log to Sentry
 		almlog.Logger.Error("replyJSON", "err", err)
 	}
@@ -80,17 +80,17 @@ func (app *appEnv) tryReadJSON(w http.ResponseWriter, r *http.Request, dst any) 
 		}
 	}
 
-	err := jsonv2.UnmarshalRead(r.Body, dst, jsonv2.RejectUnknownMembers(true))
+	err := json.UnmarshalRead(r.Body, dst, json.RejectUnknownMembers(true))
 	if err != nil {
 		var (
 			syntaxError   *jsontext.SyntacticError
-			semanticError *jsonv2.SemanticError
+			semanticError *json.SemanticError
 			maxBytesError *http.MaxBytesError
 		)
 		switch {
 		case errors.As(err, &syntaxError):
 			return resperr.E{E: err, M: fmt.Sprintf("Request body contains badly-formed JSON (at position %d)", syntaxError.ByteOffset)}
-		case errors.As(err, &semanticError) && errors.Is(semanticError.Err, jsonv2.ErrUnknownName):
+		case errors.As(err, &semanticError) && errors.Is(semanticError.Err, json.ErrUnknownName):
 			return resperr.E{E: err, M: fmt.Sprintf("Request body contains unknown field %s", semanticError.JSONPointer.LastToken())}
 		case errors.As(err, &semanticError):
 			return resperr.E{E: err, M: fmt.Sprintf("Request body contains an invalid value (at %s)", semanticError.JSONPointer)}
