@@ -8,6 +8,7 @@ import (
 
 	"github.com/carlmjohnson/be"
 	"github.com/carlmjohnson/requests"
+	"github.com/carlmjohnson/requests/reqtest"
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/spotlightpa/almanack/internal/almapp"
 	"github.com/spotlightpa/almanack/internal/almsvc"
@@ -40,11 +41,7 @@ func createTestDB(t *testing.T) *db.Handle {
 // pre-configured with the server's base URL and a mock Authorization header.
 func newTestServer(t *testing.T, svc almsvc.Services) *requests.Builder {
 	t.Helper()
-	srv := httptest.NewTestServer(t, almapp.NewHandler(svc))
-	cl := srv.Client()
 	return requests.
-		New().
-		BaseURL(srv.URL).
-		Client(cl).
+		New(reqtest.Server(httptest.NewTestServer(t, almapp.NewHandler(svc)))).
 		Header("Authorization", "Bearer mock")
 }
