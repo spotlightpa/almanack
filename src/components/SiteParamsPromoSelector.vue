@@ -19,12 +19,12 @@ watch(
   })
 );
 
-const { apiState } = watchAPI(
+const { apiState, computedList } = watchAPI(
   () => debouncedSearch.value,
   (text) => get(listPromotions, text ? { text } : undefined)
 );
 
-const promotions = () => apiState.rawData.value?.promotions ?? [];
+const promotions = computedList("promotions", (p) => p);
 </script>
 
 <template>
@@ -47,7 +47,7 @@ const promotions = () => apiState.rawData.value?.promotions ?? [];
     </p>
 
     <p
-      v-if="!apiState.isLoading.value && promotions().length === 0"
+      v-if="!apiState.isLoading.value && promotions.length === 0"
       class="help has-text-grey"
     >
       {{
@@ -57,37 +57,31 @@ const promotions = () => apiState.rawData.value?.promotions ?? [];
       }}
     </p>
 
-    <table
-      v-if="promotions().length"
-      class="table is-narrow is-hoverable is-fullwidth is-bordered"
+    <div
+      v-for="promo in promotions"
+      :key="promo.id"
+      class="is-flex is-align-items-center is-justify-content-space-between py-2"
+      style="border-bottom: 1px solid #dbdbdb"
     >
-      <thead>
-        <tr>
-          <th>Name</th>
-          <th>Description</th>
-          <th>Items</th>
-          <th></th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr v-for="promo in promotions()" :key="promo.id">
-          <td>{{ promo.name }}</td>
-          <td class="has-text-grey is-size-7">{{ promo.description }}</td>
-          <td class="is-narrow">
-            {{ promo.items?.length ?? 0 }}
-          </td>
-          <td class="is-narrow">
-            <button
-              type="button"
-              class="button is-small is-link has-text-weight-semibold"
-              @click="$emit('select', promo)"
-            >
-              Use
-            </button>
-          </td>
-        </tr>
-      </tbody>
-    </table>
+      <div>
+        <p class="has-text-weight-semibold is-size-7">{{ promo.name }}</p>
+        <p v-if="promo.description" class="has-text-grey is-size-7">
+          {{ promo.description }}
+        </p>
+        <p class="has-text-grey is-size-7">
+          {{ promo.items?.length ?? 0 }} image{{
+            promo.items?.length !== 1 ? "s" : ""
+          }}
+        </p>
+      </div>
+      <button
+        type="button"
+        class="button is-small is-link has-text-weight-semibold"
+        @click="$emit('select', promo)"
+      >
+        Use
+      </button>
+    </div>
   </div>
 </template>
 
