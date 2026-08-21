@@ -146,6 +146,7 @@ type Promotion struct {
 	ID          int64     `json:"id"`
 	Name        string    `json:"name"`
 	Description string    `json:"description"`
+	Link        string    `json:"link"`
 	Width       int32     `json:"width"`
 	Height      int32     `json:"height"`
 	Items       []string  `json:"items"`

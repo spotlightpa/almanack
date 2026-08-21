@@ -10,15 +10,16 @@ import (
 )
 
 const createPromotion = `-- name: CreatePromotion :one
-INSERT INTO "promotion" ("name", "description", "width", "height", "items")
-  VALUES ($1, $2, $3, $4, $5)
+INSERT INTO "promotion" ("name", "description", "link", "width", "height", "items")
+  VALUES ($1, $2, $3, $4, $5, $6)
 RETURNING
-  id, name, description, width, height, items, created_at, updated_at
+  id, name, description, link, width, height, items, created_at, updated_at
 `
 
 type CreatePromotionParams struct {
 	Name        string   `json:"name"`
 	Description string   `json:"description"`
+	Link        string   `json:"link"`
 	Width       int32    `json:"width"`
 	Height      int32    `json:"height"`
 	Items       []string `json:"items"`
@@ -28,6 +29,7 @@ func (q *Queries) CreatePromotion(ctx context.Context, arg CreatePromotionParams
 	row := q.db.QueryRow(ctx, createPromotion,
 		arg.Name,
 		arg.Description,
+		arg.Link,
 		arg.Width,
 		arg.Height,
 		arg.Items,
@@ -37,6 +39,7 @@ func (q *Queries) CreatePromotion(ctx context.Context, arg CreatePromotionParams
 		&i.ID,
 		&i.Name,
 		&i.Description,
+		&i.Link,
 		&i.Width,
 		&i.Height,
 		&i.Items,
@@ -52,7 +55,7 @@ WITH tsq AS (
     websearch_to_tsquery('english', $5::text) AS q
 )
 SELECT
-  promotion.id, promotion.name, promotion.description, promotion.width, promotion.height, promotion.items, promotion.created_at, promotion.updated_at
+  promotion.id, promotion.name, promotion.description, promotion.link, promotion.width, promotion.height, promotion.items, promotion.created_at, promotion.updated_at
 FROM
   "promotion"
   INNER JOIN tsq ON fts_doc_en @@ tsq.q
@@ -92,6 +95,7 @@ func (q *Queries) ListPromotionByFTS(ctx context.Context, arg ListPromotionByFTS
 			&i.ID,
 			&i.Name,
 			&i.Description,
+			&i.Link,
 			&i.Width,
 			&i.Height,
 			&i.Items,
@@ -110,7 +114,7 @@ func (q *Queries) ListPromotionByFTS(ctx context.Context, arg ListPromotionByFTS
 
 const listPromotionByUpdated = `-- name: ListPromotionByUpdated :many
 SELECT
-  id, name, description, width, height, items, created_at, updated_at
+  id, name, description, link, width, height, items, created_at, updated_at
 FROM
   "promotion"
 WHERE ("promotion"."width" = $3
@@ -147,6 +151,7 @@ func (q *Queries) ListPromotionByUpdated(ctx context.Context, arg ListPromotionB
 			&i.ID,
 			&i.Name,
 			&i.Description,
+			&i.Link,
 			&i.Width,
 			&i.Height,
 			&i.Items,
@@ -169,18 +174,20 @@ UPDATE
 SET
   "name" = $1,
   "description" = $2,
-  "width" = $3,
-  "height" = $4,
-  "items" = $5
+  "link" = $3,
+  "width" = $4,
+  "height" = $5,
+  "items" = $6
 WHERE
-  "id" = $6
+  "id" = $7
 RETURNING
-  id, name, description, width, height, items, created_at, updated_at
+  id, name, description, link, width, height, items, created_at, updated_at
 `
 
 type UpdatePromotionParams struct {
 	Name        string   `json:"name"`
 	Description string   `json:"description"`
+	Link        string   `json:"link"`
 	Width       int32    `json:"width"`
 	Height      int32    `json:"height"`
 	Items       []string `json:"items"`
@@ -191,6 +198,7 @@ func (q *Queries) UpdatePromotion(ctx context.Context, arg UpdatePromotionParams
 	row := q.db.QueryRow(ctx, updatePromotion,
 		arg.Name,
 		arg.Description,
+		arg.Link,
 		arg.Width,
 		arg.Height,
 		arg.Items,
@@ -201,6 +209,7 @@ func (q *Queries) UpdatePromotion(ctx context.Context, arg UpdatePromotionParams
 		&i.ID,
 		&i.Name,
 		&i.Description,
+		&i.Link,
 		&i.Width,
 		&i.Height,
 		&i.Items,

@@ -1134,6 +1134,7 @@ func (app *appEnv) postPromotion(w http.ResponseWriter, r *http.Request) http.Ha
 		promo, err = app.svc.Queries.CreatePromotion(r.Context(), db.CreatePromotionParams{
 			Name:        req.Name,
 			Description: req.Description,
+			Link:        req.Link,
 			Width:       req.Width,
 			Height:      req.Height,
 			Items:       req.Items,
@@ -1143,6 +1144,7 @@ func (app *appEnv) postPromotion(w http.ResponseWriter, r *http.Request) http.Ha
 			ID:          req.ID,
 			Name:        req.Name,
 			Description: req.Description,
+			Link:        req.Link,
 			Width:       req.Width,
 			Height:      req.Height,
 			Items:       req.Items,

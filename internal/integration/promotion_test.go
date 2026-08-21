@@ -31,6 +31,7 @@ func TestPromotionEndpoints(t *testing.T) {
 			BodyJSON(db.Promotion{
 				Name:        "Banner Ad",
 				Description: "A test banner",
+				Link:        "https://example.com/",
 				Width:       728,
 				Height:      90,
 				Items:       []string{"https://example.com/banner.png"},
@@ -51,6 +52,7 @@ func TestPromotionEndpoints(t *testing.T) {
 			BodyJSON(db.Promotion{
 				Name:        "Sidebar Ad",
 				Description: "A sidebar promotion",
+				Link:        "https://example.org/",
 				Width:       300,
 				Height:      250,
 				Items:       []string{"https://example.org/sidebar.png"},
@@ -122,6 +124,7 @@ func TestPromotionEndpoints(t *testing.T) {
 				ID:          created1.ID,
 				Name:        "Banner Ad Updated",
 				Description: created1.Description,
+				Link:        created1.Link,
 				Width:       created1.Width,
 				Height:      created1.Height,
 				Items:       created1.Items,

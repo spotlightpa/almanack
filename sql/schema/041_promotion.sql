@@ -2,6 +2,7 @@ CREATE TABLE promotion (
   "id" bigserial PRIMARY KEY,
   "name" text NOT NULL DEFAULT '',
   "description" text NOT NULL DEFAULT '',
+  "link" text NOT NULL DEFAULT '',
   "width" integer NOT NULL DEFAULT 0,
   "height" integer NOT NULL DEFAULT 0,
   "items" text[] NOT NULL DEFAULT '{}',
