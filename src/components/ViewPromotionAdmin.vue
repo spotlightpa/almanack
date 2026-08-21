@@ -22,6 +22,7 @@ function swap(event, i) {
 const isAdding = ref(false);
 const newName = ref("");
 const newDescription = ref("");
+const newLink = ref("");
 const newWidth = ref(0);
 const newHeight = ref(0);
 const newItems = ref([]);
@@ -29,6 +30,7 @@ const newItems = ref([]);
 function startNew() {
   newName.value = "";
   newDescription.value = "";
+  newLink.value = "";
   newWidth.value = 0;
   newHeight.value = 0;
   newItems.value = [];
@@ -43,6 +45,7 @@ async function saveNew() {
       id: null,
       name: newName.value,
       description: newDescription.value,
+      link: newLink.value,
       width: newWidth.value,
       height: newHeight.value,
       items: newItems.value,
@@ -113,6 +116,12 @@ async function saveNew() {
             v-model="newDescription"
             label="Description"
             placeholder="Short description"
+          />
+          <BulmaFieldInput
+            v-model="newLink"
+            label="Link URL"
+            type="url"
+            placeholder="https://"
           />
           <div class="is-flex mb-3" style="gap: 1rem">
             <BulmaFieldInput

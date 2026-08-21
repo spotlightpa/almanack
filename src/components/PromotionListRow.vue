@@ -20,6 +20,7 @@ const isOpen = ref(false);
 
 const name = ref("");
 const description = ref("");
+const link = ref("");
 const width = ref(0);
 const height = ref(0);
 const items = ref([]);
@@ -27,6 +28,7 @@ const items = ref([]);
 function initValues() {
   name.value = props.modelValue.name;
   description.value = props.modelValue.description;
+  link.value = props.modelValue.link ?? "";
   width.value = props.modelValue.width;
   height.value = props.modelValue.height;
   items.value = [...(props.modelValue.items ?? [])];
@@ -50,6 +52,7 @@ async function save() {
       id: props.modelValue.id,
       name: name.value,
       description: description.value,
+      link: link.value,
       width: width.value,
       height: height.value,
       items: items.value,
@@ -104,6 +107,12 @@ async function save() {
         v-model="description"
         label="Description"
         placeholder="Short description"
+      />
+      <BulmaFieldInput
+        v-model="link"
+        label="Link URL"
+        type="url"
+        placeholder="https://"
       />
       <div class="is-flex mb-3" style="gap: 1rem">
         <BulmaFieldInput

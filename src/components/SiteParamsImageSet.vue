@@ -66,7 +66,7 @@ function applyPromoSet(promo) {
       id: n++,
       label: "",
       labelLink: "",
-      link: "https://www.spotlightpa.org/donate/",
+      link: promo.link || "https://www.spotlightpa.org/donate/",
       description: "",
       sources: [url],
     });
