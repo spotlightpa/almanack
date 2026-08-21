@@ -74,7 +74,11 @@ async function saveNew() {
       :reload="fetch"
       :error="apiState.error.value"
     >
-      <div v-for="(promo, i) in promotions" :key="promo.id" class="zebra-row p-3">
+      <div
+        v-for="(promo, i) in promotions"
+        :key="promo.id"
+        class="zebra-row p-3"
+      >
         <PromotionListRow
           :model-value="promo"
           @update:model-value="swap($event, i)"
