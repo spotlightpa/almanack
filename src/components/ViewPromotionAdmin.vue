@@ -5,10 +5,10 @@ import { get, post, listPromotions, postPromotion } from "@/api/client-v2.js";
 import { makeState, watchAPI } from "@/api/service-util.js";
 import { useFileList } from "@/api/file-list.js";
 
-// ── file list (for image picker) ─────────────────────────────────────────────
+// ── file list (for image picker) ──────────────────────────────────────────────────────────────────
 const fileList = useFileList();
 
-// ── list state ───────────────────────────────────────────────────────────────
+// ── list state ────────────────────────────────────────────────────────────────────────────────────
 const { apiState, fetch, computedList } = watchAPI(
   () => null,
   () => get(listPromotions)
@@ -16,10 +16,10 @@ const { apiState, fetch, computedList } = watchAPI(
 
 const promotions = computedList("promotions", (p) => p);
 
-// ── save state ───────────────────────────────────────────────────────────────
+// ── save state ─────────────────────────────────────────────────────────────────────────────────────
 const { apiState: saveState, exec: saveExec } = makeState();
 
-// ── editing ──────────────────────────────────────────────────────────────────
+// ── editing ──────────────────────────────────────────────────────────────────────────────────────────
 const editing = ref(null);
 
 function startEdit(promo) {
@@ -35,7 +35,7 @@ function startEdit(promo) {
 
 function startNew() {
   editing.value = reactive({
-    id: 0,
+    id: null,
     name: "",
     description: "",
     width: 0,
@@ -76,7 +76,70 @@ async function save() {
       :reload="fetch"
       :error="apiState.error.value"
     >
-      <div class="mb-4 buttons">
+      <!-- ── new promotion form (shown at top when adding) ─────────────────────────── -->
+      <div v-if="editing && editing.id === null" class="zebra-row p-3 mb-2">
+        <h2 class="title is-5">New promotion set</h2>
+        <BulmaFieldInput
+          v-model="editing.name"
+          label="Name"
+          placeholder="e.g. Rail sticky promo"
+        />
+        <BulmaFieldInput
+          v-model="editing.description"
+          label="Description"
+          placeholder="Short description"
+        />
+        <div class="is-flex mb-3" style="gap: 1rem">
+          <BulmaField v-slot="{ idForLabel }" label="Width">
+            <input
+              :id="idForLabel"
+              v-model.number="editing.width"
+              class="input"
+              inputmode="numeric"
+            />
+          </BulmaField>
+          <BulmaField v-slot="{ idForLabel }" label="Height">
+            <input
+              :id="idForLabel"
+              v-model.number="editing.height"
+              class="input"
+              inputmode="numeric"
+            />
+          </BulmaField>
+        </div>
+        <BulmaField
+          label="Image URLs"
+          help="One image URL per slot; one will be chosen randomly on each page load."
+        >
+          <SiteParamsFiles
+            :files="editing.items"
+            :file-props="fileList"
+            @add="editing.items.push($event)"
+            @remove="editing.items.splice($event, 1)"
+          />
+        </BulmaField>
+        <div class="mt-3 buttons">
+          <button
+            class="button is-primary has-text-weight-semibold"
+            :class="{ 'is-loading': saveState.isLoading }"
+            :disabled="saveState.isLoading || null"
+            @click="save"
+          >
+            Save
+          </button>
+          <button
+            class="button is-light has-text-weight-semibold"
+            :disabled="saveState.isLoading || null"
+            @click="cancelEdit"
+          >
+            Cancel
+          </button>
+        </div>
+        <ErrorSimple :error="saveState.error" />
+      </div>
+
+      <!-- ── "Add new" button (hidden while editing) ─────────────────────────────── -->
+      <div v-else class="mb-4 buttons">
         <button
           class="button is-primary has-text-weight-semibold"
           @click="startNew"
@@ -94,7 +157,7 @@ async function save() {
 
       <div v-for="promo in promotions" :key="promo.id" class="zebra-row p-3">
         <template v-if="editing && editing.id === promo.id">
-          <!-- ── inline editor ──────────────────────────────────── -->
+          <!-- ── inline editor ──────────────────────────────────────────────── -->
           <BulmaFieldInput
             v-model="editing.name"
             label="Name"
@@ -155,7 +218,7 @@ async function save() {
         </template>
 
         <template v-else>
-          <!-- ── list row ───────────────────────────────────────── -->
+          <!-- ── list row ───────────────────────────────────────────────────────── -->
           <div
             class="is-flex is-justify-content-space-between is-align-items-start"
           >
@@ -178,73 +241,13 @@ async function save() {
             </div>
             <button
               class="button is-small is-info has-text-weight-semibold"
+              :disabled="editing !== null || null"
               @click="startEdit(promo)"
             >
               Edit
             </button>
           </div>
         </template>
-      </div>
-
-      <!-- ── new promotion form (when no id yet) ────────────────── -->
-      <div v-if="editing && editing.id === 0" class="zebra-row p-3">
-        <BulmaFieldInput
-          v-model="editing.name"
-          label="Name"
-          placeholder="e.g. Rail sticky promo"
-        />
-        <BulmaFieldInput
-          v-model="editing.description"
-          label="Description"
-          placeholder="Short description"
-        />
-        <div class="is-flex mb-3" style="gap: 1rem">
-          <BulmaField v-slot="{ idForLabel }" label="Width">
-            <input
-              :id="idForLabel"
-              v-model.number="editing.width"
-              class="input"
-              inputmode="numeric"
-            />
-          </BulmaField>
-          <BulmaField v-slot="{ idForLabel }" label="Height">
-            <input
-              :id="idForLabel"
-              v-model.number="editing.height"
-              class="input"
-              inputmode="numeric"
-            />
-          </BulmaField>
-        </div>
-        <BulmaField
-          label="Image URLs"
-          help="One image URL per slot; one will be chosen randomly on each page load."
-        >
-          <SiteParamsFiles
-            :files="editing.items"
-            :file-props="fileList"
-            @add="editing.items.push($event)"
-            @remove="editing.items.splice($event, 1)"
-          />
-        </BulmaField>
-        <div class="mt-3 buttons">
-          <button
-            class="button is-primary has-text-weight-semibold"
-            :class="{ 'is-loading': saveState.isLoading }"
-            :disabled="saveState.isLoading || null"
-            @click="save"
-          >
-            Save
-          </button>
-          <button
-            class="button is-light has-text-weight-semibold"
-            :disabled="saveState.isLoading || null"
-            @click="cancelEdit"
-          >
-            Cancel
-          </button>
-        </div>
-        <ErrorSimple :error="saveState.error" />
       </div>
     </APILoader>
   </div>
