@@ -81,6 +81,83 @@ async function saveNew() {
     />
     <h1 class="title">Promotions</h1>
 
+    <div class="mb-4">
+      <button
+        v-if="!isAdding"
+        class="button is-primary has-text-weight-semibold"
+        type="button"
+        @click="startNew"
+      >
+        <span class="icon">
+          <font-awesome-icon :icon="['fas', 'plus']" />
+        </span>
+        <span>New promotion set</span>
+      </button>
+      <div v-else class="box">
+        <h2 class="title is-5">New promotion set</h2>
+        <BulmaFieldInput
+          v-model="newName"
+          label="Name"
+          placeholder="e.g. Rail sticky promo"
+        />
+        <BulmaFieldInput
+          v-model="newDescription"
+          label="Description"
+          placeholder="Short description"
+        />
+        <BulmaFieldInput
+          v-model="newLink"
+          label="Link URL"
+          type="url"
+          placeholder="https://"
+        />
+        <div class="is-flex mb-3" style="gap: 1rem">
+          <BulmaFieldInput
+            label="Width"
+            inputmode="numeric"
+            :model-value="newWidth || ''"
+            @update:model-value="newWidth = +$event || 0"
+          />
+          <BulmaFieldInput
+            label="Height"
+            inputmode="numeric"
+            :model-value="newHeight || ''"
+            @update:model-value="newHeight = +$event || 0"
+          />
+        </div>
+        <BulmaField
+          label="Image URLs"
+          help="One image URL per slot; one will be chosen randomly on each page load."
+        >
+          <SiteParamsFiles
+            :files="newItems"
+            :file-props="fileList"
+            @add="newItems.push($event)"
+            @remove="newItems.splice($event, 1)"
+          />
+        </BulmaField>
+        <ErrorSimple :error="saveState.error" />
+        <div class="buttons">
+          <button
+            class="button is-success has-text-weight-semibold"
+            :class="{ 'is-loading': saveState.isLoading }"
+            type="button"
+            @click="saveNew"
+          >
+            Save
+          </button>
+          <button
+            class="button is-light has-text-weight-semibold"
+            :disabled="saveState.isLoading || null"
+            type="button"
+            @click="isAdding = false"
+          >
+            Cancel
+          </button>
+        </div>
+      </div>
+    </div>
+
     <APILoader
       :is-loading="apiState.isLoading.value"
       :reload="fetch"
@@ -98,94 +175,17 @@ async function saveNew() {
       </div>
 
       <div class="zebra-row p-3">
-        <template v-if="!isAdding">
-          <p v-if="!promotions.length" class="mb-3 has-text-grey">
-            No promotion sets yet.
-          </p>
-          <div class="buttons">
-            <button
-              class="button is-primary has-text-weight-semibold"
-              type="button"
-              @click="startNew"
-            >
-              <span class="icon">
-                <font-awesome-icon :icon="['fas', 'plus']" />
-              </span>
-              <span>New promotion set</span>
-            </button>
-            <router-link
-              v-if="nextPage"
-              :to="nextPage"
-              class="button is-light has-text-weight-semibold"
-            >
-              Show More…
-            </router-link>
-          </div>
-        </template>
-
-        <template v-else>
-          <h2 class="title is-5">New promotion set</h2>
-          <BulmaFieldInput
-            v-model="newName"
-            label="Name"
-            placeholder="e.g. Rail sticky promo"
-          />
-          <BulmaFieldInput
-            v-model="newDescription"
-            label="Description"
-            placeholder="Short description"
-          />
-          <BulmaFieldInput
-            v-model="newLink"
-            label="Link URL"
-            type="url"
-            placeholder="https://"
-          />
-          <div class="is-flex mb-3" style="gap: 1rem">
-            <BulmaFieldInput
-              label="Width"
-              inputmode="numeric"
-              :model-value="newWidth || ''"
-              @update:model-value="newWidth = +$event || 0"
-            />
-            <BulmaFieldInput
-              label="Height"
-              inputmode="numeric"
-              :model-value="newHeight || ''"
-              @update:model-value="newHeight = +$event || 0"
-            />
-          </div>
-          <BulmaField
-            label="Image URLs"
-            help="One image URL per slot; one will be chosen randomly on each page load."
+        <p v-if="!promotions.length" class="has-text-grey">
+          No promotion sets yet.
+        </p>
+        <div v-if="nextPage" class="buttons">
+          <router-link
+            :to="nextPage"
+            class="button is-light has-text-weight-semibold"
           >
-            <SiteParamsFiles
-              :files="newItems"
-              :file-props="fileList"
-              @add="newItems.push($event)"
-              @remove="newItems.splice($event, 1)"
-            />
-          </BulmaField>
-          <ErrorSimple :error="saveState.error" />
-          <div class="buttons">
-            <button
-              class="button is-success has-text-weight-semibold"
-              :class="{ 'is-loading': saveState.isLoading }"
-              type="button"
-              @click="saveNew"
-            >
-              Save
-            </button>
-            <button
-              class="button is-light has-text-weight-semibold"
-              :disabled="saveState.isLoading || null"
-              type="button"
-              @click="isAdding = false"
-            >
-              Cancel
-            </button>
-          </div>
-        </template>
+            Show More…
+          </router-link>
+        </div>
       </div>
     </APILoader>
   </div>
