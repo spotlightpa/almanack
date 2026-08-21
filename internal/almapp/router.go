@@ -76,6 +76,7 @@ func (app *appEnv) routes() http.Handler {
 		HandleFunc(mux, `POST /api/page-refresh`, app.postPageRefresh).
 		Control(mux, `GET /api/promotion`, app.listPromotions).
 		Control(mux, `POST /api/promotion`, app.postPromotion).
+		Control(mux, `POST /api/promotion-delete`, app.deletePromotion).
 		HandleFunc(mux, `POST /api/shared-article`, app.postSharedArticle).
 		HandleFunc(mux, `POST /api/shared-article-from-gdocs`, app.postSharedArticleFromGDocs).
 		HandleFunc(mux, `GET /api/sidebar`, app.siteDataGet(almsvc.SidebarLoc)).

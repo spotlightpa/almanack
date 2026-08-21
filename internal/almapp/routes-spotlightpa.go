@@ -1155,3 +1155,20 @@ func (app *appEnv) postPromotion(w http.ResponseWriter, r *http.Request) http.Ha
 	}
 	return app.jsonOK(promo)
 }
+
+func (app *appEnv) deletePromotion(w http.ResponseWriter, r *http.Request) http.Handler {
+	app.logStart(r)
+	var req struct {
+		ID int64 `json:"id"`
+	}
+	if !app.readJSON(w, r, &req) {
+		return nil
+	}
+	if req.ID == 0 {
+		return app.jsonErr(resperr.E{S: http.StatusBadRequest, M: "Missing id"})
+	}
+	if err := app.svc.Queries.DeletePromotion(r.Context(), req.ID); err != nil {
+		return app.jsonErr(err)
+	}
+	return app.jsonOK(struct{}{})
+}

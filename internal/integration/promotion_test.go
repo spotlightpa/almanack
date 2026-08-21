@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/carlmjohnson/be"
+	"github.com/carlmjohnson/requests"
 	"github.com/spotlightpa/almanack/internal/almlog"
 	"github.com/spotlightpa/almanack/internal/almsvc"
 	"github.com/spotlightpa/almanack/internal/db"
@@ -134,5 +135,61 @@ func TestPromotionEndpoints(t *testing.T) {
 		be.Equal(t, created1.ID, updated.ID)
 		be.Equal(t, "Banner Ad Updated", updated.Name)
 		be.Equal(t, int32(728), updated.Width)
+	}
+}
+
+func TestDeletePromotionEndpoint(t *testing.T) {
+	almlog.UseTestLogger(t)
+	dbhandle := createTestDB(t)
+	ctx := t.Context()
+
+	svc := almsvc.Services{
+		DB:      dbhandle,
+		Queries: dbhandle.Queries(),
+		Auth:    netlifyid.MockAuthService{},
+	}
+	rb := newTestServer(t, svc)
+
+	// Create a promotion to delete
+	var created db.Promotion
+	be.NilErr(t, rb.Clone().
+		Path("/api/promotion").
+		Method(http.MethodPost).
+		BodyJSON(db.Promotion{
+			Name:  "To Be Deleted",
+			Link:  "https://example.com/",
+			Width: 300,
+			Height: 250,
+			Items: []string{"https://example.com/img.png"},
+		}).
+		ToJSON(&created).
+		Fetch(ctx))
+	be.Nonzero(t, created.ID)
+
+	// Missing ID returns 400 Bad Request
+	err := rb.Clone().
+		Path("/api/promotion-delete").
+		Method(http.MethodPost).
+		BodyJSON(map[string]any{"id": 0}).
+		Fetch(ctx)
+	be.True(t, requests.HasStatusErr(err, http.StatusBadRequest))
+
+	// Delete the promotion
+	be.NilErr(t, rb.Clone().
+		Path("/api/promotion-delete").
+		Method(http.MethodPost).
+		BodyJSON(map[string]any{"id": created.ID}).
+		Fetch(ctx))
+
+	// Confirm it no longer appears in the list
+	var listResp struct {
+		Promotions []db.Promotion `json:"promotions"`
+	}
+	be.NilErr(t, rb.Clone().
+		Path("/api/promotion").
+		ToJSON(&listResp).
+		Fetch(ctx))
+	for _, p := range listResp.Promotions {
+		be.Unequal(t, created.ID, p.ID)
 	}
 }

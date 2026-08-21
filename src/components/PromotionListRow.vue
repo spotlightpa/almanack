@@ -1,7 +1,7 @@
 <script setup>
 import { ref } from "vue";
 
-import { post, postPromotion } from "@/api/client-v2.js";
+import { post, postPromotion, deletePromotion } from "@/api/client-v2.js";
 import { makeState } from "@/api/service-util.js";
 import { useFileList } from "@/api/file-list.js";
 
@@ -12,7 +12,7 @@ const props = defineProps({
   },
 });
 
-const emit = defineEmits(["update:modelValue"]);
+const emit = defineEmits(["update:modelValue", "delete"]);
 
 const fileList = useFileList();
 
@@ -45,6 +45,22 @@ function toggle() {
 
 const { exec, apiStateRefs } = makeState();
 const { isLoadingThrottled, error } = apiStateRefs;
+
+const { exec: deleteExec, apiStateRefs: deleteStateRefs } = makeState();
+const { isLoadingThrottled: deleteLoadingThrottled, error: deleteError } =
+  deleteStateRefs;
+
+async function remove() {
+  if (!confirm(`Delete "${props.modelValue.name || "this promotion"}"?`)) {
+    return;
+  }
+  await deleteExec(() =>
+    post(deletePromotion, { id: props.modelValue.id })
+  );
+  if (!deleteStateRefs.error.value) {
+    emit("delete");
+  }
+}
 
 async function save() {
   await exec(() =>
@@ -86,14 +102,26 @@ async function save() {
           &middot;
           {{ new Date(modelValue.updated_at).toLocaleString() }}
         </p>
-        <button
-          v-if="!isOpen"
-          class="mt-2 button is-light has-text-weight-semibold"
-          type="button"
-          @click="toggle"
-        >
-          Edit
-        </button>
+        <div class="mt-2 buttons">
+          <button
+            v-if="!isOpen"
+            class="button is-light has-text-weight-semibold"
+            type="button"
+            @click="toggle"
+          >
+            Edit
+          </button>
+          <button
+            class="button is-danger is-light has-text-weight-semibold"
+            :class="{ 'is-loading': deleteLoadingThrottled }"
+            :disabled="deleteLoadingThrottled || null"
+            type="button"
+            @click="remove"
+          >
+            Delete
+          </button>
+        </div>
+        <ErrorSimple :error="deleteError" />
       </div>
     </div>
 

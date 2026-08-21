@@ -49,3 +49,7 @@ AND ("promotion"."height" = @height
 ORDER BY
   ts_rank(fts_doc_en, tsq.q) DESC
 LIMIT $1 OFFSET $2;
+
+-- name: DeletePromotion :exec
+DELETE FROM "promotion"
+WHERE "id" = @id;

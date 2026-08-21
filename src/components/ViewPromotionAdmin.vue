@@ -27,6 +27,10 @@ function swap(event, i) {
   promotions.value[i] = event;
 }
 
+function remove(i) {
+  promotions.value.splice(i, 1);
+}
+
 // new promotion form
 const isAdding = ref(false);
 const newName = ref("");
@@ -171,6 +175,7 @@ async function saveNew() {
         <PromotionListRow
           :model-value="promo"
           @update:model-value="swap($event, i)"
+          @delete="remove(i)"
         />
       </div>
 
