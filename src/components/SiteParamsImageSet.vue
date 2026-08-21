@@ -12,6 +12,8 @@ const props = defineProps({
   help: String,
   fileProps: Object,
   showWidthHeight: Boolean,
+  fixedWidth: { type: Number, default: 0 },
+  fixedHeight: { type: Number, default: 0 },
 });
 let n = 0;
 
@@ -167,6 +169,8 @@ defineExpose({
       <SiteParamsPromoSelector
         v-if="showPromoSelector"
         class="mb-3"
+        :filter-width="showWidthHeight ? width : fixedWidth"
+        :filter-height="showWidthHeight ? height : fixedHeight"
         @select="applyPromoSet"
       />
       <div class="buttons">

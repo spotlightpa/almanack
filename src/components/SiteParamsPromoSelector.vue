@@ -1,9 +1,14 @@
 <script setup>
-import { ref, watch } from "vue";
+import { computed, ref, watch } from "vue";
 
 import { get, listPromotions } from "@/api/client-v2.js";
 import { watchAPI } from "@/api/service-util.js";
 import { debounce } from "@/utils/wait.ts";
+
+const props = defineProps({
+  filterWidth: { type: Number, default: 0 },
+  filterHeight: { type: Number, default: 0 },
+});
 
 defineEmits(["select"]);
 
@@ -24,7 +29,16 @@ const { apiState, computedList } = watchAPI(
   (text) => get(listPromotions, text ? { text } : undefined)
 );
 
-const promotions = computedList("promotions", (p) => p);
+const allPromotions = computedList("promotions", (p) => p);
+
+const promotions = computed(() => {
+  if (!props.filterWidth && !props.filterHeight) return allPromotions.value;
+  return allPromotions.value.filter(
+    (p) =>
+      (!props.filterWidth || p.width === props.filterWidth) &&
+      (!props.filterHeight || p.height === props.filterHeight)
+  );
+});
 </script>
 
 <template>
@@ -53,7 +67,9 @@ const promotions = computedList("promotions", (p) => p);
       {{
         debouncedSearch
           ? "No matching promotion sets found."
-          : "No promotion sets yet."
+          : filterWidth || filterHeight
+            ? `No promotion sets with size ${filterWidth}\xd7${filterHeight}.`
+            : "No promotion sets yet."
       }}
     </p>
 
