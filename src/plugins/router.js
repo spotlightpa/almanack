@@ -120,6 +120,7 @@ let router = createRouter({
       path: "/admin/promotions",
       name: "promotions",
       component: load(() => import("@/components/ViewPromotionAdmin.vue")),
+      props: (route) => ({ page: route.query.page }),
       meta: {
         requiresAuth: isSpotlightPAUser,
       },

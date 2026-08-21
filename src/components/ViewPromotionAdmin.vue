@@ -5,14 +5,23 @@ import { get, post, listPromotions, postPromotion } from "@/api/client-v2.js";
 import { makeState, watchAPI } from "@/api/service-util.js";
 import { useFileList } from "@/api/file-list.js";
 
+const props = defineProps({
+  page: { default: "" },
+});
+
 const fileList = useFileList();
 
-const { apiState, fetch, computedList } = watchAPI(
-  () => null,
-  () => get(listPromotions)
+const { apiState, fetch, computedList, computedProp } = watchAPI(
+  () => props.page,
+  (page) => get(listPromotions, page ? { page } : undefined)
 );
 
 const promotions = computedList("promotions", (p) => p);
+
+const nextPage = computedProp("next_page", (page) => ({
+  name: "promotions",
+  query: { page },
+}));
 
 function swap(event, i) {
   promotions.value[i] = event;
@@ -93,16 +102,25 @@ async function saveNew() {
           <p v-if="!promotions.length" class="mb-3 has-text-grey">
             No promotion sets yet.
           </p>
-          <button
-            class="button is-primary has-text-weight-semibold"
-            type="button"
-            @click="startNew"
-          >
-            <span class="icon">
-              <font-awesome-icon :icon="['fas', 'plus']" />
-            </span>
-            <span>New promotion set</span>
-          </button>
+          <div class="buttons">
+            <button
+              class="button is-primary has-text-weight-semibold"
+              type="button"
+              @click="startNew"
+            >
+              <span class="icon">
+                <font-awesome-icon :icon="['fas', 'plus']" />
+              </span>
+              <span>New promotion set</span>
+            </button>
+            <router-link
+              v-if="nextPage"
+              :to="nextPage"
+              class="button is-light has-text-weight-semibold"
+            >
+              Show More…
+            </router-link>
+          </div>
         </template>
 
         <template v-else>

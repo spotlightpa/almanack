@@ -70,8 +70,8 @@ async function save() {
     <div class="is-flex is-justify-content-space-between is-align-items-start">
       <div>
         <p class="has-text-weight-semibold">
-          {{ modelValue.name }}
-          <span class="has-text-grey is-size-7"> #{{ modelValue.id }}</span>
+          <span v-if="modelValue.name">{{ modelValue.name }}</span>
+          <span v-else class="has-text-grey is-italic">&lt;untitled&gt;</span>
         </p>
         <p v-if="modelValue.description" class="is-size-7 has-text-grey">
           {{ modelValue.description }}
