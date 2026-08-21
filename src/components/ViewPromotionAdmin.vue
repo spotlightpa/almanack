@@ -118,17 +118,19 @@ async function saveNew() {
             <BulmaField v-slot="{ idForLabel }" label="Width">
               <input
                 :id="idForLabel"
-                v-model.number="newWidth"
+                :value="newWidth || ''"
                 class="input"
                 inputmode="numeric"
+                @change="newWidth = +$event.target.value || 0"
               />
             </BulmaField>
             <BulmaField v-slot="{ idForLabel }" label="Height">
               <input
                 :id="idForLabel"
-                v-model.number="newHeight"
+                :value="newHeight || ''"
                 class="input"
                 inputmode="numeric"
+                @change="newHeight = +$event.target.value || 0"
               />
             </BulmaField>
           </div>
