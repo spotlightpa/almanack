@@ -156,11 +156,11 @@ func TestDeletePromotionEndpoint(t *testing.T) {
 		Path("/api/promotion").
 		Method(http.MethodPost).
 		BodyJSON(db.Promotion{
-			Name:  "To Be Deleted",
-			Link:  "https://example.com/",
-			Width: 300,
+			Name:   "To Be Deleted",
+			Link:   "https://example.com/",
+			Width:  300,
 			Height: 250,
-			Items: []string{"https://example.com/img.png"},
+			Items:  []string{"https://example.com/img.png"},
 		}).
 		ToJSON(&created).
 		Fetch(ctx))
