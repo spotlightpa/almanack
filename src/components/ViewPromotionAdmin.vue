@@ -1,14 +1,12 @@
 <script setup>
-import { ref, reactive } from "vue";
+import { ref } from "vue";
 
 import { get, post, listPromotions, postPromotion } from "@/api/client-v2.js";
 import { makeState, watchAPI } from "@/api/service-util.js";
 import { useFileList } from "@/api/file-list.js";
 
-// ── file list (for image picker) ──────────────────────────────────────────────────────────────────
 const fileList = useFileList();
 
-// ── list state ────────────────────────────────────────────────────────────────────────────────────
 const { apiState, fetch, computedList } = watchAPI(
   () => null,
   () => get(listPromotions)
@@ -16,32 +14,30 @@ const { apiState, fetch, computedList } = watchAPI(
 
 const promotions = computedList("promotions", (p) => p);
 
-// ── save state ─────────────────────────────────────────────────────────────────────────────────────
 const { apiState: saveState, exec: saveExec } = makeState();
 
-// ── editing ──────────────────────────────────────────────────────────────────────────────────────────
 const editing = ref(null);
 
 function startEdit(promo) {
-  editing.value = reactive({
+  editing.value = {
     id: promo.id,
     name: promo.name,
     description: promo.description,
     width: promo.width,
     height: promo.height,
     items: [...(promo.items ?? [])],
-  });
+  };
 }
 
 function startNew() {
-  editing.value = reactive({
+  editing.value = {
     id: null,
     name: "",
     description: "",
     width: 0,
     height: 0,
     items: [],
-  });
+  };
 }
 
 function cancelEdit() {
@@ -76,7 +72,7 @@ async function save() {
       :reload="fetch"
       :error="apiState.error.value"
     >
-      <!-- ── new promotion form (shown at top when adding) ─────────────────────────── -->
+      <!-- new promotion form (shown at top when adding) -->
       <div v-if="editing && editing.id === null" class="zebra-row p-3 mb-2">
         <h2 class="title is-5">New promotion set</h2>
         <BulmaFieldInput
@@ -138,7 +134,7 @@ async function save() {
         <ErrorSimple :error="saveState.error" />
       </div>
 
-      <!-- ── "Add new" button (hidden while editing) ─────────────────────────────── -->
+      <!-- "Add new" button (hidden while editing) -->
       <div v-else class="mb-4 buttons">
         <button
           class="button is-primary has-text-weight-semibold"
@@ -157,7 +153,7 @@ async function save() {
 
       <div v-for="promo in promotions" :key="promo.id" class="zebra-row p-3">
         <template v-if="editing && editing.id === promo.id">
-          <!-- ── inline editor ──────────────────────────────────────────────── -->
+          <!-- inline editor -->
           <BulmaFieldInput
             v-model="editing.name"
             label="Name"
@@ -218,7 +214,7 @@ async function save() {
         </template>
 
         <template v-else>
-          <!-- ── list row ───────────────────────────────────────────────────────── -->
+          <!-- list row -->
           <div
             class="is-flex is-justify-content-space-between is-align-items-start"
           >
