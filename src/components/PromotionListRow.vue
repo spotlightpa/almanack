@@ -74,7 +74,9 @@ async function save() {
           {{ modelValue.description }}
         </p>
         <p class="is-size-7 has-text-grey">
-          {{ modelValue.width }}×{{ modelValue.height }}px &middot;
+          <template v-if="modelValue.width || modelValue.height">
+            {{ modelValue.width }}×{{ modelValue.height }}px &middot;
+          </template>
           {{ modelValue.items?.length ?? 0 }} image{{
             modelValue.items?.length !== 1 ? "s" : ""
           }}
