@@ -83,14 +83,14 @@ const nextPage = computedProp("next_page", (page) => ({
 
     <LinkButtons label="Spotlight PA promotions">
       <LinkRoute
-        label="Promotions"
-        to="promotions"
-        :icon="['fas', 'bullhorn']"
-      ></LinkRoute>
-      <LinkRoute
         label="Sitewide Settings"
         to="site-params"
         :icon="['fas', 'sliders-h']"
+      ></LinkRoute>
+      <LinkRoute
+        label="Promotions"
+        to="promotions"
+        :icon="['fas', 'bullhorn']"
       ></LinkRoute>
       <LinkRoute
         label="Sidebar Items"
