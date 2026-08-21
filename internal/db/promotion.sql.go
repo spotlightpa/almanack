@@ -122,7 +122,7 @@ WHERE ("promotion"."width" = $3
 AND ("promotion"."height" = $4
   OR $4 = 0)
 ORDER BY
-  "updated_at"
+  "updated_at" DESC
 LIMIT $1 OFFSET $2
 `
 

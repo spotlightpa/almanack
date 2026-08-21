@@ -29,7 +29,7 @@ WHERE ("promotion"."width" = @width
 AND ("promotion"."height" = @height
   OR @height = 0)
 ORDER BY
-  "updated_at"
+  "updated_at" DESC
 LIMIT $1 OFFSET $2;
 
 -- name: ListPromotionByFTS :many
