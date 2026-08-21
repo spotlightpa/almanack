@@ -14,40 +14,42 @@ const { apiState, fetch, computedList } = watchAPI(
 
 const promotions = computedList("promotions", (p) => p);
 
-const { apiState: saveState, exec: saveExec } = makeState();
-
-const editing = ref(null);
-
-function startEdit(promo) {
-  editing.value = {
-    id: promo.id,
-    name: promo.name,
-    description: promo.description,
-    width: promo.width,
-    height: promo.height,
-    items: [...(promo.items ?? [])],
-  };
+function swap(event, i) {
+  promotions.value[i] = event;
 }
+
+// new promotion form
+const isAdding = ref(false);
+const newName = ref("");
+const newDescription = ref("");
+const newWidth = ref(0);
+const newHeight = ref(0);
+const newItems = ref([]);
 
 function startNew() {
-  editing.value = {
-    id: null,
-    name: "",
-    description: "",
-    width: 0,
-    height: 0,
-    items: [],
-  };
+  newName.value = "";
+  newDescription.value = "";
+  newWidth.value = 0;
+  newHeight.value = 0;
+  newItems.value = [];
+  isAdding.value = true;
 }
 
-function cancelEdit() {
-  editing.value = null;
-}
+const { apiState: saveState, exec: saveExec } = makeState();
 
-async function save() {
-  await saveExec(() => post(postPromotion, editing.value));
+async function saveNew() {
+  await saveExec(() =>
+    post(postPromotion, {
+      id: null,
+      name: newName.value,
+      description: newDescription.value,
+      width: newWidth.value,
+      height: newHeight.value,
+      items: newItems.value,
+    })
+  );
   if (!saveState.error) {
-    editing.value = null;
+    isAdding.value = false;
     await fetch();
   }
 }
@@ -72,95 +74,39 @@ async function save() {
       :reload="fetch"
       :error="apiState.error.value"
     >
-      <!-- new promotion form (shown at top when adding) -->
-      <div v-if="editing && editing.id === null" class="zebra-row p-3 mb-2">
-        <h2 class="title is-5">New promotion set</h2>
-        <BulmaFieldInput
-          v-model="editing.name"
-          label="Name"
-          placeholder="e.g. Rail sticky promo"
+      <div v-for="(promo, i) in promotions" :key="promo.id" class="zebra-row p-3">
+        <PromotionListRow
+          :model-value="promo"
+          @update:model-value="swap($event, i)"
         />
-        <BulmaFieldInput
-          v-model="editing.description"
-          label="Description"
-          placeholder="Short description"
-        />
-        <div class="is-flex mb-3" style="gap: 1rem">
-          <BulmaField v-slot="{ idForLabel }" label="Width">
-            <input
-              :id="idForLabel"
-              v-model.number="editing.width"
-              class="input"
-              inputmode="numeric"
-            />
-          </BulmaField>
-          <BulmaField v-slot="{ idForLabel }" label="Height">
-            <input
-              :id="idForLabel"
-              v-model.number="editing.height"
-              class="input"
-              inputmode="numeric"
-            />
-          </BulmaField>
-        </div>
-        <BulmaField
-          label="Image URLs"
-          help="One image URL per slot; one will be chosen randomly on each page load."
-        >
-          <SiteParamsFiles
-            :files="editing.items"
-            :file-props="fileList"
-            @add="editing.items.push($event)"
-            @remove="editing.items.splice($event, 1)"
-          />
-        </BulmaField>
-        <div class="mt-3 buttons">
+      </div>
+
+      <div class="zebra-row p-3">
+        <template v-if="!isAdding">
+          <p v-if="!promotions.length" class="mb-3 has-text-grey">
+            No promotion sets yet.
+          </p>
           <button
             class="button is-primary has-text-weight-semibold"
-            :class="{ 'is-loading': saveState.isLoading }"
-            :disabled="saveState.isLoading || null"
-            @click="save"
+            type="button"
+            @click="startNew"
           >
-            Save
+            <span class="icon">
+              <font-awesome-icon :icon="['fas', 'plus']" />
+            </span>
+            <span>New promotion set</span>
           </button>
-          <button
-            class="button is-light has-text-weight-semibold"
-            :disabled="saveState.isLoading || null"
-            @click="cancelEdit"
-          >
-            Cancel
-          </button>
-        </div>
-        <ErrorSimple :error="saveState.error" />
-      </div>
+        </template>
 
-      <!-- "Add new" button (hidden while editing) -->
-      <div v-else class="mb-4 buttons">
-        <button
-          class="button is-primary has-text-weight-semibold"
-          @click="startNew"
-        >
-          <span class="icon">
-            <font-awesome-icon :icon="['fas', 'plus']" />
-          </span>
-          <span>New promotion set</span>
-        </button>
-      </div>
-
-      <p v-if="!promotions.length" class="has-text-grey">
-        No promotion sets yet.
-      </p>
-
-      <div v-for="promo in promotions" :key="promo.id" class="zebra-row p-3">
-        <template v-if="editing && editing.id === promo.id">
-          <!-- inline editor -->
+        <template v-else>
+          <h2 class="title is-5">New promotion set</h2>
           <BulmaFieldInput
-            v-model="editing.name"
+            v-model="newName"
             label="Name"
             placeholder="e.g. Rail sticky promo"
           />
           <BulmaFieldInput
-            v-model="editing.description"
+            v-model="newDescription"
             label="Description"
             placeholder="Short description"
           />
@@ -168,7 +114,7 @@ async function save() {
             <BulmaField v-slot="{ idForLabel }" label="Width">
               <input
                 :id="idForLabel"
-                v-model.number="editing.width"
+                v-model.number="newWidth"
                 class="input"
                 inputmode="numeric"
               />
@@ -176,7 +122,7 @@ async function save() {
             <BulmaField v-slot="{ idForLabel }" label="Height">
               <input
                 :id="idForLabel"
-                v-model.number="editing.height"
+                v-model.number="newHeight"
                 class="input"
                 inputmode="numeric"
               />
@@ -187,60 +133,29 @@ async function save() {
             help="One image URL per slot; one will be chosen randomly on each page load."
           >
             <SiteParamsFiles
-              :files="editing.items"
+              :files="newItems"
               :file-props="fileList"
-              @add="editing.items.push($event)"
-              @remove="editing.items.splice($event, 1)"
+              @add="newItems.push($event)"
+              @remove="newItems.splice($event, 1)"
             />
           </BulmaField>
-          <div class="mt-3 buttons">
+          <ErrorSimple :error="saveState.error" />
+          <div class="buttons">
             <button
-              class="button is-primary has-text-weight-semibold"
+              class="button is-success has-text-weight-semibold"
               :class="{ 'is-loading': saveState.isLoading }"
-              :disabled="saveState.isLoading || null"
-              @click="save"
+              type="button"
+              @click="saveNew"
             >
               Save
             </button>
             <button
               class="button is-light has-text-weight-semibold"
               :disabled="saveState.isLoading || null"
-              @click="cancelEdit"
+              type="button"
+              @click="isAdding = false"
             >
               Cancel
-            </button>
-          </div>
-          <ErrorSimple :error="saveState.error" />
-        </template>
-
-        <template v-else>
-          <!-- list row -->
-          <div
-            class="is-flex is-justify-content-space-between is-align-items-start"
-          >
-            <div>
-              <p class="has-text-weight-semibold">
-                {{ promo.name }}
-                <span class="has-text-grey is-size-7"> #{{ promo.id }}</span>
-              </p>
-              <p v-if="promo.description" class="is-size-7 has-text-grey">
-                {{ promo.description }}
-              </p>
-              <p class="is-size-7 has-text-grey">
-                {{ promo.width }}×{{ promo.height }}px &middot;
-                {{ promo.items?.length ?? 0 }} image{{
-                  promo.items?.length !== 1 ? "s" : ""
-                }}
-                &middot;
-                {{ new Date(promo.updated_at).toLocaleString() }}
-              </p>
-            </div>
-            <button
-              class="button is-small is-info has-text-weight-semibold"
-              :disabled="editing !== null || null"
-              @click="startEdit(promo)"
-            >
-              Edit
             </button>
           </div>
         </template>
