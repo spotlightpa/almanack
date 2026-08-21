@@ -106,24 +106,18 @@ async function save() {
         placeholder="Short description"
       />
       <div class="is-flex mb-3" style="gap: 1rem">
-        <BulmaField v-slot="{ idForLabel }" label="Width">
-          <input
-            :id="idForLabel"
-            :value="width || ''"
-            class="input"
-            inputmode="numeric"
-            @change="width = +$event.target.value || 0"
-          />
-        </BulmaField>
-        <BulmaField v-slot="{ idForLabel }" label="Height">
-          <input
-            :id="idForLabel"
-            :value="height || ''"
-            @change="height = +$event.target.value || 0"
-            class="input"
-            inputmode="numeric"
-          />
-        </BulmaField>
+        <BulmaFieldInput
+          label="Width"
+          inputmode="numeric"
+          :model-value="width || ''"
+          @update:model-value="width = +$event || 0"
+        />
+        <BulmaFieldInput
+          label="Height"
+          inputmode="numeric"
+          :model-value="height || ''"
+          @update:model-value="height = +$event || 0"
+        />
       </div>
       <BulmaField
         label="Image URLs"
