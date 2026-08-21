@@ -1059,3 +1059,96 @@ func (app *appEnv) postPageLoad(w http.ResponseWriter, r *http.Request) http.Han
 	}
 	return app.jsonOK(page.ID)
 }
+
+func (app *appEnv) listPromotions(w http.ResponseWriter, r *http.Request) http.Handler {
+	app.logStart(r)
+
+	var page int32
+	_ = intFromQuery(r, "page", &page)
+	if page < 0 {
+		return app.jsonErr(resperr.E{M: "Invalid page"})
+	}
+
+	text := r.URL.Query().Get("text")
+	var width, height int32
+	_ = intFromQuery(r, "width", &width)
+	_ = intFromQuery(r, "height", &height)
+	pager := paginate.PageNumber(page)
+	pager.PageSize = 100
+
+	var (
+		promos []db.Promotion
+		err    error
+	)
+	if text != "" {
+		promos, err = paginate.List(
+			pager,
+			r.Context(),
+			app.svc.Queries.ListPromotionByFTS,
+			db.ListPromotionByFTSParams{
+				Limit:  pager.Limit(),
+				Offset: pager.Offset(),
+				Width:  width,
+				Height: height,
+				Text:   text,
+			})
+	} else {
+		promos, err = paginate.List(
+			pager,
+			r.Context(),
+			app.svc.Queries.ListPromotionByUpdated,
+			db.ListPromotionByUpdatedParams{
+				Limit:  pager.Limit(),
+				Offset: pager.Offset(),
+				Width:  width,
+				Height: height,
+			})
+	}
+	if err != nil {
+		return app.jsonErr(err)
+	}
+	return app.jsonOK(struct {
+		Promotions []db.Promotion `json:"promotions"`
+		NextPage   int32          `json:"next_page,string,omitempty"`
+	}{
+		Promotions: promos,
+		NextPage:   pager.NextPage,
+	})
+}
+
+func (app *appEnv) postPromotion(w http.ResponseWriter, r *http.Request) http.Handler {
+	app.logStart(r)
+	var req db.Promotion
+	if !app.readJSON(w, r, &req) {
+		return nil
+	}
+	if req.Items == nil {
+		req.Items = []string{}
+	}
+	var (
+		promo db.Promotion
+		err   error
+	)
+	if req.ID == 0 {
+		promo, err = app.svc.Queries.CreatePromotion(r.Context(), db.CreatePromotionParams{
+			Name:        req.Name,
+			Description: req.Description,
+			Width:       req.Width,
+			Height:      req.Height,
+			Items:       req.Items,
+		})
+	} else {
+		promo, err = app.svc.Queries.UpdatePromotion(r.Context(), db.UpdatePromotionParams{
+			ID:          req.ID,
+			Name:        req.Name,
+			Description: req.Description,
+			Width:       req.Width,
+			Height:      req.Height,
+			Items:       req.Items,
+		})
+	}
+	if err != nil {
+		return app.jsonErr(err)
+	}
+	return app.jsonOK(promo)
+}
