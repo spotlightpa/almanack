@@ -1118,32 +1118,33 @@ func (app *appEnv) listPromotions(w http.ResponseWriter, r *http.Request) http.H
 
 func (app *appEnv) postPromotion(w http.ResponseWriter, r *http.Request) http.Handler {
 	app.logStart(r)
-	var req struct {
-		ID          int64  `json:"id"`
-		Name        string `json:"name"`
-		Description string `json:"description"`
-		Data        any    `json:"data"`
-	}
+	var req db.Promotion
 	if !app.readJSON(w, r, &req) {
 		return nil
 	}
-	data, err := json.Marshal(req.Data)
-	if err != nil {
-		return app.jsonErr(err)
+	if req.Items == nil {
+		req.Items = []string{}
 	}
-	var promo db.Promotion
+	var (
+		promo db.Promotion
+		err   error
+	)
 	if req.ID == 0 {
 		promo, err = app.svc.Queries.CreatePromotion(r.Context(), db.CreatePromotionParams{
 			Name:        req.Name,
 			Description: req.Description,
-			Data:        data,
+			Width:       req.Width,
+			Height:      req.Height,
+			Items:       req.Items,
 		})
 	} else {
 		promo, err = app.svc.Queries.UpdatePromotion(r.Context(), db.UpdatePromotionParams{
 			ID:          req.ID,
 			Name:        req.Name,
 			Description: req.Description,
-			Data:        data,
+			Width:       req.Width,
+			Height:      req.Height,
+			Items:       req.Items,
 		})
 	}
 	if err != nil {

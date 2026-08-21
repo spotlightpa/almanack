@@ -59,13 +59,19 @@ function removeImage(n) {
 }
 
 function applyPromoSet(promo) {
-  const items = promo.data?.items ?? [];
-  items.forEach((item) => {
-    imageSet.value.push({ ...item, id: n++ });
+  (promo.items ?? []).forEach((url) => {
+    imageSet.value.push({
+      id: n++,
+      label: "",
+      labelLink: "",
+      link: "https://www.spotlightpa.org/donate/",
+      description: "",
+      sources: [url],
+    });
   });
   if (props.showWidthHeight) {
-    if (promo.data?.width) width.value = promo.data.width;
-    if (promo.data?.height) height.value = promo.data.height;
+    if (promo.width) width.value = promo.width;
+    if (promo.height) height.value = promo.height;
   }
   showPromoSelector.value = false;
 }

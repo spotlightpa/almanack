@@ -31,12 +31,16 @@ func TestPromotionEndpoints(t *testing.T) {
 			BodyJSON(db.Promotion{
 				Name:        "Banner Ad",
 				Description: "A test banner",
-				Data:        []byte(`{"url":"https://example.com","width":728,"height":90}`),
+				Width:       728,
+				Height:      90,
+				Items:       []string{"https://example.com/banner.png"},
 			}).
 			ToJSON(&created).
 			Fetch(ctx))
 		be.Nonzero(t, created.ID)
 		be.Equal(t, "Banner Ad", created.Name)
+		be.Equal(t, int64(728), created.Width)
+		be.Equal(t, int64(90), created.Height)
 		created1 = created
 	}
 	{ // Create second promotion
@@ -47,7 +51,9 @@ func TestPromotionEndpoints(t *testing.T) {
 			BodyJSON(db.Promotion{
 				Name:        "Sidebar Ad",
 				Description: "A sidebar promotion",
-				Data:        []byte(`{"url":"https://example.org","width":300,"height":250}`),
+				Width:       300,
+				Height:      250,
+				Items:       []string{"https://example.org/sidebar.png"},
 			}).
 			ToJSON(&created).
 			Fetch(ctx))
@@ -100,13 +106,14 @@ func TestPromotionEndpoints(t *testing.T) {
 				ID:          created1.ID,
 				Name:        "Banner Ad Updated",
 				Description: created1.Description,
-				Data:        created1.Data,
 				Width:       created1.Width,
 				Height:      created1.Height,
+				Items:       created1.Items,
 			}).
 			ToJSON(&updated).
 			Fetch(ctx))
 		be.Equal(t, created1.ID, updated.ID)
 		be.Equal(t, "Banner Ad Updated", updated.Name)
+		be.Equal(t, int64(728), updated.Width)
 	}
 }

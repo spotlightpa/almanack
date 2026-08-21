@@ -146,9 +146,9 @@ type Promotion struct {
 	ID          int64     `json:"id"`
 	Name        string    `json:"name"`
 	Description string    `json:"description"`
-	Data        []byte    `json:"data"`
 	Width       int64     `json:"width"`
 	Height      int64     `json:"height"`
+	Items       []string  `json:"items"`
 	CreatedAt   time.Time `json:"created_at"`
 	UpdatedAt   time.Time `json:"updated_at"`
 }
