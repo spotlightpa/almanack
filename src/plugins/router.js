@@ -117,6 +117,14 @@ let router = createRouter({
       },
     },
     {
+      path: "/admin/promotions",
+      name: "promotions",
+      component: load(() => import("@/components/ViewPromotionAdmin.vue")),
+      meta: {
+        requiresAuth: isSpotlightPAUser,
+      },
+    },
+    {
       path: "/admin/site-params",
       name: "site-params",
       component: load(() => import("@/components/ViewSiteParams.vue")),
