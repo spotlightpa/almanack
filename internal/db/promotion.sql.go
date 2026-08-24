@@ -49,14 +49,17 @@ func (q *Queries) CreatePromotion(ctx context.Context, arg CreatePromotionParams
 	return i, err
 }
 
-const deletePromotion = `-- name: DeletePromotion :exec
+const deletePromotion = `-- name: DeletePromotion :execrows
 DELETE FROM "promotion"
 WHERE "id" = $1
 `
 
-func (q *Queries) DeletePromotion(ctx context.Context, id int64) error {
-	_, err := q.db.Exec(ctx, deletePromotion, id)
-	return err
+func (q *Queries) DeletePromotion(ctx context.Context, id int64) (int64, error) {
+	result, err := q.db.Exec(ctx, deletePromotion, id)
+	if err != nil {
+		return 0, err
+	}
+	return result.RowsAffected(), nil
 }
 
 const listPromotionByFTS = `-- name: ListPromotionByFTS :many

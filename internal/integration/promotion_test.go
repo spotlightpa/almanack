@@ -170,9 +170,11 @@ func TestDeletePromotionEndpoint(t *testing.T) {
 	err := rb.Clone().
 		Path("/api/promotion-delete").
 		Method(http.MethodPost).
-		BodyJSON(map[string]any{"id": 0}).
+		BodyJSON(map[string]any{"id": 1_000}).
 		Fetch(ctx)
-	be.True(t, requests.HasStatusErr(err, http.StatusBadRequest))
+	re := new(requests.ResponseError)
+	be.ErrorAs(t, &re, err)
+	be.Equal(t, http.StatusBadRequest, re.StatusCode)
 
 	// Delete the promotion
 	be.NilErr(t, rb.Clone().

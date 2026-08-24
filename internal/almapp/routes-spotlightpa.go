@@ -1162,13 +1162,12 @@ func (app *appEnv) deletePromotion(w http.ResponseWriter, r *http.Request) http.
 		ID int64 `json:"id"`
 	}
 	if !app.readJSON(w, r, &req) {
-		return nil
+		return app.jsonErr(resperr.E{M: "Missing ID"})
 	}
-	if req.ID == 0 {
-		return app.jsonErr(resperr.E{S: http.StatusBadRequest, M: "Missing id"})
-	}
-	if err := app.svc.Queries.DeletePromotion(r.Context(), req.ID); err != nil {
+	if rows, err := app.svc.Queries.DeletePromotion(r.Context(), req.ID); err != nil {
 		return app.jsonErr(err)
+	} else if rows == 0 {
+		return app.jsonErr(resperr.E{M: fmt.Sprintf("Promotion %d not found", req.ID)})
 	}
-	return app.jsonOK(struct{}{})
+	return app.jsonOK("OK")
 }
