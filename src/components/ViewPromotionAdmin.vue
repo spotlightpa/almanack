@@ -23,10 +23,6 @@ const nextPage = computedProp("next_page", (page) => ({
   query: { page },
 }));
 
-function swap(event, i) {
-  promotions.value[i] = event;
-}
-
 function remove(i) {
   promotions.value.splice(i, 1);
 }
@@ -174,7 +170,7 @@ async function saveNew() {
       >
         <PromotionListRow
           :model-value="promo"
-          @update:model-value="swap($event, i)"
+          @update:model-value="fetch()"
           @delete="remove(i)"
         />
       </div>
