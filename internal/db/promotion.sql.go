@@ -190,7 +190,8 @@ SET
   "link" = $3,
   "width" = $4,
   "height" = $5,
-  "items" = $6
+  "items" = $6,
+  "updated_at" = CURRENT_TIMESTAMP
 WHERE
   "id" = $7
 RETURNING

@@ -13,7 +13,8 @@ SET
   "link" = @link,
   "width" = @width,
   "height" = @height,
-  "items" = @items
+  "items" = @items,
+  "updated_at" = CURRENT_TIMESTAMP
 WHERE
   "id" = @id
 RETURNING
