@@ -23,8 +23,6 @@ const nextPage = computedProp("next_page", (page) => ({
   query: { page },
 }));
 
-
-
 // new promotion form
 const isAdding = ref(false);
 const newName = ref("");
@@ -162,7 +160,7 @@ async function saveNew() {
       :error="apiState.error.value"
     >
       <div
-        v-for="(promo, i) in promotions"
+        v-for="promo in promotions"
         :key="promo.id"
         class="zebra-row p-3"
       >
