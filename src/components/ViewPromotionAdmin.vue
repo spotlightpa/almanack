@@ -23,9 +23,7 @@ const nextPage = computedProp("next_page", (page) => ({
   query: { page },
 }));
 
-function remove(i) {
-  promotions.value.splice(i, 1);
-}
+
 
 // new promotion form
 const isAdding = ref(false);
@@ -171,7 +169,7 @@ async function saveNew() {
         <PromotionListRow
           :model-value="promo"
           @update:model-value="fetch()"
-          @delete="remove(i)"
+          @delete="fetch()"
         />
       </div>
 
