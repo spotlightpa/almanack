@@ -13,8 +13,8 @@ import (
 
 func TestTranslate(t *testing.T) {
 	almlog.UseTestLogger(t)
-	svc := Service{}
-	svc.projectID = cmp.Or(os.Getenv("ALMANACK_GOOGLE_PROJECT_ID"), "1")
+	svc := Service{
+		projectID: cmp.Or(os.Getenv("ALMANACK_GOOGLE_PROJECT_ID"), "1")}
 	ctx := t.Context()
 	cl := *http.DefaultClient
 	cl.Transport = reqtest.Replay("testdata")

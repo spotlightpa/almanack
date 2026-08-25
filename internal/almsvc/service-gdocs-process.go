@@ -343,7 +343,9 @@ func processMetadata(rows tableaux.TableNodes, metadata *db.GDocsMetadata) {
 		xhtml.TextContent(rows.Value("keywords")),
 	)
 	metadata.URLSlug = strings.TrimRight(metadata.URLSlug, "/")
-	_, metadata.URLSlug, _ = stringx.LastCut(metadata.URLSlug, "/")
+	if _, s, ok := strings.CutLast(metadata.URLSlug, "/"); ok {
+		metadata.URLSlug = s
+	}
 	metadata.URLSlug = stringx.SlugifyURL(metadata.URLSlug)
 
 	metadata.Blurb = cmp.Or(

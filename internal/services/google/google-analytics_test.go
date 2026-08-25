@@ -13,8 +13,8 @@ import (
 
 func TestMostPopularNews(t *testing.T) {
 	almlog.UseTestLogger(t)
-	svc := Service{}
-	svc.viewID = cmp.Or(os.Getenv("ALMANACK_GOOGLE_TEST_VIEW"), "1")
+	svc := Service{
+		viewID: cmp.Or(os.Getenv("ALMANACK_GOOGLE_TEST_VIEW"), "1")}
 	ctx := t.Context()
 	cl := *http.DefaultClient
 	cl.Transport = reqtest.Replay("testdata")

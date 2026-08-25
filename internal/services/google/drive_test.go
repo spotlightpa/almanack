@@ -11,8 +11,8 @@ import (
 )
 
 func TestListDriveFiles(t *testing.T) {
-	svc := Service{}
-	svc.driveID = cmp.Or(os.Getenv("ALMANACK_GOOGLE_TEST_DRIVE"), "1")
+	svc := Service{
+		driveID: cmp.Or(os.Getenv("ALMANACK_GOOGLE_TEST_DRIVE"), "1")}
 	ctx := t.Context()
 	cl := *http.DefaultClient
 	cl.Transport = reqtest.Replay("testdata")

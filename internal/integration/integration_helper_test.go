@@ -41,9 +41,7 @@ func createTestDB(t *testing.T) *db.Handle {
 // pre-configured with the server's base URL and a mock Authorization header.
 func newTestServer(t *testing.T, svc almsvc.Services) *requests.Builder {
 	t.Helper()
-	srv := httptest.NewServer(almapp.NewHandler(svc))
-	t.Cleanup(srv.Close)
 	return requests.
-		New(reqtest.Server(srv)).
+		New(reqtest.Server(httptest.NewTestServer(t, almapp.NewHandler(svc)))).
 		Header("Authorization", "Bearer mock")
 }
