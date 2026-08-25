@@ -35,8 +35,8 @@ const promotions = computed(() => {
   if (!props.filterWidth && !props.filterHeight) return allPromotions.value;
   return allPromotions.value.filter(
     (p) =>
-      (!props.filterWidth || p.width === props.filterWidth) &&
-      (!props.filterHeight || p.height === props.filterHeight)
+      (!props.filterWidth || !p.width || p.width === props.filterWidth) &&
+      (!props.filterHeight || !p.height || p.height === props.filterHeight)
   );
 });
 </script>
