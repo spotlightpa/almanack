@@ -38,9 +38,11 @@ jobs:
         with:
           languages: ${{ matrix.language }}
 
-      - uses: actions/setup-go@v6
+      - name: Install Go
+        uses: actions/setup-go@v7
         with:
-          go-version: "stable"
+          go-version-file: go.mod
+
       # Autobuild attempts to build any compiled languages  (C/C++, C#, or Java).
       # If this step fails, then you should remove it and run the build manually (see below)
       - name: Autobuild
