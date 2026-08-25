@@ -169,11 +169,6 @@ async function save() {
           @remove="imageUrls.splice($event, 1)"
         />
       </BulmaField>
-      <BulmaTextarea
-        v-model="imageDescription"
-        label="Image description (alt text)"
-        help="For blind readers and search engines"
-      />
       <BulmaFieldInput
         v-model="bannerLabel"
         label="Banner label"
@@ -186,6 +181,11 @@ async function save() {
         type="url"
         placeholder="https://"
         help="Link that clicking the ad label will go to"
+      />
+      <BulmaTextarea
+        v-model="imageDescription"
+        label="Image description (alt text)"
+        help="For blind readers and search engines"
       />
       <ErrorSimple :error="error" />
       <div class="buttons">
