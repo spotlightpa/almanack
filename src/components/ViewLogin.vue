@@ -8,6 +8,7 @@ export default {
       login,
       signup,
       isSignedIn,
+      isDev: import.meta.env.MODE !== "production",
     };
   },
   beforeRouteEnter(to, from, next) {
@@ -50,6 +51,9 @@ export default {
       <a class="has-text-weight-semibold" @click="login">Login</a>
       or
       <a class="has-text-weight-semibold" @click="signup">Sign up</a>.
+    </p>
+    <p v-if="isDev">
+      <router-link to="/dev-login">Developer test login.</router-link>
     </p>
   </div>
 </template>

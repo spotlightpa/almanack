@@ -307,6 +307,16 @@ let router = createRouter({
       component: load(() => import("@/components/ViewPageLoad.vue")),
       meta: { requiresAuth: isSpotlightPAUser },
     },
+    ...(import.meta.env.MODE !== "production"
+      ? [
+          {
+            path: "/dev-login",
+            name: "dev-login",
+            component: load(() => import("@/components/ViewDevLogin.vue")),
+            meta: {},
+          },
+        ]
+      : []),
     {
       path: "/:pathMatch(.*)*",
       name: "error",
