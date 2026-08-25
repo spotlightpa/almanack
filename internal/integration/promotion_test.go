@@ -30,12 +30,15 @@ func TestPromotionEndpoints(t *testing.T) {
 			Path("/api/promotion").
 			Method(http.MethodPost).
 			BodyJSON(db.Promotion{
-				Name:        "Banner Ad",
-				Description: "A test banner",
-				Link:        "https://example.com/",
-				Width:       728,
-				Height:      90,
-				ImageUrls:   []string{"https://example.com/banner.png"},
+				Name:             "Banner Ad",
+				Description:      "A test banner",
+				Link:             "https://example.com/",
+				Width:            728,
+				Height:           90,
+				ImageUrls:        []string{"https://example.com/banner.png"},
+				ImageDescription: "A colorful banner",
+				BannerLabel:      "Sponsored by Acme",
+				BannerLabelLink:  "https://acme.example.com/",
 			}).
 			ToJSON(&created).
 			Fetch(ctx))
@@ -43,6 +46,9 @@ func TestPromotionEndpoints(t *testing.T) {
 		be.Equal(t, "Banner Ad", created.Name)
 		be.Equal(t, int32(728), created.Width)
 		be.Equal(t, int32(90), created.Height)
+		be.Equal(t, "A colorful banner", created.ImageDescription)
+		be.Equal(t, "Sponsored by Acme", created.BannerLabel)
+		be.Equal(t, "https://acme.example.com/", created.BannerLabelLink)
 		created1 = created
 	}
 	{ // Create second promotion
@@ -122,19 +128,23 @@ func TestPromotionEndpoints(t *testing.T) {
 			Path("/api/promotion").
 			Method(http.MethodPost).
 			BodyJSON(db.Promotion{
-				ID:          created1.ID,
-				Name:        "Banner Ad Updated",
-				Description: created1.Description,
-				Link:        created1.Link,
-				Width:       created1.Width,
-				Height:      created1.Height,
-				ImageUrls:   created1.ImageUrls,
+				ID:               created1.ID,
+				Name:             "Banner Ad Updated",
+				Description:      created1.Description,
+				Link:             created1.Link,
+				Width:            created1.Width,
+				Height:           created1.Height,
+				ImageUrls:        created1.ImageUrls,
+				ImageDescription: "Updated alt text",
+				BannerLabel:      created1.BannerLabel,
+				BannerLabelLink:  created1.BannerLabelLink,
 			}).
 			ToJSON(&updated).
 			Fetch(ctx))
 		be.Equal(t, created1.ID, updated.ID)
 		be.Equal(t, "Banner Ad Updated", updated.Name)
 		be.Equal(t, int32(728), updated.Width)
+		be.Equal(t, "Updated alt text", updated.ImageDescription)
 	}
 }
 

@@ -10,19 +10,24 @@ import (
 )
 
 const createPromotion = `-- name: CreatePromotion :one
-INSERT INTO "promotion" ("name", "description", "link", "width", "height", "image_urls")
-  VALUES ($1, $2, $3, $4, $5, $6)
+INSERT INTO "promotion" ("name", "description", "link", "width", "height",
+  "image_urls", "image_description", "banner_label", "banner_label_link")
+  VALUES ($1, $2, $3, $4, $5, $6,
+    $7, $8, $9)
 RETURNING
-  id, name, description, link, width, height, image_urls, created_at, updated_at
+  id, name, description, link, width, height, image_urls, image_description, banner_label, banner_label_link, created_at, updated_at
 `
 
 type CreatePromotionParams struct {
-	Name        string   `json:"name"`
-	Description string   `json:"description"`
-	Link        string   `json:"link"`
-	Width       int32    `json:"width"`
-	Height      int32    `json:"height"`
-	ImageUrls   []string `json:"image_urls"`
+	Name             string   `json:"name"`
+	Description      string   `json:"description"`
+	Link             string   `json:"link"`
+	Width            int32    `json:"width"`
+	Height           int32    `json:"height"`
+	ImageUrls        []string `json:"image_urls"`
+	ImageDescription string   `json:"image_description"`
+	BannerLabel      string   `json:"banner_label"`
+	BannerLabelLink  string   `json:"banner_label_link"`
 }
 
 func (q *Queries) CreatePromotion(ctx context.Context, arg CreatePromotionParams) (Promotion, error) {
@@ -33,6 +38,9 @@ func (q *Queries) CreatePromotion(ctx context.Context, arg CreatePromotionParams
 		arg.Width,
 		arg.Height,
 		arg.ImageUrls,
+		arg.ImageDescription,
+		arg.BannerLabel,
+		arg.BannerLabelLink,
 	)
 	var i Promotion
 	err := row.Scan(
@@ -43,6 +51,9 @@ func (q *Queries) CreatePromotion(ctx context.Context, arg CreatePromotionParams
 		&i.Width,
 		&i.Height,
 		&i.ImageUrls,
+		&i.ImageDescription,
+		&i.BannerLabel,
+		&i.BannerLabelLink,
 		&i.CreatedAt,
 		&i.UpdatedAt,
 	)
@@ -68,7 +79,7 @@ WITH tsq AS (
     websearch_to_tsquery('english', $5::text) AS q
 )
 SELECT
-  promotion.id, promotion.name, promotion.description, promotion.link, promotion.width, promotion.height, promotion.image_urls, promotion.created_at, promotion.updated_at
+  promotion.id, promotion.name, promotion.description, promotion.link, promotion.width, promotion.height, promotion.image_urls, promotion.image_description, promotion.banner_label, promotion.banner_label_link, promotion.created_at, promotion.updated_at
 FROM
   "promotion"
   INNER JOIN tsq ON fts_doc_en @@ tsq.q
@@ -114,6 +125,9 @@ func (q *Queries) ListPromotionByFTS(ctx context.Context, arg ListPromotionByFTS
 			&i.Width,
 			&i.Height,
 			&i.ImageUrls,
+			&i.ImageDescription,
+			&i.BannerLabel,
+			&i.BannerLabelLink,
 			&i.CreatedAt,
 			&i.UpdatedAt,
 		); err != nil {
@@ -129,7 +143,7 @@ func (q *Queries) ListPromotionByFTS(ctx context.Context, arg ListPromotionByFTS
 
 const listPromotionByUpdated = `-- name: ListPromotionByUpdated :many
 SELECT
-  id, name, description, link, width, height, image_urls, created_at, updated_at
+  id, name, description, link, width, height, image_urls, image_description, banner_label, banner_label_link, created_at, updated_at
 FROM
   "promotion"
 WHERE ("promotion"."width" = $3
@@ -172,6 +186,9 @@ func (q *Queries) ListPromotionByUpdated(ctx context.Context, arg ListPromotionB
 			&i.Width,
 			&i.Height,
 			&i.ImageUrls,
+			&i.ImageDescription,
+			&i.BannerLabel,
+			&i.BannerLabelLink,
 			&i.CreatedAt,
 			&i.UpdatedAt,
 		); err != nil {
@@ -195,21 +212,27 @@ SET
   "width" = $4,
   "height" = $5,
   "image_urls" = $6,
+  "image_description" = $7,
+  "banner_label" = $8,
+  "banner_label_link" = $9,
   "updated_at" = CURRENT_TIMESTAMP
 WHERE
-  "id" = $7
+  "id" = $10
 RETURNING
-  id, name, description, link, width, height, image_urls, created_at, updated_at
+  id, name, description, link, width, height, image_urls, image_description, banner_label, banner_label_link, created_at, updated_at
 `
 
 type UpdatePromotionParams struct {
-	Name        string   `json:"name"`
-	Description string   `json:"description"`
-	Link        string   `json:"link"`
-	Width       int32    `json:"width"`
-	Height      int32    `json:"height"`
-	ImageUrls   []string `json:"image_urls"`
-	ID          int64    `json:"id"`
+	Name             string   `json:"name"`
+	Description      string   `json:"description"`
+	Link             string   `json:"link"`
+	Width            int32    `json:"width"`
+	Height           int32    `json:"height"`
+	ImageUrls        []string `json:"image_urls"`
+	ImageDescription string   `json:"image_description"`
+	BannerLabel      string   `json:"banner_label"`
+	BannerLabelLink  string   `json:"banner_label_link"`
+	ID               int64    `json:"id"`
 }
 
 func (q *Queries) UpdatePromotion(ctx context.Context, arg UpdatePromotionParams) (Promotion, error) {
@@ -220,6 +243,9 @@ func (q *Queries) UpdatePromotion(ctx context.Context, arg UpdatePromotionParams
 		arg.Width,
 		arg.Height,
 		arg.ImageUrls,
+		arg.ImageDescription,
+		arg.BannerLabel,
+		arg.BannerLabelLink,
 		arg.ID,
 	)
 	var i Promotion
@@ -231,6 +257,9 @@ func (q *Queries) UpdatePromotion(ctx context.Context, arg UpdatePromotionParams
 		&i.Width,
 		&i.Height,
 		&i.ImageUrls,
+		&i.ImageDescription,
+		&i.BannerLabel,
+		&i.BannerLabelLink,
 		&i.CreatedAt,
 		&i.UpdatedAt,
 	)

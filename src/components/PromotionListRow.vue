@@ -24,6 +24,9 @@ const link = ref("");
 const width = ref(0);
 const height = ref(0);
 const imageUrls = ref([]);
+const imageDescription = ref("");
+const bannerLabel = ref("");
+const bannerLabelLink = ref("");
 
 function initValues() {
   name.value = props.modelValue.name;
@@ -32,6 +35,9 @@ function initValues() {
   width.value = props.modelValue.width;
   height.value = props.modelValue.height;
   imageUrls.value = [...(props.modelValue.image_urls ?? [])];
+  imageDescription.value = props.modelValue.image_description ?? "";
+  bannerLabel.value = props.modelValue.banner_label ?? "";
+  bannerLabelLink.value = props.modelValue.banner_label_link ?? "";
 }
 
 function toggle() {
@@ -65,6 +71,9 @@ async function save() {
       width: width.value,
       height: height.value,
       image_urls: imageUrls.value,
+      image_description: imageDescription.value,
+      banner_label: bannerLabel.value,
+      banner_label_link: bannerLabelLink.value,
     })
   );
   if (!apiStateRefs.error.value) {
@@ -160,6 +169,24 @@ async function save() {
           @remove="imageUrls.splice($event, 1)"
         />
       </BulmaField>
+      <BulmaTextarea
+        v-model="imageDescription"
+        label="Image description (alt text)"
+        help="For blind readers and search engines"
+      />
+      <BulmaFieldInput
+        v-model="bannerLabel"
+        label="Banner label"
+        placeholder="Sponsored by Acme"
+        help="Text accompanying a banner specifying the sponsor or presenter"
+      />
+      <BulmaFieldInput
+        v-model="bannerLabelLink"
+        label="Banner label link"
+        type="url"
+        placeholder="https://"
+        help="Link that clicking the ad label will go to"
+      />
       <ErrorSimple :error="error" />
       <div class="buttons">
         <button

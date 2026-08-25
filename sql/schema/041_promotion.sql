@@ -6,6 +6,9 @@ CREATE TABLE promotion (
   "width" integer NOT NULL DEFAULT 0,
   "height" integer NOT NULL DEFAULT 0,
   "image_urls" text[] NOT NULL DEFAULT '{}',
+  "image_description" text NOT NULL DEFAULT '',
+  "banner_label" text NOT NULL DEFAULT '',
+  "banner_label_link" text NOT NULL DEFAULT '',
   "fts_doc_en" tsvector GENERATED ALWAYS AS
     (setweight(to_tsvector('english', "name"), 'A') ||
     setweight(to_tsvector('english', "description"), 'B'))

@@ -64,10 +64,10 @@ function applyPromoSet(promo) {
   (promo.image_urls ?? []).forEach((url) => {
     imageSet.value.push({
       id: n++,
-      label: "",
-      labelLink: "",
+      label: promo.banner_label || "",
+      labelLink: promo.banner_label_link || "",
       link: promo.link || "https://www.spotlightpa.org/donate/",
-      description: "",
+      description: promo.image_description || "",
       sources: [url],
     });
   });

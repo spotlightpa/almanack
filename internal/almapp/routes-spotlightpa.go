@@ -1130,22 +1130,28 @@ func (app *appEnv) postPromotion(w http.ResponseWriter, r *http.Request) http.Ha
 	)
 	if req.ID == 0 {
 		promo, err = app.svc.Queries.CreatePromotion(r.Context(), db.CreatePromotionParams{
-			Name:        req.Name,
-			Description: req.Description,
-			Link:        req.Link,
-			Width:       req.Width,
-			Height:      req.Height,
-			ImageUrls:   req.ImageUrls,
+			Name:             req.Name,
+			Description:      req.Description,
+			Link:             req.Link,
+			Width:            req.Width,
+			Height:           req.Height,
+			ImageUrls:        req.ImageUrls,
+			ImageDescription: req.ImageDescription,
+			BannerLabel:      req.BannerLabel,
+			BannerLabelLink:  req.BannerLabelLink,
 		})
 	} else {
 		promo, err = app.svc.Queries.UpdatePromotion(r.Context(), db.UpdatePromotionParams{
-			ID:          req.ID,
-			Name:        req.Name,
-			Description: req.Description,
-			Link:        req.Link,
-			Width:       req.Width,
-			Height:      req.Height,
-			ImageUrls:   req.ImageUrls,
+			ID:               req.ID,
+			Name:             req.Name,
+			Description:      req.Description,
+			Link:             req.Link,
+			Width:            req.Width,
+			Height:           req.Height,
+			ImageUrls:        req.ImageUrls,
+			ImageDescription: req.ImageDescription,
+			BannerLabel:      req.BannerLabel,
+			BannerLabelLink:  req.BannerLabelLink,
 		})
 	}
 	if err != nil {

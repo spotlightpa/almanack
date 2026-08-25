@@ -1,6 +1,8 @@
 -- name: CreatePromotion :one
-INSERT INTO "promotion" ("name", "description", "link", "width", "height", "image_urls")
-  VALUES (@name, @description, @link, @width, @height, @image_urls)
+INSERT INTO "promotion" ("name", "description", "link", "width", "height",
+  "image_urls", "image_description", "banner_label", "banner_label_link")
+  VALUES (@name, @description, @link, @width, @height, @image_urls,
+    @image_description, @banner_label, @banner_label_link)
 RETURNING
   *;
 
@@ -14,6 +16,9 @@ SET
   "width" = @width,
   "height" = @height,
   "image_urls" = @image_urls,
+  "image_description" = @image_description,
+  "banner_label" = @banner_label,
+  "banner_label_link" = @banner_label_link,
   "updated_at" = CURRENT_TIMESTAMP
 WHERE
   "id" = @id
