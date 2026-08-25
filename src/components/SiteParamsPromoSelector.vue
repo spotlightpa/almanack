@@ -1,5 +1,5 @@
 <script setup>
-import { computed, ref, watch } from "vue";
+import { ref, watch } from "vue";
 
 import { get, listPromotions } from "@/api/client-v2.js";
 import { watchAPI } from "@/api/service-util.js";
@@ -26,19 +26,15 @@ watch(
 
 const { apiState, computedList } = watchAPI(
   () => debouncedSearch.value,
-  (text) => get(listPromotions, text ? { text } : undefined)
+  (text) =>
+    get(listPromotions, {
+      ...(text ? { text } : {}),
+      ...(props.filterWidth ? { width: props.filterWidth } : {}),
+      ...(props.filterHeight ? { height: props.filterHeight } : {}),
+    })
 );
 
-const allPromotions = computedList("promotions", (p) => p);
-
-const promotions = computed(() => {
-  if (!props.filterWidth && !props.filterHeight) return allPromotions.value;
-  return allPromotions.value.filter(
-    (p) =>
-      (!props.filterWidth || !p.width || p.width === props.filterWidth) &&
-      (!props.filterHeight || !p.height || p.height === props.filterHeight)
-  );
-});
+const promotions = computedList("promotions", (p) => p);
 </script>
 
 <template>
