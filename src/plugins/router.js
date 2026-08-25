@@ -1,4 +1,4 @@
-import { defineAsyncComponent, nextTick, watch } from "vue";
+import { defineAsyncComponent, h, nextTick, watch } from "vue";
 
 import { createRouter, createWebHistory } from "vue-router";
 
@@ -9,18 +9,18 @@ import { setDimensions, sendGAPageview } from "@/utils/google-analytics.js";
 import AsyncSpinner from "@/components/AsyncSpinner.vue";
 import ViewError from "@/components/ViewError.vue";
 
-// defineAsyncComponent gives us loadingComponent + errorComponent support.
-// Vue Router 5 warns if it detects __asyncLoader on the component object,
-// so we delete that property from the result to suppress R0029.
+// Wrap defineAsyncComponent in a plain component shell so Vue Router does
+// not mistake it for a defineAsyncComponent call (R0029). The shell is a
+// normal synchronous component as far as the router is concerned, while
+// the inner async component still handles loading/error states itself.
 function load(loader) {
-  const c = defineAsyncComponent({
+  const AsyncComp = defineAsyncComponent({
     loader,
     loadingComponent: AsyncSpinner,
     errorComponent: ViewError,
     timeout: 3000,
   });
-  delete c.__asyncLoader;
-  return c;
+  return { setup: () => () => h(AsyncComp) };
 }
 
 let { roles, fullName, email, isEditor, isSpotlightPAUser, isSignedIn } =
