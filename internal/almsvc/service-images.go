@@ -62,8 +62,10 @@ func (svc Services) ReplaceAndUploadImageURL(ctx context.Context, srcURL, descri
 	switch {
 	case err == nil: // found entry
 		return image.Path, nil
-	case !pgxutils.IsNotFound(err):
+	default: // unexpected DB problem
 		return "", err
+	case pgxutils.IsNotFound(err):
+		// fallthrough to upload
 	}
 
 	cl := svc.Client
