@@ -138,12 +138,6 @@ async function save() {
         label="Description"
         placeholder="Short description"
       />
-      <BulmaFieldInput
-        v-model="link"
-        label="Link URL"
-        type="url"
-        placeholder="https://"
-      />
       <div class="is-flex mb-3" style="gap: 1rem">
         <BulmaFieldInput
           label="Width"
@@ -158,17 +152,12 @@ async function save() {
           @update:model-value="height = +$event || 0"
         />
       </div>
-      <BulmaField
-        label="Image URLs"
-        help="One image URL per slot; one will be chosen randomly on each page load."
-      >
-        <SiteParamsFiles
-          :files="imageUrls"
-          :file-props="fileList"
-          @add="imageUrls.push($event)"
-          @remove="imageUrls.splice($event, 1)"
-        />
-      </BulmaField>
+      <BulmaFieldInput
+        v-model="link"
+        label="Link URL"
+        type="url"
+        placeholder="https://www.spotlightpa.org/donate/"
+      />
       <BulmaFieldInput
         v-model="bannerLabel"
         label="Banner label"
@@ -179,7 +168,7 @@ async function save() {
         v-model="bannerLabelLink"
         label="Banner label link"
         type="url"
-        placeholder="https://"
+        placeholder="https://www.spotlightpa.org/support/"
         help="Link that clicking the ad label will go to"
       />
       <BulmaTextarea
@@ -187,6 +176,17 @@ async function save() {
         label="Image description (alt text)"
         help="For blind readers and search engines"
       />
+      <BulmaField
+        label="Images"
+        help="If multiple images are provided for the same promotion, each page load will select one randomly"
+      >
+        <SiteParamsFiles
+          :files="imageUrls"
+          :file-props="fileList"
+          @add="imageUrls.push($event)"
+          @remove="imageUrls.splice($event, 1)"
+        />
+      </BulmaField>
       <ErrorSimple :error="error" />
       <div class="buttons">
         <button
