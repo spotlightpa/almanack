@@ -2,6 +2,81 @@ import { reactive, computed, toRefs } from "vue";
 
 import netlifyIdentity from "netlify-identity-widget";
 
+// ---------------------------------------------------------------------------
+// Dev-mode fake auth (only active when Vite MODE !== "production")
+// ---------------------------------------------------------------------------
+
+const DEV_AUTH_KEY = "almanack_dev_auth";
+
+function loadDevUser() {
+  try {
+    return JSON.parse(localStorage.getItem(DEV_AUTH_KEY)) ?? null;
+  } catch {
+    return null;
+  }
+}
+
+function saveDevUser(user) {
+  if (user) {
+    localStorage.setItem(DEV_AUTH_KEY, JSON.stringify(user));
+  } else {
+    localStorage.removeItem(DEV_AUTH_KEY);
+  }
+}
+
+function makeDevAuth() {
+  const authState = reactive({
+    user: loadDevUser(),
+  });
+
+  const isSignedIn = computed(() => !!authState.user);
+  const roles = computed(() => authState.user?.roles ?? []);
+  const fullName = computed(() => authState.user?.fullName ?? "");
+  const email = computed(() => authState.user?.email ?? "");
+
+  function hasRole(name) {
+    return computed(() =>
+      roles.value.some((role) => role === name || role === "admin")
+    );
+  }
+
+  const methods = {
+    signup() {},
+    login() {},
+    async logout() {
+      authState.user = null;
+      saveDevUser(null);
+    },
+    async headers() {
+      if (!authState.user) return null;
+      // Return a fake bearer token so the API client doesn't throw
+      return { Authorization: "Bearer dev-fake-token" };
+    },
+    // Called by ViewDevLogin to set the fake identity
+    setDevUser({ email, fullName, roles }) {
+      const user = { email, fullName, roles };
+      authState.user = user;
+      saveDevUser(user);
+    },
+  };
+
+  return {
+    ...toRefs(authState),
+    isSignedIn,
+    roles,
+    fullName,
+    email,
+    isEditor: hasRole("editor"),
+    isSpotlightPAUser: hasRole("Spotlight PA"),
+    isArcUser: hasRole("arc user"),
+    ...methods,
+  };
+}
+
+// ---------------------------------------------------------------------------
+// Production auth (Netlify Identity)
+// ---------------------------------------------------------------------------
+
 function makeAuth() {
   const authState = reactive({
     user: null,
@@ -95,11 +170,15 @@ function makeAuth() {
   };
 }
 
+// ---------------------------------------------------------------------------
+// Singleton
+// ---------------------------------------------------------------------------
+
 let $auth;
 
 export function useAuth() {
   if (!$auth) {
-    $auth = makeAuth();
+    $auth = import.meta.env.MODE !== "production" ? makeDevAuth() : makeAuth();
   }
   return $auth;
 }
