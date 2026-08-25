@@ -1,9 +1,9 @@
 <script setup>
-import { ref, watch } from "vue";
+import { ref, computed } from "vue";
 
 import { get, listPromotions } from "@/api/client-v2.js";
 import { watchAPI } from "@/api/service-util.js";
-import { debounce } from "@/utils/wait.ts";
+import { useDebouncedRef } from "@/utils/wait.ts";
 
 const props = defineProps({
   filterWidth: { type: Number, default: 0 },
@@ -13,16 +13,7 @@ const props = defineProps({
 defineEmits(["select"]);
 
 const searchText = ref("");
-
-// Debounced search text: only updates 400ms after the user stops typing.
-// watchAPI watches this ref, so fetches are naturally debounced.
-const debouncedSearch = ref("");
-watch(
-  searchText,
-  debounce(400 /* ms */, (val) => {
-    debouncedSearch.value = val.trim();
-  })
-);
+const debouncedSearch = useDebouncedRef(computed(() => searchText.value.trim()), 400);
 
 const { apiState, computedList } = watchAPI(
   () => debouncedSearch.value,

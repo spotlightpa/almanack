@@ -1123,7 +1123,7 @@ func (app *appEnv) postPromotion(w http.ResponseWriter, r *http.Request) http.Ha
 	if !app.readJSON(w, r, &req) {
 		return nil
 	}
-	req.ImageUrls = db.NilSliceToEmpty(req.ImageUrls)
+	req.ImageUrls = pgxutil.NilSliceToEmpty(req.ImageUrls)
 	var (
 		promo db.Promotion
 		err   error
