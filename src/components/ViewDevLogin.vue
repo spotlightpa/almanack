@@ -53,12 +53,18 @@ function applyLogin() {
 
   <div class="field is-grouped">
     <div class="control">
-      <button class="button is-primary has-text-weight-semibold" @click="applyLogin">
+      <button
+        class="button is-primary has-text-weight-semibold"
+        @click="applyLogin"
+      >
         Log in
       </button>
     </div>
     <div class="control">
-      <button class="button is-light has-text-weight-semibold" @click="auth.logout">
+      <button
+        class="button is-light has-text-weight-semibold"
+        @click="auth.logout"
+      >
         Log out
       </button>
     </div>
