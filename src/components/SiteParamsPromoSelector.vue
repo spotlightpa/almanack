@@ -28,9 +28,9 @@ const { apiState, computedList } = watchAPI(
   () => debouncedSearch.value,
   (text) =>
     get(listPromotions, {
-      ...(text ? { text } : {}),
-      ...(props.filterWidth ? { width: props.filterWidth } : {}),
-      ...(props.filterHeight ? { height: props.filterHeight } : {}),
+      text,
+      width: props.filterWidth,
+      height: props.filterHeight,
     })
 );
 
