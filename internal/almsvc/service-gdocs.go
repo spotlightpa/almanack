@@ -19,6 +19,7 @@ import (
 	"github.com/spotlightpa/almanack/internal/convert/tableaux"
 	"github.com/spotlightpa/almanack/internal/db"
 	"github.com/spotlightpa/almanack/internal/services/gdocs"
+	"github.com/spotlightpa/almanack/internal/utils/dbutils"
 	"github.com/spotlightpa/almanack/internal/utils/must"
 	"github.com/spotlightpa/almanack/internal/utils/stringx"
 	"golang.org/x/net/html"
@@ -34,7 +35,7 @@ func (svc Services) ConfigureGoogleCert(ctx context.Context) (err error) {
 
 	opt, err := svc.Queries.GetOption(ctx, "google-json")
 	switch {
-	case db.IsNotFound(err):
+	case dbutils.IsNotFound(err):
 		l := almlog.FromContext(ctx)
 		l.Warn("ConfigureGoogleCert: no certificate in database")
 		return nil
@@ -375,7 +376,7 @@ func (svc Services) UploadGDocsImage(ctx context.Context, arg UploadGDocsImagePa
 		imageID = dbImage.ID
 
 	// If it's not found, it needs to be uploaded & saved
-	case db.IsNotFound(err):
+	case dbutils.IsNotFound(err):
 		itype, err := imageTypeFromMIME(ct)
 		if err != nil {
 			return err

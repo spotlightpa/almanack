@@ -17,6 +17,7 @@ import (
 	"github.com/jackc/pgx/v5/pgtype"
 	"github.com/spotlightpa/almanack/internal/almlog"
 	"github.com/spotlightpa/almanack/internal/db"
+	"github.com/spotlightpa/almanack/internal/utils/dbutils"
 	"github.com/spotlightpa/almanack/internal/utils/stringx"
 	"github.com/spotlightpa/almanack/internal/utils/timex"
 )
@@ -160,7 +161,7 @@ func (svc Services) EnsureTaxonomyPage(ctx context.Context, path, name string, t
 	switch {
 	case err == nil:
 		return nil
-	case !db.IsNotFound(err):
+	case !dbutils.IsNotFound(err):
 		return err
 	}
 
@@ -337,7 +338,7 @@ func (svc Services) CreatePageFromGDocsDoc(ctx context.Context, shared *db.Share
 		}
 		if err = page.Save(ctx, txq, false); err != nil {
 			// If the page already exists, just keep going
-			if db.IsUniquenessViolation(err, "page_path_key") {
+			if dbutils.IsUniquenessViolation(err, "page_path_key") {
 				return nil
 			}
 			return err

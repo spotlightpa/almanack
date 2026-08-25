@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	"github.com/earthboundkid/emailx/v2"
+	"github.com/spotlightpa/almanack/internal/utils/dbutils"
 )
 
 func GetRolesForEmail(ctx context.Context, q *Queries, email string) (roles []string, err error) {
@@ -17,7 +18,7 @@ func GetRolesForEmail(ctx context.Context, q *Queries, email string) (roles []st
 		return nil, fmt.Errorf("invalid email: %q", email)
 	}
 	roles, err = q.GetRolesForAddress(ctx, email)
-	if err != nil && !IsNotFound(err) {
+	if err != nil && !dbutils.IsNotFound(err) {
 		return
 	}
 	// if user has specific roles, early exit
@@ -25,7 +26,7 @@ func GetRolesForEmail(ctx context.Context, q *Queries, email string) (roles []st
 		return
 	}
 	roles, err = q.GetRolesForDomain(ctx, domain)
-	if err != nil && !IsNotFound(err) {
+	if err != nil && !dbutils.IsNotFound(err) {
 		return
 	}
 	// ignore any not found errors

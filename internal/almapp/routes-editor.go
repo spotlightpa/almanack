@@ -5,6 +5,7 @@ import (
 
 	"github.com/spotlightpa/almanack/internal/db"
 	"github.com/spotlightpa/almanack/internal/services/netlifyid"
+	"github.com/spotlightpa/almanack/internal/utils/dbutils"
 	"github.com/spotlightpa/almanack/internal/utils/paginate"
 )
 
@@ -93,7 +94,7 @@ func (app *appEnv) getSharedArticle(w http.ResponseWriter, r *http.Request) http
 		article, err = app.svc.Queries.GetSharedArticleByID(r.Context(), id)
 	}
 	if err != nil {
-		err = db.NoRowsAs404(err,
+		err = dbutils.NoRowsAs404(err,
 			"missing shared_article %v", q)
 		return app.jsonErr(err)
 	}

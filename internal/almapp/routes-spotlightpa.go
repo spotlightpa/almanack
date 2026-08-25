@@ -22,6 +22,7 @@ import (
 	"github.com/spotlightpa/almanack/internal/db"
 	"github.com/spotlightpa/almanack/internal/services/gdocs"
 	"github.com/spotlightpa/almanack/internal/services/google"
+	"github.com/spotlightpa/almanack/internal/utils/dbutils"
 	"github.com/spotlightpa/almanack/internal/utils/paginate"
 	"github.com/spotlightpa/almanack/internal/utils/slicex"
 	"github.com/spotlightpa/almanack/internal/utils/stringx"
@@ -537,7 +538,7 @@ func (app *appEnv) getPage(w http.ResponseWriter, r *http.Request) {
 		err = errors.New("unreachable")
 	}
 	if err != nil {
-		err = db.NoRowsAs404(err, "could not find page %v", q)
+		err = dbutils.NoRowsAs404(err, "could not find page %v", q)
 		app.replyErr(w, r, err)
 		return
 	}
@@ -639,7 +640,7 @@ func (app *appEnv) postPageRefresh(w http.ResponseWriter, r *http.Request) {
 
 	page, err := app.svc.Queries.GetPageByID(r.Context(), id)
 	if err != nil {
-		err = db.NoRowsAs404(err, "could not find page ID %d", id)
+		err = dbutils.NoRowsAs404(err, "could not find page ID %d", id)
 		app.replyErr(w, r, err)
 		return
 	}
@@ -719,7 +720,7 @@ func (app *appEnv) postPageCreate(w http.ResponseWriter, r *http.Request) {
 
 	sharedArt, err := app.svc.Queries.GetSharedArticleByID(r.Context(), req.SharedArticleID)
 	if err != nil {
-		err = db.NoRowsAs404(err, "missing id=%d", req.SharedArticleID)
+		err = dbutils.NoRowsAs404(err, "missing id=%d", req.SharedArticleID)
 		app.replyErr(w, r, err)
 		return
 	}
@@ -847,7 +848,7 @@ func (app *appEnv) listPagesByFTS(w http.ResponseWriter, r *http.Request) {
 				break
 			}
 			pathPage, err := app.svc.Queries.GetPageByURLPath(r.Context(), u.Path)
-			if db.IsNotFound(err) {
+			if dbutils.IsNotFound(err) {
 				break
 			}
 			if err != nil {
@@ -924,7 +925,7 @@ func (app *appEnv) postSharedArticleFromGDocs(w http.ResponseWriter, r *http.Req
 
 	dbDoc, err := app.svc.Queries.GetGDocsByExternalIDWhereProcessed(r.Context(), id)
 	if err != nil {
-		err = db.NoRowsAs404(err, "missing external_gdocs_id=%q", req.ID)
+		err = dbutils.NoRowsAs404(err, "missing external_gdocs_id=%q", req.ID)
 		app.replyErr(w, r, err)
 		return
 	}
@@ -941,7 +942,7 @@ func (app *appEnv) postSharedArticleFromGDocs(w http.ResponseWriter, r *http.Req
 			l.Debug("postSharedArticleFromGDocs: skipping")
 			app.replyJSON(http.StatusOK, w, art)
 			return
-		case db.IsNotFound(err):
+		case dbutils.IsNotFound(err):
 			break
 		case err != nil:
 			app.replyErr(w, r, err)
@@ -993,7 +994,7 @@ func (app *appEnv) getGDocsDoc(w http.ResponseWriter, r *http.Request) {
 
 	dbDoc, err := app.svc.Queries.GetGDocsByID(r.Context(), id)
 	if err != nil {
-		err = db.NoRowsAs404(err, "missing g_docs_doc.id=%d", id)
+		err = dbutils.NoRowsAs404(err, "missing g_docs_doc.id=%d", id)
 		app.replyErr(w, r, err)
 		return
 	}
