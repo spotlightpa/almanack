@@ -55,10 +55,7 @@ export default {
           <code>localStorage</code> without a real Netlify Identity session.
         </p>
 
-        <div
-          v-if="isSignedIn"
-          class="notification is-success is-light mb-4"
-        >
+        <div v-if="isSignedIn" class="notification is-success is-light mb-4">
           <strong>Signed in as:</strong> {{ currentEmail }}<br />
           <strong>Roles:</strong>
           {{ currentRoles.length ? currentRoles.join(", ") : "(none)" }}
@@ -99,11 +96,7 @@ export default {
               :key="role"
               class="checkbox mr-4"
             >
-              <input
-                v-model="selectedRoles"
-                type="checkbox"
-                :value="role"
-              />
+              <input v-model="selectedRoles" type="checkbox" :value="role" />
               {{ role }}
             </label>
           </div>
