@@ -1,4 +1,4 @@
-package dbutils
+package pgxutils
 
 import (
 	"github.com/jackc/pgx/v5/pgtype"

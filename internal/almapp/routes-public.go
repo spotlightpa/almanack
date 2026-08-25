@@ -14,7 +14,7 @@ import (
 	"github.com/spotlightpa/almanack/internal/db"
 	"github.com/spotlightpa/almanack/internal/services/jwthook"
 	"github.com/spotlightpa/almanack/internal/services/netlifyid"
-	"github.com/spotlightpa/almanack/internal/utils/dbutils"
+	"github.com/spotlightpa/almanack/internal/utils/pgxutils"
 )
 
 func (app *appEnv) notFound(w http.ResponseWriter, r *http.Request) {
@@ -49,9 +49,9 @@ func (app *appEnv) getBookmarklet(w http.ResponseWriter, r *http.Request) {
 
 	page, err := app.svc.Queries.GetPageByURLPath(r.Context(), "%"+slug)
 	if err != nil {
-		if dbutils.IsNotFound(err) {
+		if pgxutils.IsNotFound(err) {
 			err = resperr.E{
-				E: dbutils.NoRowsAs404(err, "could not find url-path %q", slug),
+				E: pgxutils.NoRowsAs404(err, "could not find url-path %q", slug),
 				M: fmt.Sprintf("No matching page found for %s.", slug)}
 		}
 		app.replyHTMLErr(w, r, err)

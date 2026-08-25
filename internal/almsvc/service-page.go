@@ -17,7 +17,7 @@ import (
 	"github.com/jackc/pgx/v5/pgtype"
 	"github.com/spotlightpa/almanack/internal/almlog"
 	"github.com/spotlightpa/almanack/internal/db"
-	"github.com/spotlightpa/almanack/internal/utils/dbutils"
+	"github.com/spotlightpa/almanack/internal/utils/pgxutils"
 	"github.com/spotlightpa/almanack/internal/utils/stringx"
 	"github.com/spotlightpa/almanack/internal/utils/timex"
 )
@@ -48,7 +48,7 @@ func (svc Services) PublishPage(ctx context.Context, txq *db.Queries, page *db.P
 				SetFrontmatter:   false,
 				SetBody:          false,
 				SetScheduleFor:   false,
-				ScheduleFor:      dbutils.NullTime,
+				ScheduleFor:      pgxutils.NullTime,
 			})
 			if txerr != nil {
 				return txerr
@@ -161,7 +161,7 @@ func (svc Services) EnsureTaxonomyPage(ctx context.Context, path, name string, t
 	switch {
 	case err == nil:
 		return nil
-	case !dbutils.IsNotFound(err):
+	case !pgxutils.IsNotFound(err):
 		return err
 	}
 
@@ -262,7 +262,7 @@ func (svc Services) RefreshPageContents(ctx context.Context, id int64) (err erro
 		SetBody:        true,
 		Body:           page.Body,
 		URLPath:        page.URLPath.String,
-		ScheduleFor:    dbutils.NullTime,
+		ScheduleFor:    pgxutils.NullTime,
 	})
 
 	return err
@@ -338,7 +338,7 @@ func (svc Services) CreatePageFromGDocsDoc(ctx context.Context, shared *db.Share
 		}
 		if err = page.Save(ctx, txq, false); err != nil {
 			// If the page already exists, just keep going
-			if dbutils.IsUniquenessViolation(err, "page_path_key") {
+			if pgxutils.IsUniquenessViolation(err, "page_path_key") {
 				return nil
 			}
 			return err

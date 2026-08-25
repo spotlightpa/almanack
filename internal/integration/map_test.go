@@ -6,7 +6,7 @@ import (
 
 	"github.com/carlmjohnson/be"
 	"github.com/spotlightpa/almanack/internal/db"
-	"github.com/spotlightpa/almanack/internal/utils/dbutils"
+	"github.com/spotlightpa/almanack/internal/utils/pgxutils"
 )
 
 func TestMap(t *testing.T) {
@@ -39,7 +39,7 @@ func TestMap(t *testing.T) {
 		},
 		SetBody:     true,
 		Body:        "hello",
-		ScheduleFor: dbutils.NullTime,
+		ScheduleFor: pgxutils.NullTime,
 	})
 	be.NilErr(t, err)
 	be.Equal(t, testpath, p2.FilePath)
