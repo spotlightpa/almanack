@@ -35,12 +35,7 @@ function initValues() {
 }
 
 function toggle() {
-  if (isOpen.value) {
-    isOpen.value = false;
-  } else {
-    initValues();
-    isOpen.value = true;
-  }
+  isOpen.value = !isOpen.value;
 }
 
 const { exec, apiStateRefs } = makeState();
@@ -102,10 +97,10 @@ async function save() {
         </p>
         <div class="mt-2 buttons">
           <button
-            v-if="!isOpen"
             class="button is-light has-text-weight-semibold"
             type="button"
             @click="toggle"
+            :disabled="isOpen"
           >
             Edit
           </button>

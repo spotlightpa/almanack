@@ -88,7 +88,7 @@ const nextPage = computedProp("next_page", (page) => ({
         :icon="['fas', 'sliders-h']"
       ></LinkRoute>
       <LinkRoute
-        label="Promotions"
+        label="Saved Promotions"
         to="promotions"
         :icon="['fas', 'bullhorn']"
       ></LinkRoute>
