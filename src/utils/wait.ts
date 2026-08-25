@@ -25,6 +25,17 @@ export function debounce<A extends unknown[]>(
   };
 }
 
+// useDebouncedRef takes a source ref and returns a new ref that mirrors it
+// but only updates after `ms` milliseconds of inactivity.
+export function useDebouncedRef<T>(source: Ref<T>, ms: number): Ref<T> {
+  const debounced = ref(source.value) as Ref<T>;
+  const flush = debounce(ms, (val: T) => {
+    debounced.value = val;
+  });
+  watch(source, flush);
+  return debounced;
+}
+
 // useThrottleToggle keeps a ref true
 // for at least `timeout` ms after the watched ref last became truthy.
 // Useful for preventing loading-spinner flicker.
