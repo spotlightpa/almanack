@@ -27,18 +27,14 @@ function onError(err) {
       >
         <div class="mx-auto content-width">
           <router-view v-slot="{ Component }">
-            <Suspense
-              @resolve="loadError = null"
-              @fallback="loadError = null"
-              @reject="onError"
-            >
+            <Suspense @resolve="loadError = null" @reject="onError">
               <component :is="Component" />
               <template #fallback>
                 <AsyncSpinner />
               </template>
             </Suspense>
-            <ViewError v-if="loadError" :error="loadError" />
           </router-view>
+          <ViewError v-if="loadError" :error="loadError" />
         </div>
       </main>
     </div>
