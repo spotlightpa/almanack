@@ -26,8 +26,10 @@ SELECT
 FROM
   "promotion"
 WHERE ("promotion"."width" = @width
+  OR "promotion"."width" = 0
   OR @width = 0)
 AND ("promotion"."height" = @height
+  OR "promotion"."height" = 0
   OR @height = 0)
 ORDER BY
   "updated_at" DESC
@@ -44,8 +46,10 @@ FROM
   "promotion"
   INNER JOIN tsq ON fts_doc_en @@ tsq.q
 WHERE ("promotion"."width" = @width
+  OR "promotion"."width" = 0
   OR @width = 0)
 AND ("promotion"."height" = @height
+  OR "promotion"."height" = 0
   OR @height = 0)
 ORDER BY
   ts_rank(fts_doc_en, tsq.q) DESC

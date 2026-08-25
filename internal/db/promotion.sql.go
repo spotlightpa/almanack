@@ -73,8 +73,10 @@ FROM
   "promotion"
   INNER JOIN tsq ON fts_doc_en @@ tsq.q
 WHERE ("promotion"."width" = $3
+  OR "promotion"."width" = 0
   OR $3 = 0)
 AND ("promotion"."height" = $4
+  OR "promotion"."height" = 0
   OR $4 = 0)
 ORDER BY
   ts_rank(fts_doc_en, tsq.q) DESC
@@ -131,8 +133,10 @@ SELECT
 FROM
   "promotion"
 WHERE ("promotion"."width" = $3
+  OR "promotion"."width" = 0
   OR $3 = 0)
 AND ("promotion"."height" = $4
+  OR "promotion"."height" = 0
   OR $4 = 0)
 ORDER BY
   "updated_at" DESC
