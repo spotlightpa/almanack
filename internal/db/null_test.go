@@ -2,6 +2,7 @@ package db_test
 
 import (
 	"testing"
+	"unsafe"
 
 	"github.com/carlmjohnson/be"
 	"github.com/spotlightpa/almanack/internal/db"
@@ -13,12 +14,12 @@ func TestNilSliceToEmpty(t *testing.T) {
 	be.True(t, s == nil)
 	result := db.NilSliceToEmpty(s)
 	be.True(t, result != nil)
-	be.Equal(t, 0, len(result))
+	be.EqualLength(t, 0, result)
 
 	// non-nil empty slice is returned as-is
 	empty := []string{}
-	be.True(t, db.NilSliceToEmpty(empty) != nil)
-	be.Equal(t, 0, len(db.NilSliceToEmpty(empty)))
+	be.EqualLength(t, 0, db.NilSliceToEmpty(empty))
+	be.Equal(t, unsafe.SliceData(empty), unsafe.SliceData(db.NilSliceToEmpty(empty)))
 
 	// populated slice is returned unchanged
 	populated := []string{"a", "b"}
@@ -27,5 +28,5 @@ func TestNilSliceToEmpty(t *testing.T) {
 	// works with other element types
 	var ints []int
 	be.True(t, db.NilSliceToEmpty(ints) != nil)
-	be.Equal(t, 0, len(db.NilSliceToEmpty(ints)))
+	be.EqualLength(t, 0, db.NilSliceToEmpty(ints))
 }
