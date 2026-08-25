@@ -2,10 +2,6 @@ import { reactive, computed, toRefs } from "vue";
 
 import netlifyIdentity from "netlify-identity-widget";
 
-// ---------------------------------------------------------------------------
-// Dev-mode fake auth (only active when Vite MODE !== "production")
-// ---------------------------------------------------------------------------
-
 const DEV_AUTH_KEY = "almanack_dev_auth";
 
 function loadDevUser() {
@@ -40,26 +36,6 @@ function makeDevAuth() {
     );
   }
 
-  const methods = {
-    signup() {},
-    login() {},
-    async logout() {
-      authState.user = null;
-      saveDevUser(null);
-    },
-    async headers() {
-      if (!authState.user) return null;
-      // Return a fake bearer token so the API client doesn't throw
-      return { Authorization: "Bearer dev-fake-token" };
-    },
-    // Called by ViewDevLogin to set the fake identity
-    setDevUser({ email, fullName, roles }) {
-      const user = { email, fullName, roles };
-      authState.user = user;
-      saveDevUser(user);
-    },
-  };
-
   return {
     ...toRefs(authState),
     isSignedIn,
@@ -69,13 +45,23 @@ function makeDevAuth() {
     isEditor: hasRole("editor"),
     isSpotlightPAUser: hasRole("Spotlight PA"),
     isArcUser: hasRole("arc user"),
-    ...methods,
+    signup() {},
+    login() {},
+    async logout() {
+      authState.user = null;
+      saveDevUser(null);
+    },
+    async headers() {
+      if (!authState.user) return null;
+      return { Authorization: "Bearer dev-fake-token" };
+    },
+    setDevUser({ email, fullName, roles }) {
+      let user = { email, fullName, roles };
+      authState.user = user;
+      saveDevUser(user);
+    },
   };
 }
-
-// ---------------------------------------------------------------------------
-// Production auth (Netlify Identity)
-// ---------------------------------------------------------------------------
 
 function makeAuth() {
   const authState = reactive({
@@ -169,10 +155,6 @@ function makeAuth() {
     ...methods,
   };
 }
-
-// ---------------------------------------------------------------------------
-// Singleton
-// ---------------------------------------------------------------------------
 
 let $auth;
 
