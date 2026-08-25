@@ -13,7 +13,10 @@ const props = defineProps({
 defineEmits(["select"]);
 
 const searchText = ref("");
-const debouncedSearch = useDebouncedRef(computed(() => searchText.value.trim()), 400);
+const debouncedSearch = useDebouncedRef(
+  computed(() => searchText.value.trim()),
+  400
+);
 
 const { apiState, computedList } = watchAPI(
   () => debouncedSearch.value,
