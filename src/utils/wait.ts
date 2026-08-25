@@ -25,9 +25,9 @@ export function debounce<A extends unknown[]>(
   };
 }
 
-// debounceValue takes a source ref and returns a new ref that mirrors it
+// useDebouncedRef takes a source ref and returns a new ref that mirrors it
 // but only updates after `ms` milliseconds of inactivity.
-export function debounceValue<T>(source: Ref<T>, ms: number): Ref<T> {
+export function useDebouncedRef<T>(source: Ref<T>, ms: number): Ref<T> {
   const debounced = ref(source.value) as Ref<T>;
   const flush = debounce(ms, (val: T) => {
     debounced.value = val;

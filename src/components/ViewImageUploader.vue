@@ -1,6 +1,6 @@
 <script setup>
 import { ref } from "vue";
-import { debounceValue, seconds } from "@/utils/wait.ts";
+import { useDebouncedRef, seconds } from "@/utils/wait.ts";
 
 import { get, post, listImages, postImageUpdate } from "@/api/client-v2.js";
 import { makeState, watchAPI } from "@/api/service-util.js";
@@ -14,7 +14,7 @@ const props = defineProps({
 });
 
 const rawQuery = ref("");
-const query = debounceValue(rawQuery, seconds(1));
+const query = useDebouncedRef(rawQuery, seconds(1));
 
 const {
   apiState: listState,
