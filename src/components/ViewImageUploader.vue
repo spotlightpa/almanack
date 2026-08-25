@@ -121,8 +121,6 @@ function updateIsLicensed(image) {
   }
   doUpdate(image, { set_is_licensed: true, is_licensed: !image.isLicensed });
 }
-
-
 </script>
 
 <template>
