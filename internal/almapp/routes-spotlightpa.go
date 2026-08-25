@@ -1160,7 +1160,7 @@ func (app *appEnv) deletePromotion(w http.ResponseWriter, r *http.Request) http.
 		ID int64 `json:"id"`
 	}
 	if !app.readJSON(w, r, &req) {
-		return app.jsonErr(resperr.E{M: "Missing ID"})
+		return nil
 	}
 	if rows, err := app.svc.Queries.DeletePromotion(r.Context(), req.ID); err != nil {
 		return app.jsonErr(err)
