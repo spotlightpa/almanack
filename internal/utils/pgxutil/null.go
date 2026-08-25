@@ -1,4 +1,4 @@
-package pgxutils
+package pgxutil
 
 import (
 	"github.com/jackc/pgx/v5/pgtype"

@@ -1,4 +1,4 @@
-package pgxutils
+package pgxutil
 
 import (
 	"errors"

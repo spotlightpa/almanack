@@ -16,7 +16,7 @@ import (
 	"github.com/gabriel-vasile/mimetype"
 	"github.com/spotlightpa/almanack/internal/db"
 	"github.com/spotlightpa/almanack/internal/services/google"
-	"github.com/spotlightpa/almanack/internal/utils/pgxutils"
+	"github.com/spotlightpa/almanack/internal/utils/pgxutil"
 )
 
 func FetchImageURL(ctx context.Context, c *http.Client, srcurl string) (body []byte, ctype string, err error) {
@@ -64,7 +64,7 @@ func (svc Services) ReplaceAndUploadImageURL(ctx context.Context, srcURL, descri
 		return image.Path, nil
 	default: // unexpected DB problem
 		return "", err
-	case pgxutils.IsNotFound(err):
+	case pgxutil.IsNotFound(err):
 		// fallthrough to upload
 	}
 

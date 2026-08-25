@@ -6,7 +6,7 @@ import (
 	"github.com/spotlightpa/almanack/internal/db"
 	"github.com/spotlightpa/almanack/internal/services/netlifyid"
 	"github.com/spotlightpa/almanack/internal/utils/paginate"
-	"github.com/spotlightpa/almanack/internal/utils/pgxutils"
+	"github.com/spotlightpa/almanack/internal/utils/pgxutil"
 )
 
 func (app *appEnv) userInfo(w http.ResponseWriter, r *http.Request) http.Handler {
@@ -94,7 +94,7 @@ func (app *appEnv) getSharedArticle(w http.ResponseWriter, r *http.Request) http
 		article, err = app.svc.Queries.GetSharedArticleByID(r.Context(), id)
 	}
 	if err != nil {
-		err = pgxutils.NoRowsAs404(err,
+		err = pgxutil.NoRowsAs404(err,
 			"missing shared_article %v", q)
 		return app.jsonErr(err)
 	}
