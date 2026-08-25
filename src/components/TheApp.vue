@@ -1,17 +1,7 @@
 <script setup>
-import { ref } from "vue";
-import AsyncSpinner from "@/components/AsyncSpinner.vue";
-import ViewError from "@/components/ViewError.vue";
-
 const isProd = !!window.location.host.match(/spotlightpa\.org$/);
 const isStage = !!window.location.host.match(/netlify\.app$/);
 const isDev = !isProd && !isStage;
-
-const loadError = ref(null);
-
-function onError(err) {
-  loadError.value = err;
-}
 </script>
 
 <template>
@@ -26,15 +16,7 @@ function onError(err) {
         }"
       >
         <div class="mx-auto content-width">
-          <router-view v-slot="{ Component }">
-            <Suspense @resolve="loadError = null" @reject="onError">
-              <component :is="Component" />
-              <template #fallback>
-                <AsyncSpinner />
-              </template>
-            </Suspense>
-          </router-view>
-          <ViewError v-if="loadError" :error="loadError" />
+          <router-view></router-view>
         </div>
       </main>
     </div>
