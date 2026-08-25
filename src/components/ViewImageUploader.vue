@@ -1,6 +1,6 @@
 <script setup>
-import { ref, watch } from "vue";
-import { debounce, seconds } from "@/utils/wait.ts";
+import { ref } from "vue";
+import { debounceValue, seconds } from "@/utils/wait.ts";
 
 import { get, post, listImages, postImageUpdate } from "@/api/client-v2.js";
 import { makeState, watchAPI } from "@/api/service-util.js";
@@ -13,7 +13,8 @@ const props = defineProps({
   page: { type: String, default: "0" },
 });
 
-const query = ref("");
+const rawQuery = ref("");
+const query = debounceValue(rawQuery, seconds(1));
 
 const {
   apiState: listState,
@@ -121,13 +122,7 @@ function updateIsLicensed(image) {
   doUpdate(image, { set_is_licensed: true, is_licensed: !image.isLicensed });
 }
 
-const rawQuery = ref("");
-watch(
-  rawQuery,
-  debounce(seconds(1), (val) => {
-    query.value = val;
-  })
-);
+
 </script>
 
 <template>
