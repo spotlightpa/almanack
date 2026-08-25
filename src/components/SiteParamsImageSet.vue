@@ -186,7 +186,7 @@ defineExpose({
           class="button is-link has-text-weight-semibold"
           @click="showPromoSelector = !showPromoSelector"
         >
-          {{ showPromoSelector ? "Cancel" : "Copy from promotion set…" }}
+          {{ showPromoSelector ? "Cancel" : "Add from saved promotion set…" }}
         </button>
       </div>
     </div>

@@ -43,7 +43,7 @@ const promotions = computed(() => {
 
 <template>
   <div class="promo-selector box">
-    <h4 class="title is-6 mb-2">Copy from a promotion set</h4>
+    <h4 class="title is-6 mb-2">Add from saved promotion set</h4>
 
     <div class="field">
       <div class="control" :class="{ 'is-loading': apiState.isLoading.value }">

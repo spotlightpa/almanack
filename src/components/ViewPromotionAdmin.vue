@@ -91,22 +91,9 @@ async function saveNew() {
       </button>
       <div v-else class="box">
         <h2 class="title is-5">New promotion set</h2>
-        <BulmaFieldInput
-          v-model="newName"
-          label="Name"
-          placeholder="e.g. Rail sticky promo"
-        />
-        <BulmaFieldInput
-          v-model="newDescription"
-          label="Description"
-          placeholder="Short description"
-        />
-        <BulmaFieldInput
-          v-model="newLink"
-          label="Link URL"
-          type="url"
-          placeholder="https://"
-        />
+        <BulmaFieldInput v-model="newName" label="Name" />
+        <BulmaFieldInput v-model="newDescription" label="Description" />
+        <BulmaFieldInput v-model="newLink" label="Link URL" type="url" />
         <div class="is-flex mb-3" style="gap: 1rem">
           <BulmaFieldInput
             label="Width"
