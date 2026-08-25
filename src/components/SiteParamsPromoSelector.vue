@@ -85,8 +85,8 @@ const promotions = computed(() => {
           {{ promo.description }}
         </p>
         <p class="has-text-grey is-size-7">
-          {{ promo.items?.length ?? 0 }} image{{
-            promo.items?.length !== 1 ? "s" : ""
+          {{ promo.image_urls?.length ?? 0 }} image{{
+            promo.image_urls?.length !== 1 ? "s" : ""
           }}
         </p>
       </div>

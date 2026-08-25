@@ -23,7 +23,7 @@ const description = ref("");
 const link = ref("");
 const width = ref(0);
 const height = ref(0);
-const items = ref([]);
+const imageUrls = ref([]);
 
 function initValues() {
   name.value = props.modelValue.name;
@@ -31,7 +31,7 @@ function initValues() {
   link.value = props.modelValue.link ?? "";
   width.value = props.modelValue.width;
   height.value = props.modelValue.height;
-  items.value = [...(props.modelValue.items ?? [])];
+  imageUrls.value = [...(props.modelValue.image_urls ?? [])];
 }
 
 function toggle() {
@@ -69,7 +69,7 @@ async function save() {
       link: link.value,
       width: width.value,
       height: height.value,
-      items: items.value,
+      image_urls: imageUrls.value,
     })
   );
   if (!apiStateRefs.error.value) {
@@ -94,8 +94,8 @@ async function save() {
           <template v-if="modelValue.width || modelValue.height">
             {{ modelValue.width }}×{{ modelValue.height }}px &middot;
           </template>
-          {{ modelValue.items?.length ?? 0 }} image{{
-            modelValue.items?.length !== 1 ? "s" : ""
+          {{ modelValue.image_urls?.length ?? 0 }} image{{
+            modelValue.image_urls?.length !== 1 ? "s" : ""
           }}
           &middot;
           {{ new Date(modelValue.updated_at).toLocaleString() }}
@@ -159,10 +159,10 @@ async function save() {
         help="One image URL per slot; one will be chosen randomly on each page load."
       >
         <SiteParamsFiles
-          :files="items"
+          :files="imageUrls"
           :file-props="fileList"
-          @add="items.push($event)"
-          @remove="items.splice($event, 1)"
+          @add="imageUrls.push($event)"
+          @remove="imageUrls.splice($event, 1)"
         />
       </BulmaField>
       <ErrorSimple :error="error" />

@@ -30,7 +30,7 @@ const newDescription = ref("");
 const newLink = ref("");
 const newWidth = ref(0);
 const newHeight = ref(0);
-const newItems = ref([]);
+const newImageUrls = ref([]);
 
 function startNew() {
   newName.value = "";
@@ -38,7 +38,7 @@ function startNew() {
   newLink.value = "";
   newWidth.value = 0;
   newHeight.value = 0;
-  newItems.value = [];
+  newImageUrls.value = [];
   isAdding.value = true;
 }
 
@@ -53,7 +53,7 @@ async function saveNew() {
       link: newLink.value,
       width: newWidth.value,
       height: newHeight.value,
-      items: newItems.value,
+      image_urls: newImageUrls.value,
     })
   );
   if (!saveState.error) {
@@ -126,10 +126,10 @@ async function saveNew() {
           help="One image URL per slot; one will be chosen randomly on each page load."
         >
           <SiteParamsFiles
-            :files="newItems"
+            :files="newImageUrls"
             :file-props="fileList"
-            @add="newItems.push($event)"
-            @remove="newItems.splice($event, 1)"
+            @add="newImageUrls.push($event)"
+            @remove="newImageUrls.splice($event, 1)"
           />
         </BulmaField>
         <ErrorSimple :error="saveState.error" />

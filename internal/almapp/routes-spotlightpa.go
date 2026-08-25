@@ -1123,8 +1123,8 @@ func (app *appEnv) postPromotion(w http.ResponseWriter, r *http.Request) http.Ha
 	if !app.readJSON(w, r, &req) {
 		return nil
 	}
-	if req.Items == nil {
-		req.Items = []string{}
+	if req.ImageUrls == nil {
+		req.ImageUrls = []string{}
 	}
 	var (
 		promo db.Promotion
@@ -1137,7 +1137,7 @@ func (app *appEnv) postPromotion(w http.ResponseWriter, r *http.Request) http.Ha
 			Link:        req.Link,
 			Width:       req.Width,
 			Height:      req.Height,
-			Items:       req.Items,
+			ImageUrls:   req.ImageUrls,
 		})
 	} else {
 		promo, err = app.svc.Queries.UpdatePromotion(r.Context(), db.UpdatePromotionParams{
@@ -1147,7 +1147,7 @@ func (app *appEnv) postPromotion(w http.ResponseWriter, r *http.Request) http.Ha
 			Link:        req.Link,
 			Width:       req.Width,
 			Height:      req.Height,
-			Items:       req.Items,
+			ImageUrls:   req.ImageUrls,
 		})
 	}
 	if err != nil {

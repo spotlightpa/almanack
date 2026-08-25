@@ -149,7 +149,7 @@ type Promotion struct {
 	Link        string    `json:"link"`
 	Width       int32     `json:"width"`
 	Height      int32     `json:"height"`
-	Items       []string  `json:"items"`
+	ImageUrls   []string  `json:"image_urls"`
 	CreatedAt   time.Time `json:"created_at"`
 	UpdatedAt   time.Time `json:"updated_at"`
 }

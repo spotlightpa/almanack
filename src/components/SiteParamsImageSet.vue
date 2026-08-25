@@ -61,7 +61,7 @@ function removeImage(n) {
 }
 
 function applyPromoSet(promo) {
-  (promo.items ?? []).forEach((url) => {
+  (promo.image_urls ?? []).forEach((url) => {
     imageSet.value.push({
       id: n++,
       label: "",

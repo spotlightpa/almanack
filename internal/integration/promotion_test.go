@@ -35,7 +35,7 @@ func TestPromotionEndpoints(t *testing.T) {
 				Link:        "https://example.com/",
 				Width:       728,
 				Height:      90,
-				Items:       []string{"https://example.com/banner.png"},
+				ImageUrls:       []string{"https://example.com/banner.png"},
 			}).
 			ToJSON(&created).
 			Fetch(ctx))
@@ -56,7 +56,7 @@ func TestPromotionEndpoints(t *testing.T) {
 				Link:        "https://example.org/",
 				Width:       300,
 				Height:      250,
-				Items:       []string{"https://example.org/sidebar.png"},
+				ImageUrls:       []string{"https://example.org/sidebar.png"},
 			}).
 			ToJSON(&created).
 			Fetch(ctx))
@@ -114,7 +114,7 @@ func TestPromotionEndpoints(t *testing.T) {
 			ToJSON(&created).
 			Fetch(ctx))
 		be.Nonzero(t, created.ID)
-		be.AllEqual(t, []string{}, created.Items)
+		be.AllEqual(t, []string{}, created.ImageUrls)
 	}
 	{ // Update the first promotion
 		var updated db.Promotion
@@ -128,7 +128,7 @@ func TestPromotionEndpoints(t *testing.T) {
 				Link:        created1.Link,
 				Width:       created1.Width,
 				Height:      created1.Height,
-				Items:       created1.Items,
+				ImageUrls:       created1.ImageUrls,
 			}).
 			ToJSON(&updated).
 			Fetch(ctx))
@@ -160,7 +160,7 @@ func TestDeletePromotionEndpoint(t *testing.T) {
 			Link:   "https://example.com/",
 			Width:  300,
 			Height: 250,
-			Items:  []string{"https://example.com/img.png"},
+			ImageUrls:  []string{"https://example.com/img.png"},
 		}).
 		ToJSON(&created).
 		Fetch(ctx))
