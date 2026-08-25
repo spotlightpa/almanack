@@ -48,7 +48,7 @@ func (svc Services) PublishPage(ctx context.Context, txq *db.Queries, page *db.P
 				SetFrontmatter:   false,
 				SetBody:          false,
 				SetScheduleFor:   false,
-				ScheduleFor:      db.NullTime,
+				ScheduleFor:      dbutils.NullTime,
 			})
 			if txerr != nil {
 				return txerr
@@ -262,7 +262,7 @@ func (svc Services) RefreshPageContents(ctx context.Context, id int64) (err erro
 		SetBody:        true,
 		Body:           page.Body,
 		URLPath:        page.URLPath.String,
-		ScheduleFor:    db.NullTime,
+		ScheduleFor:    dbutils.NullTime,
 	})
 
 	return err
