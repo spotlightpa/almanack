@@ -100,7 +100,7 @@ func TestPromotionEndpoints(t *testing.T) {
 			be.Equal(t, int32(300), p.Width)
 		}
 	}
-	{ // Create with nil items — must not fail with NOT NULL violation
+	{ // Create with nil image_urls — must not fail with NOT NULL violation
 		var created db.Promotion
 		be.NilErr(t, rb.Clone().
 			Path("/api/promotion").
@@ -109,7 +109,7 @@ func TestPromotionEndpoints(t *testing.T) {
 				Name:   "Nil items promo",
 				Width:  300,
 				Height: 250,
-				// Items intentionally omitted (nil)
+				// ImageUrls intentionally omitted (nil)
 			}).
 			ToJSON(&created).
 			Fetch(ctx))
