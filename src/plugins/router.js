@@ -1,4 +1,4 @@
-import { defineAsyncComponent, nextTick, watch } from "vue";
+import { nextTick, watch } from "vue";
 
 import { createRouter, createWebHistory } from "vue-router";
 
@@ -6,16 +6,12 @@ import { useAuth } from "@/api/auth.js";
 import { listAllTopics, listAllSeries } from "@/api/client-v2.js";
 import { setDimensions, sendGAPageview } from "@/utils/google-analytics.js";
 
-import AsyncSpinner from "@/components/AsyncSpinner.vue";
 import ViewError from "@/components/ViewError.vue";
 
+// Pass the import function directly — Vue Router handles lazy loading natively.
+// Loading/error UI is handled via <Suspense> in TheApp.vue.
 function load(loader) {
-  return defineAsyncComponent({
-    loader,
-    loadingComponent: AsyncSpinner,
-    errorComponent: ViewError,
-    timeout: 3000,
-  });
+  return loader;
 }
 
 let { roles, fullName, email, isEditor, isSpotlightPAUser, isSignedIn } =
@@ -328,21 +324,19 @@ let router = createRouter({
   },
 });
 
-router.beforeEach((to, from, next) => {
+router.beforeEach((to, from) => {
   let record = to.matched.find((record) => record.meta.requiresAuth);
   if (record) {
     if (!record.meta.requiresAuth.value) {
       let redirect = to.fullPath || from.fullPath;
-      next({
+      return {
         name: "login",
         hash: to.hash, // For verifying tokens etc.
         replace: true,
         query: { redirect },
-      });
-      return;
+      };
     }
   }
-  next();
 });
 
 router.afterEach((to) => {
