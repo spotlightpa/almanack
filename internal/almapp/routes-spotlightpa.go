@@ -22,6 +22,7 @@ import (
 	"github.com/spotlightpa/almanack/internal/db"
 	"github.com/spotlightpa/almanack/internal/services/gdocs"
 	"github.com/spotlightpa/almanack/internal/services/google"
+	"github.com/spotlightpa/almanack/internal/utils/mathx"
 	"github.com/spotlightpa/almanack/internal/utils/paginate"
 	"github.com/spotlightpa/almanack/internal/utils/pgxutil"
 	"github.com/spotlightpa/almanack/internal/utils/slicex"
@@ -1061,10 +1062,6 @@ func (app *appEnv) postPageLoad(w http.ResponseWriter, r *http.Request) http.Han
 	return app.jsonOK(page.ID)
 }
 
-func clamp[N cmp.Ordered](n, _min, _max N) N {
-	return min(max(n, _min), _max)
-}
-
 func (app *appEnv) listPromotions(w http.ResponseWriter, r *http.Request) http.Handler {
 	app.logStart(r)
 
@@ -1080,7 +1077,7 @@ func (app *appEnv) listPromotions(w http.ResponseWriter, r *http.Request) http.H
 	_ = intFromQuery(r, "height", &height)
 	_ = intFromQuery(r, "limit", &limit)
 	pager := paginate.PageNumber(page)
-	pager.PageSize = clamp(cmp.Or(limit, 100), 1, 100)
+	pager.PageSize = mathx.Clamp(cmp.Or(limit, 100), 1, 100)
 
 	var (
 		promos []db.Promotion
