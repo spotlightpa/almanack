@@ -18,6 +18,8 @@ const debouncedSearch = useDebouncedRef(
   400
 );
 
+const LIMIT = 20;
+
 const { apiState, computedList } = watchAPI(
   () => debouncedSearch.value,
   (text) =>
@@ -25,10 +27,13 @@ const { apiState, computedList } = watchAPI(
       text,
       width: props.filterWidth,
       height: props.filterHeight,
+      limit: LIMIT + 1,
     })
 );
 
-const promotions = computedList("promotions", (p) => p);
+const allResults = computedList("promotions", (p) => p);
+const promotions = computed(() => allResults.value.slice(0, LIMIT));
+const hasMore = computed(() => allResults.value.length > LIMIT);
 </script>
 
 <template>
@@ -88,6 +93,10 @@ const promotions = computedList("promotions", (p) => p);
         Use
       </button>
     </div>
+
+    <p v-if="hasMore" class="help has-text-grey mt-2">
+      More items not shown&hellip; refine your search to see them.
+    </p>
   </div>
 </template>
 

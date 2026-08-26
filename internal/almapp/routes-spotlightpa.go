@@ -1071,11 +1071,15 @@ func (app *appEnv) listPromotions(w http.ResponseWriter, r *http.Request) http.H
 	}
 
 	text := r.URL.Query().Get("text")
-	var width, height int32
+	var width, height, limit int32
 	_ = intFromQuery(r, "width", &width)
 	_ = intFromQuery(r, "height", &height)
+	_ = intFromQuery(r, "limit", &limit)
 	pager := paginate.PageNumber(page)
 	pager.PageSize = 100
+	if limit > 0 && limit < pager.PageSize {
+		pager.PageSize = limit
+	}
 
 	var (
 		promos []db.Promotion
