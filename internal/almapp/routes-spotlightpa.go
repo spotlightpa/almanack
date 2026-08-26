@@ -1061,6 +1061,10 @@ func (app *appEnv) postPageLoad(w http.ResponseWriter, r *http.Request) http.Han
 	return app.jsonOK(page.ID)
 }
 
+func clamp[N cmp.Ordered](n, _min, _max N) N {
+	return min(max(n, _min), _max)
+}
+
 func (app *appEnv) listPromotions(w http.ResponseWriter, r *http.Request) http.Handler {
 	app.logStart(r)
 
@@ -1076,7 +1080,7 @@ func (app *appEnv) listPromotions(w http.ResponseWriter, r *http.Request) http.H
 	_ = intFromQuery(r, "height", &height)
 	_ = intFromQuery(r, "limit", &limit)
 	pager := paginate.PageNumber(page)
-	pager.PageSize = cmp.Or(min(100, limit), 100)
+	pager.PageSize = clamp(cmp.Or(limit, 100), 1, 100)
 
 	var (
 		promos []db.Promotion
