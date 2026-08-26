@@ -16,7 +16,11 @@ func TestClamp(t *testing.T) {
 		{99, 1, 10, 10}, // above max
 		{1, 1, 10, 1},   // at min boundary
 		{10, 1, 10, 10}, // at max boundary
+		{10, 1, 1, 1},   // weird clamp inputs
 	} {
 		be.Equal(t, tc.want, mathx.Clamp(tc.n, tc.min, tc.max))
 	}
+	be.Nonzero(t, be.Panicked(func() {
+		mathx.Clamp(10, 100, 1)
+	}))
 }
