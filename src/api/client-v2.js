@@ -96,6 +96,9 @@ export const postPageLoad = `/api/page-load`;
 export const postPageRefresh = `/api/page-refresh`;
 export const listPages = `/api/pages`;
 export const listPagesByFTS = `/api/pages-by-fts`;
+export const listPromotions = `/api/promotion`;
+export const postPromotion = `/api/promotion`;
+export const deletePromotion = `/api/promotion-delete`;
 export const getSharedArticle = `/api/shared-article`;
 export const postSharedArticle = `/api/shared-article`;
 export const postSharedArticleFromGDocs = `/api/shared-article-from-gdocs`;
@@ -106,9 +109,6 @@ export const getSiteData = `/api/site-data`;
 export const postSiteData = `/api/site-data`;
 export const getSiteParams = `/api/site-params`;
 export const postSiteParams = `/api/site-params`;
-export const listPromotions = `/api/promotion`;
-export const postPromotion = `/api/promotion`;
-export const deletePromotion = `/api/promotion-delete`;
 
 export async function uploadImage(body) {
   let [data, err] = await post(createSignedUpload, { type: body.type });
