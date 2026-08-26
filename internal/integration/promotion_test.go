@@ -15,14 +15,13 @@ import (
 func TestPromotionEndpoints(t *testing.T) {
 	almlog.UseTestLogger(t)
 	dbhandle := createTestDB(t)
-	ctx := t.Context()
-
-	svc := almsvc.Services{
+	rb := newTestServer(t, almsvc.Services{
 		DB:      dbhandle,
 		Queries: dbhandle.Queries(),
 		Auth:    netlifyid.MockAuthService{},
-	}
-	rb := newTestServer(t, svc)
+	})
+	ctx := t.Context()
+
 	var created1 db.Promotion
 	{ // Create first promotion
 		var created db.Promotion
@@ -151,14 +150,12 @@ func TestPromotionEndpoints(t *testing.T) {
 func TestDeletePromotionEndpoint(t *testing.T) {
 	almlog.UseTestLogger(t)
 	dbhandle := createTestDB(t)
-	ctx := t.Context()
-
-	svc := almsvc.Services{
+	rb := newTestServer(t, almsvc.Services{
 		DB:      dbhandle,
 		Queries: dbhandle.Queries(),
 		Auth:    netlifyid.MockAuthService{},
-	}
-	rb := newTestServer(t, svc)
+	})
+	ctx := t.Context()
 
 	// Create a promotion to delete
 	var created db.Promotion
