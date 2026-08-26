@@ -1077,8 +1077,8 @@ func (app *appEnv) listPromotions(w http.ResponseWriter, r *http.Request) http.H
 	_ = intFromQuery(r, "limit", &limit)
 	pager := paginate.PageNumber(page)
 	pager.PageSize = 100
-	if limit > 0 && limit < pager.PageSize {
-		pager.PageSize = limit
+	if limit > 0 {
+		pager.PageSize = min(pager.PageSize, limit)
 	}
 
 	var (
