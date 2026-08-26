@@ -112,12 +112,8 @@ func (svc Services) ProcessGDocsDoc(ctx context.Context, dbDoc db.GDocsDoc) (err
 	metadata.InternalID = cmp.Or(metadata.InternalID, dbDoc.Document.Title)
 
 	// database slices must not be "null"
-	if embeds == nil {
-		embeds = []db.Embed{}
-	}
-	if warnings == nil {
-		warnings = []string{}
-	}
+	embeds = pgxutil.NilSliceToEmpty(embeds)
+	warnings = pgxutil.NilSliceToEmpty(warnings)
 
 	// Save to database
 	_, err = svc.Queries.UpdateGDocsDoc(ctx, db.UpdateGDocsDocParams{
