@@ -18,22 +18,19 @@ const debouncedSearch = useDebouncedRef(
   400
 );
 
-const LIMIT = 20;
-
-const { apiState, computedList } = watchAPI(
+const { apiState, computedList, computedProp } = watchAPI(
   () => debouncedSearch.value,
   (text) =>
     get(listPromotions, {
       text,
       width: props.filterWidth,
       height: props.filterHeight,
-      limit: LIMIT + 1,
+      limit: 20,
     })
 );
 
-const allResults = computedList("promotions", (p) => p);
-const promotions = computed(() => allResults.value.slice(0, LIMIT));
-const hasMore = computed(() => allResults.value.length > LIMIT);
+const promotions = computedList("promotions", (p) => p);
+const hasMore = computedProp("next_page", (v) => !!v);
 </script>
 
 <template>
