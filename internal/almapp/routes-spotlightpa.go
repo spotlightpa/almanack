@@ -1076,10 +1076,7 @@ func (app *appEnv) listPromotions(w http.ResponseWriter, r *http.Request) http.H
 	_ = intFromQuery(r, "height", &height)
 	_ = intFromQuery(r, "limit", &limit)
 	pager := paginate.PageNumber(page)
-	pager.PageSize = 100
-	if limit > 0 {
-		pager.PageSize = min(pager.PageSize, limit)
-	}
+	pager.PageSize = cmp.Or(min(100, limit), 100)
 
 	var (
 		promos []db.Promotion
