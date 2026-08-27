@@ -1,6 +1,46 @@
-import { ref } from "vue";
+import { ref, type Ref } from "vue";
 
-export function makePromotion(initial = {}) {
+export interface PromotionData {
+  id?: number | null;
+  name?: string;
+  description?: string;
+  width?: number;
+  height?: number;
+  link?: string;
+  banner_label?: string;
+  banner_label_link?: string;
+  image_description?: string;
+  image_urls?: string[];
+}
+
+export interface PromotionJSON {
+  id: number | null;
+  name: string;
+  description: string;
+  width: number;
+  height: number;
+  link: string;
+  banner_label: string;
+  banner_label_link: string;
+  image_description: string;
+  image_urls: string[];
+}
+
+export interface Promotion {
+  name: Ref<string>;
+  description: Ref<string>;
+  width: Ref<number>;
+  height: Ref<number>;
+  link: Ref<string>;
+  bannerLabel: Ref<string>;
+  bannerLabelLink: Ref<string>;
+  imageDescription: Ref<string>;
+  imageUrls: Ref<string[]>;
+  init(src?: PromotionData): void;
+  toJSON(id: number | null): PromotionJSON;
+}
+
+export function makePromotion(initial: PromotionData = {}): Promotion {
   const name = ref(initial.name ?? "");
   const description = ref(initial.description ?? "");
   const width = ref(initial.width ?? 0);
@@ -11,7 +51,7 @@ export function makePromotion(initial = {}) {
   const imageDescription = ref(initial.image_description ?? "");
   const imageUrls = ref([...(initial.image_urls ?? [])]);
 
-  function init(src = {}) {
+  function init(src: PromotionData = {}): void {
     name.value = src.name ?? "";
     description.value = src.description ?? "";
     width.value = src.width ?? 0;
@@ -23,9 +63,9 @@ export function makePromotion(initial = {}) {
     imageUrls.value = [...(src.image_urls ?? [])];
   }
 
-  function toJSON(id) {
+  function toJSON(id: number | null): PromotionJSON {
     return {
-      id: id ?? null,
+      id,
       name: name.value,
       description: description.value,
       width: width.value,

@@ -2,7 +2,7 @@
 import { ref } from "vue";
 
 import { get, post, listPromotions, postPromotion } from "@/api/client-v2.js";
-import { makePromotion } from "@/api/promotion.js";
+import { makePromotion } from "@/api/promotion.ts";
 import { makeState, watchAPI } from "@/api/service-util.js";
 import { useFileList } from "@/api/file-list.js";
 
