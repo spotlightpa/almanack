@@ -1,5 +1,5 @@
 <script setup>
-import { ref } from "vue";
+import { ref, watch } from "vue";
 
 import { post, postPromotion, deletePromotion } from "@/api/client-v2.js";
 import { makePromotion } from "@/api/promotion.ts";
@@ -21,14 +21,13 @@ const isOpen = ref(false);
 
 const promo = makePromotion();
 
+watch(() => props.modelValue, (val) => promo.init(val), { immediate: true });
+
 function initValues() {
   promo.init(props.modelValue);
 }
 
 function toggle() {
-  if (!isOpen.value) {
-    initValues();
-  }
   isOpen.value = !isOpen.value;
 }
 
