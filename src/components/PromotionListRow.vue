@@ -2,6 +2,7 @@
 import { ref } from "vue";
 
 import { post, postPromotion, deletePromotion } from "@/api/client-v2.js";
+import { makePromotion } from "@/api/promotion.js";
 import { makeState } from "@/api/service-util.js";
 import { useFileList } from "@/api/file-list.js";
 
@@ -18,26 +19,10 @@ const fileList = useFileList();
 
 const isOpen = ref(false);
 
-const name = ref("");
-const description = ref("");
-const link = ref("");
-const width = ref(0);
-const height = ref(0);
-const imageUrls = ref([]);
-const imageDescription = ref("");
-const bannerLabel = ref("");
-const bannerLabelLink = ref("");
+const promo = makePromotion();
 
 function initValues() {
-  name.value = props.modelValue.name;
-  description.value = props.modelValue.description;
-  link.value = props.modelValue.link ?? "";
-  width.value = props.modelValue.width;
-  height.value = props.modelValue.height;
-  imageUrls.value = [...(props.modelValue.image_urls ?? [])];
-  imageDescription.value = props.modelValue.image_description ?? "";
-  bannerLabel.value = props.modelValue.banner_label ?? "";
-  bannerLabelLink.value = props.modelValue.banner_label_link ?? "";
+  promo.init(props.modelValue);
 }
 
 function toggle() {
@@ -62,20 +47,7 @@ async function remove() {
 }
 
 async function save() {
-  await exec(() =>
-    post(postPromotion, {
-      id: props.modelValue.id,
-      name: name.value,
-      description: description.value,
-      link: link.value,
-      width: width.value,
-      height: height.value,
-      image_urls: imageUrls.value,
-      image_description: imageDescription.value,
-      banner_label: bannerLabel.value,
-      banner_label_link: bannerLabelLink.value,
-    })
-  );
+  await exec(() => post(postPromotion, promo.toJSON(props.modelValue.id)));
   if (!apiStateRefs.error.value) {
     emit("update:modelValue", apiStateRefs.rawData.value);
     isOpen.value = false;
@@ -129,12 +101,12 @@ async function save() {
 
     <div v-if="isOpen" class="mt-3">
       <BulmaFieldInput
-        v-model="name"
+        v-model="promo.name"
         label="Name"
         placeholder="e.g. Rail sticky promo"
       />
       <BulmaTextarea
-        v-model="description"
+        v-model="promo.description"
         label="Description"
         placeholder="Short description"
         :rows="2"
@@ -143,37 +115,37 @@ async function save() {
         <BulmaFieldInput
           label="Width"
           inputmode="numeric"
-          :model-value="width || ''"
-          @update:model-value="width = +$event || 0"
+          :model-value="promo.width || ''"
+          @update:model-value="promo.width = +$event || 0"
         />
         <BulmaFieldInput
           label="Height"
           inputmode="numeric"
-          :model-value="height || ''"
-          @update:model-value="height = +$event || 0"
+          :model-value="promo.height || ''"
+          @update:model-value="promo.height = +$event || 0"
         />
       </div>
       <BulmaFieldInput
-        v-model="link"
+        v-model="promo.link"
         label="Link URL"
         type="url"
         placeholder="https://www.spotlightpa.org/donate/"
       />
       <BulmaFieldInput
-        v-model="bannerLabel"
+        v-model="promo.bannerLabel"
         label="Banner label"
         placeholder="Sponsored by Acme"
         help="Text accompanying a banner specifying the sponsor or presenter"
       />
       <BulmaFieldInput
-        v-model="bannerLabelLink"
+        v-model="promo.bannerLabelLink"
         label="Banner label link"
         type="url"
         placeholder="https://www.spotlightpa.org/support/"
         help="Link that clicking the ad label will go to"
       />
       <BulmaTextarea
-        v-model="imageDescription"
+        v-model="promo.imageDescription"
         label="Image description (alt text)"
         help="For blind readers and search engines"
       />
@@ -182,10 +154,10 @@ async function save() {
         help="If multiple images are provided for the same promotion, each page load will select one randomly"
       >
         <SiteParamsFiles
-          :files="imageUrls"
+          :files="promo.imageUrls"
           :file-props="fileList"
-          @add="imageUrls.push($event)"
-          @remove="imageUrls.splice($event, 1)"
+          @add="promo.imageUrls.push($event)"
+          @remove="promo.imageUrls.splice($event, 1)"
         />
       </BulmaField>
       <ErrorSimple :error="error" />
