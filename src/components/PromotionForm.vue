@@ -23,12 +23,10 @@ const {
   <BulmaFieldInput
     v-model="name"
     label="Name"
-    placeholder="e.g. Rail sticky promo"
   />
   <BulmaTextarea
     v-model="description"
     label="Description"
-    placeholder="Short description"
     :rows="2"
   />
   <div class="is-flex mb-3" style="gap: 1rem">
