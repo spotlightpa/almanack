@@ -57,7 +57,7 @@ async function saveNew() {
         { name: 'Promotions', to: { name: 'promotions' } },
       ]"
     />
-    <h1 class="title">Promotions</h1>
+    <h1 class="title">Saved Promotion Sets</h1>
 
     <div class="mb-4">
       <button
