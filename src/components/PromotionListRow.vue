@@ -26,6 +26,9 @@ function initValues() {
 }
 
 function toggle() {
+  if (!isOpen.value) {
+    initValues();
+  }
   isOpen.value = !isOpen.value;
 }
 
