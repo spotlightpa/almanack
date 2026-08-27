@@ -23,6 +23,7 @@ const nextPage = computedProp("next_page", (page) => ({
   name: "promotions",
   query: { page },
 }));
+const hasMore = computedProp("next_page", (v) => !!v);
 
 // new promotion form
 const isAdding = ref(false);
@@ -112,7 +113,7 @@ async function saveNew() {
         <p v-if="!promotions.length" class="has-text-grey">
           No promotion sets yet.
         </p>
-        <div v-if="nextPage" class="buttons">
+        <div v-if="hasMore" class="buttons">
           <router-link
             :to="nextPage"
             class="button is-light has-text-weight-semibold"
