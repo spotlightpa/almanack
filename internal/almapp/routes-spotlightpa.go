@@ -308,7 +308,7 @@ func (app *appEnv) listImages(w http.ResponseWriter, r *http.Request) {
 
 	app.replyJSON(http.StatusOK, w, struct {
 		Images           []db.Image `json:"images"`
-		NextPage         int32      `json:"next_page,string,omitempty"`
+		NextPage         int32      `json:"next_page,string,omitzero"`
 		WaitingForUpload bool       `json:"waiting_for_upload"`
 	}{
 		Images:           images,
@@ -371,7 +371,7 @@ func (app *appEnv) listFiles(w http.ResponseWriter, r *http.Request) {
 
 	app.replyJSON(http.StatusOK, w, struct {
 		Files    []db.File `json:"files"`
-		NextPage int32     `json:"next_page,string,omitempty"`
+		NextPage int32     `json:"next_page,string,omitzero"`
 	}{
 		Files:    files,
 		NextPage: pager.NextPage,
@@ -463,7 +463,7 @@ func (app *appEnv) listPages(w http.ResponseWriter, r *http.Request) {
 	if q.Get("select") == "frontmatter" {
 		var resp struct {
 			Pages    []db.Page `json:"pages"`
-			NextPage int32     `json:"next_page,string,omitempty"`
+			NextPage int32     `json:"next_page,string,omitzero"`
 		}
 		resp.Pages, err = paginate.List(pager, r.Context(),
 			app.svc.Queries.ListPagesWithFrontmatter,
@@ -483,7 +483,7 @@ func (app *appEnv) listPages(w http.ResponseWriter, r *http.Request) {
 
 	var resp struct {
 		Pages    []db.ListPagesRow `json:"pages"`
-		NextPage int32             `json:"next_page,string,omitempty"`
+		NextPage int32             `json:"next_page,string,omitzero"`
 	}
 	resp.Pages, err = paginate.List(pager, r.Context(),
 		app.svc.Queries.ListPages,
