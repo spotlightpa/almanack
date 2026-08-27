@@ -44,7 +44,7 @@ func (app *appEnv) listSharedArticles(w http.ResponseWriter, r *http.Request) ht
 
 		return app.jsonOK(struct {
 			Stories  []db.SharedArticle `json:"stories"`
-			NextPage int32              `json:"next_page,string,omitempty"`
+			NextPage int32              `json:"next_page,string,omitzero"`
 		}{
 			Stories:  stories,
 			NextPage: pager.NextPage,
@@ -65,7 +65,7 @@ func (app *appEnv) listSharedArticles(w http.ResponseWriter, r *http.Request) ht
 
 	return app.jsonOK(struct {
 		Stories  []db.SharedArticle `json:"stories"`
-		NextPage int32              `json:"next_page,string,omitempty"`
+		NextPage int32              `json:"next_page,string,omitzero"`
 	}{
 		Stories:  stories,
 		NextPage: pager.NextPage,
