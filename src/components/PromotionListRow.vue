@@ -100,66 +100,7 @@ async function save() {
     </div>
 
     <div v-if="isOpen" class="mt-3">
-      <BulmaFieldInput
-        v-model="promo.name"
-        label="Name"
-        placeholder="e.g. Rail sticky promo"
-      />
-      <BulmaTextarea
-        v-model="promo.description"
-        label="Description"
-        placeholder="Short description"
-        :rows="2"
-      />
-      <div class="is-flex mb-3" style="gap: 1rem">
-        <BulmaFieldInput
-          label="Width"
-          inputmode="numeric"
-          :model-value="promo.width || ''"
-          @update:model-value="promo.width = +$event || 0"
-        />
-        <BulmaFieldInput
-          label="Height"
-          inputmode="numeric"
-          :model-value="promo.height || ''"
-          @update:model-value="promo.height = +$event || 0"
-        />
-      </div>
-      <BulmaFieldInput
-        v-model="promo.link"
-        label="Link URL"
-        type="url"
-        placeholder="https://www.spotlightpa.org/donate/"
-      />
-      <BulmaFieldInput
-        v-model="promo.bannerLabel"
-        label="Banner label"
-        placeholder="Sponsored by Acme"
-        help="Text accompanying a banner specifying the sponsor or presenter"
-      />
-      <BulmaFieldInput
-        v-model="promo.bannerLabelLink"
-        label="Banner label link"
-        type="url"
-        placeholder="https://www.spotlightpa.org/support/"
-        help="Link that clicking the ad label will go to"
-      />
-      <BulmaTextarea
-        v-model="promo.imageDescription"
-        label="Image description (alt text)"
-        help="For blind readers and search engines"
-      />
-      <BulmaField
-        label="Images"
-        help="If multiple images are provided for the same promotion, each page load will select one randomly"
-      >
-        <SiteParamsFiles
-          :files="promo.imageUrls"
-          :file-props="fileList"
-          @add="promo.imageUrls.push($event)"
-          @remove="promo.imageUrls.splice($event, 1)"
-        />
-      </BulmaField>
+      <PromotionForm :promo="promo" :file-list="fileList" />
       <ErrorSimple :error="error" />
       <div class="buttons">
         <button

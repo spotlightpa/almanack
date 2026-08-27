@@ -72,62 +72,7 @@ async function saveNew() {
       </button>
       <div v-else class="box">
         <h2 class="title is-5">New promotion set</h2>
-        <BulmaFieldInput v-model="newPromo.name" label="Name" />
-        <BulmaTextarea
-          v-model="newPromo.description"
-          label="Description"
-          placeholder="Short description"
-          :rows="2"
-        />
-        <div class="is-flex mb-3" style="gap: 1rem">
-          <BulmaFieldInput
-            label="Width"
-            inputmode="numeric"
-            :model-value="newPromo.width || ''"
-            @update:model-value="newPromo.width = +$event || 0"
-          />
-          <BulmaFieldInput
-            label="Height"
-            inputmode="numeric"
-            :model-value="newPromo.height || ''"
-            @update:model-value="newPromo.height = +$event || 0"
-          />
-        </div>
-        <BulmaFieldInput
-          v-model="newPromo.link"
-          label="Link URL"
-          type="url"
-          placeholder="https://www.spotlightpa.org/donate/"
-        />
-        <BulmaFieldInput
-          v-model="newPromo.bannerLabel"
-          label="Banner label"
-          placeholder="Sponsored by Acme"
-          help="Text accompanying a banner specifying the sponsor or presenter"
-        />
-        <BulmaFieldInput
-          v-model="newPromo.bannerLabelLink"
-          label="Banner label link"
-          type="url"
-          placeholder="https://www.spotlightpa.org/support/"
-          help="Link that clicking the ad label will go to"
-        />
-        <BulmaTextarea
-          v-model="newPromo.imageDescription"
-          label="Image description (alt text)"
-          help="For blind readers and search engines"
-        />
-        <BulmaField
-          label="Images"
-          help="If multiple images are provided for the same promotion, each page load will select one randomly"
-        >
-          <SiteParamsFiles
-            :files="newPromo.imageUrls"
-            :file-props="fileList"
-            @add="newPromo.imageUrls.push($event)"
-            @remove="newPromo.imageUrls.splice($event, 1)"
-          />
-        </BulmaField>
+        <PromotionForm :promo="newPromo" :file-list="fileList" />
         <ErrorSimple :error="saveState.error" />
         <div class="buttons">
           <button
