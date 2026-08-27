@@ -15,7 +15,7 @@ defineEmits(["select"]);
 const searchText = ref("");
 const debouncedSearch = useDebouncedRef(
   computed(() => searchText.value.trim()),
-  400
+  400 /* ms */
 );
 
 const { apiState, computedList, computedProp } = watchAPI(

@@ -1,6 +1,6 @@
 import { ref, type Ref } from "vue";
 
-export interface PromotionData {
+export interface PromotionJSON {
   id?: number | null;
   name?: string;
   description?: string;
@@ -23,11 +23,11 @@ export interface Promotion {
   bannerLabelLink: Ref<string>;
   imageDescription: Ref<string>;
   imageUrls: Ref<string[]>;
-  init(src?: PromotionData): void;
-  toJSON(id: number | null): Required<PromotionData>;
+  init(src?: PromotionJSON): void;
+  toJSON(id: number | null): Required<PromotionJSON>;
 }
 
-export function makePromotion(initial: PromotionData = {}): Promotion {
+export function makePromotion(initial: PromotionJSON = {}): Promotion {
   const name = ref(initial.name ?? "");
   const description = ref(initial.description ?? "");
   const width = ref(initial.width ?? 0);
@@ -38,7 +38,7 @@ export function makePromotion(initial: PromotionData = {}): Promotion {
   const imageDescription = ref(initial.image_description ?? "");
   const imageUrls = ref([...(initial.image_urls ?? [])]);
 
-  function init(src: PromotionData = {}): void {
+  function init(src: PromotionJSON = {}): void {
     name.value = src.name ?? "";
     description.value = src.description ?? "";
     width.value = src.width ?? 0;
@@ -50,7 +50,7 @@ export function makePromotion(initial: PromotionData = {}): Promotion {
     imageUrls.value = [...(src.image_urls ?? [])];
   }
 
-  function toJSON(id: number | null): Required<PromotionData> {
+  function toJSON(id: number | null): Required<PromotionJSON> {
     return {
       id,
       name: name.value,

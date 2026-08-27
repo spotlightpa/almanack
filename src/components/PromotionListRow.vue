@@ -21,7 +21,11 @@ const isOpen = ref(false);
 
 const promo = makePromotion();
 
-watch(() => props.modelValue, (val) => promo.init(val), { immediate: true });
+watch(
+  () => props.modelValue,
+  (val) => promo.init(val),
+  { immediate: true }
+);
 
 function initValues() {
   promo.init(props.modelValue);
