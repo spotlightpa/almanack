@@ -118,7 +118,7 @@ async function saveNew() {
             :to="nextPage"
             class="button is-light has-text-weight-semibold"
           >
-            Show More…
+            Show More Promotions…
           </router-link>
         </div>
       </div>
