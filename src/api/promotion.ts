@@ -13,19 +13,6 @@ export interface PromotionData {
   image_urls?: string[];
 }
 
-export interface PromotionJSON {
-  id: number | null;
-  name: string;
-  description: string;
-  width: number;
-  height: number;
-  link: string;
-  banner_label: string;
-  banner_label_link: string;
-  image_description: string;
-  image_urls: string[];
-}
-
 export interface Promotion {
   name: Ref<string>;
   description: Ref<string>;
@@ -37,7 +24,7 @@ export interface Promotion {
   imageDescription: Ref<string>;
   imageUrls: Ref<string[]>;
   init(src?: PromotionData): void;
-  toJSON(id: number | null): PromotionJSON;
+  toJSON(id: number | null): Required<PromotionData>;
 }
 
 export function makePromotion(initial: PromotionData = {}): Promotion {
@@ -63,7 +50,7 @@ export function makePromotion(initial: PromotionData = {}): Promotion {
     imageUrls.value = [...(src.image_urls ?? [])];
   }
 
-  function toJSON(id: number | null): PromotionJSON {
+  function toJSON(id: number | null): Required<PromotionData> {
     return {
       id,
       name: name.value,
