@@ -1,7 +1,7 @@
 <script setup>
 import { ref, computed } from "vue";
 
-import { post, postPageLoad } from "@/api/client-v2.js";
+import { post, postPageLoad } from "@/api/client.ts";
 import { makeState } from "@/api/service-util.js";
 
 const { exec, apiStateRefs } = makeState();

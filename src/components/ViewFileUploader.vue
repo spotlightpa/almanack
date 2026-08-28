@@ -7,7 +7,7 @@ import {
   listFiles,
   updateFile,
   uploadFile,
-} from "@/api/client-v2.js";
+} from "@/api/client.ts";
 import { makeState } from "@/api/service-util.js";
 
 import { formatDate } from "@/utils/time-format.ts";

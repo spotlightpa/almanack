@@ -2,7 +2,7 @@
 import { ref } from "vue";
 import { useDebouncedRef, seconds } from "@/utils/wait.ts";
 
-import { get, post, listImages, postImageUpdate } from "@/api/client-v2.js";
+import { get, post, listImages, postImageUpdate } from "@/api/client.ts";
 import { makeState, watchAPI } from "@/api/service-util.js";
 import imgproxyURL from "@/api/imgproxy-url.js";
 

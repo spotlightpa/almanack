@@ -1,4 +1,4 @@
-import { getGDocsDoc, postGDocsDoc, get, post } from "./client-v2";
+import { getGDocsDoc, postGDocsDoc, get, post } from "./client.ts";
 import { wait } from "@/utils/wait.ts";
 
 export async function processGDocsDoc(externalGDocsID) {

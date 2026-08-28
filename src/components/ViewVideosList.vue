@@ -2,7 +2,7 @@
 import { watch, ref } from "vue";
 
 import { watchAPI } from "@/api/service-util.js";
-import { get, listPages } from "@/api/client-v2.js";
+import { get, listPages } from "@/api/client.ts";
 
 const props = defineProps({
   page: { default: "" },

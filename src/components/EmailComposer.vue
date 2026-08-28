@@ -1,7 +1,7 @@
 <script>
 import { computed, reactive, toRefs } from "vue";
 import { wait, seconds } from "@/utils/wait.ts";
-import { post, sendMessage } from "@/api/client-v2.js";
+import { post, sendMessage } from "@/api/client.ts";
 
 export default {
   name: "EmailComposer",

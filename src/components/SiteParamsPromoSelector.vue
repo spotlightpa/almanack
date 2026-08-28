@@ -1,7 +1,7 @@
 <script setup>
 import { ref, computed } from "vue";
 
-import { get, listPromotions } from "@/api/client-v2.js";
+import { get, listPromotions } from "@/api/client.ts";
 import { makePromotion } from "@/api/promotion.ts";
 import { watchAPI } from "@/api/service-util.js";
 import { useDebouncedRef } from "@/utils/wait.ts";

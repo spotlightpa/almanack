@@ -1,7 +1,7 @@
 <script>
 import draggable from "vuedraggable";
 
-import { get, listPagesByFTS } from "@/api/client-v2.js";
+import { get, listPagesByFTS } from "@/api/client.ts";
 import { debounce } from "@/utils/wait.ts";
 
 import { Page } from "@/api/spotlightpa-page.js";

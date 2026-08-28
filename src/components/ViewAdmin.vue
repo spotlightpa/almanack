@@ -7,7 +7,7 @@ import {
   post,
   listSharedArticles,
   postSharedArticleFromGDocs,
-} from "@/api/client-v2.js";
+} from "@/api/client.ts";
 import { processGDocsDoc } from "@/api/gdocs.js";
 import { makeState, watchAPI } from "@/api/service-util.js";
 import SharedArticle from "@/api/shared-article.js";

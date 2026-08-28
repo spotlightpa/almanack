@@ -10,7 +10,7 @@ import {
   listImages,
   postPage,
   postPageRefresh,
-} from "@/api/client-v2.js";
+} from "@/api/client.ts";
 import { processGDocsDoc } from "@/api/gdocs.js";
 import imgproxyURL from "@/api/imgproxy-url.js";
 import { toRel } from "@/utils/link.ts";

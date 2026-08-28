@@ -1,7 +1,7 @@
 <script setup>
 import { ref, watch } from "vue";
 
-import { get, post, getSiteParams, postSiteParams } from "@/api/client-v2.js";
+import { get, post, getSiteParams, postSiteParams } from "@/api/client.ts";
 import { makeState } from "@/api/service-util.js";
 import { useFileList } from "@/api/file-list.js";
 

@@ -1,7 +1,7 @@
 <script>
 import { reactive, toRefs, computed } from "vue";
 
-import { uploadImage } from "@/api/client-v2.js";
+import { uploadImage } from "@/api/client.ts";
 import imgproxyURL from "@/api/imgproxy-url.js";
 
 let acceptedTypes = [
