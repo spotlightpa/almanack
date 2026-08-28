@@ -42,14 +42,14 @@ type FetchOptions = NonNullable<Parameters<typeof fetch>[1]>;
 type SearchParamsInit = ConstructorParameters<typeof URLSearchParams>[0];
 
 interface RequestOptions {
-  params?: SearchParamsInit | null;
+  params?: SearchParamsInit;
   headers?: FetchOptions["headers"];
   options?: FetchOptions;
 }
 
 async function request<T = unknown>(
   url: string,
-  { params = null, headers = {}, options = {} }: RequestOptions = {}
+  { params = undefined, headers = {}, options = {} }: RequestOptions = {}
 ): Promise<T> {
   if (!$auth) {
     $auth = useAuth();
