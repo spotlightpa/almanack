@@ -12,7 +12,11 @@ interface DevUser {
 
 function loadDevUser(): DevUser | null {
   try {
-    return (JSON.parse(localStorage.getItem(DEV_AUTH_KEY) ?? "null") as DevUser | null) ?? null;
+    return (
+      (JSON.parse(
+        localStorage.getItem(DEV_AUTH_KEY) ?? "null"
+      ) as DevUser | null) ?? null
+    );
   } catch {
     return null;
   }
