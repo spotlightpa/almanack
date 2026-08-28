@@ -1,5 +1,5 @@
 import { ref, type Ref } from "vue";
-import maybeDate from "@/utils/maybe-date.js";
+import maybeDate from "@/utils/maybe-date.ts";
 
 export interface PromotionJSON {
   id?: number | null;

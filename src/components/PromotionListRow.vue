@@ -3,7 +3,7 @@ import { ref, watch } from "vue";
 
 import { post, postPromotion, deletePromotion } from "@/api/client-v2.js";
 import { makePromotion } from "@/api/promotion.ts";
-import { formatDateTime } from "@/utils/time-format.js";
+import { formatDateTime } from "@/utils/time-format.ts";
 import { makeState } from "@/api/service-util.js";
 import { useFileList } from "@/api/file-list.js";
 

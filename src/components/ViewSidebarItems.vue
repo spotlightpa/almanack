@@ -5,7 +5,7 @@ import { get, post, getSidebar, saveSidebar } from "@/api/client-v2.js";
 import { makeState } from "@/api/service-util.js";
 import { formatDateTime, today, tomorrow } from "@/utils/time-format.ts";
 import useScrollTo from "@/utils/use-scroll-to.js";
-import maybeDate from "@/utils/maybe-date.js";
+import maybeDate from "@/utils/maybe-date.ts";
 
 let itemIds = 0;
 
