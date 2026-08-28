@@ -24,8 +24,7 @@ const responseError = async (rsp: Response): Promise<AppError | undefined> => {
   }
   let details: ErrorDetails = {};
   try {
-    details =
-      ((await rsp.json()) as { details?: ErrorDetails })?.details ?? {};
+    details = ((await rsp.json()) as { details?: ErrorDetails })?.details ?? {};
     // eslint-disable-next-line no-empty
   } catch (e) {}
 
