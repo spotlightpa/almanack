@@ -1,7 +1,4 @@
-export default function maybeDate(
-  obj: unknown,
-  pathStr = ""
-): Date | null {
+export default function maybeDate(obj: unknown, pathStr = ""): Date | null {
   let d: unknown = obj;
   for (const prop of pathStr.split(".")) {
     if (!d || typeof d !== "object") {

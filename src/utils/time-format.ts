@@ -23,9 +23,10 @@ const tzNameLookup = new Intl.DateTimeFormat("en-US", {
 });
 
 function getTimeZoneName(d: Date): string {
-  const { value = "" } = tzNameLookup
-    .formatToParts(d)
-    .find((part) => part.type === "timeZoneName") ?? {};
+  const { value = "" } =
+    tzNameLookup
+      .formatToParts(d)
+      .find((part) => part.type === "timeZoneName") ?? {};
   return value;
 }
 
@@ -49,7 +50,14 @@ export function formatDateTime(d: DateInput): string {
   const date = toDate(d);
   const tz = getTimeZoneName(date);
   const tzSuffix = tz ? " " + tz : "";
-  return aptime(date) + " " + toShortWeekday.format(date) + "., " + apdate(date) + tzSuffix;
+  return (
+    aptime(date) +
+    " " +
+    toShortWeekday.format(date) +
+    "., " +
+    apdate(date) +
+    tzSuffix
+  );
 }
 
 export function today(): Date {
