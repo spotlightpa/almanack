@@ -10,22 +10,22 @@ const tryTo = <T>(promise: Promise<T>): Promise<Result<T>> =>
     .then((data): [T, null] => [data, null])
     .catch((error: Error): [null, Error] => [null, error]);
 
-interface ResponseErrorDetails {
-  [key: string]: unknown;
-}
+/** Mirrors url.Values from Go: map of field name → list of messages.
+ *  The "" key holds the top-level user message. */
+type ErrorDetails = Record<string, string[]>;
 
 interface AppError extends Error {
-  details: ResponseErrorDetails;
+  details: ErrorDetails;
 }
 
 const responseError = async (rsp: Response): Promise<AppError | undefined> => {
   if (rsp.ok) {
     return;
   }
-  let details: ResponseErrorDetails = {};
+  let details: ErrorDetails = {};
   try {
     details =
-      ((await rsp.json()) as { details?: ResponseErrorDetails })?.details ?? {};
+      ((await rsp.json()) as { details?: ErrorDetails })?.details ?? {};
     // eslint-disable-next-line no-empty
   } catch (e) {}
 
