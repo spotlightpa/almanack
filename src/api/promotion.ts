@@ -33,16 +33,16 @@ export interface Promotion {
 
 export function makePromotion(initial: PromotionJSON = {}): Promotion {
   const id = initial.id ?? null;
-  const updatedAt = ref(maybeDate(initial, "updated_at"));
-  const name = ref(initial.name ?? "");
-  const description = ref(initial.description ?? "");
-  const width = ref(initial.width ?? 0);
-  const height = ref(initial.height ?? 0);
-  const link = ref(initial.link ?? "");
-  const bannerLabel = ref(initial.banner_label ?? "");
-  const bannerLabelLink = ref(initial.banner_label_link ?? "");
-  const imageDescription = ref(initial.image_description ?? "");
-  const imageUrls = ref([...(initial.image_urls ?? [])]);
+  const updatedAt = ref<Date | null>(null);
+  const name = ref("");
+  const description = ref("");
+  const width = ref(0);
+  const height = ref(0);
+  const link = ref("");
+  const bannerLabel = ref("");
+  const bannerLabelLink = ref("");
+  const imageDescription = ref("");
+  const imageUrls = ref<string[]>([]);
 
   function init(src: PromotionJSON = {}): void {
     updatedAt.value = maybeDate(src, "updated_at");
@@ -56,6 +56,8 @@ export function makePromotion(initial: PromotionJSON = {}): Promotion {
     imageDescription.value = src.image_description ?? "";
     imageUrls.value = [...(src.image_urls ?? [])];
   }
+
+  init(initial);
 
   function toJSON(): Required<PromotionJSON> {
     return {
