@@ -14,7 +14,6 @@ export interface PromotionJSON {
 }
 
 export interface Promotion {
-  id: number | null;
   name: Ref<string>;
   description: Ref<string>;
   width: Ref<number>;
@@ -67,7 +66,6 @@ export function makePromotion(initial: PromotionJSON = {}): Promotion {
   }
 
   return {
-    id: initial.id ?? null,
     name,
     description,
     width,
