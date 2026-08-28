@@ -22,6 +22,7 @@ import (
 	"github.com/spotlightpa/almanack/internal/db"
 	"github.com/spotlightpa/almanack/internal/services/gdocs"
 	"github.com/spotlightpa/almanack/internal/services/google"
+	"github.com/spotlightpa/almanack/internal/utils/mathx"
 	"github.com/spotlightpa/almanack/internal/utils/paginate"
 	"github.com/spotlightpa/almanack/internal/utils/pgxutil"
 	"github.com/spotlightpa/almanack/internal/utils/slicex"
@@ -1059,4 +1060,121 @@ func (app *appEnv) postPageLoad(w http.ResponseWriter, r *http.Request) http.Han
 		return app.jsonErr(err)
 	}
 	return app.jsonOK(page.ID)
+}
+
+func (app *appEnv) listPromotions(w http.ResponseWriter, r *http.Request) http.Handler {
+	app.logStart(r)
+
+	var page int32
+	_ = intFromQuery(r, "page", &page)
+	if page < 0 {
+		return app.jsonErr(resperr.E{M: "Invalid page"})
+	}
+
+	text := r.URL.Query().Get("text")
+	var width, height, limit int32
+	_ = intFromQuery(r, "width", &width)
+	_ = intFromQuery(r, "height", &height)
+	_ = intFromQuery(r, "limit", &limit)
+	pager := paginate.PageNumber(page)
+	pager.PageSize = mathx.Clamp(cmp.Or(limit, 100), 1, 100)
+
+	var (
+		promos []db.Promotion
+		err    error
+	)
+	if text != "" {
+		promos, err = paginate.List(
+			pager,
+			r.Context(),
+			app.svc.Queries.ListPromotionByFTS,
+			db.ListPromotionByFTSParams{
+				Limit:  pager.Limit(),
+				Offset: pager.Offset(),
+				Width:  width,
+				Height: height,
+				Text:   text,
+			})
+	} else {
+		promos, err = paginate.List(
+			pager,
+			r.Context(),
+			app.svc.Queries.ListPromotionByUpdated,
+			db.ListPromotionByUpdatedParams{
+				Limit:  pager.Limit(),
+				Offset: pager.Offset(),
+				Width:  width,
+				Height: height,
+			})
+	}
+	if err != nil {
+		return app.jsonErr(err)
+	}
+	return app.jsonOK(struct {
+		Promotions []db.Promotion `json:"promotions"`
+		NextPage   int32          `json:"next_page,string,omitzero"`
+	}{
+		Promotions: promos,
+		NextPage:   pager.NextPage,
+	})
+}
+
+func (app *appEnv) postPromotion(w http.ResponseWriter, r *http.Request) http.Handler {
+	app.logStart(r)
+	var req db.Promotion
+	if !app.readJSON(w, r, &req) {
+		return nil
+	}
+	req.ImageUrls = pgxutil.NilSliceToEmpty(req.ImageUrls)
+	var (
+		promo db.Promotion
+		err   error
+	)
+	if req.ID == 0 {
+		promo, err = app.svc.Queries.CreatePromotion(r.Context(), db.CreatePromotionParams{
+			Name:             req.Name,
+			Description:      req.Description,
+			Link:             req.Link,
+			Width:            req.Width,
+			Height:           req.Height,
+			ImageUrls:        req.ImageUrls,
+			ImageDescription: req.ImageDescription,
+			BannerLabel:      req.BannerLabel,
+			BannerLabelLink:  req.BannerLabelLink,
+		})
+	} else {
+		promo, err = app.svc.Queries.UpdatePromotion(r.Context(), db.UpdatePromotionParams{
+			ID:               req.ID,
+			Name:             req.Name,
+			Description:      req.Description,
+			Link:             req.Link,
+			Width:            req.Width,
+			Height:           req.Height,
+			ImageUrls:        req.ImageUrls,
+			ImageDescription: req.ImageDescription,
+			BannerLabel:      req.BannerLabel,
+			BannerLabelLink:  req.BannerLabelLink,
+		})
+		err = pgxutil.NoRowsAs404(err, "promotion %d not found", req.ID)
+	}
+	if err != nil {
+		return app.jsonErr(err)
+	}
+	return app.jsonOK(promo)
+}
+
+func (app *appEnv) deletePromotion(w http.ResponseWriter, r *http.Request) http.Handler {
+	app.logStart(r)
+	var req struct {
+		ID int64 `json:"id"`
+	}
+	if !app.readJSON(w, r, &req) {
+		return nil
+	}
+	if rows, err := app.svc.Queries.DeletePromotion(r.Context(), req.ID); err != nil {
+		return app.jsonErr(err)
+	} else if rows == 0 {
+		return app.jsonErr(resperr.E{M: fmt.Sprintf("Promotion %d not found", req.ID)})
+	}
+	return app.jsonOK("OK")
 }

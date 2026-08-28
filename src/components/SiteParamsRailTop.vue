@@ -21,6 +21,8 @@ defineExpose({
       :params="params"
       :file-props="fileProps"
       :show-width-height="false"
+      :fixed-width="640"
+      :fixed-height="535"
       prop-name="ad-rail-top"
       label="Rail top ad is 640x535 square at the top of the rail sidebar"
       text="Show sidebar top ad"

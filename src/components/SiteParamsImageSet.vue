@@ -1,5 +1,8 @@
 <script setup>
+import { ref } from "vue";
 import useProps from "@/utils/use-props.js";
+
+const showPromoSelector = ref(false);
 
 const props = defineProps({
   params: Object,
@@ -9,6 +12,8 @@ const props = defineProps({
   help: String,
   fileProps: Object,
   showWidthHeight: Boolean,
+  fixedWidth: { type: Number, default: 0 },
+  fixedHeight: { type: Number, default: 0 },
 });
 let n = 0;
 
@@ -21,7 +26,7 @@ function deserialize(v) {
 }
 
 function serialize(v) {
-  return v.map((o) => ({ ...o, id: undefined }));
+  return v.map(({ id: _id, ...rest }) => rest);
 }
 
 let widthHeightProps = props.showWidthHeight
@@ -51,8 +56,24 @@ function pushImage() {
   });
 }
 
-function removeImage(n) {
-  imageSet.value.splice(n, 1);
+function removeImage(idx) {
+  imageSet.value.splice(idx, 1);
+}
+
+function applyPromoSet(promo) {
+  imageSet.value.push({
+    id: n++,
+    label: promo.bannerLabel.value,
+    labelLink: promo.bannerLabelLink.value,
+    link: promo.link.value,
+    description: promo.imageDescription.value,
+    sources: [...promo.imageUrls.value],
+  });
+  if (props.showWidthHeight) {
+    if (promo.width.value) width.value = promo.width.value;
+    if (promo.height.value) height.value = promo.height.value;
+  }
+  showPromoSelector.value = false;
 }
 
 defineExpose({
@@ -142,14 +163,30 @@ defineExpose({
         </div>
       </li>
     </ul>
-    <div class="my-5 buttons">
-      <button
-        type="button"
-        class="button is-success has-text-weight-semibold"
-        @click="pushImage"
-      >
-        Add promotion to set
-      </button>
+    <div class="my-4">
+      <SiteParamsPromoSelector
+        v-if="showPromoSelector"
+        class="mb-3"
+        :filter-width="showWidthHeight ? width : fixedWidth"
+        :filter-height="showWidthHeight ? height : fixedHeight"
+        @select="applyPromoSet"
+      />
+      <div class="buttons">
+        <button
+          type="button"
+          class="button is-success has-text-weight-semibold"
+          @click="pushImage"
+        >
+          Add promotion to set
+        </button>
+        <button
+          type="button"
+          class="button is-link has-text-weight-semibold"
+          @click="showPromoSelector = !showPromoSelector"
+        >
+          {{ showPromoSelector ? "Cancel" : "Add from saved promotion set…" }}
+        </button>
+      </div>
     </div>
   </div>
 </template>
