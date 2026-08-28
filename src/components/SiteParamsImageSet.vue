@@ -61,19 +61,17 @@ function removeImage(n) {
 }
 
 function applyPromoSet(promo) {
-  (promo.image_urls ?? []).forEach((url) => {
-    imageSet.value.push({
-      id: n++,
-      label: promo.banner_label || "",
-      labelLink: promo.banner_label_link || "",
-      link: promo.link || "",
-      description: promo.image_description || "",
-      sources: [url],
-    });
+  imageSet.value.push({
+    id: n++,
+    label: promo.bannerLabel.value,
+    labelLink: promo.bannerLabelLink.value,
+    link: promo.link.value,
+    description: promo.imageDescription.value,
+    sources: [...promo.imageUrls.value],
   });
   if (props.showWidthHeight) {
-    if (promo.width) width.value = promo.width;
-    if (promo.height) height.value = promo.height;
+    if (promo.width.value) width.value = promo.width.value;
+    if (promo.height.value) height.value = promo.height.value;
   }
   showPromoSelector.value = false;
 }

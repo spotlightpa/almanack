@@ -2,6 +2,7 @@
 import { ref, computed } from "vue";
 
 import { get, listPromotions } from "@/api/client-v2.js";
+import { makePromotion } from "@/api/promotion.ts";
 import { watchAPI } from "@/api/service-util.js";
 import { useDebouncedRef } from "@/utils/wait.ts";
 
@@ -10,7 +11,7 @@ const props = defineProps({
   filterHeight: { type: Number, default: 0 },
 });
 
-defineEmits(["select"]);
+const emit = defineEmits(["select"]);
 
 const searchText = ref("");
 const debouncedSearch = useDebouncedRef(
@@ -28,7 +29,7 @@ const { apiState, computedList, computedProp } = watchAPI(
     get(listPromotions, { text, width, height, limit: 20 })
 );
 
-const promotions = computedList("promotions", (p) => p);
+const promotions = computedList("promotions", (p) => makePromotion(p));
 const hasMore = computedProp("next_page", (v) => !!v);
 </script>
 
@@ -71,20 +72,20 @@ const hasMore = computedProp("next_page", (v) => !!v);
       style="border-bottom: 1px solid #dbdbdb"
     >
       <div>
-        <p class="has-text-weight-semibold is-size-7">{{ promo.name }}</p>
-        <p v-if="promo.description" class="has-text-grey is-size-7">
-          {{ promo.description }}
+        <p class="has-text-weight-semibold is-size-7">{{ promo.name.value }}</p>
+        <p v-if="promo.description.value" class="has-text-grey is-size-7">
+          {{ promo.description.value }}
         </p>
         <p class="has-text-grey is-size-7">
-          {{ promo.image_urls?.length ?? 0 }} image{{
-            promo.image_urls?.length !== 1 ? "s" : ""
+          {{ promo.imageUrls.value.length }} image{{
+            promo.imageUrls.value.length !== 1 ? "s" : ""
           }}
         </p>
       </div>
       <button
         type="button"
         class="button is-small is-link has-text-weight-semibold"
-        @click="$emit('select', promo)"
+        @click="emit('select', promo)"
       >
         Use
       </button>
