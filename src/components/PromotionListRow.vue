@@ -46,14 +46,14 @@ async function remove() {
   if (!confirm(`Delete "${props.modelValue.name || "this promotion"}"?`)) {
     return;
   }
-  await deleteExec(() => post(deletePromotion, { id: props.modelValue.id }));
+  await deleteExec(() => post(deletePromotion, { id: promo.id }));
   if (!deleteStateRefs.error.value) {
     emit("delete");
   }
 }
 
 async function save() {
-  await exec(() => post(postPromotion, promo.toJSON(props.modelValue.id)));
+  await exec(() => post(postPromotion, promo.toJSON(promo.id)));
   if (!apiStateRefs.error.value) {
     emit("update:modelValue", apiStateRefs.rawData.value);
     isOpen.value = false;
