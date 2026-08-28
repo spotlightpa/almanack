@@ -1,17 +1,23 @@
-<script setup>
+<script setup lang="ts">
 import { ref, computed } from "vue";
 
 import { get, listPromotions } from "@/api/client-v2.js";
-import { makePromotion } from "@/api/promotion.ts";
+import {
+  makePromotion,
+  type Promotion,
+  type PromotionJSON,
+} from "@/api/promotion.ts";
 import { watchAPI } from "@/api/service-util.js";
 import { useDebouncedRef } from "@/utils/wait.ts";
 
-const props = defineProps({
-  filterWidth: { type: Number, default: 0 },
-  filterHeight: { type: Number, default: 0 },
-});
+const props = defineProps<{
+  filterWidth?: number;
+  filterHeight?: number;
+}>();
 
-const emit = defineEmits(["select"]);
+const emit = defineEmits<{
+  select: [promo: Promotion];
+}>();
 
 const searchText = ref("");
 const debouncedSearch = useDebouncedRef(
@@ -22,15 +28,17 @@ const debouncedSearch = useDebouncedRef(
 const { apiState, computedList, computedProp } = watchAPI(
   () => ({
     text: debouncedSearch.value,
-    width: props.filterWidth,
-    height: props.filterHeight,
+    width: props.filterWidth ?? 0,
+    height: props.filterHeight ?? 0,
   }),
-  ({ text, width, height }) =>
+  ({ text, width, height }: { text: string; width: number; height: number }) =>
     get(listPromotions, { text, width, height, limit: 20 })
 );
 
-const promotions = computedList("promotions", (p) => makePromotion(p));
-const hasMore = computedProp("next_page", (v) => !!v);
+const promotions = computedList("promotions", (p: unknown) =>
+  makePromotion(p as PromotionJSON)
+);
+const hasMore = computedProp("next_page", (v: unknown) => !!v);
 </script>
 
 <template>
@@ -60,14 +68,14 @@ const hasMore = computedProp("next_page", (v) => !!v);
         debouncedSearch
           ? "No matching promotion sets found."
           : filterWidth || filterHeight
-            ? `No promotion sets with size ${filterWidth}\xd7${filterHeight}.`
+            ? `No promotion sets with size ${filterWidth ?? 0}\xd7${filterHeight ?? 0}.`
             : "No promotion sets yet."
       }}
     </p>
 
     <div
       v-for="promo in promotions"
-      :key="promo.id"
+      :key="promo.id ?? promo.name.value"
       class="is-flex is-align-items-center is-justify-content-space-between py-2"
       style="border-bottom: 1px solid #dbdbdb"
     >

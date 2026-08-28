@@ -1,51 +1,71 @@
-<script setup>
-import { ref } from "vue";
+<script setup lang="ts">
+import { ref, type Ref } from "vue";
 import useProps from "@/utils/use-props.js";
+import { type Promotion } from "@/api/promotion.ts";
 
 const showPromoSelector = ref(false);
 
-const props = defineProps({
-  params: Object,
-  propName: String,
-  label: String,
-  text: String,
-  help: String,
-  fileProps: Object,
-  showWidthHeight: Boolean,
-  fixedWidth: { type: Number, default: 0 },
-  fixedHeight: { type: Number, default: 0 },
-});
+interface ImageSetEntry {
+  id: number;
+  label: string;
+  labelLink: string;
+  link: string;
+  description: string;
+  sources: string[];
+}
+
+const props = defineProps<{
+  params: { data: Record<string, unknown> };
+  propName: string;
+  label?: string;
+  text?: string;
+  help?: string;
+  fileProps?: object;
+  showWidthHeight?: boolean;
+  fixedWidth?: number;
+  fixedHeight?: number;
+}>();
+
 let n = 0;
 
-function deserialize(v) {
-  let a = v || [];
-  return a.map((o) => ({
-    ...o,
-    id: n++,
-  }));
+function deserialize(v: unknown): ImageSetEntry[] {
+  let a = (v as ImageSetEntry[]) || [];
+  return a.map((o) => ({ ...o, id: n++ }));
 }
 
-function serialize(v) {
-  return v.map((o) => ({ ...o, id: undefined }));
+function serialize(v: unknown): Omit<ImageSetEntry, "id">[] {
+  return (v as ImageSetEntry[]).map(({ id: _id, ...rest }) => rest);
 }
 
-let widthHeightProps = props.showWidthHeight
+const widthHeightProps = props.showWidthHeight
   ? {
-      width: [props.propName + "-width", (v) => v ?? 0],
-      height: [props.propName + "-height", (v) => v ?? 0],
+      width: [props.propName + "-width", (v: unknown) => (v as number) ?? 0],
+      height: [props.propName + "-height", (v: unknown) => (v as number) ?? 0],
     }
   : {};
 
-let [{ imageSet, active, width, height }, saveData] = useProps(
+const [{ imageSet, active, width, height }, saveData] = useProps(
   props.params.data,
   {
     imageSet: [props.propName, deserialize, serialize],
-    active: [props.propName + "-active", (v) => v ?? false],
+    active: [
+      props.propName + "-active",
+      (v: unknown) => (v as boolean) ?? false,
+    ],
     ...widthHeightProps,
-  }
-);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  } as any
+) as [
+  {
+    imageSet: Ref<ImageSetEntry[]>;
+    active: Ref<boolean>;
+    width: Ref<number>;
+    height: Ref<number>;
+  },
+  () => Record<string, unknown>,
+];
 
-function pushImage() {
+function pushImage(): void {
   imageSet.value.push({
     id: n++,
     label: "",
@@ -56,11 +76,11 @@ function pushImage() {
   });
 }
 
-function removeImage(n) {
-  imageSet.value.splice(n, 1);
+function removeImage(idx: number): void {
+  imageSet.value.splice(idx, 1);
 }
 
-function applyPromoSet(promo) {
+function applyPromoSet(promo: Promotion): void {
   imageSet.value.push({
     id: n++,
     label: promo.bannerLabel.value,
