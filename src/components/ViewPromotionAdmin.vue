@@ -34,11 +34,11 @@ function startNew() {
   isAdding.value = true;
 }
 
-const { apiState: saveState, exec: saveExec } = makeState();
+const { apiStateRefs: saveState, exec: saveExec } = makeState();
 
 async function saveNew() {
   await saveExec(() => post(postPromotion, newPromo.toJSON(null)));
-  if (!saveState.error) {
+  if (!saveState.error.value) {
     isAdding.value = false;
     await fetch();
   }
@@ -74,11 +74,11 @@ async function saveNew() {
       <div v-else class="box">
         <h2 class="title is-5">New promotion set</h2>
         <PromotionForm :promo="newPromo" :file-list="fileList" />
-        <ErrorSimple :error="saveState.error" />
+        <ErrorSimple :error="saveState.error.value" />
         <div class="buttons">
           <button
             class="button is-success has-text-weight-semibold"
-            :class="{ 'is-loading': saveState.isLoading }"
+            :class="{ 'is-loading': saveState.isLoadingThrottled.value }"
             type="button"
             @click="saveNew"
           >
@@ -86,7 +86,7 @@ async function saveNew() {
           </button>
           <button
             class="button is-light has-text-weight-semibold"
-            :disabled="saveState.isLoading || null"
+            :disabled="saveState.isLoadingThrottled.value || null"
             type="button"
             @click="isAdding = false"
           >

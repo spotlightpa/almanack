@@ -174,7 +174,7 @@ func TestDeletePromotionEndpoint(t *testing.T) {
 		Fetch(ctx))
 	be.Nonzero(t, created.ID)
 
-	// Missing ID returns 400 Bad Request
+	// Nonexistent ID returns 400 Bad Request
 	err := rb.Clone().
 		Path("/api/promotion-delete").
 		Method(http.MethodPost).

@@ -19,14 +19,13 @@ const debouncedSearch = useDebouncedRef(
 );
 
 const { apiState, computedList, computedProp } = watchAPI(
-  () => debouncedSearch.value,
-  (text) =>
-    get(listPromotions, {
-      text,
-      width: props.filterWidth,
-      height: props.filterHeight,
-      limit: 20,
-    })
+  () => ({
+    text: debouncedSearch.value,
+    width: props.filterWidth,
+    height: props.filterHeight,
+  }),
+  ({ text, width, height }) =>
+    get(listPromotions, { text, width, height, limit: 20 })
 );
 
 const promotions = computedList("promotions", (p) => p);

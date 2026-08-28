@@ -1155,6 +1155,7 @@ func (app *appEnv) postPromotion(w http.ResponseWriter, r *http.Request) http.Ha
 			BannerLabel:      req.BannerLabel,
 			BannerLabelLink:  req.BannerLabelLink,
 		})
+		err = pgxutil.NoRowsAs404(err, "promotion %d not found", req.ID)
 	}
 	if err != nil {
 		return app.jsonErr(err)
