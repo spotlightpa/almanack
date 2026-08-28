@@ -1,18 +1,24 @@
 import { ref, computed } from "vue";
-
 import netlifyIdentity from "netlify-identity-widget";
+import type { NetlifyUser } from "netlify-identity-widget";
 
 const DEV_AUTH_KEY = "almanack_dev_auth";
 
-function loadDevUser() {
+interface DevUser {
+  email: string;
+  fullName: string;
+  roles: string[];
+}
+
+function loadDevUser(): DevUser | null {
   try {
-    return JSON.parse(localStorage.getItem(DEV_AUTH_KEY)) ?? null;
+    return (JSON.parse(localStorage.getItem(DEV_AUTH_KEY) ?? "null") as DevUser | null) ?? null;
   } catch {
     return null;
   }
 }
 
-function saveDevUser(user) {
+function saveDevUser(user: DevUser | null) {
   if (user) {
     localStorage.setItem(DEV_AUTH_KEY, JSON.stringify(user));
   } else {
@@ -21,14 +27,14 @@ function saveDevUser(user) {
 }
 
 function makeDevAuth() {
-  const user = ref(loadDevUser());
+  const user = ref<DevUser | null>(loadDevUser());
 
   const isSignedIn = computed(() => !!user.value);
   const roles = computed(() => user.value?.roles ?? []);
   const fullName = computed(() => user.value?.fullName ?? "");
   const email = computed(() => user.value?.email ?? "");
 
-  function hasRole(name) {
+  function hasRole(name: string) {
     return computed(() =>
       roles.value.some((role) => role === name || role === "admin")
     );
@@ -49,11 +55,11 @@ function makeDevAuth() {
       user.value = null;
       saveDevUser(null);
     },
-    async headers() {
+    async headers(): Promise<Record<string, string> | null> {
       if (!user.value) return null;
       return { Authorization: "Bearer dev-fake-token" };
     },
-    setDevUser({ email, fullName, roles }) {
+    setDevUser({ email, fullName, roles }: DevUser) {
       user.value = { email, fullName, roles };
       saveDevUser(user.value);
     },
@@ -61,7 +67,7 @@ function makeDevAuth() {
 }
 
 function makeAuth() {
-  const user = ref(null);
+  const user = ref<NetlifyUser | null>(null);
 
   const token = computed(() => user.value?.token?.access_token ?? null);
   const isSignedIn = computed(() => !!token.value);
@@ -69,13 +75,13 @@ function makeAuth() {
   const fullName = computed(() => user.value?.user_metadata?.full_name ?? "");
   const email = computed(() => user.value?.email ?? "");
 
-  function hasRole(name) {
+  function hasRole(name: string) {
     return computed(() =>
       roles.value.some((role) => role === name || role === "admin")
     );
   }
 
-  let methods = {
+  const methods = {
     signup() {
       netlifyIdentity.open("signup");
     },
@@ -91,11 +97,11 @@ function makeAuth() {
         netlifyIdentity.store.user = null;
       }
     },
-    async headers() {
+    async headers(): Promise<Record<string, string> | null> {
       if (!user.value) {
         return null;
       }
-      let token;
+      let token: string;
       try {
         token = await user.value.jwt();
       } catch (e) {
@@ -111,8 +117,8 @@ function makeAuth() {
   netlifyIdentity.on("init", async (u) => {
     user.value = u;
     try {
-      await u.jwt();
-    } catch (err) {
+      await u?.jwt();
+    } catch {
       await methods.logout();
     }
   });
@@ -128,7 +134,7 @@ function makeAuth() {
     user.value = null;
   });
 
-  let APIUrl = window.location.hostname.match(/localhost|\.ts\.net/)
+  const APIUrl = window.location.hostname.match(/localhost|\.ts\.net/)
     ? "https://almanack.data.spotlightpa.org/.netlify/identity"
     : null;
   netlifyIdentity.init({ logo: false, APIUrl });
@@ -146,7 +152,8 @@ function makeAuth() {
   };
 }
 
-let $auth;
+let $auth: ReturnType<typeof makeDevAuth> | ReturnType<typeof makeAuth> | null =
+  null;
 
 export function useAuth() {
   if (!$auth) {

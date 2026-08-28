@@ -1,6 +1,4 @@
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-ignore – auth.js has no types yet
-import { useAuth } from "./auth.js";
+import { useAuth } from "./auth.ts";
 
 type Result<T> = [T, null] | [null, Error];
 
@@ -35,8 +33,7 @@ const responseError = async (rsp: Response): Promise<AppError | undefined> => {
   return err;
 };
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-let $auth: any = null;
+let $auth: ReturnType<typeof useAuth> | null = null;
 
 type FetchOptions = NonNullable<Parameters<typeof fetch>[1]>;
 type SearchParamsInit = ConstructorParameters<typeof URLSearchParams>[0];
