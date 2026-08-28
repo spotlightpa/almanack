@@ -16,7 +16,7 @@ export interface PromotionJSON {
 
 export interface Promotion {
   id: number | null;
-  updatedAt: Ref<string>;
+  updatedAt: Ref<Date | null>;
   name: Ref<string>;
   description: Ref<string>;
   width: Ref<number>;
@@ -32,7 +32,9 @@ export interface Promotion {
 
 export function makePromotion(initial: PromotionJSON = {}): Promotion {
   const id = initial.id ?? null;
-  const updatedAt = ref(initial.updated_at ?? "");
+  const updatedAt = ref<Date | null>(
+    initial.updated_at ? new Date(initial.updated_at) : null
+  );
   const name = ref(initial.name ?? "");
   const description = ref(initial.description ?? "");
   const width = ref(initial.width ?? 0);
@@ -44,7 +46,7 @@ export function makePromotion(initial: PromotionJSON = {}): Promotion {
   const imageUrls = ref([...(initial.image_urls ?? [])]);
 
   function init(src: PromotionJSON = {}): void {
-    updatedAt.value = src.updated_at ?? "";
+    updatedAt.value = src.updated_at ? new Date(src.updated_at) : null;
     name.value = src.name ?? "";
     description.value = src.description ?? "";
     width.value = src.width ?? 0;
@@ -68,7 +70,7 @@ export function makePromotion(initial: PromotionJSON = {}): Promotion {
       banner_label_link: bannerLabelLink.value,
       image_description: imageDescription.value,
       image_urls: imageUrls.value,
-      updated_at: updatedAt.value,
+      updated_at: updatedAt.value?.toISOString() ?? "",
     };
   }
 
