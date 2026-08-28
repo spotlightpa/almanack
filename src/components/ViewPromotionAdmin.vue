@@ -17,7 +17,7 @@ const { apiState, fetch, computedList, computedProp } = watchAPI(
   (page) => get(listPromotions, page ? { page } : undefined)
 );
 
-const promotions = computedList("promotions", (p) => p);
+const promotions = computedList("promotions", (p) => makePromotion(p));
 
 const nextPage = computedProp("next_page", (page) => ({
   name: "promotions",
@@ -37,7 +37,7 @@ function startNew() {
 const { apiStateRefs: saveState, exec: saveExec } = makeState();
 
 async function saveNew() {
-  await saveExec(() => post(postPromotion, newPromo.toJSON(null)));
+  await saveExec(() => post(postPromotion, newPromo.toJSON()));
   if (!saveState.error.value) {
     isAdding.value = false;
     await fetch();

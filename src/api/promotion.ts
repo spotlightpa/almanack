@@ -11,10 +11,12 @@ export interface PromotionJSON {
   banner_label_link?: string;
   image_description?: string;
   image_urls?: string[];
+  updated_at?: string;
 }
 
 export interface Promotion {
   id: number | null;
+  updatedAt: Ref<string>;
   name: Ref<string>;
   description: Ref<string>;
   width: Ref<number>;
@@ -25,10 +27,12 @@ export interface Promotion {
   imageDescription: Ref<string>;
   imageUrls: Ref<string[]>;
   init(src?: PromotionJSON): void;
-  toJSON(id: number | null): Required<PromotionJSON>;
+  toJSON(): Required<PromotionJSON>;
 }
 
 export function makePromotion(initial: PromotionJSON = {}): Promotion {
+  const id = initial.id ?? null;
+  const updatedAt = ref(initial.updated_at ?? "");
   const name = ref(initial.name ?? "");
   const description = ref(initial.description ?? "");
   const width = ref(initial.width ?? 0);
@@ -40,6 +44,7 @@ export function makePromotion(initial: PromotionJSON = {}): Promotion {
   const imageUrls = ref([...(initial.image_urls ?? [])]);
 
   function init(src: PromotionJSON = {}): void {
+    updatedAt.value = src.updated_at ?? "";
     name.value = src.name ?? "";
     description.value = src.description ?? "";
     width.value = src.width ?? 0;
@@ -51,7 +56,7 @@ export function makePromotion(initial: PromotionJSON = {}): Promotion {
     imageUrls.value = [...(src.image_urls ?? [])];
   }
 
-  function toJSON(id: number | null): Required<PromotionJSON> {
+  function toJSON(): Required<PromotionJSON> {
     return {
       id,
       name: name.value,
@@ -63,11 +68,13 @@ export function makePromotion(initial: PromotionJSON = {}): Promotion {
       banner_label_link: bannerLabelLink.value,
       image_description: imageDescription.value,
       image_urls: imageUrls.value,
+      updated_at: updatedAt.value,
     };
   }
 
   return {
-    id: initial.id ?? null,
+    id,
+    updatedAt,
     name,
     description,
     width,
