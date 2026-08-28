@@ -2,14 +2,13 @@
 // @ts-ignore – auth.js has no types yet
 import { useAuth } from "./auth.js";
 
-/** [data, null] on success; [falsy, error] on failure */
-type Result<T> = [T, null] | [unknown, Error];
+type Result<T> = [T, null] | [null, Error];
 
 const tryTo = <T>(promise: Promise<T>): Promise<Result<T>> =>
   promise
     // Wrap data/errors
     .then((data): [T, null] => [data, null])
-    .catch((error: Error): [unknown, Error] => [null, error]);
+    .catch((error: Error): [null, Error] => [null, error]);
 
 interface ResponseErrorDetails {
   [key: string]: unknown;
@@ -148,17 +147,17 @@ export async function uploadImage(body: File): Promise<Result<string>> {
     type: body.type,
   });
   if (err) {
-    return ["", err];
+    return [null, err];
   }
   let { "signed-url": signedURL, filename } = data as SignedUploadResponse;
   let rsp: Response;
   try {
     rsp = await fetch(signedURL, { method: "PUT", body });
   } catch (e) {
-    return ["", e as Error];
+    return [null, e as Error];
   }
   if (!rsp.ok) {
-    return ["", (await responseError(rsp))!];
+    return [null, (await responseError(rsp))!];
   }
   [, err] = await post(postImageUpdate, {
     path: filename,
@@ -166,7 +165,7 @@ export async function uploadImage(body: File): Promise<Result<string>> {
     set_description: false,
   });
   if (err) {
-    return ["", err];
+    return [null, err];
   }
   return [filename, null];
 }
@@ -184,7 +183,7 @@ export async function uploadFile(body: File): Promise<Result<string>> {
     mimeType: body.type,
   });
   if (err) {
-    return ["", err];
+    return [null, err];
   }
   let {
     "signed-url": signedURL,
@@ -204,10 +203,10 @@ export async function uploadFile(body: File): Promise<Result<string>> {
   try {
     rsp = await fetch(signedURL, opts);
   } catch (e) {
-    return ["", e as Error];
+    return [null, e as Error];
   }
   if (!rsp.ok) {
-    return ["", (await responseError(rsp))!];
+    return [null, (await responseError(rsp))!];
   }
   [, err] = await post(updateFile, {
     url: fileURL,
@@ -215,7 +214,7 @@ export async function uploadFile(body: File): Promise<Result<string>> {
     set_description: false,
   });
   if (err) {
-    return ["", err];
+    return [null, err];
   }
   return [fileURL, null];
 }
