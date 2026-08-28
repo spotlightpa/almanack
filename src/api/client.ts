@@ -19,16 +19,14 @@ interface AppError extends Error {
   details: ResponseErrorDetails;
 }
 
-const responseError = async (
-  rsp: Response
-): Promise<AppError | undefined> => {
+const responseError = async (rsp: Response): Promise<AppError | undefined> => {
   if (rsp.ok) {
     return;
   }
   let details: ResponseErrorDetails = {};
   try {
-    details = ((await rsp.json()) as { details?: ResponseErrorDetails })
-      ?.details ?? {};
+    details =
+      ((await rsp.json()) as { details?: ResponseErrorDetails })?.details ?? {};
     // eslint-disable-next-line no-empty
   } catch (e) {}
 
