@@ -6,8 +6,8 @@ import { get, post, listImages, postImageUpdate } from "@/api/client-v2.js";
 import { makeState, watchAPI } from "@/api/service-util.js";
 import imgproxyURL from "@/api/imgproxy-url.js";
 
-import { formatDate } from "@/utils/time-format.js";
-import humanSize from "@/utils/human-size.js";
+import { formatDate } from "@/utils/time-format.ts";
+import humanSize from "@/utils/human-size.ts";
 
 const props = defineProps({
   page: { type: String, default: "0" },

@@ -5,7 +5,7 @@ import { get, post, getSiteParams, postSiteParams } from "@/api/client-v2.js";
 import { makeState } from "@/api/service-util.js";
 import { useFileList } from "@/api/file-list.js";
 
-import { formatDateTime, today, tomorrow } from "@/utils/time-format.js";
+import { formatDateTime, today, tomorrow } from "@/utils/time-format.ts";
 import useScrollTo from "@/utils/use-scroll-to.js";
 import maybeDate from "@/utils/maybe-date.js";
 

@@ -16,7 +16,7 @@ import {
 import { processGDocsDoc } from "@/api/gdocs.js";
 import { watchAPI, makeState } from "@/api/service-util.js";
 import SharedArticle from "@/api/shared-article.js";
-import { formatDate, formatDateTime, tomorrow } from "@/utils/time-format.js";
+import { formatDate, formatDateTime, tomorrow } from "@/utils/time-format.ts";
 
 const props = defineProps({
   id: String,

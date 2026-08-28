@@ -1,7 +1,7 @@
 <script>
 import { reactive, ref, toRefs } from "vue";
 import { sendGAEvent } from "@/utils/google-analytics.js";
-import { formatDate, formatDateTime } from "@/utils/time-format.js";
+import { formatDate, formatDateTime } from "@/utils/time-format.ts";
 
 export default {
   props: {
