@@ -41,7 +41,7 @@ let $auth: any = null;
 type FetchInit = NonNullable<Parameters<typeof fetch>[1]>;
 
 interface RequestOptions {
-  params?: Record<string, string> | null;
+  params?: ConstructorParameters<typeof URLSearchParams>[0] | null;
   headers?: FetchInit["headers"];
   options?: FetchInit;
 }
@@ -77,7 +77,7 @@ async function request<T = unknown>(
 
 export function get<T = unknown>(
   url: string,
-  params?: Record<string, string>
+  params?: ConstructorParameters<typeof URLSearchParams>[0]
 ): Promise<Result<T>> {
   return tryTo(request<T>(url, { params }));
 }
