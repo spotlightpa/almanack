@@ -1,5 +1,5 @@
 <script>
-import { formatDate } from "@/utils/time-format.js";
+import { formatDate } from "@/utils/time-format.ts";
 
 export default {
   name: "TagDate",

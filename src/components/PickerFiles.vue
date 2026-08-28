@@ -1,5 +1,5 @@
 <script>
-import { formatDate, formatTime } from "@/utils/time-format.js";
+import { formatDate, formatTime } from "@/utils/time-format.ts";
 import humanSize from "@/utils/human-size.js";
 
 export default {

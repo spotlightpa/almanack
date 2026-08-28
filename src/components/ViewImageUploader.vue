@@ -6,7 +6,7 @@ import { get, post, listImages, postImageUpdate } from "@/api/client-v2.js";
 import { makeState, watchAPI } from "@/api/service-util.js";
 import imgproxyURL from "@/api/imgproxy-url.js";
 
-import { formatDate } from "@/utils/time-format.js";
+import { formatDate } from "@/utils/time-format.ts";
 import humanSize from "@/utils/human-size.js";
 
 const props = defineProps({

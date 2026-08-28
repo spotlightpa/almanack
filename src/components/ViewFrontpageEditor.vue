@@ -3,7 +3,7 @@ import { get, post, getSiteData, postSiteData } from "@/api/client-v2.js";
 import usePicks from "@/api/editors-picks.js";
 import { useRoute } from "vue-router";
 
-import { formatDateTime, today, tomorrow } from "@/utils/time-format.js";
+import { formatDateTime, today, tomorrow } from "@/utils/time-format.ts";
 import useScrollTo from "@/utils/use-scroll-to.js";
 
 export default {

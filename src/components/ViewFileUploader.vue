@@ -10,7 +10,7 @@ import {
 } from "@/api/client-v2.js";
 import { makeState } from "@/api/service-util.js";
 
-import { formatDate } from "@/utils/time-format.js";
+import { formatDate } from "@/utils/time-format.ts";
 import humanSize from "@/utils/human-size.js";
 
 export default {

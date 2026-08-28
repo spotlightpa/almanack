@@ -3,7 +3,7 @@ import { computed, toRefs } from "vue";
 
 import { usePage } from "@/api/spotlightpa-page.js";
 
-import { formatDateTime } from "@/utils/time-format.js";
+import { formatDateTime } from "@/utils/time-format.ts";
 
 export default {
   props: {
