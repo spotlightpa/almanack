@@ -38,12 +38,13 @@ const responseError = async (rsp: Response): Promise<AppError | undefined> => {
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 let $auth: any = null;
 
-type FetchInit = NonNullable<Parameters<typeof fetch>[1]>;
+type FetchOptions = NonNullable<Parameters<typeof fetch>[1]>;
+type SearchParamsInit = ConstructorParameters<typeof URLSearchParams>[0];
 
 interface RequestOptions {
-  params?: ConstructorParameters<typeof URLSearchParams>[0] | null;
-  headers?: FetchInit["headers"];
-  options?: FetchInit;
+  params?: SearchParamsInit | null;
+  headers?: FetchOptions["headers"];
+  options?: FetchOptions;
 }
 
 async function request<T = unknown>(
@@ -77,7 +78,7 @@ async function request<T = unknown>(
 
 export function get<T = unknown>(
   url: string,
-  params?: ConstructorParameters<typeof URLSearchParams>[0]
+  params?: SearchParamsInit
 ): Promise<Result<T>> {
   return tryTo(request<T>(url, { params }));
 }
@@ -192,7 +193,7 @@ export async function uploadFile(body: File): Promise<Result<string>> {
     "cache-control": cacheControl,
     disposition,
   } = data as CreateFileResponse;
-  let opts: FetchInit = {
+  let opts: FetchOptions = {
     method: "PUT",
     body,
     headers: {
