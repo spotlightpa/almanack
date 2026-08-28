@@ -7,7 +7,7 @@ import { makeState, watchAPI } from "@/api/service-util.js";
 import imgproxyURL from "@/api/imgproxy-url.js";
 
 import { formatDate } from "@/utils/time-format.ts";
-import humanSize from "@/utils/human-size.js";
+import humanSize from "@/utils/human-size.ts";
 
 const props = defineProps({
   page: { type: String, default: "0" },

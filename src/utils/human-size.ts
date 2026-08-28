@@ -1,9 +1,9 @@
-export default function humanSize(size) {
+export default function humanSize(size: number): string {
   if (size < 1024) {
     return `${size} B`;
   }
   const units = ["B", "KB", "MB", "GB", "TB", "PB"];
-  let unit;
+  let unit = units[0];
   for (unit of units) {
     if (size < 1024) {
       break;
