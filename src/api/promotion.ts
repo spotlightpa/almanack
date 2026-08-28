@@ -17,7 +17,7 @@ export interface PromotionJSON {
 
 export interface Promotion {
   id: number | null;
-  updatedAt: Ref<Date | null>;
+  updatedAt: Ref<Date | null>; // read-only: populated from server response
   name: Ref<string>;
   description: Ref<string>;
   width: Ref<number>;
@@ -28,7 +28,7 @@ export interface Promotion {
   imageDescription: Ref<string>;
   imageUrls: Ref<string[]>;
   init(src?: PromotionJSON): void;
-  toJSON(): Required<PromotionJSON>;
+  toJSON(): Omit<Required<PromotionJSON>, "updated_at">;
 }
 
 export function makePromotion(initial: PromotionJSON = {}): Promotion {
@@ -59,7 +59,7 @@ export function makePromotion(initial: PromotionJSON = {}): Promotion {
 
   init(initial);
 
-  function toJSON(): Required<PromotionJSON> {
+  function toJSON(): Omit<Required<PromotionJSON>, "updated_at"> {
     return {
       id,
       name: name.value,
@@ -71,7 +71,6 @@ export function makePromotion(initial: PromotionJSON = {}): Promotion {
       banner_label_link: bannerLabelLink.value,
       image_description: imageDescription.value,
       image_urls: imageUrls.value,
-      updated_at: updatedAt.value?.toISOString() ?? "",
     };
   }
 
