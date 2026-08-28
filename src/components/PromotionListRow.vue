@@ -3,6 +3,7 @@ import { ref, watch } from "vue";
 
 import { post, postPromotion, deletePromotion } from "@/api/client-v2.js";
 import { makePromotion } from "@/api/promotion.ts";
+import { formatDateTime } from "@/utils/time-format.js";
 import { makeState } from "@/api/service-util.js";
 import { useFileList } from "@/api/file-list.js";
 
@@ -80,7 +81,7 @@ async function save() {
             modelValue.image_urls?.length !== 1 ? "s" : ""
           }}
           &middot;
-          {{ new Date(modelValue.updated_at).toLocaleString() }}
+          {{ formatDateTime(promo.updatedAt.value) }}
         </p>
         <div class="mt-2 buttons">
           <button
