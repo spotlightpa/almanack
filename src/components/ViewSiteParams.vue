@@ -7,7 +7,7 @@ import { useFileList } from "@/api/file-list.js";
 
 import { formatDateTime, today, tomorrow } from "@/utils/time-format.ts";
 import useScrollTo from "@/utils/use-scroll-to.js";
-import maybeDate from "@/utils/maybe-date.js";
+import maybeDate from "@/utils/maybe-date.ts";
 
 class SiteParamsModel {
   constructor(config) {
