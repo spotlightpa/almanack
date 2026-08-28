@@ -1,7 +1,8 @@
 <script setup>
-import { ref } from "vue";
+import { ref, watch } from "vue";
 
 import { post, postPromotion, deletePromotion } from "@/api/client-v2.js";
+import { makePromotion } from "@/api/promotion.ts";
 import { makeState } from "@/api/service-util.js";
 import { useFileList } from "@/api/file-list.js";
 
@@ -18,11 +19,16 @@ const fileList = useFileList();
 
 const isOpen = ref(false);
 
-// modelValue is already a Promotion; use it directly as the edit form.
-const promo = props.modelValue;
+const promo = makePromotion();
+
+watch(
+  () => props.modelValue,
+  (val) => promo.init(val),
+  { immediate: true }
+);
 
 function initValues() {
-  promo.init(promo.toJSON());
+  promo.init(props.modelValue);
 }
 
 function toggle() {
@@ -37,7 +43,7 @@ const { isLoadingThrottled: deleteLoadingThrottled, error: deleteError } =
   deleteStateRefs;
 
 async function remove() {
-  if (!confirm(`Delete "${promo.name.value || "this promotion"}"?`)) {
+  if (!confirm(`Delete "${props.modelValue.name || "this promotion"}"?`)) {
     return;
   }
   await deleteExec(() => post(deletePromotion, { id: promo.id }));
@@ -60,21 +66,21 @@ async function save() {
     <div class="is-flex is-justify-content-space-between is-align-items-start">
       <div>
         <p class="has-text-weight-semibold">
-          <span v-if="promo.name.value">{{ promo.name.value }}</span>
+          <span v-if="modelValue.name">{{ modelValue.name }}</span>
           <span v-else class="has-text-grey is-italic">&lt;untitled&gt;</span>
         </p>
-        <p v-if="promo.description.value" class="is-size-7 has-text-grey">
-          {{ promo.description.value }}
+        <p v-if="modelValue.description" class="is-size-7 has-text-grey">
+          {{ modelValue.description }}
         </p>
         <p class="is-size-7 has-text-grey">
-          <template v-if="promo.width.value || promo.height.value">
-            {{ promo.width.value }}×{{ promo.height.value }}px &middot;
+          <template v-if="modelValue.width || modelValue.height">
+            {{ modelValue.width }}×{{ modelValue.height }}px &middot;
           </template>
-          {{ promo.imageUrls.value.length }} image{{
-            promo.imageUrls.value.length !== 1 ? "s" : ""
+          {{ modelValue.image_urls?.length ?? 0 }} image{{
+            modelValue.image_urls?.length !== 1 ? "s" : ""
           }}
           &middot;
-          {{ new Date(promo.updatedAt.value).toLocaleString() }}
+          {{ new Date(modelValue.updated_at).toLocaleString() }}
         </p>
         <div class="mt-2 buttons">
           <button

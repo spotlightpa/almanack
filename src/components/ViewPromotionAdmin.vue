@@ -17,7 +17,7 @@ const { apiState, fetch, computedList, computedProp } = watchAPI(
   (page) => get(listPromotions, page ? { page } : undefined)
 );
 
-const promotions = computedList("promotions", (p) => makePromotion(p));
+const promotions = computedList("promotions", (p) => p);
 
 const nextPage = computedProp("next_page", (page) => ({
   name: "promotions",
