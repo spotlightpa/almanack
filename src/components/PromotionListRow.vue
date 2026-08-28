@@ -81,7 +81,7 @@ async function save() {
             modelValue.image_urls?.length !== 1 ? "s" : ""
           }}
           &middot;
-          {{ formatDateTime(promo.updatedAt.value) ?? "" }}
+          {{ formatDateTime(promo.updatedAt.value) }}
         </p>
         <div class="mt-2 buttons">
           <button
