@@ -1,4 +1,5 @@
 import { ref, type Ref } from "vue";
+import maybeDate from "@/utils/maybe-date.js";
 
 export interface PromotionJSON {
   id?: number | null;
@@ -32,9 +33,7 @@ export interface Promotion {
 
 export function makePromotion(initial: PromotionJSON = {}): Promotion {
   const id = initial.id ?? null;
-  const updatedAt = ref<Date | null>(
-    initial.updated_at ? new Date(initial.updated_at) : null
-  );
+  const updatedAt = ref(maybeDate(initial, "updated_at"));
   const name = ref(initial.name ?? "");
   const description = ref(initial.description ?? "");
   const width = ref(initial.width ?? 0);
@@ -46,7 +45,7 @@ export function makePromotion(initial: PromotionJSON = {}): Promotion {
   const imageUrls = ref([...(initial.image_urls ?? [])]);
 
   function init(src: PromotionJSON = {}): void {
-    updatedAt.value = src.updated_at ? new Date(src.updated_at) : null;
+    updatedAt.value = maybeDate(src, "updated_at");
     name.value = src.name ?? "";
     description.value = src.description ?? "";
     width.value = src.width ?? 0;
