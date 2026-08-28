@@ -1,6 +1,6 @@
 <script>
-import { formatDate, formatTime } from "@/utils/time-format.js";
-import humanSize from "@/utils/human-size.js";
+import { formatDate, formatTime } from "@/utils/time-format.ts";
+import humanSize from "@/utils/human-size.ts";
 
 export default {
   props: { files: Array },

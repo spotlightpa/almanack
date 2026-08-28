@@ -1,6 +1,6 @@
 import imgproxyURL from "@/api/imgproxy-url.js";
 import { toRel } from "@/utils/link.ts";
-import maybeDate from "@/utils/maybe-date.js";
+import maybeDate from "@/utils/maybe-date.ts";
 
 export class TaxonomyPage {
   constructor(data) {

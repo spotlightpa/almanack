@@ -10,8 +10,8 @@ import {
 } from "@/api/client-v2.js";
 import { makeState } from "@/api/service-util.js";
 
-import { formatDate } from "@/utils/time-format.js";
-import humanSize from "@/utils/human-size.js";
+import { formatDate } from "@/utils/time-format.ts";
+import humanSize from "@/utils/human-size.ts";
 
 export default {
   props: { page: { type: String, default: "0" } },
