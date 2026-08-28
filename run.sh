@@ -8,6 +8,7 @@ THIS_DIR=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
 cd "$THIS_DIR"
 
 GO_EXEC=${GO_EXEC:-go}
+PG_LOCAL_URL=${PG_LOCAL_URL:-postgres://postgres:postgres@127.0.0.1:5432/almanack?sslmode=disable}
 
 function _default() {
 	# shellcheck disable=SC2119
