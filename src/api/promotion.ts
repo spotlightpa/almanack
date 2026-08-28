@@ -15,9 +15,11 @@ export interface PromotionJSON {
   updated_at?: string;
 }
 
+type PromotionUpdateJSON = Required<Omit<PromotionJSON, "updated_at">>;
+
 export interface Promotion {
   id: number | null;
-  updatedAt: Ref<Date | null>; // read-only: populated from server response
+  updatedAt: Ref<Date | null>;
   name: Ref<string>;
   description: Ref<string>;
   width: Ref<number>;
@@ -28,7 +30,7 @@ export interface Promotion {
   imageDescription: Ref<string>;
   imageUrls: Ref<string[]>;
   init(src?: PromotionJSON): void;
-  toJSON(): Omit<Required<PromotionJSON>, "updated_at">;
+  toJSON(): PromotionUpdateJSON;
 }
 
 export function makePromotion(initial: PromotionJSON = {}): Promotion {
@@ -59,7 +61,7 @@ export function makePromotion(initial: PromotionJSON = {}): Promotion {
 
   init(initial);
 
-  function toJSON(): Omit<Required<PromotionJSON>, "updated_at"> {
+  function toJSON(): PromotionUpdateJSON {
     return {
       id,
       name: name.value,
