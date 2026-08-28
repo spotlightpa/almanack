@@ -68,16 +68,17 @@ func TestPromotionEndpoints(t *testing.T) {
 		be.Nonzero(t, created.ID)
 		be.Equal(t, "Sidebar Ad", created.Name)
 	}
-	{ // List all promotions (no text filter)
+	{ // List all promotions (no text filter) — NextPage must be absent when results fit in one page
 		var listResp struct {
 			Promotions []db.Promotion `json:"promotions"`
-			NextPage   int32          `json:"next_page,string,omitempty"`
+			NextPage   string         `json:"next_page"`
 		}
 		be.NilErr(t, rb.Clone().
 			Path("/api/promotion").
 			ToJSON(&listResp).
 			Fetch(ctx))
 		be.AtLeastLength(t, 2, listResp.Promotions)
+		be.Equal(t, "", listResp.NextPage)
 	}
 	{ // List promotions with FTS text filter
 		var ftsResp struct {
