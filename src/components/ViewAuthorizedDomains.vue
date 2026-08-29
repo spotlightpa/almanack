@@ -149,7 +149,7 @@ export default {
       </form>
     </div>
     <div class="mt-6">
-      <h2 class="title">Preauthorized email adddresses</h2>
+      <h2 class="title">Preauthorized email addresses</h2>
       <SpinnerProgress :is-loading="address.isLoading.value"></SpinnerProgress>
 
       <div class="field is-grouped is-grouped-multiline">
