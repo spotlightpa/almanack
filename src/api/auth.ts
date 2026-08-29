@@ -10,14 +10,6 @@ export interface AuthUser {
   roles: string[];
 }
 
-function netlifyToAuthUser(u: NetlifyUser): AuthUser {
-  return {
-    email: u.email,
-    fullName: u.user_metadata?.full_name ?? "",
-    roles: u.app_metadata?.roles ?? [],
-  };
-}
-
 function loadDevUser(): AuthUser | null {
   try {
     return (
@@ -81,8 +73,16 @@ function makeDevAuth() {
 function makeAuth() {
   const netlifyUser = ref<NetlifyUser | null>(null);
 
+  function toAuthUser(u: NetlifyUser): AuthUser {
+    return {
+      email: u.email,
+      fullName: u.user_metadata?.full_name ?? "",
+      roles: u.app_metadata?.roles ?? [],
+    };
+  }
+
   const user = computed(() =>
-    netlifyUser.value ? netlifyToAuthUser(netlifyUser.value) : null
+    netlifyUser.value ? toAuthUser(netlifyUser.value) : null
   );
   const isSignedIn = computed(() => !!user.value);
   const roles = computed(() => user.value?.roles ?? []);

@@ -2,12 +2,6 @@ import { useAuth } from "./auth.ts";
 
 type Result<T> = [T, null] | [null, Error];
 
-const tryTo = <T>(promise: Promise<T>): Promise<Result<T>> =>
-  promise
-    // Wrap data/errors
-    .then((data): [T, null] => [data, null])
-    .catch((error: Error): [null, Error] => [null, error]);
-
 /** Mirrors url.Values from Go: map of field name → list of messages.
  *  The "" key holds the top-level user message. */
 type ErrorDetails = Record<string, string[]>;
@@ -15,6 +9,54 @@ type ErrorDetails = Record<string, string[]>;
 interface AppError extends Error {
   details: ErrorDetails;
 }
+
+type FetchOptions = NonNullable<Parameters<typeof fetch>[1]>;
+type SearchParamsInit = ConstructorParameters<typeof URLSearchParams>[0];
+
+// Alphabetize by URL to show duplicates
+// GET and POST listed as two endpoints
+export const listAllSeries = `/api/all-series`;
+export const listAllTopics = `/api/all-topics`;
+export const postAuthorizedDomain = `/api/authorized-domains`;
+export const listAuthorizedDomains = `/api/authorized-domains`;
+export const postAuthorizedEmailAddress = `/api/authorized-addresses`;
+export const listAuthorizedEmailAddresses = `/api/authorized-addresses`;
+export const createSignedUpload = `/api/create-signed-upload`;
+export const postDonorWall = `/api/donor-wall`;
+export const createFile = `/api/files-create`;
+export const listFiles = `/api/files-list`;
+export const updateFile = `/api/files-update`;
+export const getGDocsDoc = `/api/gdocs-doc`;
+export const postGDocsDoc = `/api/gdocs-doc`;
+export const postImageUpdate = `/api/image-update`;
+export const listImages = `/api/images`;
+export const sendMessage = `/api/message`;
+export const getPage = `/api/page`;
+export const postPage = `/api/page`;
+export const postPageJSON = `/api/page-json`;
+export const postPageCreate = `/api/page-create`;
+export const postPageLoad = `/api/page-load`;
+export const postPageRefresh = `/api/page-refresh`;
+export const listPages = `/api/pages`;
+export const listPagesByFTS = `/api/pages-by-fts`;
+export const listPromotions = `/api/promotion`;
+export const postPromotion = `/api/promotion`;
+export const deletePromotion = `/api/promotion-delete`;
+export const getSharedArticle = `/api/shared-article`;
+export const postSharedArticle = `/api/shared-article`;
+export const postSharedArticleFromGDocs = `/api/shared-article-from-gdocs`;
+export const listSharedArticles = `/api/shared-articles`;
+export const getSidebar = `/api/sidebar`;
+export const saveSidebar = `/api/sidebar`;
+export const getSiteData = `/api/site-data`;
+export const postSiteData = `/api/site-data`;
+export const getSiteParams = `/api/site-params`;
+export const postSiteParams = `/api/site-params`;
+
+const tryTo = <T>(promise: Promise<T>): Promise<Result<T>> =>
+  promise
+    .then((data): [T, null] => [data, null])
+    .catch((error: Error): [null, Error] => [null, error]);
 
 const responseError = async (rsp: Response): Promise<AppError | undefined> => {
   if (rsp.ok) {
@@ -34,9 +76,6 @@ const responseError = async (rsp: Response): Promise<AppError | undefined> => {
 };
 
 let $auth: ReturnType<typeof useAuth> | null = null;
-
-type FetchOptions = NonNullable<Parameters<typeof fetch>[1]>;
-type SearchParamsInit = ConstructorParameters<typeof URLSearchParams>[0];
 
 interface RequestOptions {
   params?: SearchParamsInit;
@@ -95,46 +134,6 @@ export function post<T = unknown>(
     })
   );
 }
-
-// Alphabetize lists by URL to show duplicates
-// GET and POST listed as two endpoints
-export const listAllSeries = `/api/all-series`;
-export const listAllTopics = `/api/all-topics`;
-export const postAuthorizedDomain = `/api/authorized-domains`;
-export const listAuthorizedDomains = `/api/authorized-domains`;
-export const postAuthorizedEmailAddress = `/api/authorized-addresses`;
-export const listAuthorizedEmailAddresses = `/api/authorized-addresses`;
-export const createSignedUpload = `/api/create-signed-upload`;
-export const postDonorWall = `/api/donor-wall`;
-export const createFile = `/api/files-create`;
-export const listFiles = `/api/files-list`;
-export const updateFile = `/api/files-update`;
-export const getGDocsDoc = `/api/gdocs-doc`;
-export const postGDocsDoc = `/api/gdocs-doc`;
-export const postImageUpdate = `/api/image-update`;
-export const listImages = `/api/images`;
-export const sendMessage = `/api/message`;
-export const getPage = `/api/page`;
-export const postPage = `/api/page`;
-export const postPageJSON = `/api/page-json`;
-export const postPageCreate = `/api/page-create`;
-export const postPageLoad = `/api/page-load`;
-export const postPageRefresh = `/api/page-refresh`;
-export const listPages = `/api/pages`;
-export const listPagesByFTS = `/api/pages-by-fts`;
-export const listPromotions = `/api/promotion`;
-export const postPromotion = `/api/promotion`;
-export const deletePromotion = `/api/promotion-delete`;
-export const getSharedArticle = `/api/shared-article`;
-export const postSharedArticle = `/api/shared-article`;
-export const postSharedArticleFromGDocs = `/api/shared-article-from-gdocs`;
-export const listSharedArticles = `/api/shared-articles`;
-export const getSidebar = `/api/sidebar`;
-export const saveSidebar = `/api/sidebar`;
-export const getSiteData = `/api/site-data`;
-export const postSiteData = `/api/site-data`;
-export const getSiteParams = `/api/site-params`;
-export const postSiteParams = `/api/site-params`;
 
 interface SignedUploadResponse {
   "signed-url": string;
