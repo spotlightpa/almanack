@@ -79,10 +79,11 @@ function makeDevAuth() {
 }
 
 function makeAuth() {
-  const user = ref<AuthUser | null>(null);
-  // Keep a ref to the raw netlify user solely for jwt() calls
-  let netlifyUser: NetlifyUser | null = null;
+  const netlifyUser = ref<NetlifyUser | null>(null);
 
+  const user = computed(() =>
+    netlifyUser.value ? netlifyToAuthUser(netlifyUser.value) : null
+  );
   const isSignedIn = computed(() => !!user.value);
   const roles = computed(() => user.value?.roles ?? []);
   const fullName = computed(() => user.value?.fullName ?? "");
@@ -102,8 +103,7 @@ function makeAuth() {
       netlifyIdentity.open("login");
     },
     async logout() {
-      user.value = null;
-      netlifyUser = null;
+      netlifyUser.value = null;
       try {
         await netlifyIdentity.logout();
       } catch (e) {
@@ -112,12 +112,12 @@ function makeAuth() {
       }
     },
     async headers(): Promise<Record<string, string> | null> {
-      if (!netlifyUser) {
+      if (!netlifyUser.value) {
         return null;
       }
       let token: string;
       try {
-        token = await netlifyUser.jwt();
+        token = await netlifyUser.value.jwt();
       } catch (e) {
         await methods.logout();
         return null;
@@ -129,8 +129,7 @@ function makeAuth() {
   };
 
   netlifyIdentity.on("init", async (u) => {
-    netlifyUser = u;
-    user.value = u ? netlifyToAuthUser(u) : null;
+    netlifyUser.value = u;
     try {
       await u?.jwt();
     } catch {
@@ -138,18 +137,15 @@ function makeAuth() {
     }
   });
   netlifyIdentity.on("login", (u) => {
-    netlifyUser = u;
-    user.value = netlifyToAuthUser(u);
+    netlifyUser.value = u;
     netlifyIdentity.close();
   });
   netlifyIdentity.on("logout", () => {
-    netlifyUser = null;
-    user.value = null;
+    netlifyUser.value = null;
   });
   netlifyIdentity.on("error", (err) => {
     console.warn(err);
-    netlifyUser = null;
-    user.value = null;
+    netlifyUser.value = null;
   });
 
   const APIUrl = window.location.hostname.match(/localhost|\.ts\.net/)
