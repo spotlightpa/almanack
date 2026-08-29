@@ -9,10 +9,10 @@
     "test": "yarn run test:eslint && yarn run test:prettier && yarn run test:types",
     "test:eslint": "eslint src",
     "test:types": "vue-tsc --noEmit",
-    "test:prettier": "prettier --ignore-path .gitignore --check './*.{js,vue,yml,json}' 'src/**/*.{js,vue,yml,json}'",
+    "test:prettier": "prettier --ignore-path .gitignore --check './*.{js,ts,vue,yml,json}' 'src/**/*.{js,ts,vue,yml,json}'",
     "lint": "yarn run lint:eslint && yarn run lint:prettier",
     "lint:eslint": "eslint --fix src",
-    "lint:prettier": "prettier --ignore-path .gitignore --write './*.{js,vue,yml,json}' 'src/**/*.{js,vue,yml,json}'"
+    "lint:prettier": "prettier --ignore-path .gitignore --write './*.{js,ts,vue,yml,json}' 'src/**/*.{js,ts,vue,yml,json}'"
   },
   "dependencies": {
     "@fortawesome/fontawesome-svg-core": "^7.3.1",
