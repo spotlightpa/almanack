@@ -1,7 +1,7 @@
 <script setup>
 import { ref } from "vue";
 
-import { useAuth } from "@/api/auth.js";
+import { useAuth } from "@/api/auth.ts";
 
 const auth = useAuth();
 

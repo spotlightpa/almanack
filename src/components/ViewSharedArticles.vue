@@ -1,5 +1,5 @@
 <script setup>
-import { useAuth } from "@/api/auth.js";
+import { useAuth } from "@/api/auth.ts";
 import { get, listSharedArticles } from "@/api/client.ts";
 import { watchAPI } from "@/api/service-util.js";
 import SharedArticle from "@/api/shared-article.js";
