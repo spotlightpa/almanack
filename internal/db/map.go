@@ -26,7 +26,7 @@ func (m *Map) Scan(value any) error {
 	}
 	buf, ok := value.([]byte)
 	if !ok {
-		return fmt.Errorf("canot parse %T to bytes", value)
+		return fmt.Errorf("cannot parse %T to bytes", value)
 	}
 	if err := json.Unmarshal(buf, &dbMap); err != nil {
 		return err
