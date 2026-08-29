@@ -1,18 +1,3 @@
-import { useAuth } from "./auth.ts";
-
-type Result<T> = [T, null] | [null, Error];
-
-/** Mirrors url.Values from Go: map of field name → list of messages.
- *  The "" key holds the top-level user message. */
-type ErrorDetails = Record<string, string[]>;
-
-interface AppError extends Error {
-  details: ErrorDetails;
-}
-
-type FetchOptions = NonNullable<Parameters<typeof fetch>[1]>;
-type SearchParamsInit = ConstructorParameters<typeof URLSearchParams>[0];
-
 // Alphabetize by URL to show duplicates
 // GET and POST listed as two endpoints
 export const listAllSeries = `/api/all-series`;
@@ -53,6 +38,23 @@ export const postSiteData = `/api/site-data`;
 export const getSiteParams = `/api/site-params`;
 export const postSiteParams = `/api/site-params`;
 
+import { useAuth } from "./auth.ts";
+
+type Result<T> = [T, null] | [null, Error];
+
+type ErrorDetails = Record<string, string[]>;
+interface AppError extends Error {
+  details: ErrorDetails;
+}
+
+type FetchOptions = NonNullable<Parameters<typeof fetch>[1]>;
+type SearchParamsInit = ConstructorParameters<typeof URLSearchParams>[0];
+interface RequestOptions {
+  params?: SearchParamsInit;
+  headers?: FetchOptions["headers"];
+  options?: FetchOptions;
+}
+
 const tryTo = <T>(promise: Promise<T>): Promise<Result<T>> =>
   promise
     .then((data): [T, null] => [data, null])
@@ -76,12 +78,6 @@ const responseError = async (rsp: Response): Promise<AppError | undefined> => {
 };
 
 let $auth: ReturnType<typeof useAuth> | null = null;
-
-interface RequestOptions {
-  params?: SearchParamsInit;
-  headers?: FetchOptions["headers"];
-  options?: FetchOptions;
-}
 
 async function request<T = unknown>(
   url: string,
