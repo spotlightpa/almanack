@@ -87,18 +87,10 @@ function makeDevAuth(): Auth {
 function makeAuth(): Auth {
   const netlifyUser = ref<NetlifyUser | null>(null);
 
-  function toAuthUser(u: NetlifyUser): AuthUser {
-    return {
-      email: u.email,
-      fullName: u.user_metadata?.full_name ?? "",
-      roles: u.app_metadata?.roles ?? [],
-    };
-  }
-  const user = ref<AuthUser | null>(null);
-  const isSignedIn = computed(() => !!user.value);
-  const roles = computed(() => user.value?.roles ?? []);
-  const fullName = computed(() => user.value?.fullName ?? "");
-  const email = computed(() => user.value?.email ?? "");
+  const isSignedIn = computed(() => !!netlifyUser.value);
+  const roles = computed(() => netlifyUser.value?.app_metadata?.roles ?? []);
+  const fullName = computed(() => netlifyUser.value?.user_metadata?.full_name ?? "");
+  const email = computed(() => netlifyUser.value?.email ?? "");
 
   function hasRole(name: string) {
     return computed(() =>
@@ -141,7 +133,6 @@ function makeAuth(): Auth {
 
   netlifyIdentity.on("init", async (u) => {
     netlifyUser.value = u;
-    user.value = u ? toAuthUser(u) : null;
     try {
       await u?.jwt();
     } catch {
@@ -150,17 +141,14 @@ function makeAuth(): Auth {
   });
   netlifyIdentity.on("login", (u) => {
     netlifyUser.value = u;
-    user.value = toAuthUser(u);
     netlifyIdentity.close();
   });
   netlifyIdentity.on("logout", () => {
     netlifyUser.value = null;
-    user.value = null;
   });
   netlifyIdentity.on("error", (err) => {
     console.warn(err);
     netlifyUser.value = null;
-    user.value = null;
   });
 
   const APIUrl = window.location.hostname.match(/localhost|\.ts\.net/)
@@ -176,8 +164,8 @@ function makeAuth(): Auth {
     isEditor: hasRole("editor"),
     isSpotlightPAUser: hasRole("Spotlight PA"),
     isArcUser: hasRole("arc user"),
-    setUser(u: AuthUser) {
-      user.value = u;
+    setUser() {
+      throw new Error("setUser is not supported in production");
     },
     ...methods,
   };
