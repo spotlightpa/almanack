@@ -1,4 +1,4 @@
-import { ref, computed } from "vue";
+import { ref, computed, type Ref } from "vue";
 import netlifyIdentity from "netlify-identity-widget";
 import type { NetlifyUser } from "netlify-identity-widget";
 
@@ -8,6 +8,22 @@ export interface AuthUser {
   email: string;
   fullName: string;
   roles: string[];
+}
+
+export interface Auth {
+  user: Readonly<Ref<AuthUser | null>>;
+  isSignedIn: Readonly<Ref<boolean>>;
+  roles: Readonly<Ref<string[]>>;
+  fullName: Readonly<Ref<string>>;
+  email: Readonly<Ref<string>>;
+  isEditor: Readonly<Ref<boolean>>;
+  isSpotlightPAUser: Readonly<Ref<boolean>>;
+  isArcUser: Readonly<Ref<boolean>>;
+  signup(): void;
+  login(): void;
+  logout(): Promise<void>;
+  headers(): Promise<Record<string, string> | null>;
+  setDevUser(u: AuthUser): void;
 }
 
 function loadDevUser(): AuthUser | null {
@@ -30,7 +46,7 @@ function saveDevUser(user: AuthUser | null) {
   }
 }
 
-function makeDevAuth() {
+function makeDevAuth(): Auth {
   const user = ref<AuthUser | null>(loadDevUser());
 
   const isSignedIn = computed(() => !!user.value);
@@ -70,7 +86,7 @@ function makeDevAuth() {
   };
 }
 
-function makeAuth() {
+function makeAuth(): Auth {
   const netlifyUser = ref<NetlifyUser | null>(null);
 
   function toAuthUser(u: NetlifyUser): AuthUser {
@@ -162,12 +178,12 @@ function makeAuth() {
     isEditor: hasRole("editor"),
     isSpotlightPAUser: hasRole("Spotlight PA"),
     isArcUser: hasRole("arc user"),
+    setDevUser() {},
     ...methods,
   };
 }
 
-let $auth: ReturnType<typeof makeDevAuth> | ReturnType<typeof makeAuth> | null =
-  null;
+let $auth: Auth | null = null;
 
 export function useAuth() {
   if (!$auth) {
