@@ -89,9 +89,7 @@ function makeAuth(): Auth {
 
   const isSignedIn = computed(() => !!user.value);
   const roles = computed(() => user.value?.app_metadata?.roles ?? []);
-  const fullName = computed(
-    () => user.value?.user_metadata?.full_name ?? ""
-  );
+  const fullName = computed(() => user.value?.user_metadata?.full_name ?? "");
   const email = computed(() => user.value?.email ?? "");
 
   function hasRole(name: string) {
