@@ -2,8 +2,8 @@ import { defineAsyncComponent, h, nextTick, watch } from "vue";
 
 import { createRouter, createWebHistory } from "vue-router";
 
-import { useAuth } from "@/api/auth.js";
-import { listAllTopics, listAllSeries } from "@/api/client-v2.js";
+import { useAuth } from "@/api/auth.ts";
+import { listAllTopics, listAllSeries } from "@/api/client.ts";
 import { setDimensions, sendGAPageview } from "@/utils/google-analytics.js";
 
 import AsyncSpinner from "@/components/AsyncSpinner.vue";

@@ -1,7 +1,7 @@
 <script setup>
 import { ref } from "vue";
 
-import { useAuth } from "@/api/auth.js";
+import { useAuth } from "@/api/auth.ts";
 
 const auth = useAuth();
 
@@ -12,7 +12,7 @@ const selectedRoles = ref([...auth.roles.value]);
 const ROLES = ["admin", "Spotlight PA", "editor", "arc user"];
 
 function applyLogin() {
-  auth.setDevUser({
+  auth.setUser({
     email: email.value,
     fullName: fullName.value,
     roles: selectedRoles.value,

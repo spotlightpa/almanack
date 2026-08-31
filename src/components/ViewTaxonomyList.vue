@@ -1,6 +1,6 @@
 <script setup>
 import { watchAPI } from "@/api/service-util.js";
-import { get } from "@/api/client-v2.js";
+import { get } from "@/api/client.ts";
 
 const props = defineProps({
   title: {

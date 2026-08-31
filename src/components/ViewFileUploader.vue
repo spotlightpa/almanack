@@ -1,13 +1,7 @@
 <script>
 import { reactive, computed, toRefs, watch } from "vue";
 
-import {
-  get,
-  post,
-  listFiles,
-  updateFile,
-  uploadFile,
-} from "@/api/client-v2.js";
+import { get, post, listFiles, updateFile, uploadFile } from "@/api/client.ts";
 import { makeState } from "@/api/service-util.js";
 
 import { formatDate } from "@/utils/time-format.ts";

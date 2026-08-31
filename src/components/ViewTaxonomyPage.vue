@@ -8,7 +8,7 @@ import {
   getPage,
   listImages,
   postPage,
-} from "@/api/client-v2.js";
+} from "@/api/client.ts";
 import { TaxonomyPage } from "@/api/taxonomy-page.js";
 
 function usePage(id) {

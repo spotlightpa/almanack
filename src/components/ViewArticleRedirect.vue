@@ -3,7 +3,7 @@ import { ref } from "vue";
 import { wait } from "@/utils/wait.ts";
 import { useRouter, useRoute } from "vue-router";
 
-import { get, getSharedArticle } from "@/api/client-v2.js";
+import { get, getSharedArticle } from "@/api/client.ts";
 
 const router = useRouter();
 const route = useRoute();

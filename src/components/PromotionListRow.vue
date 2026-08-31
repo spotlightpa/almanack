@@ -1,7 +1,7 @@
 <script setup>
 import { ref, watch } from "vue";
 
-import { post, postPromotion, deletePromotion } from "@/api/client-v2.js";
+import { post, postPromotion, deletePromotion } from "@/api/client.ts";
 import { makePromotion } from "@/api/promotion.ts";
 import { formatDateTime } from "@/utils/time-format.ts";
 import { makeState } from "@/api/service-util.js";

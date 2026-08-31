@@ -1,6 +1,6 @@
 import { reactive, computed, toRefs } from "vue";
 
-import { get, post, listFiles, updateFile, uploadFile } from "./client-v2.js";
+import { get, post, listFiles, updateFile, uploadFile } from "./client.ts";
 import { makeState } from "./service-util.js";
 
 export function useFileList() {

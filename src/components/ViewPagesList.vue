@@ -1,6 +1,6 @@
 <script>
 import { watchAPI } from "@/api/service-util.js";
-import { get, listPages } from "@/api/client-v2.js";
+import { get, listPages } from "@/api/client.ts";
 import PageListItem from "@/api/spotlightpa-page-list-item.js";
 import { useRoute } from "vue-router";
 

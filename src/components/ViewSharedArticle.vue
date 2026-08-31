@@ -1,5 +1,5 @@
 <script setup>
-import { get, getSharedArticle } from "@/api/client-v2.js";
+import { get, getSharedArticle } from "@/api/client.ts";
 import { watchAPI } from "@/api/service-util.js";
 import SharedArticle from "@/api/shared-article.js";
 

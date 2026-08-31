@@ -8,7 +8,7 @@ import {
   postAuthorizedDomain,
   listAuthorizedEmailAddresses,
   postAuthorizedEmailAddress,
-} from "@/api/client-v2.js";
+} from "@/api/client.ts";
 import { makeState } from "@/api/service-util.js";
 
 function domainState() {

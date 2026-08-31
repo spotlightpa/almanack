@@ -1,5 +1,5 @@
 <script>
-import { get, post, getSiteData, postSiteData } from "@/api/client-v2.js";
+import { get, post, getSiteData, postSiteData } from "@/api/client.ts";
 import usePicks from "@/api/editors-picks.js";
 import { useRoute } from "vue-router";
 

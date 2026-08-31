@@ -1,5 +1,5 @@
 <script setup>
-import { useAuth } from "@/api/auth.js";
+import { useAuth } from "@/api/auth.ts";
 
 defineProps({
   article: Object,
