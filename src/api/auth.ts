@@ -4,11 +4,7 @@ import type { NetlifyUser } from "netlify-identity-widget";
 
 const DEV_AUTH_KEY = "almanack_dev_auth";
 
-interface AuthUser {
-  email: string;
-  fullName: string;
-  roles: string[];
-}
+type AuthUser = { email: string; fullName: string; roles: string[] };
 
 export interface Auth {
   isSignedIn: Readonly<Ref<boolean>>;
@@ -22,7 +18,7 @@ export interface Auth {
   login(): void;
   logout(): Promise<void>;
   headers(): Promise<Record<string, string> | null>;
-  setUser(u: AuthUser): void;
+  setUser(u: { email: string; fullName: string; roles: string[] }): void;
 }
 
 function loadDevUser(): AuthUser | null {
@@ -77,7 +73,7 @@ function makeDevAuth(): Auth {
       if (!user.value) return null;
       return { Authorization: "Bearer dev-fake-token" };
     },
-    setUser(u: AuthUser) {
+    setUser(u: { email: string; fullName: string; roles: string[] }) {
       user.value = u;
       saveDevUser(u);
     },
@@ -164,7 +160,7 @@ function makeAuth(): Auth {
     isEditor: hasRole("editor"),
     isSpotlightPAUser: hasRole("Spotlight PA"),
     isArcUser: hasRole("arc user"),
-    setUser() {
+    setUser(): never {
       throw new Error("setUser is not supported in production");
     },
     ...methods,

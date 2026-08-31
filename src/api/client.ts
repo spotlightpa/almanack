@@ -68,7 +68,7 @@ const responseError = async (rsp: Response): Promise<AppError | undefined> => {
   try {
     details = ((await rsp.json()) as { details?: ErrorDetails })?.details ?? {};
     // eslint-disable-next-line no-empty
-  } catch (e) {}
+  } catch {}
 
   let msg = `${rsp.status} ${rsp.statusText}`;
   let err = new Error("Unexpected response from server: " + msg) as AppError;
@@ -143,7 +143,7 @@ export async function uploadImage(body: File): Promise<Result<string>> {
   if (err) {
     return [null, err];
   }
-  let { "signed-url": signedURL, filename } = data as SignedUploadResponse;
+  let { "signed-url": signedURL, filename } = data!;
   let rsp: Response;
   try {
     rsp = await fetch(signedURL, { method: "PUT", body });
@@ -184,7 +184,7 @@ export async function uploadFile(body: File): Promise<Result<string>> {
     "file-url": fileURL,
     "cache-control": cacheControl,
     disposition,
-  } = data as CreateFileResponse;
+  } = data!;
   let opts: FetchOptions = {
     method: "PUT",
     body,
