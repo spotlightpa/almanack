@@ -87,7 +87,7 @@ function makeDevAuth(): Auth {
 function makeAuth(): Auth {
   const user = ref<NetlifyUser | null>(null);
 
-  const isSignedIn = computed(() => !!user.value);
+  const isSignedIn = computed(() => !!user.value?.token?.access_token);
   const roles = computed(() => user.value?.app_metadata?.roles ?? []);
   const fullName = computed(() => user.value?.user_metadata?.full_name ?? "");
   const email = computed(() => user.value?.email ?? "");
