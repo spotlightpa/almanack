@@ -4,14 +4,13 @@ import type { NetlifyUser } from "netlify-identity-widget";
 
 const DEV_AUTH_KEY = "almanack_dev_auth";
 
-export interface AuthUser {
+interface AuthUser {
   email: string;
   fullName: string;
   roles: string[];
 }
 
 export interface Auth {
-  user: Readonly<Ref<AuthUser | null>>;
   isSignedIn: Readonly<Ref<boolean>>;
   roles: Readonly<Ref<string[]>>;
   fullName: Readonly<Ref<string>>;
@@ -61,7 +60,6 @@ function makeDevAuth(): Auth {
   }
 
   return {
-    user,
     isSignedIn,
     roles,
     fullName,
@@ -171,7 +169,6 @@ function makeAuth(): Auth {
   netlifyIdentity.init({ logo: false, APIUrl });
 
   return {
-    user,
     isSignedIn,
     roles,
     fullName,
