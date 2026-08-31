@@ -89,7 +89,9 @@ function makeAuth(): Auth {
 
   const isSignedIn = computed(() => !!netlifyUser.value);
   const roles = computed(() => netlifyUser.value?.app_metadata?.roles ?? []);
-  const fullName = computed(() => netlifyUser.value?.user_metadata?.full_name ?? "");
+  const fullName = computed(
+    () => netlifyUser.value?.user_metadata?.full_name ?? ""
+  );
   const email = computed(() => netlifyUser.value?.email ?? "");
 
   function hasRole(name: string) {
