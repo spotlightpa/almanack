@@ -23,7 +23,7 @@ export interface Auth {
   login(): void;
   logout(): Promise<void>;
   headers(): Promise<Record<string, string> | null>;
-  setDevUser(u: AuthUser): void;
+  setUser(u: AuthUser): void;
 }
 
 function loadDevUser(): AuthUser | null {
@@ -79,7 +79,7 @@ function makeDevAuth(): Auth {
       if (!user.value) return null;
       return { Authorization: "Bearer dev-fake-token" };
     },
-    setDevUser(u: AuthUser) {
+    setUser(u: AuthUser) {
       user.value = u;
       saveDevUser(u);
     },
@@ -96,10 +96,7 @@ function makeAuth(): Auth {
       roles: u.app_metadata?.roles ?? [],
     };
   }
-
-  const user = computed(() =>
-    netlifyUser.value ? toAuthUser(netlifyUser.value) : null
-  );
+  const user = ref<AuthUser | null>(null);
   const isSignedIn = computed(() => !!user.value);
   const roles = computed(() => user.value?.roles ?? []);
   const fullName = computed(() => user.value?.fullName ?? "");
@@ -146,6 +143,7 @@ function makeAuth(): Auth {
 
   netlifyIdentity.on("init", async (u) => {
     netlifyUser.value = u;
+    user.value = u ? toAuthUser(u) : null;
     try {
       await u?.jwt();
     } catch {
@@ -154,14 +152,17 @@ function makeAuth(): Auth {
   });
   netlifyIdentity.on("login", (u) => {
     netlifyUser.value = u;
+    user.value = toAuthUser(u);
     netlifyIdentity.close();
   });
   netlifyIdentity.on("logout", () => {
     netlifyUser.value = null;
+    user.value = null;
   });
   netlifyIdentity.on("error", (err) => {
     console.warn(err);
     netlifyUser.value = null;
+    user.value = null;
   });
 
   const APIUrl = window.location.hostname.match(/localhost|\.ts\.net/)
@@ -178,7 +179,9 @@ function makeAuth(): Auth {
     isEditor: hasRole("editor"),
     isSpotlightPAUser: hasRole("Spotlight PA"),
     isArcUser: hasRole("arc user"),
-    setDevUser() {},
+    setUser(u: AuthUser) {
+      user.value = u;
+    },
     ...methods,
   };
 }
