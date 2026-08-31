@@ -4,9 +4,9 @@ import {
   postImageUpdate,
   createFile,
   updateFile,
-} from "./urls.ts";
+} from "./endpoints.ts";
 
-export * from "./urls.ts";
+export * from "./endpoints.ts";
 
 type Result<T> = [T, null] | [null, Error];
 
