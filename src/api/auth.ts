@@ -85,14 +85,14 @@ function makeDevAuth(): Auth {
 }
 
 function makeAuth(): Auth {
-  const netlifyUser = ref<NetlifyUser | null>(null);
+  const user = ref<NetlifyUser | null>(null);
 
-  const isSignedIn = computed(() => !!netlifyUser.value);
-  const roles = computed(() => netlifyUser.value?.app_metadata?.roles ?? []);
+  const isSignedIn = computed(() => !!user.value);
+  const roles = computed(() => user.value?.app_metadata?.roles ?? []);
   const fullName = computed(
-    () => netlifyUser.value?.user_metadata?.full_name ?? ""
+    () => user.value?.user_metadata?.full_name ?? ""
   );
-  const email = computed(() => netlifyUser.value?.email ?? "");
+  const email = computed(() => user.value?.email ?? "");
 
   function hasRole(name: string) {
     return computed(() =>
@@ -108,7 +108,7 @@ function makeAuth(): Auth {
       netlifyIdentity.open("login");
     },
     async logout() {
-      netlifyUser.value = null;
+      user.value = null;
       try {
         await netlifyIdentity.logout();
       } catch (e) {
@@ -117,12 +117,12 @@ function makeAuth(): Auth {
       }
     },
     async headers(): Promise<Record<string, string> | null> {
-      if (!netlifyUser.value) {
+      if (!user.value) {
         return null;
       }
       let token: string;
       try {
-        token = await netlifyUser.value.jwt();
+        token = await user.value.jwt();
       } catch (e) {
         await methods.logout();
         return null;
@@ -134,7 +134,7 @@ function makeAuth(): Auth {
   };
 
   netlifyIdentity.on("init", async (u) => {
-    netlifyUser.value = u;
+    user.value = u;
     try {
       await u?.jwt();
     } catch {
@@ -142,15 +142,15 @@ function makeAuth(): Auth {
     }
   });
   netlifyIdentity.on("login", (u) => {
-    netlifyUser.value = u;
+    user.value = u;
     netlifyIdentity.close();
   });
   netlifyIdentity.on("logout", () => {
-    netlifyUser.value = null;
+    user.value = null;
   });
   netlifyIdentity.on("error", (err) => {
     console.warn(err);
-    netlifyUser.value = null;
+    user.value = null;
   });
 
   const APIUrl = window.location.hostname.match(/localhost|\.ts\.net/)
