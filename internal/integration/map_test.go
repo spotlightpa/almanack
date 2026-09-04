@@ -2,14 +2,14 @@ package integration_test
 
 import (
 	"fmt"
-	"testing"
-
-	"github.com/carlmjohnson/be"
+	"github.com/earthboundkid/assert"
 	"github.com/spotlightpa/almanack/internal/db"
 	"github.com/spotlightpa/almanack/internal/utils/pgxutil"
+	"testing"
 )
 
 func TestMap(t *testing.T) {
+	be := assert.FailNow(t)
 	dbhandle := createTestDB(t)
 	q := dbhandle.Queries()
 
@@ -19,16 +19,16 @@ func TestMap(t *testing.T) {
 		FilePath:   testpath,
 		SourceType: "testing",
 	})
-	be.NilErr(t, err)
+	be.Zero(err)
 	// create again
 	_, err = q.CreatePage(ctx, db.CreatePageParams{
 		FilePath:   testpath,
 		SourceType: "testing",
 	})
-	be.Nonzero(t, err)
+	be.NotZero(err)
 	p1, err := q.GetPageByFilePath(ctx, testpath)
-	be.NilErr(t, err)
-	be.Equal(t, testpath, p1.FilePath)
+	be.Zero(err)
+	be.Equal(p1.FilePath, testpath)
 	p2, err := q.UpdatePage(ctx, db.UpdatePageParams{
 		ID:             p1.ID,
 		SetFrontmatter: true,
@@ -41,13 +41,13 @@ func TestMap(t *testing.T) {
 		Body:        "hello",
 		ScheduleFor: pgxutil.NullTime,
 	})
-	be.NilErr(t, err)
-	be.Equal(t, testpath, p2.FilePath)
-	be.Equal(t, "hello", p2.Body)
-	be.Equal(t, "map[bool:true hello:world number:1]", fmt.Sprint(p2.Frontmatter))
+	be.Zero(err)
+	be.Equal(p2.FilePath, testpath)
+	be.Equal(p2.Body, "hello")
+	be.Equal(fmt.Sprint(p2.Frontmatter), "map[bool:true hello:world number:1]")
 	p3, err := q.GetPageByFilePath(ctx, testpath)
-	be.NilErr(t, err)
-	be.Equal(t, testpath, p3.FilePath)
-	be.Equal(t, "hello", p3.Body)
-	be.Equal(t, "map[bool:true hello:world number:1]", fmt.Sprint(p3.Frontmatter))
+	be.Zero(err)
+	be.Equal(p3.FilePath, testpath)
+	be.Equal(p3.Body, "hello")
+	be.Equal(fmt.Sprint(p3.Frontmatter), "map[bool:true hello:world number:1]")
 }

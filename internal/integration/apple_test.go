@@ -2,20 +2,20 @@ package integration_test
 
 import (
 	"errors"
-	"net/http"
-	"strings"
-	"testing"
-
-	"github.com/carlmjohnson/be"
 	"github.com/carlmjohnson/requests"
 	"github.com/carlmjohnson/requests/reqtest"
+	"github.com/earthboundkid/assert"
 	"github.com/spotlightpa/almanack/internal/almlog"
 	"github.com/spotlightpa/almanack/internal/almsvc"
 	"github.com/spotlightpa/almanack/internal/services/anf"
 	"github.com/spotlightpa/almanack/internal/services/jsonfeed"
+	"net/http"
+	"strings"
+	"testing"
 )
 
 func TestPublishAppleNews(t *testing.T) {
+	be := assert.FailNow(t)
 	almlog.UseTestLogger(t)
 	dbhandle := createTestDB(t)
 	q := dbhandle.Queries()
@@ -48,20 +48,20 @@ func TestPublishAppleNews(t *testing.T) {
 	}
 
 	// Updating archive should add unuploaded items
-	be.NilErr(t, svc.NewsFeed.UpdateAppleNewsArchive(ctx, svc.Client, svc.Queries))
+	be.Zero(svc.NewsFeed.UpdateAppleNewsArchive(ctx, svc.Client, svc.Queries))
 	newItems, err := svc.Queries.ListNewsFeedUpdates(ctx)
-	be.NilErr(t, err)
-	be.EqualLength(t, 15, newItems)
+	be.Zero(err)
+	be.EqualLength(newItems, 15)
 
 	// Publishing should mark everything as uploaded
-	be.NilErr(t, svc.PublishAppleNewsFeed(ctx))
+	be.Zero(svc.PublishAppleNewsFeed(ctx))
 	newItems, err = svc.Queries.ListNewsFeedUpdates(ctx)
-	be.NilErr(t, err)
-	be.Zero(t, newItems)
+	be.Zero(err)
+	be.Zero(newItems)
 
 	// Updating archive should not mark previously uploaded items as null
-	be.NilErr(t, svc.NewsFeed.UpdateAppleNewsArchive(ctx, svc.Client, svc.Queries))
+	be.Zero(svc.NewsFeed.UpdateAppleNewsArchive(ctx, svc.Client, svc.Queries))
 	newItems, err = svc.Queries.ListNewsFeedUpdates(ctx)
-	be.NilErr(t, err)
-	be.EqualLength(t, 0, newItems)
+	be.Zero(err)
+	be.EqualLength(newItems, 0)
 }

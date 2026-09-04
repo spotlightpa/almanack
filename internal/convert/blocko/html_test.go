@@ -1,16 +1,16 @@
 package blocko
 
 import (
-	"strings"
-	"testing"
-
-	"github.com/carlmjohnson/be"
+	"github.com/earthboundkid/assert"
 	"github.com/earthboundkid/xhtml"
 	"golang.org/x/net/html"
 	"golang.org/x/net/html/atom"
+	"strings"
+	"testing"
 )
 
 func TestIsEmpty(t *testing.T) {
+	be := assert.FailNow(t)
 	tcases := map[string]struct {
 		in    string
 		empty bool
@@ -33,12 +33,12 @@ func TestIsEmpty(t *testing.T) {
 				Data:     "p",
 			}
 			children, err := html.ParseFragment(strings.NewReader(tc.in), p)
-			be.NilErr(t, err)
+			be.Zero(err)
 			for _, c := range children {
 				p.AppendChild(c)
 			}
-			be.DebugLog(t, "got: %q", xhtml.OuterHTML(p))
-			be.Equal(t, isEmpty(p), tc.empty)
+			t.Logf("got: %q", xhtml.OuterHTML(p))
+			be.Equal(tc.empty, isEmpty(p))
 		})
 	}
 }

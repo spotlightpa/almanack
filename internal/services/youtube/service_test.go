@@ -4,14 +4,15 @@ import (
 	"net/http"
 	"testing"
 
-	"github.com/carlmjohnson/be"
 	"github.com/carlmjohnson/requests"
 	"github.com/carlmjohnson/requests/reqtest"
+	"github.com/earthboundkid/assert"
 	"github.com/spotlightpa/almanack/internal/almlog"
 	"github.com/spotlightpa/almanack/internal/services/youtube"
 )
 
 func TestService(t *testing.T) {
+	be := assert.FailNow(t)
 	almlog.UseTestLogger(t)
 	svc := youtube.Feed{
 		ChannelID: "abc123",
@@ -20,10 +21,10 @@ func TestService(t *testing.T) {
 		Transport: reqtest.Replay("testdata"),
 	}
 	entries, err := svc.FetchFeed(t.Context(), cl)
-	be.NilErr(t, err)
-	be.Nonzero(t, entries)
+	be.Zero(err)
+	be.NotZero(entries)
 	for _, entry := range entries {
-		be.Nonzero(t, entry)
+		be.NotZero(entry)
 	}
 }
 

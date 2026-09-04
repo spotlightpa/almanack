@@ -5,8 +5,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/carlmjohnson/be"
-	"github.com/carlmjohnson/be/testfile"
+	"github.com/earthboundkid/assert/testfile"
 	"github.com/earthboundkid/xhtml"
 	"github.com/spotlightpa/almanack/internal/utils/must"
 	"golang.org/x/net/html"
@@ -24,14 +23,13 @@ func TestProcessDocHTML(t *testing.T) {
 		richTextStr := xhtml.OuterHTML(richText)
 		rawHTMLStr := xhtml.OuterHTML(rawHTML)
 
-		rt := be.Relaxed(t)
-		testfile.Equalish(rt, filepath.Join(dir, "intermediate.html"), intermediateDoc)
-		testfile.Equalish(rt, filepath.Join(dir, "rich.html"), richTextStr)
-		testfile.Equalish(rt, filepath.Join(dir, "raw.html"), rawHTMLStr)
-		testfile.Equalish(rt, filepath.Join(dir, "article.md"), md)
-		testfile.EqualJSON(rt, filepath.Join(dir, "metadata.json"), metadata)
-		testfile.EqualJSON(rt, filepath.Join(dir, "embeds.json"), embeds)
-		testfile.EqualJSON(rt, filepath.Join(dir, "warnings.json"), warnings)
+		testfile.Equalish(t, filepath.Join(dir, "intermediate.html"), intermediateDoc)
+		testfile.Equalish(t, filepath.Join(dir, "rich.html"), richTextStr)
+		testfile.Equalish(t, filepath.Join(dir, "raw.html"), rawHTMLStr)
+		testfile.Equalish(t, filepath.Join(dir, "article.md"), md)
+		testfile.EqualJSON(t, filepath.Join(dir, "metadata.json"), metadata)
+		testfile.EqualJSON(t, filepath.Join(dir, "embeds.json"), embeds)
+		testfile.EqualJSON(t, filepath.Join(dir, "warnings.json"), warnings)
 	})
 }
 

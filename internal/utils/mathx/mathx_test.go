@@ -1,13 +1,13 @@
 package mathx_test
 
 import (
-	"testing"
-
-	"github.com/carlmjohnson/be"
+	"github.com/earthboundkid/assert"
 	"github.com/spotlightpa/almanack/internal/utils/mathx"
+	"testing"
 )
 
 func TestClamp(t *testing.T) {
+	be := assert.FailNow(t)
 	for _, tc := range []struct {
 		n, min, max, want int
 	}{
@@ -18,9 +18,9 @@ func TestClamp(t *testing.T) {
 		{10, 1, 10, 10}, // at max boundary
 		{10, 1, 1, 1},   // weird clamp inputs
 	} {
-		be.Equal(t, tc.want, mathx.Clamp(tc.n, tc.min, tc.max))
+		be.Equal(mathx.Clamp(tc.n, tc.min, tc.max), tc.want)
 	}
-	be.Nonzero(t, be.Panicked(func() {
+	be.NotZero(assert.Catch(func() {
 		mathx.Clamp(10, 100, 1)
 	}))
 }
