@@ -20,11 +20,11 @@ func TestEmbed_UnmarshalJSON(t *testing.T) {
 				Description: "desc",
 			},
 		}
-		b, err := json.Marshal(e1)
-		be.Zero(err)
+		b := be.OK(json.Marshal(e1))
 		var e2 db.Embed
-		be.Zero(json.Unmarshal(b, &e2))
-		be.Equal(e2, e1)
+		be.
+			Zero(json.Unmarshal(b, &e2)).
+			Equal(e2, e1)
 	}
 	{
 		e1 := db.Embed{
@@ -32,18 +32,17 @@ func TestEmbed_UnmarshalJSON(t *testing.T) {
 			Type:  db.RawEmbedTag,
 			Value: "Mork from Ork",
 		}
-		b, err := json.Marshal(e1)
-		be.Zero(err)
+		b := be.OK(json.Marshal(e1))
 		var e2 db.Embed
-		be.Zero(json.Unmarshal(b, &e2))
-		be.Equal(e2, e1)
+		be.
+			Zero(json.Unmarshal(b, &e2)).
+			Equal(e2, e1)
 	}
 	{
 		e1 := db.Embed{
 			Type: "bad",
 		}
-		b, err := json.Marshal(e1)
-		be.Zero(err)
+		b := be.OK(json.Marshal(e1))
 		var e2 db.Embed
 		be.NotZero(json.Unmarshal(b, &e2))
 	}

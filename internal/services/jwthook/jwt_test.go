@@ -61,13 +61,10 @@ func TestVerifyRequest(t *testing.T) {
 }
 
 func getreq(t *testing.T, name string) *http.Request {
-	be := assert.FailNow(t)
 	t.Helper()
-	f, err := os.Open(name)
-	be.Zero(err)
+	be := assert.FailNow(t)
+	f := be.OK(os.Open(name))
 	defer f.Close()
 	buf := bufio.NewReader(f)
-	req, err := http.ReadRequest(buf)
-	be.Zero(err)
-	return req
+	return be.OK(http.ReadRequest(buf))
 }

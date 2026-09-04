@@ -1,12 +1,12 @@
 package almsvc
 
 import (
-	"github.com/earthboundkid/assert"
 	"testing"
+
+	"github.com/earthboundkid/assert"
 )
 
 func TestImageCAS(t *testing.T) {
-	be := assert.FailNow(t)
 	cases := []struct {
 		body, ct, want string
 	}{
@@ -17,7 +17,7 @@ func TestImageCAS(t *testing.T) {
 	for _, tc := range cases {
 		t.Run("", func(t *testing.T) {
 			got := makeCASaddress([]byte(tc.body), tc.ct)
-			be.Equal(got, tc.want)
+			assert.FailNow(t).Equal(got, tc.want)
 		})
 		var s string
 		body := []byte(tc.body)

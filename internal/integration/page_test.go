@@ -34,19 +34,18 @@ func TestServicePublish(t *testing.T) {
 	// Success case
 	{
 		const path1 = "content/news/1.md"
-		p0, err := svc.Queries.CreatePage(ctx, db.CreatePageParams{
+		p0 := be.OK(svc.Queries.CreatePage(ctx, db.CreatePageParams{
 			FilePath:   path1,
 			SourceType: "manual",
 			SourceID:   "n/a",
-		})
-		be.Zero(err)
+		}))
 
-		p, err := svc.Queries.GetPageByFilePath(ctx, path1)
-		be.Zero(err)
-		be.False(p.LastPublished.Valid)
-		be.Equal(p.ID, p0.ID)
+		p := be.OK(svc.Queries.GetPageByFilePath(ctx, path1))
+		be.
+			False(p.LastPublished.Valid).
+			Equal(p.ID, p0.ID)
 
-		_, err = os.Stat(filepath.Join(tmp, path1))
+		_, err := os.Stat(filepath.Join(tmp, path1))
 		be.ErrorIs(err, os.ErrNotExist)
 
 		p1 := &db.Page{
@@ -180,8 +179,7 @@ func TestServicePublish(t *testing.T) {
 		})
 		be.NotZero(err)
 
-		p, err := svc.Queries.GetPageByFilePath(ctx, path3)
-		be.Zero(err)
+		p := be.OK(svc.Queries.GetPageByFilePath(ctx, path3))
 		be.False(p.LastPublished.Valid)
 	}
 }
@@ -273,16 +271,16 @@ func TestServicePopScheduledPages(t *testing.T) {
 
 	{
 		const path = "content/news/test-pop.md"
-		p, err := svc.Queries.CreatePage(ctx, db.CreatePageParams{
+		p := be.OK(svc.Queries.CreatePage(ctx, db.CreatePageParams{
 			FilePath:   path,
 			SourceType: "manual",
 			SourceID:   "n/a",
-		})
-		be.Zero(err)
+		}))
 
-		p, err = svc.Queries.GetPageByFilePath(ctx, path)
-		be.Zero(err)
-		be.False(p.LastPublished.Valid)
+		p, err := svc.Queries.GetPageByFilePath(ctx, path)
+		be.
+			Zero(err).
+			False(p.LastPublished.Valid)
 
 		_, err = os.Stat(filepath.Join(tmp, path))
 		be.ErrorIs(err, os.ErrNotExist)

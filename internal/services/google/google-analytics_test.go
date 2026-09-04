@@ -19,11 +19,9 @@ func TestMostPopularNews(t *testing.T) {
 	cl := *http.DefaultClient
 	cl.Transport = reqtest.Replay("testdata")
 	if os.Getenv("ALMANACK_GOOGLE_TEST_RECORD_REQUEST") != "" {
-		gcl, err := svc.GAClient(ctx)
-		be.Zero(err)
+		gcl := be.OK(svc.GAClient(ctx))
 		cl.Transport = reqtest.Record(gcl.Transport, "testdata")
 	}
-	pages, err := svc.MostPopularNews(ctx, &cl)
-	be.Zero(err)
+	pages := be.OK(svc.MostPopularNews(ctx, &cl))
 	be.EqualLength(pages, 20)
 }

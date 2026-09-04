@@ -15,8 +15,7 @@ func TestFromDB(t *testing.T) {
 		be := assert.FailNow(t)
 		var item db.NewsFeedItem
 		testfile.ReadJSON(t, match, &item)
-		art, err := anf.FromDB(&item)
-		be.Zero(err)
+		art := be.OK(anf.FromDB(&item))
 		filename := filepath.Join(filepath.Dir(match), "article.json")
 		testfile.EqualJSON(t, filename, art)
 	})

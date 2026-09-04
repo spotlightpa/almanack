@@ -1,11 +1,12 @@
 package github_test
 
 import (
-	"github.com/earthboundkid/assert"
-	"github.com/spotlightpa/almanack/internal/services/github"
 	"os"
 	"testing"
 	"time"
+
+	"github.com/earthboundkid/assert"
+	"github.com/spotlightpa/almanack/internal/services/github"
 )
 
 func TestGithub(t *testing.T) {
@@ -24,18 +25,16 @@ func TestGithub(t *testing.T) {
 	// create
 	testFileContents := time.Now().Format(time.Stamp)
 	fname := time.Now().Format("test-" + time.RFC3339 + ".txt")
-	err := client.UpdateFile(ctx, "test create", fname, []byte(testFileContents))
-	be.Zero(err)
+	be.Zero(client.UpdateFile(ctx, "test create", fname, []byte(testFileContents)))
 	// get
-	returned, err := client.GetFile(ctx, fname)
-	be.Zero(err)
+	returned := be.OK(client.GetFile(ctx, fname))
 	be.Equal(string(returned), testFileContents)
 	// update
 	testFileContents = time.Now().Format(time.Stamp)
-	err = client.UpdateFile(ctx, "test update", fname, []byte(testFileContents))
-	be.Zero(err)
+	be.Zero(client.UpdateFile(ctx, "test update", fname, []byte(testFileContents)))
 	// get
-	returned, err = client.GetFile(ctx, fname)
-	be.Zero(err)
-	be.Equal(string(returned), testFileContents)
+	returned, err := client.GetFile(ctx, fname)
+	be.
+		Zero(err).
+		Equal(string(returned), testFileContents)
 }
