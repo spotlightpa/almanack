@@ -1,14 +1,14 @@
 package stringx_test
 
 import (
-	"testing"
-
-	"github.com/carlmjohnson/be"
-	"github.com/carlmjohnson/be/testfile"
+	"github.com/earthboundkid/assert"
+	"github.com/earthboundkid/assert/testfile"
 	"github.com/spotlightpa/almanack/internal/utils/stringx"
+	"testing"
 )
 
 func TestSlugifyURL(t *testing.T) {
+	be := assert.FailNow(t)
 	cases := []struct {
 		input, want string
 	}{
@@ -24,12 +24,13 @@ func TestSlugifyURL(t *testing.T) {
 	}
 	for _, tc := range cases {
 		t.Run(tc.input, func(t *testing.T) {
-			be.Equal(t, tc.want, stringx.SlugifyURL(tc.input))
+			be.Equal(stringx.SlugifyURL(tc.input), tc.want)
 		})
 	}
 }
 
 func TestSlugifyFilename(t *testing.T) {
+	be := assert.FailNow(t)
 	cases := []struct {
 		input, want string
 	}{
@@ -42,13 +43,16 @@ func TestSlugifyFilename(t *testing.T) {
 	}
 	for _, tc := range cases {
 		t.Run(tc.input, func(t *testing.T) {
-			be.Equal(t, tc.want, stringx.SlugifyFilename(tc.input))
+			be.Equal(stringx.SlugifyFilename(tc.input), tc.want)
 		})
 	}
 }
 
 func TestRemoveParens(t *testing.T) {
-	// Test cases
+	be :=
+		// Test cases
+		assert.FailNow(t)
+
 	testCases := []struct {
 		input string
 		want  string
@@ -64,12 +68,12 @@ func TestRemoveParens(t *testing.T) {
 
 	// Run test cases
 	for _, tc := range testCases {
-		be.Equal(t, tc.want, stringx.RemoveParens(tc.input))
+		be.Equal(stringx.RemoveParens(tc.input), tc.want)
 	}
 }
 
 func TestExtractName(t *testing.T) {
-	rt := be.Relaxed(t)
+	be := assert.Continue(t)
 
 	type testcase struct {
 		Input string
@@ -104,17 +108,18 @@ func TestExtractName(t *testing.T) {
 		{"Mari\u0301a", []string{"Mar\u00EDa"}},
 	}
 	for _, tc := range cases {
-		be.AllEqual(rt, tc.Want, stringx.ExtractNames(tc.Input))
+		be.SlicesEqual(stringx.ExtractNames(tc.Input), tc.Want)
 	}
 
 	// Bulk cases
 	testfile.ReadJSON(t, "testdata/extract-name-cases.json", &cases)
 	for _, tc := range cases {
-		be.AllEqual(rt, tc.Want, stringx.ExtractNames(tc.Input))
+		be.SlicesEqual(stringx.ExtractNames(tc.Input), tc.Want)
 	}
 }
 
 func TestTruncate(t *testing.T) {
+	be := assert.FailNow(t)
 	cases := []struct {
 		input, want string
 		max         int
@@ -127,12 +132,13 @@ func TestTruncate(t *testing.T) {
 	}
 	for _, tc := range cases {
 		t.Run(tc.input, func(t *testing.T) {
-			be.Equal(t, tc.want, stringx.Truncate(tc.input, tc.max))
+			be.Equal(stringx.Truncate(tc.input, tc.max), tc.want)
 		})
 	}
 }
 
 func TestFlattenMap(t *testing.T) {
+	be := assert.FailNow(t)
 	cases := []struct {
 		in   map[string]string
 		want []string
@@ -149,11 +155,12 @@ func TestFlattenMap(t *testing.T) {
 		},
 	}
 	for _, tc := range cases {
-		be.AllEqual(t, tc.want, stringx.FlattenMap(tc.in))
+		be.SlicesEqual(stringx.FlattenMap(tc.in), tc.want)
 	}
 }
 
 func TestFlattenMultimap(t *testing.T) {
+	be := assert.FailNow(t)
 	cases := []struct {
 		in   map[string][]string
 		want []string
@@ -175,6 +182,6 @@ func TestFlattenMultimap(t *testing.T) {
 		},
 	}
 	for _, tc := range cases {
-		be.AllEqual(t, tc.want, stringx.FlattenMultimap(tc.in))
+		be.SlicesEqual(stringx.FlattenMultimap(tc.in), tc.want)
 	}
 }

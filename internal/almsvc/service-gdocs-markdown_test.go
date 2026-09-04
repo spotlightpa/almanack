@@ -1,12 +1,12 @@
 package almsvc
 
 import (
+	"github.com/earthboundkid/assert"
 	"testing"
-
-	"github.com/carlmjohnson/be"
 )
 
 func TestReplaceSpotlightShortcodes(t *testing.T) {
+	be := assert.Continue(t)
 	cases := []struct {
 		in, want string
 	}{
@@ -146,7 +146,6 @@ var deweyConfig = {
 		},
 	}
 	for _, tc := range cases {
-		t := be.Relaxed(t)
-		be.Equal(t, tc.want, replaceSpotlightShortcodes(tc.in))
+		be.Equal(replaceSpotlightShortcodes(tc.in), tc.want)
 	}
 }

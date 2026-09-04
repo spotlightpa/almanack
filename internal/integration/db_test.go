@@ -1,29 +1,29 @@
 package integration_test
 
 import (
-	"testing"
-
-	"github.com/carlmjohnson/be"
+	"github.com/earthboundkid/assert"
 	"github.com/spotlightpa/almanack/internal/almlog"
 	"github.com/spotlightpa/almanack/internal/utils/pgxutil"
+	"testing"
 )
 
 func TestIsUniquenessViolation(t *testing.T) {
+	be := assert.FailNow(t)
 	almlog.UseTestLogger(t)
 	dbhandle := createTestDB(t)
 	dbtx := dbhandle.DBTX()
 	{ // No errors to insert some key
 		_, err := dbtx.Exec(t.Context(), "insert into option(key, value) values ('k', 'v')")
-		be.NilErr(t, err)
-		be.False(t, pgxutil.IsUniquenessViolation(err, ""))
-		be.False(t, pgxutil.IsUniquenessViolation(err, "blah"))
-		be.False(t, pgxutil.IsUniquenessViolation(err, "option_key_key"))
+		be.Zero(err)
+		be.False(pgxutil.IsUniquenessViolation(err, ""))
+		be.False(pgxutil.IsUniquenessViolation(err, "blah"))
+		be.False(pgxutil.IsUniquenessViolation(err, "option_key_key"))
 	}
 	{ // Get option_key_key uniqueness errors on repeat insertions of the same key
 		_, err := dbtx.Exec(t.Context(), "insert into option(key, value) values ('k', 'v')")
-		be.Nonzero(t, err)
-		be.True(t, pgxutil.IsUniquenessViolation(err, ""))
-		be.False(t, pgxutil.IsUniquenessViolation(err, "blah"))
-		be.True(t, pgxutil.IsUniquenessViolation(err, "option_key_key"))
+		be.NotZero(err)
+		be.True(pgxutil.IsUniquenessViolation(err, ""))
+		be.False(pgxutil.IsUniquenessViolation(err, "blah"))
+		be.True(pgxutil.IsUniquenessViolation(err, "option_key_key"))
 	}
 }

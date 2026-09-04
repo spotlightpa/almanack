@@ -1,18 +1,17 @@
 package integration_test
 
 import (
-	"net/http/httptest"
-	"os"
-	"sync"
-	"testing"
-
-	"github.com/carlmjohnson/be"
 	"github.com/carlmjohnson/requests"
 	"github.com/carlmjohnson/requests/reqtest"
+	"github.com/earthboundkid/assert"
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/spotlightpa/almanack/internal/almapp"
 	"github.com/spotlightpa/almanack/internal/almsvc"
 	"github.com/spotlightpa/almanack/internal/db"
+	"net/http/httptest"
+	"os"
+	"sync"
+	"testing"
 )
 
 var (
@@ -24,6 +23,7 @@ var (
 // createTestDB checks ALMANACK_POSTGRES and
 // creates a database called almanack_test at the provided address.
 func createTestDB(t *testing.T) *db.Handle {
+	be := assert.FailNow(t)
 	t.Helper()
 	dbURL := os.Getenv("ALMANACK_POSTGRES")
 	if dbURL == "" {
@@ -32,7 +32,7 @@ func createTestDB(t *testing.T) *db.Handle {
 	once.Do(func() {
 		pool, poolErr = db.CreateTestDatabase(dbURL)
 	})
-	be.NilErr(t, poolErr)
+	be.Zero(poolErr)
 	return db.NewHandle(pool)
 }
 

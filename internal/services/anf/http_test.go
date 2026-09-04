@@ -2,38 +2,39 @@ package anf_test
 
 import (
 	"bufio"
+	"github.com/carlmjohnson/requests/reqtest"
+	"github.com/earthboundkid/assert"
+	"github.com/earthboundkid/assert/testfile"
+	"github.com/spotlightpa/almanack/internal/almlog"
+	"github.com/spotlightpa/almanack/internal/services/anf"
 	"net/http"
 	"net/http/httputil"
 	"strings"
 	"testing"
 	"testing/synctest"
 	"time"
-
-	"github.com/carlmjohnson/be"
-	"github.com/carlmjohnson/be/testfile"
-	"github.com/carlmjohnson/requests/reqtest"
-	"github.com/spotlightpa/almanack/internal/almlog"
-	"github.com/spotlightpa/almanack/internal/services/anf"
 )
 
 func TestHMACSignRequest(t *testing.T) {
+	be := assert.FailNow(t)
 	testfile.Run(t, "testdata/req.*.raw", func(t *testing.T, match string) {
 		synctest.Test(t, func(t *testing.T) {
 			in := testfile.Read(t, match)
 			buf := bufio.NewReader(strings.NewReader(in))
 			req, err := http.ReadRequest(buf)
-			be.NilErr(t, err)
+			be.Zero(err)
 
 			now := time.Now()
-			be.NilErr(t, anf.HHMACSignRequest(req, "key", "aGVsbG8=", now))
+			be.Zero(anf.HHMACSignRequest(req, "key", "aGVsbG8=", now))
 			signed, err := httputil.DumpRequest(req, true)
-			be.NilErr(t, err)
+			be.Zero(err)
 			testfile.Equalish(t, testfile.Ext(match, "signed"), string(signed))
 		})
 	})
 }
 
 func TestService(t *testing.T) {
+	be := assert.FailNow(t)
 	almlog.UseTestLogger(t)
 	svc := anf.Service{
 		ChannelID: "abc",
@@ -45,12 +46,12 @@ func TestService(t *testing.T) {
 	}
 	synctest.Test(t, func(t *testing.T) {
 		data, err := svc.ReadChannel(t.Context())
-		be.NilErr(t, err)
-		be.Nonzero(t, data)
+		be.Zero(err)
+		be.NotZero(data)
 		sections, err := svc.ListSections(t.Context())
-		be.NilErr(t, err)
-		be.Nonzero(t, sections)
+		be.Zero(err)
+		be.NotZero(sections)
 		// Should have at least default channel
-		be.Nonzero(t, sections.ToMap()[""])
+		be.NotZero(sections.ToMap()[""])
 	})
 }

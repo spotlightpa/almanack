@@ -2,16 +2,16 @@ package stringx_test
 
 import (
 	_ "embed"
-	"testing"
-
-	"github.com/carlmjohnson/be"
+	"github.com/earthboundkid/assert"
 	"github.com/spotlightpa/almanack/internal/utils/stringx"
+	"testing"
 )
 
 //go:embed testdata/article.txt
 var article string
 
 func TestWordCount(t *testing.T) {
+	be := assert.Continue(t)
 	cases := []struct {
 		s string
 		n int
@@ -23,7 +23,7 @@ func TestWordCount(t *testing.T) {
 		{article, 1510},
 	}
 	for _, tc := range cases {
-		be.Equal(be.Relaxed(t), tc.n, stringx.WordCount(tc.s))
+		be.Equal(stringx.WordCount(tc.s), tc.n)
 	}
 }
 

@@ -1,20 +1,20 @@
 package integration_test
 
 import (
-	"net/http"
-	"testing"
-
-	"github.com/carlmjohnson/be"
 	"github.com/carlmjohnson/requests/reqtest"
+	"github.com/earthboundkid/assert"
 	"github.com/spotlightpa/almanack/internal/almlog"
 	"github.com/spotlightpa/almanack/internal/almsvc"
 	"github.com/spotlightpa/almanack/internal/db"
 	"github.com/spotlightpa/almanack/internal/services/aws"
 	"github.com/spotlightpa/almanack/internal/services/github"
 	"github.com/spotlightpa/almanack/internal/services/youtube"
+	"net/http"
+	"testing"
 )
 
 func TestYouTube(t *testing.T) {
+	be := assert.FailNow(t)
 	almlog.UseTestLogger(t)
 	dbhandle := createTestDB(t)
 	svc := almsvc.Services{
@@ -37,11 +37,11 @@ func TestYouTube(t *testing.T) {
 			Limit:    20,
 			Offset:   0,
 		})
-		be.NilErr(t, err)
-		be.Zero(t, pages)
+		be.Zero(err)
+		be.Zero(pages)
 	}
 	{ // Load initial items
-		be.NilErr(t, svc.UpdateYouTubeFeed(ctx))
+		be.Zero(svc.UpdateYouTubeFeed(ctx))
 	}
 	{ // Should have pages
 		pages, err := svc.Queries.ListPages(ctx, db.ListPagesParams{
@@ -49,7 +49,7 @@ func TestYouTube(t *testing.T) {
 			Limit:    20,
 			Offset:   0,
 		})
-		be.NilErr(t, err)
-		be.EqualLength(t, 15, pages)
+		be.Zero(err)
+		be.EqualLength(pages, 15)
 	}
 }

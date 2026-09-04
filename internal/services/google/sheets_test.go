@@ -1,18 +1,18 @@
 package google_test
 
 import (
-	"net/http"
-	"testing"
-
-	"github.com/carlmjohnson/be"
-	"github.com/carlmjohnson/be/testfile"
 	"github.com/carlmjohnson/requests/reqtest"
+	"github.com/earthboundkid/assert"
+	"github.com/earthboundkid/assert/testfile"
 	"github.com/spotlightpa/almanack/internal/almlog"
 	"github.com/spotlightpa/almanack/internal/services/google"
 	"gopkg.in/Iwark/spreadsheet.v2"
+	"net/http"
+	"testing"
 )
 
 func TestSheetToFileObjects(t *testing.T) {
+	be := assert.FailNow(t)
 	ctx := t.Context()
 	almlog.UseTestLogger(t)
 
@@ -22,16 +22,17 @@ func TestSheetToFileObjects(t *testing.T) {
 	if false {
 		svc := google.Service{}
 		gcl, err := svc.SheetsClient(ctx)
-		be.NilErr(t, err)
+		be.Zero(err)
 		cl.Transport = reqtest.Caching(gcl.Transport, "testdata/sheets")
 	}
 
 	obj, err := google.SheetToDonorWall(ctx, cl, "abc123")
-	be.NilErr(t, err)
+	be.Zero(err)
 	testfile.EqualJSON(t, "testdata/sheets/want.json", obj)
 }
 
 func TestSheetMap(t *testing.T) {
+	be := assert.FailNow(t)
 	sheet := &spreadsheet.Sheet{
 		Rows: [][]spreadsheet.Cell{
 			{{Value: "a"}, {Value: "b"}, {Value: "c"}, {}, {}},
@@ -47,5 +48,5 @@ func TestSheetMap(t *testing.T) {
 		b := sm.Field("b")
 		got = append(got, abc{sm.Field("a"), b, sm.Field("c")})
 	}
-	be.AllEqual(t, []abc{{"1", "2", "3"}, {"4", "5", "6"}}, got)
+	be.SlicesEqual(got, []abc{{"1", "2", "3"}, {"4", "5", "6"}})
 }
