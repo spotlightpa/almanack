@@ -94,8 +94,8 @@ github.com/cncf/xds/go v0.0.0-20260202195803-dba9d589def2 h1:aBangftG7EVZoUb69Os
 github.com/cncf/xds/go v0.0.0-20260202195803-dba9d589def2/go.mod h1:qwXFYgsP6T7XnJtbKlf1HP8AjxZZyzxMmc+Lq5GjlU4=
 github.com/davecgh/go-spew v1.1.0/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/davecgh/go-spew v1.1.1/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
-github.com/earthboundkid/assert v0.26.1 h1:1M2VpvcxnCoJyYPV/Mt1EmsF+e72SKJJRD7jmsLCBs4=
-github.com/earthboundkid/assert v0.26.1/go.mod h1:vctZ82uDOVsYzYb4NP94i/+QRzfJKM2UoNjoehSHODI=
+github.com/earthboundkid/assert v0.26.2 h1:bYOnnYpcQI5ph5NR8tCv5izSUCVUTC89fs5aLdrlaoo=
+github.com/earthboundkid/assert v0.26.2/go.mod h1:vctZ82uDOVsYzYb4NP94i/+QRzfJKM2UoNjoehSHODI=
 github.com/earthboundkid/bytemap/v2 v2.24.1 h1:/uV7l5RwQk+i7CHBaysasl+nmHR/VYOGQCjrdNeCPv8=
 github.com/earthboundkid/bytemap/v2 v2.24.1/go.mod h1:amqatzrKVIgZYITQzyXL1bV4pH3cEVqRdX23T3iKhnM=
 github.com/earthboundkid/crockford/v2 v2.25.3 h1:XLAMunAlwif1ibtaiOh81IkqXjik4uraYyWLwiM2eAk=
