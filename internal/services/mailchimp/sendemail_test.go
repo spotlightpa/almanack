@@ -1,17 +1,17 @@
 package mailchimp_test
 
 import (
+	"net/http"
+	"os"
+	"testing"
+
 	"github.com/carlmjohnson/requests/reqtest"
 	"github.com/earthboundkid/assert"
 	"github.com/spotlightpa/almanack/internal/almlog"
 	"github.com/spotlightpa/almanack/internal/services/mailchimp"
-	"net/http"
-	"os"
-	"testing"
 )
 
 func TestSendEmail(t *testing.T) {
-	be := assert.FailNow(t)
 	almlog.UseTestLogger(t)
 
 	cl := *http.DefaultClient
@@ -23,6 +23,5 @@ func TestSendEmail(t *testing.T) {
 		cl.Transport = reqtest.Caching(nil, "testdata/sendemail")
 	}
 	v3 := mailchimp.NewV3(apiKey, listID, &cl)
-	err := v3.SendEmail(t.Context(), "Test message", "Hello, World!")
-	be.Zero(err)
+	assert.FailNow(t).Zero(v3.SendEmail(t.Context(), "Test message", "Hello, World!"))
 }

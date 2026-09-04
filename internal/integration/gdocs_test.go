@@ -52,14 +52,12 @@ func TestProcessGDocsDoc(t *testing.T) {
 		testfile.ReadJSON(t, path+"/doc.json", &doc)
 		// Run twice to test the already uploaded path
 		for range 2 {
-			dbDoc, err := svc.Queries.CreateGDocsDoc(ctx, db.CreateGDocsDocParams{
+			dbDoc := be.OK(svc.Queries.CreateGDocsDoc(ctx, db.CreateGDocsDocParams{
 				ExternalID: fmt.Sprintf("abc123_%s", stringx.SlugifyURL(path)),
 				Document:   doc,
-			})
-			be.Zero(err)
-			err = svc.ProcessGDocsDoc(ctx, dbDoc)
-			be.Zero(err)
-			dbDoc, err = svc.Queries.GetGDocsByID(ctx, dbDoc.ID)
+			}))
+			be.Zero(svc.ProcessGDocsDoc(ctx, dbDoc))
+			dbDoc, err := svc.Queries.GetGDocsByID(ctx, dbDoc.ID)
 			be.Zero(err)
 
 			testfile.Equal(t, path+"/raw.html", dbDoc.RawHtml)
@@ -68,16 +66,15 @@ func TestProcessGDocsDoc(t *testing.T) {
 			testfile.EqualJSON(t, path+"/metadata.json", dbDoc.Metadata)
 			testfile.EqualJSON(t, path+"/warnings.json", dbDoc.Warnings)
 
-			art, err := svc.UpsertSharedArticleForGDoc(ctx, &dbDoc, false)
-			be.Zero(err)
+			art := be.OK(svc.UpsertSharedArticleForGDoc(ctx, &dbDoc, false))
 			date := time.Date(2020, time.March, 15, 20, 00, 00, 00, time.UTC)
 			art.PublicationDate.Time = date
 			swapInternalID := filepath.Base(path) // Set a unique slug
 			art.InternalID, swapInternalID = swapInternalID, art.InternalID
-			be.Zero(svc.CreatePageFromGDocsDoc(ctx, art, "news"))
-			be.True(art.PageID.Valid)
-			page, err := svc.Queries.GetPageByID(ctx, art.PageID.Int64)
-			be.Zero(err)
+			be.
+				Zero(svc.CreatePageFromGDocsDoc(ctx, art, "news")).
+				True(art.PageID.Valid)
+			page := be.OK(svc.Queries.GetPageByID(ctx, art.PageID.Int64))
 			// Swap internal ID back
 			art.InternalID = swapInternalID
 			// Stablize racey fields

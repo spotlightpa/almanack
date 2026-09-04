@@ -23,8 +23,7 @@ func TestListDriveFiles(t *testing.T) {
 		}
 		cl.Transport = reqtest.Record(gcl.Transport, "testdata")
 	}
-	files, err := svc.Files(ctx, &cl)
-	be.Zero(err)
+	files := be.OK(svc.Files(ctx, &cl))
 	be.NotZero(files)
 }
 
@@ -34,15 +33,16 @@ func TestDownloadFile(t *testing.T) {
 	ctx := t.Context()
 	cl := *http.DefaultClient
 	cl.Transport = reqtest.Replay("testdata")
-	b, err := gsvc.DownloadFile(ctx, &cl, "1ssiQd8AKXHo99qkZZwYbHxfVJHY3RPnL")
-	be.Zero(err)
+	b := be.OK(gsvc.DownloadFile(ctx, &cl, "1ssiQd8AKXHo99qkZZwYbHxfVJHY3RPnL"))
 	be.Equal(http.DetectContentType(b), "image/jpeg")
 
-	b, err = gsvc.DownloadFile(ctx, &cl, "https://drive.google.com/file/d/1ssiQd8AKXHo99qkZZwYbHxfVJHY3RPnL/view?usp=share_link")
-	be.Zero(err)
-	be.Equal(http.DetectContentType(b), "image/jpeg")
+	b, err := gsvc.DownloadFile(ctx, &cl, "https://drive.google.com/file/d/1ssiQd8AKXHo99qkZZwYbHxfVJHY3RPnL/view?usp=share_link")
+	be.
+		Zero(err).
+		Equal(http.DetectContentType(b), "image/jpeg")
 
 	b, err = gsvc.DownloadFile(ctx, &cl, "https://drive.google.com/file/d/1ssiQd8AKXHo99qkZZwYbHxfVJHY3RPnL;;/view?usp=share_link")
-	be.NotZero(err)
-	be.Zero(b)
+	be.
+		NotZero(err).
+		Zero(b)
 }

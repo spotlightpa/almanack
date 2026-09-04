@@ -53,9 +53,7 @@ func TestNew(t *testing.T) {
 }
 
 func TestNewPanicsOnOddAttrs(t *testing.T) {
-	be := assert.FailNow(t)
-	r := assert.Catch(func() {
+	assert.FailNow(t).NotZero(assert.Catch(func() {
 		shortcode.New("picture", "src")
-	})
-	be.NotZero(r)
+	}))
 }

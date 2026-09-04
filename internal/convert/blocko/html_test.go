@@ -10,7 +10,6 @@ import (
 )
 
 func TestIsEmpty(t *testing.T) {
-	be := assert.FailNow(t)
 	tcases := map[string]struct {
 		in    string
 		empty bool
@@ -32,8 +31,8 @@ func TestIsEmpty(t *testing.T) {
 				DataAtom: atom.P,
 				Data:     "p",
 			}
-			children, err := html.ParseFragment(strings.NewReader(tc.in), p)
-			be.Zero(err)
+			be := assert.FailNow(t)
+			children := be.OK(html.ParseFragment(strings.NewReader(tc.in), p))
 			for _, c := range children {
 				p.AppendChild(c)
 			}

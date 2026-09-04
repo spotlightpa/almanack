@@ -12,8 +12,7 @@ func TestConvert(t *testing.T) {
 	testfile.Run(t, "testdata/*/article.html", func(t *testing.T, match string) {
 		be := assert.FailNow(t)
 		in := testfile.Read(t, match)
-		art, err := anf.ConvertToAppleNews(in, "http://www.spotlightpa.org")
-		be.Zero(err)
+		art := be.OK(anf.ConvertToAppleNews(in, "http://www.spotlightpa.org"))
 		testfile.EqualJSON(t, testfile.Ext(match, ".json"), art)
 	})
 }

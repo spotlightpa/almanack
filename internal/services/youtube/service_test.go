@@ -18,8 +18,7 @@ func TestService(t *testing.T) {
 	cl := &http.Client{
 		Transport: reqtest.Replay("testdata"),
 	}
-	entries, err := svc.FetchFeed(t.Context(), cl)
-	be.Zero(err)
+	entries := be.OK(svc.FetchFeed(t.Context(), cl))
 	be.NotZero(entries)
 	for _, entry := range entries {
 		be.NotZero(entry)

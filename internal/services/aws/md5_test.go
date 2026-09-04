@@ -19,18 +19,19 @@ func TestMD5(t *testing.T) {
 
 	ctx := t.Context()
 	bucket := aws.NewTestBlobStore(dir)
-	err := bucket.WriteFile(ctx, "hello.txt", nil, []byte(teststr))
-	be.Zero(err)
+	be.Zero(bucket.WriteFile(ctx, "hello.txt", nil, []byte(teststr)))
 
 	hash, size, err := bucket.ReadMD5(ctx, "hello.txt")
-	be.Zero(err)
-	be.SlicesEqual(hash, wantMD5[:])
-	be.Equal(size, int64(len(teststr)))
+	be.
+		Zero(err).
+		SlicesEqual(hash, wantMD5[:]).
+		Equal(size, int64(len(teststr)))
 
 	be.Zero(os.Remove(filepath.Join(dir, "hello.txt.attrs")))
 
 	hash, size, err = bucket.ReadMD5(ctx, "hello.txt")
-	be.Zero(err)
-	be.SlicesEqual(hash, wantMD5[:])
-	be.EqualLength(teststr, int(size))
+	be.
+		Zero(err).
+		SlicesEqual(hash, wantMD5[:]).
+		EqualLength(teststr, int(size))
 }

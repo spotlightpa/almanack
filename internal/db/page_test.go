@@ -34,13 +34,12 @@ func TestToFromTOML(t *testing.T) {
 	for name, p1 := range cases {
 		t.Run(name, func(t *testing.T) {
 			be := assert.FailNow(t)
-			toml, err := p1.ToTOML()
-			be.Zero(err)
+			toml := be.OK(p1.ToTOML())
 
 			var p2 db.Page
-			err = p2.FromMD(toml)
-			be.Zero(err)
-			be.Equal(fmt.Sprint(p2), fmt.Sprint(p1))
+			be.
+				Zero(p2.FromMD(toml)).
+				Equal(fmt.Sprint(p2), fmt.Sprint(p1))
 		})
 	}
 }
@@ -242,7 +241,6 @@ func TestSetURLPath(t *testing.T) {
 }
 
 func TestShouldPublishShouldNotify(t *testing.T) {
-	be := assert.FailNow(t)
 	past := pgtype.Timestamptz{
 		Valid: true}
 	future := pgtype.Timestamptz{
@@ -349,8 +347,9 @@ func TestShouldPublishShouldNotify(t *testing.T) {
 		t.Run(name, func(t *testing.T) {
 			pub := tc.new.ShouldPublish()
 			notify := tc.new.ShouldNotify(&tc.old)
-			be.Equal(pub, tc.pub)
-			be.Equal(notify, tc.notify)
+			assert.FailNow(t).
+				Equal(pub, tc.pub).
+				Equal(notify, tc.notify)
 		})
 	}
 }

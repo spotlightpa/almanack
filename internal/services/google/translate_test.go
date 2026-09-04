@@ -19,12 +19,11 @@ func TestTranslate(t *testing.T) {
 	cl := *http.DefaultClient
 	cl.Transport = reqtest.Replay("testdata")
 	if os.Getenv("ALMANACK_GOOGLE_TEST_RECORD_REQUEST") != "" {
-		gcl, err := svc.TranslateClient(ctx)
-		be.Zero(err)
+		gcl := be.OK(svc.TranslateClient(ctx))
 		cl.Transport = reqtest.Record(gcl.Transport, "testdata")
 	}
-	translated, err := svc.Translate(ctx, &cl, "text/plain", "Hello, World!")
-	be.Zero(err)
-	be.EqualLength(translated, 1)
-	be.Equal(translated[0], "¡Hola Mundo!")
+	translated := be.OK(svc.Translate(ctx, &cl, "text/plain", "Hello, World!"))
+	be.
+		EqualLength(translated, 1).
+		Equal(translated[0], "¡Hola Mundo!")
 }
