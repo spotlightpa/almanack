@@ -1,12 +1,12 @@
 package blocko
 
 import (
-	"github.com/earthboundkid/assert"
-	"github.com/earthboundkid/xhtml"
-	"golang.org/x/net/html"
-	"golang.org/x/net/html/atom"
 	"strings"
 	"testing"
+
+	"github.com/earthboundkid/assert"
+	"golang.org/x/net/html"
+	"golang.org/x/net/html/atom"
 )
 
 func TestIsEmpty(t *testing.T) {
@@ -36,7 +36,6 @@ func TestIsEmpty(t *testing.T) {
 			for _, c := range children {
 				p.AppendChild(c)
 			}
-			t.Logf("got: %q", xhtml.OuterHTML(p))
 			be.Equal(tc.empty, isEmpty(p))
 		})
 	}
