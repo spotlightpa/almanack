@@ -42,13 +42,14 @@ func TestPromotionEndpoints(t *testing.T) {
 			}).
 			ToJSON(&created).
 			Fetch(ctx))
-		be.NotZero(created.ID)
-		be.Equal(created.Name, "Banner Ad")
-		be.Equal(created.Width, int32(728))
-		be.Equal(created.Height, int32(90))
-		be.Equal(created.ImageDescription, "A colorful banner")
-		be.Equal(created.BannerLabel, "Sponsored by Acme")
-		be.Equal(created.BannerLabelLink, "https://acme.example.com/")
+		be.
+			NotZero(created.ID).
+			Equal(created.Name, "Banner Ad").
+			Equal(created.Width, int32(728)).
+			Equal(created.Height, int32(90)).
+			Equal(created.ImageDescription, "A colorful banner").
+			Equal(created.BannerLabel, "Sponsored by Acme").
+			Equal(created.BannerLabelLink, "https://acme.example.com/")
 		created1 = created
 	}
 	{ // Create second promotion
@@ -66,8 +67,9 @@ func TestPromotionEndpoints(t *testing.T) {
 			}).
 			ToJSON(&created).
 			Fetch(ctx))
-		be.NotZero(created.ID)
-		be.Equal(created.Name, "Sidebar Ad")
+		be.
+			NotZero(created.ID).
+			Equal(created.Name, "Sidebar Ad")
 	}
 	{ // List all promotions (no text filter) — NextPage must be absent when results fit in one page
 		var listResp struct {
@@ -78,8 +80,9 @@ func TestPromotionEndpoints(t *testing.T) {
 			Path("/api/promotion").
 			ToJSON(&listResp).
 			Fetch(ctx))
-		be.AtLeastLength(listResp.Promotions, 2)
-		be.Equal(listResp.NextPage, "")
+		be.
+			AtLeastLength(listResp.Promotions, 2).
+			Equal(listResp.NextPage, "")
 	}
 	{ // List promotions with FTS text filter
 		var ftsResp struct {
@@ -90,8 +93,9 @@ func TestPromotionEndpoints(t *testing.T) {
 			Param("text", "sidebar").
 			ToJSON(&ftsResp).
 			Fetch(ctx))
-		be.AtLeastLength(ftsResp.Promotions, 1)
-		be.Equal(ftsResp.Promotions[0].Name, "Sidebar Ad")
+		be.
+			AtLeastLength(ftsResp.Promotions, 1).
+			Equal(ftsResp.Promotions[0].Name, "Sidebar Ad")
 	}
 	{ // List promotions filtered by width
 		var widthResp struct {
@@ -120,8 +124,9 @@ func TestPromotionEndpoints(t *testing.T) {
 			}).
 			ToJSON(&created).
 			Fetch(ctx))
-		be.NotZero(created.ID)
-		be.SlicesEqual(created.ImageUrls, []string{})
+		be.
+			NotZero(created.ID).
+			SlicesEqual(created.ImageUrls, []string{})
 	}
 	{ // Update the first promotion
 		var updated db.Promotion
@@ -142,10 +147,11 @@ func TestPromotionEndpoints(t *testing.T) {
 			}).
 			ToJSON(&updated).
 			Fetch(ctx))
-		be.Equal(updated.ID, created1.ID)
-		be.Equal(updated.Name, "Banner Ad Updated")
-		be.Equal(updated.Width, int32(728))
-		be.Equal(updated.ImageDescription, "Updated alt text")
+		be.
+			Equal(updated.ID, created1.ID).
+			Equal(updated.Name, "Banner Ad Updated").
+			Equal(updated.Width, int32(728)).
+			Equal(updated.ImageDescription, "Updated alt text")
 	}
 }
 
