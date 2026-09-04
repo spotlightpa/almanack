@@ -57,8 +57,7 @@ func TestProcessGDocsDoc(t *testing.T) {
 				Document:   doc,
 			}))
 			be.Zero(svc.ProcessGDocsDoc(ctx, dbDoc))
-			dbDoc, err := svc.Queries.GetGDocsByID(ctx, dbDoc.ID)
-			be.Zero(err)
+			dbDoc = be.OK(svc.Queries.GetGDocsByID(ctx, dbDoc.ID))
 
 			testfile.Equal(t, path+"/raw.html", dbDoc.RawHtml)
 			testfile.Equal(t, path+"/rich.html", dbDoc.RichText)

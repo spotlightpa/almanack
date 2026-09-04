@@ -31,9 +31,7 @@ func TestFullConvert(t *testing.T) {
 		testfile.ReadJSON(t, path, &doc)
 
 		n := Convert(&doc)
-		got, err := blocko.MinifyAndBlockize(xhtml.OuterHTML(n))
-		be.Zero(err)
-
+		got := be.OK(blocko.MinifyAndBlockize(xhtml.OuterHTML(n)))
 		testfile.Equalish(t, testfile.Ext(path, ".md"), got)
 	})
 }
