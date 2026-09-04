@@ -137,7 +137,6 @@ func TestTruncate(t *testing.T) {
 }
 
 func TestFlattenMap(t *testing.T) {
-	be := assert.FailNow(t)
 	cases := []struct {
 		in   map[string]string
 		want []string
@@ -154,7 +153,7 @@ func TestFlattenMap(t *testing.T) {
 		},
 	}
 	for _, tc := range cases {
-		be.SlicesEqual(stringx.FlattenMap(tc.in), tc.want)
+		assert.FailNow(t).SlicesEqual(stringx.FlattenMap(tc.in), tc.want)
 	}
 }
 
