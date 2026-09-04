@@ -8,7 +8,6 @@ import (
 )
 
 func TestMakeImageName(t *testing.T) {
-	be := assert.FailNow(t)
 	cases := map[string]struct {
 		ct   string
 		want string
@@ -25,9 +24,11 @@ func TestMakeImageName(t *testing.T) {
 	}
 	for name, tc := range cases {
 		t.Run(name, func(t *testing.T) {
+			be := assert.FailNow(t)
 			got := makeImageName(tc.ct)
-			be.Equal(path.Ext(got), tc.want)
-			be.NotMatch(got, `\.\.`)
+			be.
+				Equal(path.Ext(got), tc.want).
+				NotMatch(got, `\.\.`)
 		})
 		var s string
 		allocs := testing.AllocsPerRun(10, func() {

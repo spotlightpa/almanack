@@ -1,14 +1,14 @@
 package stringx_test
 
 import (
+	"testing"
+
 	"github.com/earthboundkid/assert"
 	"github.com/earthboundkid/assert/testfile"
 	"github.com/spotlightpa/almanack/internal/utils/stringx"
-	"testing"
 )
 
 func TestSlugifyURL(t *testing.T) {
-	be := assert.FailNow(t)
 	cases := []struct {
 		input, want string
 	}{
@@ -24,13 +24,13 @@ func TestSlugifyURL(t *testing.T) {
 	}
 	for _, tc := range cases {
 		t.Run(tc.input, func(t *testing.T) {
+			be := assert.FailNow(t)
 			be.Equal(stringx.SlugifyURL(tc.input), tc.want)
 		})
 	}
 }
 
 func TestSlugifyFilename(t *testing.T) {
-	be := assert.FailNow(t)
 	cases := []struct {
 		input, want string
 	}{
@@ -43,16 +43,14 @@ func TestSlugifyFilename(t *testing.T) {
 	}
 	for _, tc := range cases {
 		t.Run(tc.input, func(t *testing.T) {
+			be := assert.FailNow(t)
 			be.Equal(stringx.SlugifyFilename(tc.input), tc.want)
 		})
 	}
 }
 
 func TestRemoveParens(t *testing.T) {
-	be :=
-		// Test cases
-		assert.FailNow(t)
-
+	// Test cases
 	testCases := []struct {
 		input string
 		want  string
@@ -68,7 +66,9 @@ func TestRemoveParens(t *testing.T) {
 
 	// Run test cases
 	for _, tc := range testCases {
-		be.Equal(stringx.RemoveParens(tc.input), tc.want)
+		assert.
+			Continue(t).
+			Equal(stringx.RemoveParens(tc.input), tc.want)
 	}
 }
 
@@ -119,7 +119,6 @@ func TestExtractName(t *testing.T) {
 }
 
 func TestTruncate(t *testing.T) {
-	be := assert.FailNow(t)
 	cases := []struct {
 		input, want string
 		max         int
@@ -132,7 +131,7 @@ func TestTruncate(t *testing.T) {
 	}
 	for _, tc := range cases {
 		t.Run(tc.input, func(t *testing.T) {
-			be.Equal(stringx.Truncate(tc.input, tc.max), tc.want)
+			assert.FailNow(t).Equal(stringx.Truncate(tc.input, tc.max), tc.want)
 		})
 	}
 }
@@ -160,7 +159,6 @@ func TestFlattenMap(t *testing.T) {
 }
 
 func TestFlattenMultimap(t *testing.T) {
-	be := assert.FailNow(t)
 	cases := []struct {
 		in   map[string][]string
 		want []string
@@ -182,6 +180,8 @@ func TestFlattenMultimap(t *testing.T) {
 		},
 	}
 	for _, tc := range cases {
-		be.SlicesEqual(stringx.FlattenMultimap(tc.in), tc.want)
+		assert.
+			Continue(t).
+			SlicesEqual(stringx.FlattenMultimap(tc.in), tc.want)
 	}
 }

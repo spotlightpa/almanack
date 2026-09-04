@@ -1,15 +1,15 @@
 package timex_test
 
 import (
+	"testing"
+	"time"
+
 	"github.com/earthboundkid/assert"
 	"github.com/jackc/pgx/v5/pgtype"
 	"github.com/spotlightpa/almanack/internal/utils/timex"
-	"testing"
-	"time"
 )
 
 func TestEqualish(t *testing.T) {
-	be := assert.FailNow(t)
 	parseTime := func(s string) pgtype.Timestamptz {
 		if s == "0" {
 			return pgtype.Timestamptz{Valid: true}
@@ -40,7 +40,9 @@ func TestEqualish(t *testing.T) {
 		t.Run(name, func(t *testing.T) {
 			a, b := parseTime(tc.a), parseTime(tc.b)
 			got := timex.Equalish(a, b)
-			be.Equal(got, tc.want)
+			assert.
+				FailNow(t).
+				Equal(got, tc.want)
 		})
 	}
 }

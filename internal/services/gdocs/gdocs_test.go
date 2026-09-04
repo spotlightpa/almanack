@@ -24,9 +24,9 @@ func TestConvert(t *testing.T) {
 }
 
 func TestFullConvert(t *testing.T) {
-	be := assert.FailNow(t)
 	t.Parallel()
 	testfile.Run(t, "testdata/*.json", func(t *testing.T, path string) {
+		be := assert.FailNow(t)
 		var doc docs.Document
 		testfile.ReadJSON(t, path, &doc)
 
