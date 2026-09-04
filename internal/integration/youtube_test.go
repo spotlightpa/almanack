@@ -1,6 +1,9 @@
 package integration_test
 
 import (
+	"net/http"
+	"testing"
+
 	"github.com/carlmjohnson/requests/reqtest"
 	"github.com/earthboundkid/assert"
 	"github.com/spotlightpa/almanack/internal/almlog"
@@ -9,8 +12,6 @@ import (
 	"github.com/spotlightpa/almanack/internal/services/aws"
 	"github.com/spotlightpa/almanack/internal/services/github"
 	"github.com/spotlightpa/almanack/internal/services/youtube"
-	"net/http"
-	"testing"
 )
 
 func TestYouTube(t *testing.T) {

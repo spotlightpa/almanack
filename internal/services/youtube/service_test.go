@@ -1,12 +1,13 @@
 package youtube_test
 
 import (
+	"net/http"
+	"testing"
+
 	"github.com/carlmjohnson/requests/reqtest"
 	"github.com/earthboundkid/assert"
 	"github.com/spotlightpa/almanack/internal/almlog"
 	"github.com/spotlightpa/almanack/internal/services/youtube"
-	"net/http"
-	"testing"
 )
 
 func TestService(t *testing.T) {

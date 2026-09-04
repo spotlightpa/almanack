@@ -1,6 +1,11 @@
 package integration_test
 
 import (
+	"net/http/httptest"
+	"os"
+	"sync"
+	"testing"
+
 	"github.com/carlmjohnson/requests"
 	"github.com/carlmjohnson/requests/reqtest"
 	"github.com/earthboundkid/assert"
@@ -8,10 +13,6 @@ import (
 	"github.com/spotlightpa/almanack/internal/almapp"
 	"github.com/spotlightpa/almanack/internal/almsvc"
 	"github.com/spotlightpa/almanack/internal/db"
-	"net/http/httptest"
-	"os"
-	"sync"
-	"testing"
 )
 
 var (

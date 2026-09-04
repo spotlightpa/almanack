@@ -2,9 +2,10 @@ package stringx_test
 
 import (
 	_ "embed"
+	"testing"
+
 	"github.com/earthboundkid/assert"
 	"github.com/spotlightpa/almanack/internal/utils/stringx"
-	"testing"
 )
 
 //go:embed testdata/article.txt

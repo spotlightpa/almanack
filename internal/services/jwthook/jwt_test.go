@@ -2,12 +2,13 @@ package jwthook_test
 
 import (
 	"bufio"
-	"github.com/earthboundkid/assert"
-	jwt "github.com/spotlightpa/almanack/internal/services/jwthook"
 	"net/http"
 	"os"
 	"testing"
 	"time"
+
+	"github.com/earthboundkid/assert"
+	jwt "github.com/spotlightpa/almanack/internal/services/jwthook"
 )
 
 func TestVerifyRequest(t *testing.T) {

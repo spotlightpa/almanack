@@ -1,10 +1,11 @@
 package slicex_test
 
 import (
-	"github.com/earthboundkid/assert"
-	"github.com/spotlightpa/almanack/internal/utils/slicex"
 	"strings"
 	"testing"
+
+	"github.com/earthboundkid/assert"
+	"github.com/spotlightpa/almanack/internal/utils/slicex"
 )
 
 func TestUniqueFunc(t *testing.T) {

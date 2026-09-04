@@ -1,13 +1,14 @@
 package integration_test
 
 import (
+	"net/http"
+	"slices"
+	"testing"
+
 	"github.com/earthboundkid/assert"
 	"github.com/spotlightpa/almanack/internal/almlog"
 	"github.com/spotlightpa/almanack/internal/almsvc"
 	"github.com/spotlightpa/almanack/internal/services/netlifyid"
-	"net/http"
-	"slices"
-	"testing"
 )
 
 func TestAuthorizedAddressesEndpoints(t *testing.T) {
