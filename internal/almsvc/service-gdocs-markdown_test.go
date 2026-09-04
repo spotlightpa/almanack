@@ -7,7 +7,6 @@ import (
 )
 
 func TestReplaceSpotlightShortcodes(t *testing.T) {
-	be := assert.Continue(t)
 	cases := []struct {
 		in, want string
 	}{
@@ -147,6 +146,6 @@ var deweyConfig = {
 		},
 	}
 	for _, tc := range cases {
-		be.Equal(replaceSpotlightShortcodes(tc.in), tc.want)
+		assert.Continue(t).Equal(replaceSpotlightShortcodes(tc.in), tc.want)
 	}
 }

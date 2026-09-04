@@ -24,7 +24,6 @@ var (
 // createTestDB checks ALMANACK_POSTGRES and
 // creates a database called almanack_test at the provided address.
 func createTestDB(t *testing.T) *db.Handle {
-	be := assert.FailNow(t)
 	t.Helper()
 	dbURL := os.Getenv("ALMANACK_POSTGRES")
 	if dbURL == "" {
@@ -33,7 +32,7 @@ func createTestDB(t *testing.T) *db.Handle {
 	once.Do(func() {
 		pool, poolErr = db.CreateTestDatabase(dbURL)
 	})
-	be.Zero(poolErr)
+	assert.FailNow(t).Zero(poolErr)
 	return db.NewHandle(pool)
 }
 
