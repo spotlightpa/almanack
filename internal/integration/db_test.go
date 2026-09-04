@@ -1,10 +1,11 @@
 package integration_test
 
 import (
+	"testing"
+
 	"github.com/earthboundkid/assert"
 	"github.com/spotlightpa/almanack/internal/almlog"
 	"github.com/spotlightpa/almanack/internal/utils/pgxutil"
-	"testing"
 )
 
 func TestIsUniquenessViolation(t *testing.T) {

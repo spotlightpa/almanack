@@ -10,11 +10,9 @@ import (
 
 func TestGoldenFiles(t *testing.T) {
 	testfile.Run(t, "testdata/*.html", func(t *testing.T, path string) {
-		be := assert.FailNow(t)
 		in := testfile.Read(t, path)
 
-		got, err := blocko.MinifyAndBlockize(in)
-		be.Zero(err)
+		got := assert.FailNow(t).OK(blocko.MinifyAndBlockize(in))
 
 		testfile.Equal(t, testfile.Ext(path, ".md"), got)
 	})
