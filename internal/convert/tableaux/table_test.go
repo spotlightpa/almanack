@@ -5,8 +5,8 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/carlmjohnson/be"
-	"github.com/carlmjohnson/be/testfile"
+	"github.com/earthboundkid/assert"
+	"github.com/earthboundkid/assert/testfile"
 	"github.com/earthboundkid/xhtml"
 	"github.com/spotlightpa/almanack/internal/convert/tableaux"
 	"golang.org/x/net/html"
@@ -17,9 +17,8 @@ func TestTable(t *testing.T) {
 	testfile.Run(t, "testdata/*.html", func(t *testing.T, path string) {
 		in := testfile.Read(t, path)
 		bareName := testfile.Ext(path, "")
+		root := assert.FailNow(t).OK(html.Parse(strings.NewReader(in)))
 
-		root, err := html.Parse(strings.NewReader(in))
-		be.NilErr(t, err)
 		i := 0
 		for _, tbl := range tableaux.Tables(root) {
 			i++

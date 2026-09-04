@@ -4,8 +4,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/carlmjohnson/be"
-	"github.com/earthboundkid/xhtml"
+	"github.com/earthboundkid/assert"
 	"golang.org/x/net/html"
 	"golang.org/x/net/html/atom"
 )
@@ -32,13 +31,12 @@ func TestIsEmpty(t *testing.T) {
 				DataAtom: atom.P,
 				Data:     "p",
 			}
-			children, err := html.ParseFragment(strings.NewReader(tc.in), p)
-			be.NilErr(t, err)
+			be := assert.FailNow(t)
+			children := be.OK(html.ParseFragment(strings.NewReader(tc.in), p))
 			for _, c := range children {
 				p.AppendChild(c)
 			}
-			be.DebugLog(t, "got: %q", xhtml.OuterHTML(p))
-			be.Equal(t, isEmpty(p), tc.empty)
+			be.Equal(tc.empty, isEmpty(p))
 		})
 	}
 }

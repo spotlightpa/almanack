@@ -6,12 +6,13 @@ import (
 	"os"
 	"testing"
 
-	"github.com/carlmjohnson/be"
 	"github.com/carlmjohnson/requests/reqtest"
+	"github.com/earthboundkid/assert"
 	"github.com/spotlightpa/almanack/internal/almlog"
 )
 
 func TestMostPopularNews(t *testing.T) {
+	be := assert.FailNow(t)
 	almlog.UseTestLogger(t)
 	svc := Service{
 		viewID: cmp.Or(os.Getenv("ALMANACK_GOOGLE_TEST_VIEW"), "1")}
@@ -19,11 +20,9 @@ func TestMostPopularNews(t *testing.T) {
 	cl := *http.DefaultClient
 	cl.Transport = reqtest.Replay("testdata")
 	if os.Getenv("ALMANACK_GOOGLE_TEST_RECORD_REQUEST") != "" {
-		gcl, err := svc.GAClient(ctx)
-		be.NilErr(t, err)
+		gcl := be.OK(svc.GAClient(ctx))
 		cl.Transport = reqtest.Record(gcl.Transport, "testdata")
 	}
-	pages, err := svc.MostPopularNews(ctx, &cl)
-	be.NilErr(t, err)
-	be.EqualLength(t, 20, pages)
+	pages := be.OK(svc.MostPopularNews(ctx, &cl))
+	be.EqualLength(pages, 20)
 }

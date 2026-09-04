@@ -3,7 +3,7 @@ package almsvc
 import (
 	"testing"
 
-	"github.com/carlmjohnson/be"
+	"github.com/earthboundkid/assert"
 )
 
 func TestImageCAS(t *testing.T) {
@@ -17,7 +17,7 @@ func TestImageCAS(t *testing.T) {
 	for _, tc := range cases {
 		t.Run("", func(t *testing.T) {
 			got := makeCASaddress([]byte(tc.body), tc.ct)
-			be.Equal(t, tc.want, got)
+			assert.FailNow(t).Equal(got, tc.want)
 		})
 		var s string
 		body := []byte(tc.body)

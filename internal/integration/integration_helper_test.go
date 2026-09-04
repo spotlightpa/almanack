@@ -6,9 +6,9 @@ import (
 	"sync"
 	"testing"
 
-	"github.com/carlmjohnson/be"
 	"github.com/carlmjohnson/requests"
 	"github.com/carlmjohnson/requests/reqtest"
+	"github.com/earthboundkid/assert"
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/spotlightpa/almanack/internal/almapp"
 	"github.com/spotlightpa/almanack/internal/almsvc"
@@ -32,7 +32,7 @@ func createTestDB(t *testing.T) *db.Handle {
 	once.Do(func() {
 		pool, poolErr = db.CreateTestDatabase(dbURL)
 	})
-	be.NilErr(t, poolErr)
+	assert.FailNow(t).Zero(poolErr)
 	return db.NewHandle(pool)
 }
 

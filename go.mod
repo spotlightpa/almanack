@@ -11,10 +11,10 @@ require (
 	github.com/aws/aws-sdk-go-v2/config v1.33.2
 	github.com/aws/aws-sdk-go-v2/credentials v1.20.2
 	github.com/aws/aws-sdk-go-v2/service/s3 v1.110.0
-	github.com/carlmjohnson/be v0.25.2
 	github.com/carlmjohnson/flowmatic v0.23.4
 	github.com/carlmjohnson/gateway v1.22.2
 	github.com/carlmjohnson/requests v0.26.1
+	github.com/earthboundkid/assert v0.26.2
 	github.com/earthboundkid/bytemap/v2 v2.24.1
 	github.com/earthboundkid/crockford/v2 v2.25.3
 	github.com/earthboundkid/emailx/v2 v2.24.1

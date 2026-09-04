@@ -3,8 +3,8 @@ package gdocs
 import (
 	"testing"
 
-	"github.com/carlmjohnson/be"
-	"github.com/carlmjohnson/be/testfile"
+	"github.com/earthboundkid/assert"
+	"github.com/earthboundkid/assert/testfile"
 	"github.com/earthboundkid/xhtml"
 	"github.com/spotlightpa/almanack/internal/convert/blocko"
 	"golang.org/x/net/html"
@@ -19,7 +19,7 @@ func TestConvert(t *testing.T) {
 		n := Convert(&doc)
 		got := xhtml.OuterHTML(n)
 
-		testfile.Equalish(be.Relaxed(t), testfile.Ext(path, ".html"), got)
+		testfile.Equalish(t, testfile.Ext(path, ".html"), got)
 	})
 }
 
@@ -30,40 +30,37 @@ func TestFullConvert(t *testing.T) {
 		testfile.ReadJSON(t, path, &doc)
 
 		n := Convert(&doc)
-		got, err := blocko.MinifyAndBlockize(xhtml.OuterHTML(n))
-		be.NilErr(t, err)
-
+		got := assert.FailNow(t).OK(blocko.MinifyAndBlockize(xhtml.OuterHTML(n)))
 		testfile.Equalish(t, testfile.Ext(path, ".md"), got)
 	})
 }
 
 func BenchmarkConvert(b *testing.B) {
-	want := testfile.Read(be.Relaxed(b), "testdata/privacy.html")
+	want := testfile.Read(b, "testdata/privacy.html")
 	var got *html.Node
 
 	var doc docs.Document
 	testfile.ReadJSON(b, "testdata/privacy.json", &doc)
 	b.ResetTimer()
 
-	for i := 0; i < b.N; i++ {
+	for b.Loop() {
 		got = Convert(&doc)
 	}
-	be.Equal(b, want, xhtml.OuterHTML(got))
+	assert.FailNow(b).Equal(xhtml.OuterHTML(got), want)
 }
 
 func BenchmarkFullConvert(b *testing.B) {
-	want := testfile.Read(be.Relaxed(b), "testdata/privacy.md")
+	be := assert.Continue(b)
+	want := testfile.Read(b, "testdata/privacy.md")
 	var got string
 
 	var doc docs.Document
 	testfile.ReadJSON(b, "testdata/privacy.json", &doc)
 	b.ResetTimer()
 
-	for i := 0; i < b.N; i++ {
+	for b.Loop() {
 		n := Convert(&doc)
-		var err error
-		got, err = blocko.MinifyAndBlockize(xhtml.OuterHTML(n))
-		be.NilErr(b, err)
+		got = be.OK(blocko.MinifyAndBlockize(xhtml.OuterHTML(n)))
 	}
-	be.Equal(b, want, got)
+	be.Equal(got, want)
 }

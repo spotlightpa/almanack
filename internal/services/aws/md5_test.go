@@ -6,12 +6,13 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/carlmjohnson/be"
+	"github.com/earthboundkid/assert"
 	"github.com/spotlightpa/almanack/internal/almlog"
 	"github.com/spotlightpa/almanack/internal/services/aws"
 )
 
 func TestMD5(t *testing.T) {
+	be := assert.FailNow(t)
 	almlog.UseTestLogger(t)
 	dir := t.ArtifactDir()
 	const teststr = "Hello, World!"
@@ -19,18 +20,19 @@ func TestMD5(t *testing.T) {
 
 	ctx := t.Context()
 	bucket := aws.NewTestBlobStore(dir)
-	err := bucket.WriteFile(ctx, "hello.txt", nil, []byte(teststr))
-	be.NilErr(t, err)
+	be.Zero(bucket.WriteFile(ctx, "hello.txt", nil, []byte(teststr)))
 
 	hash, size, err := bucket.ReadMD5(ctx, "hello.txt")
-	be.NilErr(t, err)
-	be.AllEqual(t, wantMD5[:], hash)
-	be.Equal(t, int64(len(teststr)), size)
+	be.
+		Zero(err).
+		SlicesEqual(hash, wantMD5[:]).
+		Equal(size, int64(len(teststr)))
 
-	be.NilErr(t, os.Remove(filepath.Join(dir, "hello.txt.attrs")))
+	be.Zero(os.Remove(filepath.Join(dir, "hello.txt.attrs")))
 
 	hash, size, err = bucket.ReadMD5(ctx, "hello.txt")
-	be.NilErr(t, err)
-	be.AllEqual(t, wantMD5[:], hash)
-	be.EqualLength(t, int(size), teststr)
+	be.
+		Zero(err).
+		SlicesEqual(hash, wantMD5[:]).
+		EqualLength(teststr, int(size))
 }

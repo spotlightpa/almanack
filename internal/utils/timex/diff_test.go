@@ -4,7 +4,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/carlmjohnson/be"
+	"github.com/earthboundkid/assert"
 	"github.com/jackc/pgx/v5/pgtype"
 	"github.com/spotlightpa/almanack/internal/utils/timex"
 )
@@ -40,7 +40,9 @@ func TestEqualish(t *testing.T) {
 		t.Run(name, func(t *testing.T) {
 			a, b := parseTime(tc.a), parseTime(tc.b)
 			got := timex.Equalish(a, b)
-			be.Equal(t, tc.want, got)
+			assert.
+				FailNow(t).
+				Equal(got, tc.want)
 		})
 	}
 }

@@ -4,11 +4,12 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/carlmjohnson/be"
+	"github.com/earthboundkid/assert"
 	"github.com/spotlightpa/almanack/internal/utils/slicex"
 )
 
 func TestUniqueFunc(t *testing.T) {
+	be := assert.FailNow(t)
 	for _, tc := range []struct{ have, want string }{
 		{"", ""},
 		{"1", "1"},
@@ -20,6 +21,6 @@ func TestUniqueFunc(t *testing.T) {
 		in := strings.Fields(tc.have)
 		slicex.UniquesFunc(&in, func(s string) string { return s })
 		got := strings.Join(in, " ")
-		be.Equal(t, tc.want, got)
+		be.Equal(got, tc.want)
 	}
 }

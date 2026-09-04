@@ -4,7 +4,7 @@ import (
 	"path"
 	"testing"
 
-	"github.com/carlmjohnson/be"
+	"github.com/earthboundkid/assert"
 )
 
 func TestMakeImageName(t *testing.T) {
@@ -25,8 +25,9 @@ func TestMakeImageName(t *testing.T) {
 	for name, tc := range cases {
 		t.Run(name, func(t *testing.T) {
 			got := makeImageName(tc.ct)
-			be.Equal(t, tc.want, path.Ext(got))
-			be.NotIn(t, "..", got)
+			assert.FailNow(t).
+				Equal(path.Ext(got), tc.want).
+				NotMatch(got, `\.\.`)
 		})
 		var s string
 		allocs := testing.AllocsPerRun(10, func() {

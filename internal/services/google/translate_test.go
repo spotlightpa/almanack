@@ -6,12 +6,13 @@ import (
 	"os"
 	"testing"
 
-	"github.com/carlmjohnson/be"
 	"github.com/carlmjohnson/requests/reqtest"
+	"github.com/earthboundkid/assert"
 	"github.com/spotlightpa/almanack/internal/almlog"
 )
 
 func TestTranslate(t *testing.T) {
+	be := assert.FailNow(t)
 	almlog.UseTestLogger(t)
 	svc := Service{
 		projectID: cmp.Or(os.Getenv("ALMANACK_GOOGLE_PROJECT_ID"), "1")}
@@ -19,12 +20,11 @@ func TestTranslate(t *testing.T) {
 	cl := *http.DefaultClient
 	cl.Transport = reqtest.Replay("testdata")
 	if os.Getenv("ALMANACK_GOOGLE_TEST_RECORD_REQUEST") != "" {
-		gcl, err := svc.TranslateClient(ctx)
-		be.NilErr(t, err)
+		gcl := be.OK(svc.TranslateClient(ctx))
 		cl.Transport = reqtest.Record(gcl.Transport, "testdata")
 	}
-	translated, err := svc.Translate(ctx, &cl, "text/plain", "Hello, World!")
-	be.NilErr(t, err)
-	be.EqualLength(t, 1, translated)
-	be.Equal(t, "¡Hola Mundo!", translated[0])
+	translated := be.OK(svc.Translate(ctx, &cl, "text/plain", "Hello, World!"))
+	be.
+		EqualLength(translated, 1).
+		Equal(translated[0], "¡Hola Mundo!")
 }

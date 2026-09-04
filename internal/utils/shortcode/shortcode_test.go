@@ -3,11 +3,12 @@ package shortcode_test
 import (
 	"testing"
 
-	"github.com/carlmjohnson/be"
+	"github.com/earthboundkid/assert"
 	"github.com/spotlightpa/almanack/internal/utils/shortcode"
 )
 
 func TestNew(t *testing.T) {
+	be := assert.FailNow(t)
 	cases := []struct {
 		tag   string
 		attrs []string
@@ -48,13 +49,12 @@ func TestNew(t *testing.T) {
 	}
 	for _, tc := range cases {
 		got := shortcode.New(tc.tag, tc.attrs...)
-		be.Equal(t, tc.want, got)
+		be.Equal(got, tc.want)
 	}
 }
 
 func TestNewPanicsOnOddAttrs(t *testing.T) {
-	r := be.Panicked(func() {
+	assert.FailNow(t).NotZero(assert.Catch(func() {
 		shortcode.New("picture", "src")
-	})
-	be.Nonzero(t, r)
+	}))
 }

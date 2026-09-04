@@ -5,8 +5,8 @@ import (
 	"os"
 	"testing"
 
-	"github.com/carlmjohnson/be"
 	"github.com/carlmjohnson/requests/reqtest"
+	"github.com/earthboundkid/assert"
 	"github.com/spotlightpa/almanack/internal/almlog"
 	"github.com/spotlightpa/almanack/internal/services/mailchimp"
 )
@@ -23,6 +23,5 @@ func TestSendEmail(t *testing.T) {
 		cl.Transport = reqtest.Caching(nil, "testdata/sendemail")
 	}
 	v3 := mailchimp.NewV3(apiKey, listID, &cl)
-	err := v3.SendEmail(t.Context(), "Test message", "Hello, World!")
-	be.NilErr(t, err)
+	assert.FailNow(t).Zero(v3.SendEmail(t.Context(), "Test message", "Hello, World!"))
 }
