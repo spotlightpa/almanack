@@ -16,13 +16,15 @@ func TestNilSliceToEmpty(t *testing.T) {
 	var s []string
 	be.True(s == nil)
 	result := pgxutil.NilSliceToEmpty(s)
-	be.True(result != nil)
-	be.EqualLength(result, 0)
+	be.
+		True(result != nil).
+		EqualLength(result, 0)
 
 	// non-nil empty slice is returned as-is
 	empty := []string{}
-	be.EqualLength(pgxutil.NilSliceToEmpty(empty), 0)
-	be.Equal(unsafe.SliceData(pgxutil.NilSliceToEmpty(empty)), unsafe.SliceData(empty))
+	be.
+		EqualLength(pgxutil.NilSliceToEmpty(empty), 0).
+		Equal(unsafe.SliceData(pgxutil.NilSliceToEmpty(empty)), unsafe.SliceData(empty))
 
 	// populated slice is returned unchanged
 	populated := []string{"a", "b"}
@@ -30,6 +32,7 @@ func TestNilSliceToEmpty(t *testing.T) {
 
 	// works with other element types
 	var ints []int
-	be.True(pgxutil.NilSliceToEmpty(ints) != nil)
-	be.EqualLength(pgxutil.NilSliceToEmpty(ints), 0)
+	be.
+		True(pgxutil.NilSliceToEmpty(ints) != nil).
+		EqualLength(pgxutil.NilSliceToEmpty(ints), 0)
 }
