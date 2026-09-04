@@ -2,24 +2,24 @@ package tableaux_test
 
 import (
 	"fmt"
+	"strings"
+	"testing"
+
 	"github.com/earthboundkid/assert"
 	"github.com/earthboundkid/assert/testfile"
 	"github.com/earthboundkid/xhtml"
 	"github.com/spotlightpa/almanack/internal/convert/tableaux"
 	"golang.org/x/net/html"
-	"strings"
-	"testing"
 )
 
 func TestTable(t *testing.T) {
-	be := assert.FailNow(t)
 	t.Parallel()
 	testfile.Run(t, "testdata/*.html", func(t *testing.T, path string) {
+		be := assert.FailNow(t)
 		in := testfile.Read(t, path)
 		bareName := testfile.Ext(path, "")
 
-		root, err := html.Parse(strings.NewReader(in))
-		be.Zero(err)
+		root := be.OK(html.Parse(strings.NewReader(in)))
 		i := 0
 		for _, tbl := range tableaux.Tables(root) {
 			i++

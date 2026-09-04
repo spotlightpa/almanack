@@ -2,22 +2,23 @@ package anf_test
 
 import (
 	"bufio"
-	"github.com/carlmjohnson/requests/reqtest"
-	"github.com/earthboundkid/assert"
-	"github.com/earthboundkid/assert/testfile"
-	"github.com/spotlightpa/almanack/internal/almlog"
-	"github.com/spotlightpa/almanack/internal/services/anf"
 	"net/http"
 	"net/http/httputil"
 	"strings"
 	"testing"
 	"testing/synctest"
 	"time"
+
+	"github.com/carlmjohnson/requests/reqtest"
+	"github.com/earthboundkid/assert"
+	"github.com/earthboundkid/assert/testfile"
+	"github.com/spotlightpa/almanack/internal/almlog"
+	"github.com/spotlightpa/almanack/internal/services/anf"
 )
 
 func TestHMACSignRequest(t *testing.T) {
-	be := assert.FailNow(t)
 	testfile.Run(t, "testdata/req.*.raw", func(t *testing.T, match string) {
+		be := assert.FailNow(t)
 		synctest.Test(t, func(t *testing.T) {
 			in := testfile.Read(t, match)
 			buf := bufio.NewReader(strings.NewReader(in))
