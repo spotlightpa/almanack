@@ -12,10 +12,9 @@ import (
 
 func TestFromDB(t *testing.T) {
 	testfile.Run(t, "testdata/*/item.json", func(t *testing.T, match string) {
-		be := assert.FailNow(t)
 		var item db.NewsFeedItem
 		testfile.ReadJSON(t, match, &item)
-		art := be.OK(anf.FromDB(&item))
+		art := assert.FailNow(t).OK(anf.FromDB(&item))
 		filename := filepath.Join(filepath.Dir(match), "article.json")
 		testfile.EqualJSON(t, filename, art)
 	})
