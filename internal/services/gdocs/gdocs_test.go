@@ -26,18 +26,16 @@ func TestConvert(t *testing.T) {
 func TestFullConvert(t *testing.T) {
 	t.Parallel()
 	testfile.Run(t, "testdata/*.json", func(t *testing.T, path string) {
-		be := assert.FailNow(t)
 		var doc docs.Document
 		testfile.ReadJSON(t, path, &doc)
 
 		n := Convert(&doc)
-		got := be.OK(blocko.MinifyAndBlockize(xhtml.OuterHTML(n)))
+		got := assert.FailNow(t).OK(blocko.MinifyAndBlockize(xhtml.OuterHTML(n)))
 		testfile.Equalish(t, testfile.Ext(path, ".md"), got)
 	})
 }
 
 func BenchmarkConvert(b *testing.B) {
-	be := assert.Continue(b)
 	want := testfile.Read(b, "testdata/privacy.html")
 	var got *html.Node
 
@@ -45,10 +43,10 @@ func BenchmarkConvert(b *testing.B) {
 	testfile.ReadJSON(b, "testdata/privacy.json", &doc)
 	b.ResetTimer()
 
-	for i := 0; i < b.N; i++ {
+	for b.Loop() {
 		got = Convert(&doc)
 	}
-	be.Equal(xhtml.OuterHTML(got), want)
+	assert.FailNow(b).Equal(xhtml.OuterHTML(got), want)
 }
 
 func BenchmarkFullConvert(b *testing.B) {
