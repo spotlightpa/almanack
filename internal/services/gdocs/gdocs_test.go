@@ -60,11 +60,9 @@ func BenchmarkFullConvert(b *testing.B) {
 	testfile.ReadJSON(b, "testdata/privacy.json", &doc)
 	b.ResetTimer()
 
-	for i := 0; i < b.N; i++ {
+	for b.Loop() {
 		n := Convert(&doc)
-		var err error
-		got, err = blocko.MinifyAndBlockize(xhtml.OuterHTML(n))
-		be.Zero(err)
+		got = be.OK(blocko.MinifyAndBlockize(xhtml.OuterHTML(n)))
 	}
 	be.Equal(got, want)
 }

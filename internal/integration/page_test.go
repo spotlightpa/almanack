@@ -2,6 +2,11 @@ package integration_test
 
 import (
 	"errors"
+	"os"
+	"path/filepath"
+	"testing"
+	"time"
+
 	"github.com/earthboundkid/assert"
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgtype"
@@ -10,10 +15,6 @@ import (
 	"github.com/spotlightpa/almanack/internal/db"
 	"github.com/spotlightpa/almanack/internal/services/github"
 	"github.com/spotlightpa/almanack/internal/services/index"
-	"os"
-	"path/filepath"
-	"testing"
-	"time"
 )
 
 func TestServicePublish(t *testing.T) {
@@ -71,20 +72,18 @@ func TestServicePublish(t *testing.T) {
 		})
 		be.Zero(err)
 
-		p, err = svc.Queries.GetPageByFilePath(ctx, path1)
-		be.Zero(err)
+		p = be.OK(svc.Queries.GetPageByFilePath(ctx, path1))
 		be.True(p.LastPublished.Valid)
 	}
 	{
 		const path2 = "content/news/2.md"
-		_, err := svc.Queries.CreatePage(ctx, db.CreatePageParams{
+		_ = be.OK(svc.Queries.CreatePage(ctx, db.CreatePageParams{
 			FilePath:   path2,
 			SourceType: "manual",
 			SourceID:   "n/a",
-		})
-		be.Zero(err)
+		}))
 
-		_, err = os.Stat(filepath.Join(tmp, path2))
+		_, err := os.Stat(filepath.Join(tmp, path2))
 		be.ErrorIs(err, os.ErrNotExist)
 
 		// Can't create another page with the same URLPath
@@ -142,14 +141,13 @@ func TestServicePublish(t *testing.T) {
 	// Test Github failure
 	{
 		const path3 = "content/news/3.md"
-		_, err := svc.Queries.CreatePage(ctx, db.CreatePageParams{
+		_ = be.OK(svc.Queries.CreatePage(ctx, db.CreatePageParams{
 			FilePath:   path3,
 			SourceType: "manual",
 			SourceID:   "n/a",
-		})
-		be.Zero(err)
+		}))
 
-		_, err = os.Stat(filepath.Join(tmp, path3))
+		_, err := os.Stat(filepath.Join(tmp, path3))
 		be.ErrorIs(err, os.ErrNotExist)
 
 		p4 := &db.Page{
@@ -241,8 +239,7 @@ func TestServicePublishTaxonomyPages(t *testing.T) {
 			Equal(tp.SourceID, storyPath).
 			True(tp.LastPublished.Valid).
 			NotZero(tp.URLPath)
-		_, err := os.Stat(filepath.Join(tmp, path))
-		be.Zero(err)
+		_ = be.OK(os.Stat(filepath.Join(tmp, path)))
 	}
 
 	// Republishing the page should not produce duplicate taxonomy pages
@@ -277,15 +274,12 @@ func TestServicePopScheduledPages(t *testing.T) {
 			SourceID:   "n/a",
 		}))
 
-		p, err := svc.Queries.GetPageByFilePath(ctx, path)
-		be.
-			Zero(err).
-			False(p.LastPublished.Valid)
-
-		_, err = os.Stat(filepath.Join(tmp, path))
+		p = be.OK(svc.Queries.GetPageByFilePath(ctx, path))
+		be.False(p.LastPublished.Valid)
+		_, err := os.Stat(filepath.Join(tmp, path))
 		be.ErrorIs(err, os.ErrNotExist)
 
-		p, err = svc.Queries.UpdatePage(ctx, db.UpdatePageParams{
+		p = be.OK(svc.Queries.UpdatePage(ctx, db.UpdatePageParams{
 			ID:             p.ID,
 			SetFrontmatter: false,
 			Frontmatter:    map[string]any{},
@@ -298,19 +292,16 @@ func TestServicePopScheduledPages(t *testing.T) {
 			},
 			URLPath:          "",
 			SetLastPublished: false,
-		})
-		be.Zero(err)
+		}))
 		be.False(p.LastPublished.Valid)
 
 		err, warning := svc.PopScheduledPages(ctx)
 		be.Zero(warning)
 		be.Zero(err)
 
-		p, err = svc.Queries.GetPageByFilePath(ctx, path)
-		be.Zero(err)
+		p = be.OK(svc.Queries.GetPageByFilePath(ctx, path))
 		be.True(p.LastPublished.Valid)
 
-		_, err = os.Stat(filepath.Join(tmp, path))
-		be.Zero(err)
+		_ = be.OK(os.Stat(filepath.Join(tmp, path)))
 	}
 }

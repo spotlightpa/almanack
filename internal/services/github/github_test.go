@@ -33,8 +33,6 @@ func TestGithub(t *testing.T) {
 	testFileContents = time.Now().Format(time.Stamp)
 	be.Zero(client.UpdateFile(ctx, "test update", fname, []byte(testFileContents)))
 	// get
-	returned, err := client.GetFile(ctx, fname)
-	be.
-		Zero(err).
-		Equal(string(returned), testFileContents)
+	returned = be.OK(client.GetFile(ctx, fname))
+	be.Equal(string(returned), testFileContents)
 }

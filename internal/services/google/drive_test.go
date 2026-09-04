@@ -2,11 +2,12 @@ package google
 
 import (
 	"cmp"
-	"github.com/carlmjohnson/requests/reqtest"
-	"github.com/earthboundkid/assert"
 	"net/http"
 	"os"
 	"testing"
+
+	"github.com/carlmjohnson/requests/reqtest"
+	"github.com/earthboundkid/assert"
 )
 
 func TestListDriveFiles(t *testing.T) {
@@ -36,12 +37,10 @@ func TestDownloadFile(t *testing.T) {
 	b := be.OK(gsvc.DownloadFile(ctx, &cl, "1ssiQd8AKXHo99qkZZwYbHxfVJHY3RPnL"))
 	be.Equal(http.DetectContentType(b), "image/jpeg")
 
-	b, err := gsvc.DownloadFile(ctx, &cl, "https://drive.google.com/file/d/1ssiQd8AKXHo99qkZZwYbHxfVJHY3RPnL/view?usp=share_link")
-	be.
-		Zero(err).
-		Equal(http.DetectContentType(b), "image/jpeg")
+	b = be.OK(gsvc.DownloadFile(ctx, &cl, "https://drive.google.com/file/d/1ssiQd8AKXHo99qkZZwYbHxfVJHY3RPnL/view?usp=share_link"))
+	be.Equal(http.DetectContentType(b), "image/jpeg")
 
-	b, err = gsvc.DownloadFile(ctx, &cl, "https://drive.google.com/file/d/1ssiQd8AKXHo99qkZZwYbHxfVJHY3RPnL;;/view?usp=share_link")
+	b, err := gsvc.DownloadFile(ctx, &cl, "https://drive.google.com/file/d/1ssiQd8AKXHo99qkZZwYbHxfVJHY3RPnL;;/view?usp=share_link")
 	be.
 		NotZero(err).
 		Zero(b)
