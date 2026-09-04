@@ -1,9 +1,10 @@
 package shortcode_test
 
 import (
+	"testing"
+
 	"github.com/earthboundkid/assert"
 	"github.com/spotlightpa/almanack/internal/utils/shortcode"
-	"testing"
 )
 
 func TestNew(t *testing.T) {

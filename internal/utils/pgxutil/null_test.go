@@ -1,10 +1,11 @@
 package pgxutil_test
 
 import (
-	"github.com/earthboundkid/assert"
-	"github.com/spotlightpa/almanack/internal/utils/pgxutil"
 	"testing"
 	"unsafe"
+
+	"github.com/earthboundkid/assert"
+	"github.com/spotlightpa/almanack/internal/utils/pgxutil"
 )
 
 func TestNilSliceToEmpty(t *testing.T) {

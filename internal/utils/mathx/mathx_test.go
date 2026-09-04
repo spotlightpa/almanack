@@ -1,9 +1,10 @@
 package mathx_test
 
 import (
+	"testing"
+
 	"github.com/earthboundkid/assert"
 	"github.com/spotlightpa/almanack/internal/utils/mathx"
-	"testing"
 )
 
 func TestClamp(t *testing.T) {

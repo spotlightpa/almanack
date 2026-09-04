@@ -1,8 +1,9 @@
 package almsvc
 
 import (
-	"github.com/earthboundkid/assert"
 	"testing"
+
+	"github.com/earthboundkid/assert"
 )
 
 func TestReplaceSpotlightShortcodes(t *testing.T) {

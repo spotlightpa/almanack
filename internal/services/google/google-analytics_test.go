@@ -2,12 +2,13 @@ package google
 
 import (
 	"cmp"
-	"github.com/carlmjohnson/requests/reqtest"
-	"github.com/earthboundkid/assert"
-	"github.com/spotlightpa/almanack/internal/almlog"
 	"net/http"
 	"os"
 	"testing"
+
+	"github.com/carlmjohnson/requests/reqtest"
+	"github.com/earthboundkid/assert"
+	"github.com/spotlightpa/almanack/internal/almlog"
 )
 
 func TestMostPopularNews(t *testing.T) {

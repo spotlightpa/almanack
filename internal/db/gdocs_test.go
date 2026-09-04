@@ -2,9 +2,10 @@ package db_test
 
 import (
 	"encoding/json"
+	"testing"
+
 	"github.com/earthboundkid/assert"
 	"github.com/spotlightpa/almanack/internal/db"
-	"testing"
 )
 
 func TestEmbed_UnmarshalJSON(t *testing.T) {

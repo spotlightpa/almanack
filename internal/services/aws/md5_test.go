@@ -2,12 +2,13 @@ package aws_test
 
 import (
 	"crypto/md5"
-	"github.com/earthboundkid/assert"
-	"github.com/spotlightpa/almanack/internal/almlog"
-	"github.com/spotlightpa/almanack/internal/services/aws"
 	"os"
 	"path/filepath"
 	"testing"
+
+	"github.com/earthboundkid/assert"
+	"github.com/spotlightpa/almanack/internal/almlog"
+	"github.com/spotlightpa/almanack/internal/services/aws"
 )
 
 func TestMD5(t *testing.T) {

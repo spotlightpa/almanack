@@ -1,14 +1,15 @@
 package integration_test
 
 import (
+	"net/http"
+	"testing"
+
 	"github.com/carlmjohnson/requests"
 	"github.com/earthboundkid/assert"
 	"github.com/spotlightpa/almanack/internal/almlog"
 	"github.com/spotlightpa/almanack/internal/almsvc"
 	"github.com/spotlightpa/almanack/internal/db"
 	"github.com/spotlightpa/almanack/internal/services/netlifyid"
-	"net/http"
-	"testing"
 )
 
 func TestPromotionEndpoints(t *testing.T) {
