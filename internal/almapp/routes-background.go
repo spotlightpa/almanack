@@ -228,3 +228,15 @@ func (app *appEnv) postMigrate(w http.ResponseWriter, r *http.Request) http.Hand
 
 	return app.jsonOK(http.StatusText(http.StatusOK))
 }
+
+func (app *appEnv) postMapSheet(w http.ResponseWriter, r *http.Request) http.Handler {
+	app.logStart(r)
+	sheetID, err := app.svc.Queries.GetOption(r.Context(), "map-sheet")
+	if err != nil {
+		return app.jsonErr(err)
+	}
+	if err := app.svc.SyncMapSheet(r.Context(), sheetID); err != nil {
+		return app.jsonErr(err)
+	}
+	return app.jsonAccepted(http.StatusText(http.StatusAccepted))
+}
