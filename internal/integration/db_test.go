@@ -15,16 +15,18 @@ func TestIsUniquenessViolation(t *testing.T) {
 	dbtx := dbhandle.DBTX()
 	{ // No errors to insert some key
 		_, err := dbtx.Exec(t.Context(), "insert into option(key, value) values ('k', 'v')")
-		be.Zero(err)
-		be.False(pgxutil.IsUniquenessViolation(err, ""))
-		be.False(pgxutil.IsUniquenessViolation(err, "blah"))
-		be.False(pgxutil.IsUniquenessViolation(err, "option_key_key"))
+		be.
+			Zero(err).
+			False(pgxutil.IsUniquenessViolation(err, "")).
+			False(pgxutil.IsUniquenessViolation(err, "blah")).
+			False(pgxutil.IsUniquenessViolation(err, "option_key_key"))
 	}
 	{ // Get option_key_key uniqueness errors on repeat insertions of the same key
 		_, err := dbtx.Exec(t.Context(), "insert into option(key, value) values ('k', 'v')")
-		be.NotZero(err)
-		be.True(pgxutil.IsUniquenessViolation(err, ""))
-		be.False(pgxutil.IsUniquenessViolation(err, "blah"))
-		be.True(pgxutil.IsUniquenessViolation(err, "option_key_key"))
+		be.
+			NotZero(err).
+			True(pgxutil.IsUniquenessViolation(err, "")).
+			False(pgxutil.IsUniquenessViolation(err, "blah")).
+			True(pgxutil.IsUniquenessViolation(err, "option_key_key"))
 	}
 }

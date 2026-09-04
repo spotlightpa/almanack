@@ -48,15 +48,17 @@ func TestAuthorizedAddressesEndpoints(t *testing.T) {
 		BodyJSON(map[string]any{"address": "bob@example.com"}).
 		ToJSON(&list).
 		Fetch(ctx))
-	be.True(slices.Contains(list.Addresses, "alice@example.com"))
-	be.True(slices.Contains(list.Addresses, "bob@example.com"))
+	be.
+		True(slices.Contains(list.Addresses, "alice@example.com")).
+		True(slices.Contains(list.Addresses, "bob@example.com"))
 
 	// GET the list and confirm both addresses appear.
 	be.Zero(rb.Clone().
 		Path("/api/authorized-addresses").
 		ToJSON(&list).
 		Fetch(ctx))
-	be.AtLeastLength(list.Addresses, 2)
-	be.True(slices.Contains(list.Addresses, "alice@example.com"))
-	be.True(slices.Contains(list.Addresses, "bob@example.com"))
+	be.
+		AtLeastLength(list.Addresses, 2).
+		True(slices.Contains(list.Addresses, "alice@example.com")).
+		True(slices.Contains(list.Addresses, "bob@example.com"))
 }

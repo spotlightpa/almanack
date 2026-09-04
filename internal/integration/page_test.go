@@ -296,8 +296,9 @@ func TestServicePopScheduledPages(t *testing.T) {
 		be.False(p.LastPublished.Valid)
 
 		err, warning := svc.PopScheduledPages(ctx)
-		be.Zero(warning)
-		be.Zero(err)
+		be.
+			Zero(err).
+			Zero(warning)
 
 		p = be.OK(svc.Queries.GetPageByFilePath(ctx, path))
 		be.True(p.LastPublished.Valid)
