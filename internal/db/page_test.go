@@ -230,9 +230,8 @@ func TestSetURLPath(t *testing.T) {
 	}
 	for name, tc := range cases {
 		t.Run(name, func(t *testing.T) {
-			be := assert.FailNow(t)
 			tc.Page.SetURLPath()
-			be.
+			assert.FailNow(t).
 				Equal(
 					tc.Page.URLPath.String != "", tc.Page.URLPath.Valid).
 				Equal(tc.Page.URLPath.String, tc.string)
@@ -355,7 +354,6 @@ func TestShouldPublishShouldNotify(t *testing.T) {
 }
 
 func TestSeries(t *testing.T) {
-	be := assert.FailNow(t)
 	cases := []struct {
 		have any
 		want []string
@@ -370,6 +368,6 @@ func TestSeries(t *testing.T) {
 	}
 	for _, tc := range cases {
 		p := db.Page{Frontmatter: db.Map{"series": tc.have}}
-		be.SlicesEqual(p.Series(), tc.want)
+		assert.Continue(t).SlicesEqual(p.Series(), tc.want)
 	}
 }

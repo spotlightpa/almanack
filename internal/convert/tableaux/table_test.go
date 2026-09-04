@@ -15,11 +15,10 @@ import (
 func TestTable(t *testing.T) {
 	t.Parallel()
 	testfile.Run(t, "testdata/*.html", func(t *testing.T, path string) {
-		be := assert.FailNow(t)
 		in := testfile.Read(t, path)
 		bareName := testfile.Ext(path, "")
+		root := assert.FailNow(t).OK(html.Parse(strings.NewReader(in)))
 
-		root := be.OK(html.Parse(strings.NewReader(in)))
 		i := 0
 		for _, tbl := range tableaux.Tables(root) {
 			i++
