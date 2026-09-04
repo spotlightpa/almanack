@@ -32,24 +32,22 @@ func TestYouTube(t *testing.T) {
 	}
 	ctx := t.Context()
 	{ // Should not have pages
-		pages, err := svc.Queries.ListPages(ctx, db.ListPagesParams{
+		pages := be.OK(svc.Queries.ListPages(ctx, db.ListPagesParams{
 			FilePath: "content/videos/%",
 			Limit:    20,
 			Offset:   0,
-		})
-		be.Zero(err)
+		}))
 		be.Zero(pages)
 	}
 	{ // Load initial items
 		be.Zero(svc.UpdateYouTubeFeed(ctx))
 	}
 	{ // Should have pages
-		pages, err := svc.Queries.ListPages(ctx, db.ListPagesParams{
+		pages := be.OK(svc.Queries.ListPages(ctx, db.ListPagesParams{
 			FilePath: "content/videos/%",
 			Limit:    20,
 			Offset:   0,
-		})
-		be.Zero(err)
+		}))
 		be.EqualLength(pages, 15)
 	}
 }

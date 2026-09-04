@@ -235,13 +235,13 @@ func TestServicePublishTaxonomyPages(t *testing.T) {
 		"content/series/Capitol Notebook/_index.md",
 	}
 	for _, path := range wantPaths {
-		tp, err := svc.Queries.GetPageByFilePath(ctx, path)
-		be.Zero(err)
-		be.Equal(tp.SourceType, "taxonomy")
-		be.Equal(tp.SourceID, storyPath)
-		be.True(tp.LastPublished.Valid)
-		be.NotZero(tp.URLPath)
-		_, err = os.Stat(filepath.Join(tmp, path))
+		tp := be.OK(svc.Queries.GetPageByFilePath(ctx, path))
+		be.
+			Equal(tp.SourceType, "taxonomy").
+			Equal(tp.SourceID, storyPath).
+			True(tp.LastPublished.Valid).
+			NotZero(tp.URLPath)
+		_, err := os.Stat(filepath.Join(tmp, path))
 		be.Zero(err)
 	}
 

@@ -22,8 +22,7 @@ func TestSheetToFileObjects(t *testing.T) {
 	// To update sheet, use this path
 	if false {
 		svc := google.Service{}
-		gcl, err := svc.SheetsClient(ctx)
-		be.Zero(err)
+		gcl := be.OK(svc.SheetsClient(ctx))
 		cl.Transport = reqtest.Caching(gcl.Transport, "testdata/sheets")
 	}
 
