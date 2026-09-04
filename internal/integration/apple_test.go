@@ -2,6 +2,10 @@ package integration_test
 
 import (
 	"errors"
+	"net/http"
+	"strings"
+	"testing"
+
 	"github.com/carlmjohnson/requests"
 	"github.com/carlmjohnson/requests/reqtest"
 	"github.com/earthboundkid/assert"
@@ -9,9 +13,6 @@ import (
 	"github.com/spotlightpa/almanack/internal/almsvc"
 	"github.com/spotlightpa/almanack/internal/services/anf"
 	"github.com/spotlightpa/almanack/internal/services/jsonfeed"
-	"net/http"
-	"strings"
-	"testing"
 )
 
 func TestPublishAppleNews(t *testing.T) {
@@ -54,15 +55,11 @@ func TestPublishAppleNews(t *testing.T) {
 
 	// Publishing should mark everything as uploaded
 	be.Zero(svc.PublishAppleNewsFeed(ctx))
-	newItems, err := svc.Queries.ListNewsFeedUpdates(ctx)
-	be.
-		Zero(err).
-		Zero(newItems)
+	newItems = be.OK(svc.Queries.ListNewsFeedUpdates(ctx))
+	be.Zero(newItems)
 
 	// Updating archive should not mark previously uploaded items as null
 	be.Zero(svc.NewsFeed.UpdateAppleNewsArchive(ctx, svc.Client, svc.Queries))
-	newItems, err = svc.Queries.ListNewsFeedUpdates(ctx)
-	be.
-		Zero(err).
-		EqualLength(newItems, 0)
+	newItems = be.OK(svc.Queries.ListNewsFeedUpdates(ctx))
+	be.EqualLength(newItems, 0)
 }
