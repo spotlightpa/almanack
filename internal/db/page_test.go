@@ -223,15 +223,16 @@ func TestSetURLPath(t *testing.T) {
 			"/news/2019/12/abc/",
 		},
 	}
-	for name, tc := range cases {
-		t.Run(name, func(t *testing.T) {
-			tc.Page.SetURLPath()
-			assert.FailsNow(t).
-				Equal(
-					tc.Page.URLPath.String != "", tc.Page.URLPath.Valid).
-				Equal(tc.Page.URLPath.String, tc.string)
-		})
-	}
+	assert.Run(t, cases, func(be assert.TB, tc struct {
+		db.Page
+		string
+	}) {
+		tc.Page.SetURLPath()
+		be.
+			Equal(
+				tc.Page.URLPath.String != "", tc.Page.URLPath.Valid).
+			Equal(tc.Page.URLPath.String, tc.string)
+	})
 }
 
 func TestShouldPublishShouldNotify(t *testing.T) {
@@ -337,15 +338,16 @@ func TestShouldPublishShouldNotify(t *testing.T) {
 			notify: false,
 		},
 	}
-	for name, tc := range cases {
-		t.Run(name, func(t *testing.T) {
-			pub := tc.new.ShouldPublish()
-			notify := tc.new.ShouldNotify(&tc.old)
-			assert.FailsNow(t).
-				Equal(pub, tc.pub).
-				Equal(notify, tc.notify)
-		})
-	}
+	assert.Run(t, cases, func(be assert.TB, tc struct {
+		old, new    db.Page
+		pub, notify bool
+	}) {
+		pub := tc.new.ShouldPublish()
+		notify := tc.new.ShouldNotify(&tc.old)
+		be.
+			Equal(pub, tc.pub).
+			Equal(notify, tc.notify)
+	})
 }
 
 func TestSeries(t *testing.T) {

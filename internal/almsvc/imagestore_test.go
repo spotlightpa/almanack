@@ -22,13 +22,16 @@ func TestMakeImageName(t *testing.T) {
 		"json":      {"application/json", ".json"},
 		"text":      {"text/plain", ".plain"},
 	}
-	for name, tc := range cases {
-		t.Run(name, func(t *testing.T) {
-			got := makeImageName(tc.ct)
-			assert.FailsNow(t).
-				Equal(path.Ext(got), tc.want).
-				NotMatch(got, `\.\.`)
-		})
+	assert.Run(t, cases, func(be assert.TB, tc struct {
+		ct   string
+		want string
+	}) {
+		got := makeImageName(tc.ct)
+		be.
+			Equal(path.Ext(got), tc.want).
+			NotMatch(got, `\.\.`)
+	})
+	for _, tc := range cases {
 		var s string
 		allocs := testing.AllocsPerRun(10, func() {
 			s = makeImageName(tc.ct)
