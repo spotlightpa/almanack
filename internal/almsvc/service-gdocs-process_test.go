@@ -13,8 +13,8 @@ import (
 )
 
 func TestProcessDocHTML(t *testing.T) {
-	testfile.Run(t, "testdata/processDocHTML/*/doc.html", func(t assert.TB, path string) {
-		input := testfile.Read(t, path)
+	testfile.Run(t, "testdata/processDocHTML/*/doc.html", func(be assert.TB, path string) {
+		input := testfile.Read(be, path)
 		doc := must.Get(html.Parse(strings.NewReader(input)))
 		metadata, embeds, intDoc, richText, rawHTML, md, warnings := processDocHTML(doc)
 
@@ -24,13 +24,13 @@ func TestProcessDocHTML(t *testing.T) {
 		richTextStr := xhtml.OuterHTML(richText)
 		rawHTMLStr := xhtml.OuterHTML(rawHTML)
 
-		testfile.Equalish(t, filepath.Join(dir, "intermediate.html"), intermediateDoc)
-		testfile.Equalish(t, filepath.Join(dir, "rich.html"), richTextStr)
-		testfile.Equalish(t, filepath.Join(dir, "raw.html"), rawHTMLStr)
-		testfile.Equalish(t, filepath.Join(dir, "article.md"), md)
-		testfile.EqualJSON(t, filepath.Join(dir, "metadata.json"), metadata)
-		testfile.EqualJSON(t, filepath.Join(dir, "embeds.json"), embeds)
-		testfile.EqualJSON(t, filepath.Join(dir, "warnings.json"), warnings)
+		testfile.Equalish(be, filepath.Join(dir, "intermediate.html"), intermediateDoc)
+		testfile.Equalish(be, filepath.Join(dir, "rich.html"), richTextStr)
+		testfile.Equalish(be, filepath.Join(dir, "raw.html"), rawHTMLStr)
+		testfile.Equalish(be, filepath.Join(dir, "article.md"), md)
+		testfile.EqualJSON(be, filepath.Join(dir, "metadata.json"), metadata)
+		testfile.EqualJSON(be, filepath.Join(dir, "embeds.json"), embeds)
+		testfile.EqualJSON(be, filepath.Join(dir, "warnings.json"), warnings)
 	})
 }
 
