@@ -25,13 +25,13 @@ func TestConvert(t *testing.T) {
 
 func TestFullConvert(t *testing.T) {
 	t.Parallel()
-	testfile.Run(t, "testdata/*.json", func(t assert.TB, path string) {
+	testfile.Run(t, "testdata/*.json", func(be assert.TB, path string) {
 		var doc docs.Document
-		testfile.ReadJSON(t, path, &doc)
+		testfile.ReadJSON(be, path, &doc)
 
 		n := Convert(&doc)
-		got := assert.FailsNow(t).OK(blocko.MinifyAndBlockize(xhtml.OuterHTML(n)))
-		testfile.Equalish(t, testfile.Ext(path, ".md"), got)
+		got := be.OK(blocko.MinifyAndBlockize(xhtml.OuterHTML(n)))
+		testfile.Equalish(be, testfile.Ext(path, ".md"), got)
 	})
 }
 
