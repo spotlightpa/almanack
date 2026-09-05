@@ -28,7 +28,7 @@ func TestRoles(t *testing.T) {
 	}))
 
 	roles := be.OK(db.GetRolesForEmail(ctx, q, "a@foo.com"))
-	be.Equal(strings.Join(roles, ","), "fooer")
+	be.SlicesEqual(roles, []string{"fooer"})
 
 	be.OK(q.UpsertRolesForAddress(ctx, db.UpsertRolesForAddressParams{
 		EmailAddress: "a@foo.com",
@@ -36,7 +36,7 @@ func TestRoles(t *testing.T) {
 	}))
 
 	roles = be.OK(db.GetRolesForEmail(ctx, q, "a@foo.com"))
-	be.Equal(strings.Join(roles, ","), "bar")
+	be.SlicesEqual(roles, []string{"bar"})
 
 	be.OK(q.UpsertRolesForDomain(ctx, db.UpsertRolesForDomainParams{
 		Domain: "foo.com",
@@ -44,5 +44,5 @@ func TestRoles(t *testing.T) {
 	}))
 
 	roles = be.OK(db.GetRolesForEmail(ctx, q, "a@foo.com"))
-	be.Equal(strings.Join(roles, ","), "")
+	be.SlicesEqual(roles, nil)
 }
