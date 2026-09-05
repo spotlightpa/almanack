@@ -13,7 +13,7 @@ func TestNilSliceToEmpty(t *testing.T) {
 
 	// nil slice becomes non-nil empty slice
 	var s []string
-	be.Falsey(s)
+	be.True(s == nil)
 	result := pgxutil.NilSliceToEmpty(s)
 	be.
 		True(result != nil).
