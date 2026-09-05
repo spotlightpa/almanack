@@ -9,12 +9,11 @@ import (
 )
 
 func TestNilSliceToEmpty(t *testing.T) {
-	be :=
-		// nil slice becomes non-nil empty slice
-		assert.FailsNow(t)
+	be := assert.FailsNow(t)
 
+	// nil slice becomes non-nil empty slice
 	var s []string
-	be.True(s == nil)
+	be.Falsey(s)
 	result := pgxutil.NilSliceToEmpty(s)
 	be.
 		True(result != nil).
