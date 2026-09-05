@@ -54,10 +54,11 @@ func TestFromToTOML(t *testing.T) {
 }
 
 func TestSetURLPath(t *testing.T) {
-	cases := map[string]struct {
+	type testcase struct {
 		db.Page
 		string
-	}{
+	}
+	cases := map[string]testcase{
 		"blank": {
 			db.Page{}, "",
 		},
@@ -223,10 +224,7 @@ func TestSetURLPath(t *testing.T) {
 			"/news/2019/12/abc/",
 		},
 	}
-	assert.Run(t, cases, func(be assert.TB, tc struct {
-		db.Page
-		string
-	}) {
+	assert.Run(t, cases, func(be assert.TB, tc testcase) {
 		tc.Page.SetURLPath()
 		be.
 			Equal(
@@ -241,10 +239,11 @@ func TestShouldPublishShouldNotify(t *testing.T) {
 	future := pgtype.Timestamptz{
 		Valid: true,
 		Time:  time.Now().Add(24 * time.Hour)}
-	cases := map[string]struct {
+	type testcase struct {
 		old, new    db.Page
 		pub, notify bool
-	}{
+	}
+	cases := map[string]testcase{
 		"blank": {
 			old:    db.Page{},
 			new:    db.Page{},
@@ -338,10 +337,7 @@ func TestShouldPublishShouldNotify(t *testing.T) {
 			notify: false,
 		},
 	}
-	assert.Run(t, cases, func(be assert.TB, tc struct {
-		old, new    db.Page
-		pub, notify bool
-	}) {
+	assert.Run(t, cases, func(be assert.TB, tc testcase) {
 		pub := tc.new.ShouldPublish()
 		notify := tc.new.ShouldNotify(&tc.old)
 		be.

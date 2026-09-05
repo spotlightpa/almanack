@@ -8,10 +8,11 @@ import (
 )
 
 func TestMakeImageName(t *testing.T) {
-	cases := map[string]struct {
+	type testcase struct {
 		ct   string
 		want string
-	}{
+	}
+	cases := map[string]testcase{
 		"none":      {"", ".bin"},
 		"slash":     {"/", ".bin"},
 		"no slash":  {"hello", ".bin"},
@@ -22,10 +23,7 @@ func TestMakeImageName(t *testing.T) {
 		"json":      {"application/json", ".json"},
 		"text":      {"text/plain", ".plain"},
 	}
-	assert.Run(t, cases, func(be assert.TB, tc struct {
-		ct   string
-		want string
-	}) {
+	assert.Run(t, cases, func(be assert.TB, tc testcase) {
 		got := makeImageName(tc.ct)
 		be.
 			Equal(path.Ext(got), tc.want).
