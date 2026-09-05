@@ -36,7 +36,10 @@ func TestToFromTOML(t *testing.T) {
 		var p2 db.Page
 		be.
 			Falsey(p2.FromMD(toml)).
-			Equal(fmt.Sprint(p2), fmt.Sprint(p1))
+			Equal(fmt.Sprint(p1), fmt.Sprint(p2))
+
+		toml2 := be.OK(p2.ToTOML())
+		be.Equal(toml, toml2)
 	})
 }
 
