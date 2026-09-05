@@ -31,7 +31,7 @@ func TestWordCount(t *testing.T) {
 var n int
 
 func BenchmarkWordCount(b *testing.B) {
-	for i := 0; i < b.N; i++ {
+	for b.Loop() {
 		n = stringx.WordCount(article)
 	}
 }

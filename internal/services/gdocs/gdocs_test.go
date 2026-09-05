@@ -50,7 +50,7 @@ func BenchmarkConvert(b *testing.B) {
 }
 
 func BenchmarkFullConvert(b *testing.B) {
-	be := assert.Continues(b)
+	be := assert.FailsNow(b)
 	want := testfile.Read(b, "testdata/privacy.md")
 	var got string
 
