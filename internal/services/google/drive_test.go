@@ -40,8 +40,5 @@ func TestDownloadFile(t *testing.T) {
 	b = be.OK(gsvc.DownloadFile(ctx, &cl, "https://drive.google.com/file/d/1ssiQd8AKXHo99qkZZwYbHxfVJHY3RPnL/view?usp=share_link"))
 	be.Equal(http.DetectContentType(b), "image/jpeg")
 
-	b, err := gsvc.DownloadFile(ctx, &cl, "https://drive.google.com/file/d/1ssiQd8AKXHo99qkZZwYbHxfVJHY3RPnL;;/view?usp=share_link")
-	be.
-		Truthy(err).
-		Falsey(b)
+	be.NotOK(gsvc.DownloadFile(ctx, &cl, "https://drive.google.com/file/d/1ssiQd8AKXHo99qkZZwYbHxfVJHY3RPnL;;/view?usp=share_link"))
 }

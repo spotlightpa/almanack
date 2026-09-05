@@ -22,11 +22,10 @@ func TestMap(t *testing.T) {
 	})
 	be.Falsey(err)
 	// create again
-	_, err = q.CreatePage(ctx, db.CreatePageParams{
+	_ = be.NotOK(q.CreatePage(ctx, db.CreatePageParams{
 		FilePath:   testpath,
 		SourceType: "testing",
-	})
-	be.Truthy(err)
+	}))
 	p1 := be.OK(q.GetPageByFilePath(ctx, testpath))
 	be.Equal(p1.FilePath, testpath)
 	p2 := be.OK(q.UpdatePage(ctx, db.UpdatePageParams{

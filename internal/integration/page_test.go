@@ -109,7 +109,7 @@ func TestServicePublish(t *testing.T) {
 			return err
 		})
 		be.Truthy(err)
-		_, err = os.Stat(filepath.Join(tmp, path2))
+		err = be.NotOK(os.Stat(filepath.Join(tmp, path2)))
 		be.ErrorIs(err, os.ErrNotExist)
 
 		// Can create if the URL changes
