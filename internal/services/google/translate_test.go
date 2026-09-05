@@ -12,7 +12,7 @@ import (
 )
 
 func TestTranslate(t *testing.T) {
-	be := assert.FailNow(t)
+	be := assert.FailsNow(t)
 	almlog.UseTestLogger(t)
 	svc := Service{
 		projectID: cmp.Or(os.Getenv("ALMANACK_GOOGLE_PROJECT_ID"), "1")}

@@ -12,7 +12,7 @@ import (
 )
 
 func TestService(t *testing.T) {
-	be := assert.FailNow(t)
+	be := assert.FailsNow(t)
 	almlog.UseTestLogger(t)
 	svc := youtube.Feed{
 		ChannelID: "abc123",
@@ -21,9 +21,9 @@ func TestService(t *testing.T) {
 		Transport: reqtest.Replay("testdata"),
 	}
 	entries := be.OK(svc.FetchFeed(t.Context(), cl))
-	be.NotZero(entries)
+	be.Truthy(entries)
 	for _, entry := range entries {
-		be.NotZero(entry)
+		be.Truthy(entry)
 	}
 }
 

@@ -12,7 +12,7 @@ import (
 )
 
 func TestMostPopularNews(t *testing.T) {
-	be := assert.FailNow(t)
+	be := assert.FailsNow(t)
 	almlog.UseTestLogger(t)
 	svc := Service{
 		viewID: cmp.Or(os.Getenv("ALMANACK_GOOGLE_TEST_VIEW"), "1")}

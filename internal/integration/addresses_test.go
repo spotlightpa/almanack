@@ -12,7 +12,7 @@ import (
 )
 
 func TestAuthorizedAddressesEndpoints(t *testing.T) {
-	be := assert.FailNow(t)
+	be := assert.FailsNow(t)
 	almlog.UseTestLogger(t)
 	dbhandle := createTestDB(t)
 	rb := newTestServer(t, almsvc.Services{
@@ -27,14 +27,14 @@ func TestAuthorizedAddressesEndpoints(t *testing.T) {
 	}
 
 	// Initially empty
-	be.Zero(rb.Clone().
+	be.Falsey(rb.Clone().
 		Path("/api/authorized-addresses").
 		ToJSON(&list).
 		Fetch(ctx))
-	be.Zero(list.Addresses)
+	be.Falsey(list.Addresses)
 
 	// Add two addresses via POST.
-	be.Zero(rb.Clone().
+	be.Falsey(rb.Clone().
 		Path("/api/authorized-addresses").
 		Method(http.MethodPost).
 		BodyJSON(map[string]any{"address": "alice@example.com"}).
@@ -42,7 +42,7 @@ func TestAuthorizedAddressesEndpoints(t *testing.T) {
 		Fetch(ctx))
 	be.True(slices.Contains(list.Addresses, "alice@example.com"))
 
-	be.Zero(rb.Clone().
+	be.Falsey(rb.Clone().
 		Path("/api/authorized-addresses").
 		Method(http.MethodPost).
 		BodyJSON(map[string]any{"address": "bob@example.com"}).
@@ -53,7 +53,7 @@ func TestAuthorizedAddressesEndpoints(t *testing.T) {
 		True(slices.Contains(list.Addresses, "bob@example.com"))
 
 	// GET the list and confirm both addresses appear.
-	be.Zero(rb.Clone().
+	be.Falsey(rb.Clone().
 		Path("/api/authorized-addresses").
 		ToJSON(&list).
 		Fetch(ctx))

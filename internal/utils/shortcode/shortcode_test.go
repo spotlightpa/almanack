@@ -8,7 +8,7 @@ import (
 )
 
 func TestNew(t *testing.T) {
-	be := assert.FailNow(t)
+	be := assert.FailsNow(t)
 	cases := []struct {
 		tag   string
 		attrs []string
@@ -54,7 +54,7 @@ func TestNew(t *testing.T) {
 }
 
 func TestNewPanicsOnOddAttrs(t *testing.T) {
-	assert.FailNow(t).NotZero(assert.Catch(func() {
+	assert.FailsNow(t).Panicked(func() {
 		shortcode.New("picture", "src")
-	}))
+	})
 }

@@ -12,7 +12,7 @@ import (
 var article string
 
 func TestWordCount(t *testing.T) {
-	be := assert.Continue(t)
+	be := assert.Continues(t)
 	cases := []struct {
 		s string
 		n int

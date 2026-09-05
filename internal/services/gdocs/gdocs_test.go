@@ -12,25 +12,25 @@ import (
 )
 
 func TestConvert(t *testing.T) {
-	testfile.Run(t, "testdata/*.json", func(t *testing.T, path string) {
+	testfile.Run(t, "testdata/*.json", func(be assert.TB, path string) {
 		var doc docs.Document
-		testfile.ReadJSON(t, path, &doc)
+		testfile.ReadJSON(be, path, &doc)
 
 		n := Convert(&doc)
 		got := xhtml.OuterHTML(n)
 
-		testfile.Equalish(t, testfile.Ext(path, ".html"), got)
+		testfile.Equalish(be, testfile.Ext(path, ".html"), got)
 	})
 }
 
 func TestFullConvert(t *testing.T) {
 	t.Parallel()
-	testfile.Run(t, "testdata/*.json", func(t *testing.T, path string) {
+	testfile.Run(t, "testdata/*.json", func(t assert.TB, path string) {
 		var doc docs.Document
 		testfile.ReadJSON(t, path, &doc)
 
 		n := Convert(&doc)
-		got := assert.FailNow(t).OK(blocko.MinifyAndBlockize(xhtml.OuterHTML(n)))
+		got := assert.FailsNow(t).OK(blocko.MinifyAndBlockize(xhtml.OuterHTML(n)))
 		testfile.Equalish(t, testfile.Ext(path, ".md"), got)
 	})
 }
@@ -46,11 +46,11 @@ func BenchmarkConvert(b *testing.B) {
 	for b.Loop() {
 		got = Convert(&doc)
 	}
-	assert.FailNow(b).Equal(xhtml.OuterHTML(got), want)
+	assert.FailsNow(b).Equal(xhtml.OuterHTML(got), want)
 }
 
 func BenchmarkFullConvert(b *testing.B) {
-	be := assert.Continue(b)
+	be := assert.Continues(b)
 	want := testfile.Read(b, "testdata/privacy.md")
 	var got string
 

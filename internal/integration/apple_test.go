@@ -16,7 +16,7 @@ import (
 )
 
 func TestPublishAppleNews(t *testing.T) {
-	be := assert.FailNow(t)
+	be := assert.FailsNow(t)
 	almlog.UseTestLogger(t)
 	dbhandle := createTestDB(t)
 	q := dbhandle.Queries()
@@ -49,17 +49,17 @@ func TestPublishAppleNews(t *testing.T) {
 	}
 
 	// Updating archive should add unuploaded items
-	be.Zero(svc.NewsFeed.UpdateAppleNewsArchive(ctx, svc.Client, svc.Queries))
+	be.Falsey(svc.NewsFeed.UpdateAppleNewsArchive(ctx, svc.Client, svc.Queries))
 	newItems := be.OK(svc.Queries.ListNewsFeedUpdates(ctx))
 	be.EqualLength(newItems, 15)
 
 	// Publishing should mark everything as uploaded
-	be.Zero(svc.PublishAppleNewsFeed(ctx))
+	be.Falsey(svc.PublishAppleNewsFeed(ctx))
 	newItems = be.OK(svc.Queries.ListNewsFeedUpdates(ctx))
-	be.Zero(newItems)
+	be.Falsey(newItems)
 
 	// Updating archive should not mark previously uploaded items as null
-	be.Zero(svc.NewsFeed.UpdateAppleNewsArchive(ctx, svc.Client, svc.Queries))
+	be.Falsey(svc.NewsFeed.UpdateAppleNewsArchive(ctx, svc.Client, svc.Queries))
 	newItems = be.OK(svc.Queries.ListNewsFeedUpdates(ctx))
 	be.EqualLength(newItems, 0)
 }

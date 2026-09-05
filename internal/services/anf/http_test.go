@@ -17,15 +17,15 @@ import (
 )
 
 func TestHMACSignRequest(t *testing.T) {
-	testfile.Run(t, "testdata/req.*.raw", func(t *testing.T, match string) {
-		synctest.Test(t, func(t *testing.T) {
-			be := assert.FailNow(t)
+	testfile.Run(t, "testdata/req.*.raw", func(be assert.TB, match string) {
+		synctest.Test(be.TB.(*testing.T), func(t *testing.T) {
+			be := assert.FailsNow(t)
 			in := testfile.Read(t, match)
 			buf := bufio.NewReader(strings.NewReader(in))
 			req := be.OK(http.ReadRequest(buf))
 
 			now := time.Now()
-			be.Zero(anf.HHMACSignRequest(req, "key", "aGVsbG8=", now))
+			be.Falsey(anf.HHMACSignRequest(req, "key", "aGVsbG8=", now))
 			signed := be.OK(httputil.DumpRequest(req, true))
 			testfile.Equalish(t, testfile.Ext(match, "signed"), string(signed))
 		})
@@ -43,12 +43,12 @@ func TestService(t *testing.T) {
 		},
 	}
 	synctest.Test(t, func(t *testing.T) {
-		be := assert.FailNow(t)
+		be := assert.FailsNow(t)
 		data := be.OK(svc.ReadChannel(t.Context()))
-		be.NotZero(data)
+		be.Truthy(data)
 		sections := be.OK(svc.ListSections(t.Context()))
-		be.NotZero(sections)
+		be.Truthy(sections)
 		// Should have at least default channel
-		be.NotZero(sections.ToMap()[""])
+		be.Truthy(sections.ToMap()[""])
 	})
 }

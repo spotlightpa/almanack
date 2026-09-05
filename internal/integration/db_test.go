@@ -9,14 +9,14 @@ import (
 )
 
 func TestIsUniquenessViolation(t *testing.T) {
-	be := assert.FailNow(t)
+	be := assert.FailsNow(t)
 	almlog.UseTestLogger(t)
 	dbhandle := createTestDB(t)
 	dbtx := dbhandle.DBTX()
 	{ // No errors to insert some key
 		_, err := dbtx.Exec(t.Context(), "insert into option(key, value) values ('k', 'v')")
 		be.
-			Zero(err).
+			Falsey(err).
 			False(pgxutil.IsUniquenessViolation(err, "")).
 			False(pgxutil.IsUniquenessViolation(err, "blah")).
 			False(pgxutil.IsUniquenessViolation(err, "option_key_key"))
@@ -24,7 +24,7 @@ func TestIsUniquenessViolation(t *testing.T) {
 	{ // Get option_key_key uniqueness errors on repeat insertions of the same key
 		_, err := dbtx.Exec(t.Context(), "insert into option(key, value) values ('k', 'v')")
 		be.
-			NotZero(err).
+			Truthy(err).
 			True(pgxutil.IsUniquenessViolation(err, "")).
 			False(pgxutil.IsUniquenessViolation(err, "blah")).
 			True(pgxutil.IsUniquenessViolation(err, "option_key_key"))

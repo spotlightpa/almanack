@@ -25,7 +25,7 @@ func TestMakeImageName(t *testing.T) {
 	for name, tc := range cases {
 		t.Run(name, func(t *testing.T) {
 			got := makeImageName(tc.ct)
-			assert.FailNow(t).
+			assert.FailsNow(t).
 				Equal(path.Ext(got), tc.want).
 				NotMatch(got, `\.\.`)
 		})

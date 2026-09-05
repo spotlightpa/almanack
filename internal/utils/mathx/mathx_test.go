@@ -8,7 +8,7 @@ import (
 )
 
 func TestClamp(t *testing.T) {
-	be := assert.FailNow(t)
+	be := assert.FailsNow(t)
 	for _, tc := range []struct {
 		n, min, max, want int
 	}{
@@ -21,7 +21,7 @@ func TestClamp(t *testing.T) {
 	} {
 		be.Equal(mathx.Clamp(tc.n, tc.min, tc.max), tc.want)
 	}
-	be.NotZero(assert.Catch(func() {
+	be.Truthy(assert.Catch(func() {
 		mathx.Clamp(10, 100, 1)
 	}))
 }

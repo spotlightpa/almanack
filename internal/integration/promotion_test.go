@@ -13,7 +13,7 @@ import (
 )
 
 func TestPromotionEndpoints(t *testing.T) {
-	be := assert.FailNow(t)
+	be := assert.FailsNow(t)
 	almlog.UseTestLogger(t)
 	dbhandle := createTestDB(t)
 	rb := newTestServer(t, almsvc.Services{
@@ -26,7 +26,7 @@ func TestPromotionEndpoints(t *testing.T) {
 	var created1 db.Promotion
 	{ // Create first promotion
 		var created db.Promotion
-		be.Zero(rb.Clone().
+		be.Falsey(rb.Clone().
 			Path("/api/promotion").
 			Method(http.MethodPost).
 			BodyJSON(db.Promotion{
@@ -43,7 +43,7 @@ func TestPromotionEndpoints(t *testing.T) {
 			ToJSON(&created).
 			Fetch(ctx))
 		be.
-			NotZero(created.ID).
+			Truthy(created.ID).
 			Equal(created.Name, "Banner Ad").
 			Equal(created.Width, int32(728)).
 			Equal(created.Height, int32(90)).
@@ -54,7 +54,7 @@ func TestPromotionEndpoints(t *testing.T) {
 	}
 	{ // Create second promotion
 		var created db.Promotion
-		be.Zero(rb.Clone().
+		be.Falsey(rb.Clone().
 			Path("/api/promotion").
 			Method(http.MethodPost).
 			BodyJSON(db.Promotion{
@@ -68,7 +68,7 @@ func TestPromotionEndpoints(t *testing.T) {
 			ToJSON(&created).
 			Fetch(ctx))
 		be.
-			NotZero(created.ID).
+			Truthy(created.ID).
 			Equal(created.Name, "Sidebar Ad")
 	}
 	{ // List all promotions (no text filter) — NextPage must be absent when results fit in one page
@@ -76,7 +76,7 @@ func TestPromotionEndpoints(t *testing.T) {
 			Promotions []db.Promotion `json:"promotions"`
 			NextPage   string         `json:"next_page"`
 		}
-		be.Zero(rb.Clone().
+		be.Falsey(rb.Clone().
 			Path("/api/promotion").
 			ToJSON(&listResp).
 			Fetch(ctx))
@@ -88,7 +88,7 @@ func TestPromotionEndpoints(t *testing.T) {
 		var ftsResp struct {
 			Promotions []db.Promotion `json:"promotions"`
 		}
-		be.Zero(rb.Clone().
+		be.Falsey(rb.Clone().
 			Path("/api/promotion").
 			Param("text", "sidebar").
 			ToJSON(&ftsResp).
@@ -101,7 +101,7 @@ func TestPromotionEndpoints(t *testing.T) {
 		var widthResp struct {
 			Promotions []db.Promotion `json:"promotions"`
 		}
-		be.Zero(rb.Clone().
+		be.Falsey(rb.Clone().
 			Path("/api/promotion").
 			Param("width", "300").
 			ToJSON(&widthResp).
@@ -113,7 +113,7 @@ func TestPromotionEndpoints(t *testing.T) {
 	}
 	{ // Create with nil image_urls — must not fail with NOT NULL violation
 		var created db.Promotion
-		be.Zero(rb.Clone().
+		be.Falsey(rb.Clone().
 			Path("/api/promotion").
 			Method(http.MethodPost).
 			BodyJSON(db.Promotion{
@@ -125,12 +125,12 @@ func TestPromotionEndpoints(t *testing.T) {
 			ToJSON(&created).
 			Fetch(ctx))
 		be.
-			NotZero(created.ID).
+			Truthy(created.ID).
 			SlicesEqual(created.ImageUrls, []string{})
 	}
 	{ // Update the first promotion
 		var updated db.Promotion
-		be.Zero(rb.Clone().
+		be.Falsey(rb.Clone().
 			Path("/api/promotion").
 			Method(http.MethodPost).
 			BodyJSON(db.Promotion{
@@ -156,7 +156,7 @@ func TestPromotionEndpoints(t *testing.T) {
 }
 
 func TestDeletePromotionEndpoint(t *testing.T) {
-	be := assert.FailNow(t)
+	be := assert.FailsNow(t)
 	almlog.UseTestLogger(t)
 	dbhandle := createTestDB(t)
 	rb := newTestServer(t, almsvc.Services{
@@ -168,7 +168,7 @@ func TestDeletePromotionEndpoint(t *testing.T) {
 
 	// Create a promotion to delete
 	var created db.Promotion
-	be.Zero(rb.Clone().
+	be.Falsey(rb.Clone().
 		Path("/api/promotion").
 		Method(http.MethodPost).
 		BodyJSON(db.Promotion{
@@ -180,7 +180,7 @@ func TestDeletePromotionEndpoint(t *testing.T) {
 		}).
 		ToJSON(&created).
 		Fetch(ctx))
-	be.NotZero(created.ID)
+	be.Truthy(created.ID)
 
 	// Nonexistent ID returns 400 Bad Request
 	err := rb.Clone().
@@ -192,7 +192,7 @@ func TestDeletePromotionEndpoint(t *testing.T) {
 	be.Equal(re.StatusCode, http.StatusBadRequest)
 
 	// Delete the promotion
-	be.Zero(rb.Clone().
+	be.Falsey(rb.Clone().
 		Path("/api/promotion-delete").
 		Method(http.MethodPost).
 		BodyJSON(map[string]any{"id": created.ID}).
@@ -202,7 +202,7 @@ func TestDeletePromotionEndpoint(t *testing.T) {
 	var listResp struct {
 		Promotions []db.Promotion `json:"promotions"`
 	}
-	be.Zero(rb.Clone().
+	be.Falsey(rb.Clone().
 		Path("/api/promotion").
 		ToJSON(&listResp).
 		Fetch(ctx))

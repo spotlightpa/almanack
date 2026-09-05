@@ -10,7 +10,7 @@ import (
 )
 
 func TestMap(t *testing.T) {
-	be := assert.FailNow(t)
+	be := assert.FailsNow(t)
 	dbhandle := createTestDB(t)
 	q := dbhandle.Queries()
 
@@ -20,13 +20,13 @@ func TestMap(t *testing.T) {
 		FilePath:   testpath,
 		SourceType: "testing",
 	})
-	be.Zero(err)
+	be.Falsey(err)
 	// create again
 	_, err = q.CreatePage(ctx, db.CreatePageParams{
 		FilePath:   testpath,
 		SourceType: "testing",
 	})
-	be.NotZero(err)
+	be.Truthy(err)
 	p1 := be.OK(q.GetPageByFilePath(ctx, testpath))
 	be.Equal(p1.FilePath, testpath)
 	p2 := be.OK(q.UpdatePage(ctx, db.UpdatePageParams{

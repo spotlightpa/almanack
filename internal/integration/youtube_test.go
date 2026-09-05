@@ -16,7 +16,7 @@ import (
 )
 
 func TestYouTube(t *testing.T) {
-	be := assert.FailNow(t)
+	be := assert.FailsNow(t)
 	almlog.UseTestLogger(t)
 	dbhandle := createTestDB(t)
 	svc := almsvc.Services{
@@ -45,10 +45,10 @@ func TestYouTube(t *testing.T) {
 			Limit:    20,
 			Offset:   0,
 		}))
-		be.Zero(pages)
+		be.Falsey(pages)
 	}
 	{ // Load initial items
-		be.Zero(svc.UpdateYouTubeFeed(ctx))
+		be.Falsey(svc.UpdateYouTubeFeed(ctx))
 	}
 	{ // Should have pages
 		pages := be.OK(svc.Queries.ListPages(ctx, db.ListPagesParams{

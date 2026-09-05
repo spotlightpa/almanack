@@ -13,7 +13,7 @@ import (
 )
 
 func TestSheetToFileObjects(t *testing.T) {
-	be := assert.FailNow(t)
+	be := assert.FailsNow(t)
 	ctx := t.Context()
 	almlog.UseTestLogger(t)
 
@@ -46,5 +46,5 @@ func TestSheetMap(t *testing.T) {
 		b := sm.Field("b")
 		got = append(got, abc{sm.Field("a"), b, sm.Field("c")})
 	}
-	assert.FailNow(t).SlicesEqual(got, []abc{{"1", "2", "3"}, {"4", "5", "6"}})
+	assert.FailsNow(t).SlicesEqual(got, []abc{{"1", "2", "3"}, {"4", "5", "6"}})
 }

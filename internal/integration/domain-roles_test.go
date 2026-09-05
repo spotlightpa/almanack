@@ -9,7 +9,7 @@ import (
 )
 
 func TestRoles(t *testing.T) {
-	be := assert.FailNow(t)
+	be := assert.FailsNow(t)
 	dbhandle := createTestDB(t)
 	q := dbhandle.Queries()
 

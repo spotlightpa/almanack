@@ -18,7 +18,7 @@ import (
 )
 
 func TestServicePublish(t *testing.T) {
-	be := assert.FailNow(t)
+	be := assert.FailsNow(t)
 	ctx := t.Context()
 	almlog.UseTestLogger(t)
 
@@ -67,10 +67,10 @@ func TestServicePublish(t *testing.T) {
 		}
 		err = svc.DB.Tx(ctx, pgx.TxOptions{}, func(txq *db.Queries) (txerr error) {
 			err, warning := svc.PublishPage(ctx, txq, p1)
-			be.Zero(warning)
+			be.Falsey(warning)
 			return err
 		})
-		be.Zero(err)
+		be.Falsey(err)
 
 		p = be.OK(svc.Queries.GetPageByFilePath(ctx, path1))
 		be.True(p.LastPublished.Valid)
@@ -105,10 +105,10 @@ func TestServicePublish(t *testing.T) {
 		}
 		err = svc.DB.Tx(ctx, pgx.TxOptions{}, func(txq *db.Queries) (txerr error) {
 			err, warning := svc.PublishPage(ctx, txq, p2)
-			be.Zero(warning)
+			be.Falsey(warning)
 			return err
 		})
-		be.NotZero(err)
+		be.Truthy(err)
 		_, err = os.Stat(filepath.Join(tmp, path2))
 		be.ErrorIs(err, os.ErrNotExist)
 
@@ -131,12 +131,11 @@ func TestServicePublish(t *testing.T) {
 		}
 		err = svc.DB.Tx(ctx, pgx.TxOptions{}, func(txq *db.Queries) (txerr error) {
 			err, warning := svc.PublishPage(ctx, txq, p3)
-			be.Zero(warning)
+			be.Falsey(warning)
 			return err
 		})
-		be.Zero(err)
-		_, err = os.Stat(filepath.Join(tmp, path2))
-		be.Zero(err)
+		be.Falsey(err)
+		_ = be.OK(os.Stat(filepath.Join(tmp, path2)))
 	}
 	// Test Github failure
 	{
@@ -172,10 +171,10 @@ func TestServicePublish(t *testing.T) {
 		}
 		err = svc.DB.Tx(ctx, pgx.TxOptions{}, func(txq *db.Queries) (txerr error) {
 			err, warning := svc.PublishPage(ctx, txq, p4)
-			be.Zero(warning)
+			be.Falsey(warning)
 			return err
 		})
-		be.NotZero(err)
+		be.Truthy(err)
 
 		p := be.OK(svc.Queries.GetPageByFilePath(ctx, path3))
 		be.False(p.LastPublished.Valid)
@@ -183,7 +182,7 @@ func TestServicePublish(t *testing.T) {
 }
 
 func TestServicePublishTaxonomyPages(t *testing.T) {
-	be := assert.FailNow(t)
+	be := assert.FailsNow(t)
 	ctx := t.Context()
 	almlog.UseTestLogger(t)
 
@@ -214,17 +213,16 @@ func TestServicePublishTaxonomyPages(t *testing.T) {
 
 	err := svc.DB.Tx(ctx, pgx.TxOptions{}, func(txq *db.Queries) (txerr error) {
 		txerr = p.Save(ctx, txq, false)
-		be.Zero(txerr)
+		be.Falsey(txerr)
 
 		err, warning := svc.PublishPage(ctx, txq, p)
-		be.Zero(warning)
+		be.Falsey(warning)
 		return err
 	})
-	be.Zero(err)
+	be.Falsey(err)
 
 	// Source page was published.
-	_, err = os.Stat(filepath.Join(tmp, storyPath))
-	be.Zero(err)
+	_ = be.OK(os.Stat(filepath.Join(tmp, storyPath)))
 
 	// Taxonomy pages were created in the DB and in the content store.
 	wantPaths := []string{
@@ -238,7 +236,7 @@ func TestServicePublishTaxonomyPages(t *testing.T) {
 			Equal(tp.SourceType, "taxonomy").
 			Equal(tp.SourceID, storyPath).
 			True(tp.LastPublished.Valid).
-			NotZero(tp.URLPath)
+			Truthy(tp.URLPath)
 		_ = be.OK(os.Stat(filepath.Join(tmp, path)))
 	}
 
@@ -246,14 +244,14 @@ func TestServicePublishTaxonomyPages(t *testing.T) {
 	// or error out.
 	err = svc.DB.Tx(ctx, pgx.TxOptions{}, func(txq *db.Queries) (txerr error) {
 		err, warning := svc.PublishPage(ctx, txq, p)
-		be.Zero(warning)
+		be.Falsey(warning)
 		return err
 	})
-	be.Zero(err)
+	be.Falsey(err)
 }
 
 func TestServicePopScheduledPages(t *testing.T) {
-	be := assert.FailNow(t)
+	be := assert.FailsNow(t)
 	ctx := t.Context()
 	almlog.UseTestLogger(t)
 	dbhandle := createTestDB(t)
@@ -297,8 +295,8 @@ func TestServicePopScheduledPages(t *testing.T) {
 
 		err, warning := svc.PopScheduledPages(ctx)
 		be.
-			Zero(err).
-			Zero(warning)
+			Falsey(err).
+			Falsey(warning)
 
 		p = be.OK(svc.Queries.GetPageByFilePath(ctx, path))
 		be.True(p.LastPublished.Valid)

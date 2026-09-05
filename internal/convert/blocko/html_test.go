@@ -10,10 +10,11 @@ import (
 )
 
 func TestIsEmpty(t *testing.T) {
-	tcases := map[string]struct {
+	type testcase struct {
 		in    string
 		empty bool
-	}{
+	}
+	assert.Run(t, map[string]testcase{
 		"span":       {"<span></span>", true},
 		"div":        {"<div></div>", false},
 		"span-space": {"<span> </span>", true},
@@ -23,20 +24,17 @@ func TestIsEmpty(t *testing.T) {
 		"span-text":  {"<span></span>x", false},
 		"nested":     {"<a><b>\n</b></a> ", true},
 		"nested-x":   {"<a><b>x</b></a> ", false},
-	}
-	for name, tc := range tcases {
-		t.Run(name, func(t *testing.T) {
-			p := &html.Node{
-				Type:     html.ElementNode,
-				DataAtom: atom.P,
-				Data:     "p",
-			}
-			be := assert.FailNow(t)
-			children := be.OK(html.ParseFragment(strings.NewReader(tc.in), p))
-			for _, c := range children {
-				p.AppendChild(c)
-			}
-			be.Equal(tc.empty, isEmpty(p))
-		})
-	}
+	}, func(be assert.TB, tc testcase) {
+		p := &html.Node{
+			Type:     html.ElementNode,
+			DataAtom: atom.P,
+			Data:     "p",
+		}
+
+		children := be.OK(html.ParseFragment(strings.NewReader(tc.in), p))
+		for _, c := range children {
+			p.AppendChild(c)
+		}
+		be.Equal(tc.empty, isEmpty(p))
+	})
 }

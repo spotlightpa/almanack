@@ -12,7 +12,7 @@ import (
 )
 
 func TestMD5(t *testing.T) {
-	be := assert.FailNow(t)
+	be := assert.FailsNow(t)
 	almlog.UseTestLogger(t)
 	dir := t.ArtifactDir()
 	const teststr = "Hello, World!"
@@ -20,19 +20,17 @@ func TestMD5(t *testing.T) {
 
 	ctx := t.Context()
 	bucket := aws.NewTestBlobStore(dir)
-	be.Zero(bucket.WriteFile(ctx, "hello.txt", nil, []byte(teststr)))
+	be.Falsey(bucket.WriteFile(ctx, "hello.txt", nil, []byte(teststr)))
 
-	hash, size, err := bucket.ReadMD5(ctx, "hello.txt")
+	hash, size := be.OK2(bucket.ReadMD5(ctx, "hello.txt"))
 	be.
-		Zero(err).
 		SlicesEqual(hash, wantMD5[:]).
 		Equal(size, int64(len(teststr)))
 
-	be.Zero(os.Remove(filepath.Join(dir, "hello.txt.attrs")))
+	be.Falsey(os.Remove(filepath.Join(dir, "hello.txt.attrs")))
 
-	hash, size, err = bucket.ReadMD5(ctx, "hello.txt")
+	hash, size = be.OK2(bucket.ReadMD5(ctx, "hello.txt"))
 	be.
-		Zero(err).
 		SlicesEqual(hash, wantMD5[:]).
 		EqualLength(teststr, int(size))
 }

@@ -11,7 +11,7 @@ import (
 )
 
 func TestListDriveFiles(t *testing.T) {
-	be := assert.FailNow(t)
+	be := assert.FailsNow(t)
 	svc := Service{
 		driveID: cmp.Or(os.Getenv("ALMANACK_GOOGLE_TEST_DRIVE"), "1")}
 	ctx := t.Context()
@@ -25,11 +25,11 @@ func TestListDriveFiles(t *testing.T) {
 		cl.Transport = reqtest.Record(gcl.Transport, "testdata")
 	}
 	files := be.OK(svc.Files(ctx, &cl))
-	be.NotZero(files)
+	be.Truthy(files)
 }
 
 func TestDownloadFile(t *testing.T) {
-	be := assert.FailNow(t)
+	be := assert.FailsNow(t)
 	var gsvc Service
 	ctx := t.Context()
 	cl := *http.DefaultClient
@@ -42,6 +42,6 @@ func TestDownloadFile(t *testing.T) {
 
 	b, err := gsvc.DownloadFile(ctx, &cl, "https://drive.google.com/file/d/1ssiQd8AKXHo99qkZZwYbHxfVJHY3RPnL;;/view?usp=share_link")
 	be.
-		NotZero(err).
-		Zero(b)
+		Truthy(err).
+		Falsey(b)
 }

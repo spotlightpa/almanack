@@ -23,5 +23,5 @@ func TestSendEmail(t *testing.T) {
 		cl.Transport = reqtest.Caching(nil, "testdata/sendemail")
 	}
 	v3 := mailchimp.NewV3(apiKey, listID, &cl)
-	assert.FailNow(t).Zero(v3.SendEmail(t.Context(), "Test message", "Hello, World!"))
+	assert.FailsNow(t).Falsey(v3.SendEmail(t.Context(), "Test message", "Hello, World!"))
 }

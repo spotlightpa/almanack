@@ -12,7 +12,7 @@ import (
 )
 
 func TestToFromTOML(t *testing.T) {
-	cases := map[string]db.Page{
+	assert.Run(t, map[string]db.Page{
 		"empty": {Frontmatter: db.Map{}},
 		"body":  {Frontmatter: db.Map{}, Body: "\n ## subhead ! \n"},
 		"fm": {Frontmatter: db.Map{
@@ -30,31 +30,26 @@ func TestToFromTOML(t *testing.T) {
 				"Authors": []string{"john", "smith"}},
 			Body: "## subhead !\n+++\n\nmore\n+++\nstuff",
 		},
-	}
-	for name, p1 := range cases {
-		t.Run(name, func(t *testing.T) {
-			be := assert.FailNow(t)
-			toml := be.OK(p1.ToTOML())
+	}, func(be assert.TB, p1 db.Page) {
+		toml := be.OK(p1.ToTOML())
 
-			var p2 db.Page
-			be.
-				Zero(p2.FromMD(toml)).
-				Equal(fmt.Sprint(p2), fmt.Sprint(p1))
-		})
-	}
+		var p2 db.Page
+		be.
+			Falsey(p2.FromMD(toml)).
+			Equal(fmt.Sprint(p2), fmt.Sprint(p1))
+	})
 }
 
 func TestFromToTOML(t *testing.T) {
-	testfile.Run(t, "testdata/*.md", func(t *testing.T, path string) {
-		be := assert.FailNow(t)
-		s := testfile.Read(t, path)
+	testfile.Run(t, "testdata/*.md", func(be assert.TB, path string) {
+		s := testfile.Read(be, path)
 
 		var page db.Page
-		be.Zero(page.FromMD(s))
+		be.Falsey(page.FromMD(s))
 
 		toml := be.OK(page.ToTOML())
 
-		testfile.Equal(t, path, toml)
+		testfile.Equal(be, path, toml)
 	})
 }
 
@@ -231,7 +226,7 @@ func TestSetURLPath(t *testing.T) {
 	for name, tc := range cases {
 		t.Run(name, func(t *testing.T) {
 			tc.Page.SetURLPath()
-			assert.FailNow(t).
+			assert.FailsNow(t).
 				Equal(
 					tc.Page.URLPath.String != "", tc.Page.URLPath.Valid).
 				Equal(tc.Page.URLPath.String, tc.string)
@@ -346,7 +341,7 @@ func TestShouldPublishShouldNotify(t *testing.T) {
 		t.Run(name, func(t *testing.T) {
 			pub := tc.new.ShouldPublish()
 			notify := tc.new.ShouldNotify(&tc.old)
-			assert.FailNow(t).
+			assert.FailsNow(t).
 				Equal(pub, tc.pub).
 				Equal(notify, tc.notify)
 		})
@@ -368,6 +363,6 @@ func TestSeries(t *testing.T) {
 	}
 	for _, tc := range cases {
 		p := db.Page{Frontmatter: db.Map{"series": tc.have}}
-		assert.Continue(t).SlicesEqual(p.Series(), tc.want)
+		assert.Continues(t).SlicesEqual(p.Series(), tc.want)
 	}
 }

@@ -11,7 +11,7 @@ import (
 func TestNilSliceToEmpty(t *testing.T) {
 	be :=
 		// nil slice becomes non-nil empty slice
-		assert.FailNow(t)
+		assert.FailsNow(t)
 
 	var s []string
 	be.True(s == nil)

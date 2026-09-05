@@ -14,16 +14,16 @@ import (
 
 func TestTable(t *testing.T) {
 	t.Parallel()
-	testfile.Run(t, "testdata/*.html", func(t *testing.T, path string) {
-		in := testfile.Read(t, path)
+	testfile.Run(t, "testdata/*.html", func(be assert.TB, path string) {
+		in := testfile.Read(be, path)
 		bareName := testfile.Ext(path, "")
-		root := assert.FailNow(t).OK(html.Parse(strings.NewReader(in)))
+		root := be.OK(html.Parse(strings.NewReader(in)))
 
 		i := 0
 		for _, tbl := range tableaux.Tables(root) {
 			i++
 			rows := tableaux.Map(tbl, xhtml.InnerHTML)
-			testfile.EqualJSON(t, fmt.Sprintf("%s-%d.json", bareName, i), &rows)
+			testfile.EqualJSON(be, fmt.Sprintf("%s-%d.json", bareName, i), &rows)
 		}
 	})
 }

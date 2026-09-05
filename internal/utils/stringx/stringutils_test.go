@@ -24,7 +24,7 @@ func TestSlugifyURL(t *testing.T) {
 	}
 	for _, tc := range cases {
 		t.Run(tc.input, func(t *testing.T) {
-			be := assert.FailNow(t)
+			be := assert.FailsNow(t)
 			be.Equal(stringx.SlugifyURL(tc.input), tc.want)
 		})
 	}
@@ -43,7 +43,7 @@ func TestSlugifyFilename(t *testing.T) {
 	}
 	for _, tc := range cases {
 		t.Run(tc.input, func(t *testing.T) {
-			be := assert.FailNow(t)
+			be := assert.FailsNow(t)
 			be.Equal(stringx.SlugifyFilename(tc.input), tc.want)
 		})
 	}
@@ -67,13 +67,13 @@ func TestRemoveParens(t *testing.T) {
 	// Run test cases
 	for _, tc := range testCases {
 		assert.
-			Continue(t).
+			Continues(t).
 			Equal(stringx.RemoveParens(tc.input), tc.want)
 	}
 }
 
 func TestExtractName(t *testing.T) {
-	be := assert.Continue(t)
+	be := assert.Continues(t)
 
 	type testcase struct {
 		Input string
@@ -131,7 +131,7 @@ func TestTruncate(t *testing.T) {
 	}
 	for _, tc := range cases {
 		t.Run(tc.input, func(t *testing.T) {
-			assert.FailNow(t).Equal(stringx.Truncate(tc.input, tc.max), tc.want)
+			assert.FailsNow(t).Equal(stringx.Truncate(tc.input, tc.max), tc.want)
 		})
 	}
 }
@@ -153,7 +153,7 @@ func TestFlattenMap(t *testing.T) {
 		},
 	}
 	for _, tc := range cases {
-		assert.FailNow(t).SlicesEqual(stringx.FlattenMap(tc.in), tc.want)
+		assert.Continues(t).SlicesEqual(stringx.FlattenMap(tc.in), tc.want)
 	}
 }
 
@@ -180,7 +180,7 @@ func TestFlattenMultimap(t *testing.T) {
 	}
 	for _, tc := range cases {
 		assert.
-			Continue(t).
+			Continues(t).
 			SlicesEqual(stringx.FlattenMultimap(tc.in), tc.want)
 	}
 }

@@ -9,7 +9,7 @@ import (
 )
 
 func TestUniqueFunc(t *testing.T) {
-	be := assert.FailNow(t)
+	be := assert.FailsNow(t)
 	for _, tc := range []struct{ have, want string }{
 		{"", ""},
 		{"1", "1"},

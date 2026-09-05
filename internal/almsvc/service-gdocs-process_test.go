@@ -5,6 +5,7 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/earthboundkid/assert"
 	"github.com/earthboundkid/assert/testfile"
 	"github.com/earthboundkid/xhtml"
 	"github.com/spotlightpa/almanack/internal/utils/must"
@@ -12,7 +13,7 @@ import (
 )
 
 func TestProcessDocHTML(t *testing.T) {
-	testfile.Run(t, "testdata/processDocHTML/*/doc.html", func(t *testing.T, path string) {
+	testfile.Run(t, "testdata/processDocHTML/*/doc.html", func(t assert.TB, path string) {
 		input := testfile.Read(t, path)
 		doc := must.Get(html.Parse(strings.NewReader(input)))
 		metadata, embeds, intDoc, richText, rawHTML, md, warnings := processDocHTML(doc)

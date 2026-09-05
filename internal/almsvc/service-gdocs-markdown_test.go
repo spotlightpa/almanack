@@ -146,6 +146,6 @@ var deweyConfig = {
 		},
 	}
 	for _, tc := range cases {
-		assert.Continue(t).Equal(replaceSpotlightShortcodes(tc.in), tc.want)
+		assert.Continues(t).Equal(replaceSpotlightShortcodes(tc.in), tc.want)
 	}
 }
