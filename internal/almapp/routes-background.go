@@ -124,9 +124,7 @@ func (app *appEnv) backgroundCron(w http.ResponseWriter, r *http.Request) http.H
 			return nil
 		},
 		func() error {
-			// TODO: Figure out what's failing here
-			_ = errors.Join(app.svc.UpdateYouTubeFeed(r.Context()))
-			return nil
+			return errors.Join(app.svc.UpdateYouTubeFeed(r.Context()))
 		},
 	); err != nil {
 		// Log multierrors individually so Sentry isn't confused
