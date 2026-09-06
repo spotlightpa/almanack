@@ -52,7 +52,8 @@ func (svc Services) CreateYouTubePage(ctx context.Context, video *db.Youtube) (e
 	if isShort {
 		imageDesc = fmt.Sprintf("Short: %s", video.Title)
 	}
-	imagePath, err := svc.ReplaceAndUploadImageURL(ctx, video.ThumbnailUrl, imageDesc, "")
+	thumbnailURL := youtube.BestThumbnailURL(ctx, svc.Client, video.YouTubeID())
+	imagePath, err := svc.ReplaceAndUploadImageURL(ctx, thumbnailURL, imageDesc, "")
 	if err != nil {
 		return err
 	}

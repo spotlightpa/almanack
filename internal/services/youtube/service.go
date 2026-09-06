@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/xml"
 	"flag"
+	"fmt"
 	"net/http"
 	"time"
 
@@ -20,6 +21,36 @@ func AddFlags(fl *flag.FlagSet) (feed *Feed) {
 	feed = new(Feed)
 	fl.StringVar(&feed.ChannelID, "youtube-channel-id", "", "`URL` for YouTube feed")
 	return feed
+}
+
+// thumbnailQualities lists YouTube thumbnail filename suffixes from best to worst.
+var thumbnailQualities = []string{
+	"maxresdefault.jpg",
+	"sddefault.jpg",
+	"hqdefault.jpg",
+	"mqdefault.jpg",
+	"default.jpg",
+}
+
+// BestThumbnailURL returns the highest-resolution thumbnail URL available for
+// the given video ID by probing each quality level until one returns HTTP 200.
+// Falls back to hqdefault.jpg if all probes fail.
+func BestThumbnailURL(ctx context.Context, cl *http.Client, videoID string) string {
+	base := fmt.Sprintf("https://img.youtube.com/vi/%s/", videoID)
+	for _, quality := range thumbnailQualities {
+		url := base + quality
+		err := requests.
+			URL(url).
+			Client(cl).
+			Method(http.MethodHead).
+			Handle(requests.CheckStatus(http.StatusOK)).
+			Fetch(ctx)
+		if err == nil {
+			return url
+		}
+	}
+	// Ultimate fallback
+	return base + "hqdefault.jpg"
 }
 
 func (svc *Feed) FetchFeed(ctx context.Context, cl *http.Client) (entries []Entry, err error) {
