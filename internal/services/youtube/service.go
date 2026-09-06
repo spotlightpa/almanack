@@ -24,7 +24,7 @@ func AddFlags(fl *flag.FlagSet) (feed *Feed) {
 }
 
 // thumbnailQualities lists YouTube thumbnail filename suffixes from best to worst.
-var thumbnailQualities = []string{
+var thumbnailQualities = [...]string{
 	"maxresdefault.jpg",
 	"sddefault.jpg",
 	"hqdefault.jpg",

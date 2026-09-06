@@ -2,9 +2,11 @@ package integration_test
 
 import (
 	"net/http"
+	"strings"
 	"testing"
 
 	"github.com/carlmjohnson/be"
+	"github.com/carlmjohnson/requests"
 	"github.com/carlmjohnson/requests/reqtest"
 	"github.com/spotlightpa/almanack/internal/almlog"
 	"github.com/spotlightpa/almanack/internal/almsvc"
@@ -24,7 +26,16 @@ func TestYouTube(t *testing.T) {
 			ChannelID: "abc123",
 		},
 		Client: &http.Client{
-			Transport: reqtest.Replay("testdata/youtube"),
+			Transport: requests.RoundTripFunc(func(req *http.Request) (*http.Response, error) {
+				// Intercept all img.youtube.com requests (HEAD probes from
+				// BestThumbnailURL and subsequent GET image downloads) so the
+				// replay transport doesn't need recorded thumbnail responses.
+				if strings.Contains(req.URL.Host, "img.youtube.com") {
+					return reqtest.ReplayString("HTTP/1.1 200 OK\r\nContent-Type: image/jpeg\r\n\r\n" +
+						"\xFF\xD8\xFF\xD9").RoundTrip(req)
+				}
+				return reqtest.Replay("testdata/youtube").RoundTrip(req)
+			}),
 		},
 		FileStore:    aws.NewTestBlobStore(t.ArtifactDir(), "file"),
 		ImageStore:   aws.NewTestBlobStore(t.ArtifactDir(), "image"),
