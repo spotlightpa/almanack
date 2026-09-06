@@ -42,8 +42,7 @@ func BestThumbnailURL(ctx context.Context, cl *http.Client, videoID string) stri
 		err := requests.
 			URL(url).
 			Client(cl).
-			Method(http.MethodHead).
-			Handle(requests.CheckStatus(http.StatusOK)).
+			Head().
 			Fetch(ctx)
 		if err == nil {
 			return url
