@@ -2,7 +2,6 @@ package integration_test
 
 import (
 	"net/http"
-	"strings"
 	"testing"
 
 	"github.com/carlmjohnson/be"
@@ -27,10 +26,8 @@ func TestYouTube(t *testing.T) {
 		},
 		Client: &http.Client{
 			Transport: requests.RoundTripFunc(func(req *http.Request) (*http.Response, error) {
-				// Intercept all img.youtube.com requests (HEAD probes from
-				// BestThumbnailURL and subsequent GET image downloads) so the
-				// replay transport doesn't need recorded thumbnail responses.
-				if strings.Contains(req.URL.Host, "img.youtube.com") {
+				// Intercept img.youtube.com from youtube.BestThumbnailURL and subsequent GET
+				if req.URL.Host == "img.youtube.com" {
 					return reqtest.ReplayFile("testdata/youtube/NCmg292P.res.txt").RoundTrip(req)
 				}
 				return reqtest.Replay("testdata/youtube").RoundTrip(req)
