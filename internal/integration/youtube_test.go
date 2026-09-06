@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/carlmjohnson/be"
+	"github.com/carlmjohnson/requests"
 	"github.com/carlmjohnson/requests/reqtest"
 	"github.com/spotlightpa/almanack/internal/almlog"
 	"github.com/spotlightpa/almanack/internal/almsvc"
@@ -24,7 +25,13 @@ func TestYouTube(t *testing.T) {
 			ChannelID: "abc123",
 		},
 		Client: &http.Client{
-			Transport: reqtest.Replay("testdata/youtube"),
+			Transport: requests.RoundTripFunc(func(req *http.Request) (*http.Response, error) {
+				// Intercept img.youtube.com from youtube.BestThumbnailURL and subsequent GET
+				if req.URL.Host == "img.youtube.com" {
+					return reqtest.ReplayFile("testdata/youtube/NCmg292P.res.txt").RoundTrip(req)
+				}
+				return reqtest.Replay("testdata/youtube").RoundTrip(req)
+			}),
 		},
 		FileStore:    aws.NewTestBlobStore(t.ArtifactDir(), "file"),
 		ImageStore:   aws.NewTestBlobStore(t.ArtifactDir(), "image"),

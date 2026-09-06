@@ -3,7 +3,6 @@ package youtube
 import (
 	"context"
 	"encoding/json"
-	"strings"
 	"time"
 
 	"github.com/earthboundkid/errorx/v2"
@@ -34,15 +33,11 @@ type bulkItem struct {
 func convertForDatabase(entries []Entry) []bulkItem {
 	items := make([]bulkItem, len(entries))
 	for i, entry := range entries {
-		thumb := entry.MediaGroup.Thumbnail.URL
-		if prefix, ok := strings.CutSuffix(thumb, "/hqdefault.jpg"); ok {
-			thumb = prefix + "/maxresdefault.jpg"
-		}
 		items[i] = bulkItem{
 			ExternalID:          entry.ID,
 			Title:               entry.Title,
 			URL:                 entry.Link.Href,
-			ThumbnailUrl:        thumb,
+			ThumbnailUrl:        entry.MediaGroup.Thumbnail.URL,
 			ExternalPublishedAt: entry.Published,
 			ExternalUpdatedAt:   entry.Updated,
 		}

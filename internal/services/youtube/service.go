@@ -5,11 +5,13 @@ import (
 	"encoding/xml"
 	"flag"
 	"net/http"
+	"net/url"
 	"time"
 
 	"github.com/carlmjohnson/requests"
 	"github.com/carlmjohnson/requests/reqxml"
 	"github.com/earthboundkid/errorx/v2"
+	"github.com/spotlightpa/almanack/internal/utils/must"
 )
 
 type Feed struct {
@@ -20,6 +22,33 @@ func AddFlags(fl *flag.FlagSet) (feed *Feed) {
 	feed = new(Feed)
 	fl.StringVar(&feed.ChannelID, "youtube-channel-id", "", "`URL` for YouTube feed")
 	return feed
+}
+
+// thumbnailQualities lists YouTube thumbnail filename suffixes from best to worst.
+var thumbnailQualities = [...]string{
+	"maxresdefault.jpg",
+	"sddefault.jpg",
+	"hqdefault.jpg",
+	"mqdefault.jpg",
+}
+
+// BestThumbnailURL returns the highest-resolution thumbnail URL available for
+// the given video ID by probing each quality level until one returns HTTP OK.
+// Falls back to default.jpg if all probes fail.
+func BestThumbnailURL(ctx context.Context, cl *http.Client, videoID string) string {
+	u := must.Get(url.Parse("https://img.youtube.com/vi/" + videoID + "/default.jpg"))
+	rb := requests.
+		URL("https://img.youtube.com/").
+		Client(cl).
+		Head()
+	for _, quality := range thumbnailQualities {
+		rb.Pathf("/vi/%s/%s", videoID, quality)
+		if err := rb.Fetch(ctx); err == nil {
+			u = must.Get(rb.URL())
+			break
+		}
+	}
+	return u.String()
 }
 
 func (svc *Feed) FetchFeed(ctx context.Context, cl *http.Client) (entries []Entry, err error) {
