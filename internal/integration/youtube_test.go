@@ -48,7 +48,7 @@ func TestYouTube(t *testing.T) {
 		be.Falsey(pages)
 	}
 	{ // Load initial items
-		be.Falsey(svc.UpdateYouTubeFeed(ctx))
+		be.NilError(svc.UpdateYouTubeFeed(ctx))
 	}
 	{ // Should have pages
 		pages := be.OK(svc.Queries.ListPages(ctx, db.ListPagesParams{

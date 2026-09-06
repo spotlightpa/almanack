@@ -25,7 +25,7 @@ func TestHMACSignRequest(t *testing.T) {
 			req := be.OK(http.ReadRequest(buf))
 
 			now := time.Now()
-			be.Falsey(anf.HHMACSignRequest(req, "key", "aGVsbG8=", now))
+			be.NilError(anf.HHMACSignRequest(req, "key", "aGVsbG8=", now))
 			signed := be.OK(httputil.DumpRequest(req, true))
 			testfile.Equalish(t, testfile.Ext(match, "signed"), string(signed))
 		})

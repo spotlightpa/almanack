@@ -24,7 +24,7 @@ func TestEmbed_UnmarshalJSON(t *testing.T) {
 		b := be.OK(json.Marshal(e1))
 		var e2 db.Embed
 		be.
-			Falsey(json.Unmarshal(b, &e2)).
+			NilError(json.Unmarshal(b, &e2)).
 			Equal(e2, e1)
 	}
 	{
@@ -36,7 +36,7 @@ func TestEmbed_UnmarshalJSON(t *testing.T) {
 		b := be.OK(json.Marshal(e1))
 		var e2 db.Embed
 		be.
-			Falsey(json.Unmarshal(b, &e2)).
+			NilError(json.Unmarshal(b, &e2)).
 			Equal(e2, e1)
 	}
 	{

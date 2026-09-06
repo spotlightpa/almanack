@@ -16,7 +16,7 @@ func TestIsUniquenessViolation(t *testing.T) {
 	{ // No errors to insert some key
 		_, err := dbtx.Exec(t.Context(), "insert into option(key, value) values ('k', 'v')")
 		be.
-			Falsey(err).
+			NilError(err).
 			False(pgxutil.IsUniquenessViolation(err, "")).
 			False(pgxutil.IsUniquenessViolation(err, "blah")).
 			False(pgxutil.IsUniquenessViolation(err, "option_key_key"))

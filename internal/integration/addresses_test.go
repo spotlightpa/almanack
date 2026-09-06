@@ -27,14 +27,14 @@ func TestAuthorizedAddressesEndpoints(t *testing.T) {
 	}
 
 	// Initially empty
-	be.Falsey(rb.Clone().
+	be.NilError(rb.Clone().
 		Path("/api/authorized-addresses").
 		ToJSON(&list).
 		Fetch(ctx))
 	be.Falsey(list.Addresses)
 
 	// Add two addresses via POST.
-	be.Falsey(rb.Clone().
+	be.NilError(rb.Clone().
 		Path("/api/authorized-addresses").
 		Method(http.MethodPost).
 		BodyJSON(map[string]any{"address": "alice@example.com"}).
@@ -42,7 +42,7 @@ func TestAuthorizedAddressesEndpoints(t *testing.T) {
 		Fetch(ctx))
 	be.True(slices.Contains(list.Addresses, "alice@example.com"))
 
-	be.Falsey(rb.Clone().
+	be.NilError(rb.Clone().
 		Path("/api/authorized-addresses").
 		Method(http.MethodPost).
 		BodyJSON(map[string]any{"address": "bob@example.com"}).
@@ -53,7 +53,7 @@ func TestAuthorizedAddressesEndpoints(t *testing.T) {
 		True(slices.Contains(list.Addresses, "bob@example.com"))
 
 	// GET the list and confirm both addresses appear.
-	be.Falsey(rb.Clone().
+	be.NilError(rb.Clone().
 		Path("/api/authorized-addresses").
 		ToJSON(&list).
 		Fetch(ctx))

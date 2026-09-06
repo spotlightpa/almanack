@@ -35,7 +35,7 @@ func TestToFromTOML(t *testing.T) {
 
 		var p2 db.Page
 		be.
-			Falsey(p2.FromMD(toml)).
+			NilError(p2.FromMD(toml)).
 			Equal(fmt.Sprint(p1), fmt.Sprint(p2))
 
 		toml2 := be.OK(p2.ToTOML())
@@ -48,7 +48,7 @@ func TestFromToTOML(t *testing.T) {
 		s := testfile.Read(be, path)
 
 		var page db.Page
-		be.Falsey(page.FromMD(s))
+		be.NilError(page.FromMD(s))
 
 		toml := be.OK(page.ToTOML())
 

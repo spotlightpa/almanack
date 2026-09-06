@@ -55,7 +55,7 @@ func TestProcessGDocsDoc(t *testing.T) {
 				ExternalID: fmt.Sprintf("abc123_%s", stringx.SlugifyURL(path)),
 				Document:   doc,
 			}))
-			be.Falsey(svc.ProcessGDocsDoc(ctx, dbDoc))
+			be.NilError(svc.ProcessGDocsDoc(ctx, dbDoc))
 			dbDoc = be.OK(svc.Queries.GetGDocsByID(ctx, dbDoc.ID))
 
 			testfile.Equal(be, path+"/raw.html", dbDoc.RawHtml)
@@ -70,7 +70,7 @@ func TestProcessGDocsDoc(t *testing.T) {
 			swapInternalID := filepath.Base(path) // Set a unique slug
 			art.InternalID, swapInternalID = swapInternalID, art.InternalID
 			be.
-				Falsey(svc.CreatePageFromGDocsDoc(ctx, art, "news")).
+				NilError(svc.CreatePageFromGDocsDoc(ctx, art, "news")).
 				True(art.PageID.Valid)
 			page := be.OK(svc.Queries.GetPageByID(ctx, art.PageID.Int64))
 			// Swap internal ID back

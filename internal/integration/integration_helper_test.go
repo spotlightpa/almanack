@@ -32,7 +32,7 @@ func createTestDB(t *testing.T) *db.Handle {
 	once.Do(func() {
 		pool, poolErr = db.CreateTestDatabase(dbURL)
 	})
-	assert.FailsNow(t).Falsey(poolErr)
+	assert.FailsNow(t).NilError(poolErr)
 	return db.NewHandle(pool)
 }
 

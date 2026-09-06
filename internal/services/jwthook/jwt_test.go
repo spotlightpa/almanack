@@ -47,7 +47,7 @@ func TestVerifyRequest(t *testing.T) {
 			"abc", "d4cce6f2-6b46-4bba-b126-cfb8f469e3c5", "xxx",
 			tc.iat,
 			&event))
-		be.Falsey(jwt.VerifyRequest(
+		be.NilError(jwt.VerifyRequest(
 			getreq(t, tc.name),
 			"abc", "d4cce6f2-6b46-4bba-b126-cfb8f469e3c5", "gotrue",
 			tc.iat,

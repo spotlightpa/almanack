@@ -16,11 +16,10 @@ func TestMap(t *testing.T) {
 
 	ctx := t.Context()
 	const testpath = "test/hello.md"
-	_, err := q.CreatePage(ctx, db.CreatePageParams{
+	_ = be.OK(q.CreatePage(ctx, db.CreatePageParams{
 		FilePath:   testpath,
 		SourceType: "testing",
-	})
-	be.Falsey(err)
+	}))
 	// create again
 	_ = be.NotOK(q.CreatePage(ctx, db.CreatePageParams{
 		FilePath:   testpath,

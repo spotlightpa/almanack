@@ -67,10 +67,10 @@ func TestServicePublish(t *testing.T) {
 		}
 		err = svc.DB.Tx(ctx, pgx.TxOptions{}, func(txq *db.Queries) (txerr error) {
 			err, warning := svc.PublishPage(ctx, txq, p1)
-			be.Falsey(warning)
+			be.NilError(warning)
 			return err
 		})
-		be.Falsey(err)
+		be.NilError(err)
 
 		p = be.OK(svc.Queries.GetPageByFilePath(ctx, path1))
 		be.True(p.LastPublished.Valid)
@@ -105,7 +105,7 @@ func TestServicePublish(t *testing.T) {
 		}
 		err = svc.DB.Tx(ctx, pgx.TxOptions{}, func(txq *db.Queries) (txerr error) {
 			err, warning := svc.PublishPage(ctx, txq, p2)
-			be.Falsey(warning)
+			be.NilError(warning)
 			return err
 		})
 		be.Truthy(err)
@@ -131,10 +131,10 @@ func TestServicePublish(t *testing.T) {
 		}
 		err = svc.DB.Tx(ctx, pgx.TxOptions{}, func(txq *db.Queries) (txerr error) {
 			err, warning := svc.PublishPage(ctx, txq, p3)
-			be.Falsey(warning)
+			be.NilError(warning)
 			return err
 		})
-		be.Falsey(err)
+		be.NilError(err)
 		_ = be.OK(os.Stat(filepath.Join(tmp, path2)))
 	}
 	// Test Github failure
@@ -171,7 +171,7 @@ func TestServicePublish(t *testing.T) {
 		}
 		err = svc.DB.Tx(ctx, pgx.TxOptions{}, func(txq *db.Queries) (txerr error) {
 			err, warning := svc.PublishPage(ctx, txq, p4)
-			be.Falsey(warning)
+			be.NilError(warning)
 			return err
 		})
 		be.Truthy(err)
@@ -213,13 +213,13 @@ func TestServicePublishTaxonomyPages(t *testing.T) {
 
 	err := svc.DB.Tx(ctx, pgx.TxOptions{}, func(txq *db.Queries) (txerr error) {
 		txerr = p.Save(ctx, txq, false)
-		be.Falsey(txerr)
+		be.NilError(txerr)
 
 		err, warning := svc.PublishPage(ctx, txq, p)
-		be.Falsey(warning)
+		be.NilError(warning)
 		return err
 	})
-	be.Falsey(err)
+	be.NilError(err)
 
 	// Source page was published.
 	_ = be.OK(os.Stat(filepath.Join(tmp, storyPath)))
@@ -244,10 +244,10 @@ func TestServicePublishTaxonomyPages(t *testing.T) {
 	// or error out.
 	err = svc.DB.Tx(ctx, pgx.TxOptions{}, func(txq *db.Queries) (txerr error) {
 		err, warning := svc.PublishPage(ctx, txq, p)
-		be.Falsey(warning)
+		be.NilError(warning)
 		return err
 	})
-	be.Falsey(err)
+	be.NilError(err)
 }
 
 func TestServicePopScheduledPages(t *testing.T) {
@@ -295,8 +295,8 @@ func TestServicePopScheduledPages(t *testing.T) {
 
 		err, warning := svc.PopScheduledPages(ctx)
 		be.
-			Falsey(err).
-			Falsey(warning)
+			NilError(err).
+			NilError(warning)
 
 		p = be.OK(svc.Queries.GetPageByFilePath(ctx, path))
 		be.True(p.LastPublished.Valid)

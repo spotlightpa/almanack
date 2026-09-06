@@ -26,7 +26,7 @@ func TestPromotionEndpoints(t *testing.T) {
 	var created1 db.Promotion
 	{ // Create first promotion
 		var created db.Promotion
-		be.Falsey(rb.Clone().
+		be.NilError(rb.Clone().
 			Path("/api/promotion").
 			Method(http.MethodPost).
 			BodyJSON(db.Promotion{
@@ -54,7 +54,7 @@ func TestPromotionEndpoints(t *testing.T) {
 	}
 	{ // Create second promotion
 		var created db.Promotion
-		be.Falsey(rb.Clone().
+		be.NilError(rb.Clone().
 			Path("/api/promotion").
 			Method(http.MethodPost).
 			BodyJSON(db.Promotion{
@@ -76,7 +76,7 @@ func TestPromotionEndpoints(t *testing.T) {
 			Promotions []db.Promotion `json:"promotions"`
 			NextPage   string         `json:"next_page"`
 		}
-		be.Falsey(rb.Clone().
+		be.NilError(rb.Clone().
 			Path("/api/promotion").
 			ToJSON(&listResp).
 			Fetch(ctx))
@@ -88,7 +88,7 @@ func TestPromotionEndpoints(t *testing.T) {
 		var ftsResp struct {
 			Promotions []db.Promotion `json:"promotions"`
 		}
-		be.Falsey(rb.Clone().
+		be.NilError(rb.Clone().
 			Path("/api/promotion").
 			Param("text", "sidebar").
 			ToJSON(&ftsResp).
@@ -101,7 +101,7 @@ func TestPromotionEndpoints(t *testing.T) {
 		var widthResp struct {
 			Promotions []db.Promotion `json:"promotions"`
 		}
-		be.Falsey(rb.Clone().
+		be.NilError(rb.Clone().
 			Path("/api/promotion").
 			Param("width", "300").
 			ToJSON(&widthResp).
@@ -113,7 +113,7 @@ func TestPromotionEndpoints(t *testing.T) {
 	}
 	{ // Create with nil image_urls — must not fail with NOT NULL violation
 		var created db.Promotion
-		be.Falsey(rb.Clone().
+		be.NilError(rb.Clone().
 			Path("/api/promotion").
 			Method(http.MethodPost).
 			BodyJSON(db.Promotion{
@@ -130,7 +130,7 @@ func TestPromotionEndpoints(t *testing.T) {
 	}
 	{ // Update the first promotion
 		var updated db.Promotion
-		be.Falsey(rb.Clone().
+		be.NilError(rb.Clone().
 			Path("/api/promotion").
 			Method(http.MethodPost).
 			BodyJSON(db.Promotion{
@@ -168,7 +168,7 @@ func TestDeletePromotionEndpoint(t *testing.T) {
 
 	// Create a promotion to delete
 	var created db.Promotion
-	be.Falsey(rb.Clone().
+	be.NilError(rb.Clone().
 		Path("/api/promotion").
 		Method(http.MethodPost).
 		BodyJSON(db.Promotion{
@@ -192,7 +192,7 @@ func TestDeletePromotionEndpoint(t *testing.T) {
 	be.Equal(re.StatusCode, http.StatusBadRequest)
 
 	// Delete the promotion
-	be.Falsey(rb.Clone().
+	be.NilError(rb.Clone().
 		Path("/api/promotion-delete").
 		Method(http.MethodPost).
 		BodyJSON(map[string]any{"id": created.ID}).
@@ -202,7 +202,7 @@ func TestDeletePromotionEndpoint(t *testing.T) {
 	var listResp struct {
 		Promotions []db.Promotion `json:"promotions"`
 	}
-	be.Falsey(rb.Clone().
+	be.NilError(rb.Clone().
 		Path("/api/promotion").
 		ToJSON(&listResp).
 		Fetch(ctx))
