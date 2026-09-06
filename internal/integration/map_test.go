@@ -21,10 +21,11 @@ func TestMap(t *testing.T) {
 		SourceType: "testing",
 	}))
 	// create again
-	_ = be.NotOK(q.CreatePage(ctx, db.CreatePageParams{
+	err := be.NotOK(q.CreatePage(ctx, db.CreatePageParams{
 		FilePath:   testpath,
 		SourceType: "testing",
 	}))
+	be.True(pgxutil.IsUniquenessViolation(err, "page_path_key"))
 	p1 := be.OK(q.GetPageByFilePath(ctx, testpath))
 	be.Equal(p1.FilePath, testpath)
 	p2 := be.OK(q.UpdatePage(ctx, db.UpdatePageParams{
