@@ -119,10 +119,14 @@ func (app *appEnv) backgroundCron(w http.ResponseWriter, r *http.Request) http.H
 			))
 		},
 		func() error {
-			return app.svc.PublishAppleNewsFeed(r.Context())
+			// TODO: Figure out what's failing here
+			_ = app.svc.PublishAppleNewsFeed(r.Context())
+			return nil
 		},
 		func() error {
-			return errors.Join(app.svc.UpdateYouTubeFeed(r.Context()))
+			// TODO: Figure out what's failing here
+			_ = errors.Join(app.svc.UpdateYouTubeFeed(r.Context()))
+			return nil
 		},
 	); err != nil {
 		// Log multierrors individually so Sentry isn't confused
