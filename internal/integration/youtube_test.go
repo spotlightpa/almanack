@@ -31,8 +31,7 @@ func TestYouTube(t *testing.T) {
 				// BestThumbnailURL and subsequent GET image downloads) so the
 				// replay transport doesn't need recorded thumbnail responses.
 				if strings.Contains(req.URL.Host, "img.youtube.com") {
-					return reqtest.ReplayString("HTTP/1.1 200 OK\r\nContent-Type: image/jpeg\r\n\r\n" +
-						"\xFF\xD8\xFF\xD9").RoundTrip(req)
+					return reqtest.ReplayFile("testdata/youtube/NCmg292P.res.txt").RoundTrip(req)
 				}
 				return reqtest.Replay("testdata/youtube").RoundTrip(req)
 			}),
