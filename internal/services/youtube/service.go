@@ -35,19 +35,19 @@ var thumbnailQualities = [...]string{
 // the given video ID by probing each quality level until one returns HTTP 200.
 // Falls back to hqdefault.jpg if all probes fail.
 func BestThumbnailURL(ctx context.Context, cl *http.Client, videoID string) string {
+	var b *requests.Builder
 	for _, quality := range thumbnailQualities {
-		err := requests.
+		b = requests.
 			URL("https://img.youtube.com").
-			Pathf("/vi/%s/%s", videoID, quality).
-			Client(cl).
-			Head().
-			Fetch(ctx)
-		if err == nil {
-			return "https://img.youtube.com/vi/" + videoID + "/" + quality
+			Pathf("/vi/%s/%s", videoID, quality)
+		if err := b.Client(cl).Head().Fetch(ctx); err == nil {
+			u, _ := b.URL()
+			return u.String()
 		}
 	}
-	// Ultimate fallback
-	return "https://img.youtube.com/vi/" + videoID + "/hqdefault.jpg"
+	// All probes failed; return the smallest size (most universally available)
+	u, _ := b.URL()
+	return u.String()
 }
 
 func (svc *Feed) FetchFeed(ctx context.Context, cl *http.Client) (entries []Entry, err error) {
