@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/carlmjohnson/be"
+	"github.com/carlmjohnson/requests"
 	"github.com/carlmjohnson/requests/reqtest"
 	"github.com/spotlightpa/almanack/internal/almlog"
 	"github.com/spotlightpa/almanack/internal/services/youtube"
@@ -23,5 +24,30 @@ func TestService(t *testing.T) {
 	be.Nonzero(t, entries)
 	for _, entry := range entries {
 		be.Nonzero(t, entry)
+	}
+}
+
+func TestBestThumbnailURL(t *testing.T) {
+	for _, tc := range []struct {
+		name    string
+		succeed string // first quality suffix to return 200 for
+		want    string
+	}{
+		{"maxres available", "maxresdefault.jpg", "https://img.youtube.com/vi/abc/maxresdefault.jpg"},
+		{"only hq available", "hqdefault.jpg", "https://img.youtube.com/vi/abc/hqdefault.jpg"},
+		{"only default available", "default.jpg", "https://img.youtube.com/vi/abc/default.jpg"},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			cl := &http.Client{
+				Transport: requests.RoundTripFunc(func(req *http.Request) (*http.Response, error) {
+					if req.URL.Path == "/vi/abc/"+tc.succeed {
+						return reqtest.ReplayString("HTTP/1.1 200 OK\r\n\r\n").RoundTrip(req)
+					}
+					return reqtest.ReplayString("HTTP/1.1 404 Not Found\r\n\r\n").RoundTrip(req)
+				}),
+			}
+			got := youtube.BestThumbnailURL(t.Context(), cl, "abc")
+			be.Equal(t, tc.want, got)
+		})
 	}
 }
