@@ -5,11 +5,13 @@ import (
 	"encoding/xml"
 	"flag"
 	"net/http"
+	"net/url"
 	"time"
 
 	"github.com/carlmjohnson/requests"
 	"github.com/carlmjohnson/requests/reqxml"
 	"github.com/earthboundkid/errorx/v2"
+	"github.com/spotlightpa/almanack/internal/utils/must"
 )
 
 type Feed struct {
@@ -28,23 +30,24 @@ var thumbnailQualities = [...]string{
 	"sddefault.jpg",
 	"hqdefault.jpg",
 	"mqdefault.jpg",
-	"default.jpg",
 }
 
 // BestThumbnailURL returns the highest-resolution thumbnail URL available for
-// the given video ID by probing each quality level until one returns HTTP 200.
-// Falls back to hqdefault.jpg if all probes fail.
+// the given video ID by probing each quality level until one returns HTTP OK.
+// Falls back to default.jpg if all probes fail.
 func BestThumbnailURL(ctx context.Context, cl *http.Client, videoID string) string {
-	var b *requests.Builder
+	u := must.Get(url.Parse("https://img.youtube.com/vi/" + videoID + "/default.jpg"))
+	rb := requests.
+		URL("https://img.youtube.com/").
+		Client(cl).
+		Head()
 	for _, quality := range thumbnailQualities {
-		b = requests.
-			URL("https://img.youtube.com").
-			Pathf("/vi/%s/%s", videoID, quality)
-		if err := b.Client(cl).Head().Fetch(ctx); err == nil {
+		rb.Pathf("/vi/%s/%s", videoID, quality)
+		if err := rb.Fetch(ctx); err == nil {
+			u = must.Get(rb.URL())
 			break
 		}
 	}
-	u, _ := b.URL()
 	return u.String()
 }
 

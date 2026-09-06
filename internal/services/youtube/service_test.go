@@ -28,25 +28,28 @@ func TestService(t *testing.T) {
 }
 
 func TestBestThumbnailURL(t *testing.T) {
-	for _, tc := range []struct {
-		name    string
-		succeed string // first quality suffix to return 200 for
-	}{
-		{"maxres available", "maxresdefault.jpg"},
-		{"only hq available", "hqdefault.jpg"},
-		{"only default available", "default.jpg"},
+	type testcase struct {
+		n    int
+		want string
+	}
+	for name, tc := range map[string]testcase{
+		"maxres available":  {0, "/maxresdefault.jpg$"},
+		"sd available":      {1, "/sddefault.jpg$"},
+		"nothing available": {10, "/default.jpg$"},
 	} {
-		t.Run(tc.name, func(t *testing.T) {
+		t.Run(name, func(t *testing.T) {
+			n := 0
 			cl := &http.Client{
 				Transport: requests.RoundTripFunc(func(req *http.Request) (*http.Response, error) {
-					if req.URL.Path == "/vi/abc/"+tc.succeed {
+					n++
+					if n > tc.n {
 						return reqtest.ReplayString("HTTP/1.1 200 OK\r\n\r\n").RoundTrip(req)
 					}
 					return reqtest.ReplayString("HTTP/1.1 404 Not Found\r\n\r\n").RoundTrip(req)
 				}),
 			}
 			got := youtube.BestThumbnailURL(t.Context(), cl, "abc")
-			be.Match(t, tc.succeed+`$`, got)
+			be.Match(t, tc.want, got)
 		})
 	}
 }
