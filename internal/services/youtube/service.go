@@ -41,11 +41,9 @@ func BestThumbnailURL(ctx context.Context, cl *http.Client, videoID string) stri
 			URL("https://img.youtube.com").
 			Pathf("/vi/%s/%s", videoID, quality)
 		if err := b.Client(cl).Head().Fetch(ctx); err == nil {
-			u, _ := b.URL()
-			return u.String()
+			break
 		}
 	}
-	// All probes failed; return the smallest size (most universally available)
 	u, _ := b.URL()
 	return u.String()
 }
