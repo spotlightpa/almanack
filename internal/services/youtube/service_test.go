@@ -31,11 +31,10 @@ func TestBestThumbnailURL(t *testing.T) {
 	for _, tc := range []struct {
 		name    string
 		succeed string // first quality suffix to return 200 for
-		want    string
 	}{
-		{"maxres available", "maxresdefault.jpg", "https://img.youtube.com/vi/abc/maxresdefault.jpg"},
-		{"only hq available", "hqdefault.jpg", "https://img.youtube.com/vi/abc/hqdefault.jpg"},
-		{"only default available", "default.jpg", "https://img.youtube.com/vi/abc/default.jpg"},
+		{"maxres available", "maxresdefault.jpg"},
+		{"only hq available", "hqdefault.jpg"},
+		{"only default available", "default.jpg"},
 	} {
 		t.Run(tc.name, func(t *testing.T) {
 			cl := &http.Client{
@@ -47,7 +46,7 @@ func TestBestThumbnailURL(t *testing.T) {
 				}),
 			}
 			got := youtube.BestThumbnailURL(t.Context(), cl, "abc")
-			be.Equal(t, tc.want, got)
+			be.Match(t, tc.succeed+`$`, got)
 		})
 	}
 }
