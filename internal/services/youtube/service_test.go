@@ -32,24 +32,22 @@ func TestBestThumbnailURL(t *testing.T) {
 		n    int
 		want string
 	}
-	for name, tc := range map[string]testcase{
+	assert.Run(t, map[string]testcase{
 		"maxres available":  {0, "/maxresdefault.jpg$"},
 		"sd available":      {1, "/sddefault.jpg$"},
 		"nothing available": {10, "/default.jpg$"},
-	} {
-		t.Run(name, func(t *testing.T) {
-			n := 0
-			cl := &http.Client{
-				Transport: requests.RoundTripFunc(func(req *http.Request) (*http.Response, error) {
-					n++
-					if n > tc.n {
-						return reqtest.ReplayString("HTTP/1.1 200 OK\r\n\r\n").RoundTrip(req)
-					}
-					return reqtest.ReplayString("HTTP/1.1 404 Not Found\r\n\r\n").RoundTrip(req)
-				}),
-			}
-			got := youtube.BestThumbnailURL(t.Context(), cl, "abc")
-			be.Match(t, tc.want, got)
-		})
-	}
+	}, func(be assert.TB, tc testcase) {
+		n := 0
+		cl := &http.Client{
+			Transport: requests.RoundTripFunc(func(req *http.Request) (*http.Response, error) {
+				n++
+				if n > tc.n {
+					return reqtest.ReplayString("HTTP/1.1 200 OK\r\n\r\n").RoundTrip(req)
+				}
+				return reqtest.ReplayString("HTTP/1.1 404 Not Found\r\n\r\n").RoundTrip(req)
+			}),
+		}
+		got := youtube.BestThumbnailURL(be.Context(), cl, "abc")
+		be.Match(got, tc.want)
+	})
 }
