@@ -5,16 +5,16 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/carlmjohnson/be"
-	"github.com/carlmjohnson/be/testfile"
+	"github.com/earthboundkid/assert"
+	"github.com/earthboundkid/assert/testfile"
 	"github.com/earthboundkid/xhtml"
 	"github.com/spotlightpa/almanack/internal/utils/must"
 	"golang.org/x/net/html"
 )
 
 func TestProcessDocHTML(t *testing.T) {
-	testfile.Run(t, "testdata/processDocHTML/*/doc.html", func(t *testing.T, path string) {
-		input := testfile.Read(t, path)
+	testfile.Run(t, "testdata/processDocHTML/*/doc.html", func(be assert.TB, path string) {
+		input := testfile.Read(be, path)
 		doc := must.Get(html.Parse(strings.NewReader(input)))
 		metadata, embeds, intDoc, richText, rawHTML, md, warnings := processDocHTML(doc)
 
@@ -24,14 +24,13 @@ func TestProcessDocHTML(t *testing.T) {
 		richTextStr := xhtml.OuterHTML(richText)
 		rawHTMLStr := xhtml.OuterHTML(rawHTML)
 
-		rt := be.Relaxed(t)
-		testfile.Equalish(rt, filepath.Join(dir, "intermediate.html"), intermediateDoc)
-		testfile.Equalish(rt, filepath.Join(dir, "rich.html"), richTextStr)
-		testfile.Equalish(rt, filepath.Join(dir, "raw.html"), rawHTMLStr)
-		testfile.Equalish(rt, filepath.Join(dir, "article.md"), md)
-		testfile.EqualJSON(rt, filepath.Join(dir, "metadata.json"), metadata)
-		testfile.EqualJSON(rt, filepath.Join(dir, "embeds.json"), embeds)
-		testfile.EqualJSON(rt, filepath.Join(dir, "warnings.json"), warnings)
+		testfile.Equalish(be, filepath.Join(dir, "intermediate.html"), intermediateDoc)
+		testfile.Equalish(be, filepath.Join(dir, "rich.html"), richTextStr)
+		testfile.Equalish(be, filepath.Join(dir, "raw.html"), rawHTMLStr)
+		testfile.Equalish(be, filepath.Join(dir, "article.md"), md)
+		testfile.EqualJSON(be, filepath.Join(dir, "metadata.json"), metadata)
+		testfile.EqualJSON(be, filepath.Join(dir, "embeds.json"), embeds)
+		testfile.EqualJSON(be, filepath.Join(dir, "warnings.json"), warnings)
 	})
 }
 

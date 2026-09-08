@@ -9,25 +9,24 @@ import (
 	"testing/synctest"
 	"time"
 
-	"github.com/carlmjohnson/be"
-	"github.com/carlmjohnson/be/testfile"
 	"github.com/carlmjohnson/requests/reqtest"
+	"github.com/earthboundkid/assert"
+	"github.com/earthboundkid/assert/testfile"
 	"github.com/spotlightpa/almanack/internal/almlog"
 	"github.com/spotlightpa/almanack/internal/services/anf"
 )
 
 func TestHMACSignRequest(t *testing.T) {
-	testfile.Run(t, "testdata/req.*.raw", func(t *testing.T, match string) {
-		synctest.Test(t, func(t *testing.T) {
+	testfile.Run(t, "testdata/req.*.raw", func(be assert.TB, match string) {
+		synctest.Test(be.TB.(*testing.T), func(t *testing.T) {
+			be := assert.FailsNow(t)
 			in := testfile.Read(t, match)
 			buf := bufio.NewReader(strings.NewReader(in))
-			req, err := http.ReadRequest(buf)
-			be.NilErr(t, err)
+			req := be.OK(http.ReadRequest(buf))
 
 			now := time.Now()
-			be.NilErr(t, anf.HHMACSignRequest(req, "key", "aGVsbG8=", now))
-			signed, err := httputil.DumpRequest(req, true)
-			be.NilErr(t, err)
+			be.NilError(anf.HHMACSignRequest(req, "key", "aGVsbG8=", now))
+			signed := be.OK(httputil.DumpRequest(req, true))
 			testfile.Equalish(t, testfile.Ext(match, "signed"), string(signed))
 		})
 	})
@@ -44,13 +43,12 @@ func TestService(t *testing.T) {
 		},
 	}
 	synctest.Test(t, func(t *testing.T) {
-		data, err := svc.ReadChannel(t.Context())
-		be.NilErr(t, err)
-		be.Nonzero(t, data)
-		sections, err := svc.ListSections(t.Context())
-		be.NilErr(t, err)
-		be.Nonzero(t, sections)
+		be := assert.FailsNow(t)
+		data := be.OK(svc.ReadChannel(t.Context()))
+		be.Truthy(data)
+		sections := be.OK(svc.ListSections(t.Context()))
+		be.Truthy(sections)
 		// Should have at least default channel
-		be.Nonzero(t, sections.ToMap()[""])
+		be.Truthy(sections.ToMap()[""])
 	})
 }

@@ -3,18 +3,17 @@ package blocko_test
 import (
 	"testing"
 
-	"github.com/carlmjohnson/be"
-	"github.com/carlmjohnson/be/testfile"
+	"github.com/earthboundkid/assert"
+	"github.com/earthboundkid/assert/testfile"
 	"github.com/spotlightpa/almanack/internal/convert/blocko"
 )
 
 func TestGoldenFiles(t *testing.T) {
-	testfile.Run(t, "testdata/*.html", func(t *testing.T, path string) {
-		in := testfile.Read(t, path)
+	testfile.Run(t, "testdata/*.html", func(be assert.TB, path string) {
+		in := testfile.Read(be, path)
 
-		got, err := blocko.MinifyAndBlockize(in)
-		be.NilErr(t, err)
+		got := be.OK(blocko.MinifyAndBlockize(in))
 
-		testfile.Equal(t, testfile.Ext(path, ".md"), got)
+		testfile.Equal(be, testfile.Ext(path, ".md"), got)
 	})
 }

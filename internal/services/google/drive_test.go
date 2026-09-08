@@ -6,11 +6,12 @@ import (
 	"os"
 	"testing"
 
-	"github.com/carlmjohnson/be"
 	"github.com/carlmjohnson/requests/reqtest"
+	"github.com/earthboundkid/assert"
 )
 
 func TestListDriveFiles(t *testing.T) {
+	be := assert.FailsNow(t)
 	svc := Service{
 		driveID: cmp.Or(os.Getenv("ALMANACK_GOOGLE_TEST_DRIVE"), "1")}
 	ctx := t.Context()
@@ -23,25 +24,21 @@ func TestListDriveFiles(t *testing.T) {
 		}
 		cl.Transport = reqtest.Record(gcl.Transport, "testdata")
 	}
-	files, err := svc.Files(ctx, &cl)
-	be.NilErr(t, err)
-	be.Nonzero(t, files)
+	files := be.OK(svc.Files(ctx, &cl))
+	be.Truthy(files)
 }
 
 func TestDownloadFile(t *testing.T) {
+	be := assert.FailsNow(t)
 	var gsvc Service
 	ctx := t.Context()
 	cl := *http.DefaultClient
 	cl.Transport = reqtest.Replay("testdata")
-	b, err := gsvc.DownloadFile(ctx, &cl, "1ssiQd8AKXHo99qkZZwYbHxfVJHY3RPnL")
-	be.NilErr(t, err)
-	be.Equal(t, "image/jpeg", http.DetectContentType(b))
+	b := be.OK(gsvc.DownloadFile(ctx, &cl, "1ssiQd8AKXHo99qkZZwYbHxfVJHY3RPnL"))
+	be.Equal(http.DetectContentType(b), "image/jpeg")
 
-	b, err = gsvc.DownloadFile(ctx, &cl, "https://drive.google.com/file/d/1ssiQd8AKXHo99qkZZwYbHxfVJHY3RPnL/view?usp=share_link")
-	be.NilErr(t, err)
-	be.Equal(t, "image/jpeg", http.DetectContentType(b))
+	b = be.OK(gsvc.DownloadFile(ctx, &cl, "https://drive.google.com/file/d/1ssiQd8AKXHo99qkZZwYbHxfVJHY3RPnL/view?usp=share_link"))
+	be.Equal(http.DetectContentType(b), "image/jpeg")
 
-	b, err = gsvc.DownloadFile(ctx, &cl, "https://drive.google.com/file/d/1ssiQd8AKXHo99qkZZwYbHxfVJHY3RPnL;;/view?usp=share_link")
-	be.Nonzero(t, err)
-	be.Zero(t, b)
+	be.NotOK(gsvc.DownloadFile(ctx, &cl, "https://drive.google.com/file/d/1ssiQd8AKXHo99qkZZwYbHxfVJHY3RPnL;;/view?usp=share_link"))
 }

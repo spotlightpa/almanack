@@ -4,14 +4,15 @@ import (
 	"path"
 	"testing"
 
-	"github.com/carlmjohnson/be"
+	"github.com/earthboundkid/assert"
 )
 
 func TestMakeImageName(t *testing.T) {
-	cases := map[string]struct {
+	type testcase struct {
 		ct   string
 		want string
-	}{
+	}
+	cases := map[string]testcase{
 		"none":      {"", ".bin"},
 		"slash":     {"/", ".bin"},
 		"no slash":  {"hello", ".bin"},
@@ -22,12 +23,13 @@ func TestMakeImageName(t *testing.T) {
 		"json":      {"application/json", ".json"},
 		"text":      {"text/plain", ".plain"},
 	}
-	for name, tc := range cases {
-		t.Run(name, func(t *testing.T) {
-			got := makeImageName(tc.ct)
-			be.Equal(t, tc.want, path.Ext(got))
-			be.NotIn(t, "..", got)
-		})
+	assert.Run(t, cases, func(be assert.TB, tc testcase) {
+		got := makeImageName(tc.ct)
+		be.
+			Equal(path.Ext(got), tc.want).
+			NotMatch(got, `\.\.`)
+	})
+	for _, tc := range cases {
 		var s string
 		allocs := testing.AllocsPerRun(10, func() {
 			s = makeImageName(tc.ct)

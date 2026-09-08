@@ -8,9 +8,9 @@ import (
 	"testing"
 	"time"
 
-	"github.com/carlmjohnson/be"
-	"github.com/carlmjohnson/be/testfile"
 	"github.com/carlmjohnson/requests/reqtest"
+	"github.com/earthboundkid/assert"
+	"github.com/earthboundkid/assert/testfile"
 	"github.com/spotlightpa/almanack/internal/almlog"
 	"github.com/spotlightpa/almanack/internal/almsvc"
 	"github.com/spotlightpa/almanack/internal/db"
@@ -26,8 +26,8 @@ func TestProcessGDocsDoc(t *testing.T) {
 	dbhandle := createTestDB(t)
 
 	ctx := t.Context()
-	testfile.Run(t, "testdata/gdoc*", func(t *testing.T, path string) {
-		t.Parallel()
+	testfile.Run(t, "testdata/gdoc*", func(be assert.TB, path string) {
+		be.TB.(*testing.T).Parallel()
 		svc := almsvc.Services{
 			DB:         dbhandle,
 			Queries:    dbhandle.Queries(),
@@ -40,7 +40,7 @@ func TestProcessGDocsDoc(t *testing.T) {
 		}
 		if os.Getenv("RECORD") != "" {
 			svc.Client.Transport = reqtest.Caching(nil, path)
-			cl, _ := svc.Gsvc.DriveClient(t.Context())
+			cl, _ := svc.Gsvc.DriveClient(be.Context())
 			cl.Transport = reqtest.Caching(cl.Transport, path)
 			svc.Gsvc.SetMockClient(cl)
 		} else {
@@ -48,37 +48,31 @@ func TestProcessGDocsDoc(t *testing.T) {
 		}
 
 		var doc docs.Document
-		testfile.ReadJSON(t, path+"/doc.json", &doc)
+		testfile.ReadJSON(be, path+"/doc.json", &doc)
 		// Run twice to test the already uploaded path
 		for range 2 {
-			dbDoc, err := svc.Queries.CreateGDocsDoc(ctx, db.CreateGDocsDocParams{
+			dbDoc := be.OK(svc.Queries.CreateGDocsDoc(ctx, db.CreateGDocsDocParams{
 				ExternalID: fmt.Sprintf("abc123_%s", stringx.SlugifyURL(path)),
 				Document:   doc,
-			})
-			be.NilErr(t, err)
-			err = svc.ProcessGDocsDoc(ctx, dbDoc)
-			be.NilErr(t, err)
-			dbDoc, err = svc.Queries.GetGDocsByID(ctx, dbDoc.ID)
-			be.NilErr(t, err)
+			}))
+			be.NilError(svc.ProcessGDocsDoc(ctx, dbDoc))
+			dbDoc = be.OK(svc.Queries.GetGDocsByID(ctx, dbDoc.ID))
 
-			rt := be.Relaxed(t)
+			testfile.Equal(be, path+"/raw.html", dbDoc.RawHtml)
+			testfile.Equal(be, path+"/rich.html", dbDoc.RichText)
+			testfile.Equal(be, path+"/article.md", dbDoc.ArticleMarkdown)
+			testfile.EqualJSON(be, path+"/metadata.json", dbDoc.Metadata)
+			testfile.EqualJSON(be, path+"/warnings.json", dbDoc.Warnings)
 
-			testfile.Equal(rt, path+"/raw.html", dbDoc.RawHtml)
-			testfile.Equal(rt, path+"/rich.html", dbDoc.RichText)
-			testfile.Equal(rt, path+"/article.md", dbDoc.ArticleMarkdown)
-			testfile.EqualJSON(rt, path+"/metadata.json", dbDoc.Metadata)
-			testfile.EqualJSON(rt, path+"/warnings.json", dbDoc.Warnings)
-
-			art, err := svc.UpsertSharedArticleForGDoc(ctx, &dbDoc, false)
-			be.NilErr(t, err)
+			art := be.OK(svc.UpsertSharedArticleForGDoc(ctx, &dbDoc, false))
 			date := time.Date(2020, time.March, 15, 20, 00, 00, 00, time.UTC)
 			art.PublicationDate.Time = date
 			swapInternalID := filepath.Base(path) // Set a unique slug
 			art.InternalID, swapInternalID = swapInternalID, art.InternalID
-			be.NilErr(t, svc.CreatePageFromGDocsDoc(ctx, art, "news"))
-			be.True(t, art.PageID.Valid)
-			page, err := svc.Queries.GetPageByID(ctx, art.PageID.Int64)
-			be.NilErr(t, err)
+			be.
+				NilError(svc.CreatePageFromGDocsDoc(ctx, art, "news")).
+				True(art.PageID.Valid)
+			page := be.OK(svc.Queries.GetPageByID(ctx, art.PageID.Int64))
 			// Swap internal ID back
 			art.InternalID = swapInternalID
 			// Stablize racey fields
@@ -87,12 +81,12 @@ func TestProcessGDocsDoc(t *testing.T) {
 			art.RawData = nil
 			art.CreatedAt = date
 			art.UpdatedAt = date
-			testfile.EqualJSON(rt, path+"/shared-article.json", art)
+			testfile.EqualJSON(be, path+"/shared-article.json", art)
 			page.ID = 123
 			page.CreatedAt = date
 			page.UpdatedAt = date
 			page.PublicationDate.Time = timex.ToEST(page.PublicationDate.Time)
-			testfile.EqualJSON(rt, path+"/page.json", page)
+			testfile.EqualJSON(be, path+"/page.json", page)
 		}
 	})
 }

@@ -3,8 +3,8 @@ package gdocs
 import (
 	"testing"
 
-	"github.com/carlmjohnson/be"
-	"github.com/carlmjohnson/be/testfile"
+	"github.com/earthboundkid/assert"
+	"github.com/earthboundkid/assert/testfile"
 	"github.com/earthboundkid/xhtml"
 	"github.com/spotlightpa/almanack/internal/convert/blocko"
 	"golang.org/x/net/html"
@@ -12,58 +12,55 @@ import (
 )
 
 func TestConvert(t *testing.T) {
-	testfile.Run(t, "testdata/*.json", func(t *testing.T, path string) {
+	testfile.Run(t, "testdata/*.json", func(be assert.TB, path string) {
 		var doc docs.Document
-		testfile.ReadJSON(t, path, &doc)
+		testfile.ReadJSON(be, path, &doc)
 
 		n := Convert(&doc)
 		got := xhtml.OuterHTML(n)
 
-		testfile.Equalish(be.Relaxed(t), testfile.Ext(path, ".html"), got)
+		testfile.Equalish(be, testfile.Ext(path, ".html"), got)
 	})
 }
 
 func TestFullConvert(t *testing.T) {
 	t.Parallel()
-	testfile.Run(t, "testdata/*.json", func(t *testing.T, path string) {
+	testfile.Run(t, "testdata/*.json", func(be assert.TB, path string) {
 		var doc docs.Document
-		testfile.ReadJSON(t, path, &doc)
+		testfile.ReadJSON(be, path, &doc)
 
 		n := Convert(&doc)
-		got, err := blocko.MinifyAndBlockize(xhtml.OuterHTML(n))
-		be.NilErr(t, err)
-
-		testfile.Equalish(t, testfile.Ext(path, ".md"), got)
+		got := be.OK(blocko.MinifyAndBlockize(xhtml.OuterHTML(n)))
+		testfile.Equalish(be, testfile.Ext(path, ".md"), got)
 	})
 }
 
 func BenchmarkConvert(b *testing.B) {
-	want := testfile.Read(be.Relaxed(b), "testdata/privacy.html")
+	want := testfile.Read(b, "testdata/privacy.html")
 	var got *html.Node
 
 	var doc docs.Document
 	testfile.ReadJSON(b, "testdata/privacy.json", &doc)
 	b.ResetTimer()
 
-	for i := 0; i < b.N; i++ {
+	for b.Loop() {
 		got = Convert(&doc)
 	}
-	be.Equal(b, want, xhtml.OuterHTML(got))
+	assert.FailsNow(b).Equal(xhtml.OuterHTML(got), want)
 }
 
 func BenchmarkFullConvert(b *testing.B) {
-	want := testfile.Read(be.Relaxed(b), "testdata/privacy.md")
+	be := assert.FailsNow(b)
+	want := testfile.Read(b, "testdata/privacy.md")
 	var got string
 
 	var doc docs.Document
 	testfile.ReadJSON(b, "testdata/privacy.json", &doc)
 	b.ResetTimer()
 
-	for i := 0; i < b.N; i++ {
+	for b.Loop() {
 		n := Convert(&doc)
-		var err error
-		got, err = blocko.MinifyAndBlockize(xhtml.OuterHTML(n))
-		be.NilErr(b, err)
+		got = be.OK(blocko.MinifyAndBlockize(xhtml.OuterHTML(n)))
 	}
-	be.Equal(b, want, got)
+	be.Equal(got, want)
 }

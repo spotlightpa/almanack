@@ -4,7 +4,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/carlmjohnson/be"
+	"github.com/earthboundkid/assert"
 	"github.com/jackc/pgx/v5/pgtype"
 	"github.com/spotlightpa/almanack/internal/utils/timex"
 )
@@ -21,10 +21,11 @@ func TestEqualish(t *testing.T) {
 		}
 		return pgtype.Timestamptz{Time: t, Valid: valid}
 	}
-	cases := map[string]struct {
+	type testcase struct {
 		a, b string
 		want bool
-	}{
+	}
+	assert.Run(t, map[string]testcase{
 		"both null":          {"", "", true},
 		"first null":         {"", "1:00:00", false},
 		"second null":        {"1:00:00", "", false},
@@ -35,12 +36,9 @@ func TestEqualish(t *testing.T) {
 		"second much later":  {"1:00:00", "1:10:00", false},
 		"first zero":         {"0", "1:00:00", false},
 		"second zero":        {"1:00:00", "0", false},
-	}
-	for name, tc := range cases {
-		t.Run(name, func(t *testing.T) {
-			a, b := parseTime(tc.a), parseTime(tc.b)
-			got := timex.Equalish(a, b)
-			be.Equal(t, tc.want, got)
-		})
-	}
+	}, func(be assert.TB, tc testcase) {
+		a, b := parseTime(tc.a), parseTime(tc.b)
+		got := timex.Equalish(a, b)
+		be.Equal(got, tc.want)
+	})
 }
