@@ -1,12 +1,10 @@
 package blocko
 
 import (
-	"strings"
 	"testing"
 
 	"github.com/earthboundkid/assert"
-	"golang.org/x/net/html"
-	"golang.org/x/net/html/atom"
+	"github.com/earthboundkid/xhtml"
 )
 
 func TestIsEmpty(t *testing.T) {
@@ -25,16 +23,8 @@ func TestIsEmpty(t *testing.T) {
 		"nested":     {"<a><b>\n</b></a> ", true},
 		"nested-x":   {"<a><b>x</b></a> ", false},
 	}, func(be assert.TB, tc testcase) {
-		p := &html.Node{
-			Type:     html.ElementNode,
-			DataAtom: atom.P,
-			Data:     "p",
-		}
-
-		children := be.OK(html.ParseFragment(strings.NewReader(tc.in), p))
-		for _, c := range children {
-			p.AppendChild(c)
-		}
-		be.Equal(tc.empty, isEmpty(p))
+		div := xhtml.New("div")
+		be.NilError(xhtml.SetInnerHTML(div, tc.in))
+		be.Equal(tc.empty, isEmpty(div))
 	})
 }
