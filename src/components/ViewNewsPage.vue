@@ -240,19 +240,6 @@ export default {
         class="mt-1 mb-4"
       ></BulmaCharLimit>
 
-      <BulmaFieldInput
-        id="twitter"
-        v-model="page.twitterTitle"
-        label="Twitter Hed"
-        help="If set, this overrides the SEO hed on Twitter"
-      ></BulmaFieldInput>
-      <BulmaCharLimit
-        :warn="60"
-        :max="70"
-        :value="page.twitterTitle"
-        class="mt-1 mb-4"
-      ></BulmaCharLimit>
-
       <BulmaAutocompleteArray
         v-model="page.authors"
         label="Authors"
@@ -659,7 +646,6 @@ export default {
           [page.titleTag.length < 1, '#seo', 'SEO hed is unset'],
           [page.titleTag.length > 55, '#seo', 'SEO hed is long'],
           [page.ogTitle.length > 80, '#facebook', 'Facebook hed is long'],
-          [page.twitterTitle.length > 70, '#twitter', 'Twitter hed is long'],
           [page.summary.length < 1, '#description', 'SEO description is unset'],
           [
             page.summary.length > 150,
