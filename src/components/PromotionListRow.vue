@@ -20,12 +20,11 @@ const fileList = useFileList();
 
 const isOpen = ref(false);
 
-const promo = makePromotion();
+const promo = makePromotion(props.modelValue);
 
 watch(
   () => props.modelValue,
-  (val) => promo.init(val),
-  { immediate: true }
+  (val) => promo.init(val)
 );
 
 function initValues() {
