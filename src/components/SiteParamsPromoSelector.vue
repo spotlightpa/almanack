@@ -67,7 +67,7 @@ const hasMore = computedProp("next_page", (v) => !!v);
 
     <div
       v-for="promo in promotions"
-      :key="promo.id"
+      :key="promo.id.value"
       class="is-flex is-align-items-center is-justify-content-space-between py-2"
       style="border-bottom: 1px solid #dbdbdb"
     >

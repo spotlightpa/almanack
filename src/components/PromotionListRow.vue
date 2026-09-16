@@ -46,7 +46,7 @@ async function remove() {
   if (!confirm(`Delete "${props.modelValue.name || "this promotion"}"?`)) {
     return;
   }
-  await deleteExec(() => post(deletePromotion, { id: promo.id }));
+  await deleteExec(() => post(deletePromotion, { id: promo.id.value }));
   if (!deleteStateRefs.error.value) {
     emit("delete");
   }

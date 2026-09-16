@@ -18,7 +18,7 @@ export interface PromotionJSON {
 type PromotionUpdateJSON = Required<Omit<PromotionJSON, "updated_at">>;
 
 export interface Promotion {
-  id: number | null;
+  id: Ref<number | null>;
   updatedAt: Ref<Date | null>;
   name: Ref<string>;
   description: Ref<string>;
@@ -34,7 +34,7 @@ export interface Promotion {
 }
 
 export function makePromotion(initial: PromotionJSON = {}): Promotion {
-  const id = initial.id ?? null;
+  const id = ref<number | null>(null);
   const updatedAt = ref<Date | null>(null);
   const name = ref("");
   const description = ref("");
@@ -47,6 +47,7 @@ export function makePromotion(initial: PromotionJSON = {}): Promotion {
   const imageUrls = ref<string[]>([]);
 
   function init(src: PromotionJSON = {}): void {
+    id.value = src.id ?? null;
     updatedAt.value = maybeDate(src, "updated_at");
     name.value = src.name ?? "";
     description.value = src.description ?? "";
@@ -63,7 +64,7 @@ export function makePromotion(initial: PromotionJSON = {}): Promotion {
 
   function toJSON(): PromotionUpdateJSON {
     return {
-      id,
+      id: id.value,
       name: name.value,
       description: description.value,
       width: width.value,
