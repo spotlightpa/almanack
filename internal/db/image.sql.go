@@ -11,7 +11,7 @@ import (
 
 const getImageByMD5 = `-- name: GetImageByMD5 :one
 SELECT
-  id, path, type, description, credit, src_url, is_uploaded, created_at, updated_at, md5, bytes, keywords, deleted_at, is_licensed
+  id, path, type, description, credit, src_url, is_uploaded, created_at, updated_at, md5, bytes, keywords, deleted_at, is_licensed, width, height
 FROM
   image
 WHERE
@@ -39,13 +39,15 @@ func (q *Queries) GetImageByMD5(ctx context.Context, md5 []byte) (Image, error) 
 		&i.Keywords,
 		&i.DeletedAt,
 		&i.IsLicensed,
+		&i.Width,
+		&i.Height,
 	)
 	return i, err
 }
 
 const getImageByPath = `-- name: GetImageByPath :one
 SELECT
-  id, path, type, description, credit, src_url, is_uploaded, created_at, updated_at, md5, bytes, keywords, deleted_at, is_licensed
+  id, path, type, description, credit, src_url, is_uploaded, created_at, updated_at, md5, bytes, keywords, deleted_at, is_licensed, width, height
 FROM
   "image"
 WHERE
@@ -70,13 +72,15 @@ func (q *Queries) GetImageByPath(ctx context.Context, path string) (Image, error
 		&i.Keywords,
 		&i.DeletedAt,
 		&i.IsLicensed,
+		&i.Width,
+		&i.Height,
 	)
 	return i, err
 }
 
 const getImageBySourceURL = `-- name: GetImageBySourceURL :one
 SELECT
-  id, path, type, description, credit, src_url, is_uploaded, created_at, updated_at, md5, bytes, keywords, deleted_at, is_licensed
+  id, path, type, description, credit, src_url, is_uploaded, created_at, updated_at, md5, bytes, keywords, deleted_at, is_licensed, width, height
 FROM
   image
 WHERE
@@ -104,6 +108,8 @@ func (q *Queries) GetImageBySourceURL(ctx context.Context, srcUrl string) (Image
 		&i.Keywords,
 		&i.DeletedAt,
 		&i.IsLicensed,
+		&i.Width,
+		&i.Height,
 	)
 	return i, err
 }
@@ -126,7 +132,7 @@ func (q *Queries) GetImageTypeForExtension(ctx context.Context, extension string
 
 const listImageWhereNotUploaded = `-- name: ListImageWhereNotUploaded :many
 SELECT
-  id, path, type, description, credit, src_url, is_uploaded, created_at, updated_at, md5, bytes, keywords, deleted_at, is_licensed
+  id, path, type, description, credit, src_url, is_uploaded, created_at, updated_at, md5, bytes, keywords, deleted_at, is_licensed, width, height
 FROM
   image
 WHERE
@@ -162,6 +168,8 @@ func (q *Queries) ListImageWhereNotUploaded(ctx context.Context) ([]Image, error
 			&i.Keywords,
 			&i.DeletedAt,
 			&i.IsLicensed,
+			&i.Width,
+			&i.Height,
 		); err != nil {
 			return nil, err
 		}
@@ -175,7 +183,7 @@ func (q *Queries) ListImageWhereNotUploaded(ctx context.Context) ([]Image, error
 
 const listImages = `-- name: ListImages :many
 SELECT
-  id, path, type, description, credit, src_url, is_uploaded, created_at, updated_at, md5, bytes, keywords, deleted_at, is_licensed
+  id, path, type, description, credit, src_url, is_uploaded, created_at, updated_at, md5, bytes, keywords, deleted_at, is_licensed, width, height
 FROM
   image
 WHERE
@@ -218,6 +226,8 @@ func (q *Queries) ListImages(ctx context.Context, arg ListImagesParams) ([]Image
 			&i.Keywords,
 			&i.DeletedAt,
 			&i.IsLicensed,
+			&i.Width,
+			&i.Height,
 		); err != nil {
 			return nil, err
 		}
@@ -231,7 +241,7 @@ func (q *Queries) ListImages(ctx context.Context, arg ListImagesParams) ([]Image
 
 const listImagesByFTS = `-- name: ListImagesByFTS :many
 SELECT
-  image.id, image.path, image.type, image.description, image.credit, image.src_url, image.is_uploaded, image.created_at, image.updated_at, image.md5, image.bytes, image.keywords, image.deleted_at, image.is_licensed
+  image.id, image.path, image.type, image.description, image.credit, image.src_url, image.is_uploaded, image.created_at, image.updated_at, image.md5, image.bytes, image.keywords, image.deleted_at, image.is_licensed, image.width, image.height
 FROM
   image,
   websearch_to_tsquery('english', $3) tsq
@@ -277,6 +287,8 @@ func (q *Queries) ListImagesByFTS(ctx context.Context, arg ListImagesByFTSParams
 			&i.Keywords,
 			&i.DeletedAt,
 			&i.IsLicensed,
+			&i.Width,
+			&i.Height,
 		); err != nil {
 			return nil, err
 		}
@@ -290,7 +302,7 @@ func (q *Queries) ListImagesByFTS(ctx context.Context, arg ListImagesByFTSParams
 
 const listImagesWhereNoMD5 = `-- name: ListImagesWhereNoMD5 :many
 SELECT
-  id, path, type, description, credit, src_url, is_uploaded, created_at, updated_at, md5, bytes, keywords, deleted_at, is_licensed
+  id, path, type, description, credit, src_url, is_uploaded, created_at, updated_at, md5, bytes, keywords, deleted_at, is_licensed, width, height
 FROM
   image
 WHERE
@@ -326,6 +338,8 @@ func (q *Queries) ListImagesWhereNoMD5(ctx context.Context, limit int32) ([]Imag
 			&i.Keywords,
 			&i.DeletedAt,
 			&i.IsLicensed,
+			&i.Width,
+			&i.Height,
 		); err != nil {
 			return nil, err
 		}
@@ -365,7 +379,7 @@ SET
 WHERE
   path = $9
 RETURNING
-  id, path, type, description, credit, src_url, is_uploaded, created_at, updated_at, md5, bytes, keywords, deleted_at, is_licensed
+  id, path, type, description, credit, src_url, is_uploaded, created_at, updated_at, md5, bytes, keywords, deleted_at, is_licensed, width, height
 `
 
 type UpdateImageParams struct {
@@ -408,6 +422,8 @@ func (q *Queries) UpdateImage(ctx context.Context, arg UpdateImageParams) (Image
 		&i.Keywords,
 		&i.DeletedAt,
 		&i.IsLicensed,
+		&i.Width,
+		&i.Height,
 	)
 	return i, err
 }
@@ -421,7 +437,7 @@ SET
 WHERE
   id = $3
 RETURNING
-  id, path, type, description, credit, src_url, is_uploaded, created_at, updated_at, md5, bytes, keywords, deleted_at, is_licensed
+  id, path, type, description, credit, src_url, is_uploaded, created_at, updated_at, md5, bytes, keywords, deleted_at, is_licensed, width, height
 `
 
 type UpdateImageMD5SizeParams struct {
@@ -448,14 +464,17 @@ func (q *Queries) UpdateImageMD5Size(ctx context.Context, arg UpdateImageMD5Size
 		&i.Keywords,
 		&i.DeletedAt,
 		&i.IsLicensed,
+		&i.Width,
+		&i.Height,
 	)
 	return i, err
 }
 
 const upsertImage = `-- name: UpsertImage :one
 INSERT INTO image ("path", "type", "description", "credit", "keywords",
-  "src_url", "is_uploaded")
-  VALUES ($1, $2, $3, $4, $5, $6, $7)
+  "src_url", "is_uploaded", "width", "height")
+  VALUES ($1, $2, $3, $4, $5, $6,
+    $7, $8, $9)
 ON CONFLICT (path)
   DO UPDATE SET
     credit = CASE WHEN image.credit = '' THEN
@@ -477,9 +496,19 @@ ON CONFLICT (path)
       excluded.src_url
     ELSE
       image.src_url
+    END,
+    width = CASE WHEN image.width = 0 THEN
+      excluded.width
+    ELSE
+      image.width
+    END,
+    height = CASE WHEN image.height = 0 THEN
+      excluded.height
+    ELSE
+      image.height
     END
   RETURNING
-    id, path, type, description, credit, src_url, is_uploaded, created_at, updated_at, md5, bytes, keywords, deleted_at, is_licensed
+    id, path, type, description, credit, src_url, is_uploaded, created_at, updated_at, md5, bytes, keywords, deleted_at, is_licensed, width, height
 `
 
 type UpsertImageParams struct {
@@ -490,6 +519,8 @@ type UpsertImageParams struct {
 	Keywords    string `json:"keywords"`
 	SourceURL   string `json:"src_url"`
 	IsUploaded  bool   `json:"is_uploaded"`
+	Width       int32  `json:"width"`
+	Height      int32  `json:"height"`
 }
 
 func (q *Queries) UpsertImage(ctx context.Context, arg UpsertImageParams) (Image, error) {
@@ -501,6 +532,8 @@ func (q *Queries) UpsertImage(ctx context.Context, arg UpsertImageParams) (Image
 		arg.Keywords,
 		arg.SourceURL,
 		arg.IsUploaded,
+		arg.Width,
+		arg.Height,
 	)
 	var i Image
 	err := row.Scan(
@@ -518,6 +551,8 @@ func (q *Queries) UpsertImage(ctx context.Context, arg UpsertImageParams) (Image
 		&i.Keywords,
 		&i.DeletedAt,
 		&i.IsLicensed,
+		&i.Width,
+		&i.Height,
 	)
 	return i, err
 }
@@ -559,7 +594,7 @@ ON CONFLICT (path)
       image.bytes
     END
   RETURNING
-    id, path, type, description, credit, src_url, is_uploaded, created_at, updated_at, md5, bytes, keywords, deleted_at, is_licensed
+    id, path, type, description, credit, src_url, is_uploaded, created_at, updated_at, md5, bytes, keywords, deleted_at, is_licensed, width, height
 `
 
 type UpsertImageWithMD5Params struct {
@@ -600,6 +635,8 @@ func (q *Queries) UpsertImageWithMD5(ctx context.Context, arg UpsertImageWithMD5
 		&i.Keywords,
 		&i.DeletedAt,
 		&i.IsLicensed,
+		&i.Width,
+		&i.Height,
 	)
 	return i, err
 }
