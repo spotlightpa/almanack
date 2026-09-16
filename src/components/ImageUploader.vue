@@ -1,10 +1,12 @@
-<script>
-import { reactive, toRefs, computed } from "vue";
+<script setup>
+import { ref, computed } from "vue";
 
 import { uploadImage } from "@/api/client.ts";
 import imgproxyURL from "@/api/imgproxy-url.js";
 
-let acceptedTypes = [
+const emit = defineEmits(["update-image-list"]);
+
+const acceptedTypes = [
   "image/jpeg",
   "image/png",
   "image/tiff",
@@ -13,60 +15,46 @@ let acceptedTypes = [
   "image/heic",
 ];
 
-export default {
-  name: "ImageUploader",
-  setup(props, { emit }) {
-    const state = reactive({
-      isUploading: false,
-      filename: "",
-      error: null,
-      isDragging: false,
+const isUploading = ref(false);
+const filename = ref("");
+const error = ref(null);
+const isDragging = ref(false);
 
-      imageURL: computed(() => imgproxyURL(state.filename)),
-    });
+const imageURL = computed(() => imgproxyURL(filename.value));
 
-    let actions = {
-      async uploadFileInput(ev) {
-        if (state.isUploading) {
-          return;
-        }
-        let { files } = ev.target;
+async function uploadFileInput(ev) {
+  if (isUploading.value) {
+    return;
+  }
+  let { files } = ev.target;
 
-        for (let body of files) {
-          if (!acceptedTypes.includes(body.type)) {
-            state.error = new Error(
-              "Only JPEG, PNG, WEBP, AVIF, HEIC, and TIFF are supported"
-            );
-            return;
-          }
-        }
-        state.isUploading = true;
-        state.error = null;
+  for (let body of files) {
+    if (!acceptedTypes.includes(body.type)) {
+      error.value = new Error(
+        "Only JPEG, PNG, WEBP, AVIF, HEIC, and TIFF are supported"
+      );
+      return;
+    }
+  }
+  isUploading.value = true;
+  error.value = null;
 
-        for (let body of files) {
-          [state.filename, state.error] = await uploadImage(body);
-          if (state.error) {
-            break;
-          }
-        }
+  for (let body of files) {
+    [filename.value, error.value] = await uploadImage(body);
+    if (error.value) {
+      break;
+    }
+  }
 
-        state.isUploading = false;
-        emit("update-image-list");
-      },
-      dropFile(ev) {
-        state.isDragging = false;
-        let { files = [] } = ev.dataTransfer;
-        return actions.uploadFileInput({ target: { files } });
-      },
-    };
+  isUploading.value = false;
+  emit("update-image-list");
+}
 
-    return {
-      acceptedTypes,
-      ...toRefs(state),
-      ...actions,
-    };
-  },
-};
+function dropFile(ev) {
+  isDragging.value = false;
+  let { files = [] } = ev.dataTransfer;
+  return uploadFileInput({ target: { files } });
+}
 </script>
 
 <template>
