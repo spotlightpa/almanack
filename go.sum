@@ -82,8 +82,6 @@ github.com/carlmjohnson/deque v0.23.1 h1:X2HOJM9xcglY03deMZ0oZ1V2xtbqYV7dJDnZiSZ
 github.com/carlmjohnson/deque v0.23.1/go.mod h1:LF5NJjICBrEOPx84pxPL4nCimy5n9NQjxKi5cXkh+8U=
 github.com/carlmjohnson/flowmatic v0.23.4 h1:SfK6f+zKUlw4aga1ph+7/csqVeUAWnBxfqKN5gvQzzs=
 github.com/carlmjohnson/flowmatic v0.23.4/go.mod h1:Jpvyl591Dvkt9chYpnVupjxlKvqkZ9CtCmqL4wfQD7U=
-github.com/carlmjohnson/gateway v1.22.2 h1:Nr7JVUSruWG3I6PGGxUTaIGLHSEhCcoppFX0zGxha80=
-github.com/carlmjohnson/gateway v1.22.2/go.mod h1:C2xSaIo4kkvdbTQQI5EhmzzWC1wB/+f5COhlpQ4O8fA=
 github.com/carlmjohnson/requests v0.26.1 h1:kFt5j1XsynNKoladW2qJdP9S+UdigvGLW+53DXbN5F4=
 github.com/carlmjohnson/requests v0.26.1/go.mod h1:qMGUsG9/8MbvYRMGwvMBVSQQmRswVcVMAzexVyy038g=
 github.com/cespare/xxhash/v2 v2.3.0 h1:UL815xU9SqsFlibzuggzjXhog7bL6oX9BbNZnL2UFvs=
@@ -108,6 +106,8 @@ github.com/earthboundkid/errorx/v2 v2.25.1 h1:fjyBu0PFb0psCrQZ9USlE3waHB7ribC4ez
 github.com/earthboundkid/errorx/v2 v2.25.1/go.mod h1:sG7ss+tguj326adlVkr64+1MkOPTFQ7AgGTFjv2O32o=
 github.com/earthboundkid/flagx/v2 v2.25.1 h1:NCnaW8sg0B9EcThAFUOEPQFbD2qhGFMp1s4GqU3kPW8=
 github.com/earthboundkid/flagx/v2 v2.25.1/go.mod h1:uFev2jp4UhPBLZpRkeHEXuko2vVhi/E/vuxrYgDVjBg=
+github.com/earthboundkid/gateway/v2 v2.26.1 h1:8UoqhB9ZQOAK3mWRgJuFhfCsnZB7ynOVDTygvdK9TJE=
+github.com/earthboundkid/gateway/v2 v2.26.1/go.mod h1:tz++YAgks600Qj5j62qbnb2zoaoxfcd4xdAVNrqMU4g=
 github.com/earthboundkid/mid v0.26.1 h1:hr3DeMz+DKRYGYDRS00CLqztgFfxukOZ+DeNkWj65rw=
 github.com/earthboundkid/mid v0.26.1/go.mod h1:hyrjqI1JpXaOJ1pc7zC4m1tlrQCUt9clOPJNd3XvTcA=
 github.com/earthboundkid/resperr/v2 v2.25.1 h1:H6GCeI/hynE3z1D3eGJ4Dh5s9AzjEf1YHFO4fRIgSs0=
