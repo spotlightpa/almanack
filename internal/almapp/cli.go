@@ -10,11 +10,11 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/carlmjohnson/gateway"
 	"github.com/earthboundkid/flagx/v2"
 	"github.com/earthboundkid/versioninfo/v2"
 	"github.com/getsentry/sentry-go"
 
+	"github.com/earthboundkid/gateway/v2"
 	"github.com/spotlightpa/almanack/internal/almlog"
 	"github.com/spotlightpa/almanack/internal/almsvc"
 )

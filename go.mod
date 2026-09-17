@@ -12,7 +12,6 @@ require (
 	github.com/aws/aws-sdk-go-v2/credentials v1.20.2
 	github.com/aws/aws-sdk-go-v2/service/s3 v1.110.0
 	github.com/carlmjohnson/flowmatic v0.23.4
-	github.com/carlmjohnson/gateway v1.22.2
 	github.com/carlmjohnson/requests v0.26.1
 	github.com/earthboundkid/assert v0.26.6
 	github.com/earthboundkid/bytemap/v2 v2.24.1
@@ -20,6 +19,7 @@ require (
 	github.com/earthboundkid/emailx/v2 v2.24.1
 	github.com/earthboundkid/errorx/v2 v2.25.1
 	github.com/earthboundkid/flagx/v2 v2.25.1
+	github.com/earthboundkid/gateway/v2 v2.26.1
 	github.com/earthboundkid/mid v0.26.1
 	github.com/earthboundkid/resperr/v2 v2.25.1
 	github.com/earthboundkid/slackhook/v2 v2.25.1
