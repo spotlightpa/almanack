@@ -1,6 +1,7 @@
 package integration_test
 
 import (
+	"context"
 	"net/http"
 	"testing"
 
@@ -10,12 +11,16 @@ import (
 	"github.com/spotlightpa/almanack/internal/db"
 	"github.com/spotlightpa/almanack/internal/services/aws"
 	"github.com/spotlightpa/almanack/internal/services/netlifyid"
+	"gocloud.dev/blob/driver"
 )
 
 func TestCreateSignedUploadStoresDimensions(t *testing.T) {
 	be := assert.FailsNow(t)
 	almlog.UseTestLogger(t)
 	dbhandle := createTestDB(t)
+	t.Cleanup(aws.UseMockSigner(func(ctx context.Context, key string, opts *driver.SignedURLOptions) (string, error) {
+		return "http://example.com/signed?key=" + key, nil
+	}))
 	rb := newTestServer(t, almsvc.Services{
 		DB:         dbhandle,
 		Queries:    dbhandle.Queries(),
