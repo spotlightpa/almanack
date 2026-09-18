@@ -23,7 +23,7 @@ interface RequestOptions {
   options?: FetchOptions;
 }
 
-const tryTo = <T>(promise: Promise<T>): Promise<Result<T>> =>
+export const tryTo = <T>(promise: Promise<T>): Promise<Result<T>> =>
   promise
     .then((data): [T, null] => [data, null])
     .catch((error: Error): [null, Error] => [null, error]);
@@ -104,9 +104,15 @@ interface SignedUploadResponse {
   filename: string;
 }
 
-export async function uploadImage(body: File): Promise<Result<string>> {
+export async function uploadImage(
+  body: File,
+  width = 0,
+  height = 0
+): Promise<Result<string>> {
   let [data, err] = await post<SignedUploadResponse>(createSignedUpload, {
     type: body.type,
+    width,
+    height,
   });
   if (err) {
     return [null, err];

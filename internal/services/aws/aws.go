@@ -16,6 +16,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/s3"
 	"github.com/earthboundkid/errorx/v2"
 	"gocloud.dev/blob"
+	"gocloud.dev/blob/driver"
 
 	"github.com/spotlightpa/almanack/internal/almlog"
 	"github.com/spotlightpa/almanack/internal/utils/httpx"
@@ -52,6 +53,27 @@ type BlobStore struct {
 
 func NewBlobStore(s string) BlobStore {
 	return BlobStore{s}
+}
+
+// UseMockSigner swaps gocloud.dev/blob.NewBucket to inject a mock signer.
+// Call result with t.Cleanup.
+func UseMockSigner(
+	signFn func(ctx context.Context, key string, opts *driver.SignedURLOptions) (string, error),
+) (restore func()) {
+	prev := blob.NewBucket
+	blob.NewBucket = func(b driver.Bucket) *blob.Bucket {
+		return prev(&signingWrapper{Bucket: b, signFn: signFn})
+	}
+	return func() { blob.NewBucket = prev }
+}
+
+type signingWrapper struct {
+	driver.Bucket
+	signFn func(ctx context.Context, key string, opts *driver.SignedURLOptions) (string, error)
+}
+
+func (w *signingWrapper) SignedURL(ctx context.Context, key string, opts *driver.SignedURLOptions) (string, error) {
+	return w.signFn(ctx, key, opts)
 }
 
 func NewTestBlobStore(dirs ...string) BlobStore {

@@ -66,7 +66,9 @@ func (app *appEnv) postSignedUpload(w http.ResponseWriter, r *http.Request) {
 	app.logStart(r)
 
 	var userData struct {
-		Type string `json:"type"`
+		Type   string `json:"type"`
+		Width  int32  `json:"width"`
+		Height int32  `json:"height"`
 	}
 	if !app.readJSON(w, r, &userData) {
 		return
@@ -93,8 +95,10 @@ func (app *appEnv) postSignedUpload(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if dbImage, err := app.svc.Queries.UpsertImage(r.Context(), db.UpsertImageParams{
-		Path: res.FileName,
-		Type: ext,
+		Path:   res.FileName,
+		Type:   ext,
+		Width:  userData.Width,
+		Height: userData.Height,
 	}); err != nil {
 		app.replyErr(w, r, err)
 		return

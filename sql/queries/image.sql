@@ -31,8 +31,9 @@ LIMIT $1 OFFSET $2;
 
 -- name: UpsertImage :one
 INSERT INTO image ("path", "type", "description", "credit", "keywords",
-  "src_url", "is_uploaded")
-  VALUES (@path, @type, @description, @credit, @keywords, @src_url, @is_uploaded)
+  "src_url", "is_uploaded", "width", "height")
+  VALUES (@path, @type, @description, @credit, @keywords, @src_url,
+    @is_uploaded, @width, @height)
 ON CONFLICT (path)
   DO UPDATE SET
     credit = CASE WHEN image.credit = '' THEN
@@ -54,6 +55,16 @@ ON CONFLICT (path)
       excluded.src_url
     ELSE
       image.src_url
+    END,
+    width = CASE WHEN image.width = 0 THEN
+      excluded.width
+    ELSE
+      image.width
+    END,
+    height = CASE WHEN image.height = 0 THEN
+      excluded.height
+    ELSE
+      image.height
     END
   RETURNING
     *;
@@ -120,6 +131,16 @@ SET
     @is_licensed
   ELSE
     is_licensed
+  END,
+  width = CASE WHEN @set_width::boolean THEN
+    @width::int
+  ELSE
+    width
+  END,
+  height = CASE WHEN @set_height::boolean THEN
+    @height::int
+  ELSE
+    height
   END,
   is_uploaded = TRUE
 WHERE
