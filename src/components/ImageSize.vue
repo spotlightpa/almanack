@@ -11,7 +11,7 @@ const props = defineProps({
   height: { type: Number, default: 0 },
 });
 
-const emit = defineEmits(["update:width", "update:height"]);
+const emit = defineEmits(["update"]);
 
 const open = ref(false);
 
@@ -24,7 +24,7 @@ const fetchedWidth = computed(
   () => getDimensionsState.rawData.value.width ?? 0
 );
 const fetchedHeight = computed(
-  () => getDimensionsState.rawData.value.width ?? 0
+  () => getDimensionsState.rawData.value.height ?? 0
 );
 const displayWidth = computed(() =>
   hasDimensions.value ? props.width : fetchedWidth.value
@@ -53,8 +53,7 @@ async function onclick() {
     })
   );
   if (!saveState.error.value) {
-    emit("update:width", fetchedWidth.value);
-    emit("update:height", fetchedHeight.value);
+    emit("update");
   }
   open.value = true;
 }
