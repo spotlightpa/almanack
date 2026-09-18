@@ -208,8 +208,7 @@ function updateIsLicensed(image) {
                 :path="image.path"
                 :width="image.width"
                 :height="image.height"
-                @update:width="image.width = $event"
-                @update:height="image.height = $event"
+                @update="fetch"
               ></ImageSize>
             </div>
           </td>
