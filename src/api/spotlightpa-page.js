@@ -1,4 +1,4 @@
-import { computed, reactive, ref, toRefs, watch } from "vue";
+import { computed, reactive, ref, watch } from "vue";
 
 import { makeState, watchAPI } from "@/api/loader.ts";
 import {
@@ -288,7 +288,7 @@ function useSeries() {
 }
 
 export function usePage(id) {
-  const { apiState, exec } = makeState();
+  const { apiStateRefs, exec } = makeState();
 
   const fetch = (id) =>
     exec(() =>
@@ -297,20 +297,22 @@ export function usePage(id) {
   const post = (page) => exec(() => clientPost(postPage, page));
 
   const page = computed(() =>
-    apiState.rawData ? reactive(new Page(apiState.rawData)) : null
+    apiStateRefs.rawData.value
+      ? reactive(new Page(apiStateRefs.rawData.value))
+      : null
   );
 
   watch(() => id.value, fetch, {
     immediate: true,
   });
 
-  const { apiState: imageState, exec: execImage } = makeState();
+  const { apiStateRefs: imageStateRefs, exec: execImage } = makeState();
   execImage(() => clientGet(listImages));
 
   return {
     showScheduler: ref(false),
 
-    ...toRefs(apiState),
+    ...apiStateRefs,
     topics: useTopics(),
     series: useSeries(),
     fetch,
@@ -376,10 +378,7 @@ export function usePage(id) {
         });
       });
     },
-    imageState,
-    images: computed(() =>
-      !imageState.rawData ? [] : imageState.rawData.images
-    ),
+    images: computed(() => imageStateRefs.rawData.value?.images ?? []),
     setImageProps(image) {
       page.value.image = image.path;
       page.value.imageDescription = image.description;

@@ -4,11 +4,11 @@ import { get, post, listFiles, updateFile, uploadFile } from "./client.ts";
 import { makeState } from "@/api/loader.ts";
 
 export function useFileList() {
-  let { apiState, exec } = makeState();
+  let { apiStateRefs, exec } = makeState();
 
   const state = reactive({
     files: computed(() => {
-      return apiState.rawData?.files || [];
+      return apiStateRefs.rawData.value?.files || [];
     }),
     isDragging: false,
     isUploading: false,
@@ -55,7 +55,7 @@ export function useFileList() {
   actions.fetch();
 
   return {
-    ...toRefs(apiState),
+    ...apiStateRefs,
     ...toRefs(state),
     ...actions,
   };
