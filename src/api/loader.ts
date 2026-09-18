@@ -5,14 +5,14 @@ import { useThrottleToggle } from "@/utils/wait.ts";
 import type { Result } from "@/utils/try-to.ts";
 
 // CoreState holds the reactive fields for a single API request lifecycle.
-interface CoreState {
+interface LoadingState {
   rawData: unknown;
   isLoading: boolean;
   error: unknown;
 }
 
 export function makeState() {
-  const apiState = reactive<CoreState>({
+  const apiState = reactive<LoadingState>({
     rawData: null,
     isLoading: false,
     error: null,
