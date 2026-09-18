@@ -25,8 +25,9 @@ export function makeState() {
   const apiStateRefsWithThrottle = { ...apiStateRefs, isLoadingThrottled };
 
   return {
-    // @deprecated: use apiStateRefs instead; direct access to the reactive
-    // object bypasses TypeScript and makes future migration harder.
+    // @deprecated: use apiStateRefs instead;
+    // direct access to the reactive object bypasses TypeScript
+    // and makes future migration harder.
     apiState,
     apiStateRefs: apiStateRefsWithThrottle,
 

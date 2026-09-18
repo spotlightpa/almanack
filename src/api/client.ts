@@ -9,7 +9,6 @@ import tryTo from "@/utils/try-to.ts";
 import type { Result } from "@/utils/try-to.ts";
 
 export * from "./endpoints.ts";
-export type { Result } from "@/utils/try-to.ts";
 
 type ErrorDetails = Record<string, string[]>;
 interface AppError extends Error {
