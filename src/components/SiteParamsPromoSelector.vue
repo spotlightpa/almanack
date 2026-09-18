@@ -3,7 +3,7 @@ import { ref, computed } from "vue";
 
 import { get, listPromotions } from "@/api/client.ts";
 import { makePromotion } from "@/api/promotion.ts";
-import { watchAPI } from "@/api/service-util.js";
+import { watchAPI } from "@/api/loader.ts";
 import { useDebouncedRef } from "@/utils/wait.ts";
 
 const props = defineProps({

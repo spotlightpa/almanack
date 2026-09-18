@@ -9,7 +9,7 @@ import {
   postSharedArticleFromGDocs,
 } from "@/api/client.ts";
 import { processGDocsDoc } from "@/api/gdocs.js";
-import { makeState, watchAPI } from "@/api/service-util.js";
+import { makeState, watchAPI } from "@/api/loader.ts";
 import SharedArticle from "@/api/shared-article.js";
 
 const props = defineProps({
