@@ -1,5 +1,5 @@
 <script setup>
-import { ref, watch } from "vue";
+import { ref } from "vue";
 import { useDebouncedRef, seconds } from "@/utils/wait.ts";
 
 import { get, post, listImages, postImageUpdate } from "@/api/client.ts";
@@ -203,7 +203,14 @@ function updateIsLicensed(image) {
                 :icon="['fas', 'file-download']"
                 :href="image.downloadURL"
               ></LinkHref>
-              <ImageSize class="mt-1" :path="image.path"></ImageSize>
+              <ImageSize
+                class="mt-1"
+                :path="image.path"
+                :width="image.width"
+                :height="image.height"
+                @update:width="image.width = $event"
+                @update:height="image.height = $event"
+              ></ImageSize>
             </div>
           </td>
           <td>
