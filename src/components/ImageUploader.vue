@@ -3,6 +3,7 @@ import { ref, computed } from "vue";
 
 import { uploadImage } from "@/api/client.ts";
 import imgproxyURL from "@/api/imgproxy-url.js";
+import { imageFileSize } from "@/utils/image-size.ts";
 
 const emit = defineEmits(["update-image-list"]);
 
@@ -22,22 +23,6 @@ const isDragging = ref(false);
 
 const imageURL = computed(() => imgproxyURL(filename.value));
 
-function measureImage(file) {
-  return new Promise((resolve) => {
-    const url = URL.createObjectURL(file);
-    const img = new Image();
-    img.onload = () => {
-      URL.revokeObjectURL(url);
-      resolve({ width: img.naturalWidth, height: img.naturalHeight });
-    };
-    img.onerror = () => {
-      URL.revokeObjectURL(url);
-      resolve({ width: 0, height: 0 });
-    };
-    img.src = url;
-  });
-}
-
 async function uploadFileInput(ev) {
   if (isUploading.value) {
     return;
@@ -56,7 +41,7 @@ async function uploadFileInput(ev) {
   error.value = null;
 
   for (let body of files) {
-    const { width, height } = await measureImage(body);
+    const { width, height } = await imageFileSize(body);
     [filename.value, error.value] = await uploadImage(body, width, height);
     if (error.value) {
       break;

@@ -1,8 +1,9 @@
 <script setup>
-import { ref } from "vue";
+import { ref, watch } from "vue";
 import { useDebouncedRef, seconds } from "@/utils/wait.ts";
 
 import { get, post, listImages, postImageUpdate } from "@/api/client.ts";
+import imageSize from "@/utils/image-size.ts";
 import { makeState, watchAPI } from "@/api/service-util.js";
 import imgproxyURL from "@/api/imgproxy-url.js";
 
@@ -44,9 +45,12 @@ const toImageObj = (rawImage) => ({
   isLicensed: rawImage.is_licensed,
   date: new Date(rawImage.created_at),
   downloadURL: "/ssr/download-image?src=" + encodeURIComponent(rawImage.path),
+  width: rawImage.width ?? 0,
+  height: rawImage.height ?? 0,
 });
 
 const images = computedList("images", (obj) => toImageObj(obj));
+
 const nextPage = computedProp("next_page", (page) => ({
   name: "image-uploader",
   query: {

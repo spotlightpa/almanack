@@ -375,9 +375,19 @@ SET
   ELSE
     is_licensed
   END,
+  width = CASE WHEN $9::boolean THEN
+    $10::int
+  ELSE
+    width
+  END,
+  height = CASE WHEN $11::boolean THEN
+    $12::int
+  ELSE
+    height
+  END,
   is_uploaded = TRUE
 WHERE
-  path = $9
+  path = $13
 RETURNING
   id, path, type, description, credit, src_url, is_uploaded, created_at, updated_at, md5, bytes, keywords, deleted_at, is_licensed, width, height
 `
@@ -391,6 +401,10 @@ type UpdateImageParams struct {
 	Keywords       string `json:"keywords"`
 	SetIsLicensed  bool   `json:"set_is_licensed"`
 	IsLicensed     bool   `json:"is_licensed"`
+	SetWidth       bool   `json:"set_width"`
+	Width          int32  `json:"width"`
+	SetHeight      bool   `json:"set_height"`
+	Height         int32  `json:"height"`
 	Path           string `json:"path"`
 }
 
@@ -404,6 +418,10 @@ func (q *Queries) UpdateImage(ctx context.Context, arg UpdateImageParams) (Image
 		arg.Keywords,
 		arg.SetIsLicensed,
 		arg.IsLicensed,
+		arg.SetWidth,
+		arg.Width,
+		arg.SetHeight,
+		arg.Height,
 		arg.Path,
 	)
 	var i Image

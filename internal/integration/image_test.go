@@ -2,7 +2,6 @@ package integration_test
 
 import (
 	"context"
-	"net/http"
 	"testing"
 
 	"github.com/earthboundkid/assert"
@@ -37,7 +36,6 @@ func TestCreateSignedUploadStoresDimensions(t *testing.T) {
 	// Upload with explicit width and height
 	be.NilError(rb.Clone().
 		Path("/api/create-signed-upload").
-		Method(http.MethodPost).
 		BodyJSON(map[string]any{
 			"type":   "image/jpeg",
 			"width":  1920,
@@ -60,7 +58,6 @@ func TestCreateSignedUploadStoresDimensions(t *testing.T) {
 	}
 	be.NilError(rb.Clone().
 		Path("/api/create-signed-upload").
-		Method(http.MethodPost).
 		BodyJSON(map[string]any{
 			"type": "image/png",
 		}).
@@ -76,10 +73,99 @@ func TestCreateSignedUploadStoresDimensions(t *testing.T) {
 	// Confirm an unsupported type returns an error
 	err := rb.Clone().
 		Path("/api/create-signed-upload").
-		Method(http.MethodPost).
 		BodyJSON(map[string]any{"type": "image/gif"}).
 		Fetch(ctx)
 	be.Truthy(err)
+}
+
+func TestImageUpdateEndpoint(t *testing.T) {
+	be := assert.FailsNow(t)
+	almlog.UseTestLogger(t)
+	dbhandle := createTestDB(t)
+	t.Cleanup(aws.UseMockSigner(func(ctx context.Context, key string, opts *driver.SignedURLOptions) (string, error) {
+		return "http://example.com/signed?key=" + key, nil
+	}))
+	rb := newTestServer(t, almsvc.Services{
+		DB:         dbhandle,
+		Queries:    dbhandle.Queries(),
+		Auth:       netlifyid.MockAuthService{},
+		ImageStore: aws.NewBlobStore("mem://"),
+	})
+	ctx := t.Context()
+
+	// Create an image to update
+	var uploadResp struct {
+		Filename string `json:"filename"`
+	}
+	be.NilError(rb.Clone().
+		Path("/api/create-signed-upload").
+		BodyJSON(map[string]any{"type": "image/jpeg"}).
+		ToJSON(&uploadResp).
+		Fetch(ctx))
+	path := uploadResp.Filename
+	be.Truthy(path)
+
+	var img db.Image
+
+	// Update description
+	be.NilError(rb.Clone().
+		Path("/api/image-update").
+		BodyJSON(map[string]any{
+			"path":            path,
+			"set_description": true,
+			"description":     "A lovely photo",
+		}).
+		ToJSON(&img).
+		Fetch(ctx))
+	be.Equal(img.Description, "A lovely photo")
+
+	// Update credit
+	be.NilError(rb.Clone().
+		Path("/api/image-update").
+		BodyJSON(map[string]any{
+			"path":       path,
+			"set_credit": true,
+			"credit":     "Jane Smith",
+		}).
+		ToJSON(&img).
+		Fetch(ctx))
+	be.Equal(img.Credit, "Jane Smith")
+	// Description should be unchanged
+	be.Equal(img.Description, "A lovely photo")
+
+	// Update dimensions
+	be.NilError(rb.Clone().
+		Path("/api/image-update").
+		BodyJSON(map[string]any{
+			"path":       path,
+			"set_width":  true,
+			"width":      1280,
+			"set_height": true,
+			"height":     720,
+		}).
+		ToJSON(&img).
+		Fetch(ctx))
+	be.
+		Equal(img.Width, int32(1280)).
+		Equal(img.Height, int32(720))
+	// Prior fields should be unchanged
+	be.
+		Equal(img.Credit, "Jane Smith").
+		Equal(img.Description, "A lovely photo")
+
+	// set_width/set_height false — dimensions must not change
+	be.NilError(rb.Clone().
+		Path("/api/image-update").
+		BodyJSON(map[string]any{
+			"path":   path,
+			"width":  0,
+			"height": 0,
+		}).
+		ToJSON(&img).
+		Fetch(ctx))
+	be.
+		Equal(img.Width, int32(1280)).
+		Equal(img.Height, int32(720))
 }
 
 func TestCreateSignedUploadUpsertPreservesExistingDimensions(t *testing.T) {
