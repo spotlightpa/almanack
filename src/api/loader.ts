@@ -27,9 +27,7 @@ export function makeState() {
     apiState,
     apiStateRefs: apiStateRefsWithThrottle,
 
-    async exec(
-      callback: () => Promise<[unknown, unknown]>
-    ): Promise<void> {
+    async exec(callback: () => Promise<[unknown, unknown]>): Promise<void> {
       if (apiState.isLoading) {
         return;
       }
@@ -55,15 +53,12 @@ export function watchAPI<T>(
   watch(watchCb, doFetch, { immediate: true });
 
   // Typed accessor for rawData.
-  const rawData = (): T | null =>
-    (apiStateRefs.rawData as Ref<T | null>).value;
+  const rawData = (): T | null => (apiStateRefs.rawData as Ref<T | null>).value;
 
   return {
     apiState: apiStateRefs,
     async fetch(): Promise<void> {
-      return doFetch(
-        typeof watchCb === "function" ? watchCb() : watchCb.value
-      );
+      return doFetch(typeof watchCb === "function" ? watchCb() : watchCb.value);
     },
     computer<R>(cb: (val: T | null) => R): ComputedRef<R> {
       return computed(() => cb(rawData()));
