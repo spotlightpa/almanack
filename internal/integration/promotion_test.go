@@ -28,7 +28,6 @@ func TestPromotionEndpoints(t *testing.T) {
 		var created db.Promotion
 		be.NilError(rb.Clone().
 			Path("/api/promotion").
-			Method(http.MethodPost).
 			BodyJSON(db.Promotion{
 				Name:             "Banner Ad",
 				Description:      "A test banner",
@@ -56,7 +55,6 @@ func TestPromotionEndpoints(t *testing.T) {
 		var created db.Promotion
 		be.NilError(rb.Clone().
 			Path("/api/promotion").
-			Method(http.MethodPost).
 			BodyJSON(db.Promotion{
 				Name:        "Sidebar Ad",
 				Description: "A sidebar promotion",
@@ -115,7 +113,6 @@ func TestPromotionEndpoints(t *testing.T) {
 		var created db.Promotion
 		be.NilError(rb.Clone().
 			Path("/api/promotion").
-			Method(http.MethodPost).
 			BodyJSON(db.Promotion{
 				Name:   "Nil items promo",
 				Width:  300,
@@ -132,7 +129,6 @@ func TestPromotionEndpoints(t *testing.T) {
 		var updated db.Promotion
 		be.NilError(rb.Clone().
 			Path("/api/promotion").
-			Method(http.MethodPost).
 			BodyJSON(db.Promotion{
 				ID:               created1.ID,
 				Name:             "Banner Ad Updated",
@@ -170,7 +166,6 @@ func TestDeletePromotionEndpoint(t *testing.T) {
 	var created db.Promotion
 	be.NilError(rb.Clone().
 		Path("/api/promotion").
-		Method(http.MethodPost).
 		BodyJSON(db.Promotion{
 			Name:      "To Be Deleted",
 			Link:      "https://example.com/",
@@ -185,7 +180,6 @@ func TestDeletePromotionEndpoint(t *testing.T) {
 	// Nonexistent ID returns 400 Bad Request
 	err := rb.Clone().
 		Path("/api/promotion-delete").
-		Method(http.MethodPost).
 		BodyJSON(map[string]any{"id": 1_000}).
 		Fetch(ctx)
 	re := be.ErrorAsType[*requests.ResponseError](err)
@@ -194,7 +188,6 @@ func TestDeletePromotionEndpoint(t *testing.T) {
 	// Delete the promotion
 	be.NilError(rb.Clone().
 		Path("/api/promotion-delete").
-		Method(http.MethodPost).
 		BodyJSON(map[string]any{"id": created.ID}).
 		Fetch(ctx))
 

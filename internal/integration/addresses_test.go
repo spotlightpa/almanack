@@ -1,7 +1,6 @@
 package integration_test
 
 import (
-	"net/http"
 	"slices"
 	"testing"
 
@@ -36,7 +35,6 @@ func TestAuthorizedAddressesEndpoints(t *testing.T) {
 	// Add two addresses via POST.
 	be.NilError(rb.Clone().
 		Path("/api/authorized-addresses").
-		Method(http.MethodPost).
 		BodyJSON(map[string]any{"address": "alice@example.com"}).
 		ToJSON(&list).
 		Fetch(ctx))
@@ -44,7 +42,6 @@ func TestAuthorizedAddressesEndpoints(t *testing.T) {
 
 	be.NilError(rb.Clone().
 		Path("/api/authorized-addresses").
-		Method(http.MethodPost).
 		BodyJSON(map[string]any{"address": "bob@example.com"}).
 		ToJSON(&list).
 		Fetch(ctx))
