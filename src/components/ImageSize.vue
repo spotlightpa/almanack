@@ -1,7 +1,7 @@
 <script setup>
 import { computed, ref } from "vue";
 import imageSize from "@/utils/image-size.ts";
-import { post } from "@/api/client.ts";
+import { tryTo, post } from "@/api/client.ts";
 import { postImageUpdate } from "@/api/endpoints.ts";
 import { makeState } from "@/api/service-util.js";
 
@@ -14,12 +14,18 @@ const props = defineProps({
 const emit = defineEmits(["update:width", "update:height"]);
 
 const open = ref(false);
-const fetchedWidth = ref(0);
-const fetchedHeight = ref(0);
 
 const { apiStateRefs: saveState, exec } = makeState();
+const { apiStateRefs: getDimensionsState, exec: getDimensionsExec } =
+  makeState();
 
 const hasDimensions = computed(() => props.width > 0 && props.height > 0);
+const fetchedWidth = computed(
+  () => getDimensionsState.rawData.value.width ?? 0
+);
+const fetchedHeight = computed(
+  () => getDimensionsState.rawData.value.width ?? 0
+);
 const displayWidth = computed(() =>
   hasDimensions.value ? props.width : fetchedWidth.value
 );
@@ -36,21 +42,19 @@ async function onclick() {
     open.value = true;
     return;
   }
-  const size = await imageSize(url.value);
-  fetchedWidth.value = size.width;
-  fetchedHeight.value = size.height;
+  await getDimensionsExec(() => tryTo(imageSize(url.value)));
   await exec(() =>
     post(postImageUpdate, {
       path: props.path,
       set_width: true,
-      width: size.width,
+      width: fetchedWidth.value,
       set_height: true,
-      height: size.height,
+      height: fetchedHeight.value,
     })
   );
   if (!saveState.error.value) {
-    emit("update:width", size.width);
-    emit("update:height", size.height);
+    emit("update:width", fetchedWidth.value);
+    emit("update:height", fetchedHeight.value);
   }
   open.value = true;
 }
@@ -60,7 +64,11 @@ async function onclick() {
   <div>
     <LinkButton
       :label="hasDimensions ? `${width}\u00d7${height}` : 'Dimensions'"
-      :class="{ 'is-loading': saveState.isLoadingThrottled.value }"
+      :class="{
+        'is-loading':
+          saveState.isLoadingThrottled.value ||
+          getDimensionsState.isLoadingThrottled.value,
+      }"
       color="is-success"
       :icon="['fas', 'file-image']"
       @click.prevent="onclick"

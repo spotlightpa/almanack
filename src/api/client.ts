@@ -23,7 +23,7 @@ interface RequestOptions {
   options?: FetchOptions;
 }
 
-const tryTo = <T>(promise: Promise<T>): Promise<Result<T>> =>
+export const tryTo = <T>(promise: Promise<T>): Promise<Result<T>> =>
   promise
     .then((data): [T, null] => [data, null])
     .catch((error: Error): [null, Error] => [null, error]);
