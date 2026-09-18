@@ -1,6 +1,6 @@
 <script setup>
 import { computed, ref } from "vue";
-import imageSize from "@/utils/image-size";
+import imageSize from "@/utils/image-size.ts";
 
 const props = defineProps({
   path: String,
