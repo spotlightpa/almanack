@@ -3,7 +3,7 @@ import { ref } from "vue";
 
 import { get, post, listPromotions, postPromotion } from "@/api/client.ts";
 import { makePromotion } from "@/api/promotion.ts";
-import { makeState, watchAPI } from "@/api/service-util.js";
+import { makeState, watchAPI } from "@/api/loader.ts";
 import { useFileList } from "@/api/file-list.js";
 
 const props = defineProps({

@@ -1,7 +1,7 @@
 <script>
 import { computed, reactive, toRefs, watch } from "vue";
 
-import { makeState } from "@/api/service-util.js";
+import { makeState } from "@/api/loader.ts";
 import {
   get as clientGet,
   post as clientPost,

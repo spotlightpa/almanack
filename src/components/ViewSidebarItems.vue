@@ -2,7 +2,7 @@
 import { reactive, computed, toRefs, watch } from "vue";
 
 import { get, post, getSidebar, saveSidebar } from "@/api/client.ts";
-import { makeState } from "@/api/service-util.js";
+import { makeState } from "@/api/loader.ts";
 import { formatDateTime, today, tomorrow } from "@/utils/time-format.ts";
 import useScrollTo from "@/utils/use-scroll-to.js";
 import maybeDate from "@/utils/maybe-date.ts";

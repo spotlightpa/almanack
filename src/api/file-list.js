@@ -1,7 +1,7 @@
 import { reactive, computed, toRefs } from "vue";
 
 import { get, post, listFiles, updateFile, uploadFile } from "./client.ts";
-import { makeState } from "./service-util.js";
+import { makeState } from "@/api/loader.ts";
 
 export function useFileList() {
   let { apiState, exec } = makeState();

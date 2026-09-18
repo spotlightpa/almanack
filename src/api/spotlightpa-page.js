@@ -1,6 +1,6 @@
 import { computed, reactive, ref, toRefs, watch } from "vue";
 
-import { makeState, watchAPI } from "@/api/service-util.js";
+import { makeState, watchAPI } from "@/api/loader.ts";
 import {
   get as clientGet,
   post as clientPost,
