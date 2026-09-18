@@ -248,7 +248,9 @@ export default {
       </button>
     </div>
 
-    <SpinnerProgress :is-loading="sidebarState.isLoading.value"></SpinnerProgress>
+    <SpinnerProgress
+      :is-loading="sidebarState.isLoading.value"
+    ></SpinnerProgress>
     <ErrorReloader
       :error="sidebarState.error.value"
       @reload="reloadSidebars"
