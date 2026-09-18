@@ -2,6 +2,7 @@ import { computed, reactive, toRefs, watch } from "vue";
 import type { ComputedRef, Ref, WatchSource } from "vue";
 
 import { useThrottleToggle } from "@/utils/wait.ts";
+import type { Result } from "@/utils/try-to.ts";
 
 // CoreState holds the reactive fields for a single API request lifecycle.
 interface CoreState {
@@ -29,13 +30,13 @@ export function makeState() {
     apiState,
     apiStateRefs: apiStateRefsWithThrottle,
 
-    async exec(callback: () => Promise<[unknown, unknown]>): Promise<void> {
+    async exec<T>(callback: () => Promise<Result<T>>): Promise<void> {
       if (apiState.isLoading) {
         return;
       }
       apiState.isLoading = true;
       let data: unknown;
-      [data, apiState.error] = await callback();
+      [data, apiState.error] = (await callback()) as Result<unknown>;
       apiState.isLoading = false;
       if (!apiState.error) {
         apiState.rawData = data;
@@ -46,11 +47,10 @@ export function makeState() {
 
 export function watchAPI<T>(
   watchCb: WatchSource,
-  fetcher: (val: unknown) => Promise<[T, unknown]>
+  fetcher: (val: unknown) => Promise<Result<T>>
 ) {
   const { exec, apiStateRefs } = makeState();
-  const doFetch = (newVal: unknown) =>
-    exec(() => fetcher(newVal) as Promise<[unknown, unknown]>);
+  const doFetch = (newVal: unknown) => exec(() => fetcher(newVal));
 
   watch(watchCb, doFetch, { immediate: true });
 

@@ -5,10 +5,11 @@ import {
   createFile,
   updateFile,
 } from "./endpoints.ts";
+import tryTo from "@/utils/try-to.ts";
+import type { Result } from "@/utils/try-to.ts";
 
 export * from "./endpoints.ts";
-
-type Result<T> = [T, null] | [null, Error];
+export type { Result } from "@/utils/try-to.ts";
 
 type ErrorDetails = Record<string, string[]>;
 interface AppError extends Error {
@@ -22,11 +23,6 @@ interface RequestOptions {
   headers?: FetchOptions["headers"];
   options?: FetchOptions;
 }
-
-const tryTo = <T>(promise: Promise<T>): Promise<Result<T>> =>
-  promise
-    .then((data): [T, null] => [data, null])
-    .catch((error: Error): [null, Error] => [null, error]);
 
 const responseError = async (rsp: Response): Promise<AppError | undefined> => {
   if (rsp.ok) {
