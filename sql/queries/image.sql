@@ -132,6 +132,16 @@ SET
   ELSE
     is_licensed
   END,
+  width = CASE WHEN @set_width::boolean THEN
+    @width::int
+  ELSE
+    width
+  END,
+  height = CASE WHEN @set_height::boolean THEN
+    @height::int
+  ELSE
+    height
+  END,
   is_uploaded = TRUE
 WHERE
   path = @path
