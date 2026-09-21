@@ -1,5 +1,5 @@
 <script setup>
-import { watchAPI } from "@/api/service-util.js";
+import { watchAPI } from "@/api/loader.ts";
 import { get, getPage } from "@/api/client.ts";
 import { Page } from "@/api/spotlightpa-page.js";
 

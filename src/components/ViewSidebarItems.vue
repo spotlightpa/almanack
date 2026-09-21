@@ -2,7 +2,7 @@
 import { reactive, computed, toRefs, watch } from "vue";
 
 import { get, post, getSidebar, saveSidebar } from "@/api/client.ts";
-import { makeState } from "@/api/service-util.js";
+import { makeState } from "@/api/loader.ts";
 import { formatDateTime, today, tomorrow } from "@/utils/time-format.ts";
 import useScrollTo from "@/utils/use-scroll-to.js";
 import maybeDate from "@/utils/maybe-date.ts";
@@ -82,9 +82,11 @@ export default {
   setup() {
     const [container, scrollTo] = useScrollTo();
 
-    let { apiState: sidebarState, exec: sidebarExec } = makeState();
+    let { apiStateRefs: sidebarStateRefs, exec: sidebarExec } = makeState();
     const state = reactive({
-      rawSidebars: computed(() => sidebarState.rawData?.configs ?? []),
+      rawSidebars: computed(
+        () => sidebarStateRefs.rawData.value?.configs ?? []
+      ),
       allSidebars: [],
       nextSchedule: null,
     });
@@ -119,7 +121,7 @@ export default {
       container,
       today,
       tomorrow,
-      sidebarState,
+      sidebarState: sidebarStateRefs,
       ...toRefs(state),
       ...actions,
       formatDateTime,
@@ -188,7 +190,7 @@ export default {
         </button>
       </div>
     </div>
-    <template v-if="!sidebarState.isLoading">
+    <template v-if="!sidebarState.isLoading.value">
       <h2 class="mt-2 mb-0 title is-size-3">Add a scheduled change</h2>
       <BulmaDateTime
         v-model="nextSchedule"
@@ -229,8 +231,8 @@ export default {
       <button
         type="button"
         class="button is-primary has-text-weight-semibold"
-        :disabled="sidebarState.isLoading || null"
-        :class="{ 'is-loading': sidebarState.isLoading }"
+        :disabled="sidebarState.isLoading.value || null"
+        :class="{ 'is-loading': sidebarState.isLoading.value }"
         @click="save"
       >
         Save
@@ -238,17 +240,19 @@ export default {
       <button
         type="button"
         class="button is-light has-text-weight-semibold"
-        :disabled="sidebarState.isLoading || null"
-        :class="{ 'is-loading': sidebarState.isLoading }"
+        :disabled="sidebarState.isLoading.value || null"
+        :class="{ 'is-loading': sidebarState.isLoading.value }"
         @click="reloadSidebars"
       >
         Revert
       </button>
     </div>
 
-    <SpinnerProgress :is-loading="sidebarState.isLoading"></SpinnerProgress>
+    <SpinnerProgress
+      :is-loading="sidebarState.isLoading.value"
+    ></SpinnerProgress>
     <ErrorReloader
-      :error="sidebarState.error"
+      :error="sidebarState.error.value"
       @reload="reloadSidebars"
     ></ErrorReloader>
   </div>

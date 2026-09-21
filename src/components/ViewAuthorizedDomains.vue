@@ -9,7 +9,7 @@ import {
   listAuthorizedEmailAddresses,
   postAuthorizedEmailAddress,
 } from "@/api/client.ts";
-import { makeState } from "@/api/service-util.js";
+import { makeState } from "@/api/loader.ts";
 
 function domainState() {
   let { apiState: listState, exec: listExec } = makeState();

@@ -2,7 +2,7 @@
 import { reactive, computed, toRefs, watch } from "vue";
 
 import { get, post, listFiles, updateFile, uploadFile } from "@/api/client.ts";
-import { makeState } from "@/api/service-util.js";
+import { makeState } from "@/api/loader.ts";
 
 import { formatDate } from "@/utils/time-format.ts";
 import humanSize from "@/utils/human-size.ts";

@@ -3,7 +3,7 @@ import { ref } from "vue";
 import { useDebouncedRef, seconds } from "@/utils/wait.ts";
 
 import { get, post, listImages, postImageUpdate } from "@/api/client.ts";
-import { makeState, watchAPI } from "@/api/service-util.js";
+import { makeState, watchAPI } from "@/api/loader.ts";
 import imgproxyURL from "@/api/imgproxy-url.js";
 
 import { formatDate } from "@/utils/time-format.ts";

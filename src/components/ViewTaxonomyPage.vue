@@ -1,7 +1,7 @@
 <script>
 import { computed, reactive, toRefs, watch } from "vue";
 
-import { makeState } from "@/api/service-util.js";
+import { makeState } from "@/api/loader.ts";
 import {
   get as clientGet,
   post as clientPost,
@@ -12,7 +12,7 @@ import {
 import { TaxonomyPage } from "@/api/taxonomy-page.js";
 
 function usePage(id) {
-  const { apiState, exec } = makeState();
+  const { apiStateRefs, exec } = makeState();
 
   const fetch = (id) =>
     exec(() =>
@@ -21,18 +21,20 @@ function usePage(id) {
   const post = (page) => exec(() => clientPost(postPage, page));
 
   const page = computed(() =>
-    apiState.rawData ? reactive(new TaxonomyPage(apiState.rawData)) : null
+    apiStateRefs.rawData.value
+      ? reactive(new TaxonomyPage(apiStateRefs.rawData.value))
+      : null
   );
 
   watch(() => id.value, fetch, {
     immediate: true,
   });
 
-  const { apiState: imageState, exec: execImage } = makeState();
+  const { apiStateRefs: imageStateRefs, exec: execImage } = makeState();
   execImage(() => clientGet(listImages));
 
   return {
-    ...toRefs(apiState),
+    ...apiStateRefs,
     fetch,
     post,
     page,
@@ -48,10 +50,7 @@ function usePage(id) {
       }
       return post(page.value);
     },
-    imageState,
-    images: computed(() =>
-      !imageState.rawData ? [] : imageState.rawData.images
-    ),
+    images: computed(() => imageStateRefs.rawData.value?.images ?? []),
     setImageProps(image) {
       page.value.image = image.path;
       page.value.imageDescription = image.description;

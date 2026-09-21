@@ -1,7 +1,7 @@
 <script setup>
 import { watch, ref } from "vue";
 
-import { watchAPI } from "@/api/service-util.js";
+import { watchAPI } from "@/api/loader.ts";
 import { get, listPages } from "@/api/client.ts";
 
 const props = defineProps({
