@@ -3,6 +3,7 @@ import { ref, computed } from "vue";
 
 import { uploadImage } from "@/api/client.ts";
 import imgproxyURL from "@/api/imgproxy-url.js";
+import { imageFileSize } from "@/utils/image-size.ts";
 
 const emit = defineEmits(["update-image-list"]);
 
@@ -40,7 +41,8 @@ async function uploadFileInput(ev) {
   error.value = null;
 
   for (let body of files) {
-    [filename.value, error.value] = await uploadImage(body);
+    const { width, height } = await imageFileSize(body);
+    [filename.value, error.value] = await uploadImage(body, width, height);
     if (error.value) {
       break;
     }
