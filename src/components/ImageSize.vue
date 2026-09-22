@@ -27,12 +27,14 @@ const fetchedWidth = computed(
 const fetchedHeight = computed(
   () => getDimensionsState.rawData.value.height ?? 0
 );
-const displayWidth = computed(() =>
+const tWidth = computed(() =>
   hasDimensions.value ? props.width : fetchedWidth.value
 );
-const displayHeight = computed(() =>
+const tHeight = computed(() =>
   hasDimensions.value ? props.height : fetchedHeight.value
 );
+const displayWidth = computed(() => tWidth.value.toLocaleString("en-US"));
+const displayHeight = computed(() => tHeight.value.toLocaleString("en-US"));
 
 const url = computed(
   () => "/ssr/download-image?src=" + encodeURIComponent(props.path)
@@ -63,7 +65,9 @@ async function onclick() {
 <template>
   <div>
     <LinkButton
-      :label="hasDimensions ? `${width}\u00d7${height}` : 'Dimensions'"
+      :label="
+        hasDimensions ? `${displayWidth}\u00d7${displayHeight}` : 'Dimensions'
+      "
       :class="{
         'is-loading':
           saveState.isLoadingThrottled.value ||
@@ -79,15 +83,9 @@ async function onclick() {
         <ErrorSimple :error="saveState.error.value"></ErrorSimple>
         <template v-if="!saveState.error.value">
           <span class="label">Image width</span>
-          <CopyWithButton
-            :value="'' + displayWidth"
-            label="Width"
-          ></CopyWithButton>
+          <CopyWithButton :value="'' + tWidth" label="Width"></CopyWithButton>
           <span class="label">Image height</span>
-          <CopyWithButton
-            :value="'' + displayHeight"
-            label="Height"
-          ></CopyWithButton>
+          <CopyWithButton :value="'' + tHeight" label="Height"></CopyWithButton>
         </template>
       </div>
     </BulmaModal>
