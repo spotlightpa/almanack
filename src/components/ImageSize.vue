@@ -1,9 +1,10 @@
 <script setup>
 import { computed, ref } from "vue";
 import imageSize from "@/utils/image-size.ts";
-import { tryTo, post } from "@/api/client.ts";
+import tryTo from "@/utils/try-to.ts";
+import { post } from "@/api/client.ts";
 import { postImageUpdate } from "@/api/endpoints.ts";
-import { makeState } from "@/api/service-util.js";
+import { makeState } from "@/api/loader.ts";
 
 const props = defineProps({
   path: String,
