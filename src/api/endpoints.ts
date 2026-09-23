@@ -33,5 +33,3 @@ export const postSharedArticleFromGDocs = `/api/shared-article-from-gdocs`;
 export const listSharedArticles = `/api/shared-articles`;
 export const getSiteData = `/api/site-data`;
 export const postSiteData = `/api/site-data`;
-export const getSiteParams = `/api/site-params`;
-export const postSiteParams = `/api/site-params`;
