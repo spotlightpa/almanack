@@ -1,11 +1,11 @@
 # Plan: Sub-site Sticky Controllers (Berks & State College)
 
-> **Implementation order:** Phase 0 (consolidation + cleanup) merges to master
-> first as a standalone PR. Phase 1 (the new feature) builds on top of it.
+> **Implementation order:** Phases 1 & 2 (consolidation + cleanup) merge to master
+> first as standalone PRs. Phase 3 (the new feature) builds on top of them.
 
-## Phase 0: Consolidation & Cleanup (prerequisite, lands on master first)
+## Phase 1: Delete Sidebar Items
 
-### 0a — Delete the sidebar items feature
+### Overview
 
 `ViewSidebarItems.vue` and `SidebarItem.vue` are unused and being dropped in
 their entirety.
@@ -20,7 +20,7 @@ their entirety.
 | `internal/almapp/router.go` | Remove `GET/POST /api/sidebar` routes |
 | `internal/almsvc/site-data.go` | Remove `SidebarLoc` constant and its `messageForLoc` entry |
 
-### 0b — Consolidate site-data endpoints
+## Phase 2: Consolidate Site-Data Endpoints
 
 `GET/POST /api/site-params` is a special-cased alias for
 `GET/POST /api/site-data?location=<loc>` — same handler, loc hard-coded in the
@@ -35,16 +35,19 @@ Extend that to `ViewSiteParams.vue` and remove the redundant route pair.
 
 (`SiteParamsLoc` stays in `site-data.go` — still used by `MessageForLoc`.)
 
-### Phase 0 commit sequence
+### Phase 1 commit sequence
 
 1. `ViewSidebarItems, SidebarItem: Delete unused sidebar items feature`
 2. `endpoints, router, almsvc: Remove /api/sidebar route and SidebarLoc`
+
+### Phase 2 commit sequence
+
 3. `ViewSiteParams: Use /api/site-data?location= instead of /api/site-params`
 4. `endpoints, router: Remove /api/site-params special-case route`
 
 ---
 
-## Phase 1: Sub-site Sticky Controllers
+## Phase 3: Sub-site Sticky Controllers
 
 ### Goal
 
@@ -73,7 +76,7 @@ BerksSidebarLoc:        "Setting Berks County sidebar configuration",
 StateCollegeSidebarLoc: "Setting State College sidebar configuration",
 ```
 
-No new backend routes — `/api/site-data?location=` handles them after Phase 0.
+No new backend routes — `/api/site-data?location=` handles them after Phase 2.
 
 ### Step 2 — Frontend: Create `ViewSubSiteSidebar.vue`
 
@@ -139,7 +142,7 @@ Add two `<LinkRoute>` entries near the existing `berks-editor` /
 ></LinkRoute>
 ```
 
-### Phase 1 commit sequence
+### Phase 3 commit sequence
 
 5. `almsvc: Add Berks and State College sidebar loc constants`
 6. `ViewSubSiteSidebar: New sub-site sticky controller view`
@@ -150,7 +153,7 @@ Add two `<LinkRoute>` entries near the existing `berks-editor` /
 
 ## Full File Change Summary
 
-### Phase 0
+### Phases 1 & 2
 
 | File | Change |
 |---|---|
@@ -163,7 +166,7 @@ Add two `<LinkRoute>` entries near the existing `berks-editor` /
 | `internal/almapp/router.go` | Remove `/api/sidebar` and `/api/site-params` routes |
 | `internal/almsvc/site-data.go` | Remove `SidebarLoc` constant and `messageForLoc` entry |
 
-### Phase 1
+### Phase 3
 
 | File | Change |
 |---|---|
@@ -175,5 +178,5 @@ Add two `<LinkRoute>` entries near the existing `berks-editor` /
 ## What We Are NOT Doing
 
 - **No DB migrations** — `site_data` keys on `loc` string; new values work automatically.
-- **No new backend routes** — `/api/site-data?location=` covers everything after Phase 0.
+- **No new backend routes** — `/api/site-data?location=` covers everything after Phase 2.
 - **No content-store schema changes** — same JSON shape as main site params.
