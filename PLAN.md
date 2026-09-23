@@ -1,46 +1,116 @@
 # Plan: Sub-site Sidebar Editors (Berks & State College)
 
-## Goal
+> **Implementation order:** Phase 0 (consolidation) merges to master first as a
+> standalone PR. Phase 1 (the new feature) builds on top of it.
 
-Add the ability for Spotlight PA editors to curate sidebar items for the Berks and
-State College sub-sites, using the same sidebar item structure already used for the
-main site sidebar (`data/sidebar.json`). The new data files will be:
+## Phase 0: Consolidation (prerequisite, lands on master first)
 
-- `data/berks-sidebar.json` (Berks County)
-- `data/statecollege-sidebar.json` (State College)
+### The Problem
 
-## Background: How the Main Sidebar Works
+Right now there are three parallel mechanisms for reading/writing site data from
+the content store, each with its own dedicated URL and named endpoint constants:
 
-The existing sidebar flow is a useful template:
+| Frontend constants | Backend route | Handler | What it does |
+|---|---|---|---|
+| `getSidebar` / `saveSidebar` | `GET/POST /api/sidebar` | `siteDataGet(SidebarLoc)` | Main sidebar |
+| `getSiteParams` / `postSiteParams` | `GET/POST /api/site-params` | `siteDataGet(SiteParamsLoc)` | Site-wide ad params |
+| `getSiteData` / `postSiteData` | `GET/POST /api/site-data` | `getSiteData` / `postSiteData` (reads `?location=` query param) | Frontpage editors (Berks, State College, Homepage) |
 
-1. **Content store constant** - `internal/almsvc/site-data.go` defines
-   `SidebarLoc = "data/sidebar.json"` and maps it to a human-readable commit
-   message.
-2. **Backend routes** - `internal/almapp/router.go` wires up `GET /api/sidebar`
-   and `POST /api/sidebar` using the generic `app.siteDataGet(loc)` /
-   `app.siteDataSet(loc)` handlers. These handlers read/write scheduled configs
-   stored in the DB and publish the active config to the content store.
-3. **API endpoint constants** - `src/api/endpoints.ts` exports `getSidebar` and
-   `saveSidebar` (both pointing to `/api/sidebar`).
-4. **Frontend view** - `src/components/ViewSidebarItems.vue` loads configs via
-   `getSidebar`, renders each scheduled config using `SidebarItem.vue`
-   sub-components, and saves via `saveSidebar`.
-5. **Router entry** - `src/plugins/router.js` has a named route `sidebar-items`
-   pointing to `ViewSidebarItems.vue`.
-6. **Admin nav** - `src/components/ViewAdmin.vue` has a link to `sidebar-items`
-   under "Spotlight PA promotions".
+The `/api/site-data` route already solves the general case: it accepts a
+`?location=` query parameter and delegates to the same generic handlers. The
+other two routes (`/api/sidebar`, `/api/site-params`) are just special-cased
+wrappers around the exact same handler with a hard-coded loc. Every new loc we
+add (e.g. the two new sidebar files) would normally mean a new pair of named
+endpoint constants and a new pair of named routes — that's what the plan before
+this revision proposed.
 
-The backend handlers (`siteDataGet` / `siteDataSet`) are already generic - they
-take any `loc` string. **No new Go code is needed** beyond adding two constants
-and two pairs of route registrations.
+### The Solution
 
-## Plan
+Consolidate everything through `/api/site-data?location=<loc>`. This means:
 
-### Step 1 - Backend: Add constants and routes
+**Backend (`internal/almapp/router.go`):**
+
+Remove the four special-cased routes:
+```
+GET/POST /api/sidebar
+GET/POST /api/site-params
+```
+The `GET/POST /api/site-data` routes (which already exist and use the same
+handler logic via `getSiteData`/`postSiteData`) absorb their traffic.
+
+**Frontend (`src/api/endpoints.ts`):**
+
+Remove the four now-redundant named constants:
+```ts
+getSidebar / saveSidebar
+getSiteParams / postSiteParams
+```
+They are replaced by the existing `getSiteData` / `postSiteData` constants, used
+with a `?location=` query param — exactly as `ViewFrontpageEditor.vue` already
+does.
+
+**Frontend callers:**
+
+- `ViewSidebarItems.vue` — change `get(getSidebar)` →
+  `get(getSiteData, { location: "data/sidebar.json" })` and
+  `post(saveSidebar, ...)` → `post(postSiteData + "?location=data/sidebar.json", ...)`.
+- `ViewSiteParams.vue` — same treatment with `"config/_default/params.json"`.
+
+Follow the same URL-construction pattern already used in `ViewFrontpageEditor.vue`
+(`getSiteData + "?location=" + dataFile`). Check whether `client.ts`'s `post()`
+helper accepts a `params` arg for query params; if not, use string concatenation
+as the existing code does.
+
+**Backend (`internal/almsvc/site-data.go`):**
+
+No changes needed. The loc constants (`SidebarLoc`, `SiteParamsLoc`, etc.) stay
+as-is — they're still used by `MessageForLoc`.
+
+### How the generic handlers already work
+
+From `routes-spotlightpa.go`:
+
+```go
+func (app *appEnv) getSiteData(w http.ResponseWriter, r *http.Request) http.Handler {
+    loc := r.URL.Query().Get("location")
+    return app.siteDataGet(loc)
+}
+func (app *appEnv) postSiteData(w http.ResponseWriter, r *http.Request) http.Handler {
+    loc := r.URL.Query().Get("location")
+    return app.siteDataSet(loc)
+}
+```
+
+No backend changes needed.
+
+### Consolidation commit sequence (master PR)
+
+1. `ViewSiteParams: Use /api/site-data?location= instead of /api/site-params`
+2. `ViewSidebarItems: Use /api/site-data?location= instead of /api/sidebar`
+3. `endpoints: Remove getSidebar, saveSidebar, getSiteParams, postSiteParams`
+4. `router: Remove /api/sidebar and /api/site-params special-case routes`
+
+Steps 1–2 can be verified against the running backend before steps 3–4 remove
+the old routes, making rollback easy if needed.
+
+---
+
+## Phase 1: The Feature (builds on Phase 0)
+
+### Goal
+
+Add the ability for Spotlight PA editors to curate sidebar items for the Berks
+and State College sub-sites. Controlled by:
+
+- `data/berks-sidebar.json`
+- `data/statecollege-sidebar.json`
+
+### Step 1 — Backend: Add loc constants
 
 **File: `internal/almsvc/site-data.go`**
 
-Add two new location constants and their commit messages:
+Add two new location constants and their commit messages. No new routes needed —
+`/api/site-data?location=` handles them automatically after Phase 0.
 
 ```go
 BerksSidebarLoc        = "data/berks-sidebar.json"
@@ -54,57 +124,25 @@ BerksSidebarLoc:        "Setting Berks County sidebar configuration",
 StateCollegeSidebarLoc: "Setting State College sidebar configuration",
 ```
 
-**File: `internal/almapp/router.go`**
+### Step 2 — Frontend: Parameterize `ViewSidebarItems.vue` via route meta
 
-Add four new route registrations in the `spotlightMW` block, adjacent to the
-existing `/api/sidebar` pair:
-
-```go
-HandleFunc(mux, `GET /api/berks-sidebar`, app.siteDataGet(almsvc.BerksSidebarLoc)).
-HandleFunc(mux, `POST /api/berks-sidebar`, app.siteDataSet(almsvc.BerksSidebarLoc)).
-HandleFunc(mux, `GET /api/statecollege-sidebar`, app.siteDataGet(almsvc.StateCollegeSidebarLoc)).
-HandleFunc(mux, `POST /api/statecollege-sidebar`, app.siteDataSet(almsvc.StateCollegeSidebarLoc))
-```
-
-### Step 2 - Frontend API: Add endpoint constants
-
-**File: `src/api/endpoints.ts`**
-
-Add alongside the existing sidebar constants:
-
-```ts
-export const getBerksSidebar = `/api/berks-sidebar`;
-export const saveBerksSidebar = `/api/berks-sidebar`;
-export const getStateCollegeSidebar = `/api/statecollege-sidebar`;
-export const saveStateCollegeSidebar = `/api/statecollege-sidebar`;
-```
-
-### Step 3 - Frontend: Parameterize `ViewSidebarItems.vue` via route meta
-
-Rather than copying the component (which would create three copies to maintain),
-we follow the same pattern used by `ViewFrontpageEditor.vue`: read `route.meta`
-to determine which endpoint and title to use.
-
-`ViewSidebarItems.vue` currently hard-codes `getSidebar` / `saveSidebar`. Refactor
-it to pull these from `route.meta`, falling back to the main sidebar endpoints:
+After Phase 0, `ViewSidebarItems.vue` already uses `getSiteData`/`postSiteData`
+with a location string. Make that location configurable via `route.meta` so the
+same component serves all three sidebars — following the same pattern as
+`ViewFrontpageEditor.vue`.
 
 - Import `useRoute` from `vue-router`.
 - At setup: `const route = useRoute()`.
-- Replace the hard-coded `get(getSidebar)` with `get(route.meta.getEndpoint ?? getSidebar)`
-  and likewise for the save call.
-- Read `route.meta.title` (default: `"Sidebar Items"`) for the `<MetaHead>` title
-  and breadcrumb.
+- Use `route.meta.location ?? "data/sidebar.json"` as the location string.
+- Use `route.meta.title ?? "Sidebar Items"` for the `<MetaHead>` title and
+  breadcrumb.
 
-No other changes to `SidebarItem.vue` or any `SiteParams*.vue` component are
-needed - those are entirely unrelated to this feature.
-
-### Step 4 - Frontend: Add router entries
+### Step 3 — Frontend: Add router entries
 
 **File: `src/plugins/router.js`**
 
-Add two new routes in the Spotlight section, adjacent to the existing
-`sidebar-items` route. Import the new endpoint constants from `endpoints.ts`
-(check the existing import list at the top of `router.js` and add there):
+Add two new routes adjacent to the existing `sidebar-items` route. No new
+imports needed — `getSiteData`/`postSiteData` are already imported after Phase 0.
 
 ```js
 {
@@ -113,8 +151,7 @@ Add two new routes in the Spotlight section, adjacent to the existing
   component: load(() => import("@/components/ViewSidebarItems.vue")),
   meta: {
     requiresAuth: isSpotlightPAUser,
-    getEndpoint: getBerksSidebar,
-    saveEndpoint: saveBerksSidebar,
+    location: "data/berks-sidebar.json",
     title: "Berks County Sidebar Items",
   },
 },
@@ -124,20 +161,18 @@ Add two new routes in the Spotlight section, adjacent to the existing
   component: load(() => import("@/components/ViewSidebarItems.vue")),
   meta: {
     requiresAuth: isSpotlightPAUser,
-    getEndpoint: getStateCollegeSidebar,
-    saveEndpoint: saveStateCollegeSidebar,
+    location: "data/statecollege-sidebar.json",
     title: "State College Sidebar Items",
   },
 },
 ```
 
-### Step 5 - Frontend: Add nav links
+### Step 4 — Frontend: Add nav links
 
 **File: `src/components/ViewAdmin.vue`**
 
-Add two `<LinkRoute>` entries. Group them near the existing sub-site frontpage
-editor links (`berks-editor`, `state-college-editor`) rather than with the main
-"Sidebar Items" link, since these are sub-site-specific:
+Add two `<LinkRoute>` entries grouped near the existing sub-site frontpage editor
+links (`berks-editor`, `state-college-editor`):
 
 ```html
 <LinkRoute
@@ -152,33 +187,43 @@ editor links (`berks-editor`, `state-college-editor`) rather than with the main
 ></LinkRoute>
 ```
 
+### Phase 1 commit sequence
+
+5. `almsvc: Add Berks and State College sidebar loc constants`
+6. `ViewSidebarItems: Parameterize location and title via route meta`
+7. `router.js: Add berks-sidebar and statecollege-sidebar routes`
+8. `ViewAdmin: Add nav links for sub-site sidebar editors`
+
+---
+
 ## File Change Summary
+
+### Phase 0 (consolidation PR, master)
+
+| File | Change |
+|---|---|
+| `src/components/ViewSiteParams.vue` | Use `getSiteData?location=` instead of `getSiteParams` |
+| `src/components/ViewSidebarItems.vue` | Use `getSiteData?location=` instead of `getSidebar` |
+| `src/api/endpoints.ts` | Remove `getSidebar`, `saveSidebar`, `getSiteParams`, `postSiteParams` |
+| `internal/almapp/router.go` | Remove `/api/sidebar` and `/api/site-params` special-case routes |
+
+### Phase 1 (feature PR, based on Phase 0)
 
 | File | Change |
 |---|---|
 | `internal/almsvc/site-data.go` | Add 2 loc constants + 2 commit messages |
-| `internal/almapp/router.go` | Register 4 new routes (GET+POST x2) |
-| `src/api/endpoints.ts` | Add 4 endpoint constants |
-| `src/plugins/router.js` | Add 2 route entries with meta; import new endpoint constants |
-| `src/components/ViewSidebarItems.vue` | Parameterize endpoint and title via `route.meta` |
+| `src/components/ViewSidebarItems.vue` | Parameterize location and title via `route.meta` |
+| `src/plugins/router.js` | Add 2 route entries with `location` and `title` meta |
 | `src/components/ViewAdmin.vue` | Add 2 nav links |
 
 ## What We Are NOT Doing
 
-- **No DB migrations** - the existing `site_data` table stores records keyed by
-  `loc` string, so new `loc` values work automatically.
-- **No new `.vue` components** - `ViewSidebarItems.vue` and `SidebarItem.vue` are
-  reused directly via parameterization.
-- **No changes to `SiteParams*.vue`** - this feature is about sidebar items, not
-  site-wide ad/promo params.
-- **No content-store schema changes** - the existing JSON shape (`{ items: [...] }`)
-  is reused as-is.
-
-## Commit Sequence
-
-1. `almsvc: Add Berks and State College sidebar loc constants`
-2. `router: Register berks-sidebar and statecollege-sidebar API routes`
-3. `endpoints: Add berks-sidebar and statecollege-sidebar API constants`
-4. `ViewSidebarItems: Parameterize endpoint and title via route meta`
-5. `router.js: Add berks-sidebar and statecollege-sidebar routes`
-6. `ViewAdmin: Add nav links for sub-site sidebar editors`
+- **No DB migrations** — the `site_data` table keys on `loc` string; new values
+  work automatically.
+- **No new `.vue` components** — `ViewSidebarItems.vue` and `SidebarItem.vue` are
+  reused via parameterization.
+- **No changes to `SiteParams*.vue`** — this is about sidebar items, not ad params.
+- **No new backend routes** — `/api/site-data?location=` covers everything after
+  Phase 0.
+- **No content-store schema changes** — existing JSON shape `{ items: [...] }`
+  reused as-is.
