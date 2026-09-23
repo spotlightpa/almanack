@@ -93,11 +93,6 @@ const nextPage = computedProp("next_page", (page) => ({
         :icon="['fas', 'bullhorn']"
       ></LinkRoute>
       <LinkRoute
-        label="Sidebar Items"
-        to="sidebar-items"
-        :icon="['fas', 'check-circle']"
-      ></LinkRoute>
-      <LinkRoute
         label="Donor Walls"
         to="donor-wall"
         :icon="['fas', 'receipt']"

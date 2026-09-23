@@ -184,14 +184,6 @@ let router = createRouter({
       },
     },
     {
-      path: "/admin/sidebar-items",
-      name: "sidebar-items",
-      component: load(() => import("@/components/ViewSidebarItems.vue")),
-      meta: {
-        requiresAuth: isSpotlightPAUser,
-      },
-    },
-    {
       path: "/admin/uploader",
       name: "image-uploader",
       component: load(() => import("@/components/ViewImageUploader.vue")),

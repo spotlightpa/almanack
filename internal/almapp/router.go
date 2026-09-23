@@ -79,8 +79,6 @@ func (app *appEnv) routes() http.Handler {
 		Control(mux, `POST /api/promotion-delete`, app.deletePromotion).
 		HandleFunc(mux, `POST /api/shared-article`, app.postSharedArticle).
 		HandleFunc(mux, `POST /api/shared-article-from-gdocs`, app.postSharedArticleFromGDocs).
-		HandleFunc(mux, `GET /api/sidebar`, app.siteDataGet(almsvc.SidebarLoc)).
-		HandleFunc(mux, `POST /api/sidebar`, app.siteDataSet(almsvc.SidebarLoc)).
 		Control(mux, `GET /api/site-data`, app.getSiteData).
 		Control(mux, `POST /api/site-data`, app.postSiteData).
 		HandleFunc(mux, `GET /api/site-params`, app.siteDataGet(almsvc.SiteParamsLoc)).
