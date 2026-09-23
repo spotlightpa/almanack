@@ -2,26 +2,15 @@ package almsvc
 
 import "fmt"
 
-const (
-	HomepageLoc     = "data/editorsPicks.json"
-	SidebarLoc      = "data/sidebar.json"
-	SiteParamsLoc   = "config/_default/params.json"
-	StateCollegeLoc = "data/stateCollege.json"
-	BerksLoc        = "data/berks.json"
-)
-
-var messageForLoc = map[string]string{
-	HomepageLoc:     "Setting homepage configuration",
-	SidebarLoc:      "Setting sidebar configuration",
-	SiteParamsLoc:   "Setting site parameters",
-	StateCollegeLoc: "Setting State College frontpage configuration",
-	BerksLoc:        "Setting Berks County frontpage configuration",
-}
-
 func MessageForLoc(loc string) string {
-	msg := messageForLoc[loc]
-	if msg == "" {
-		return fmt.Sprintf("Updating %s", loc)
+	if msg := map[string]string{
+		"config/_default/params.json": "Setting site parameters",
+		"data/berks.json":             "Setting Berks County frontpage configuration",
+		"data/editorsPicks.json":      "Setting homepage configuration",
+		"data/sidebar.json":           "Setting sidebar configuration", // Obsolete
+		"data/stateCollege.json":      "Setting State College frontpage configuration",
+	}[loc]; msg != "" {
+		return msg
 	}
-	return msg
+	return fmt.Sprintf("Updating %s", loc)
 }
