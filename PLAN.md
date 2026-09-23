@@ -1,23 +1,19 @@
-# Plan: Sub-site Sticky Ad Params (Berks & State College)
+# Plan: Sub-site Sidebar Sticky Items (Berks & State College)
 
 > **Implementation order:** Phase 0 (consolidation + cleanup) merges to master
 > first as a standalone PR. Phase 1 (the new feature) builds on top of it.
 
 ## Phase 0: Consolidation & Cleanup (prerequisite, lands on master first)
 
-### 0a — Delete the sidebar items feature
+### 0a — Remove main-site sidebar items wiring
 
-The sidebar items feature (`ViewSidebarItems.vue`, `SidebarItem.vue`, the
-`/api/sidebar` route, the `SidebarLoc` constant, and the nav link) is unused and
-can be removed entirely. This is the right time to do it since Phase 1 was
-originally going to add more sidebar machinery on top of it.
-
-Files to touch:
+The main-site sidebar items feature is unused and being dropped. However,
+`ViewSidebarItems.vue` and `SidebarItem.vue` are the right components for Phase 1
+(sub-site sidebar stickies), so **the components themselves are kept** — only
+their main-site wiring is removed:
 
 | File | Change |
 |---|---|
-| `src/components/ViewSidebarItems.vue` | Delete |
-| `src/components/SidebarItem.vue` | Delete |
 | `src/api/endpoints.ts` | Remove `getSidebar`, `saveSidebar` |
 | `src/plugins/router.js` | Remove `sidebar-items` route |
 | `src/components/ViewAdmin.vue` | Remove "Sidebar Items" nav link |
@@ -26,11 +22,10 @@ Files to touch:
 
 ### 0b — Consolidate site-data endpoints
 
-Right now `GET/POST /api/sidebar` (deleted above) and `GET/POST /api/site-params`
-are special-cased aliases for `GET/POST /api/site-data?location=<loc>` — the
-exact same Go handler, with the loc hard-coded in the route. `ViewFrontpageEditor.vue`
-already uses the generic `?location=` pattern. Extend that pattern to
-`ViewSiteParams.vue` and remove the redundant route pair.
+`GET/POST /api/site-params` is a special-cased alias for
+`GET/POST /api/site-data?location=<loc>` — same handler, loc hard-coded in the
+route. `ViewFrontpageEditor.vue` already uses the generic `?location=` pattern.
+Extend that to `ViewSiteParams.vue` and remove the redundant route pair.
 
 | File | Change |
 |---|---|
@@ -42,86 +37,80 @@ already uses the generic `?location=` pattern. Extend that pattern to
 
 ### Phase 0 commit sequence
 
-1. `SidebarItem, ViewSidebarItems: Delete unused sidebar items feature`
-2. `endpoints, router: Remove /api/sidebar and sidebar-items route`
-3. `ViewSiteParams: Use /api/site-data?location= instead of /api/site-params`
-4. `endpoints, router: Remove /api/site-params special-case route`
+1. `endpoints, router, almsvc: Remove main-site sidebar items wiring`
+2. `ViewSiteParams: Use /api/site-data?location= instead of /api/site-params`
+3. `endpoints, router: Remove /api/site-params special-case route`
 
 ---
 
-## Phase 1: Sub-site Sticky Ad Params
+## Phase 1: Sub-site Sidebar Sticky Items
 
 ### Goal
 
-Allow Spotlight PA editors to configure sticky ad params (and potentially other
-ad slots) independently for the Berks and State College sub-sites, stored in:
+Allow Spotlight PA editors to curate sidebar sticky items independently for the
+Berks and State College sub-sites, using the same `ViewSidebarItems.vue` /
+`SidebarItem.vue` components already built for the main site. Stored in:
 
 - `data/berks-sidebar.json`
 - `data/statecollege-bar.json`
-
-These are analogous to the main site's `config/_default/params.json`, but scoped
-to each sub-site and containing only the params those sites need.
 
 ### Step 1 — Backend: Add loc constants
 
 **File: `internal/almsvc/site-data.go`**
 
 ```go
-BerksSiteParamsLoc        = "data/berks-sidebar.json"
-StateCollegeSiteParamsLoc = "data/statecollege-bar.json"
+BerksSidebarLoc        = "data/berks-sidebar.json"
+StateCollegeSidebarLoc = "data/statecollege-bar.json"
 ```
 
 Add to `messageForLoc`:
 
 ```go
-BerksSiteParamsLoc:        "Setting Berks County site parameters",
-StateCollegeSiteParamsLoc: "Setting State College site parameters",
+BerksSidebarLoc:        "Setting Berks County sidebar configuration",
+StateCollegeSidebarLoc: "Setting State College sidebar configuration",
 ```
 
-No new backend routes needed — `/api/site-data?location=` handles them
-automatically after Phase 0.
+No new backend routes needed — `/api/site-data?location=` handles them after
+Phase 0.
 
-### Step 2 — Frontend: Create `ViewSubSiteParams.vue`
+### Step 2 — Frontend: Parameterize `ViewSidebarItems.vue` via route meta
 
-Create a new view component modelled on `ViewSiteParams.vue` but:
+After Phase 0, `ViewSidebarItems.vue` still hard-codes
+`get(getSidebar)`/`post(saveSidebar, ...)`. Update it to use
+`getSiteData?location=` and read the location from `route.meta`, following the
+same pattern as `ViewFrontpageEditor.vue`.
 
-- Reads `route.meta.location` and `route.meta.title` instead of hard-coding the
-  main site params location.
-- Renders a sub-set of `SiteParams*.vue` child components appropriate to
-  sub-sites. At minimum: `SiteParamsSticky`. Other slots (rail, banner, etc.)
-  can be added here as needed — using the same `ref`/`saveData()` pattern
-  already established in `SiteParams.vue`.
-- The scheduling UI (add scheduled change, revert) is identical to
-  `ViewSiteParams.vue` and should be copied as-is.
-
-Because the main site params view includes many homepage and article slots that
-sub-sites don't have, a separate view component (rather than parameterizing
-`ViewSiteParams.vue`) is the right call — it keeps each view's component tree
-explicit and easy to adjust per-site without conditional clutter.
+- Import `useRoute` from `vue-router`.
+- Use `route.meta.location` (required — no main-site fallback needed now that the
+  main-site wiring is gone) for the `?location=` query param on both fetch and
+  save calls.
+- Use `route.meta.title` for the `<MetaHead>` title and breadcrumb label.
 
 ### Step 3 — Frontend: Add router entries
 
 **File: `src/plugins/router.js`**
 
+Add two routes adjacent to where `sidebar-items` used to be:
+
 ```js
 {
-  path: "/admin/berks-params",
-  name: "berks-params",
-  component: load(() => import("@/components/ViewSubSiteParams.vue")),
+  path: "/admin/berks-sidebar",
+  name: "berks-sidebar",
+  component: load(() => import("@/components/ViewSidebarItems.vue")),
   meta: {
     requiresAuth: isSpotlightPAUser,
     location: "data/berks-sidebar.json",
-    title: "Berks County Site Params",
+    title: "Berks County Sidebar",
   },
 },
 {
-  path: "/admin/statecollege-params",
-  name: "statecollege-params",
-  component: load(() => import("@/components/ViewSubSiteParams.vue")),
+  path: "/admin/statecollege-sidebar",
+  name: "statecollege-sidebar",
+  component: load(() => import("@/components/ViewSidebarItems.vue")),
   meta: {
     requiresAuth: isSpotlightPAUser,
     location: "data/statecollege-bar.json",
-    title: "State College Site Params",
+    title: "State College Sidebar",
   },
 },
 ```
@@ -135,23 +124,23 @@ Add two `<LinkRoute>` entries near the existing `berks-editor` /
 
 ```html
 <LinkRoute
-  label="Berks Site Params"
-  to="berks-params"
-  :icon="['fas', 'sliders-h']"
+  label="Berks Sidebar"
+  to="berks-sidebar"
+  :icon="['fas', 'check-circle']"
 ></LinkRoute>
 <LinkRoute
-  label="State College Site Params"
-  to="statecollege-params"
-  :icon="['fas', 'sliders-h']"
+  label="State College Sidebar"
+  to="statecollege-sidebar"
+  :icon="['fas', 'check-circle']"
 ></LinkRoute>
 ```
 
 ### Phase 1 commit sequence
 
-5. `almsvc: Add Berks and State College sub-site params loc constants`
-6. `ViewSubSiteParams: New view for sub-site ad param configuration`
-7. `router.js: Add berks-params and statecollege-params routes`
-8. `ViewAdmin: Add nav links for sub-site params editors`
+4. `almsvc: Add Berks and State College sidebar loc constants`
+5. `ViewSidebarItems: Parameterize location and title via route meta`
+6. `router.js: Add berks-sidebar and statecollege-sidebar routes`
+7. `ViewAdmin: Add nav links for sub-site sidebar editors`
 
 ---
 
@@ -161,8 +150,6 @@ Add two `<LinkRoute>` entries near the existing `berks-editor` /
 
 | File | Change |
 |---|---|
-| `src/components/ViewSidebarItems.vue` | **Delete** |
-| `src/components/SidebarItem.vue` | **Delete** |
 | `src/components/ViewSiteParams.vue` | Use `getSiteData?location=` instead of `getSiteParams` |
 | `src/api/endpoints.ts` | Remove `getSidebar`, `saveSidebar`, `getSiteParams`, `postSiteParams` |
 | `src/plugins/router.js` | Remove `sidebar-items` route |
@@ -175,7 +162,7 @@ Add two `<LinkRoute>` entries near the existing `berks-editor` /
 | File | Change |
 |---|---|
 | `internal/almsvc/site-data.go` | Add 2 loc constants + 2 `messageForLoc` entries |
-| `src/components/ViewSubSiteParams.vue` | **New** — sub-site params view with `SiteParamsSticky` (et al.) |
+| `src/components/ViewSidebarItems.vue` | Parameterize location and title via `route.meta` |
 | `src/plugins/router.js` | Add 2 route entries with `location` and `title` meta |
 | `src/components/ViewAdmin.vue` | Add 2 nav links |
 
@@ -183,5 +170,6 @@ Add two `<LinkRoute>` entries near the existing `berks-editor` /
 
 - **No DB migrations** — `site_data` keys on `loc` string; new values work automatically.
 - **No new backend routes** — `/api/site-data?location=` covers everything after Phase 0.
-- **No changes to existing `SiteParams*.vue` components** — they are reused as-is.
-- **No content-store schema changes** — same JSON shape as main site params.
+- **No deleting `ViewSidebarItems.vue` or `SidebarItem.vue`** — they're reused as-is for Phase 1.
+- **No changes to `SiteParams*.vue`** — the sticky slider in those components is a different UI element; sub-site sidebar stickies use the sidebar items pattern.
+- **No content-store schema changes** — same JSON shape as `data/sidebar.json`.
