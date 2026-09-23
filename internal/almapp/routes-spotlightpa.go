@@ -756,65 +756,47 @@ func (app *appEnv) postPageCreate(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func (app *appEnv) siteDataGet(loc string) http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		app.logStart(r, "location", loc)
-
-		type response struct {
-			Configs []db.SiteDatum `json:"configs"`
-		}
-		var (
-			res response
-			err error
-		)
-		res.Configs, err = app.svc.Queries.GetSiteData(r.Context(), loc)
-		if err != nil {
-			app.replyErr(w, r, err)
-			return
-		}
-		app.replyJSON(http.StatusOK, w, res)
-	}
-}
-
 func (app *appEnv) getSiteData(w http.ResponseWriter, r *http.Request) http.Handler {
 	loc := r.URL.Query().Get("location")
-	return app.siteDataGet(loc)
-}
-
-func (app *appEnv) siteDataSet(loc string) http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		app.logStart(r, "location", loc)
-
-		var req struct {
-			Configs []almsvc.ScheduledSiteConfig `json:"configs"`
-		}
-		if !app.readJSON(w, r, &req) {
-			return
-		}
-		if len(req.Configs) < 1 {
-			app.replyErr(w, r, resperr.E{M: "No schedulable items provided"})
-			return
-		}
-
-		var (
-			res struct {
-				Configs []db.SiteDatum `json:"configs"`
-			}
-			err error
-		)
-		res.Configs, err = app.svc.UpdateSiteConfig(r.Context(), loc, req.Configs)
-		if err != nil {
-			app.replyErr(w, r, err)
-			return
-		}
-
-		app.replyJSON(http.StatusOK, w, res)
+	app.logStart(r, "location", loc)
+	type response struct {
+		Configs []db.SiteDatum `json:"configs"`
 	}
+	var (
+		res response
+		err error
+	)
+	res.Configs, err = app.svc.Queries.GetSiteData(r.Context(), loc)
+	if err != nil {
+		return app.jsonErr(err)
+	}
+	return app.jsonOK(res)
 }
 
 func (app *appEnv) postSiteData(w http.ResponseWriter, r *http.Request) http.Handler {
 	loc := r.URL.Query().Get("location")
-	return app.siteDataSet(loc)
+
+	app.logStart(r, "location", loc)
+	var req struct {
+		Configs []almsvc.ScheduledSiteConfig `json:"configs"`
+	}
+	if !app.readJSON(w, r, &req) {
+		return nil
+	}
+	if len(req.Configs) < 1 {
+		return app.jsonErr(resperr.E{M: "No schedulable items provided"})
+	}
+	var (
+		res struct {
+			Configs []db.SiteDatum `json:"configs"`
+		}
+		err error
+	)
+	res.Configs, err = app.svc.UpdateSiteConfig(r.Context(), loc, req.Configs)
+	if err != nil {
+		return app.jsonErr(err)
+	}
+	return app.jsonOK(res)
 }
 
 func (app *appEnv) listPagesByFTS(w http.ResponseWriter, r *http.Request) {
