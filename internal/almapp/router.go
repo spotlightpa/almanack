@@ -80,9 +80,7 @@ func (app *appEnv) routes() http.Handler {
 		HandleFunc(mux, `POST /api/shared-article`, app.postSharedArticle).
 		HandleFunc(mux, `POST /api/shared-article-from-gdocs`, app.postSharedArticleFromGDocs).
 		Control(mux, `GET /api/site-data`, app.getSiteData).
-		Control(mux, `POST /api/site-data`, app.postSiteData).
-		HandleFunc(mux, `GET /api/site-params`, app.siteDataGet(almsvc.SiteParamsLoc)).
-		HandleFunc(mux, `POST /api/site-params`, app.siteDataSet(almsvc.SiteParamsLoc))
+		Control(mux, `POST /api/site-data`, app.postSiteData)
 	// End spotlight endpoints
 
 	// Don't trust this middleware!

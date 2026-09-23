@@ -1,13 +1,15 @@
 <script setup>
 import { ref, watch } from "vue";
 
-import { get, post, getSiteParams, postSiteParams } from "@/api/client.ts";
+import { get, post, getSiteData, postSiteData } from "@/api/client.ts";
 import { makeState } from "@/api/loader.ts";
 import { useFileList } from "@/api/file-list.js";
 
 import { formatDateTime, today, tomorrow } from "@/utils/time-format.ts";
 import useScrollTo from "@/utils/use-scroll-to.js";
 import maybeDate from "@/utils/maybe-date.ts";
+
+const query = `?location=config/_default/params.json`;
 
 class SiteParamsModel {
   constructor(config) {
@@ -32,7 +34,7 @@ const nextSchedule = ref(null);
 const { exec, apiStateRefs } = makeState();
 
 function fetch() {
-  return exec(() => get(getSiteParams));
+  return exec(() => get(getSiteData + query));
 }
 
 const [container, scrollTo] = useScrollTo();
@@ -55,7 +57,7 @@ function removeScheduledConfig(i) {
 
 async function save() {
   let configs = siteParamsComps.value.map((comp) => comp.saveParams());
-  return exec(() => post(postSiteParams, { configs }));
+  return exec(() => post(postSiteData + query, { configs }));
 }
 
 watch(apiStateRefs.rawData, (data) => {
