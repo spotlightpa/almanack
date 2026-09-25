@@ -6,7 +6,7 @@ import { makeState } from "@/api/loader.ts";
 import { useFileList } from "@/api/file-list.js";
 
 import { formatDateTime, today, tomorrow } from "@/utils/time-format.ts";
-import useScrollTo from "@/utils/use-scroll-to.js";
+import useScrollTo from "@/utils/use-scroll-to.ts";
 import maybeDate from "@/utils/maybe-date.ts";
 
 const query = `?location=config/_default/params.json`;
