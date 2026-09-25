@@ -1,4 +1,4 @@
-import { reactive, computed, toRefs } from "vue";
+import { ref, computed } from "vue";
 
 import { get, post, listFiles, updateFile, uploadFile } from "./client.ts";
 import { makeState } from "@/api/loader.ts";
@@ -15,17 +15,13 @@ interface FileListResponse {
 export function useFileList() {
   let { apiStateRefs, exec } = makeState();
 
-  const state = reactive({
-    files: computed(() => {
-      return (
-        (apiStateRefs.rawData.value as FileListResponse | null)?.files ?? []
-      );
-    }),
-    isDragging: false,
-    isUploading: false,
-    uploadError: null as unknown,
-    fileURL: null as string | null,
-  });
+  const files = computed(
+    () => (apiStateRefs.rawData.value as FileListResponse | null)?.files ?? []
+  );
+  const isDragging = ref(false);
+  const isUploading = ref(false);
+  const uploadError = ref<unknown>(null);
+  const fileURL = ref<string | null>(null);
 
   let actions = {
     async fetch() {
@@ -44,21 +40,21 @@ export function useFileList() {
       }
     },
     async uploadFileInput(ev: { target: { files: FileList | File[] } }) {
-      let { files } = ev.target;
-      state.isUploading = true;
-      state.uploadError = null;
+      let { files: inputFiles } = ev.target;
+      isUploading.value = true;
+      uploadError.value = null;
 
-      for (let body of files) {
-        [state.fileURL, state.uploadError] = await uploadFile(body);
-        if (state.uploadError) {
+      for (let body of inputFiles) {
+        [fileURL.value, uploadError.value] = await uploadFile(body);
+        if (uploadError.value) {
           break;
         }
       }
-      state.isUploading = false;
+      isUploading.value = false;
       await actions.fetch();
     },
     dropFile(ev: DragEvent) {
-      state.isDragging = false;
+      isDragging.value = false;
       let files = ev.dataTransfer?.files ?? [];
       return actions.uploadFileInput({ target: { files } });
     },
@@ -68,7 +64,11 @@ export function useFileList() {
 
   return {
     ...apiStateRefs,
-    ...toRefs(state),
+    files,
+    isDragging,
+    isUploading,
+    uploadError,
+    fileURL,
     ...actions,
   };
 }
