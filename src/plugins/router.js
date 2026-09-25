@@ -235,6 +235,26 @@ let router = createRouter({
       },
     },
     {
+      path: "/admin/berks-sidebar",
+      name: "berks-sidebar",
+      component: load(() => import("@/components/ViewSubsiteSidebar.vue")),
+      meta: {
+        requiresAuth: isSpotlightPAUser,
+        location: "data/berks-sidebar.json",
+        title: "Berks County Sidebar",
+      },
+    },
+    {
+      path: "/admin/statecollege-sidebar",
+      name: "statecollege-sidebar",
+      component: load(() => import("@/components/ViewSubsiteSidebar.vue")),
+      meta: {
+        requiresAuth: isSpotlightPAUser,
+        location: "data/statecollege-sidebar.json",
+        title: "State College Sidebar",
+      },
+    },
+    {
       path: "/admin/topics",
       name: "topic-pages",
       component: load(() => import("@/components/ViewTaxonomyList.vue")),
