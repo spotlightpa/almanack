@@ -1,7 +1,7 @@
 <script setup>
 import { ref } from "vue";
 
-defineProps({ params: Object, fileProps: Object });
+defineProps({ params: Object, fileProps: Object, open: Boolean });
 
 const imageSet = ref(null);
 
@@ -13,7 +13,7 @@ defineExpose({
 </script>
 
 <template>
-  <details class="mt-4">
+  <details class="mt-4" :open="open ?? null">
     <summary class="title is-4">Rail sticky ad</summary>
     <SiteParamsImageSet
       ref="imageSet"
