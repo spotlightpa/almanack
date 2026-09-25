@@ -21,7 +21,7 @@ export function useFileList() {
   const isDragging = ref(false);
   const isUploading = ref(false);
   const uploadError = ref<unknown>(null);
-  const fileURL = ref("");
+  const fileURL = ref<string | null>(null);
 
   let actions = {
     async fetch() {
@@ -45,9 +45,7 @@ export function useFileList() {
       uploadError.value = null;
 
       for (let body of inputFiles) {
-        let [url, err] = await uploadFile(body);
-        fileURL.value = url ?? "";
-        uploadError.value = err;
+        [fileURL.value, uploadError.value] = await uploadFile(body);
         if (uploadError.value) {
           break;
         }
