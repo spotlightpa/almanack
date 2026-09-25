@@ -3,7 +3,7 @@ import { ref, watch } from "vue";
 
 import { get, post, getSiteData, postSiteData } from "@/api/client.ts";
 import { makeState } from "@/api/loader.ts";
-import { useFileList } from "@/api/file-list.js";
+import { useFileList } from "@/api/file-list.ts";
 
 import { formatDateTime, today, tomorrow } from "@/utils/time-format.ts";
 import useScrollTo from "@/utils/use-scroll-to.ts";

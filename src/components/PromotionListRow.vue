@@ -5,7 +5,7 @@ import { post, postPromotion, deletePromotion } from "@/api/client.ts";
 import { makePromotion } from "@/api/promotion.ts";
 import { formatDateTime } from "@/utils/time-format.ts";
 import { makeState } from "@/api/loader.ts";
-import { useFileList } from "@/api/file-list.js";
+import { useFileList } from "@/api/file-list.ts";
 
 const props = defineProps({
   modelValue: {
