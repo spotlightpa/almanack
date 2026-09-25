@@ -9,7 +9,11 @@ import { formatDateTime, today, tomorrow } from "@/utils/time-format.ts";
 import useScrollTo from "@/utils/use-scroll-to.js";
 import maybeDate from "@/utils/maybe-date.ts";
 
-const query = `?location=config/_default/params.json`;
+import { useRoute } from "vue-router";
+
+const route = useRoute();
+
+const query = `?location=` + route.meta.location;
 
 class SiteParamsModel {
   constructor(config) {
@@ -78,17 +82,17 @@ fetch();
 
 <template>
   <MetaHead>
-    <title>Sitewide Settings • Spotlight PA Almanack</title>
+    <title>{{ route.meta.title }} • Spotlight PA Almanack</title>
   </MetaHead>
   <div>
     <div class="px-2">
       <BulmaBreadcrumbs
         :links="[
           { name: 'Admin', to: { name: 'admin' } },
-          { name: 'Sitewide Settings', to: { name: 'site-params' } },
+          { name: route.meta.title, to: '' },
         ]"
       ></BulmaBreadcrumbs>
-      <h1 class="title">Sitewide Settings</h1>
+      <h1 class="title">{{ route.meta.title }}</h1>
     </div>
     <div v-if="scheduledConfigs.length" ref="container">
       <div
@@ -104,11 +108,11 @@ fetch();
           }}
         </h2>
 
-        <SiteParams
+        <SubsiteParams
           ref="siteParamsComps"
           :params="params"
           :file-props="files"
-        ></SiteParams>
+        ></SubsiteParams>
 
         <button
           v-if="!params.isCurrent"
@@ -119,41 +123,41 @@ fetch();
           Remove {{ formatDateTime(params.scheduleFor) }}
         </button>
       </div>
-      <h2 class="mt-2 mb-0 title is-size-3">Add a scheduled change</h2>
-      <BulmaDateTime
-        v-model="nextSchedule"
-        label="Schedule for"
-        icon="user-clock"
-      >
-        <p class="mt-2 buttons">
-          <button
-            type="button"
-            :disabled="!nextSchedule || nextSchedule < new Date() || null"
-            class="button is-small is-success has-text-weight-semibold"
-            @click="addScheduledConfig"
-          >
-            <span class="icon is-size-6">
-              <font-awesome-icon :icon="['fas', 'plus']"></font-awesome-icon>
-            </span>
-            <span>Add</span>
-          </button>
-          <button
-            class="button is-small is-light has-text-weight-semibold"
-            type="button"
-            @click="nextSchedule = today()"
-          >
-            Today
-          </button>
-          <button
-            type="button"
-            class="button is-small is-light has-text-weight-semibold"
-            @click="nextSchedule = tomorrow()"
-          >
-            Tomorrow
-          </button>
-        </p>
-      </BulmaDateTime>
     </div>
+    <h2 class="mt-2 mb-0 title is-size-3">Add a scheduled change</h2>
+    <BulmaDateTime
+      v-model="nextSchedule"
+      label="Schedule for"
+      icon="user-clock"
+    >
+      <p class="mt-2 buttons">
+        <button
+          type="button"
+          :disabled="!nextSchedule || nextSchedule < new Date() || null"
+          class="button is-small is-success has-text-weight-semibold"
+          @click="addScheduledConfig"
+        >
+          <span class="icon is-size-6">
+            <font-awesome-icon :icon="['fas', 'plus']"></font-awesome-icon>
+          </span>
+          <span>Add</span>
+        </button>
+        <button
+          class="button is-small is-light has-text-weight-semibold"
+          type="button"
+          @click="nextSchedule = today()"
+        >
+          Today
+        </button>
+        <button
+          type="button"
+          class="button is-small is-light has-text-weight-semibold"
+          @click="nextSchedule = tomorrow()"
+        >
+          Tomorrow
+        </button>
+      </p>
+    </BulmaDateTime>
     <div class="mt-5 buttons">
       <button
         type="button"
