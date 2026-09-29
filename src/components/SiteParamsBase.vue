@@ -1,10 +1,11 @@
 <script setup>
 import { formatDateTime, today, tomorrow } from "@/utils/time-format.ts";
+import { useSiteParamsEditor } from "@/api/use-site-params-editor.ts";
 
 const props = defineProps({
   title: { type: String, required: true },
   breadcrumbTo: { type: [String, Object], default: "" },
-  editor: { type: Object, required: true },
+  location: { type: String, required: true },
 });
 
 const {
@@ -20,7 +21,7 @@ const {
   save,
   addScheduledConfig,
   removeScheduledConfig,
-} = props.editor;
+} = useSiteParamsEditor(props.location);
 </script>
 
 <template>

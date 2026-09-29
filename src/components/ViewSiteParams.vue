@@ -1,17 +1,13 @@
-<script setup>
-import { useSiteParamsEditor } from "@/api/use-site-params-editor.ts";
-
-const editor = useSiteParamsEditor("config/_default/params.json");
-</script>
+<script setup></script>
 
 <template>
   <MetaHead>
     <title>Sitewide Settings • Spotlight PA Almanack</title>
   </MetaHead>
-  <ViewSiteParamsBase
+  <SiteParamsBase
     title="Sitewide Settings"
+    location="config/_default/params.json"
     :breadcrumb-to="{ name: 'site-params' }"
-    :editor="editor"
   >
     <template #form="{ params, fileProps, setRef }">
       <SiteParams
@@ -20,5 +16,5 @@ const editor = useSiteParamsEditor("config/_default/params.json");
         :file-props="fileProps"
       ></SiteParams>
     </template>
-  </ViewSiteParamsBase>
+  </SiteParamsBase>
 </template>
