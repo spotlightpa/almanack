@@ -15,9 +15,9 @@ func TestImageCAS(t *testing.T) {
 		{"Hello, World!", "image/jpeg", "cas/cpme-4zc8-f4m3-gcdp.jpeg"},
 	}
 	for _, tc := range cases {
-		t.Run("", func(t *testing.T) {
+		assert.FailsNow(t).Run("", func(be assert.TB) {
 			got := makeCASaddress([]byte(tc.body), tc.ct)
-			assert.FailsNow(t).Equal(got, tc.want)
+			be.Equal(got, tc.want)
 		})
 		var s string
 		body := []byte(tc.body)

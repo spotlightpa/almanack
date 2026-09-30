@@ -23,7 +23,7 @@ func TestMakeImageName(t *testing.T) {
 		"json":      {"application/json", ".json"},
 		"text":      {"text/plain", ".plain"},
 	}
-	assert.Run(t, cases, func(be assert.TB, tc testcase) {
+	assert.RunAll(t, cases, func(be assert.TB, tc testcase) {
 		got := makeImageName(tc.ct)
 		be.
 			Equal(path.Ext(got), tc.want).

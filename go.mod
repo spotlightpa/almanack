@@ -13,18 +13,18 @@ require (
 	github.com/aws/aws-sdk-go-v2/service/s3 v1.110.0
 	github.com/carlmjohnson/flowmatic v0.23.4
 	github.com/carlmjohnson/requests v0.26.1
-	github.com/earthboundkid/assert v0.26.6
+	github.com/earthboundkid/assert v0.26.7
 	github.com/earthboundkid/bytemap/v2 v2.24.1
-	github.com/earthboundkid/crockford/v2 v2.25.3
+	github.com/earthboundkid/crockford/v2 v2.26.1
 	github.com/earthboundkid/emailx/v2 v2.24.1
 	github.com/earthboundkid/errorx/v2 v2.25.1
-	github.com/earthboundkid/flagx/v2 v2.25.1
+	github.com/earthboundkid/flagx/v2 v2.26.1
 	github.com/earthboundkid/gateway/v2 v2.26.1
-	github.com/earthboundkid/mid v0.26.1
-	github.com/earthboundkid/resperr/v2 v2.25.1
+	github.com/earthboundkid/mid v0.26.2
+	github.com/earthboundkid/resperr/v2 v2.26.1
 	github.com/earthboundkid/slackhook/v2 v2.25.1
 	github.com/earthboundkid/versioninfo/v2 v2.24.1
-	github.com/earthboundkid/xhtml v0.26.1
+	github.com/earthboundkid/xhtml v0.26.2
 	github.com/gabriel-vasile/mimetype v1.4.15
 	github.com/getsentry/sentry-go v0.49.0
 	github.com/go-chi/chi/v5 v5.3.2
@@ -36,9 +36,9 @@ require (
 	github.com/microcosm-cc/bluemonday v1.0.27
 	github.com/tdewolff/minify/v2 v2.24.17
 	gocloud.dev v0.46.0
-	golang.org/x/net v0.58.0
+	golang.org/x/net v0.59.0
 	golang.org/x/oauth2 v0.36.0
-	golang.org/x/text v0.41.0
+	golang.org/x/text v0.42.0
 	google.golang.org/api v0.296.0
 	gopkg.in/Iwark/spreadsheet.v2 v2.0.0-20230915040305-7677e8164883
 )
@@ -99,9 +99,9 @@ require (
 	go.opentelemetry.io/otel/sdk v1.46.0 // indirect
 	go.opentelemetry.io/otel/sdk/metric v1.46.0 // indirect
 	go.opentelemetry.io/otel/trace v1.46.0 // indirect
-	golang.org/x/crypto v0.55.0 // indirect
-	golang.org/x/sync v0.22.0 // indirect
-	golang.org/x/sys v0.47.0 // indirect
+	golang.org/x/crypto v0.57.0 // indirect
+	golang.org/x/sync v0.23.0 // indirect
+	golang.org/x/sys v0.48.0 // indirect
 	golang.org/x/xerrors v0.0.0-20240903120638-7835f813f4da // indirect
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20260831171406-18b4a7587f8a // indirect
 	google.golang.org/grpc v1.83.2 // indirect
