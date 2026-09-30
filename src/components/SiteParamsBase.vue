@@ -1,6 +1,12 @@
 <script setup lang="ts">
+import { ref, type Ref, watch } from "vue";
+
 import { formatDateTime, today, tomorrow } from "@/utils/time-format.ts";
-import { useSiteParamsEditor } from "@/api/use-site-params-editor.ts";
+import { get, post, getSiteData, postSiteData } from "@/api/client.ts";
+import { makeState } from "@/api/loader.ts";
+import { useFileList } from "@/api/file-list.ts";
+import useScrollTo from "@/utils/use-scroll-to.ts";
+import maybeDate from "@/utils/maybe-date.ts";
 
 const props = defineProps({
   title: { type: String, required: true },
@@ -8,20 +14,78 @@ const props = defineProps({
   location: { type: String, required: true },
 });
 
-const {
-  scheduledConfigs,
-  siteParamsComps,
-  nextSchedule,
-  container,
-  isLoading,
-  isLoadingThrottled,
-  error,
-  files,
-  fetch,
-  save,
-  addScheduledConfig,
-  removeScheduledConfig,
-} = useSiteParamsEditor(props.location);
+class SiteParamsModel {
+  scheduleFor: Date | null;
+  publishedAt: Date | null;
+  isCurrent: boolean;
+  data: Record<string, unknown>;
+
+  constructor(config: Record<string, unknown>) {
+    this.scheduleFor = maybeDate(config, "schedule_for");
+    this.publishedAt = maybeDate(config, "published_at");
+    this.isCurrent = !!this.publishedAt;
+    this.data = (config.data ?? {}) as Record<string, unknown>;
+  }
+
+  toJSON() {
+    return {
+      schedule_for: this.scheduleFor,
+      data: this.data,
+    };
+  }
+}
+
+const query = `?location=${props.location}`;
+
+const scheduledConfigs = ref<SiteParamsModel[]>([]);
+const siteParamsComps = ref<{ saveParams(): unknown }[]>([]);
+const nextSchedule = ref<Date | null>(null);
+
+const { exec, apiStateRefs } = makeState();
+
+function fetch() {
+  return exec(() => get(getSiteData + query));
+}
+
+const [container, scrollTo] = useScrollTo();
+
+async function addScheduledConfig() {
+  let lastParams = scheduledConfigs.value[
+    scheduledConfigs.value.length - 1
+  ] ?? { data: {} };
+  scheduledConfigs.value.push(
+    new SiteParamsModel({
+      ...JSON.parse(JSON.stringify(lastParams)),
+      schedule_for: nextSchedule.value,
+    })
+  );
+  nextSchedule.value = null;
+  await scrollTo();
+}
+
+function removeScheduledConfig(i: number) {
+  scheduledConfigs.value.splice(i, 1);
+}
+
+async function save() {
+  let configs = siteParamsComps.value.map((comp) => comp.saveParams());
+  return exec(() => post(postSiteData + query, { configs }));
+}
+
+watch(apiStateRefs.rawData as Ref<Record<string, unknown>>, (data) => {
+  if (!data?.configs) {
+    return;
+  }
+  scheduledConfigs.value = (data.configs as Record<string, unknown>[]).map(
+    (cfg) => new SiteParamsModel(cfg)
+  );
+});
+
+const { isLoading, isLoadingThrottled, error } = apiStateRefs;
+
+const files = useFileList();
+
+fetch();
 </script>
 
 <template>
@@ -54,7 +118,7 @@ const {
           :params="params"
           :file-props="files"
           :set-ref="
-            (el) => {
+            (el: { saveParams(): unknown } | null) => {
               if (el) siteParamsComps[i] = el;
             }
           "
@@ -79,7 +143,7 @@ const {
       <p class="mt-2 buttons">
         <button
           type="button"
-          :disabled="!nextSchedule || nextSchedule < new Date() || null"
+          :disabled="!nextSchedule || nextSchedule < new Date() || undefined"
           class="button is-small is-success has-text-weight-semibold"
           @click="addScheduledConfig"
         >
@@ -108,7 +172,7 @@ const {
       <button
         type="button"
         class="button is-primary has-text-weight-semibold"
-        :disabled="isLoading || null"
+        :disabled="isLoading || undefined"
         :class="{ 'is-loading': isLoadingThrottled }"
         @click="save"
       >
@@ -117,7 +181,7 @@ const {
       <button
         type="button"
         class="button is-light has-text-weight-semibold"
-        :disabled="isLoading || null"
+        :disabled="isLoading || undefined"
         :class="{ 'is-loading': isLoadingThrottled }"
         @click="fetch"
       >
