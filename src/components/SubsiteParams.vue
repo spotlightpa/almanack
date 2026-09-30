@@ -3,14 +3,14 @@ import { ref } from "vue";
 
 const props = defineProps({ params: Object, fileProps: Object });
 
-const railSticky = ref();
+const railTop = ref();
 
 function saveParams() {
   return {
     schedule_for: props.params.scheduleFor,
     data: {
       ...props.params.data,
-      ...railSticky.value.saveData(),
+      ...railTop.value.saveData(),
     },
   };
 }
@@ -21,10 +21,9 @@ defineExpose({
 </script>
 
 <template>
-  <SiteParamsRailSticky
-    ref="railSticky"
+  <SiteParamsRailTop
+    ref="railTop"
     :file-props="fileProps"
     :params="params"
-    :open="true"
-  ></SiteParamsRailSticky>
+  ></SiteParamsRailTop>
 </template>
