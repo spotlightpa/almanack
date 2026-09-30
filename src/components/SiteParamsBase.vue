@@ -14,6 +14,13 @@ const props = defineProps({
   location: { type: String, required: true },
 });
 
+interface ParamComponent {
+  saveParams(): {
+    scheduleFor: Date;
+    data: Record<string, unknown>;
+  };
+}
+
 class SiteParamsModel {
   scheduleFor: Date | null;
   publishedAt: Date | null;
@@ -38,7 +45,7 @@ class SiteParamsModel {
 const query = `?location=${props.location}`;
 
 const scheduledConfigs = ref<SiteParamsModel[]>([]);
-const siteParamsComps = ref<{ saveParams(): unknown }[]>([]);
+const siteParamsComps = ref<ParamComponent[]>([]);
 const nextSchedule = ref<Date | null>(null);
 
 const { exec, apiStateRefs } = makeState();
@@ -118,7 +125,7 @@ fetch();
           :params="params"
           :file-props="files"
           :set-ref="
-            (el: { saveParams(): unknown } | null) => {
+            (el: ParamComponent | null) => {
               if (el) siteParamsComps[i] = el;
             }
           "
