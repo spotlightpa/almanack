@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 import { formatDateTime, today, tomorrow } from "@/utils/time-format.ts";
 import { useSiteParamsEditor } from "@/api/use-site-params-editor.ts";
 
