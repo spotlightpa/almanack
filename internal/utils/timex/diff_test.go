@@ -25,7 +25,7 @@ func TestEqualish(t *testing.T) {
 		a, b string
 		want bool
 	}
-	assert.Run(t, map[string]testcase{
+	assert.RunAll(t, map[string]testcase{
 		"both null":          {"", "", true},
 		"first null":         {"", "1:00:00", false},
 		"second null":        {"1:00:00", "", false},

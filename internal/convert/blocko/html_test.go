@@ -12,7 +12,7 @@ func TestIsEmpty(t *testing.T) {
 		in    string
 		empty bool
 	}
-	assert.Run(t, map[string]testcase{
+	assert.RunAll(t, map[string]testcase{
 		"span":       {"<span></span>", true},
 		"div":        {"<div></div>", false},
 		"span-space": {"<span> </span>", true},

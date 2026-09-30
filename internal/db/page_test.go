@@ -12,7 +12,7 @@ import (
 )
 
 func TestToFromTOML(t *testing.T) {
-	assert.Run(t, map[string]db.Page{
+	assert.RunAll(t, map[string]db.Page{
 		"empty": {Frontmatter: db.Map{}},
 		"body":  {Frontmatter: db.Map{}, Body: "\n ## subhead ! \n"},
 		"fm": {Frontmatter: db.Map{
@@ -227,7 +227,7 @@ func TestSetURLPath(t *testing.T) {
 			"/news/2019/12/abc/",
 		},
 	}
-	assert.Run(t, cases, func(be assert.TB, tc testcase) {
+	assert.RunAll(t, cases, func(be assert.TB, tc testcase) {
 		tc.Page.SetURLPath()
 		be.
 			Equal(
@@ -340,7 +340,7 @@ func TestShouldPublishShouldNotify(t *testing.T) {
 			notify: false,
 		},
 	}
-	assert.Run(t, cases, func(be assert.TB, tc testcase) {
+	assert.RunAll(t, cases, func(be assert.TB, tc testcase) {
 		pub := tc.new.ShouldPublish()
 		notify := tc.new.ShouldNotify(&tc.old)
 		be.

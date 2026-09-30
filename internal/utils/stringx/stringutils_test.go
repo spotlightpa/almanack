@@ -23,8 +23,7 @@ func TestSlugifyURL(t *testing.T) {
 		{"Groß fæces", "gross-faeces"},
 	}
 	for _, tc := range cases {
-		t.Run(tc.input, func(t *testing.T) {
-			be := assert.FailsNow(t)
+		assert.FailsNow(t).Run(tc.input, func(be assert.TB) {
 			be.Equal(stringx.SlugifyURL(tc.input), tc.want)
 		})
 	}
@@ -42,8 +41,7 @@ func TestSlugifyFilename(t *testing.T) {
 		{"the (fort~Nightly)   news  ", "the-fort-nightly-news-"},
 	}
 	for _, tc := range cases {
-		t.Run(tc.input, func(t *testing.T) {
-			be := assert.FailsNow(t)
+		assert.FailsNow(t).Run(tc.input, func(be assert.TB) {
 			be.Equal(stringx.SlugifyFilename(tc.input), tc.want)
 		})
 	}
@@ -130,8 +128,8 @@ func TestTruncate(t *testing.T) {
 		{"1234567890", "12345…", 8},
 	}
 	for _, tc := range cases {
-		t.Run(tc.input, func(t *testing.T) {
-			assert.FailsNow(t).Equal(stringx.Truncate(tc.input, tc.max), tc.want)
+		assert.FailsNow(t).Run(tc.input, func(be assert.TB) {
+			be.Equal(stringx.Truncate(tc.input, tc.max), tc.want)
 		})
 	}
 }

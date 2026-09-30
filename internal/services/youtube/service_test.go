@@ -32,7 +32,7 @@ func TestBestThumbnailURL(t *testing.T) {
 		n    int
 		want string
 	}
-	assert.Run(t, map[string]testcase{
+	assert.RunAll(t, map[string]testcase{
 		"maxres available":  {0, "/maxresdefault.jpg$"},
 		"sd available":      {1, "/sddefault.jpg$"},
 		"nothing available": {10, "/default.jpg$"},
