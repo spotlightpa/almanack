@@ -11,7 +11,7 @@ var HTTPTransport http.RoundTripper
 
 func init() {
 	HTTPTransport = requests.LogTransport(http.DefaultTransport, logReq)
-	http.DefaultTransport = HTTPTransport
+	http.DefaultClient.Transport = HTTPTransport
 }
 
 func logReq(req *http.Request, res *http.Response, err error, duration time.Duration) {
