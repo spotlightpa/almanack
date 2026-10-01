@@ -39,7 +39,7 @@ require (
 	golang.org/x/net v0.59.0
 	golang.org/x/oauth2 v0.37.0
 	golang.org/x/text v0.42.0
-	google.golang.org/api v0.299.0
+	google.golang.org/api v0.300.0
 	gopkg.in/Iwark/spreadsheet.v2 v2.0.0-20230915040305-7677e8164883
 )
 
@@ -55,7 +55,7 @@ require (
 	github.com/aws/aws-sdk-go-v2 v1.47.1 // indirect
 	github.com/aws/aws-sdk-go-v2/aws/protocol/eventstream v1.7.20 // indirect
 	github.com/aws/aws-sdk-go-v2/feature/ec2/imds v1.20.1 // indirect
-	github.com/aws/aws-sdk-go-v2/feature/s3/transfermanager v0.4.12 // indirect
+	github.com/aws/aws-sdk-go-v2/feature/s3/transfermanager v0.4.13 // indirect
 	github.com/aws/aws-sdk-go-v2/internal/configsources v1.5.4 // indirect
 	github.com/aws/aws-sdk-go-v2/internal/endpoints/v2 v2.8.4 // indirect
 	github.com/aws/aws-sdk-go-v2/internal/v4a v1.5.4 // indirect
