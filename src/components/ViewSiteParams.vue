@@ -7,7 +7,6 @@
   <SiteParamsBase
     title="Sitewide Settings"
     location="config/_default/params.json"
-    :breadcrumb-to="{ name: 'site-params' }"
   >
     <template #form="{ params, fileProps, setRef }">
       <SiteParams

@@ -10,7 +10,6 @@ import maybeDate from "@/utils/maybe-date.ts";
 
 const props = defineProps({
   title: { type: String, required: true },
-  breadcrumbTo: { type: [String, Object], default: "" },
   location: { type: String, required: true },
 });
 
@@ -101,7 +100,7 @@ fetch();
       <BulmaBreadcrumbs
         :links="[
           { name: 'Admin', to: { name: 'admin' } },
-          { name: title, to: breadcrumbTo },
+          { name: title, to: {} },
         ]"
       ></BulmaBreadcrumbs>
       <h1 class="title">{{ title }}</h1>
