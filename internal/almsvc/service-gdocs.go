@@ -166,7 +166,9 @@ func (svc Services) processDocExternals(ctx context.Context, dbDoc *db.GDocsDoc,
 	for tbl, rows := range tableaux.Tables(docHTML) {
 		switch label := rows.Label(); label {
 		case "photo", "image", "photograph", "illustration", "illo",
-			"spl-photo", "partner-photo", "spl-image", "partner-image":
+			"spl-photo", "partner-photo", "spl-image", "partner-image",
+			"picture-wide", "photo-wide", "picture-left", "photo-left",
+			"picture-right", "photo-right":
 			if warning := svc.replaceImagePath(
 				ctx, tbl, rows, dbDoc.ExternalID, objID2Path,
 			); warning != "" {
