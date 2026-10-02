@@ -2,7 +2,12 @@
 import { ref } from "vue";
 import adImg from "@/assets/img/ad-rail.png";
 
-defineProps({ params: Object, fileProps: Object });
+defineProps({
+  params: Object,
+  fileProps: Object,
+  open: Boolean,
+  hideDemo: Boolean,
+});
 
 const imageSet = ref(null);
 
@@ -14,7 +19,7 @@ defineExpose({
 </script>
 
 <template>
-  <details class="mt-4">
+  <details class="mt-4" :open="open || undefined">
     <summary class="title is-4">Rail top ad</summary>
     <SiteParamsImageSet
       ref="imageSet"
@@ -27,6 +32,6 @@ defineExpose({
       label="Rail top ad is 640x535 square at the top of the rail sidebar"
       text="Show sidebar top ad"
     />
-    <img :src="adImg" class="ad-demo" style="" />
+    <img v-if="!hideDemo" :src="adImg" class="ad-demo" style="" />
   </details>
 </template>

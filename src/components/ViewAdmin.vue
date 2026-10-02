@@ -88,6 +88,16 @@ const nextPage = computedProp("next_page", (page) => ({
         :icon="['fas', 'sliders-h']"
       ></LinkRoute>
       <LinkRoute
+        label="Berks Sidebar"
+        to="berks-sidebar"
+        :icon="['fas', 'sliders-h']"
+      ></LinkRoute>
+      <LinkRoute
+        label="State College Sidebar"
+        to="statecollege-sidebar"
+        :icon="['fas', 'sliders-h']"
+      ></LinkRoute>
+      <LinkRoute
         label="Saved Promotions"
         to="promotions"
         :icon="['fas', 'bullhorn']"
