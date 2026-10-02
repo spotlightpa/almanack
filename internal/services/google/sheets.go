@@ -3,6 +3,7 @@ package google
 import (
 	"context"
 	"fmt"
+	"iter"
 	"net/http"
 	"strings"
 
@@ -128,12 +129,24 @@ func (sm *SheetMap) Next() bool {
 	}
 }
 
+func (sm *SheetMap) Rows() iter.Seq[int] {
+	return func(yield func(int) bool) {
+		for sm.Next() {
+			if !yield(sm.row) {
+				return
+			}
+		}
+	}
+}
+
 // Field returns the value in the currently loaded row of the column
 // corresponding to fieldname.
 func (sm *SheetMap) Field(fieldname string) string {
 	fieldname = strings.ToLower(fieldname)
 	if idx, ok := sm.idx[fieldname]; ok {
-		return strings.TrimSpace(sm.sheet.Rows[sm.row][idx].Value)
+		if idx < len(sm.sheet.Rows[sm.row]) {
+			return strings.TrimSpace(sm.sheet.Rows[sm.row][idx].Value)
+		}
 	}
 	return ""
 }
