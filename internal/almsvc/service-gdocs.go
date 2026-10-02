@@ -170,14 +170,14 @@ func (svc Services) processDocExternals(ctx context.Context, dbDoc *db.GDocsDoc,
 			"picture-wide", "photo-wide", "picture-left", "photo-left",
 			"picture-right", "photo-right":
 			if warning := svc.replaceImagePath(
-				ctx, tbl.Node, tbl.Cells, dbDoc.ExternalID, objID2Path,
+				ctx, tbl, dbDoc.ExternalID, objID2Path,
 			); warning != "" {
 				warnings = append(warnings, warning)
 			}
 
 		case "metadata", "info":
 			if warning := svc.replaceMetadataImagePath(
-				ctx, tbl.Node, tbl.Cells, dbDoc.ExternalID, objID2Path,
+				ctx, tbl, dbDoc.ExternalID, objID2Path,
 			); warning != "" {
 				warnings = append(warnings, warning)
 			}
@@ -188,50 +188,97 @@ func (svc Services) processDocExternals(ctx context.Context, dbDoc *db.GDocsDoc,
 
 func (svc Services) replaceImagePath(
 	ctx context.Context,
-	tbl *html.Node,
-	rows tableaux.Cells,
+	tbl tableaux.Table,
 	externalID string,
 	objID2Path map[string]string,
 ) (warning string) {
-	if path := xhtml.TextContent(rows.Value("path")); path != "" {
+	if path := xhtml.TextContent(tbl.Value("path")); path != "" {
 		return ""
 	}
-
 	imageEmbed := &db.EmbedImage{
-		Credit:  xhtml.TextContent(rows.Value("credit")),
-		Caption: xhtml.TextContent(rows.Value("caption")),
+		Credit:  xhtml.TextContent(tbl.Value("credit")),
+		Caption: xhtml.TextContent(tbl.Value("caption")),
 		Description: cmp.Or(
-			xhtml.TextContent(rows.Value("description")),
-			xhtml.TextContent(rows.Value("alt")),
+			xhtml.TextContent(tbl.Value("description")),
+			xhtml.TextContent(tbl.Value("alt")),
 		),
 	}
+	return svc.findAndReplaceImagePath(ctx, tbl, tbl.Node, externalID, objID2Path, imageEmbed)
+}
 
-	linkTag := xhtml.Select(tbl, xhtml.WithAtom(atom.A))
-	if href := xhtml.Attr(linkTag, "href"); href != "" {
+func (svc Services) replaceMetadataImagePath(
+	ctx context.Context,
+	tbl tableaux.Table,
+	externalID string,
+	objID2Path map[string]string,
+) (warning string) {
+	if path := cmp.Or(
+		xhtml.TextContent(tbl.Value("lede image path")),
+		xhtml.TextContent(tbl.Value("lead image path")),
+		xhtml.TextContent(tbl.Value("path")),
+	); path != "" {
+		return ""
+	}
+	cell := tbl.ValueOrNext("lede image")
+	if cell == nil {
+		cell = tbl.ValueOrNext("lead image")
+	}
+	if cell == nil {
+		return ""
+	}
+	imageEmbed := &db.EmbedImage{
+		Credit: cmp.Or(
+			xhtml.TextContent(tbl.Value("lede image credit")),
+			xhtml.TextContent(tbl.Value("lead image credit")),
+			xhtml.TextContent(tbl.Value("credit")),
+		),
+		Description: cmp.Or(
+			xhtml.TextContent(tbl.Value("lede image description")),
+			xhtml.TextContent(tbl.Value("lead image description")),
+			xhtml.TextContent(tbl.Value("lede image alt")),
+			xhtml.TextContent(tbl.Value("lead image alt")),
+			xhtml.TextContent(tbl.Value("alt")),
+		),
+	}
+	return svc.findAndReplaceImagePath(ctx, tbl, cell, externalID, objID2Path, imageEmbed)
+}
+
+func (svc Services) findAndReplaceImagePath(
+	ctx context.Context,
+	tbl tableaux.Table,
+	cell *html.Node,
+	externalID string,
+	objID2Path map[string]string,
+	imageEmbed *db.EmbedImage,
+) (warning string) {
+	// Look for a link to Google Drive or a link around an image
+	href := ""
+	if linkTag := xhtml.Select(cell, xhtml.WithAtom(atom.A)); linkTag != nil {
+		href = xhtml.Attr(linkTag, "href")
+	}
+
+	if href != "" {
 		path, err := svc.ReplaceAndUploadImageURL(ctx, href, imageEmbed.Description, imageEmbed.Credit)
 		switch {
 		case err == nil:
-			setRowValue(tbl, "path", path)
+			tbl.Set("path", path)
 			return ""
-
 		case errors.Is(err, requests.ErrValidator):
-			// Try looking up the image
-			break
+			// Try GDocs object-ID upload next
 		case err != nil:
 			l := almlog.FromContext(ctx)
-			l.ErrorContext(ctx, "ProcessGDocsDoc: ReplaceAndUploadImageURL", "err", err)
-			return fmt.Sprintf(
-				"An error occurred when processing images in table: %v.", err)
+			l.ErrorContext(ctx, "findAndReplaceImagePath: ReplaceAndUploadImageURL", "err", err)
+			return fmt.Sprintf("An error occurred when processing images: %v.", err)
 		}
 	}
 
-	image := xhtml.Select(tbl, xhtml.WithAtom(atom.Img))
+	image := xhtml.Select(cell, xhtml.WithAtom(atom.Img))
 	if image == nil {
 		return ""
 	}
 	objID := xhtml.Attr(image, "data-oid")
 	if path := objID2Path[objID]; path != "" {
-		setRowValue(tbl, "path", path)
+		tbl.Set("path", path)
 		return ""
 	}
 	src := xhtml.Attr(image, "src")
@@ -242,106 +289,10 @@ func (svc Services) replaceImagePath(
 		Embed:       imageEmbed,
 	}); uploadErr != nil {
 		l := almlog.FromContext(ctx)
-		l.ErrorContext(ctx, "ProcessGDocsDoc: UploadGDocsImage", "err", uploadErr)
-		return fmt.Sprintf(
-			"An error occurred when processing images in table: %v.", uploadErr)
+		l.ErrorContext(ctx, "findAndReplaceImagePath: UploadGDocsImage", "err", uploadErr)
+		return fmt.Sprintf("An error occurred when processing images: %v.", uploadErr)
 	}
-
-	setRowValue(tbl, "path", imageEmbed.Path)
-	return ""
-}
-
-func setRowValue(tbl *html.Node, key, value string) {
-	tr := xhtml.New("tr")
-	keyNode := xhtml.New("td")
-	xhtml.AppendText(keyNode, key)
-	tr.AppendChild(keyNode)
-
-	valueNode := xhtml.New("td")
-	xhtml.AppendText(valueNode, value)
-	tr.AppendChild(valueNode)
-
-	tbl.AppendChild(tr)
-}
-
-func (svc Services) replaceMetadataImagePath(
-	ctx context.Context,
-	tbl *html.Node,
-	rows tableaux.Cells,
-	externalID string,
-	objID2Path map[string]string,
-) string {
-	if path := cmp.Or(
-		xhtml.TextContent(rows.Value("lede image path")),
-		xhtml.TextContent(rows.Value("lead image path")),
-		xhtml.TextContent(rows.Value("path")),
-	); path != "" {
-		return ""
-	}
-	cell := rows.ValueOrNext("lede image")
-	if cell == nil {
-		cell = rows.ValueOrNext("lead image")
-	}
-	if cell == nil {
-		return ""
-	}
-	credit := cmp.Or(
-		xhtml.TextContent(rows.Value("lede image credit")),
-		xhtml.TextContent(rows.Value("lead image credit")),
-		xhtml.TextContent(rows.Value("credit")),
-	)
-	description := cmp.Or(
-		xhtml.TextContent(rows.Value("lede image description")),
-		xhtml.TextContent(rows.Value("lead image description")),
-		xhtml.TextContent(rows.Value("lede image alt")),
-		xhtml.TextContent(rows.Value("lead image alt")),
-		xhtml.TextContent(rows.Value("alt")),
-	)
-
-	linkTag := xhtml.Select(cell, xhtml.WithAtom(atom.A))
-	if href := xhtml.Attr(linkTag, "href"); href != "" {
-		path, err := svc.ReplaceAndUploadImageURL(ctx, href, description, credit)
-		switch {
-		case err == nil:
-			setRowValue(tbl, "path", path)
-			return ""
-		case errors.Is(err, requests.ErrValidator):
-			// Try image URL next
-		case err != nil:
-			l := almlog.FromContext(ctx)
-			l.ErrorContext(ctx, "ProcessGDocsDoc: replaceMetadata: ReplaceAndUploadImageURL",
-				"err", err)
-			return fmt.Sprintf("An error occurred when processing the lede image: %v.", err)
-		}
-	}
-
-	image := xhtml.Select(tbl, xhtml.WithAtom(atom.Img))
-	if image == nil {
-		return ""
-	}
-	objID := xhtml.Attr(image, "data-oid")
-	if path := objID2Path[objID]; path != "" {
-		setRowValue(tbl, "path", path)
-		return ""
-	}
-
-	src := xhtml.Attr(image, "src")
-	imageEmbed := db.EmbedImage{
-		Credit:      credit,
-		Description: description,
-	}
-	if uploadErr := svc.UploadGDocsImage(ctx, UploadGDocsImageParams{
-		ExternalID:  externalID,
-		DocObjectID: objID,
-		ImageURL:    src,
-		Embed:       &imageEmbed,
-	}); uploadErr != nil {
-		l := almlog.FromContext(ctx)
-		l.ErrorContext(ctx, "ProcessGDocsDoc: replaceMetadata: UploadGDocsImage",
-			"err", uploadErr)
-		return fmt.Sprintf("An error occurred when processing the lede image: %v.", uploadErr)
-	}
-	setRowValue(tbl, "path", imageEmbed.Path)
+	tbl.Set("path", imageEmbed.Path)
 	return ""
 }
 

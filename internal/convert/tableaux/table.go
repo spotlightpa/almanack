@@ -41,6 +41,20 @@ func (tbl Table) ReplaceWith(n *html.Node) {
 	xhtml.ReplaceWith(tbl.Node, n)
 }
 
+func (tbl Table) Set(key, value string) {
+	tr := xhtml.New("tr")
+	keyNode := xhtml.New("td")
+	xhtml.AppendText(keyNode, key)
+	tr.AppendChild(keyNode)
+
+	valueNode := xhtml.New("td")
+	xhtml.AppendText(valueNode, value)
+	tr.AppendChild(valueNode)
+
+	tbl.Node.AppendChild(tr)
+	tbl.Cells = append(tbl.Cells, []*html.Node{keyNode, valueNode})
+}
+
 type Cells [][]*html.Node
 
 func (cells Cells) At(row, col int) *html.Node {
