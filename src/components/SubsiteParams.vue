@@ -25,5 +25,7 @@ defineExpose({
     ref="railTop"
     :file-props="fileProps"
     :params="params"
+    :open="true"
+    :hideDemo="true"
   ></SiteParamsRailTop>
 </template>
