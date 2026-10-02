@@ -26,34 +26,63 @@ func (svc Services) SyncMapSheet(ctx context.Context, sheetID string) (err error
 		return
 	}
 
-	l := almlog.FromContext(ctx)
 	for _, page := range pages {
-		var featured string
-		if page.FeaturedDocLink != "" {
-			var ferr error
-			featured, ferr = svc.featuredStoryMarkdown(ctx, page.FeaturedDocLink)
-			if ferr != nil {
-				l.ErrorContext(ctx, "SyncMapSheet: featuredStoryMarkdown", "slug", page.Slug, "err", ferr)
-				featured = ""
-			}
+		if perr := svc.publishMapPage(ctx, page.Slug, page.FeaturedDocLink, page.FilePath(), page.ToMarkdown); perr != nil {
+			err = perr
 		}
-
-		content, mderr := page.ToMarkdown(featured)
-		if mderr != nil {
-			l.ErrorContext(ctx, "SyncMapSheet: ToMarkdown", "slug", page.Slug, "err", mderr)
-			err = mderr
-			continue
-		}
-		path := page.FilePath()
-		msg := fmt.Sprintf("Maps: publish %q from sheet", page.Slug)
-		if writeErr := svc.ContentStore.UpdateFile(ctx, msg, path, []byte(content)); writeErr != nil {
-			l.ErrorContext(ctx, "SyncMapSheet: UpdateFile", "slug", page.Slug, "err", writeErr)
-			err = writeErr
-			continue
-		}
-		l.InfoContext(ctx, "SyncMapSheet: published", "slug", page.Slug, "path", path)
 	}
 	return
+}
+
+func (svc Services) SyncScrollyMapSheet(ctx context.Context, sheetID string) (err error) {
+	defer errorx.Trace(&err)
+
+	if err = svc.ConfigureGoogleCert(ctx); err != nil {
+		return
+	}
+	cl, err := svc.Gsvc.SheetsClient(ctx)
+	if err != nil {
+		return
+	}
+
+	pages, err := google.SheetToScrollyMapPages(ctx, cl, sheetID)
+	if err != nil {
+		return
+	}
+
+	for _, page := range pages {
+		if perr := svc.publishMapPage(ctx, page.Slug, page.FeaturedDocLink, page.FilePath(), page.ToMarkdown); perr != nil {
+			err = perr
+		}
+	}
+	return
+}
+
+func (svc Services) publishMapPage(ctx context.Context, slug, featuredDocLink, path string, toMarkdown func(string) (string, error)) error {
+	l := almlog.FromContext(ctx)
+
+	var featured string
+	if featuredDocLink != "" {
+		md, err := svc.featuredStoryMarkdown(ctx, featuredDocLink)
+		if err != nil {
+			l.ErrorContext(ctx, "publishMapPage: featuredStoryMarkdown", "slug", slug, "err", err)
+		} else {
+			featured = md
+		}
+	}
+
+	content, err := toMarkdown(featured)
+	if err != nil {
+		l.ErrorContext(ctx, "publishMapPage: ToMarkdown", "slug", slug, "err", err)
+		return err
+	}
+	msg := fmt.Sprintf("Maps: publish %q from sheet", slug)
+	if err := svc.ContentStore.UpdateFile(ctx, msg, path, []byte(content)); err != nil {
+		l.ErrorContext(ctx, "publishMapPage: UpdateFile", "slug", slug, "err", err)
+		return err
+	}
+	l.InfoContext(ctx, "publishMapPage: published", "slug", slug, "path", path)
+	return nil
 }
 
 func (svc Services) featuredStoryMarkdown(ctx context.Context, docLink string) (md string, err error) {
