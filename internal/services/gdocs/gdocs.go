@@ -209,6 +209,13 @@ func convertEl(n *html.Node, el *docs.StructuralElement, listInfo map[string]str
 			inner.AppendChild(el)
 		}
 
+		if dateEl := subel.DateElement; dateEl != nil && dateEl.DateElementProperties != nil {
+			inner := xhtml.LastChildOrNew(n, blockType)
+			timestamp := xhtml.New("time", "datetime", dateEl.DateElementProperties.Timestamp)
+			xhtml.AppendText(timestamp, dateEl.DateElementProperties.DisplayText)
+			inner.AppendChild(timestamp)
+		}
+
 		if subel.TextRun == nil {
 			continue
 		}
