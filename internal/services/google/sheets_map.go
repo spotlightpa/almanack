@@ -56,17 +56,20 @@ type MapCredit struct {
 }
 
 func (m MapPage) FilePath() string {
-	section := m.Section
+	return mapContentPath(m.Section, m.Slug, m.InternalID, m.PublishedAt)
+}
+
+func mapContentPath(section, slug, internalID string, publishedAt time.Time) string {
 	if section == "" {
 		section = "news"
 	}
 	section = strings.ToLower(section)
 
-	name := m.Slug
-	if m.InternalID != "" && !m.PublishedAt.IsZero() {
+	name := slug
+	if internalID != "" && !publishedAt.IsZero() {
 		name = fmt.Sprintf("%s-%s",
-			m.PublishedAt.Format("2006-01-02"),
-			strings.ToUpper(m.InternalID),
+			publishedAt.Format("2006-01-02"),
+			strings.ToUpper(internalID),
 		)
 	}
 
@@ -173,30 +176,35 @@ func (m MapPage) ToMarkdown(featuredMD string) (string, error) {
 		sb.WriteString("\n")
 	}
 
-	if len(m.Credits) > 0 {
-		sb.WriteString(shortcode.New("featured/footer"))
-		sb.WriteString("\n")
-		for _, c := range m.Credits {
-			var cattrs []string
-			if c.Eyebrow != "" {
-				cattrs = append(cattrs, "eyebrow", c.Eyebrow)
-			}
-			if c.Name != "" {
-				cattrs = append(cattrs, "name", c.Name)
-			}
-			if c.Role != "" {
-				cattrs = append(cattrs, "role", c.Role)
-			}
-			if c.Email != "" {
-				cattrs = append(cattrs, "email", c.Email)
-			}
-			sb.WriteString(shortcode.New("featured/credit", cattrs...))
-			sb.WriteString("\n")
-		}
-		sb.WriteString("{{</featured/footer>}}\n")
-	}
+	writeMapCredits(&sb, m.Credits)
 
 	return sb.String(), nil
+}
+
+func writeMapCredits(sb *strings.Builder, credits []MapCredit) {
+	if len(credits) == 0 {
+		return
+	}
+	sb.WriteString(shortcode.New("featured/footer"))
+	sb.WriteString("\n")
+	for _, c := range credits {
+		var cattrs []string
+		if c.Eyebrow != "" {
+			cattrs = append(cattrs, "eyebrow", c.Eyebrow)
+		}
+		if c.Name != "" {
+			cattrs = append(cattrs, "name", c.Name)
+		}
+		if c.Role != "" {
+			cattrs = append(cattrs, "role", c.Role)
+		}
+		if c.Email != "" {
+			cattrs = append(cattrs, "email", c.Email)
+		}
+		sb.WriteString(shortcode.New("featured/credit", cattrs...))
+		sb.WriteString("\n")
+	}
+	sb.WriteString("{{</featured/footer>}}\n")
 }
 
 func sheetBool(s string) bool {
@@ -263,6 +271,52 @@ func hasRow(seq iter.Seq[int]) bool {
 	return false
 }
 
+func sheetPublished(ctx context.Context, s string) (time.Time, error) {
+	if s == "" {
+		return time.Now(), nil
+	}
+	loc, err := time.LoadLocation("America/New_York")
+	if err != nil {
+		return time.Time{}, err
+	}
+	parsed, err := time.ParseInLocation("2006-01-02", s, loc)
+	if err != nil {
+		l := almlog.FromContext(ctx)
+		l.ErrorContext(ctx, "sheetPublished: invalid Published date", "value", s, "err", err)
+		return time.Now(), nil
+	}
+	return parsed, nil
+}
+
+func sheetTopics(s string) []string {
+	var topics []string
+	for t := range strings.SplitSeq(s, ",") {
+		t = strings.TrimSpace(t)
+		if t != "" {
+			topics = append(topics, t)
+		}
+	}
+	return topics
+}
+
+func sheetCredits(sheet *spreadsheet.Sheet) []MapCredit {
+	var credits []MapCredit
+	cred := newSheetMapSkipDescription(sheet)
+	for range cred.Rows() {
+		name := cred.Field("Name")
+		if name == "" {
+			continue
+		}
+		credits = append(credits, MapCredit{
+			Eyebrow: cred.Field("Eyebrow"),
+			Name:    name,
+			Role:    cred.Field("Role"),
+			Email:   cred.Field("Email"),
+		})
+	}
+	return credits
+}
+
 func SheetToMapPages(ctx context.Context, cl *http.Client, sheetID string) ([]MapPage, error) {
 	service := spreadsheet.NewServiceWithClient(cl)
 	doc, err := service.FetchSpreadsheet(sheetID)
@@ -318,45 +372,12 @@ func SheetToMapPages(ctx context.Context, cl *http.Client, sheetID string) ([]Ma
 		return nil, resperr.E{M: "Header sheet missing Slug value"}
 	}
 
-	publishedStr := hdr.Field("Published")
-	publishedAt := time.Now()
-	if publishedStr != "" {
-		loc, lerr := time.LoadLocation("America/New_York")
-		if lerr != nil {
-			return nil, lerr
-		}
-		parsed, perr := time.ParseInLocation("2006-01-02", publishedStr, loc)
-		if perr != nil {
-			l := almlog.FromContext(ctx)
-			l.ErrorContext(ctx, "SheetToMapPages: invalid Published date", "value", publishedStr, "err", perr)
-		} else {
-			publishedAt = parsed
-		}
+	publishedAt, err := sheetPublished(ctx, hdr.Field("Published"))
+	if err != nil {
+		return nil, err
 	}
-
-	topicsStr := hdr.Field("Topics")
-	var topics []string
-	for t := range strings.SplitSeq(topicsStr, ",") {
-		t = strings.TrimSpace(t)
-		if t != "" {
-			topics = append(topics, t)
-		}
-	}
-
-	var credits []MapCredit
-	cred := newSheetMapSkipDescription(creditsSheet)
-	for range cred.Rows() {
-		name := cred.Field("Name")
-		if name == "" {
-			continue
-		}
-		credits = append(credits, MapCredit{
-			Eyebrow: cred.Field("Eyebrow"),
-			Name:    name,
-			Role:    cred.Field("Role"),
-			Email:   cred.Field("Email"),
-		})
-	}
+	topics := sheetTopics(hdr.Field("Topics"))
+	credits := sheetCredits(creditsSheet)
 
 	geojson := dat.Field("Map Data")
 
