@@ -87,13 +87,3 @@ func makeCASaddress(body []byte, ct string) string {
 	}
 	return "cas/" + string(b) + "." + ext
 }
-
-type SharedArticleGDoc struct {
-	*db.GDocsDoc
-	Document string `json:"document,omitempty"`
-}
-
-type SharedArticle struct {
-	*db.SharedArticle
-	GDocs SharedArticleGDoc `json:"gdocs"`
-}

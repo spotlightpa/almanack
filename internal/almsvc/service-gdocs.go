@@ -51,6 +51,16 @@ func (svc Services) ProcessGDocs(ctx context.Context) error {
 	return errors.Join(errs...)
 }
 
+type SharedArticleGDoc struct {
+	*db.GDocsDoc
+	Document string `json:"document,omitempty"`
+}
+
+type SharedArticle struct {
+	*db.SharedArticle
+	GDocs SharedArticleGDoc `json:"gdocs"`
+}
+
 func (svc Services) InflateSharedArticle(ctx context.Context, a *db.SharedArticle) (v any, err error) {
 	defer errorx.Trace(&err)
 
