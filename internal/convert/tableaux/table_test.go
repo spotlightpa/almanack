@@ -20,9 +20,9 @@ func TestTable(t *testing.T) {
 		root := be.OK(html.Parse(strings.NewReader(in)))
 
 		i := 0
-		for _, tbl := range tableaux.Tables(root) {
+		for tbl := range tableaux.Tables(root) {
 			i++
-			rows := tableaux.Map(tbl, xhtml.InnerHTML)
+			rows := tbl.Map(xhtml.InnerHTML)
 			testfile.EqualJSON(be, fmt.Sprintf("%s-%d.json", bareName, i), &rows)
 		}
 	})

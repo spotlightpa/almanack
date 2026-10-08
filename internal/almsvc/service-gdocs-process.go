@@ -88,12 +88,12 @@ func createIntermediateDoc(docHTML *html.Node) (
 ) {
 	// Now collect the embeds array and metadata
 	n := 1
-	for tbl, rows := range tableaux.Tables(docHTML) {
+	for tbl := range tableaux.Tables(docHTML) {
 		embed := db.Embed{N: n}
-		switch label := rows.Label(); label {
+		switch label := tbl.Label(); label {
 		case "html", "embed", "raw", "script":
 			embed.Type = db.RawEmbedTag
-			embedHTML := xhtml.TextContent(rows.At(1, 0))
+			embedHTML := xhtml.TextContent(tbl.At(1, 0))
 			embed.Value = embedHTML
 			if !ascii.Contains(embedHTML) {
 				warnings = append(warnings, fmt.Sprintf(
@@ -108,25 +108,25 @@ func createIntermediateDoc(docHTML *html.Node) (
 			goto append
 
 		case "spl", "spl-embed":
-			embedHTML := xhtml.TextContent(rows.At(1, 0))
+			embedHTML := xhtml.TextContent(tbl.At(1, 0))
 			if !strings.Contains(embedHTML, "{{<") && !xhtml.IsBalanced(embedHTML) {
 				warnings = append(warnings,
 					"Spotlight PA embed seems to contain unbalanced HTML.")
 			}
 			data := newDataTag(dtSpotlightRaw, embedHTML)
-			xhtml.ReplaceWith(tbl, data)
+			tbl.ReplaceWith(data)
 
 		case "spl-text":
-			n := xhtml.Clone(rows.At(1, 0))
+			n := xhtml.Clone(tbl.At(1, 0))
 			blocko.MergeSiblings(n)
 			blocko.RemoveEmptyP(n)
 			blocko.RemoveMarks(n)
 			s := blocko.Blockize(n)
 			data := newDataTag(dtSpotlightText, s)
-			xhtml.ReplaceWith(tbl, data)
+			tbl.ReplaceWith(data)
 
 		case "partner-embed":
-			embedHTML := xhtml.TextContent(rows.At(1, 0))
+			embedHTML := xhtml.TextContent(tbl.At(1, 0))
 			embed.Type = db.PartnerRawEmbedTag
 			embed.Value = embedHTML
 			if !ascii.Contains(embedHTML) {
@@ -142,12 +142,12 @@ func createIntermediateDoc(docHTML *html.Node) (
 			goto append
 
 		case "partner-text":
-			n := xhtml.Clone(rows.At(1, 0))
+			n := xhtml.Clone(tbl.At(1, 0))
 			blocko.MergeSiblings(n)
 			blocko.RemoveEmptyP(n)
 			blocko.RemoveMarks(n)
 			data := newDataTag(dtPartnerText, xhtml.InnerHTMLBlocks(n))
-			xhtml.ReplaceWith(tbl, data)
+			tbl.ReplaceWith(data)
 
 		case "photo", "image", "photograph", "illustration", "illo",
 			"spl-photo", "partner-photo", "spl-image", "partner-image",
@@ -169,8 +169,8 @@ func createIntermediateDoc(docHTML *html.Node) (
 			default:
 				kind = "all"
 			}
-			if imageEmbed, warning := processImage(rows, n, kind); warning != "" {
-				tbl.Parent.RemoveChild(tbl)
+			if imageEmbed, warning := processImage(tbl.Cells, n, kind); warning != "" {
+				tbl.RemoveFromParent()
 				warnings = append(warnings, warning)
 			} else {
 				embed.Value = *imageEmbed
@@ -182,36 +182,36 @@ func createIntermediateDoc(docHTML *html.Node) (
 					n++
 				}
 				data := newDataTag(dtDBEmbed, dbEmbedToString(embed))
-				xhtml.ReplaceWith(tbl, data)
+				tbl.ReplaceWith(data)
 			}
 
 		case "metadata", "info":
-			processMetadata(rows, &metadata)
-			tbl.Parent.RemoveChild(tbl)
+			processMetadata(tbl.Cells, &metadata)
+			tbl.RemoveFromParent()
 
 		case "comment", "ignore", "note":
-			tbl.Parent.RemoveChild(tbl)
+			tbl.RemoveFromParent()
 
 		case "table":
-			row := xhtml.Closest(rows.At(0, 0), xhtml.WithAtom(atom.Tr))
+			row := xhtml.Closest(tbl.At(0, 0), xhtml.WithAtom(atom.Tr))
 			row.Parent.RemoveChild(row)
 
 		case "toc", "table of contents":
 			embed.Type = db.ToCEmbedTag
-			embed.Value = processToc(docHTML, rows)
+			embed.Value = processToc(docHTML, tbl.Cells)
 			goto append
 
 		default:
 			warnings = append(warnings, fmt.Sprintf(
 				"Unrecognized table type: %q", label,
 			))
-			tbl.Parent.RemoveChild(tbl)
+			tbl.RemoveFromParent()
 		}
 		continue
 	append:
 		embeds = append(embeds, embed)
 		data := newDataTag(dtDBEmbed, dbEmbedToString(embed))
-		xhtml.ReplaceWith(tbl, data)
+		tbl.ReplaceWith(data)
 		n++
 	}
 
@@ -263,7 +263,7 @@ func createIntermediateDoc(docHTML *html.Node) (
 	return
 }
 
-func processImage(rows tableaux.TableNodes, n int, kind string) (imageEmbed *db.EmbedImage, warning string) {
+func processImage(rows tableaux.Cells, n int, kind string) (imageEmbed *db.EmbedImage, warning string) {
 	var width, height int
 	if w := xhtml.TextContent(rows.Value("width")); w != "" {
 		width, _ = strconv.Atoi(w)
@@ -293,7 +293,7 @@ func processImage(rows tableaux.TableNodes, n int, kind string) (imageEmbed *db.
 	)
 }
 
-func processMetadata(rows tableaux.TableNodes, metadata *db.GDocsMetadata) {
+func processMetadata(rows tableaux.Cells, metadata *db.GDocsMetadata) {
 	metadata.InternalID = cmp.Or(
 		xhtml.TextContent(rows.Value("slug")),
 		xhtml.TextContent(rows.Value("internal id")),
@@ -382,7 +382,7 @@ func processMetadata(rows tableaux.TableNodes, metadata *db.GDocsMetadata) {
 	metadata.Layout = xhtml.TextContent(rows.Value("layout"))
 }
 
-func processToc(doc *html.Node, rows tableaux.TableNodes) string {
+func processToc(doc *html.Node, rows tableaux.Cells) string {
 	type header struct {
 		text  string
 		id    string
