@@ -163,21 +163,21 @@ func (svc Services) processDocExternals(ctx context.Context, dbDoc *db.GDocsDoc,
 	}
 
 	// Handle image uploads/database lookups
-	for tbl, rows := range tableaux.Tables(docHTML) {
-		switch label := rows.Label(); label {
+	for tbl := range tableaux.Tables(docHTML) {
+		switch label := tbl.Label(); label {
 		case "photo", "image", "photograph", "illustration", "illo",
 			"spl-photo", "partner-photo", "spl-image", "partner-image",
 			"picture-wide", "photo-wide", "picture-left", "photo-left",
 			"picture-right", "photo-right":
 			if warning := svc.replaceImagePath(
-				ctx, tbl, rows, dbDoc.ExternalID, objID2Path,
+				ctx, tbl.Node, tbl.Cells, dbDoc.ExternalID, objID2Path,
 			); warning != "" {
 				warnings = append(warnings, warning)
 			}
 
 		case "metadata", "info":
 			if warning := svc.replaceMetadataImagePath(
-				ctx, tbl, rows, dbDoc.ExternalID, objID2Path,
+				ctx, tbl.Node, tbl.Cells, dbDoc.ExternalID, objID2Path,
 			); warning != "" {
 				warnings = append(warnings, warning)
 			}
@@ -189,7 +189,7 @@ func (svc Services) processDocExternals(ctx context.Context, dbDoc *db.GDocsDoc,
 func (svc Services) replaceImagePath(
 	ctx context.Context,
 	tbl *html.Node,
-	rows tableaux.TableNodes,
+	rows tableaux.Cells,
 	externalID string,
 	objID2Path map[string]string,
 ) (warning string) {
@@ -267,7 +267,7 @@ func setRowValue(tbl *html.Node, key, value string) {
 func (svc Services) replaceMetadataImagePath(
 	ctx context.Context,
 	tbl *html.Node,
-	rows tableaux.TableNodes,
+	rows tableaux.Cells,
 	externalID string,
 	objID2Path map[string]string,
 ) string {
