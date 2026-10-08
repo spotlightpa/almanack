@@ -181,6 +181,13 @@ func (svc Services) processDocExternals(ctx context.Context, dbDoc *db.GDocsDoc,
 			); warning != "" {
 				warnings = append(warnings, warning)
 			}
+
+		case "card":
+			if warning := svc.replaceCardImagePath(
+				ctx, tbl, dbDoc.ExternalID, objID2Path,
+			); warning != "" {
+				warnings = append(warnings, warning)
+			}
 		}
 	}
 	return warnings, nil
@@ -237,6 +244,36 @@ func (svc Services) replaceMetadataImagePath(
 			xhtml.TextContent(tbl.Value("lead image description")),
 			xhtml.TextContent(tbl.Value("lede image alt")),
 			xhtml.TextContent(tbl.Value("lead image alt")),
+			xhtml.TextContent(tbl.Value("alt")),
+		),
+	}
+	return svc.findAndReplaceImagePath(ctx, tbl, cell, externalID, objID2Path, imageEmbed)
+}
+
+func (svc Services) replaceCardImagePath(
+	ctx context.Context,
+	tbl *tableaux.Table,
+	externalID string,
+	objID2Path map[string]string,
+) (warning string) {
+	if path := cmp.Or(
+		xhtml.TextContent(tbl.Value("image path")),
+		xhtml.TextContent(tbl.Value("path")),
+	); path != "" {
+		return ""
+	}
+	cell := tbl.ValueOrNext("image")
+	if cell == nil {
+		return ""
+	}
+	imageEmbed := &db.EmbedImage{
+		Credit: cmp.Or(
+			xhtml.TextContent(tbl.Value("image credit")),
+			xhtml.TextContent(tbl.Value("credit")),
+		),
+		Description: cmp.Or(
+			xhtml.TextContent(tbl.Value("image description")),
+			xhtml.TextContent(tbl.Value("image alt")),
 			xhtml.TextContent(tbl.Value("alt")),
 		),
 	}

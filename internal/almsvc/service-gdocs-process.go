@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"iter"
+	"maps"
 	"regexp"
 	"slices"
 	"strconv"
@@ -16,6 +17,7 @@ import (
 	"github.com/spotlightpa/almanack/internal/convert/tableaux"
 	"github.com/spotlightpa/almanack/internal/db"
 	"github.com/spotlightpa/almanack/internal/utils/must"
+	"github.com/spotlightpa/almanack/internal/utils/shortcode"
 	"github.com/spotlightpa/almanack/internal/utils/stringx"
 	"golang.org/x/net/html"
 	"golang.org/x/net/html/atom"
@@ -195,6 +197,40 @@ func createIntermediateDoc(docHTML *html.Node) (
 		case "table":
 			row := xhtml.Closest(tbl.At(0, 0), xhtml.WithAtom(atom.Tr))
 			row.Parent.RemoveChild(row)
+
+		case "card":
+			// Case card needs to:
+			// 1. create a shortcode for spl
+			var body string
+			{
+				n := xhtml.Clone(tbl.ValueOrNext("body"))
+				blocko.MergeSiblings(n)
+				blocko.RemoveEmptyP(n)
+				blocko.RemoveMarks(n)
+				body = blocko.Blockize(n)
+			}
+			attrs := map[string]string{
+				"hed": xhtml.TextContent(
+					cmp.Or(tbl.Value("hed"), tbl.Value("head"), tbl.Value("headline"))),
+				"timestamp": xhtml.Attr(
+					xhtml.Select(tbl.Value("time"), xhtml.WithAtom(atom.Time)),
+					"datetime"),
+				"image":             "",
+				"image-credit":      "",
+				"image-description": "",
+			}
+			maps.DeleteFunc(attrs, func(k, v string) bool {
+				return v == ""
+			})
+			s := shortcode.New("card", stringx.FlattenMap(attrs)...)
+			s = fmt.Sprintf("%s\n%s\n{{</card>}}", s, body)
+			data := newDataTag(dtSpotlightText, s)
+			// TODO
+			// 2. create some text for partners
+			// 3. create a partner-photo if necessary
+			//
+			tbl.ReplaceWith(data)
+			// data.Parent.InsertBefore(n, data)
 
 		case "toc", "table of contents":
 			embed.Type = db.ToCEmbedTag
