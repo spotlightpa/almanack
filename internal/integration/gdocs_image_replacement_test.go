@@ -137,15 +137,15 @@ func makeMetadataDocWithLedeImage(imageURL string) docs.Document {
 						Columns: 2,
 						TableRows: []*docs.TableRow{
 							// row 0: label (single colspan=2 cell)
-							{TableCells: []*docs.TableCell{labelCell("metadata")},},
+							{TableCells: []*docs.TableCell{labelCell("metadata")}},
 							// row 1: Hed
-							{TableCells: []*docs.TableCell{textCell("hed"), textCell("Test Headline")},},
+							{TableCells: []*docs.TableCell{textCell("hed"), textCell("Test Headline")}},
 							// row 2: "lede image" key only (no value column)
-							{TableCells: []*docs.TableCell{textCell("lede image")},},
+							{TableCells: []*docs.TableCell{textCell("lede image")}},
 							// row 3: the image in a spanning cell (valueOrNext falls here)
-							{TableCells: []*docs.TableCell{wideImageCell(objID)},},
+							{TableCells: []*docs.TableCell{wideImageCell(objID)}},
 							// row 4: Lede image credit
-							{TableCells: []*docs.TableCell{textCell("lede image credit"), textCell("Test Photographer")},},
+							{TableCells: []*docs.TableCell{textCell("lede image credit"), textCell("Test Photographer")}},
 						},
 					},
 				},
@@ -189,11 +189,11 @@ func makePhotoDocWithInlineImage(imageURL string) docs.Document {
 						Columns: 2,
 						TableRows: []*docs.TableRow{
 							// row 0: label | inline image
-							{TableCells: []*docs.TableCell{textCell("photo"), imageCell(objID)},},
+							{TableCells: []*docs.TableCell{textCell("photo"), imageCell(objID)}},
 							// row 1: credit
-							{TableCells: []*docs.TableCell{textCell("credit"), textCell("Test Credit")},},
+							{TableCells: []*docs.TableCell{textCell("credit"), textCell("Test Credit")}},
 							// row 2: description
-							{TableCells: []*docs.TableCell{textCell("description"), textCell("Test Alt")},},
+							{TableCells: []*docs.TableCell{textCell("description"), textCell("Test Alt")}},
 						},
 					},
 				},

@@ -22,7 +22,7 @@ func TestTable(t *testing.T) {
 		i := 0
 		for tbl := range tableaux.Tables(root) {
 			i++
-			rows := tbl.Map(xhtml.InnerHTML)
+			rows := tableaux.Map(tbl.Cells, xhtml.InnerHTML)
 			testfile.EqualJSON(be, fmt.Sprintf("%s-%d.json", bareName, i), &rows)
 		}
 	})

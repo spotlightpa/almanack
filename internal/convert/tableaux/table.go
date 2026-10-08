@@ -115,7 +115,7 @@ func (cells Cells) Value(name string) *html.Node {
 	return nil
 }
 
-func (cells Cells) Map[T any](f func(*html.Node) T) [][]T {
+func Map[T any](cells Cells, f func(*html.Node) T) [][]T {
 	rows := make([][]T, 0, len(cells))
 	for _, row := range cells {
 		rowT := make([]T, 0, len(row))
