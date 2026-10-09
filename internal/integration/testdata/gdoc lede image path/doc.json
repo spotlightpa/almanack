@@ -1,0 +1,255 @@
+{
+  "title": "Lede Image Path Test",
+  "body": {
+    "content": [
+      {
+        "table": {
+          "rows": 6,
+          "columns": 2,
+          "tableRows": [
+            {
+              "tableCells": [
+                {
+                  "tableCellStyle": {
+                    "columnSpan": 2
+                  },
+                  "content": [
+                    {
+                      "paragraph": {
+                        "paragraphStyle": {
+                          "namedStyleType": "NORMAL_TEXT"
+                        },
+                        "elements": [
+                          {
+                            "textRun": {
+                              "content": "metadata\n"
+                            }
+                          }
+                        ]
+                      }
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "tableCells": [
+                {
+                  "tableCellStyle": {
+                    "columnSpan": 1
+                  },
+                  "content": [
+                    {
+                      "paragraph": {
+                        "paragraphStyle": {
+                          "namedStyleType": "NORMAL_TEXT"
+                        },
+                        "elements": [
+                          {
+                            "textRun": {
+                              "content": "slug\n"
+                            }
+                          }
+                        ]
+                      }
+                    }
+                  ]
+                },
+                {
+                  "tableCellStyle": {
+                    "columnSpan": 1
+                  },
+                  "content": [
+                    {
+                      "paragraph": {
+                        "paragraphStyle": {
+                          "namedStyleType": "NORMAL_TEXT"
+                        },
+                        "elements": [
+                          {
+                            "textRun": {
+                              "content": "lede-img-path-test\n"
+                            }
+                          }
+                        ]
+                      }
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "tableCells": [
+                {
+                  "tableCellStyle": {
+                    "columnSpan": 1
+                  },
+                  "content": [
+                    {
+                      "paragraph": {
+                        "paragraphStyle": {
+                          "namedStyleType": "NORMAL_TEXT"
+                        },
+                        "elements": [
+                          {
+                            "textRun": {
+                              "content": "hed\n"
+                            }
+                          }
+                        ]
+                      }
+                    }
+                  ]
+                },
+                {
+                  "tableCellStyle": {
+                    "columnSpan": 1
+                  },
+                  "content": [
+                    {
+                      "paragraph": {
+                        "paragraphStyle": {
+                          "namedStyleType": "NORMAL_TEXT"
+                        },
+                        "elements": [
+                          {
+                            "textRun": {
+                              "content": "Lede Image Path Test\n"
+                            }
+                          }
+                        ]
+                      }
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "tableCells": [
+                {
+                  "tableCellStyle": {
+                    "columnSpan": 1
+                  },
+                  "content": [
+                    {
+                      "paragraph": {
+                        "paragraphStyle": {
+                          "namedStyleType": "NORMAL_TEXT"
+                        },
+                        "elements": [
+                          {
+                            "textRun": {
+                              "content": "lede image\n"
+                            }
+                          }
+                        ]
+                      }
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "tableCells": [
+                {
+                  "tableCellStyle": {
+                    "columnSpan": 2
+                  },
+                  "content": [
+                    {
+                      "paragraph": {
+                        "paragraphStyle": {
+                          "namedStyleType": "NORMAL_TEXT"
+                        },
+                        "elements": [
+                          {
+                            "inlineObjectElement": {
+                              "inlineObjectId": "kix.4v7yhj6ax6xk"
+                            }
+                          }
+                        ]
+                      }
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "tableCells": [
+                {
+                  "tableCellStyle": {
+                    "columnSpan": 1
+                  },
+                  "content": [
+                    {
+                      "paragraph": {
+                        "paragraphStyle": {
+                          "namedStyleType": "NORMAL_TEXT"
+                        },
+                        "elements": [
+                          {
+                            "textRun": {
+                              "content": "lede image credit\n"
+                            }
+                          }
+                        ]
+                      }
+                    }
+                  ]
+                },
+                {
+                  "tableCellStyle": {
+                    "columnSpan": 1
+                  },
+                  "content": [
+                    {
+                      "paragraph": {
+                        "paragraphStyle": {
+                          "namedStyleType": "NORMAL_TEXT"
+                        },
+                        "elements": [
+                          {
+                            "textRun": {
+                              "content": "Test Photographer\n"
+                            }
+                          }
+                        ]
+                      }
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      },
+      {
+        "paragraph": {
+          "paragraphStyle": {
+            "namedStyleType": "NORMAL_TEXT"
+          },
+          "elements": [
+            {
+              "textRun": {
+                "content": "Body text.\n"
+              }
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "inlineObjects": {
+    "kix.4v7yhj6ax6xk": {
+      "objectId": "kix.4v7yhj6ax6xk",
+      "inlineObjectProperties": {
+        "embeddedObject": {
+          "imageProperties": {
+            "contentUri": "https://lh3.googleusercontent.com/docs/AG8NV2Y0FrXSefDcNXQNa-NdCiGs2BTkB1Tut4xxqkBQ0NecjCb9wWGYqZjigXbLBkQOc3HMb9G9rA8BERhgQJFfudKEZyEVoS3HyzrAf6gpbRUr0eH7kwLZrNIIq1X4___hRd8Y0Upm-N6htQCXSw1ZNyahUjhPHU5GUb2FWrP91GeoTLYY28MmWEc4tuiSwOeKNtY",
+            "cropProperties": {}
+          }
+        }
+      }
+    }
+  }
+}
