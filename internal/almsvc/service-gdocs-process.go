@@ -119,11 +119,7 @@ func createIntermediateDoc(docHTML *html.Node) (
 			tbl.ReplaceWith(data)
 
 		case "spl-text":
-			n := xhtml.Clone(tbl.At(1, 0))
-			blocko.MergeSiblings(n)
-			blocko.RemoveEmptyP(n)
-			blocko.RemoveMarks(n)
-			s := blocko.Blockize(n)
+			s := markdownify(tbl.At(1, 0))
 			data := newDataTag(dtSpotlightText, s)
 			tbl.ReplaceWith(data)
 
@@ -201,14 +197,7 @@ func createIntermediateDoc(docHTML *html.Node) (
 		case "card":
 			// Case card needs to:
 			// 1. create a shortcode for spl
-			var body string
-			{
-				n := xhtml.Clone(tbl.ValueOrNext("body"))
-				blocko.MergeSiblings(n)
-				blocko.RemoveEmptyP(n)
-				blocko.RemoveMarks(n)
-				body = blocko.Blockize(n)
-			}
+			body := markdownify(tbl.ValueOrNext("body"))
 			attrs := map[string]string{
 				"hed": xhtml.TextContent(
 					cmp.Or(tbl.Value("hed"), tbl.Value("head"), tbl.Value("headline"))),
@@ -298,6 +287,14 @@ func createIntermediateDoc(docHTML *html.Node) (
 	}
 
 	return
+}
+
+func markdownify(n *html.Node) string {
+	n = xhtml.Clone(n)
+	blocko.MergeSiblings(n)
+	blocko.RemoveEmptyP(n)
+	blocko.RemoveMarks(n)
+	return blocko.Blockize(n)
 }
 
 func processImage(rows tableaux.Cells, n int, kind string) (imageEmbed *db.EmbedImage, warning string) {
