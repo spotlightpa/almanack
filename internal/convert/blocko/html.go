@@ -55,24 +55,21 @@ var InlineElements = map[atom.Atom]bool{
 }
 
 func isEmpty(n *html.Node) bool {
-	root := n
 	for n := range n.Descendants() {
-		if n == root {
-			continue
-		}
 		switch n.Type {
 		case html.TextNode:
 			s := strings.ReplaceAll(n.Data, "\n", " ")
 			s = strings.TrimSpace(s)
-			if s == "" {
-				continue
+			if s != "" {
+				return false
 			}
 		case html.ElementNode:
-			if InlineElements[n.DataAtom] {
-				continue
+			if !InlineElements[n.DataAtom] {
+				return false
 			}
+		default:
+			return false
 		}
-		return false
 	}
 	return true
 }
