@@ -188,7 +188,7 @@ func (svc Services) processDocExternals(ctx context.Context, dbDoc *db.GDocsDoc,
 
 func (svc Services) replaceImagePath(
 	ctx context.Context,
-	tbl tableaux.Table,
+	tbl *tableaux.Table,
 	externalID string,
 	objID2Path map[string]string,
 ) (warning string) {
@@ -208,7 +208,7 @@ func (svc Services) replaceImagePath(
 
 func (svc Services) replaceMetadataImagePath(
 	ctx context.Context,
-	tbl tableaux.Table,
+	tbl *tableaux.Table,
 	externalID string,
 	objID2Path map[string]string,
 ) (warning string) {
@@ -245,7 +245,7 @@ func (svc Services) replaceMetadataImagePath(
 
 func (svc Services) findAndReplaceImagePath(
 	ctx context.Context,
-	tbl tableaux.Table,
+	tbl *tableaux.Table,
 	cell *html.Node,
 	externalID string,
 	objID2Path map[string]string,
