@@ -10,8 +10,8 @@ import (
 	"golang.org/x/net/html/atom"
 )
 
-func Tables(root *html.Node) iter.Seq[Table] {
-	return func(yield func(Table) bool) {
+func Tables(root *html.Node) iter.Seq[*Table] {
+	return func(yield func(*Table) bool) {
 		tables := xhtml.SelectSlice(root, xhtml.WithAtom(atom.Table))
 		for _, tblNode := range tables {
 			var cells Cells
@@ -21,7 +21,7 @@ func Tables(root *html.Node) iter.Seq[Table] {
 				})
 				cells = append(cells, tds)
 			}
-			if !yield(Table{tblNode, cells}) {
+			if !yield(&Table{tblNode, cells}) {
 				return
 			}
 		}
