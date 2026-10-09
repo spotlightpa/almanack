@@ -276,13 +276,14 @@ func createIntermediateDoc(docHTML *html.Node) (
 	}
 
 	// Warn about TK in document
-	tkRe := regexp.MustCompile(`(?i)\bTK\b`)
+	tkRe := regexp.MustCompile(`(?i)\b(TK)+\b`)
 	for n := range intermediateDoc.ChildNodes() {
-		if n.Type != html.TextNode {
+		if !blocko.BlockElements[n.DataAtom] {
 			continue
 		}
-		if tkRe.MatchString(n.Data) {
-			text := stringx.Truncate(n.Data, 17)
+		text := xhtml.TextContent(n)
+		if tkRe.MatchString(text) {
+			text := stringx.Truncate(text, 17)
 			warning := fmt.Sprintf(
 				`Text %q contains "TK". Did you mean to remove it?`, text)
 			warnings = append(warnings, warning)
