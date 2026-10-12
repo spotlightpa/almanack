@@ -38,7 +38,7 @@ func BenchmarkProcessDocHTML(b *testing.B) {
 	input := testfile.Read(b, "testdata/processDocHTML/SPLEX23ERR/doc.html")
 	doc := must.Get(html.Parse(strings.NewReader(input)))
 	b.ResetTimer()
-	for range b.N {
+	for b.Loop() {
 		processDocHTML(xhtml.Clone(doc))
 	}
 }
