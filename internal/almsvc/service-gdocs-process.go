@@ -2,7 +2,9 @@ package almsvc
 
 import (
 	"cmp"
+	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"iter"
 	"regexp"
@@ -10,16 +12,231 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/carlmjohnson/requests"
 	"github.com/earthboundkid/bytemap/v2"
+	"github.com/earthboundkid/errorx/v2"
 	"github.com/earthboundkid/xhtml"
+	"github.com/spotlightpa/almanack/internal/almlog"
 	"github.com/spotlightpa/almanack/internal/convert/blocko"
 	"github.com/spotlightpa/almanack/internal/convert/tableaux"
 	"github.com/spotlightpa/almanack/internal/db"
+	"github.com/spotlightpa/almanack/internal/services/gdocs"
 	"github.com/spotlightpa/almanack/internal/utils/must"
+	"github.com/spotlightpa/almanack/internal/utils/pgxutil"
 	"github.com/spotlightpa/almanack/internal/utils/stringx"
 	"golang.org/x/net/html"
 	"golang.org/x/net/html/atom"
 )
+
+func (svc Services) ProcessGDocsDoc(ctx context.Context, dbDoc db.GDocsDoc) (err error) {
+	defer errorx.Trace(&err)
+
+	docHTML := gdocs.Convert(&dbDoc.Document)
+	if n := xhtml.Select(docHTML, xhtml.WithAtom(atom.Data)); n != nil {
+		return fmt.Errorf(
+			"document unexpectedly contains <data> element: %q",
+			xhtml.OuterHTML(n),
+		)
+	}
+
+	// First remove everything after a ###
+	removeTail(docHTML)
+
+	warnings, err := svc.processDocExternals(ctx, &dbDoc, docHTML)
+	if err != nil {
+		return err
+	}
+
+	metadata, embeds, _, richText, rawHTML, md, warnings2 := processDocHTML(docHTML)
+	warnings = append(warnings, warnings2...)
+
+	// Default slug is article title
+	metadata.InternalID = cmp.Or(metadata.InternalID, dbDoc.Document.Title)
+
+	// database slices must not be "null"
+	embeds = pgxutil.NilSliceToEmpty(embeds)
+	warnings = pgxutil.NilSliceToEmpty(warnings)
+
+	// Save to database
+	_, err = svc.Queries.UpdateGDocsDoc(ctx, db.UpdateGDocsDocParams{
+		ID:              dbDoc.ID,
+		Metadata:        metadata,
+		Embeds:          embeds,
+		RichText:        xhtml.InnerHTMLBlocks(richText),
+		RawHtml:         xhtml.InnerHTMLBlocks(rawHTML),
+		ArticleMarkdown: md,
+		Warnings:        warnings,
+		WordCount:       int32(stringx.WordCount(xhtml.TextContent(richText))),
+	})
+	return err
+}
+
+func removeTail(n *html.Node) {
+	for c := range n.ChildNodes() {
+		if c.DataAtom == atom.Table {
+			continue
+		}
+		if !blocko.BlockElements[c.DataAtom] {
+			continue
+		}
+		if text := xhtml.TextContent(c); text != "###" {
+			continue
+		}
+
+		remove := []*html.Node{c}
+		for sibling := c.NextSibling; sibling != nil; sibling = sibling.NextSibling {
+			remove = append(remove, sibling)
+		}
+		xhtml.RemoveAll(remove)
+		return
+	}
+}
+
+func (svc Services) processDocExternals(ctx context.Context, dbDoc *db.GDocsDoc, docHTML *html.Node) (warnings []string, err error) {
+	// Get existing image uploads
+	rows, err := svc.Queries.ListGDocsImagesByExternalID(ctx, dbDoc.ExternalID)
+	if err != nil {
+		return nil, err
+	}
+
+	objID2Path := make(map[string]string, len(rows))
+	for _, row := range rows {
+		objID2Path[row.DocObjectID] = row.Path
+	}
+
+	// Handle image uploads/database lookups
+	for tbl := range tableaux.Tables(docHTML) {
+		switch label := tbl.Label(); label {
+		case "photo", "image", "photograph", "illustration", "illo",
+			"spl-photo", "partner-photo", "spl-image", "partner-image",
+			"picture-wide", "photo-wide", "picture-left", "photo-left",
+			"picture-right", "photo-right":
+			if warning := svc.replaceImagePath(
+				ctx, tbl, dbDoc.ExternalID, objID2Path,
+			); warning != "" {
+				warnings = append(warnings, warning)
+			}
+
+		case "metadata", "info":
+			if warning := svc.replaceMetadataImagePath(
+				ctx, tbl, dbDoc.ExternalID, objID2Path,
+			); warning != "" {
+				warnings = append(warnings, warning)
+			}
+		}
+	}
+	return warnings, nil
+}
+
+func (svc Services) replaceImagePath(
+	ctx context.Context,
+	tbl *tableaux.Table,
+	externalID string,
+	objID2Path map[string]string,
+) (warning string) {
+	if path := xhtml.TextContent(tbl.Value("path")); path != "" {
+		return ""
+	}
+	imageEmbed := &db.EmbedImage{
+		Credit:  xhtml.TextContent(tbl.Value("credit")),
+		Caption: xhtml.TextContent(tbl.Value("caption")),
+		Description: cmp.Or(
+			xhtml.TextContent(tbl.Value("description")),
+			xhtml.TextContent(tbl.Value("alt")),
+		),
+	}
+	return svc.findAndReplaceImagePath(ctx, tbl, tbl.Node, externalID, objID2Path, imageEmbed)
+}
+
+func (svc Services) replaceMetadataImagePath(
+	ctx context.Context,
+	tbl *tableaux.Table,
+	externalID string,
+	objID2Path map[string]string,
+) (warning string) {
+	if path := cmp.Or(
+		xhtml.TextContent(tbl.Value("lede image path")),
+		xhtml.TextContent(tbl.Value("lead image path")),
+		xhtml.TextContent(tbl.Value("path")),
+	); path != "" {
+		return ""
+	}
+	cell := tbl.ValueOrNext("lede image")
+	if cell == nil {
+		cell = tbl.ValueOrNext("lead image")
+	}
+	if cell == nil {
+		return ""
+	}
+	imageEmbed := &db.EmbedImage{
+		Credit: cmp.Or(
+			xhtml.TextContent(tbl.Value("lede image credit")),
+			xhtml.TextContent(tbl.Value("lead image credit")),
+			xhtml.TextContent(tbl.Value("credit")),
+		),
+		Description: cmp.Or(
+			xhtml.TextContent(tbl.Value("lede image description")),
+			xhtml.TextContent(tbl.Value("lead image description")),
+			xhtml.TextContent(tbl.Value("lede image alt")),
+			xhtml.TextContent(tbl.Value("lead image alt")),
+			xhtml.TextContent(tbl.Value("alt")),
+		),
+	}
+	return svc.findAndReplaceImagePath(ctx, tbl, cell, externalID, objID2Path, imageEmbed)
+}
+
+func (svc Services) findAndReplaceImagePath(
+	ctx context.Context,
+	tbl *tableaux.Table,
+	cell *html.Node,
+	externalID string,
+	objID2Path map[string]string,
+	imageEmbed *db.EmbedImage,
+) (warning string) {
+	// Look for a link to Google Drive or a link around an image
+	href := ""
+	if linkTag := xhtml.Select(cell, xhtml.WithAtom(atom.A)); linkTag != nil {
+		href = xhtml.Attr(linkTag, "href")
+	}
+
+	if href != "" {
+		path, err := svc.ReplaceAndUploadImageURL(ctx, href, imageEmbed.Description, imageEmbed.Credit)
+		switch {
+		case err == nil:
+			tbl.Set("path", path)
+			return ""
+		case errors.Is(err, requests.ErrValidator):
+			// Try GDocs object-ID upload next
+		case err != nil:
+			l := almlog.FromContext(ctx)
+			l.ErrorContext(ctx, "findAndReplaceImagePath: ReplaceAndUploadImageURL", "err", err)
+			return fmt.Sprintf("An error occurred when processing images: %v.", err)
+		}
+	}
+
+	image := xhtml.Select(cell, xhtml.WithAtom(atom.Img))
+	if image == nil {
+		return ""
+	}
+	objID := xhtml.Attr(image, "data-oid")
+	if path := objID2Path[objID]; path != "" {
+		tbl.Set("path", path)
+		return ""
+	}
+	src := xhtml.Attr(image, "src")
+	if uploadErr := svc.UploadGDocsImage(ctx, UploadGDocsImageParams{
+		ExternalID:  externalID,
+		DocObjectID: objID,
+		ImageURL:    src,
+		Embed:       imageEmbed,
+	}); uploadErr != nil {
+		l := almlog.FromContext(ctx)
+		l.ErrorContext(ctx, "findAndReplaceImagePath: UploadGDocsImage", "err", uploadErr)
+		return fmt.Sprintf("An error occurred when processing images: %v.", uploadErr)
+	}
+	tbl.Set("path", imageEmbed.Path)
+	return ""
+}
 
 // dataTagType is a string enum of possible types in
 // <data type="" value=""> elements used to pass information
