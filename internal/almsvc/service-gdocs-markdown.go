@@ -303,6 +303,21 @@ func replaceSpotlightShortcodes(s string) string {
 		buf.WriteString(shortcode.New("youtube", stringx.FlattenMap(attrs)...))
 	}
 
+	// $("blockquote[id^=ig-tp-]")
+	els = xhtml.SelectAll(n, func(n *html.Node) bool {
+		if n.DataAtom != atom.Blockquote {
+			return false
+		}
+		return strings.HasPrefix(xhtml.Attr(n, "id"), "ig-tp-")
+	})
+	for el := range els {
+		if !isFirst {
+			buf.WriteString("\n")
+		}
+		id := strings.TrimPrefix(xhtml.Attr(el, "id"), "ig-tp-")
+		buf.WriteString(shortcode.New("threads", "id", id))
+	}
+
 	if buf.Len() > 0 {
 		return buf.String()
 	}
