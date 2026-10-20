@@ -35,6 +35,8 @@ type MapPage struct {
 	ReadMoreEnabled   bool
 	TooltipsEnabled   bool
 	TooltipValue      string
+	DesktopDisplay    string
+	MobileDisplay     string
 	FeaturedDocLink   string
 	CustomCodeURL     string
 	Blurb             string
@@ -150,11 +152,13 @@ func (m MapPage) ToMarkdown(featuredMD string) (string, error) {
 		attrs = append(attrs, "tooltips", "true")
 	}
 	if m.TooltipValue != "" {
-		tv := strings.NewReplacer("\r\n", "<br>", "\n", "<br>", "\r", "<br>").Replace(m.TooltipValue)
-		tv = strings.ReplaceAll(tv, `\n`, "<br>")
-		tv = trimBR(tv)
-		tv = strings.ReplaceAll(tv, `"`, "'")
-		attrs = append(attrs, "tooltip-value", tv)
+		attrs = append(attrs, "tooltip-value", templateAttr(m.TooltipValue))
+	}
+	if d := sheetDisplay(m.DesktopDisplay); d != "" {
+		attrs = append(attrs, "desktop-display", d)
+	}
+	if d := sheetDisplay(m.MobileDisplay); d != "" {
+		attrs = append(attrs, "mobile-display", d)
 	}
 	if m.CustomCodeURL != "" {
 		attrs = append(attrs, "custom-code", m.CustomCodeURL)
@@ -209,6 +213,42 @@ func writeMapCredits(sb *strings.Builder, credits []MapCredit) {
 
 func sheetBool(s string) bool {
 	return strings.EqualFold(strings.TrimSpace(s), "TRUE")
+}
+
+func templateAttr(s string) string {
+	v := strings.NewReplacer("\r\n", "<br>", "\n", "<br>", "\r", "<br>").Replace(s)
+	v = strings.ReplaceAll(v, `\n`, "<br>")
+	v = trimBR(v)
+	return strings.ReplaceAll(v, `"`, "'")
+}
+
+func tooltipTypeDisplay(explicit, tooltipType, screen string) string {
+	if strings.TrimSpace(explicit) != "" {
+		return explicit
+	}
+	t := strings.ToLower(tooltipType)
+	if !strings.Contains(t, "card") {
+		return ""
+	}
+	desktop := strings.Contains(t, "desktop")
+	mobile := strings.Contains(t, "mobile")
+	if !desktop && !mobile {
+		return "card"
+	}
+	if (screen == "desktop" && desktop) || (screen == "mobile" && mobile) {
+		return "card"
+	}
+	return "popup"
+}
+
+func sheetDisplay(s string) string {
+	switch strings.ToLower(strings.TrimSpace(s)) {
+	case "card", "cards":
+		return "card"
+	case "popup", "tooltip":
+		return "popup"
+	}
+	return ""
 }
 
 func trimBR(s string) string {
@@ -402,6 +442,8 @@ func SheetToMapPages(ctx context.Context, cl *http.Client, sheetID string) ([]Ma
 		ReadMoreEnabled:   sheetBool(set.Field("Read More")),
 		TooltipsEnabled:   sheetBool(tip.Field("Tooltips Enabled")),
 		TooltipValue:      tip.Field("Tooltip Value"),
+		DesktopDisplay:    tooltipTypeDisplay(tip.Field("Desktop Display"), tip.Field("Tooltip Type"), "desktop"),
+		MobileDisplay:     tooltipTypeDisplay(tip.Field("Mobile Display"), tip.Field("Tooltip Type"), "mobile"),
 		FeaturedDocLink:   set.Field("Featured Story Document Link"),
 		CustomCodeURL:     set.Field("Custom Code"),
 		Blurb:             hdr.Field("Blurb"),
