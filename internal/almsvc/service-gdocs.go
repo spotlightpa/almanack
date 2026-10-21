@@ -52,6 +52,15 @@ func (svc Services) ProcessGDocs(ctx context.Context) error {
 }
 
 func (svc Services) InflateSharedArticle(ctx context.Context, a *db.SharedArticle) (v any, err error) {
+	type GDocsWithoutDocument struct {
+		*db.GDocsDoc
+		Document string `json:"document,omitempty"`
+	}
+
+	type SharedArticleWithGDoc struct {
+		*db.SharedArticle
+		GDocs GDocsWithoutDocument `json:"gdocs"`
+	}
 	defer errorx.Trace(&err)
 
 	if a.SourceType != "gdocs" {
@@ -67,7 +76,7 @@ func (svc Services) InflateSharedArticle(ctx context.Context, a *db.SharedArticl
 		return nil, err
 	}
 
-	return SharedArticle{a, SharedArticleGDoc{&doc, ""}}, err
+	return SharedArticleWithGDoc{a, GDocsWithoutDocument{&doc, ""}}, err
 }
 
 func (svc Services) UpsertSharedArticleForGDoc(ctx context.Context, dbDoc *db.GDocsDoc, refreshMetadata bool) (*db.SharedArticle, error) {
