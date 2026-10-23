@@ -37,9 +37,7 @@ func MergeSiblings(root *html.Node) {
 }
 
 func RemoveEmptyP(root *html.Node) {
-	emptyP := xhtml.SelectSlice(root, func(n *html.Node) bool {
-		return n.DataAtom == atom.P && isEmpty(n)
-	})
+	emptyP := xhtml.SelectSlice(root, xhtml.WithAtom(atom.P).And(isEmpty))
 	for _, n := range emptyP {
 		n.Parent.RemoveChild(n)
 	}

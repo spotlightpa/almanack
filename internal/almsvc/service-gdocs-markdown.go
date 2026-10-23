@@ -144,9 +144,8 @@ func replaceSpotlightShortcodes(s string) string {
 	isFirst := true
 
 	// $("div[data-spl-embed-version=1]")
-	els := xhtml.SelectAll(n, func(n *html.Node) bool {
-		return n.DataAtom == atom.Div && xhtml.Attr(n, "data-spl-embed-version") == "1"
-	})
+	els := xhtml.SelectAll(n, xhtml.WithAtom(atom.Div).And(
+		xhtml.WithAttr("data-spl-embed-version", "1")))
 	for el := range els {
 		if !isFirst {
 			buf.WriteString("\n")
@@ -170,11 +169,9 @@ func replaceSpotlightShortcodes(s string) string {
 		buf.WriteString(shortcode.New(tag, stringx.FlattenMultimap(u.Query())...))
 	}
 
-	// $("iframe[src~=vimeo]")
-	els = xhtml.SelectAll(n, func(n *html.Node) bool {
-		return n.DataAtom == atom.Iframe &&
-			strings.HasPrefix(xhtml.Attr(n, "src"), "https://player.vimeo.com/video/")
-	})
+	// $("iframe[src^=https://player.vimeo.com/video/]")
+	els = xhtml.SelectAll(n,
+		xhtml.WithAtom(atom.Iframe).And(xhtml.WithAttrMatch("src", `^https://player\.vimeo\.com/video/`)))
 	for el := range els {
 		if !isFirst {
 			buf.WriteString("\n")
@@ -195,11 +192,9 @@ func replaceSpotlightShortcodes(s string) string {
 		buf.WriteString(shortcode.New("vimeo", attrs...))
 	}
 
-	// $("div.flourish-embed.flourish-table")
-	els = xhtml.SelectAll(n, func(n *html.Node) bool {
-		return n.DataAtom == atom.Div &&
-			strings.Contains(xhtml.Attr(n, "class"), "flourish-embed")
-	})
+	// $("div.flourish-embed")
+	els = xhtml.SelectAll(n,
+		xhtml.WithAtom(atom.Div).And(xhtml.WithClass("flourish-embed")))
 	for el := range els {
 		if !isFirst {
 			buf.WriteString("\n")
@@ -210,10 +205,8 @@ func replaceSpotlightShortcodes(s string) string {
 	}
 
 	// $("iframe[src~=datawrapper.dwcdn.net]")
-	els = xhtml.SelectAll(n, func(n *html.Node) bool {
-		return n.DataAtom == atom.Iframe &&
-			strings.Contains(xhtml.Attr(n, "src"), "datawrapper.dwcdn.net")
-	})
+	els = xhtml.SelectAll(n,
+		xhtml.WithAtom(atom.Iframe).And(xhtml.WithAttrMatch("src", `datawrapper\.dwcdn\.net`)))
 	for el := range els {
 		if !isFirst {
 			buf.WriteString("\n")
@@ -227,10 +220,8 @@ func replaceSpotlightShortcodes(s string) string {
 	}
 
 	// $("script[src~=datawrapper.dwcdn.net]")
-	els = xhtml.SelectAll(n, func(n *html.Node) bool {
-		return n.DataAtom == atom.Script &&
-			strings.Contains(xhtml.Attr(n, "src"), "datawrapper.dwcdn.net")
-	})
+	els = xhtml.SelectAll(n,
+		xhtml.WithAtom(atom.Script).And(xhtml.WithAttrMatch("src", `datawrapper\.dwcdn\.net`)))
 	for el := range els {
 		if !isFirst {
 			buf.WriteString("\n")
@@ -249,10 +240,8 @@ func replaceSpotlightShortcodes(s string) string {
 	}
 
 	// $("iframe[src~=https://www.scribd.com/embeds/]")
-	els = xhtml.SelectAll(n, func(n *html.Node) bool {
-		return n.DataAtom == atom.Iframe &&
-			strings.HasPrefix(xhtml.Attr(n, "src"), "https://www.scribd.com/embeds/")
-	})
+	els = xhtml.SelectAll(n,
+		xhtml.WithAtom(atom.Iframe).And(xhtml.WithAttrMatch("src", `^https://www\.scribd\.com/embeds/`)))
 	for el := range els {
 		if !isFirst {
 			buf.WriteString("\n")
@@ -263,10 +252,8 @@ func replaceSpotlightShortcodes(s string) string {
 	}
 
 	// $("div[data-tf-live]")
-	els = xhtml.SelectAll(n, func(n *html.Node) bool {
-		return n.DataAtom == atom.Div &&
-			xhtml.Attr(n, "data-tf-live") != ""
-	})
+	els = xhtml.SelectAll(n,
+		xhtml.WithAtom(atom.Div).And(xhtml.WithDataset("tf-live")))
 	for el := range els {
 		if !isFirst {
 			buf.WriteString("\n")
@@ -277,14 +264,8 @@ func replaceSpotlightShortcodes(s string) string {
 	}
 
 	// $("iframe[src^=https://youtube.com/embeds/]")
-	els = xhtml.SelectAll(n, func(n *html.Node) bool {
-		if n.DataAtom != atom.Iframe {
-			return false
-		}
-		src := xhtml.Attr(n, "src")
-		return strings.HasPrefix(src, "https://www.youtube.com/embed/") ||
-			strings.HasPrefix(src, "https://www.youtube-nocookie.com/embed/")
-	})
+	els = xhtml.SelectAll(n,
+		xhtml.WithAtom(atom.Iframe).And(xhtml.WithAttrMatch("src", `^https://www\.youtube(-nocookie)?\.com/embed/`)))
 	for el := range els {
 		if !isFirst {
 			buf.WriteString("\n")
@@ -304,12 +285,8 @@ func replaceSpotlightShortcodes(s string) string {
 	}
 
 	// $("blockquote[id^=ig-tp-]")
-	els = xhtml.SelectAll(n, func(n *html.Node) bool {
-		if n.DataAtom != atom.Blockquote {
-			return false
-		}
-		return strings.HasPrefix(xhtml.Attr(n, "id"), "ig-tp-")
-	})
+	els = xhtml.SelectAll(n,
+		xhtml.WithAtom(atom.Blockquote).And(xhtml.WithAttrMatch("id", `^ig-tp-`)))
 	for el := range els {
 		if !isFirst {
 			buf.WriteString("\n")

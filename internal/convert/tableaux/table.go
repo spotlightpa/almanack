@@ -16,9 +16,7 @@ func Tables(root *html.Node) iter.Seq[*Table] {
 		for _, tblNode := range tables {
 			var cells Cells
 			for row := range xhtml.SelectAll(tblNode, xhtml.WithAtom(atom.Tr)) {
-				tds := xhtml.SelectSlice(row, func(n *html.Node) bool {
-					return n.DataAtom == atom.Td || n.DataAtom == atom.Th
-				})
+				tds := xhtml.SelectSlice(row, xhtml.WithAtom(atom.Td).Or(xhtml.WithAtom(atom.Th)))
 				cells = append(cells, tds)
 			}
 			if !yield(&Table{tblNode, cells}) {
