@@ -269,10 +269,7 @@ func dbEmbedToString(embed db.Embed) string {
 // for data elements with a matching type="" attribute.
 func dataEls(n *html.Node, tag dataTagType) iter.Seq2[*html.Node, string] {
 	return func(yield func(*html.Node, string) bool) {
-		els := xhtml.SelectSlice(n, func(n *html.Node) bool {
-			return n.DataAtom == atom.Data && xhtml.Attr(n, "type") == string(tag)
-		})
-
+		els := xhtml.SelectSlice(n, xhtml.WithAtom(atom.Data).And(xhtml.WithAttr("type", string(tag))))
 		for _, el := range els {
 			if !yield(el, xhtml.Attr(el, "value")) {
 				return
