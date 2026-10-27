@@ -63,15 +63,14 @@ func replaceWhitespace(root *html.Node) {
 		if n.Type != html.TextNode {
 			continue
 		}
-		// Ignore children of pre/code
-		codeblock := xhtml.Closest(n, func(n *html.Node) bool {
-			return n.DataAtom == atom.Pre ||
-				n.DataAtom == atom.Code ||
-				n.Type == html.RawNode
-		})
-		if codeblock == nil {
-			n.Data = whitespaceReplacer.Replace(n.Data)
+		// Ignore children of pre/code/raw text
+		codeblock := xhtml.Closest(n, xhtml.WithAtom(atom.Pre).
+			Or(xhtml.WithAtom(atom.Code)).
+			Or(xhtml.WithType(html.RawNode)))
+		if codeblock != nil {
+			continue
 		}
+		n.Data = whitespaceReplacer.Replace(n.Data)
 	}
 }
 
