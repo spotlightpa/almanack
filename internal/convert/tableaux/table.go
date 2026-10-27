@@ -89,7 +89,9 @@ func (cells Cells) ValueOrNext(name string) *html.Node {
 			return cell
 		}
 	}
-	return nil
+	return &html.Node{
+		Type: html.CommentNode,
+	}
 }
 
 func (cells Cells) Value(name string) *html.Node {
@@ -110,7 +112,9 @@ func (cells Cells) Value(name string) *html.Node {
 			return cell
 		}
 	}
-	return nil
+	return &html.Node{
+		Type: html.CommentNode,
+	}
 }
 
 func (cells Cells) Map[T any](f func(*html.Node) T) [][]T {

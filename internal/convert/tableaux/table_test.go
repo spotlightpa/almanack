@@ -24,6 +24,14 @@ func TestTable(t *testing.T) {
 			i++
 			rows := tbl.Map(xhtml.InnerHTML)
 			testfile.EqualJSON(be, fmt.Sprintf("%s-%d.json", bareName, i), &rows)
+			be.Run("Value missing", func(be assert.TB) {
+				n := tbl.Value("missing")
+				be.Truthy(n).Falsey(xhtml.TextContent(n))
+			})
+			be.Run("ValueOrNext missing", func(be assert.TB) {
+				n := tbl.ValueOrNext("missing")
+				be.Truthy(n).Falsey(xhtml.TextContent(n))
+			})
 		}
 	})
 }
