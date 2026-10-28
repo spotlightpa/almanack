@@ -182,3 +182,26 @@ func TestFlattenMultimap(t *testing.T) {
 			SlicesEqual(stringx.FlattenMultimap(tc.in), tc.want)
 	}
 }
+
+func TestIsWhitespace(t *testing.T) {
+	type testcase struct {
+		input string
+		want  bool
+	}
+	assert.RunAll(t, map[string]testcase{
+		"empty":         {"", true},
+		"space":         {" ", true},
+		"tab":           {"\t", true},
+		"newline":       {"\n", true},
+		"crlf":          {"\r\n", true},
+		"mixed space":   {" \t\n\r ", true},
+		"letter":        {"a", false},
+		"padded word":   {" a ", false},
+		"two words":     {"hello world", false},
+		"space then word": {"\t\nfoo", false},
+		"nbsp":          {"\u00a0", true},
+		"em space":      {"\u2003", true},
+	}, func(be assert.TB, tc testcase) {
+		be.Equal(stringx.IsWhitespace(tc.input), tc.want)
+	})
+}
