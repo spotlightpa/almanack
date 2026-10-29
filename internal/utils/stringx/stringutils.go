@@ -205,3 +205,11 @@ func UnwrapSlice(v any) []string {
 	})
 	return ss
 }
+
+// IsWhitespace returns true if all runes in s satisfy unicode.IsSpace.
+// Empty strings are true.
+func IsWhitespace(s string) bool {
+	return !strings.ContainsFunc(s, func(r rune) bool {
+		return !unicode.IsSpace(r)
+	})
+}
