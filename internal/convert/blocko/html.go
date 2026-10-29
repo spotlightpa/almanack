@@ -1,8 +1,6 @@
 package blocko
 
 import (
-	"strings"
-
 	"github.com/spotlightpa/almanack/internal/utils/stringx"
 	"golang.org/x/net/html"
 	"golang.org/x/net/html/atom"
@@ -59,8 +57,7 @@ func isEmpty(n *html.Node) bool {
 	for n := range n.Descendants() {
 		switch n.Type {
 		case html.TextNode:
-			s := strings.ReplaceAll(n.Data, "\n", " ")
-			if !stringx.IsWhitespace(s) {
+			if !stringx.IsWhitespace(n.Data) {
 				return false
 			}
 		case html.ElementNode:
