@@ -107,7 +107,7 @@ func (sm *SheetMap) Next() bool {
 		sm.idx = make(map[string]int)
 		for i, cell := range sm.sheet.Rows[0] {
 			s := strings.ToLower(strings.TrimSpace(cell.Value))
-			if stringx.IsWhitespace(s) {
+			if s == "" {
 				continue
 			}
 			sm.idx[s] = i
