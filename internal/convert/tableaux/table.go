@@ -78,7 +78,7 @@ func (cells Cells) ValueOrNext(name string) *html.Node {
 	for i := range cells {
 		if slugify(cells.At(i, 0)) == name {
 			cell := cells.At(i, 1)
-			if s := xhtml.TextContent(cell); s == "" {
+			if isEmpty(cell) {
 				cell = cells.At(i+1, 0)
 			}
 			if stringx.RemoveAllWhitespace(slugify(cell)) == "n/a" {
@@ -127,4 +127,24 @@ func (cells Cells) Map[T any](f func(*html.Node) T) [][]T {
 		rows = append(rows, rowT)
 	}
 	return rows
+}
+
+// isEmpty: It's not empty if it contains text, links, or images
+func isEmpty(n *html.Node) bool {
+	for n := range n.Descendants() {
+		switch n.Type {
+		case html.TextNode:
+			if !stringx.IsWhitespace(n.Data) {
+				return false
+			}
+		case html.ElementNode:
+			switch n.DataAtom {
+			case atom.A, atom.Img:
+				return false
+			}
+		default:
+			return false
+		}
+	}
+	return true
 }
