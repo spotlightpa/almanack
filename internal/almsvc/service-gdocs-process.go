@@ -446,8 +446,8 @@ func createIntermediateDoc(docHTML *html.Node) (
 			row.Parent.RemoveChild(row)
 
 		case "card":
+			container := xhtml.New("div")
 			// Case card needs to:
-			// 1. create a shortcode for spl
 			body := strings.TrimSpace(markdownify(tbl.ValueOrNext("body")))
 			attrs := map[string]string{
 				"hed": xhtml.TextContent(cmp.Or(
@@ -465,21 +465,44 @@ func createIntermediateDoc(docHTML *html.Node) (
 			maps.DeleteFunc(attrs, func(k, v string) bool {
 				return v == ""
 			})
-			s := shortcode.New("card", stringx.FlattenMap(attrs)...)
-			var buf strings.Builder
-			buf.Grow(len(s) + len(body) + len("\n\n{{</card>}}"))
-			buf.WriteString(s)
-			if body != "" {
-				buf.WriteString("\n")
-				buf.WriteString(body)
-				buf.WriteString("\n")
+			// 1. create a shortcode for spl
+			{
+				s := shortcode.New("card", stringx.FlattenMap(attrs)...)
+				var buf strings.Builder
+				buf.Grow(len(s) + len(body) + len("\n\n{{</card>}}"))
+				buf.WriteString(s)
+				if body != "" {
+					buf.WriteString("\n")
+					buf.WriteString(body)
+					buf.WriteString("\n")
+				}
+				buf.WriteString("{{</card>}}")
+				container.AppendChild(newDataTag(dtSpotlightText, buf.String()))
 			}
-			buf.WriteString("{{</card>}}")
-			data := newDataTag(dtSpotlightText, buf.String())
-			// TODO
 			// 2. create some text for partners
+			{
+				div := xhtml.New("div")
+				if attrs["hed"] != "" {
+					h2 := xhtml.New("h2")
+					xhtml.AppendText(h2, attrs["hed"])
+					div.AppendChild(h2)
+				}
+
+				if t := xhtml.Select(tbl.Value("time"), xhtml.WithAtom(atom.Time)); t != nil {
+					h3 := xhtml.New("h3")
+					h3.AppendChild(xhtml.Clone(t))
+					div.AppendChild(h3)
+				}
+				if body := tbl.ValueOrNext("body"); body != nil {
+					xhtml.AdoptChildren(div, xhtml.Clone(body))
+				}
+				data := newDataTag(dtPartnerText, xhtml.InnerHTMLBlocks(div))
+				container.AppendChild(data)
+			}
+			// TODO
 			// 3. create a partner-photo if necessary
-			tbl.ReplaceWith(data)
+			tbl.ReplaceWith(container)
+			xhtml.UnnestChildren(container)
 
 		case "toc", "table of contents":
 			embed.Type = db.ToCEmbedTag
