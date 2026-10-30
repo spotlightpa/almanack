@@ -1,0 +1,33 @@
+{
+  "id": 123,
+  "file_path": "content/news/2020-03-15-gdoc_card.md",
+  "frontmatter": {
+    "authors": null,
+    "blurb": "Get real-time results on races for Pennsylvania governor, Congress, legislature, and more in the 2026 election.",
+    "byline": "Spotlight PA Staff",
+    "description": "Starting at 8 p.m. on May 19, get live results on 2026 primary races for PA governor, Congress, state legislature, and more.",
+    "image": "",
+    "image-caption": "",
+    "image-credit": "Matt Smith / For Spotlight PA",
+    "image-description": "A “Vote Here” sign is shown May 19, 2026, at Lehigh County Government Center in Allentown, Lehigh County, Pennsylvania.",
+    "internal-id": "gdoc card",
+    "kicker": "Elections",
+    "layout": "",
+    "linktitle": "",
+    "og-title": "",
+    "published": "2020-03-15T20:00:00Z",
+    "slug": "pennsylvania-election-results-2026-primary-elections",
+    "title": "Latest results from the 2026 Pennsylvania primary election",
+    "title-tag": "2026 Pennsylvania primary election results",
+    "twitter-title": ""
+  },
+  "body": "{{<card hed=\"Summary\" timestamp=\"2026-10-30T10:04:00-04:00\">}}\nPennsylvania election results to watch include governor, U.S. House, legislature, and more. <strong>Results will begin to show here after 8 p.m. on May 19.  </strong>\n\nResults for statewide races can also be found on the Department of State <a href=\"https://www.electionreturns.pa.gov/\">website</a>. Local results may be posted by <a href=\"https://www.pa.gov/agencies/vote/contact-us/contact-your-election-officials.html\">individual counties on their websites</a>.\n\nFor complete coverage of the 2026 election, <a href=\"https://www.spotlightpa.org/elections-2024/\">visit Spotlight PA’s Election Center</a>.\n{{</card>}}\n\nLorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.\n\n{{<card hed=\"What we know so far\" timestamp=\"2026-10-30T09:37:00-04:00\">}}\nVoters go to the polls today:\n\n- Polls close at <strong>7pm</strong>.\n\n- Results expected to begin at <strong>9pm</strong>.\n{{</card>}}\n\n{{<card hed=\"What we know so far\" image=\"cas/9kr9-56c7-tnss-rspy.jpeg\" image-credit=\"Matt Smith / For Spotlight PA\" image-description=\"Mail-in ballots are sorted and counted by workers on Election Day on Nov. 3, 2020, at Northampton County Courthouse in Easton, Northampton County, Pennsylvania.\" timestamp=\"2026-10-29T06:49:00-04:00\">}}{{</card>}}\n\n{{<card hed=\"What we know so far &lt;div&gt;\" image=\"cas/9kr9-56c7-tnss-rspy.jpeg\" image-credit=\"Matt Smith / For Spotlight PA\" image-description=\"Mail-in ballots are sorted and counted by workers on Election Day on Nov. 3, 2020, at Northampton County Courthouse in Easton, Northampton County, Pennsylvania.\">}}\nVoters go to the polls today: &lt;div&gt;\n\n- Polls close at <strong>7pm</strong>.\n\n- Results expected to begin at <strong>9pm</strong>.\n{{</card>}}\n",
+  "schedule_for": null,
+  "last_published": null,
+  "created_at": "2020-03-15T20:00:00Z",
+  "updated_at": "2020-03-15T20:00:00Z",
+  "url_path": null,
+  "source_type": "gdocs",
+  "source_id": "abc123_testdata-gdoc-card",
+  "publication_date": "2020-03-15T16:00:00-04:00"
+}
