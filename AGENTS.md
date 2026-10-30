@@ -1,9 +1,14 @@
 - Run `./run.sh help` to see management commands for this repo.
-  Do `./run.sh check-deps` after a new clone to see if you have all the tools needed.
+
+- Do `./run.sh check-deps` after a new clone to see if you have all the tools needed.
+
+- Use [semantic line breaks](https://sembr.org) in comments and Markdown.
+  Break at sentence boundaries and major clause boundaries
+  so that editing one thought produces a minimal diff.
 
 Backend:
 
-- Use `go doc foo.Bar` or `go doc -all foo` to read documentation for packages, types, functions, etc.
+- Use `go doc foo.Bar` or `go doc -all foo` to read documentation for packages, types, functions, etc. not `cat`.
 
 - To see source files from a dependency, or to answer questions about a dependency,
   run `go mod download -json MODULE` and use the returned `Dir` path to read the files.
@@ -11,7 +16,8 @@ Backend:
 - Use `go run .` or `go run ./cmd/foo` instead of `go build` to run programs,
   to avoid leaving behind build artifacts.
 
-- To test if things compile, you can use `go test ./...` which checks if it compiles and also runs the tests.
+- To test if things compile, you can use `go test ./...`
+  which checks if it compiles and also runs the tests.
   Do not use `go build` just to test compilation.
 
 - Prefer to use `gopls` for minor refactoring where possible.
@@ -31,8 +37,9 @@ Backend:
 
 - Integration tests in `pkg/integration/` require a real PostgreSQL database.
   Set `ALMANACK_POSTGRES` env var to run them, or they will be skipped.
+  Your .env should be set up to do this when you use ./run.sh.
 
-- Services are configured via command-line flags.
+- Services are configured via flags set at the command-line or env vars.
   Look for `AddFlags` functions that register flags and return initialization functions.
 
 Frontend:
@@ -41,10 +48,6 @@ Frontend:
   If an existing utility is still in JS but needs to be extended,
   create a commit that can be cherry-picked that just converts it to TS
   before adding the new functionality in a second commit.
-
-Use [semantic line breaks](https://sembr.org) in comments and Markdown.
-Break at sentence boundaries and major clause boundaries
-so that editing one thought produces a minimal diff.
 
 Pull requests should pass the following rubric:
 
