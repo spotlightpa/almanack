@@ -26,6 +26,10 @@ Frontend:
 
 - Frontend utilities should preferably in TypeScript. If an existing utility is still in JS but needs to be extended, create a commit that can be cherry-picked that just converts it to TS before adding the new functionality in a second commit.
 
+Use [semantic line breaks](https://sembr.org) in comments and Markdown.
+Break at sentence boundaries and major clause boundaries
+so that editing one thought produces a minimal diff.
+
 Pull requests should pass the following rubric:
 
 - Is this change atomic? Does it make the minimum viable change to get to a working state?
