@@ -499,8 +499,21 @@ func createIntermediateDoc(docHTML *html.Node) (
 				data := newDataTag(dtPartnerText, xhtml.InnerHTMLBlocks(div))
 				container.AppendChild(data)
 			}
-			// TODO
+
 			// 3. create a partner-photo if necessary
+			if attrs["image"] != "" {
+				imageEmbed := db.EmbedImage{
+					Path:        attrs["image"],
+					Credit:      attrs["image-credit"],
+					Description: attrs["image-description"],
+					Kind:        "partner",
+				}
+				photoEmbed := db.Embed{N: n, Type: db.ImageEmbedTag, Value: imageEmbed}
+				// can't goto the end
+				n++
+				embeds = append(embeds, photoEmbed)
+				container.AppendChild(newDataTag(dtDBEmbed, dbEmbedToString(photoEmbed)))
+			}
 			tbl.ReplaceWith(container)
 			xhtml.UnnestChildren(container)
 
