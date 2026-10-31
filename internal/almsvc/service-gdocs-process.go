@@ -482,6 +482,7 @@ func createIntermediateDoc(docHTML *html.Node) (
 			// 2. create some text for partners
 			{
 				div := xhtml.New("div")
+				div.AppendChild(xhtml.New("hr"))
 				if attrs["hed"] != "" {
 					h2 := xhtml.New("h2")
 					xhtml.AppendText(h2, attrs["hed"])
@@ -493,9 +494,10 @@ func createIntermediateDoc(docHTML *html.Node) (
 					h3.AppendChild(xhtml.Clone(t))
 					div.AppendChild(h3)
 				}
-				if body := tbl.ValueOrNext("body"); body != nil {
+				if body := tbl.ValueOrNext("body"); xhtml.TextContent(body) != "" {
 					xhtml.AdoptChildren(div, xhtml.Clone(body))
 				}
+				div.AppendChild(xhtml.New("hr"))
 				data := newDataTag(dtPartnerText, xhtml.InnerHTMLBlocks(div))
 				container.AppendChild(data)
 			}
