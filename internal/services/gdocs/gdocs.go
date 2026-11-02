@@ -281,26 +281,28 @@ func convertEl(n *html.Node, el *docs.StructuralElement, listInfo map[string]str
 // So, interpret the timestamp in US Eastern if TimeZoneId is unset.
 // Returns the zero time on error.
 func toTime(p *docs.DateElementProperties) time.Time {
-	const defaultTimeZoneID = "America/New_York"
+	var t time.Time
+	if parsed, err := time.Parse(time.RFC3339Nano, p.Timestamp); err == nil {
+		t = parsed.UTC()
+	} else if f, err := strconv.ParseFloat(p.Timestamp, 64); err == nil {
+		sec := int64(f)
+		t = time.Unix(sec, int64((f-float64(sec))*1e9)).UTC()
+	} else {
+		return time.Time{}
+	}
 
 	tzID := p.TimeZoneId
 	if tzID == "" {
-		tzID = defaultTimeZoneID
+		loc, err := time.LoadLocation("America/New_York")
+		if err != nil {
+			return time.Time{}
+		}
+		return time.Date(t.Year(), t.Month(), t.Day(), t.Hour(), t.Minute(), t.Second(), t.Nanosecond(), loc)
 	}
+
 	loc, err := time.LoadLocation(tzID)
 	if err != nil {
 		return time.Time{}
 	}
-
-	if t, err := time.Parse(time.RFC3339, p.Timestamp); err == nil {
-		return t.In(loc)
-	}
-
-	f, err := strconv.ParseFloat(p.Timestamp, 64)
-	if err != nil {
-		return time.Time{}
-	}
-	sec := int64(f)
-	nsec := int64((f - float64(sec)) * 1e9)
-	return time.Unix(sec, nsec).In(loc)
+	return t.In(loc)
 }

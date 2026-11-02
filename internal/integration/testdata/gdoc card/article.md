@@ -16,7 +16,7 @@ Voters go to the polls today:
 - Results expected to begin at <strong>9pm</strong>.
 {{</card>}}
 
-{{<card hed="What we know so far" image="cas/9kr9-56c7-tnss-rspy.jpeg" image-credit="Matt Smith / For Spotlight PA" image-description="Mail-in ballots are sorted and counted by workers on Election Day on Nov. 3, 2020, at Northampton County Courthouse in Easton, Northampton County, Pennsylvania." timestamp="2026-10-29T06:49:00-04:00">}}{{</card>}}
+{{<card hed="What we know so far" image="cas/9kr9-56c7-tnss-rspy.jpeg" image-credit="Matt Smith / For Spotlight PA" image-description="Mail-in ballots are sorted and counted by workers on Election Day on Nov. 3, 2020, at Northampton County Courthouse in Easton, Northampton County, Pennsylvania." timestamp="2026-10-29T10:49:00-04:00">}}{{</card>}}
 
 {{<card hed="What we know so far &lt;div&gt;" image="cas/9kr9-56c7-tnss-rspy.jpeg" image-credit="Matt Smith / For Spotlight PA" image-description="Mail-in ballots are sorted and counted by workers on Election Day on Nov. 3, 2020, at Northampton County Courthouse in Easton, Northampton County, Pennsylvania.">}}
 Voters go to the polls today: &lt;div&gt;
