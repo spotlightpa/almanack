@@ -335,19 +335,16 @@ func processDocHTML(docHTML *html.Node) (
 
 func createIntermediateDoc(docHTML *html.Node) (
 	metadata db.GDocsMetadata,
-	embeds []db.Embed,
+	embeds db.Embeds,
 	warnings []string,
 	intermediateDoc *html.Node,
 ) {
 	// Now collect the embeds array and metadata
-	n := 1
 	for tbl := range tableaux.Tables(docHTML) {
-		embed := db.Embed{N: n}
 		switch label := tbl.Label(); label {
 		case "html", "embed", "raw", "script":
-			embed.Type = db.RawEmbedTag
 			embedHTML := xhtml.TextContent(tbl.At(1, 0))
-			embed.Value = embedHTML
+			embeds.Append(db.RawEmbedTag, embedHTML)
 			if !ascii.Contains(embedHTML) {
 				warnings = append(warnings, fmt.Sprintf(
 					"Embed #%d contains unusual characters.", n,
@@ -358,7 +355,6 @@ func createIntermediateDoc(docHTML *html.Node) (
 					"Embed #%d seems to contain unbalanced HTML.", n,
 				))
 			}
-			goto append
 
 		case "spl", "spl-embed":
 			embedHTML := xhtml.TextContent(tbl.At(1, 0))
@@ -376,8 +372,7 @@ func createIntermediateDoc(docHTML *html.Node) (
 
 		case "partner-embed":
 			embedHTML := xhtml.TextContent(tbl.At(1, 0))
-			embed.Type = db.PartnerRawEmbedTag
-			embed.Value = embedHTML
+			embeds.Append(db.PartnerRawEmbedTag, embedHTML)
 			if !ascii.Contains(embedHTML) {
 				warnings = append(warnings, fmt.Sprintf(
 					"Embed #%d contains unusual characters.", n,
@@ -388,7 +383,6 @@ func createIntermediateDoc(docHTML *html.Node) (
 					"Embed #%d seems to contain unbalanced HTML.", n,
 				))
 			}
-			goto append
 
 		case "partner-text":
 			n := xhtml.Clone(tbl.At(1, 0))
@@ -402,7 +396,6 @@ func createIntermediateDoc(docHTML *html.Node) (
 			"spl-photo", "partner-photo", "spl-image", "partner-image",
 			"picture-wide", "photo-wide", "picture-left", "photo-left",
 			"picture-right", "photo-right":
-			embed.Type = db.ImageEmbedTag
 			var kind string
 			switch label {
 			case "spl-photo", "spl-image":
@@ -422,13 +415,12 @@ func createIntermediateDoc(docHTML *html.Node) (
 				tbl.RemoveFromParent()
 				warnings = append(warnings, warning)
 			} else {
-				embed.Value = *imageEmbed
-				if bytemap.Make(" \t\n\r").Contains(imageEmbed.Description) {
-					warnings = append(warnings, fmt.Sprintf("Image embed #%d missing alt description.", embed.N))
-				}
 				if kind != "spl" {
-					embeds = append(embeds, embed)
-					n++
+					embeds.AppendImage(*imageEmbed)
+					if stringx.IsWhitespace(imageEmbed.Description) {
+						warnings = append(warnings, fmt.Sprintf("Image embed #%d missing alt description.", len(embeds)))
+					}
+
 				}
 				data := newDataTag(dtDBEmbed, dbEmbedToString(embed))
 				tbl.ReplaceWith(data)
