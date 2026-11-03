@@ -22,7 +22,9 @@ import (
 	"github.com/spotlightpa/almanack/internal/db"
 	"github.com/spotlightpa/almanack/internal/services/gdocs"
 	"github.com/spotlightpa/almanack/internal/services/google"
+	"github.com/spotlightpa/almanack/internal/utils/mathx"
 	"github.com/spotlightpa/almanack/internal/utils/paginate"
+	"github.com/spotlightpa/almanack/internal/utils/pgxutil"
 	"github.com/spotlightpa/almanack/internal/utils/slicex"
 	"github.com/spotlightpa/almanack/internal/utils/stringx"
 )
@@ -64,7 +66,9 @@ func (app *appEnv) postSignedUpload(w http.ResponseWriter, r *http.Request) {
 	app.logStart(r)
 
 	var userData struct {
-		Type string `json:"type"`
+		Type   string `json:"type"`
+		Width  int32  `json:"width"`
+		Height int32  `json:"height"`
 	}
 	if !app.readJSON(w, r, &userData) {
 		return
@@ -91,8 +95,10 @@ func (app *appEnv) postSignedUpload(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if dbImage, err := app.svc.Queries.UpsertImage(r.Context(), db.UpsertImageParams{
-		Path: res.FileName,
-		Type: ext,
+		Path:   res.FileName,
+		Type:   ext,
+		Width:  userData.Width,
+		Height: userData.Height,
 	}); err != nil {
 		app.replyErr(w, r, err)
 		return
@@ -307,7 +313,7 @@ func (app *appEnv) listImages(w http.ResponseWriter, r *http.Request) {
 
 	app.replyJSON(http.StatusOK, w, struct {
 		Images           []db.Image `json:"images"`
-		NextPage         int32      `json:"next_page,string,omitempty"`
+		NextPage         int32      `json:"next_page,string,omitzero"`
 		WaitingForUpload bool       `json:"waiting_for_upload"`
 	}{
 		Images:           images,
@@ -370,7 +376,7 @@ func (app *appEnv) listFiles(w http.ResponseWriter, r *http.Request) {
 
 	app.replyJSON(http.StatusOK, w, struct {
 		Files    []db.File `json:"files"`
-		NextPage int32     `json:"next_page,string,omitempty"`
+		NextPage int32     `json:"next_page,string,omitzero"`
 	}{
 		Files:    files,
 		NextPage: pager.NextPage,
@@ -462,7 +468,7 @@ func (app *appEnv) listPages(w http.ResponseWriter, r *http.Request) {
 	if q.Get("select") == "frontmatter" {
 		var resp struct {
 			Pages    []db.Page `json:"pages"`
-			NextPage int32     `json:"next_page,string,omitempty"`
+			NextPage int32     `json:"next_page,string,omitzero"`
 		}
 		resp.Pages, err = paginate.List(pager, r.Context(),
 			app.svc.Queries.ListPagesWithFrontmatter,
@@ -482,7 +488,7 @@ func (app *appEnv) listPages(w http.ResponseWriter, r *http.Request) {
 
 	var resp struct {
 		Pages    []db.ListPagesRow `json:"pages"`
-		NextPage int32             `json:"next_page,string,omitempty"`
+		NextPage int32             `json:"next_page,string,omitzero"`
 	}
 	resp.Pages, err = paginate.List(pager, r.Context(),
 		app.svc.Queries.ListPages,
@@ -537,7 +543,7 @@ func (app *appEnv) getPage(w http.ResponseWriter, r *http.Request) {
 		err = errors.New("unreachable")
 	}
 	if err != nil {
-		err = db.NoRowsAs404(err, "could not find page %v", q)
+		err = pgxutil.NoRowsAs404(err, "could not find page %v", q)
 		app.replyErr(w, r, err)
 		return
 	}
@@ -639,7 +645,7 @@ func (app *appEnv) postPageRefresh(w http.ResponseWriter, r *http.Request) {
 
 	page, err := app.svc.Queries.GetPageByID(r.Context(), id)
 	if err != nil {
-		err = db.NoRowsAs404(err, "could not find page ID %d", id)
+		err = pgxutil.NoRowsAs404(err, "could not find page ID %d", id)
 		app.replyErr(w, r, err)
 		return
 	}
@@ -719,7 +725,7 @@ func (app *appEnv) postPageCreate(w http.ResponseWriter, r *http.Request) {
 
 	sharedArt, err := app.svc.Queries.GetSharedArticleByID(r.Context(), req.SharedArticleID)
 	if err != nil {
-		err = db.NoRowsAs404(err, "missing id=%d", req.SharedArticleID)
+		err = pgxutil.NoRowsAs404(err, "missing id=%d", req.SharedArticleID)
 		app.replyErr(w, r, err)
 		return
 	}
@@ -750,65 +756,47 @@ func (app *appEnv) postPageCreate(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func (app *appEnv) siteDataGet(loc string) http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		app.logStart(r, "location", loc)
-
-		type response struct {
-			Configs []db.SiteDatum `json:"configs"`
-		}
-		var (
-			res response
-			err error
-		)
-		res.Configs, err = app.svc.Queries.GetSiteData(r.Context(), loc)
-		if err != nil {
-			app.replyErr(w, r, err)
-			return
-		}
-		app.replyJSON(http.StatusOK, w, res)
-	}
-}
-
 func (app *appEnv) getSiteData(w http.ResponseWriter, r *http.Request) http.Handler {
 	loc := r.URL.Query().Get("location")
-	return app.siteDataGet(loc)
-}
-
-func (app *appEnv) siteDataSet(loc string) http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		app.logStart(r, "location", loc)
-
-		var req struct {
-			Configs []almsvc.ScheduledSiteConfig `json:"configs"`
-		}
-		if !app.readJSON(w, r, &req) {
-			return
-		}
-		if len(req.Configs) < 1 {
-			app.replyErr(w, r, resperr.E{M: "No schedulable items provided"})
-			return
-		}
-
-		var (
-			res struct {
-				Configs []db.SiteDatum `json:"configs"`
-			}
-			err error
-		)
-		res.Configs, err = app.svc.UpdateSiteConfig(r.Context(), loc, req.Configs)
-		if err != nil {
-			app.replyErr(w, r, err)
-			return
-		}
-
-		app.replyJSON(http.StatusOK, w, res)
+	app.logStart(r, "location", loc)
+	type response struct {
+		Configs []db.SiteDatum `json:"configs"`
 	}
+	var (
+		res response
+		err error
+	)
+	res.Configs, err = app.svc.Queries.GetSiteData(r.Context(), loc)
+	if err != nil {
+		return app.jsonErr(err)
+	}
+	return app.jsonOK(res)
 }
 
 func (app *appEnv) postSiteData(w http.ResponseWriter, r *http.Request) http.Handler {
 	loc := r.URL.Query().Get("location")
-	return app.siteDataSet(loc)
+
+	app.logStart(r, "location", loc)
+	var req struct {
+		Configs []almsvc.ScheduledSiteConfig `json:"configs"`
+	}
+	if !app.readJSON(w, r, &req) {
+		return nil
+	}
+	if len(req.Configs) < 1 {
+		return app.jsonErr(resperr.E{M: "No schedulable items provided"})
+	}
+	var (
+		res struct {
+			Configs []db.SiteDatum `json:"configs"`
+		}
+		err error
+	)
+	res.Configs, err = app.svc.UpdateSiteConfig(r.Context(), loc, req.Configs)
+	if err != nil {
+		return app.jsonErr(err)
+	}
+	return app.jsonOK(res)
 }
 
 func (app *appEnv) listPagesByFTS(w http.ResponseWriter, r *http.Request) {
@@ -847,7 +835,7 @@ func (app *appEnv) listPagesByFTS(w http.ResponseWriter, r *http.Request) {
 				break
 			}
 			pathPage, err := app.svc.Queries.GetPageByURLPath(r.Context(), u.Path)
-			if db.IsNotFound(err) {
+			if pgxutil.IsNotFound(err) {
 				break
 			}
 			if err != nil {
@@ -924,7 +912,7 @@ func (app *appEnv) postSharedArticleFromGDocs(w http.ResponseWriter, r *http.Req
 
 	dbDoc, err := app.svc.Queries.GetGDocsByExternalIDWhereProcessed(r.Context(), id)
 	if err != nil {
-		err = db.NoRowsAs404(err, "missing external_gdocs_id=%q", req.ID)
+		err = pgxutil.NoRowsAs404(err, "missing external_gdocs_id=%q", req.ID)
 		app.replyErr(w, r, err)
 		return
 	}
@@ -941,7 +929,7 @@ func (app *appEnv) postSharedArticleFromGDocs(w http.ResponseWriter, r *http.Req
 			l.Debug("postSharedArticleFromGDocs: skipping")
 			app.replyJSON(http.StatusOK, w, art)
 			return
-		case db.IsNotFound(err):
+		case pgxutil.IsNotFound(err):
 			break
 		case err != nil:
 			app.replyErr(w, r, err)
@@ -993,7 +981,7 @@ func (app *appEnv) getGDocsDoc(w http.ResponseWriter, r *http.Request) {
 
 	dbDoc, err := app.svc.Queries.GetGDocsByID(r.Context(), id)
 	if err != nil {
-		err = db.NoRowsAs404(err, "missing g_docs_doc.id=%d", id)
+		err = pgxutil.NoRowsAs404(err, "missing g_docs_doc.id=%d", id)
 		app.replyErr(w, r, err)
 		return
 	}
@@ -1058,4 +1046,121 @@ func (app *appEnv) postPageLoad(w http.ResponseWriter, r *http.Request) http.Han
 		return app.jsonErr(err)
 	}
 	return app.jsonOK(page.ID)
+}
+
+func (app *appEnv) listPromotions(w http.ResponseWriter, r *http.Request) http.Handler {
+	app.logStart(r)
+
+	var page int32
+	_ = intFromQuery(r, "page", &page)
+	if page < 0 {
+		return app.jsonErr(resperr.E{M: "Invalid page"})
+	}
+
+	text := r.URL.Query().Get("text")
+	var width, height, limit int32
+	_ = intFromQuery(r, "width", &width)
+	_ = intFromQuery(r, "height", &height)
+	_ = intFromQuery(r, "limit", &limit)
+	pager := paginate.PageNumber(page)
+	pager.PageSize = mathx.Clamp(cmp.Or(limit, 100), 1, 100)
+
+	var (
+		promos []db.Promotion
+		err    error
+	)
+	if text != "" {
+		promos, err = paginate.List(
+			pager,
+			r.Context(),
+			app.svc.Queries.ListPromotionByFTS,
+			db.ListPromotionByFTSParams{
+				Limit:  pager.Limit(),
+				Offset: pager.Offset(),
+				Width:  width,
+				Height: height,
+				Text:   text,
+			})
+	} else {
+		promos, err = paginate.List(
+			pager,
+			r.Context(),
+			app.svc.Queries.ListPromotionByUpdated,
+			db.ListPromotionByUpdatedParams{
+				Limit:  pager.Limit(),
+				Offset: pager.Offset(),
+				Width:  width,
+				Height: height,
+			})
+	}
+	if err != nil {
+		return app.jsonErr(err)
+	}
+	return app.jsonOK(struct {
+		Promotions []db.Promotion `json:"promotions"`
+		NextPage   int32          `json:"next_page,string,omitzero"`
+	}{
+		Promotions: promos,
+		NextPage:   pager.NextPage,
+	})
+}
+
+func (app *appEnv) postPromotion(w http.ResponseWriter, r *http.Request) http.Handler {
+	app.logStart(r)
+	var req db.Promotion
+	if !app.readJSON(w, r, &req) {
+		return nil
+	}
+	req.ImageUrls = pgxutil.NilSliceToEmpty(req.ImageUrls)
+	var (
+		promo db.Promotion
+		err   error
+	)
+	if req.ID == 0 {
+		promo, err = app.svc.Queries.CreatePromotion(r.Context(), db.CreatePromotionParams{
+			Name:             req.Name,
+			Description:      req.Description,
+			Link:             req.Link,
+			Width:            req.Width,
+			Height:           req.Height,
+			ImageUrls:        req.ImageUrls,
+			ImageDescription: req.ImageDescription,
+			BannerLabel:      req.BannerLabel,
+			BannerLabelLink:  req.BannerLabelLink,
+		})
+	} else {
+		promo, err = app.svc.Queries.UpdatePromotion(r.Context(), db.UpdatePromotionParams{
+			ID:               req.ID,
+			Name:             req.Name,
+			Description:      req.Description,
+			Link:             req.Link,
+			Width:            req.Width,
+			Height:           req.Height,
+			ImageUrls:        req.ImageUrls,
+			ImageDescription: req.ImageDescription,
+			BannerLabel:      req.BannerLabel,
+			BannerLabelLink:  req.BannerLabelLink,
+		})
+		err = pgxutil.NoRowsAs404(err, "promotion %d not found", req.ID)
+	}
+	if err != nil {
+		return app.jsonErr(err)
+	}
+	return app.jsonOK(promo)
+}
+
+func (app *appEnv) deletePromotion(w http.ResponseWriter, r *http.Request) http.Handler {
+	app.logStart(r)
+	var req struct {
+		ID int64 `json:"id"`
+	}
+	if !app.readJSON(w, r, &req) {
+		return nil
+	}
+	if rows, err := app.svc.Queries.DeletePromotion(r.Context(), req.ID); err != nil {
+		return app.jsonErr(err)
+	} else if rows == 0 {
+		return app.jsonErr(resperr.E{M: fmt.Sprintf("Promotion %d not found", req.ID)})
+	}
+	return app.jsonOK("OK")
 }

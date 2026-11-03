@@ -89,6 +89,8 @@ type Image struct {
 	Keywords    string             `json:"keywords"`
 	DeletedAt   pgtype.Timestamptz `json:"deleted_at"`
 	IsLicensed  bool               `json:"is_licensed"`
+	Width       int32              `json:"width"`
+	Height      int32              `json:"height"`
 }
 
 type ImageType struct {
@@ -140,6 +142,21 @@ type Page struct {
 	SourceType      string             `json:"source_type"`
 	SourceID        string             `json:"source_id"`
 	PublicationDate pgtype.Timestamptz `json:"publication_date"`
+}
+
+type Promotion struct {
+	ID               int64     `json:"id"`
+	Name             string    `json:"name"`
+	Description      string    `json:"description"`
+	Link             string    `json:"link"`
+	Width            int32     `json:"width"`
+	Height           int32     `json:"height"`
+	ImageUrls        []string  `json:"image_urls"`
+	ImageDescription string    `json:"image_description"`
+	BannerLabel      string    `json:"banner_label"`
+	BannerLabelLink  string    `json:"banner_label_link"`
+	CreatedAt        time.Time `json:"created_at"`
+	UpdatedAt        time.Time `json:"updated_at"`
 }
 
 type Redirect struct {

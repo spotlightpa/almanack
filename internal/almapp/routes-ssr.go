@@ -4,7 +4,7 @@ import (
 	"net/http"
 
 	"github.com/earthboundkid/resperr/v2"
-	"github.com/spotlightpa/almanack/internal/db"
+	"github.com/spotlightpa/almanack/internal/utils/pgxutil"
 )
 
 func (app *appEnv) renderNotFound(w http.ResponseWriter, r *http.Request) {
@@ -31,14 +31,14 @@ func (app *appEnv) redirectSSR(w http.ResponseWriter, r *http.Request) http.Hand
 	from := r.URL.Path
 	redirectInfo, err := app.svc.Queries.GetRedirect(r.Context(), from)
 	if err != nil {
-		return app.htmlErr(db.NoRowsAs404(err, "redirect not found: from=%q", from))
+		return app.htmlErr(pgxutil.NoRowsAs404(err, "redirect not found: from=%q", from))
 	}
 	if err != nil {
 		return app.htmlErr(err)
 	}
 	for _, role := range redirectInfo.Roles {
 
-		if err := app.auth.HasRole(r, role); err == nil {
+		if err := app.svc.Auth.HasRole(r, role); err == nil {
 			http.Redirect(w, r, redirectInfo.To, int(redirectInfo.Code))
 			return nil
 		}

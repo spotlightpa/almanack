@@ -1,5 +1,5 @@
 import ArcArticle from "./arc-article.js";
-import maybeDate from "@/utils/maybe-date.js";
+import maybeDate from "@/utils/maybe-date.ts";
 
 export default class SharedArticle {
   constructor(rawData) {

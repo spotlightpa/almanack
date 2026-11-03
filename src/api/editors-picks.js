@@ -1,7 +1,7 @@
 import { reactive, computed, toRefs, watch } from "vue";
 
-import { makeState } from "@/api/service-util.js";
-import maybeDate from "@/utils/maybe-date.js";
+import { makeState } from "@/api/loader.ts";
+import maybeDate from "@/utils/maybe-date.ts";
 
 class EditorsPicksData {
   constructor(siteConfig) {

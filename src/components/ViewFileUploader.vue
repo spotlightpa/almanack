@@ -1,17 +1,11 @@
 <script>
 import { reactive, computed, toRefs, watch } from "vue";
 
-import {
-  get,
-  post,
-  listFiles,
-  updateFile,
-  uploadFile,
-} from "@/api/client-v2.js";
-import { makeState } from "@/api/service-util.js";
+import { get, post, listFiles, updateFile, uploadFile } from "@/api/client.ts";
+import { makeState } from "@/api/loader.ts";
 
-import { formatDate } from "@/utils/time-format.js";
-import humanSize from "@/utils/human-size.js";
+import { formatDate } from "@/utils/time-format.ts";
+import humanSize from "@/utils/human-size.ts";
 
 export default {
   props: { page: { type: String, default: "0" } },

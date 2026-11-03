@@ -22,6 +22,8 @@ defineExpose({
       :params="params"
       :file-props="fileProps"
       :show-width-height="false"
+      :fixed-width="600"
+      :fixed-height="500"
       prop-name="ad-hp-featured"
       label="Featured ad is 600x500 square near the top of the homepage"
       text="Show homepage featured ad"

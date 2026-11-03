@@ -1,10 +1,10 @@
 <script setup>
 import { computed, ref } from "vue";
 
-import { post, postPageJSON } from "@/api/client-v2.js";
-import { makeState } from "@/api/service-util.js";
+import { post, postPageJSON } from "@/api/client.ts";
+import { makeState } from "@/api/loader.ts";
 import imgproxyURL from "@/api/imgproxy-url.js";
-import maybeDate from "@/utils/maybe-date.js";
+import maybeDate from "@/utils/maybe-date.ts";
 
 const props = defineProps({
   modelValue: {

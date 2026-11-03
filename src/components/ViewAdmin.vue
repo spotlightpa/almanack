@@ -7,9 +7,9 @@ import {
   post,
   listSharedArticles,
   postSharedArticleFromGDocs,
-} from "@/api/client-v2.js";
+} from "@/api/client.ts";
 import { processGDocsDoc } from "@/api/gdocs.js";
-import { makeState, watchAPI } from "@/api/service-util.js";
+import { makeState, watchAPI } from "@/api/loader.ts";
 import SharedArticle from "@/api/shared-article.js";
 
 const props = defineProps({
@@ -88,9 +88,19 @@ const nextPage = computedProp("next_page", (page) => ({
         :icon="['fas', 'sliders-h']"
       ></LinkRoute>
       <LinkRoute
-        label="Sidebar Items"
-        to="sidebar-items"
-        :icon="['fas', 'check-circle']"
+        label="Berks Sidebar"
+        to="berks-sidebar"
+        :icon="['fas', 'sliders-h']"
+      ></LinkRoute>
+      <LinkRoute
+        label="State College Sidebar"
+        to="statecollege-sidebar"
+        :icon="['fas', 'sliders-h']"
+      ></LinkRoute>
+      <LinkRoute
+        label="Saved Promotions"
+        to="promotions"
+        :icon="['fas', 'bullhorn']"
       ></LinkRoute>
       <LinkRoute
         label="Donor Walls"

@@ -3,7 +3,7 @@ import { computed, toRefs } from "vue";
 
 import { usePage } from "@/api/spotlightpa-page.js";
 
-import { formatDateTime } from "@/utils/time-format.js";
+import { formatDateTime } from "@/utils/time-format.ts";
 
 export default {
   props: {
@@ -237,19 +237,6 @@ export default {
         :warn="60"
         :max="80"
         :value="page.ogTitle"
-        class="mt-1 mb-4"
-      ></BulmaCharLimit>
-
-      <BulmaFieldInput
-        id="twitter"
-        v-model="page.twitterTitle"
-        label="Twitter Hed"
-        help="If set, this overrides the SEO hed on Twitter"
-      ></BulmaFieldInput>
-      <BulmaCharLimit
-        :warn="60"
-        :max="70"
-        :value="page.twitterTitle"
         class="mt-1 mb-4"
       ></BulmaCharLimit>
 
@@ -574,12 +561,6 @@ export default {
             </span>
           </div>
         </BulmaField>
-        <BulmaFieldCheckbox
-          v-model="page.feedExclude"
-          label="Exclude from mobile app feed"
-        >
-          Don't show article in mobile app list of articles
-        </BulmaFieldCheckbox>
 
         <BulmaField v-slot="{ idForLabel }" label="Language">
           <div class="select is-fullwidth">
@@ -589,6 +570,24 @@ export default {
             </select>
           </div>
         </BulmaField>
+
+        <BulmaFieldCheckbox
+          v-model="page.feedExclude"
+          label="Exclude from mobile app feed"
+        >
+          Don't show article in mobile app list of articles
+        </BulmaFieldCheckbox>
+
+        <BulmaFieldCheckbox
+          v-model="page.riverExclude"
+          label="Exclude from homepage river"
+        >
+          Don't show article in river of news on the homepage
+        </BulmaFieldCheckbox>
+
+        <BulmaFieldCheckbox v-model="page.noIndex" label="No index">
+          Hide page from Google search results and homepage river
+        </BulmaFieldCheckbox>
 
         <BulmaFieldCheckbox
           v-model="page.suppressDate"
@@ -601,10 +600,6 @@ export default {
           Don't trigger Wisepops and newsletter modal screens on this article
         </BulmaFieldCheckbox>
 
-        <BulmaFieldCheckbox v-model="page.noIndex" label="No index">
-          Hide page from Google search results and homepage river
-        </BulmaFieldCheckbox>
-
         <BulmaFieldCheckbox v-model="page.suppressAds" label="Suppress ads">
           Hide ads from header, footer, and sidebar of page
         </BulmaFieldCheckbox>
@@ -614,12 +609,13 @@ export default {
           label="Override URL path"
         ></BulmaFieldInput>
 
-        <BulmaAutocompleteArray
+        <BulmaURLArray
           v-model="page.aliases"
           label="URL Aliases"
           help="Redirect these URLs to the story"
           :options="[]"
-        ></BulmaAutocompleteArray>
+          :relative="true"
+        ></BulmaURLArray>
 
         <BulmaField v-slot="{ idForLabel }" label="Layout override">
           <input v-model="page.layout" class="input" :list="idForLabel" />
@@ -651,7 +647,6 @@ export default {
           [page.titleTag.length < 1, '#seo', 'SEO hed is unset'],
           [page.titleTag.length > 55, '#seo', 'SEO hed is long'],
           [page.ogTitle.length > 80, '#facebook', 'Facebook hed is long'],
-          [page.twitterTitle.length > 70, '#twitter', 'Twitter hed is long'],
           [page.summary.length < 1, '#description', 'SEO description is unset'],
           [
             page.summary.length > 150,

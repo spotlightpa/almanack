@@ -9,6 +9,7 @@ import (
 
 	"github.com/earthboundkid/resperr/v2"
 	"github.com/spotlightpa/almanack/internal/almlog"
+	"github.com/spotlightpa/almanack/internal/utils/stringx"
 	spreadsheet "gopkg.in/Iwark/spreadsheet.v2"
 )
 
@@ -121,8 +122,7 @@ func (sm *SheetMap) Next() bool {
 			return false
 		}
 		for _, cell := range sm.sheet.Rows[sm.row] {
-			s := strings.TrimSpace(cell.Value)
-			if s != "" {
+			if !stringx.IsWhitespace(cell.Value) {
 				return true
 			}
 		}

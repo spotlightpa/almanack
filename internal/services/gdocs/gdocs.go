@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"strconv"
 	"strings"
+	"time"
 	"unicode/utf8"
 
 	"github.com/carlmjohnson/requests"
@@ -209,6 +210,14 @@ func convertEl(n *html.Node, el *docs.StructuralElement, listInfo map[string]str
 			inner.AppendChild(el)
 		}
 
+		if dateEl := subel.DateElement; dateEl != nil && dateEl.DateElementProperties != nil {
+			inner := xhtml.LastChildOrNew(n, blockType)
+			t := toTime(dateEl.DateElementProperties)
+			timestamp := xhtml.New("time", "datetime", t.Format(time.RFC3339))
+			xhtml.AppendText(timestamp, dateEl.DateElementProperties.DisplayText)
+			inner.AppendChild(timestamp)
+		}
+
 		if subel.TextRun == nil {
 			continue
 		}
@@ -264,4 +273,36 @@ func convertEl(n *html.Node, el *docs.StructuralElement, listInfo map[string]str
 		}
 		xhtml.AppendText(inner, content)
 	}
+}
+
+// toTime:
+// Google stinks and use Z even when the timestamp does not have a timezone.
+// And for some bizarre reason, they don't have a timestamp for @now!
+// So, interpret the timestamp in US Eastern if TimeZoneId is unset.
+// Returns the zero time on error.
+func toTime(p *docs.DateElementProperties) time.Time {
+	var t time.Time
+	if parsed, err := time.Parse(time.RFC3339Nano, p.Timestamp); err == nil {
+		t = parsed.UTC()
+	} else if f, err := strconv.ParseFloat(p.Timestamp, 64); err == nil {
+		sec := int64(f)
+		t = time.Unix(sec, int64((f-float64(sec))*1e9)).UTC()
+	} else {
+		return time.Time{}
+	}
+
+	tzID := p.TimeZoneId
+	if tzID == "" {
+		loc, err := time.LoadLocation("America/New_York")
+		if err != nil {
+			return time.Time{}
+		}
+		return time.Date(t.Year(), t.Month(), t.Day(), t.Hour(), t.Minute(), t.Second(), t.Nanosecond(), loc)
+	}
+
+	loc, err := time.LoadLocation(tzID)
+	if err != nil {
+		return time.Time{}
+	}
+	return t.In(loc)
 }

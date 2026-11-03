@@ -2,7 +2,7 @@
 import { ref } from "vue";
 
 import { sendGAEvent } from "@/utils/google-analytics.js";
-import { formatDate, formatDateTime } from "@/utils/time-format.js";
+import { formatDate, formatDateTime } from "@/utils/time-format.ts";
 
 defineProps({
   article: Object,

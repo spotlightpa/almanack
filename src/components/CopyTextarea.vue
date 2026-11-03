@@ -1,4 +1,6 @@
 <script>
+import { wait, seconds } from "@/utils/wait.ts";
+
 export default {
   name: "CopyTextarea",
   props: {
@@ -31,9 +33,7 @@ export default {
       await this.$nextTick();
       if (document.execCommand("copy")) {
         this.$emit("copied", true);
-        window.setTimeout(() => {
-          this.$emit("copied", false);
-        }, 5000); // 5s
+        wait(seconds(5)).then(() => this.$emit("copied", false));
       }
     },
   },

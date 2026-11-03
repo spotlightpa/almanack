@@ -1,0 +1,23 @@
+{
+  "id": 123,
+  "status": "U",
+  "embargo_until": null,
+  "note": "",
+  "source_type": "gdocs",
+  "source_id": "abc123_testdata-gdoc-card",
+  "raw_data": null,
+  "page_id": null,
+  "created_at": "2020-03-15T20:00:00Z",
+  "updated_at": "2020-03-15T20:00:00Z",
+  "publication_date": null,
+  "internal_id": "SPLAPGENRES0526",
+  "byline": "Spotlight PA Staff",
+  "budget": "Latest results from the 2026 Pennsylvania election",
+  "hed": "Latest results from the 2026 Pennsylvania primary election",
+  "description": "Starting at 8 p.m. on May 19, get live results on 2026 primary races for PA governor, Congress, state legislature, and more.",
+  "lede_image": "",
+  "lede_image_credit": "Matt Smith / For Spotlight PA",
+  "lede_image_description": "A “Vote Here” sign is shown May 19, 2026, at Lehigh County Government Center in Allentown, Lehigh County, Pennsylvania.",
+  "lede_image_caption": "",
+  "blurb": "Get real-time results on races for Pennsylvania governor, Congress, legislature, and more in the 2026 election."
+}

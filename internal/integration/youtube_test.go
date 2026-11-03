@@ -4,8 +4,9 @@ import (
 	"net/http"
 	"testing"
 
-	"github.com/carlmjohnson/be"
+	"github.com/carlmjohnson/requests"
 	"github.com/carlmjohnson/requests/reqtest"
+	"github.com/earthboundkid/assert"
 	"github.com/spotlightpa/almanack/internal/almlog"
 	"github.com/spotlightpa/almanack/internal/almsvc"
 	"github.com/spotlightpa/almanack/internal/db"
@@ -15,6 +16,7 @@ import (
 )
 
 func TestYouTube(t *testing.T) {
+	be := assert.FailsNow(t)
 	almlog.UseTestLogger(t)
 	dbhandle := createTestDB(t)
 	svc := almsvc.Services{
@@ -24,7 +26,13 @@ func TestYouTube(t *testing.T) {
 			ChannelID: "abc123",
 		},
 		Client: &http.Client{
-			Transport: reqtest.Replay("testdata/youtube"),
+			Transport: requests.RoundTripFunc(func(req *http.Request) (*http.Response, error) {
+				// Intercept img.youtube.com from youtube.BestThumbnailURL and subsequent GET
+				if req.URL.Host == "img.youtube.com" {
+					return reqtest.ReplayFile("testdata/youtube/NCmg292P.res.txt").RoundTrip(req)
+				}
+				return reqtest.Replay("testdata/youtube").RoundTrip(req)
+			}),
 		},
 		FileStore:    aws.NewTestBlobStore(t.ArtifactDir(), "file"),
 		ImageStore:   aws.NewTestBlobStore(t.ArtifactDir(), "image"),
@@ -32,24 +40,22 @@ func TestYouTube(t *testing.T) {
 	}
 	ctx := t.Context()
 	{ // Should not have pages
-		pages, err := svc.Queries.ListPages(ctx, db.ListPagesParams{
+		pages := be.OK(svc.Queries.ListPages(ctx, db.ListPagesParams{
 			FilePath: "content/videos/%",
 			Limit:    20,
 			Offset:   0,
-		})
-		be.NilErr(t, err)
-		be.Zero(t, pages)
+		}))
+		be.Falsey(pages)
 	}
 	{ // Load initial items
-		be.NilErr(t, svc.UpdateYouTubeFeed(ctx))
+		be.NilError(svc.UpdateYouTubeFeed(ctx))
 	}
 	{ // Should have pages
-		pages, err := svc.Queries.ListPages(ctx, db.ListPagesParams{
+		pages := be.OK(svc.Queries.ListPages(ctx, db.ListPagesParams{
 			FilePath: "content/videos/%",
 			Limit:    20,
 			Offset:   0,
-		})
-		be.NilErr(t, err)
-		be.EqualLength(t, 15, pages)
+		}))
+		be.EqualLength(pages, 15)
 	}
 }

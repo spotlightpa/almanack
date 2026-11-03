@@ -79,13 +79,6 @@ func SlugifyFilename(s string) string {
 	return strings.Map(f, s)
 }
 
-func LastCut(s, sep string) (before, after string, found bool) {
-	if i := strings.LastIndex(s, sep); i >= 0 {
-		return s[:i], s[i+len(sep):], true
-	}
-	return "", s, false
-}
-
 // RemoveParens removes parentheses and any text that is inside of them.
 func RemoveParens(s string) string {
 	if !strings.Contains(s, "(") {
@@ -250,4 +243,12 @@ func ToToml(m map[string]any) (string, error) {
 		return "", err
 	}
 	return buf.String(), nil
+}
+
+// IsWhitespace returns true if all runes in s satisfy unicode.IsSpace.
+// Empty strings are true.
+func IsWhitespace(s string) bool {
+	return !strings.ContainsFunc(s, func(r rune) bool {
+		return !unicode.IsSpace(r)
+	})
 }

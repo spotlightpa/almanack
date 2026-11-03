@@ -9,6 +9,7 @@ import {
 import {
   faArrowDown,
   faArrowUp,
+  faBullhorn,
   faCheckCircle,
   faCircleExclamation,
   faFileDownload,
@@ -36,6 +37,7 @@ import {
 library.add(
   faArrowDown,
   faArrowUp,
+  faBullhorn,
   faCheckCircle,
   faCircleExclamation,
   faCopy,

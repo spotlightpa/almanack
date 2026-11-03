@@ -1,18 +1,20 @@
 <script setup>
-import { ref, watch } from "vue";
+import { ref } from "vue";
+import { useDebouncedRef, seconds } from "@/utils/wait.ts";
 
-import { get, post, listImages, postImageUpdate } from "@/api/client-v2.js";
-import { makeState, watchAPI } from "@/api/service-util.js";
+import { get, post, listImages, postImageUpdate } from "@/api/client.ts";
+import { makeState, watchAPI } from "@/api/loader.ts";
 import imgproxyURL from "@/api/imgproxy-url.js";
 
-import { formatDate } from "@/utils/time-format.js";
-import humanSize from "@/utils/human-size.js";
+import { formatDate } from "@/utils/time-format.ts";
+import humanSize from "@/utils/human-size.ts";
 
 const props = defineProps({
   page: { type: String, default: "0" },
 });
 
-const query = ref("");
+const rawQuery = ref("");
+const query = useDebouncedRef(rawQuery, seconds(1));
 
 const {
   apiState: listState,
@@ -42,9 +44,12 @@ const toImageObj = (rawImage) => ({
   isLicensed: rawImage.is_licensed,
   date: new Date(rawImage.created_at),
   downloadURL: "/ssr/download-image?src=" + encodeURIComponent(rawImage.path),
+  width: rawImage.width ?? 0,
+  height: rawImage.height ?? 0,
 });
 
 const images = computedList("images", (obj) => toImageObj(obj));
+
 const nextPage = computedProp("next_page", (page) => ({
   name: "image-uploader",
   query: {
@@ -119,15 +124,6 @@ function updateIsLicensed(image) {
   }
   doUpdate(image, { set_is_licensed: true, is_licensed: !image.isLicensed });
 }
-
-const rawQuery = ref("");
-let timeout = null;
-watch(rawQuery, (val) => {
-  window.clearTimeout(timeout);
-  timeout = window.setTimeout(() => {
-    query.value = val;
-  }, 1000);
-});
 </script>
 
 <template>
@@ -207,7 +203,13 @@ watch(rawQuery, (val) => {
                 :icon="['fas', 'file-download']"
                 :href="image.downloadURL"
               ></LinkHref>
-              <ImageSize class="mt-1" :path="image.path"></ImageSize>
+              <ImageSize
+                class="mt-1"
+                :path="image.path"
+                :width="image.width"
+                :height="image.height"
+                @update="fetch"
+              ></ImageSize>
             </div>
           </td>
           <td>

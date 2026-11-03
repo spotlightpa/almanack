@@ -3,8 +3,8 @@ package stringx_test
 import (
 	"testing"
 
-	"github.com/carlmjohnson/be"
-	"github.com/carlmjohnson/be/testfile"
+	"github.com/earthboundkid/assert"
+	"github.com/earthboundkid/assert/testfile"
 	"github.com/spotlightpa/almanack/internal/utils/stringx"
 )
 
@@ -23,8 +23,8 @@ func TestSlugifyURL(t *testing.T) {
 		{"Groß fæces", "gross-faeces"},
 	}
 	for _, tc := range cases {
-		t.Run(tc.input, func(t *testing.T) {
-			be.Equal(t, tc.want, stringx.SlugifyURL(tc.input))
+		assert.FailsNow(t).Run(tc.input, func(be assert.TB) {
+			be.Equal(stringx.SlugifyURL(tc.input), tc.want)
 		})
 	}
 }
@@ -41,8 +41,8 @@ func TestSlugifyFilename(t *testing.T) {
 		{"the (fort~Nightly)   news  ", "the-fort-nightly-news-"},
 	}
 	for _, tc := range cases {
-		t.Run(tc.input, func(t *testing.T) {
-			be.Equal(t, tc.want, stringx.SlugifyFilename(tc.input))
+		assert.FailsNow(t).Run(tc.input, func(be assert.TB) {
+			be.Equal(stringx.SlugifyFilename(tc.input), tc.want)
 		})
 	}
 }
@@ -64,12 +64,14 @@ func TestRemoveParens(t *testing.T) {
 
 	// Run test cases
 	for _, tc := range testCases {
-		be.Equal(t, tc.want, stringx.RemoveParens(tc.input))
+		assert.
+			Continues(t).
+			Equal(stringx.RemoveParens(tc.input), tc.want)
 	}
 }
 
 func TestExtractName(t *testing.T) {
-	rt := be.Relaxed(t)
+	be := assert.Continues(t)
 
 	type testcase struct {
 		Input string
@@ -101,15 +103,16 @@ func TestExtractName(t *testing.T) {
 		{"Danielle Ohl of Spotlight PA; Jessica Lussenhop of ProPublica; and Irina Bucur, Tracy Leturgey and Eddie Trizzino of The Butler Eagle", []string{"Danielle Ohl", "Jessica Lussenhop", "Irina Bucur", "Tracy Leturgey", "Eddie Trizzino"}},
 		{"Amanda Fries / For Spotlight PA", []string{"Amanda Fries"}},
 		{"\uFEFFAmanda \u200dFries / For Spotlight PA", []string{"Amanda Fries"}},
+		{"Mari\u0301a", []string{"Mar\u00EDa"}},
 	}
 	for _, tc := range cases {
-		be.AllEqual(rt, tc.Want, stringx.ExtractNames(tc.Input))
+		be.SlicesEqual(stringx.ExtractNames(tc.Input), tc.Want)
 	}
 
 	// Bulk cases
 	testfile.ReadJSON(t, "testdata/extract-name-cases.json", &cases)
 	for _, tc := range cases {
-		be.AllEqual(rt, tc.Want, stringx.ExtractNames(tc.Input))
+		be.SlicesEqual(stringx.ExtractNames(tc.Input), tc.Want)
 	}
 }
 
@@ -125,8 +128,8 @@ func TestTruncate(t *testing.T) {
 		{"1234567890", "12345…", 8},
 	}
 	for _, tc := range cases {
-		t.Run(tc.input, func(t *testing.T) {
-			be.Equal(t, tc.want, stringx.Truncate(tc.input, tc.max))
+		assert.FailsNow(t).Run(tc.input, func(be assert.TB) {
+			be.Equal(stringx.Truncate(tc.input, tc.max), tc.want)
 		})
 	}
 }
@@ -148,7 +151,7 @@ func TestFlattenMap(t *testing.T) {
 		},
 	}
 	for _, tc := range cases {
-		be.AllEqual(t, tc.want, stringx.FlattenMap(tc.in))
+		assert.Continues(t).SlicesEqual(stringx.FlattenMap(tc.in), tc.want)
 	}
 }
 
@@ -174,6 +177,31 @@ func TestFlattenMultimap(t *testing.T) {
 		},
 	}
 	for _, tc := range cases {
-		be.AllEqual(t, tc.want, stringx.FlattenMultimap(tc.in))
+		assert.
+			Continues(t).
+			SlicesEqual(stringx.FlattenMultimap(tc.in), tc.want)
 	}
+}
+
+func TestIsWhitespace(t *testing.T) {
+	type testcase struct {
+		input string
+		want  bool
+	}
+	assert.RunAll(t, map[string]testcase{
+		"empty":           {"", true},
+		"space":           {" ", true},
+		"tab":             {"\t", true},
+		"newline":         {"\n", true},
+		"crlf":            {"\r\n", true},
+		"mixed space":     {" \t\n\r ", true},
+		"letter":          {"a", false},
+		"padded word":     {" a ", false},
+		"two words":       {"hello world", false},
+		"space then word": {"\t\nfoo", false},
+		"nbsp":            {"\u00a0", true},
+		"em space":        {"\u2003", true},
+	}, func(be assert.TB, tc testcase) {
+		be.Equal(stringx.IsWhitespace(tc.input), tc.want)
+	})
 }

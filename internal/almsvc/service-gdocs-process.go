@@ -2,24 +2,280 @@ package almsvc
 
 import (
 	"cmp"
+	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"iter"
+	"maps"
 	"regexp"
 	"slices"
 	"strconv"
 	"strings"
 
+	"github.com/carlmjohnson/requests"
 	"github.com/earthboundkid/bytemap/v2"
+	"github.com/earthboundkid/errorx/v2"
 	"github.com/earthboundkid/xhtml"
+	"github.com/spotlightpa/almanack/internal/almlog"
 	"github.com/spotlightpa/almanack/internal/convert/blocko"
 	"github.com/spotlightpa/almanack/internal/convert/tableaux"
 	"github.com/spotlightpa/almanack/internal/db"
+	"github.com/spotlightpa/almanack/internal/services/gdocs"
 	"github.com/spotlightpa/almanack/internal/utils/must"
+	"github.com/spotlightpa/almanack/internal/utils/pgxutil"
+	"github.com/spotlightpa/almanack/internal/utils/shortcode"
 	"github.com/spotlightpa/almanack/internal/utils/stringx"
 	"golang.org/x/net/html"
 	"golang.org/x/net/html/atom"
 )
+
+func (svc Services) ProcessGDocsDoc(ctx context.Context, dbDoc db.GDocsDoc) (err error) {
+	defer errorx.Trace(&err)
+
+	docHTML := gdocs.Convert(&dbDoc.Document)
+	if n := xhtml.Select(docHTML, xhtml.WithAtom(atom.Data)); n != nil {
+		return fmt.Errorf(
+			"document unexpectedly contains <data> element: %q",
+			xhtml.OuterHTML(n),
+		)
+	}
+
+	// First remove everything after a ###
+	removeTail(docHTML)
+
+	warnings, err := svc.processDocExternals(ctx, &dbDoc, docHTML)
+	if err != nil {
+		return err
+	}
+
+	metadata, embeds, _, richText, rawHTML, md, warnings2 := processDocHTML(docHTML)
+	warnings = append(warnings, warnings2...)
+
+	// Default slug is article title
+	metadata.InternalID = cmp.Or(metadata.InternalID, dbDoc.Document.Title)
+
+	// database slices must not be "null"
+	embeds = pgxutil.NilSliceToEmpty(embeds)
+	warnings = pgxutil.NilSliceToEmpty(warnings)
+
+	// Save to database
+	_, err = svc.Queries.UpdateGDocsDoc(ctx, db.UpdateGDocsDocParams{
+		ID:              dbDoc.ID,
+		Metadata:        metadata,
+		Embeds:          embeds,
+		RichText:        xhtml.InnerHTMLBlocks(richText),
+		RawHtml:         xhtml.InnerHTMLBlocks(rawHTML),
+		ArticleMarkdown: md,
+		Warnings:        warnings,
+		WordCount:       int32(stringx.WordCount(xhtml.TextContent(richText))),
+	})
+	return err
+}
+
+func removeTail(n *html.Node) {
+	for c := range n.ChildNodes() {
+		if c.DataAtom == atom.Table {
+			continue
+		}
+		if !blocko.BlockElements[c.DataAtom] {
+			continue
+		}
+		if text := xhtml.TextContent(c); text != "###" {
+			continue
+		}
+
+		remove := []*html.Node{c}
+		for sibling := c.NextSibling; sibling != nil; sibling = sibling.NextSibling {
+			remove = append(remove, sibling)
+		}
+		xhtml.RemoveAll(remove)
+		return
+	}
+}
+
+func (svc Services) processDocExternals(ctx context.Context, dbDoc *db.GDocsDoc, docHTML *html.Node) (warnings []string, err error) {
+	// Get existing image uploads
+	rows, err := svc.Queries.ListGDocsImagesByExternalID(ctx, dbDoc.ExternalID)
+	if err != nil {
+		return nil, err
+	}
+
+	objID2Path := make(map[string]string, len(rows))
+	for _, row := range rows {
+		objID2Path[row.DocObjectID] = row.Path
+	}
+
+	// Handle image uploads/database lookups
+	for tbl := range tableaux.Tables(docHTML) {
+		switch label := tbl.Label(); label {
+		case "photo", "image", "photograph", "illustration", "illo",
+			"spl-photo", "partner-photo", "spl-image", "partner-image",
+			"picture-wide", "photo-wide", "picture-left", "photo-left",
+			"picture-right", "photo-right":
+			if warning := svc.replaceImagePath(
+				ctx, tbl, dbDoc.ExternalID, objID2Path,
+			); warning != "" {
+				warnings = append(warnings, warning)
+			}
+
+		case "metadata", "info":
+			if warning := svc.replaceMetadataImagePath(
+				ctx, tbl, dbDoc.ExternalID, objID2Path,
+			); warning != "" {
+				warnings = append(warnings, warning)
+			}
+
+		case "card":
+			if warning := svc.replaceCardImagePath(
+				ctx, tbl, dbDoc.ExternalID, objID2Path,
+			); warning != "" {
+				warnings = append(warnings, warning)
+			}
+		}
+	}
+	return warnings, nil
+}
+
+func (svc Services) replaceImagePath(
+	ctx context.Context,
+	tbl *tableaux.Table,
+	externalID string,
+	objID2Path map[string]string,
+) (warning string) {
+	if path := xhtml.TextContent(tbl.Value("path")); path != "" {
+		return ""
+	}
+	imageEmbed := &db.EmbedImage{
+		Credit:  xhtml.TextContent(tbl.Value("credit")),
+		Caption: xhtml.TextContent(tbl.Value("caption")),
+		Description: cmp.Or(
+			xhtml.TextContent(tbl.Value("description")),
+			xhtml.TextContent(tbl.Value("alt")),
+		),
+	}
+	return svc.findAndReplaceImagePath(ctx, tbl, tbl.Node, externalID, objID2Path, imageEmbed)
+}
+
+func (svc Services) replaceMetadataImagePath(
+	ctx context.Context,
+	tbl *tableaux.Table,
+	externalID string,
+	objID2Path map[string]string,
+) (warning string) {
+	if path := cmp.Or(
+		xhtml.TextContent(tbl.Value("lede image path")),
+		xhtml.TextContent(tbl.Value("lead image path")),
+		xhtml.TextContent(tbl.Value("path")),
+	); path != "" {
+		return ""
+	}
+	cell := tbl.ValueOrNext("lede image")
+	if cell == nil {
+		cell = tbl.ValueOrNext("lead image")
+	}
+	if cell == nil {
+		return ""
+	}
+	imageEmbed := &db.EmbedImage{
+		Credit: cmp.Or(
+			xhtml.TextContent(tbl.Value("lede image credit")),
+			xhtml.TextContent(tbl.Value("lead image credit")),
+			xhtml.TextContent(tbl.Value("credit")),
+		),
+		Description: cmp.Or(
+			xhtml.TextContent(tbl.Value("lede image description")),
+			xhtml.TextContent(tbl.Value("lead image description")),
+			xhtml.TextContent(tbl.Value("lede image alt")),
+			xhtml.TextContent(tbl.Value("lead image alt")),
+			xhtml.TextContent(tbl.Value("alt")),
+		),
+	}
+	return svc.findAndReplaceImagePath(ctx, tbl, cell, externalID, objID2Path, imageEmbed)
+}
+
+func (svc Services) replaceCardImagePath(
+	ctx context.Context,
+	tbl *tableaux.Table,
+	externalID string,
+	objID2Path map[string]string,
+) (warning string) {
+	if path := cmp.Or(
+		xhtml.TextContent(tbl.Value("image path")),
+		xhtml.TextContent(tbl.Value("path")),
+	); path != "" {
+		return ""
+	}
+	cell := tbl.ValueOrNext("image")
+	if cell == nil {
+		return ""
+	}
+	imageEmbed := &db.EmbedImage{
+		Credit: cmp.Or(
+			xhtml.TextContent(tbl.Value("image credit")),
+			xhtml.TextContent(tbl.Value("credit")),
+		),
+		Description: cmp.Or(
+			xhtml.TextContent(tbl.Value("image description")),
+			xhtml.TextContent(tbl.Value("image alt")),
+			xhtml.TextContent(tbl.Value("alt")),
+		),
+	}
+	return svc.findAndReplaceImagePath(ctx, tbl, cell, externalID, objID2Path, imageEmbed)
+}
+
+func (svc Services) findAndReplaceImagePath(
+	ctx context.Context,
+	tbl *tableaux.Table,
+	cell *html.Node,
+	externalID string,
+	objID2Path map[string]string,
+	imageEmbed *db.EmbedImage,
+) (warning string) {
+	// Look for a link to Google Drive or a link around an image
+	href := ""
+	if linkTag := xhtml.Select(cell, xhtml.WithAtom(atom.A)); linkTag != nil {
+		href = xhtml.Attr(linkTag, "href")
+	}
+
+	if href != "" {
+		path, err := svc.ReplaceAndUploadImageURL(ctx, href, imageEmbed.Description, imageEmbed.Credit)
+		switch {
+		case err == nil:
+			tbl.Set("path", path)
+			return ""
+		case errors.Is(err, requests.ErrValidator):
+			// Try GDocs object-ID upload next
+		case err != nil:
+			l := almlog.FromContext(ctx)
+			l.ErrorContext(ctx, "findAndReplaceImagePath: ReplaceAndUploadImageURL", "err", err)
+			return fmt.Sprintf("An error occurred when processing images: %v.", err)
+		}
+	}
+
+	image := xhtml.Select(cell, xhtml.WithAtom(atom.Img))
+	if image == nil {
+		return ""
+	}
+	objID := xhtml.Attr(image, "data-oid")
+	if path := objID2Path[objID]; path != "" {
+		tbl.Set("path", path)
+		return ""
+	}
+	src := xhtml.Attr(image, "src")
+	if uploadErr := svc.UploadGDocsImage(ctx, UploadGDocsImageParams{
+		ExternalID:  externalID,
+		DocObjectID: objID,
+		ImageURL:    src,
+		Embed:       imageEmbed,
+	}); uploadErr != nil {
+		l := almlog.FromContext(ctx)
+		l.ErrorContext(ctx, "findAndReplaceImagePath: UploadGDocsImage", "err", uploadErr)
+		return fmt.Sprintf("An error occurred when processing images: %v.", uploadErr)
+	}
+	tbl.Set("path", imageEmbed.Path)
+	return ""
+}
 
 // dataTagType is a string enum of possible types in
 // <data type="" value=""> elements used to pass information
@@ -52,10 +308,7 @@ func dbEmbedToString(embed db.Embed) string {
 // for data elements with a matching type="" attribute.
 func dataEls(n *html.Node, tag dataTagType) iter.Seq2[*html.Node, string] {
 	return func(yield func(*html.Node, string) bool) {
-		els := xhtml.SelectSlice(n, func(n *html.Node) bool {
-			return n.DataAtom == atom.Data && xhtml.Attr(n, "type") == string(tag)
-		})
-
+		els := xhtml.SelectSlice(n, xhtml.WithAtom(atom.Data).And(xhtml.WithAttr("type", string(tag))))
 		for _, el := range els {
 			if !yield(el, xhtml.Attr(el, "value")) {
 				return
@@ -88,12 +341,12 @@ func createIntermediateDoc(docHTML *html.Node) (
 ) {
 	// Now collect the embeds array and metadata
 	n := 1
-	for tbl, rows := range tableaux.Tables(docHTML) {
+	for tbl := range tableaux.Tables(docHTML) {
 		embed := db.Embed{N: n}
-		switch label := rows.Label(); label {
+		switch label := tbl.Label(); label {
 		case "html", "embed", "raw", "script":
 			embed.Type = db.RawEmbedTag
-			embedHTML := xhtml.TextContent(rows.At(1, 0))
+			embedHTML := xhtml.TextContent(tbl.At(1, 0))
 			embed.Value = embedHTML
 			if !ascii.Contains(embedHTML) {
 				warnings = append(warnings, fmt.Sprintf(
@@ -108,25 +361,21 @@ func createIntermediateDoc(docHTML *html.Node) (
 			goto append
 
 		case "spl", "spl-embed":
-			embedHTML := xhtml.TextContent(rows.At(1, 0))
+			embedHTML := xhtml.TextContent(tbl.At(1, 0))
 			if !strings.Contains(embedHTML, "{{<") && !xhtml.IsBalanced(embedHTML) {
 				warnings = append(warnings,
 					"Spotlight PA embed seems to contain unbalanced HTML.")
 			}
 			data := newDataTag(dtSpotlightRaw, embedHTML)
-			xhtml.ReplaceWith(tbl, data)
+			tbl.ReplaceWith(data)
 
 		case "spl-text":
-			n := xhtml.Clone(rows.At(1, 0))
-			blocko.MergeSiblings(n)
-			blocko.RemoveEmptyP(n)
-			blocko.RemoveMarks(n)
-			s := blocko.Blockize(n)
+			s := markdownify(tbl.At(1, 0))
 			data := newDataTag(dtSpotlightText, s)
-			xhtml.ReplaceWith(tbl, data)
+			tbl.ReplaceWith(data)
 
 		case "partner-embed":
-			embedHTML := xhtml.TextContent(rows.At(1, 0))
+			embedHTML := xhtml.TextContent(tbl.At(1, 0))
 			embed.Type = db.PartnerRawEmbedTag
 			embed.Value = embedHTML
 			if !ascii.Contains(embedHTML) {
@@ -142,12 +391,12 @@ func createIntermediateDoc(docHTML *html.Node) (
 			goto append
 
 		case "partner-text":
-			n := xhtml.Clone(rows.At(1, 0))
+			n := xhtml.Clone(tbl.At(1, 0))
 			blocko.MergeSiblings(n)
 			blocko.RemoveEmptyP(n)
 			blocko.RemoveMarks(n)
 			data := newDataTag(dtPartnerText, xhtml.InnerHTMLBlocks(n))
-			xhtml.ReplaceWith(tbl, data)
+			tbl.ReplaceWith(data)
 
 		case "photo", "image", "photograph", "illustration", "illo",
 			"spl-photo", "partner-photo", "spl-image", "partner-image",
@@ -169,8 +418,8 @@ func createIntermediateDoc(docHTML *html.Node) (
 			default:
 				kind = "all"
 			}
-			if imageEmbed, warning := processImage(rows, n, kind); warning != "" {
-				tbl.Parent.RemoveChild(tbl)
+			if imageEmbed, warning := processImage(tbl.Cells, n, kind); warning != "" {
+				tbl.RemoveFromParent()
 				warnings = append(warnings, warning)
 			} else {
 				embed.Value = *imageEmbed
@@ -182,36 +431,110 @@ func createIntermediateDoc(docHTML *html.Node) (
 					n++
 				}
 				data := newDataTag(dtDBEmbed, dbEmbedToString(embed))
-				xhtml.ReplaceWith(tbl, data)
+				tbl.ReplaceWith(data)
 			}
 
 		case "metadata", "info":
-			processMetadata(rows, &metadata)
-			tbl.Parent.RemoveChild(tbl)
+			processMetadata(tbl.Cells, &metadata)
+			tbl.RemoveFromParent()
 
 		case "comment", "ignore", "note":
-			tbl.Parent.RemoveChild(tbl)
+			tbl.RemoveFromParent()
 
 		case "table":
-			row := xhtml.Closest(rows.At(0, 0), xhtml.WithAtom(atom.Tr))
+			row := xhtml.Closest(tbl.At(0, 0), xhtml.WithAtom(atom.Tr))
 			row.Parent.RemoveChild(row)
+
+		case "card":
+			container := xhtml.New("div")
+			// Case card needs to:
+			body := strings.TrimSpace(markdownify(tbl.ValueOrNext("body")))
+			attrs := map[string]string{
+				"hed": xhtml.TextContent(cmp.Or(
+					tbl.Value("hed"), tbl.Value("head"), tbl.Value("headline"))),
+				"timestamp": xhtml.Attr(
+					xhtml.Select(tbl.Value("time"), xhtml.WithAtom(atom.Time)),
+					"datetime"),
+				"image": cmp.Or(
+					xhtml.TextContent(tbl.Value("path")),
+					xhtml.TextContent(tbl.Value("image path")),
+					xhtml.TextContent(tbl.Value("image"))),
+				"image-credit":      xhtml.TextContent(tbl.Value("image credit")),
+				"image-description": xhtml.TextContent(tbl.Value("image description")),
+			}
+			maps.DeleteFunc(attrs, func(k, v string) bool {
+				return v == ""
+			})
+			// 1. create a shortcode for spl
+			{
+				s := shortcode.New("card", stringx.FlattenMap(attrs)...)
+				var buf strings.Builder
+				buf.Grow(len(s) + len(body) + len("\n\n{{</card>}}"))
+				buf.WriteString(s)
+				if body != "" {
+					buf.WriteString("\n")
+					buf.WriteString(body)
+					buf.WriteString("\n")
+				}
+				buf.WriteString("{{</card>}}")
+				container.AppendChild(newDataTag(dtSpotlightText, buf.String()))
+			}
+			// 2. create some text for partners
+			{
+				div := xhtml.New("div")
+				div.AppendChild(xhtml.New("hr"))
+				if attrs["hed"] != "" {
+					h2 := xhtml.New("h2")
+					xhtml.AppendText(h2, attrs["hed"])
+					div.AppendChild(h2)
+				}
+
+				if t := xhtml.Select(tbl.Value("time"), xhtml.WithAtom(atom.Time)); t != nil {
+					h3 := xhtml.New("h3")
+					h3.AppendChild(xhtml.Clone(t))
+					div.AppendChild(h3)
+				}
+				if body := tbl.ValueOrNext("body"); xhtml.TextContent(body) != "" {
+					xhtml.AdoptChildren(div, xhtml.Clone(body))
+				}
+				div.AppendChild(xhtml.New("hr"))
+				data := newDataTag(dtPartnerText, xhtml.InnerHTMLBlocks(div))
+				container.AppendChild(data)
+			}
+
+			// 3. create a partner-photo if necessary
+			if attrs["image"] != "" {
+				imageEmbed := db.EmbedImage{
+					Path:        attrs["image"],
+					Credit:      attrs["image-credit"],
+					Description: attrs["image-description"],
+					Kind:        "partner",
+				}
+				photoEmbed := db.Embed{N: n, Type: db.ImageEmbedTag, Value: imageEmbed}
+				// can't goto the end
+				n++
+				embeds = append(embeds, photoEmbed)
+				container.AppendChild(newDataTag(dtDBEmbed, dbEmbedToString(photoEmbed)))
+			}
+			tbl.ReplaceWith(container)
+			xhtml.UnnestChildren(container)
 
 		case "toc", "table of contents":
 			embed.Type = db.ToCEmbedTag
-			embed.Value = processToc(docHTML, rows)
+			embed.Value = processToc(docHTML, tbl.Cells)
 			goto append
 
 		default:
 			warnings = append(warnings, fmt.Sprintf(
 				"Unrecognized table type: %q", label,
 			))
-			tbl.Parent.RemoveChild(tbl)
+			tbl.RemoveFromParent()
 		}
 		continue
 	append:
 		embeds = append(embeds, embed)
 		data := newDataTag(dtDBEmbed, dbEmbedToString(embed))
-		xhtml.ReplaceWith(tbl, data)
+		tbl.ReplaceWith(data)
 		n++
 	}
 
@@ -240,13 +563,14 @@ func createIntermediateDoc(docHTML *html.Node) (
 	}
 
 	// Warn about TK in document
-	tkRe := regexp.MustCompile(`(?i)\bTK\b`)
+	tkRe := regexp.MustCompile(`(?i)\b(TK)+\b`)
 	for n := range intermediateDoc.ChildNodes() {
-		if n.Type != html.TextNode {
+		if !blocko.BlockElements[n.DataAtom] {
 			continue
 		}
-		if tkRe.MatchString(n.Data) {
-			text := stringx.Truncate(n.Data, 17)
+		text := xhtml.TextContent(n)
+		if tkRe.MatchString(text) {
+			text := stringx.Truncate(text, 17)
 			warning := fmt.Sprintf(
 				`Text %q contains "TK". Did you mean to remove it?`, text)
 			warnings = append(warnings, warning)
@@ -263,7 +587,15 @@ func createIntermediateDoc(docHTML *html.Node) (
 	return
 }
 
-func processImage(rows tableaux.TableNodes, n int, kind string) (imageEmbed *db.EmbedImage, warning string) {
+func markdownify(n *html.Node) string {
+	n = xhtml.Clone(n)
+	blocko.MergeSiblings(n)
+	blocko.RemoveEmptyP(n)
+	blocko.RemoveMarks(n)
+	return blocko.Blockize(n)
+}
+
+func processImage(rows tableaux.Cells, n int, kind string) (imageEmbed *db.EmbedImage, warning string) {
 	var width, height int
 	if w := xhtml.TextContent(rows.Value("width")); w != "" {
 		width, _ = strconv.Atoi(w)
@@ -293,7 +625,7 @@ func processImage(rows tableaux.TableNodes, n int, kind string) (imageEmbed *db.
 	)
 }
 
-func processMetadata(rows tableaux.TableNodes, metadata *db.GDocsMetadata) {
+func processMetadata(rows tableaux.Cells, metadata *db.GDocsMetadata) {
 	metadata.InternalID = cmp.Or(
 		xhtml.TextContent(rows.Value("slug")),
 		xhtml.TextContent(rows.Value("internal id")),
@@ -343,7 +675,9 @@ func processMetadata(rows tableaux.TableNodes, metadata *db.GDocsMetadata) {
 		xhtml.TextContent(rows.Value("keywords")),
 	)
 	metadata.URLSlug = strings.TrimRight(metadata.URLSlug, "/")
-	_, metadata.URLSlug, _ = stringx.LastCut(metadata.URLSlug, "/")
+	if _, s, ok := strings.CutLast(metadata.URLSlug, "/"); ok {
+		metadata.URLSlug = s
+	}
 	metadata.URLSlug = stringx.SlugifyURL(metadata.URLSlug)
 
 	metadata.Blurb = cmp.Or(
@@ -380,7 +714,7 @@ func processMetadata(rows tableaux.TableNodes, metadata *db.GDocsMetadata) {
 	metadata.Layout = xhtml.TextContent(rows.Value("layout"))
 }
 
-func processToc(doc *html.Node, rows tableaux.TableNodes) string {
+func processToc(doc *html.Node, rows tableaux.Cells) string {
 	type header struct {
 		text  string
 		id    string

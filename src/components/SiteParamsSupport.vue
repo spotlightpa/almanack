@@ -3,7 +3,7 @@ import { computed } from "vue";
 
 import useProps from "@/utils/use-props.js";
 import { toRel, toAbs } from "@/utils/link.ts";
-import sanitizeText from "@/utils/sanitize-text.js";
+import sanitizeText from "@/utils/sanitize-text.ts";
 
 function cleanText(text) {
   return (text ?? "")

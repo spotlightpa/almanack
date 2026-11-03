@@ -1,8 +1,8 @@
 <script setup>
 import { ref, computed } from "vue";
 
-import { post, postPageLoad } from "@/api/client-v2.js";
-import { makeState } from "@/api/service-util.js";
+import { post, postPageLoad } from "@/api/client.ts";
+import { makeState } from "@/api/loader.ts";
 
 const { exec, apiStateRefs } = makeState();
 const isLoading = apiStateRefs.isLoadingThrottled;

@@ -1,6 +1,6 @@
-import { computed, reactive, ref, toRefs, watch } from "vue";
+import { computed, reactive, ref, watch } from "vue";
 
-import { makeState, watchAPI } from "@/api/service-util.js";
+import { makeState, watchAPI } from "@/api/loader.ts";
 import {
   get as clientGet,
   post as clientPost,
@@ -10,11 +10,11 @@ import {
   listImages,
   postPage,
   postPageRefresh,
-} from "@/api/client-v2.js";
+} from "@/api/client.ts";
 import { processGDocsDoc } from "@/api/gdocs.js";
 import imgproxyURL from "@/api/imgproxy-url.js";
 import { toRel } from "@/utils/link.ts";
-import maybeDate from "@/utils/maybe-date.js";
+import maybeDate from "@/utils/maybe-date.ts";
 
 export class Page {
   constructor(data) {
@@ -71,6 +71,7 @@ export class Page {
     this.layout = this.frontmatter["layout"] ?? "";
     this.feedExclude = this.frontmatter["feed-exclude"] ?? false;
     this.contentSource = this.frontmatter["content-source"] ?? "";
+    this.riverExclude = this.frontmatter["river-exclude"] ?? false;
 
     // not a getter so it won't react to changes
     this.status = "pub";
@@ -253,6 +254,7 @@ export class Page {
         layout: this.layout,
         "feed-exclude": this.feedExclude,
         "content-source": this.contentSource,
+        "river-exclude": this.riverExclude,
       },
       set_body: true,
       body: this.body,
@@ -286,7 +288,7 @@ function useSeries() {
 }
 
 export function usePage(id) {
-  const { apiState, exec } = makeState();
+  const { apiStateRefs, exec } = makeState();
 
   const fetch = (id) =>
     exec(() =>
@@ -295,20 +297,22 @@ export function usePage(id) {
   const post = (page) => exec(() => clientPost(postPage, page));
 
   const page = computed(() =>
-    apiState.rawData ? reactive(new Page(apiState.rawData)) : null
+    apiStateRefs.rawData.value
+      ? reactive(new Page(apiStateRefs.rawData.value))
+      : null
   );
 
   watch(() => id.value, fetch, {
     immediate: true,
   });
 
-  const { apiState: imageState, exec: execImage } = makeState();
+  const { apiStateRefs: imageStateRefs, exec: execImage } = makeState();
   execImage(() => clientGet(listImages));
 
   return {
     showScheduler: ref(false),
 
-    ...toRefs(apiState),
+    ...apiStateRefs,
     topics: useTopics(),
     series: useSeries(),
     fetch,
@@ -374,10 +378,7 @@ export function usePage(id) {
         });
       });
     },
-    imageState,
-    images: computed(() =>
-      !imageState.rawData ? [] : imageState.rawData.images
-    ),
+    images: computed(() => imageStateRefs.rawData.value?.images ?? []),
     setImageProps(image) {
       page.value.image = image.path;
       page.value.imageDescription = image.description;

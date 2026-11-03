@@ -1,7 +1,7 @@
 <script setup>
-import { useAuth } from "@/api/auth.js";
-import { get, listSharedArticles } from "@/api/client-v2.js";
-import { watchAPI } from "@/api/service-util.js";
+import { useAuth } from "@/api/auth.ts";
+import { get, listSharedArticles } from "@/api/client.ts";
+import { watchAPI } from "@/api/loader.ts";
 import SharedArticle from "@/api/shared-article.js";
 
 const props = defineProps({

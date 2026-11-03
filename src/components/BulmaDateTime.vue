@@ -1,6 +1,6 @@
 <script setup>
 import { computed } from "vue";
-import { formatDateTime } from "@/utils/time-format.js";
+import { formatDateTime } from "@/utils/time-format.ts";
 
 const props = defineProps({
   label: String,

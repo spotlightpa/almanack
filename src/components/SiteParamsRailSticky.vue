@@ -20,6 +20,8 @@ defineExpose({
       :params="params"
       :file-props="fileProps"
       :show-width-height="false"
+      :fixed-width="640"
+      :fixed-height="535"
       prop-name="ad-rail-sticky"
       label="Sidebar sticky ad is a 640x535 square at the bottom of the rail sidebar that sticks to the screen on scroll"
       text="Show sidebar sticky ad"

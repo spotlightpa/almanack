@@ -5,7 +5,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/carlmjohnson/be"
+	"github.com/earthboundkid/assert"
 )
 
 func TestTooltipCards(t *testing.T) {
@@ -21,8 +21,9 @@ func TestTooltipCards(t *testing.T) {
 		{"Cards (mobile only)", false, true},
 	}
 	for _, tc := range cases {
-		be.Equal(t, tc.desktop, tooltipCards(tc.tooltipType, "desktop"))
-		be.Equal(t, tc.mobile, tooltipCards(tc.tooltipType, "mobile"))
+		assert.Continues(t).
+			Equal(tooltipCards(tc.tooltipType, "desktop"), tc.desktop).
+			Equal(tooltipCards(tc.tooltipType, "mobile"), tc.mobile)
 	}
 }
 
@@ -36,25 +37,28 @@ func TestSheetPercent(t *testing.T) {
 		"abc":  "",
 	}
 	for in, want := range cases {
-		be.Equal(t, want, sheetPercent(in))
+		assert.Continues(t).Equal(sheetPercent(in), want)
 	}
 }
 
 func TestTemplateAttr(t *testing.T) {
-	be.Equal(t, "a<br>b", templateAttr("\na\nb\n"))
-	be.Equal(t, "a<br>b", templateAttr(`a\nb`))
-	be.Equal(t, "<div class='x'>", templateAttr(`<div class="x">`))
+	assert.Continues(t).
+		Equal(templateAttr("\na\nb\n"), "a<br>b").
+		Equal(templateAttr(`a\nb`), "a<br>b").
+		Equal(templateAttr(`<div class="x">`), "<div class='x'>")
 }
 
 func TestMapContentPath(t *testing.T) {
 	published := time.Date(2026, 7, 20, 0, 0, 0, 0, time.UTC)
-	be.Equal(t, "content/news/2026-07-20-SPLREADINGMAP.md",
-		mapContentPath("", "reading-map", "splreadingmap", published))
-	be.Equal(t, "content/news/reading-map.md",
-		mapContentPath("News", "reading-map", "", time.Time{}))
+	assert.Continues(t).
+		Equal(mapContentPath("", "reading-map", "splreadingmap", published),
+			"content/news/2026-07-20-SPLREADINGMAP.md").
+		Equal(mapContentPath("News", "reading-map", "", time.Time{}),
+			"content/news/reading-map.md")
 }
 
 func TestMapPageToMarkdown(t *testing.T) {
+	be := assert.FailsNow(t)
 	page := MapPage{
 		Slug:            "reading-map",
 		Headline:        "Find Your District",
@@ -65,12 +69,11 @@ func TestMapPageToMarkdown(t *testing.T) {
 		DesktopCards:    true,
 		GeoJSON:         "https://example.com/map.geojson",
 	}
-	md, err := page.ToMarkdown("")
-	be.NilErr(t, err)
-	be.In(t, `tooltips="true"`, md)
-	be.In(t, `desktop-display="card"`, md)
-	be.True(t, !strings.Contains(md, "mobile-display"))
-	be.True(t, !strings.Contains(md, "eyebrow="))
-	be.In(t, "{{column}}", md)
-	be.In(t, `geojson="https://example.com/map.geojson"`, md)
+	md := be.OK(page.ToMarkdown(""))
+	be.True(strings.Contains(md, `tooltips="true"`)).
+		True(strings.Contains(md, `desktop-display="card"`)).
+		False(strings.Contains(md, "mobile-display")).
+		False(strings.Contains(md, "eyebrow=")).
+		True(strings.Contains(md, "{{column}}")).
+		True(strings.Contains(md, `geojson="https://example.com/map.geojson"`))
 }

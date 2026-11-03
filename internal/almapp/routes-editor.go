@@ -6,6 +6,7 @@ import (
 	"github.com/spotlightpa/almanack/internal/db"
 	"github.com/spotlightpa/almanack/internal/services/netlifyid"
 	"github.com/spotlightpa/almanack/internal/utils/paginate"
+	"github.com/spotlightpa/almanack/internal/utils/pgxutil"
 )
 
 func (app *appEnv) userInfo(w http.ResponseWriter, r *http.Request) http.Handler {
@@ -25,7 +26,7 @@ func (app *appEnv) listSharedArticles(w http.ResponseWriter, r *http.Request) ht
 
 	// Spotlight PA users can add ?show=all
 	if r.URL.Query().Get("show") == "all" {
-		if err := app.auth.HasRole(r, "Spotlight PA"); err != nil {
+		if err := app.svc.Auth.HasRole(r, "Spotlight PA"); err != nil {
 			return app.jsonErr(err)
 		}
 
@@ -43,7 +44,7 @@ func (app *appEnv) listSharedArticles(w http.ResponseWriter, r *http.Request) ht
 
 		return app.jsonOK(struct {
 			Stories  []db.SharedArticle `json:"stories"`
-			NextPage int32              `json:"next_page,string,omitempty"`
+			NextPage int32              `json:"next_page,string,omitzero"`
 		}{
 			Stories:  stories,
 			NextPage: pager.NextPage,
@@ -64,7 +65,7 @@ func (app *appEnv) listSharedArticles(w http.ResponseWriter, r *http.Request) ht
 
 	return app.jsonOK(struct {
 		Stories  []db.SharedArticle `json:"stories"`
-		NextPage int32              `json:"next_page,string,omitempty"`
+		NextPage int32              `json:"next_page,string,omitzero"`
 	}{
 		Stories:  stories,
 		NextPage: pager.NextPage,
@@ -93,7 +94,7 @@ func (app *appEnv) getSharedArticle(w http.ResponseWriter, r *http.Request) http
 		article, err = app.svc.Queries.GetSharedArticleByID(r.Context(), id)
 	}
 	if err != nil {
-		err = db.NoRowsAs404(err,
+		err = pgxutil.NoRowsAs404(err,
 			"missing shared_article %v", q)
 		return app.jsonErr(err)
 	}
@@ -101,7 +102,7 @@ func (app *appEnv) getSharedArticle(w http.ResponseWriter, r *http.Request) http
 	if article.Status != "S" &&
 		article.Status != "P" {
 		// Let Spotlight PA users get article regardless of its status
-		if err := app.auth.HasRole(r, "Spotlight PA"); err != nil {
+		if err := app.svc.Auth.HasRole(r, "Spotlight PA"); err != nil {
 			return app.jsonNewErr(http.StatusNotFound,
 				"user unauthorized to view article: %w", err)
 		}

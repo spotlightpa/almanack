@@ -66,3 +66,4 @@ dist/
 functions/
 
 _artifacts/
+components.d.ts

@@ -13,6 +13,12 @@ import (
 	"github.com/spotlightpa/almanack/internal/utils/httpx"
 )
 
+// NewHandler builds an http.Handler for use in tests.
+func NewHandler(svc almsvc.Services) http.Handler {
+	app := &appEnv{svc: svc}
+	return app.routes()
+}
+
 func (app *appEnv) routes() http.Handler {
 	mux := http.NewServeMux()
 
@@ -68,14 +74,13 @@ func (app *appEnv) routes() http.Handler {
 		HandleFunc(mux, `GET /api/pages`, app.listPages).
 		HandleFunc(mux, `GET /api/pages-by-fts`, app.listPagesByFTS).
 		HandleFunc(mux, `POST /api/page-refresh`, app.postPageRefresh).
+		Control(mux, `GET /api/promotion`, app.listPromotions).
+		Control(mux, `POST /api/promotion`, app.postPromotion).
+		Control(mux, `POST /api/promotion-delete`, app.deletePromotion).
 		HandleFunc(mux, `POST /api/shared-article`, app.postSharedArticle).
 		HandleFunc(mux, `POST /api/shared-article-from-gdocs`, app.postSharedArticleFromGDocs).
-		HandleFunc(mux, `GET /api/sidebar`, app.siteDataGet(almsvc.SidebarLoc)).
-		HandleFunc(mux, `POST /api/sidebar`, app.siteDataSet(almsvc.SidebarLoc)).
 		Control(mux, `GET /api/site-data`, app.getSiteData).
-		Control(mux, `POST /api/site-data`, app.postSiteData).
-		HandleFunc(mux, `GET /api/site-params`, app.siteDataGet(almsvc.SiteParamsLoc)).
-		HandleFunc(mux, `POST /api/site-params`, app.siteDataSet(almsvc.SiteParamsLoc))
+		Control(mux, `POST /api/site-data`, app.postSiteData)
 	// End spotlight endpoints
 
 	// Don't trust this middleware!
@@ -133,8 +138,8 @@ func (app *appEnv) routes() http.Handler {
 		middleware.RealIP,
 		almlog.Middleware,
 	)
-	baseMW.PushIf(!app.isLambda, middleware.Recoverer)
-	baseMW.PushIf(app.isLambda, sentryhttp.
+	baseMW.PushIf(!app.svc.IsLambda, middleware.Recoverer)
+	baseMW.PushIf(app.svc.IsLambda, sentryhttp.
 		New(sentryhttp.Options{
 			WaitForDelivery: true,
 			Timeout:         5 * time.Second,

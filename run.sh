@@ -80,11 +80,11 @@ function build:frontend() {
 }
 
 function build:backend() {
-	$GO_EXEC version
+	"$GO_EXEC" version
 	set -x
 	echo "${DEPLOY_PRIME_URL:-http://local.dev}" >internal/almsvc/deploy-url.txt
 	LDFLAGS="-linkmode external -extldflags -static"
-	GOBIN=$THIS_DIR/functions $GO_EXEC install -ldflags "$LDFLAGS" ./funcs/...
+	GOBIN=$THIS_DIR/functions "$GO_EXEC" install -ldflags "$LDFLAGS" ./funcs/...
 	cp "$THIS_DIR/functions/almanack-api" "$THIS_DIR/functions/almanack-api-background"
 	set +x
 }
@@ -107,16 +107,16 @@ function test:frontend() {
 }
 
 function test:backend() {
-	$GO_EXEC test -race -v ./...
+	"$GO_EXEC" test -race -v ./...
 }
 
 function test:db() {
-	ALMANACK_POSTGRES=$PG_LOCAL_URL $GO_EXEC test "$@" ./internal/integration
+	ALMANACK_POSTGRES=$PG_LOCAL_URL "$GO_EXEC" test "$@" ./internal/integration
 }
 
 function test:misc() {
 	_git-xargs '*.sh' shellcheck _
-	$GO_EXEC mod tidy -diff
+	"$GO_EXEC" mod tidy -diff
 }
 
 function format() {
@@ -180,7 +180,7 @@ function db:load-dump() {
 function api() {
 	# shellcheck disable=SC1091
 	[[ -f .env ]] && echo "Using .env file" && source .env
-	$GO_EXEC run ./funcs/almanack-api "$@"
+	"$GO_EXEC" run ./funcs/almanack-api "$@"
 }
 
 function frontend() {

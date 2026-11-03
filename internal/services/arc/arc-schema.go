@@ -73,7 +73,7 @@ func (item *FeedItem) Scan(value any) error {
 	}
 	buf, ok := value.([]byte)
 	if !ok {
-		return errors.New("canot parse to bytes")
+		return errors.New("cannot parse to bytes")
 	}
 	if err := json.Unmarshal(buf, &newItem); err != nil {
 		return err

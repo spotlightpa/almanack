@@ -37,9 +37,7 @@ func MergeSiblings(root *html.Node) {
 }
 
 func RemoveEmptyP(root *html.Node) {
-	emptyP := xhtml.SelectSlice(root, func(n *html.Node) bool {
-		return n.DataAtom == atom.P && isEmpty(n)
-	})
+	emptyP := xhtml.SelectSlice(root, xhtml.WithAtom(atom.P).And(isEmpty))
 	for _, n := range emptyP {
 		n.Parent.RemoveChild(n)
 	}
@@ -65,15 +63,14 @@ func replaceWhitespace(root *html.Node) {
 		if n.Type != html.TextNode {
 			continue
 		}
-		// Ignore children of pre/code
-		codeblock := xhtml.Closest(n, func(n *html.Node) bool {
-			return n.DataAtom == atom.Pre ||
-				n.DataAtom == atom.Code ||
-				n.Type == html.RawNode
-		})
-		if codeblock == nil {
-			n.Data = whitespaceReplacer.Replace(n.Data)
+		// Ignore children of pre/code/raw text
+		codeblock := xhtml.Closest(n, xhtml.WithAtom(atom.Pre).
+			Or(xhtml.WithAtom(atom.Code)).
+			Or(xhtml.WithType(html.RawNode)))
+		if codeblock != nil {
+			continue
 		}
+		n.Data = whitespaceReplacer.Replace(n.Data)
 	}
 }
 
