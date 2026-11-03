@@ -28,15 +28,14 @@ type MapPage struct {
 	GeoJSON           string
 	Color             string
 	ColorOpacity      string
-	MapType           string
 	SearchEnabled     bool
 	SearchText        string
 	SearchUseLocation bool
 	ReadMoreEnabled   bool
 	TooltipsEnabled   bool
 	TooltipValue      string
-	DesktopDisplay    string
-	MobileDisplay     string
+	DesktopCards      bool
+	MobileCards       bool
 	FeaturedDocLink   string
 	CustomCodeURL     string
 	Blurb             string
@@ -154,11 +153,11 @@ func (m MapPage) ToMarkdown(featuredMD string) (string, error) {
 	if m.TooltipValue != "" {
 		attrs = append(attrs, "tooltip-value", templateAttr(m.TooltipValue))
 	}
-	if d := sheetDisplay(m.DesktopDisplay); d != "" {
-		attrs = append(attrs, "desktop-display", d)
+	if m.DesktopCards {
+		attrs = append(attrs, "desktop-display", "card")
 	}
-	if d := sheetDisplay(m.MobileDisplay); d != "" {
-		attrs = append(attrs, "mobile-display", d)
+	if m.MobileCards {
+		attrs = append(attrs, "mobile-display", "card")
 	}
 	if m.CustomCodeURL != "" {
 		attrs = append(attrs, "custom-code", m.CustomCodeURL)
@@ -222,33 +221,17 @@ func templateAttr(s string) string {
 	return strings.ReplaceAll(v, `"`, "'")
 }
 
-func tooltipTypeDisplay(explicit, tooltipType, screen string) string {
-	if strings.TrimSpace(explicit) != "" {
-		return explicit
-	}
+func tooltipCards(tooltipType, screen string) bool {
 	t := strings.ToLower(tooltipType)
 	if !strings.Contains(t, "card") {
-		return ""
+		return false
 	}
 	desktop := strings.Contains(t, "desktop")
 	mobile := strings.Contains(t, "mobile")
 	if !desktop && !mobile {
-		return "card"
+		return true
 	}
-	if (screen == "desktop" && desktop) || (screen == "mobile" && mobile) {
-		return "card"
-	}
-	return "popup"
-}
-
-func sheetDisplay(s string) string {
-	switch strings.ToLower(strings.TrimSpace(s)) {
-	case "card", "cards":
-		return "card"
-	case "popup", "tooltip":
-		return "popup"
-	}
-	return ""
+	return (screen == "desktop" && desktop) || (screen == "mobile" && mobile)
 }
 
 func trimBR(s string) string {
@@ -435,15 +418,14 @@ func SheetToMapPages(ctx context.Context, cl *http.Client, sheetID string) ([]Ma
 		PublishedAt:       publishedAt,
 		Color:             set.Field("Map Color"),
 		ColorOpacity:      sheetPercent(set.Field("Map Color Opacity")),
-		MapType:           set.Field("Map Type"),
 		SearchEnabled:     sheetBool(set.Field("Search Bar")),
 		SearchText:        set.Field("Search Bar Text"),
 		SearchUseLocation: sheetBool(set.Field("Search Bar Use Location")),
 		ReadMoreEnabled:   sheetBool(set.Field("Read More")),
 		TooltipsEnabled:   sheetBool(tip.Field("Tooltips Enabled")),
 		TooltipValue:      tip.Field("Tooltip Value"),
-		DesktopDisplay:    tooltipTypeDisplay(tip.Field("Desktop Display"), tip.Field("Tooltip Type"), "desktop"),
-		MobileDisplay:     tooltipTypeDisplay(tip.Field("Mobile Display"), tip.Field("Tooltip Type"), "mobile"),
+		DesktopCards:      tooltipCards(tip.Field("Tooltip Type"), "desktop"),
+		MobileCards:       tooltipCards(tip.Field("Tooltip Type"), "mobile"),
 		FeaturedDocLink:   set.Field("Featured Story Document Link"),
 		CustomCodeURL:     set.Field("Custom Code"),
 		Blurb:             hdr.Field("Blurb"),
