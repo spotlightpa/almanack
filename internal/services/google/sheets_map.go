@@ -40,6 +40,9 @@ type MapPage struct {
 	CustomCodeURL     string
 	Blurb             string
 	Description       string
+	ShareImage        string
+	ShareImageDesc    string
+	ShareImageCrop    string
 	InternalID        string
 	Kicker            string
 	Topics            []string
@@ -83,19 +86,22 @@ func (m MapPage) ToMarkdown(featuredMD string) (string, error) {
 		authors = stringx.ExtractNames(m.Byline)
 	}
 	fm, err := stringx.ToToml(map[string]any{
-		"authors":      authors,
-		"blurb":        m.Blurb,
-		"byline":       m.Byline,
-		"description":  m.Description,
-		"internal-id":  m.InternalID,
-		"kicker":       m.Kicker,
-		"layout":       "searchable-map",
-		"published":    m.PublishedAt,
-		"slug":         m.Slug,
-		"suppress-ads": true,
-		"title":        m.Headline,
-		"title-tag":    m.Headline,
-		"topics":       m.Topics,
+		"authors":           authors,
+		"blurb":             m.Blurb,
+		"byline":            m.Byline,
+		"description":       m.Description,
+		"image":             m.ShareImage,
+		"image-description": m.ShareImageDesc,
+		"image-gravity":     sheetGravity(m.ShareImageCrop),
+		"internal-id":       m.InternalID,
+		"kicker":            m.Kicker,
+		"layout":            "searchable-map",
+		"published":         m.PublishedAt,
+		"slug":              m.Slug,
+		"suppress-ads":      true,
+		"title":             m.Headline,
+		"title-tag":         m.Headline,
+		"topics":            m.Topics,
 	})
 	if err != nil {
 		return "", err
@@ -242,6 +248,22 @@ func trimBR(s string) string {
 		s = strings.TrimSuffix(s, "<br>")
 	}
 	return strings.TrimSpace(s)
+}
+
+func sheetGravity(s string) string {
+	switch strings.ToLower(strings.TrimSpace(s)) {
+	case "top":
+		return "no"
+	case "bottom":
+		return "so"
+	case "left":
+		return "we"
+	case "right":
+		return "ea"
+	case "smart":
+		return "sm"
+	}
+	return "ce"
 }
 
 func sheetPercent(s string) string {
@@ -430,6 +452,9 @@ func SheetToMapPages(ctx context.Context, cl *http.Client, sheetID string) ([]Ma
 		CustomCodeURL:     set.Field("Custom Code"),
 		Blurb:             hdr.Field("Blurb"),
 		Description:       hdr.Field("Description"),
+		ShareImage:        hdr.Field("Share Image"),
+		ShareImageDesc:    hdr.Field("Share Image Description"),
+		ShareImageCrop:    hdr.Field("Share Image Crop"),
 		InternalID:        hdr.Field("Internal ID"),
 		Kicker:            hdr.Field("Kicker"),
 		Topics:            topics,

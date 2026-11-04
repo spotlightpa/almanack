@@ -66,6 +66,7 @@ func TestScrollyMapPageToMarkdown(t *testing.T) {
 	}
 	md := be.OK(page.ToMarkdown(""))
 	for _, want := range []string{
+		`image-gravity = "ce"`,
 		`credit-type="Words by"`,
 		`hed-size="large"`,
 		`topper-layout="icon"`,
@@ -82,6 +83,27 @@ func TestScrollyMapPageToMarkdown(t *testing.T) {
 	} {
 		be.True(strings.Contains(md, want))
 	}
+}
+
+func TestScrollyMapShareImageFallback(t *testing.T) {
+	be := assert.FailsNow(t)
+	page := ScrollyMapPage{
+		Slug:                   "regions",
+		Headline:               "Regions",
+		TopperImage:            "2026/09/topper.png",
+		TopperImageDescription: "Illustrated map of Pennsylvania",
+		Stops:                  []ScrollyMapStop{{Label: "A"}},
+	}
+	md := be.OK(page.ToMarkdown(""))
+	be.True(strings.Contains(md, `image = "2026/09/topper.png"`)).
+		True(strings.Contains(md, `image-description = "Illustrated map of Pennsylvania"`))
+
+	page.ShareImage = "2026/09/share.png"
+	page.ShareImageDescription = "Share art"
+	md = be.OK(page.ToMarkdown(""))
+	be.True(strings.Contains(md, `image = "2026/09/share.png"`)).
+		True(strings.Contains(md, `image-description = "Share art"`)).
+		False(strings.Contains(md, `image = "2026/09/topper.png"`))
 }
 
 func TestScrollyMapTopperSkippedWithoutImage(t *testing.T) {

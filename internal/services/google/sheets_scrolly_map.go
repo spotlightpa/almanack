@@ -32,6 +32,7 @@ type ScrollyMapPage struct {
 	Description            string
 	ShareImage             string
 	ShareImageDescription  string
+	ShareImageCrop         string
 	TopperLayout           string
 	TopperMobileLayout     string
 	TopperImage            string
@@ -83,13 +84,18 @@ func (m ScrollyMapPage) ToMarkdown(featuredMD string) (string, error) {
 	if m.Byline != "" {
 		authors = stringx.ExtractNames(m.Byline)
 	}
+	shareImage, shareDescription := m.ShareImage, m.ShareImageDescription
+	if shareImage == "" {
+		shareImage, shareDescription = m.TopperImage, m.TopperImageDescription
+	}
 	fm, err := stringx.ToToml(map[string]any{
 		"authors":           authors,
 		"blurb":             m.Blurb,
 		"byline":            m.Byline,
 		"description":       m.Description,
-		"image":             m.ShareImage,
-		"image-description": m.ShareImageDescription,
+		"image":             shareImage,
+		"image-description": shareDescription,
+		"image-gravity":     sheetGravity(m.ShareImageCrop),
 		"internal-id":       m.InternalID,
 		"kicker":            m.Kicker,
 		"layout":            "scrolly-map",
@@ -316,6 +322,7 @@ func SheetToScrollyMapPages(ctx context.Context, cl *http.Client, sheetID string
 		Description:            hdr.Field("Description"),
 		ShareImage:             hdr.Field("Share Image"),
 		ShareImageDescription:  hdr.Field("Share Image Description"),
+		ShareImageCrop:         hdr.Field("Share Image Crop"),
 		TopperLayout:           hdr.Field("Topper Layout"),
 		TopperMobileLayout:     hdr.Field("Mobile Topper Layout"),
 		TopperImage:            hdr.Field("Topper Image"),
