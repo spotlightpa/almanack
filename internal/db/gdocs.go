@@ -84,6 +84,13 @@ type EmbedImage struct {
 
 type Embeds []Embed
 
+func (embeds Embeds) Last() *Embed {
+	if len(embeds) == 0 {
+		return nil
+	}
+	return &embeds[len(embeds)-1]
+}
+
 func (embeds *Embeds) Append(embedType EmbedType, value string) {
 	*embeds = append(*embeds, Embed{
 		N:     len(*embeds) + 1,
@@ -98,4 +105,8 @@ func (embeds *Embeds) AppendImage(embed EmbedImage) {
 		Type:  ImageEmbedTag,
 		Value: embed,
 	})
+}
+
+func (embeds *Embeds) DropLast() {
+	*embeds = (*embeds)[:len(*embeds)-1]
 }
