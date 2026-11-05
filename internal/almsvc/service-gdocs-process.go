@@ -355,6 +355,8 @@ func createIntermediateDoc(docHTML *html.Node) (
 					"Embed #%d seems to contain unbalanced HTML.", embeds.Last().N,
 				))
 			}
+			data := newDataTag(dtDBEmbed, dbEmbedToString(embeds.Last()))
+			tbl.ReplaceWith(data)
 
 		case "spl", "spl-embed":
 			embedHTML := xhtml.TextContent(tbl.At(1, 0))
@@ -383,6 +385,8 @@ func createIntermediateDoc(docHTML *html.Node) (
 					"Embed #%d seems to contain unbalanced HTML.", embeds.Last().N,
 				))
 			}
+			data := newDataTag(dtDBEmbed, dbEmbedToString(embeds.Last()))
+			tbl.ReplaceWith(data)
 
 		case "partner-text":
 			n := xhtml.Clone(tbl.At(1, 0))
@@ -513,6 +517,8 @@ func createIntermediateDoc(docHTML *html.Node) (
 		case "toc", "table of contents":
 			toc := processToc(docHTML, tbl.Cells)
 			embeds.Append(db.ToCEmbedTag, toc)
+			data := newDataTag(dtDBEmbed, dbEmbedToString(embeds.Last()))
+			tbl.ReplaceWith(data)
 
 		default:
 			warnings = append(warnings, fmt.Sprintf(
