@@ -300,8 +300,8 @@ func dbEmbedFromString(s string) db.Embed {
 	return dbembed
 }
 
-func dbEmbedToString(embed db.Embed) string {
-	return string(must.Get(json.Marshal(embed)))
+func dbEmbedToString(embed *db.Embed) string {
+	return string(must.Get(json.Marshal(*embed)))
 }
 
 // dataEls yields a tuple of elements and their value attribute
@@ -347,12 +347,12 @@ func createIntermediateDoc(docHTML *html.Node) (
 			embeds.Append(db.RawEmbedTag, embedHTML)
 			if !ascii.Contains(embedHTML) {
 				warnings = append(warnings, fmt.Sprintf(
-					"Embed #%d contains unusual characters.", n,
+					"Embed #%d contains unusual characters.", embeds.Last().N,
 				))
 			}
 			if !xhtml.IsBalanced(embedHTML) {
 				warnings = append(warnings, fmt.Sprintf(
-					"Embed #%d seems to contain unbalanced HTML.", n,
+					"Embed #%d seems to contain unbalanced HTML.", embeds.Last().N,
 				))
 			}
 
@@ -375,12 +375,12 @@ func createIntermediateDoc(docHTML *html.Node) (
 			embeds.Append(db.PartnerRawEmbedTag, embedHTML)
 			if !ascii.Contains(embedHTML) {
 				warnings = append(warnings, fmt.Sprintf(
-					"Embed #%d contains unusual characters.", n,
+					"Embed #%d contains unusual characters.", embeds.Last().N,
 				))
 			}
 			if !xhtml.IsBalanced(embedHTML) {
 				warnings = append(warnings, fmt.Sprintf(
-					"Embed #%d seems to contain unbalanced HTML.", n,
+					"Embed #%d seems to contain unbalanced HTML.", embeds.Last().N,
 				))
 			}
 
@@ -411,19 +411,21 @@ func createIntermediateDoc(docHTML *html.Node) (
 			default:
 				kind = "all"
 			}
-			if imageEmbed, warning := processImage(tbl.Cells, n, kind); warning != "" {
+			if imageEmbed, warning := processImage(tbl.Cells, kind); warning != "" {
 				tbl.RemoveFromParent()
 				warnings = append(warnings, warning)
 			} else {
+				embeds.AppendImage(*imageEmbed)
 				if kind != "spl" {
-					embeds.AppendImage(*imageEmbed)
 					if stringx.IsWhitespace(imageEmbed.Description) {
-						warnings = append(warnings, fmt.Sprintf("Image embed #%d missing alt description.", len(embeds)))
+						warnings = append(warnings, fmt.Sprintf("Image embed #%d missing alt description.", embeds.Last().N))
 					}
-
 				}
-				data := newDataTag(dtDBEmbed, dbEmbedToString(embed))
+				data := newDataTag(dtDBEmbed, dbEmbedToString(embeds.Last()))
 				tbl.ReplaceWith(data)
+				if kind == "spl" {
+					embeds.DropLast()
+				}
 			}
 
 		case "metadata", "info":
@@ -502,19 +504,15 @@ func createIntermediateDoc(docHTML *html.Node) (
 					Description: attrs["image-description"],
 					Kind:        "partner",
 				}
-				photoEmbed := db.Embed{N: n, Type: db.ImageEmbedTag, Value: imageEmbed}
-				// can't goto the end
-				n++
-				embeds = append(embeds, photoEmbed)
-				container.AppendChild(newDataTag(dtDBEmbed, dbEmbedToString(photoEmbed)))
+				embeds.AppendImage(imageEmbed)
+				container.AppendChild(newDataTag(dtDBEmbed, dbEmbedToString(embeds.Last())))
 			}
 			tbl.ReplaceWith(container)
 			xhtml.UnnestChildren(container)
 
 		case "toc", "table of contents":
-			embed.Type = db.ToCEmbedTag
-			embed.Value = processToc(docHTML, tbl.Cells)
-			goto append
+			toc := processToc(docHTML, tbl.Cells)
+			embeds.Append(db.ToCEmbedTag, toc)
 
 		default:
 			warnings = append(warnings, fmt.Sprintf(
@@ -522,12 +520,6 @@ func createIntermediateDoc(docHTML *html.Node) (
 			))
 			tbl.RemoveFromParent()
 		}
-		continue
-	append:
-		embeds = append(embeds, embed)
-		data := newDataTag(dtDBEmbed, dbEmbedToString(embed))
-		tbl.ReplaceWith(data)
-		n++
 	}
 
 	intermediateDoc = must.Get(blocko.Minify(xhtml.ToBuffer(docHTML)))
@@ -587,7 +579,7 @@ func markdownify(n *html.Node) string {
 	return blocko.Blockize(n)
 }
 
-func processImage(rows tableaux.Cells, n int, kind string) (imageEmbed *db.EmbedImage, warning string) {
+func processImage(rows tableaux.Cells, kind string) (imageEmbed *db.EmbedImage, warning string) {
 	var width, height int
 	if w := xhtml.TextContent(rows.Value("width")); w != "" {
 		width, _ = strconv.Atoi(w)
@@ -612,9 +604,7 @@ func processImage(rows tableaux.Cells, n int, kind string) (imageEmbed *db.Embed
 		imageEmbed.Path = path
 		return imageEmbed, ""
 	}
-	return nil, fmt.Sprintf(
-		"Table %d missing image", n,
-	)
+	return nil, "Table missing image"
 }
 
 func processMetadata(rows tableaux.Cells, metadata *db.GDocsMetadata) {
