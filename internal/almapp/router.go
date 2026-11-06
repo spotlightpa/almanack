@@ -113,6 +113,18 @@ func (app *appEnv) routes() http.Handler {
 			app.hasRoleMiddleware("Spotlight PA"),
 		).
 		Control(mux, `POST /api-background/migrate`, app.postMigrate)
+	backgroundMW.
+		With(
+			app.authHeaderMiddleware,
+			app.hasRoleMiddleware("Spotlight PA"),
+		).
+		Control(mux, `POST /api-background/map-sheet`, app.postMapSheet)
+	backgroundMW.
+		With(
+			app.authHeaderMiddleware,
+			app.hasRoleMiddleware("Spotlight PA"),
+		).
+		Control(mux, `POST /api-background/scrolly-map-sheet`, app.postScrollyMapSheet)
 	// End background API endpoints
 
 	standardMW.HandleFunc(mux, "/", app.notFound)
