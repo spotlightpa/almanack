@@ -41,22 +41,6 @@ func TestSheetPercent(t *testing.T) {
 	}
 }
 
-func TestSheetGravity(t *testing.T) {
-	cases := map[string]string{
-		"":         "ce",
-		"Center":   "ce",
-		"Top":      "no",
-		" bottom ": "so",
-		"Left":     "we",
-		"Right":    "ea",
-		"Smart":    "sm",
-		"other":    "ce",
-	}
-	for in, want := range cases {
-		assert.Continues(t).Equal(sheetGravity(in), want)
-	}
-}
-
 func TestTemplateAttr(t *testing.T) {
 	assert.Continues(t).
 		Equal(templateAttr("\na\nb\n"), "a<br>b").
@@ -73,6 +57,14 @@ func TestMapContentPath(t *testing.T) {
 			"content/news/reading-map.md")
 }
 
+func TestMapPageDefaultShareImage(t *testing.T) {
+	be := assert.FailsNow(t)
+	page := MapPage{Slug: "reading-map", Headline: "Find Your District"}
+	md := be.OK(page.ToMarkdown(""))
+	be.True(strings.Contains(md, `image = "2020/06/01fdjfj1nf20rwxt.jpeg"`)).
+		True(strings.Contains(md, `image-description = "Spotlight PA"`))
+}
+
 func TestMapPageToMarkdown(t *testing.T) {
 	be := assert.FailsNow(t)
 	page := MapPage{
@@ -86,7 +78,6 @@ func TestMapPageToMarkdown(t *testing.T) {
 		GeoJSON:         "https://example.com/map.geojson",
 		ShareImage:      "2026/07/share.png",
 		ShareImageDesc:  "Map of Reading council districts",
-		ShareImageCrop:  "Top",
 	}
 	md := be.OK(page.ToMarkdown(""))
 	be.True(strings.Contains(md, `tooltips="true"`)).
@@ -97,5 +88,5 @@ func TestMapPageToMarkdown(t *testing.T) {
 		True(strings.Contains(md, `geojson="https://example.com/map.geojson"`)).
 		True(strings.Contains(md, `image = "2026/07/share.png"`)).
 		True(strings.Contains(md, `image-description = "Map of Reading council districts"`)).
-		True(strings.Contains(md, `image-gravity = "no"`))
+		True(strings.Contains(md, `image-gravity = "ce"`))
 }

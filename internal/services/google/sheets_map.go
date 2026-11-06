@@ -42,7 +42,6 @@ type MapPage struct {
 	Description       string
 	ShareImage        string
 	ShareImageDesc    string
-	ShareImageCrop    string
 	InternalID        string
 	Kicker            string
 	Topics            []string
@@ -80,7 +79,16 @@ func mapContentPath(section, slug, internalID string, publishedAt time.Time) str
 	return fmt.Sprintf("content/%s/%s.md", section, name)
 }
 
+const (
+	defaultShareImage            = "2020/06/01fdjfj1nf20rwxt.jpeg"
+	defaultShareImageDescription = "Spotlight PA"
+)
+
 func (m MapPage) ToMarkdown(featuredMD string) (string, error) {
+	shareImage, shareDescription := m.ShareImage, m.ShareImageDesc
+	if shareImage == "" {
+		shareImage, shareDescription = defaultShareImage, defaultShareImageDescription
+	}
 	var authors []string
 	if m.Byline != "" {
 		authors = stringx.ExtractNames(m.Byline)
@@ -90,9 +98,9 @@ func (m MapPage) ToMarkdown(featuredMD string) (string, error) {
 		"blurb":             m.Blurb,
 		"byline":            m.Byline,
 		"description":       m.Description,
-		"image":             m.ShareImage,
-		"image-description": m.ShareImageDesc,
-		"image-gravity":     sheetGravity(m.ShareImageCrop),
+		"image":             shareImage,
+		"image-description": shareDescription,
+		"image-gravity":     "ce",
 		"internal-id":       m.InternalID,
 		"kicker":            m.Kicker,
 		"layout":            "searchable-map",
@@ -248,22 +256,6 @@ func trimBR(s string) string {
 		s = strings.TrimSuffix(s, "<br>")
 	}
 	return strings.TrimSpace(s)
-}
-
-func sheetGravity(s string) string {
-	switch strings.ToLower(strings.TrimSpace(s)) {
-	case "top":
-		return "no"
-	case "bottom":
-		return "so"
-	case "left":
-		return "we"
-	case "right":
-		return "ea"
-	case "smart":
-		return "sm"
-	}
-	return "ce"
 }
 
 func sheetPercent(s string) string {
@@ -454,7 +446,6 @@ func SheetToMapPages(ctx context.Context, cl *http.Client, sheetID string) ([]Ma
 		Description:       hdr.Field("Description"),
 		ShareImage:        hdr.Field("Share Image"),
 		ShareImageDesc:    hdr.Field("Share Image Description"),
-		ShareImageCrop:    hdr.Field("Share Image Crop"),
 		InternalID:        hdr.Field("Internal ID"),
 		Kicker:            hdr.Field("Kicker"),
 		Topics:            topics,

@@ -21,8 +21,6 @@ type ScrollyMapPage struct {
 	Eyebrow                string
 	Dek                    string
 	Byline                 string
-	CreditType             string
-	HeadlineSize           string
 	Date                   string
 	PublishedAt            time.Time
 	InternalID             string
@@ -32,13 +30,10 @@ type ScrollyMapPage struct {
 	Description            string
 	ShareImage             string
 	ShareImageDescription  string
-	ShareImageCrop         string
 	TopperLayout           string
 	TopperMobileLayout     string
 	TopperImage            string
 	TopperImageDescription string
-	TopperImageFit         string
-	TopperBackground       string
 	Color                  string
 	ColorOpacity           string
 	UnshadedColor          string
@@ -84,9 +79,15 @@ func (m ScrollyMapPage) ToMarkdown(featuredMD string) (string, error) {
 	if m.Byline != "" {
 		authors = stringx.ExtractNames(m.Byline)
 	}
-	shareImage, shareDescription := m.ShareImage, m.ShareImageDescription
+	shareImage, shareDescription, shareGravity := m.ShareImage, m.ShareImageDescription, "ce"
 	if shareImage == "" {
 		shareImage, shareDescription = m.TopperImage, m.TopperImageDescription
+		if !strings.HasPrefix(sheetOption(m.TopperLayout), "icon") {
+			shareGravity = "sm"
+		}
+	}
+	if shareImage == "" {
+		shareImage, shareDescription, shareGravity = defaultShareImage, defaultShareImageDescription, "ce"
 	}
 	fm, err := stringx.ToToml(map[string]any{
 		"authors":           authors,
@@ -95,7 +96,7 @@ func (m ScrollyMapPage) ToMarkdown(featuredMD string) (string, error) {
 		"description":       m.Description,
 		"image":             shareImage,
 		"image-description": shareDescription,
-		"image-gravity":     sheetGravity(m.ShareImageCrop),
+		"image-gravity":     shareGravity,
 		"internal-id":       m.InternalID,
 		"kicker":            m.Kicker,
 		"layout":            "scrolly-map",
@@ -122,8 +123,6 @@ func (m ScrollyMapPage) ToMarkdown(featuredMD string) (string, error) {
 	attrs = appendAttr(attrs, "dek", m.Dek)
 	attrs = appendAttr(attrs, "display-date", m.Date)
 	attrs = appendAttr(attrs, "byline", m.Byline)
-	attrs = appendAttr(attrs, "credit-type", m.CreditType)
-	attrs = appendAttr(attrs, "hed-size", sheetOption(m.HeadlineSize))
 	attrs = append(attrs, "outlet", "Spotlight PA")
 	attrs = appendAttr(attrs, "color", m.Color)
 	attrs = appendAttr(attrs, "color-opacity", m.ColorOpacity)
@@ -141,10 +140,8 @@ func (m ScrollyMapPage) ToMarkdown(featuredMD string) (string, error) {
 	if layout := sheetOption(m.TopperLayout); m.TopperImage != "" && layout != "none" {
 		attrs = append(attrs, "topper-image", m.TopperImage)
 		attrs = appendAttr(attrs, "topper-image-description", m.TopperImageDescription)
-		attrs = appendAttr(attrs, "topper-image-fit", sheetOption(m.TopperImageFit))
 		attrs = appendAttr(attrs, "topper-layout", layout)
 		attrs = appendAttr(attrs, "topper-mobile-layout", sheetOption(m.TopperMobileLayout))
-		attrs = appendAttr(attrs, "topper-bg", m.TopperBackground)
 	}
 	sb.WriteString(shortcode.New("featured/scrolly-map", attrs...))
 	sb.WriteString("\n")
@@ -311,8 +308,6 @@ func SheetToScrollyMapPages(ctx context.Context, cl *http.Client, sheetID string
 		Eyebrow:                hdr.Field("Eyebrow"),
 		Dek:                    hdr.Field("Deck"),
 		Byline:                 hdr.Field("Author"),
-		CreditType:             hdr.Field("Credit Type"),
-		HeadlineSize:           hdr.Field("Headline Size"),
 		Date:                   hdr.Field("Display Date"),
 		PublishedAt:            publishedAt,
 		InternalID:             hdr.Field("Internal ID"),
@@ -322,13 +317,10 @@ func SheetToScrollyMapPages(ctx context.Context, cl *http.Client, sheetID string
 		Description:            hdr.Field("Description"),
 		ShareImage:             hdr.Field("Share Image"),
 		ShareImageDescription:  hdr.Field("Share Image Description"),
-		ShareImageCrop:         hdr.Field("Share Image Crop"),
 		TopperLayout:           hdr.Field("Topper Layout"),
 		TopperMobileLayout:     hdr.Field("Mobile Topper Layout"),
 		TopperImage:            hdr.Field("Topper Image"),
 		TopperImageDescription: hdr.Field("Topper Image Description"),
-		TopperImageFit:         hdr.Field("Topper Image Fit"),
-		TopperBackground:       hdr.Field("Topper Background Color"),
 		Color:                  set.Field("Map Color"),
 		ColorOpacity:           sheetPercent(set.Field("Map Color Opacity")),
 		UnshadedColor:          set.Field("Unshaded Color"),
