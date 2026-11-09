@@ -54,7 +54,6 @@ func TestScrollyMapPageToMarkdown(t *testing.T) {
 		TopperLayout:  "Icon Light",
 		TopperImage:   "2026/09/topper.png",
 		CardPosition:  "Right",
-		UnshadedColor: "#e5e5e5",
 		BasemapHidden: true,
 		Background:    "Navy",
 		OutlineOff:    true,
@@ -66,7 +65,6 @@ func TestScrollyMapPageToMarkdown(t *testing.T) {
 	for _, want := range []string{
 		`image-gravity = "ce"`,
 		`topper-layout="icon-light"`,
-		`base-color="#e5e5e5"`,
 		`layout="right"`,
 		`basemap="hide"`,
 		`background="Navy"`,
@@ -122,4 +120,61 @@ func TestScrollyMapTopperSkippedWithoutImage(t *testing.T) {
 		False(strings.Contains(md, "topper-image")).
 		True(strings.Contains(md, `image = "2020/06/01fdjfj1nf20rwxt.jpeg"`)).
 		True(strings.Contains(md, `image-gravity = "ce"`))
+}
+
+func storyPage(position, stop string) ScrollyMapPage {
+	return ScrollyMapPage{
+		Slug:                  "regions",
+		Headline:              "Regions",
+		FeaturedStoryPosition: position,
+		FeaturedStoryStop:     stop,
+		Stops: []ScrollyMapStop{
+			{SheetRow: 3, Label: "One"},
+			{SheetRow: 4, Label: "Two"},
+			{SheetRow: 6, Label: "Three"},
+		},
+	}
+}
+
+func TestScrollyMapStoryPosition(t *testing.T) {
+	const story = "STORY TEXT"
+	cases := []struct {
+		position, stop string
+		want           []string
+	}{
+		{"", "", []string{"One", "Two", "Three", "/featured/scrolly-map", story}},
+		{"After the Map", "", []string{"One", "Two", "Three", "/featured/scrolly-map", story}},
+		{"Before the Map", "", []string{`continues="true"`, "/featured/scrolly-map", story, `continued="true"`, "One", "Two", "Three"}},
+		{"After a specific Stop", "A4", []string{`continues="true"`, "One", "Two", "/featured/scrolly-map", story, `continued="true"`, "Three"}},
+		{"After a specific Stop", "3", []string{`continues="true"`, "One", "/featured/scrolly-map", story, `continued="true"`, "Two", "Three"}},
+		{"After a specific Stop", "A6", []string{"One", "Two", "Three", "/featured/scrolly-map", story}},
+		{"After a specific Stop", "A9", []string{"One", "Two", "Three", "/featured/scrolly-map", story}},
+		{"After a specific Stop", "", []string{"One", "Two", "Three", "/featured/scrolly-map", story}},
+	}
+	for _, tc := range cases {
+		md, err := storyPage(tc.position, tc.stop).ToMarkdown(story)
+		assert.Continues(t).OK(md, err)
+		pos := 0
+		for _, want := range tc.want {
+			i := strings.Index(md[pos:], want)
+			assert.Continues(t).True(i >= 0)
+			if i >= 0 {
+				pos += i + len(want)
+			}
+		}
+		splits := strings.Count(md, "{{</featured/scrolly-map>}}")
+		wantSplits := 1
+		if strings.Contains(tc.want[0], "continues") {
+			wantSplits = 2
+		}
+		assert.Continues(t).Equal(splits, wantSplits)
+	}
+}
+
+func TestScrollyMapStoryPositionWithoutStory(t *testing.T) {
+	md, err := storyPage("Before the Map", "").ToMarkdown("")
+	assert.FailsNow(t).OK(md, err)
+	assert.Continues(t).
+		False(strings.Contains(md, "continues")).
+		Equal(strings.Count(md, "{{</featured/scrolly-map>}}"), 1)
 }

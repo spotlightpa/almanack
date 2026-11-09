@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"net/http"
+	"slices"
 	"strconv"
 	"strings"
 	"time"
@@ -36,7 +37,6 @@ type ScrollyMapPage struct {
 	TopperImageDescription string
 	Color                  string
 	ColorOpacity           string
-	UnshadedColor          string
 	CardPosition           string
 	BasemapHidden          bool
 	Background             string
@@ -44,11 +44,14 @@ type ScrollyMapPage struct {
 	OutlineColor           string
 	ShadeProperty          string
 	FeaturedDocLink        string
+	FeaturedStoryPosition  string
+	FeaturedStoryStop      string
 	Stops                  []ScrollyMapStop
 	Credits                []MapCredit
 }
 
 type ScrollyMapStop struct {
+	SheetRow          int
 	Label             string
 	GeoJSON           string
 	CardText          string
@@ -72,6 +75,63 @@ type ScrollyMapStop struct {
 
 func (m ScrollyMapPage) FilePath() string {
 	return mapContentPath(m.Section, m.Slug, m.InternalID, m.PublishedAt)
+}
+
+func (m ScrollyMapPage) storySplit(featuredMD string) int {
+	if featuredMD == "" {
+		return -1
+	}
+	switch sheetOption(m.FeaturedStoryPosition) {
+	case "before-the-map":
+		return 0
+	case "after-a-specific-stop":
+		row, err := strconv.Atoi(strings.TrimLeft(strings.ToUpper(strings.TrimSpace(m.FeaturedStoryStop)), "ABCDEFGHIJKLMNOPQRSTUVWXYZ"))
+		if err != nil {
+			return -1
+		}
+		for i, stop := range m.Stops[:max(len(m.Stops)-1, 0)] {
+			if stop.SheetRow == row {
+				return i + 1
+			}
+		}
+	}
+	return -1
+}
+
+func writeScrollyMap(sb *strings.Builder, attrs []string, stops []ScrollyMapStop) {
+	sb.WriteString(shortcode.New("featured/scrolly-map", attrs...))
+	sb.WriteString("\n")
+	for _, stop := range stops {
+		var sattrs []string
+		sattrs = appendAttr(sattrs, "label", stop.Label)
+		sattrs = appendAttr(sattrs, "color", stop.Color)
+		sattrs = appendAttr(sattrs, "geojson", stop.GeoJSON)
+		sattrs = appendAttr(sattrs, "align", sheetOption(stop.CardPosition))
+		sattrs = appendAttr(sattrs, "fit", sheetOption(stop.ZoomTo))
+		if stop.ShadingOff {
+			sattrs = append(sattrs, "shade", "false")
+		}
+		sattrs = appendAttr(sattrs, "dots", stop.Dots)
+		sattrs = appendAttr(sattrs, "image", stop.Image)
+		sattrs = appendAttr(sattrs, "image-description", stop.ImageDescription)
+		sattrs = appendAttr(sattrs, "image-caption", stop.ImageCaption)
+		sattrs = appendAttr(sattrs, "image-credit", stop.ImageCredit)
+		sattrs = appendAttr(sattrs, "image-ratio", sheetRatio(stop.ImageRatio))
+		sattrs = appendAttr(sattrs, "datawrapper", stop.Datawrapper)
+		sattrs = appendAttr(sattrs, "datawrapper-height", stop.DatawrapperHeight)
+		sattrs = appendAttr(sattrs, "flourish", stop.Flourish)
+		sattrs = appendAttr(sattrs, "media-position", sheetOption(stop.MediaPosition))
+		sattrs = appendAttr(sattrs, "card-class", stop.CardClass)
+		sattrs = appendAttr(sattrs, "text-class", stop.TextClass)
+		sb.WriteString(shortcode.New("featured/scrolly-map-stop", sattrs...))
+		sb.WriteString("\n")
+		if stop.CardText != "" {
+			sb.WriteString(stop.CardText)
+			sb.WriteString("\n")
+		}
+		sb.WriteString("{{</featured/scrolly-map-stop>}}\n")
+	}
+	sb.WriteString("{{</featured/scrolly-map>}}\n")
 }
 
 func (m ScrollyMapPage) ToMarkdown(featuredMD string) (string, error) {
@@ -126,7 +186,6 @@ func (m ScrollyMapPage) ToMarkdown(featuredMD string) (string, error) {
 	attrs = append(attrs, "outlet", "Spotlight PA")
 	attrs = appendAttr(attrs, "color", m.Color)
 	attrs = appendAttr(attrs, "color-opacity", m.ColorOpacity)
-	attrs = appendAttr(attrs, "base-color", m.UnshadedColor)
 	attrs = appendAttr(attrs, "layout", sheetOption(m.CardPosition))
 	if m.BasemapHidden {
 		attrs = append(attrs, "basemap", "hide")
@@ -143,43 +202,20 @@ func (m ScrollyMapPage) ToMarkdown(featuredMD string) (string, error) {
 		attrs = appendAttr(attrs, "topper-layout", layout)
 		attrs = appendAttr(attrs, "topper-mobile-layout", sheetOption(m.TopperMobileLayout))
 	}
-	sb.WriteString(shortcode.New("featured/scrolly-map", attrs...))
-	sb.WriteString("\n")
-
-	for _, stop := range m.Stops {
-		var sattrs []string
-		sattrs = appendAttr(sattrs, "label", stop.Label)
-		sattrs = appendAttr(sattrs, "color", stop.Color)
-		sattrs = appendAttr(sattrs, "geojson", stop.GeoJSON)
-		sattrs = appendAttr(sattrs, "align", sheetOption(stop.CardPosition))
-		sattrs = appendAttr(sattrs, "fit", sheetOption(stop.ZoomTo))
-		if stop.ShadingOff {
-			sattrs = append(sattrs, "shade", "false")
-		}
-		sattrs = appendAttr(sattrs, "dots", stop.Dots)
-		sattrs = appendAttr(sattrs, "image", stop.Image)
-		sattrs = appendAttr(sattrs, "image-description", stop.ImageDescription)
-		sattrs = appendAttr(sattrs, "image-caption", stop.ImageCaption)
-		sattrs = appendAttr(sattrs, "image-credit", stop.ImageCredit)
-		sattrs = appendAttr(sattrs, "image-ratio", sheetRatio(stop.ImageRatio))
-		sattrs = appendAttr(sattrs, "datawrapper", stop.Datawrapper)
-		sattrs = appendAttr(sattrs, "datawrapper-height", stop.DatawrapperHeight)
-		sattrs = appendAttr(sattrs, "flourish", stop.Flourish)
-		sattrs = appendAttr(sattrs, "media-position", sheetOption(stop.MediaPosition))
-		sattrs = appendAttr(sattrs, "card-class", stop.CardClass)
-		sattrs = appendAttr(sattrs, "text-class", stop.TextClass)
-		sb.WriteString(shortcode.New("featured/scrolly-map-stop", sattrs...))
+	split := m.storySplit(featuredMD)
+	if split < 0 {
+		writeScrollyMap(&sb, attrs, m.Stops)
 		sb.WriteString("\n")
-		if stop.CardText != "" {
-			sb.WriteString(stop.CardText)
+		if featuredMD != "" {
+			sb.WriteString(featuredMD)
 			sb.WriteString("\n")
 		}
-		sb.WriteString("{{</featured/scrolly-map-stop>}}\n")
-	}
-	sb.WriteString("{{</featured/scrolly-map>}}\n\n")
-
-	if featuredMD != "" {
+	} else {
+		writeScrollyMap(&sb, append(slices.Clip(attrs), "continues", "true"), m.Stops[:split])
+		sb.WriteString("\n")
 		sb.WriteString(featuredMD)
+		sb.WriteString("\n\n")
+		writeScrollyMap(&sb, append(slices.Clip(attrs), "continued", "true"), m.Stops[split:])
 		sb.WriteString("\n")
 	}
 
@@ -270,8 +306,9 @@ func SheetToScrollyMapPages(ctx context.Context, cl *http.Client, sheetID string
 
 	var stops []ScrollyMapStop
 	st := newSheetMapSkipDescription(stopsSheet)
-	for range st.Rows() {
+	for row := range st.Rows() {
 		stop := ScrollyMapStop{
+			SheetRow:          row + 1,
 			Label:             st.Field("Label"),
 			GeoJSON:           st.Field("GeoJSON"),
 			CardText:          sheetText(st.Field("Card Text")),
@@ -323,7 +360,6 @@ func SheetToScrollyMapPages(ctx context.Context, cl *http.Client, sheetID string
 		TopperImageDescription: hdr.Field("Topper Image Description"),
 		Color:                  set.Field("Map Color"),
 		ColorOpacity:           sheetPercent(set.Field("Map Color Opacity")),
-		UnshadedColor:          set.Field("Unshaded Color"),
 		CardPosition:           set.Field("Default Card Position"),
 		BasemapHidden:          strings.EqualFold(set.Field("Basemap"), "Hide"),
 		Background:             set.Field("Background Color"),
@@ -331,6 +367,8 @@ func SheetToScrollyMapPages(ctx context.Context, cl *http.Client, sheetID string
 		OutlineColor:           set.Field("Outline Color"),
 		ShadeProperty:          set.Field("Shade Property"),
 		FeaturedDocLink:        set.Field("Featured Story Document Link"),
+		FeaturedStoryPosition:  set.Field("Featured Story Position"),
+		FeaturedStoryStop:      set.Field("Featured Story Stop"),
 		Stops:                  stops,
 		Credits:                sheetCredits(creditsSheet),
 	}
