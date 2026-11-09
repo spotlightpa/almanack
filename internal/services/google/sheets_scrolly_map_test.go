@@ -58,7 +58,7 @@ func TestScrollyMapPageToMarkdown(t *testing.T) {
 		Background:    "Navy",
 		OutlineOff:    true,
 		Stops: []ScrollyMapStop{
-			{Label: "Central PA", GeoJSON: "https://example.com/a.geojson", CardText: "Hello", ZoomTo: "Shaded", ShadingOff: true, ImageRatio: "16:9"},
+			{Label: "Central PA", GeoJSON: "https://example.com/a.geojson", CardText: "Hello", ZoomTo: "Shaded", ImageRatio: "16:9"},
 		},
 	}
 	md := be.OK(page.ToMarkdown(""))
@@ -70,7 +70,6 @@ func TestScrollyMapPageToMarkdown(t *testing.T) {
 		`background="Navy"`,
 		`outline="false"`,
 		`fit="shaded"`,
-		`shade="false"`,
 		`image-ratio="16:9"`,
 		"Hello\n{{</featured/scrolly-map-stop>}}",
 	} {

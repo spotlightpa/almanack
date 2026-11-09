@@ -58,7 +58,6 @@ type ScrollyMapStop struct {
 	Color             string
 	CardPosition      string
 	ZoomTo            string
-	ShadingOff        bool
 	Dots              string
 	Image             string
 	ImageDescription  string
@@ -113,9 +112,6 @@ func writeScrollyMap(sb *strings.Builder, attrs []string, stops []ScrollyMapStop
 		sattrs = appendAttr(sattrs, "geojson", stop.GeoJSON)
 		sattrs = appendAttr(sattrs, "align", sheetOption(stop.CardPosition))
 		sattrs = appendAttr(sattrs, "fit", sheetOption(stop.ZoomTo))
-		if stop.ShadingOff {
-			sattrs = append(sattrs, "shade", "false")
-		}
 		sattrs = appendAttr(sattrs, "dots", stop.Dots)
 		sattrs = appendAttr(sattrs, "image", stop.Image)
 		sattrs = appendAttr(sattrs, "image-description", stop.ImageDescription)
@@ -320,7 +316,6 @@ func SheetToScrollyMapPages(ctx context.Context, cl *http.Client, sheetID string
 			Color:             st.Field("Color"),
 			CardPosition:      st.Field("Card Position"),
 			ZoomTo:            st.Field("Zoom To"),
-			ShadingOff:        sheetUnchecked(st.Field("Shading")),
 			Dots:              st.Field("Dots"),
 			Image:             st.Field("Image"),
 			ImageDescription:  st.Field("Image Description"),
