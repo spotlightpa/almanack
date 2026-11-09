@@ -178,3 +178,16 @@ func TestScrollyMapStoryPositionWithoutStory(t *testing.T) {
 		False(strings.Contains(md, "continues")).
 		Equal(strings.Count(md, "{{</featured/scrolly-map>}}"), 1)
 }
+
+func TestScrollyMapStopHasContent(t *testing.T) {
+	assert.Continues(t).
+		False(ScrollyMapStop{}.hasContent()).
+		False(ScrollyMapStop{Color: "Blue", CardPosition: "Left"}.hasContent()).
+		True(ScrollyMapStop{Dots: "Altoona: 40.5, -78.4"}.hasContent()).
+		True(ScrollyMapStop{Image: "2026/05/photo.jpeg"}.hasContent()).
+		True(ScrollyMapStop{Datawrapper: "1Dg8P"}.hasContent()).
+		True(ScrollyMapStop{Flourish: "visualisation/1"}.hasContent()).
+		True(ScrollyMapStop{Label: "A"}.hasContent()).
+		True(ScrollyMapStop{CardText: "Text"}.hasContent()).
+		True(ScrollyMapStop{GeoJSON: "https://example.com/a.geojson"}.hasContent())
+}

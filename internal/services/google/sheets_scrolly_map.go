@@ -98,6 +98,11 @@ func (m ScrollyMapPage) storySplit(featuredMD string) int {
 	return -1
 }
 
+func (s ScrollyMapStop) hasContent() bool {
+	return s.Label != "" || s.CardText != "" || s.GeoJSON != "" || s.Dots != "" ||
+		s.Image != "" || s.Datawrapper != "" || s.Flourish != ""
+}
+
 func writeScrollyMap(sb *strings.Builder, attrs []string, stops []ScrollyMapStop) {
 	sb.WriteString(shortcode.New("featured/scrolly-map", attrs...))
 	sb.WriteString("\n")
@@ -329,7 +334,7 @@ func SheetToScrollyMapPages(ctx context.Context, cl *http.Client, sheetID string
 			CardClass:         st.Field("Card Class"),
 			TextClass:         st.Field("Text Class"),
 		}
-		if stop.Label == "" && stop.GeoJSON == "" && stop.CardText == "" {
+		if !stop.hasContent() {
 			continue
 		}
 		stops = append(stops, stop)
