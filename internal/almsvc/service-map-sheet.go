@@ -49,6 +49,19 @@ func (svc Services) SyncScrollyMapSheet(ctx context.Context, sheetID string) (er
 	if err != nil {
 		return
 	}
+	for i := range pages {
+		for j := range pages[i].Stops {
+			stop := &pages[i].Stops[j]
+			if stop.Image == "" || stop.ImageRatio != "" {
+				continue
+			}
+			img, ierr := svc.Queries.GetImageByPath(ctx, stop.Image)
+			if ierr != nil {
+				continue
+			}
+			stop.ImageRatio = google.SizeRatio(int(img.Width), int(img.Height))
+		}
+	}
 
 	for _, page := range pages {
 		if perr := svc.publishMapPage(ctx, page.Slug, page.FeaturedDocLink, page.FilePath(), page.ToMarkdown); perr != nil {

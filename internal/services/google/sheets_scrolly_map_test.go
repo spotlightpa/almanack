@@ -190,3 +190,23 @@ func TestScrollyMapStopHasContent(t *testing.T) {
 		True(ScrollyMapStop{CardText: "Text"}.hasContent()).
 		True(ScrollyMapStop{GeoJSON: "https://example.com/a.geojson"}.hasContent())
 }
+
+func TestScrollyMapBasemapThrough(t *testing.T) {
+	be := assert.FailsNow(t)
+	page := ScrollyMapPage{
+		Slug:           "regions",
+		Headline:       "Regions",
+		BasemapThrough: true,
+		Stops:          []ScrollyMapStop{{Label: "A"}},
+	}
+	md := be.OK(page.ToMarkdown(""))
+	be.True(strings.Contains(md, `basemap="show-through"`))
+}
+
+func TestSizeRatio(t *testing.T) {
+	be := assert.FailsNow(t)
+	be.Equal(SizeRatio(1280, 720), "16:9")
+	be.Equal(SizeRatio(1200, 800), "3:2")
+	be.Equal(SizeRatio(1000, 1000), "1:1")
+	be.Equal(SizeRatio(0, 720), "")
+}

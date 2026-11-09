@@ -39,6 +39,7 @@ type ScrollyMapPage struct {
 	ColorOpacity           string
 	CardPosition           string
 	BasemapHidden          bool
+	BasemapThrough         bool
 	Background             string
 	OutlineOff             bool
 	OutlineColor           string
@@ -51,25 +52,24 @@ type ScrollyMapPage struct {
 }
 
 type ScrollyMapStop struct {
-	SheetRow          int
-	Label             string
-	GeoJSON           string
-	CardText          string
-	Color             string
-	CardPosition      string
-	ZoomTo            string
-	Dots              string
-	Image             string
-	ImageDescription  string
-	ImageCaption      string
-	ImageCredit       string
-	ImageRatio        string
-	Datawrapper       string
-	DatawrapperHeight string
-	Flourish          string
-	MediaPosition     string
-	CardClass         string
-	TextClass         string
+	SheetRow         int
+	Label            string
+	GeoJSON          string
+	CardText         string
+	Color            string
+	CardPosition     string
+	ZoomTo           string
+	Dots             string
+	Image            string
+	ImageDescription string
+	ImageCaption     string
+	ImageCredit      string
+	ImageRatio       string
+	Datawrapper      string
+	Flourish         string
+	MediaPosition    string
+	CardClass        string
+	TextClass        string
 }
 
 func (m ScrollyMapPage) FilePath() string {
@@ -119,7 +119,6 @@ func writeScrollyMap(sb *strings.Builder, attrs []string, stops []ScrollyMapStop
 		sattrs = appendAttr(sattrs, "image-credit", stop.ImageCredit)
 		sattrs = appendAttr(sattrs, "image-ratio", sheetRatio(stop.ImageRatio))
 		sattrs = appendAttr(sattrs, "datawrapper", stop.Datawrapper)
-		sattrs = appendAttr(sattrs, "datawrapper-height", stop.DatawrapperHeight)
 		sattrs = appendAttr(sattrs, "flourish", stop.Flourish)
 		sattrs = appendAttr(sattrs, "media-position", sheetOption(stop.MediaPosition))
 		sattrs = appendAttr(sattrs, "card-class", stop.CardClass)
@@ -191,6 +190,8 @@ func (m ScrollyMapPage) ToMarkdown(featuredMD string) (string, error) {
 	if m.BasemapHidden {
 		attrs = append(attrs, "basemap", "hide")
 		attrs = appendAttr(attrs, "background", m.Background)
+	} else if m.BasemapThrough {
+		attrs = append(attrs, "basemap", "show-through")
 	}
 	if m.OutlineOff {
 		attrs = append(attrs, "outline", "false")
@@ -238,6 +239,17 @@ func sheetOption(s string) string {
 
 func sheetUnchecked(s string) bool {
 	return strings.EqualFold(strings.TrimSpace(s), "FALSE")
+}
+
+func SizeRatio(w, h int) string {
+	if w <= 0 || h <= 0 {
+		return ""
+	}
+	a, b := w, h
+	for b != 0 {
+		a, b = b, a%b
+	}
+	return fmt.Sprintf("%d:%d", w/a, h/a)
 }
 
 func sheetRatio(s string) string {
@@ -309,25 +321,24 @@ func SheetToScrollyMapPages(ctx context.Context, cl *http.Client, sheetID string
 	st := newSheetMapSkipDescription(stopsSheet)
 	for row := range st.Rows() {
 		stop := ScrollyMapStop{
-			SheetRow:          row + 1,
-			Label:             st.Field("Label"),
-			GeoJSON:           st.Field("GeoJSON"),
-			CardText:          sheetText(st.Field("Card Text")),
-			Color:             st.Field("Color"),
-			CardPosition:      st.Field("Card Position"),
-			ZoomTo:            st.Field("Zoom To"),
-			Dots:              st.Field("Dots"),
-			Image:             st.Field("Image"),
-			ImageDescription:  st.Field("Image Description"),
-			ImageCaption:      st.Field("Image Caption"),
-			ImageCredit:       st.Field("Image Credit"),
-			ImageRatio:        st.Field("Image Ratio"),
-			Datawrapper:       st.Field("Datawrapper"),
-			DatawrapperHeight: st.Field("Datawrapper Height"),
-			Flourish:          st.Field("Flourish"),
-			MediaPosition:     st.Field("Media Position"),
-			CardClass:         st.Field("Card Class"),
-			TextClass:         st.Field("Text Class"),
+			SheetRow:         row + 1,
+			Label:            st.Field("Label"),
+			GeoJSON:          st.Field("GeoJSON"),
+			CardText:         sheetText(st.Field("Card Text")),
+			Color:            st.Field("Color"),
+			CardPosition:     st.Field("Card Position"),
+			ZoomTo:           st.Field("Zoom To"),
+			Dots:             st.Field("Dots"),
+			Image:            st.Field("Image"),
+			ImageDescription: st.Field("Image Description"),
+			ImageCaption:     st.Field("Image Caption"),
+			ImageCredit:      st.Field("Image Credit"),
+			ImageRatio:       st.Field("Image Ratio"),
+			Datawrapper:      st.Field("Datawrapper"),
+			Flourish:         st.Field("Flourish"),
+			MediaPosition:    st.Field("Media Position"),
+			CardClass:        st.Field("Card Class"),
+			TextClass:        st.Field("Text Class"),
 		}
 		if !stop.hasContent() {
 			continue
@@ -362,6 +373,7 @@ func SheetToScrollyMapPages(ctx context.Context, cl *http.Client, sheetID string
 		ColorOpacity:           sheetPercent(set.Field("Map Color Opacity")),
 		CardPosition:           set.Field("Default Card Position"),
 		BasemapHidden:          strings.EqualFold(set.Field("Basemap"), "Hide"),
+		BasemapThrough:         sheetOption(set.Field("Basemap")) == "show-through",
 		Background:             set.Field("Background Color"),
 		OutlineOff:             sheetUnchecked(set.Field("State Outline")),
 		OutlineColor:           set.Field("Outline Color"),
