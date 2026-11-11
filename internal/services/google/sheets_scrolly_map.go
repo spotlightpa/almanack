@@ -323,7 +323,7 @@ func SheetToScrollyMapPages(ctx context.Context, cl *http.Client, sheetID string
 		return nil, resperr.E{M: "Header sheet missing Slug value"}
 	}
 
-	publishedAt, err := sheetPublished(ctx, hdr.Field("Published"))
+	publishedAt, err := sheetPublished(hdr.Field("Published"))
 	if err != nil {
 		return nil, err
 	}

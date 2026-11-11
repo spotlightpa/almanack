@@ -10,7 +10,6 @@ import (
 	"time"
 
 	"github.com/earthboundkid/resperr/v2"
-	"github.com/spotlightpa/almanack/internal/almlog"
 	"github.com/spotlightpa/almanack/internal/utils/shortcode"
 	"github.com/spotlightpa/almanack/internal/utils/stringx"
 	spreadsheet "gopkg.in/Iwark/spreadsheet.v2"
@@ -133,39 +132,19 @@ func (m MapPage) ToMarkdown(featuredMD string) (string, error) {
 	sb.WriteString("\n")
 
 	var attrs []string
-	if m.Eyebrow != "" {
-		attrs = append(attrs, "eyebrow", m.Eyebrow)
-	}
-	if m.Headline != "" {
-		attrs = append(attrs, "hed", m.Headline)
-	}
-	if m.Dek != "" {
-		attrs = append(attrs, "dek", m.Dek)
-	}
-	if m.Date != "" {
-		attrs = append(attrs, "display-date", m.Date)
-	}
-	if m.Byline != "" {
-		attrs = append(attrs, "byline", m.Byline)
-	}
-	if m.Color != "" {
-		attrs = append(attrs, "color", m.Color)
-	}
-	if m.Layout != "" {
-		attrs = append(attrs, "layout", m.Layout)
-	}
-	if m.MobileLayout != "" {
-		attrs = append(attrs, "mobile-layout", m.MobileLayout)
-	}
-	if m.ColorOpacity != "" {
-		attrs = append(attrs, "color-opacity", m.ColorOpacity)
-	}
+	attrs = appendAttr(attrs, "eyebrow", m.Eyebrow)
+	attrs = appendAttr(attrs, "hed", m.Headline)
+	attrs = appendAttr(attrs, "dek", m.Dek)
+	attrs = appendAttr(attrs, "display-date", m.Date)
+	attrs = appendAttr(attrs, "byline", m.Byline)
+	attrs = appendAttr(attrs, "color", m.Color)
+	attrs = appendAttr(attrs, "layout", m.Layout)
+	attrs = appendAttr(attrs, "mobile-layout", m.MobileLayout)
+	attrs = appendAttr(attrs, "color-opacity", m.ColorOpacity)
 	if m.SearchEnabled {
 		attrs = append(attrs, "search", "true")
 	}
-	if m.SearchText != "" {
-		attrs = append(attrs, "search-text", m.SearchText)
-	}
+	attrs = appendAttr(attrs, "search-text", m.SearchText)
 	if m.SearchUseLocation {
 		attrs = append(attrs, "search-use-location", "true")
 	}
@@ -184,13 +163,9 @@ func (m MapPage) ToMarkdown(featuredMD string) (string, error) {
 	if m.MobileCards {
 		attrs = append(attrs, "mobile-display", "card")
 	}
-	if m.CustomCodeURL != "" {
-		attrs = append(attrs, "custom-code", m.CustomCodeURL)
-	}
+	attrs = appendAttr(attrs, "custom-code", m.CustomCodeURL)
 	attrs = append(attrs, "outlet", "Spotlight PA")
-	if m.GeoJSON != "" {
-		attrs = append(attrs, "geojson", m.GeoJSON)
-	}
+	attrs = appendAttr(attrs, "geojson", m.GeoJSON)
 	sb.WriteString(shortcode.New("featured/map-header", attrs...))
 	sb.WriteString("\n")
 	if m.Body != "" {
@@ -319,19 +294,14 @@ func hasRow(seq iter.Seq[int]) bool {
 	return false
 }
 
-func sheetPublished(ctx context.Context, s string) (time.Time, error) {
-	if s == "" {
-		return time.Now(), nil
-	}
+func sheetPublished(s string) (time.Time, error) {
 	loc, err := time.LoadLocation("America/New_York")
 	if err != nil {
 		return time.Time{}, err
 	}
 	parsed, err := time.ParseInLocation("2006-01-02", s, loc)
 	if err != nil {
-		l := almlog.FromContext(ctx)
-		l.ErrorContext(ctx, "sheetPublished: invalid Published date", "value", s, "err", err)
-		return time.Now(), nil
+		return time.Time{}, resperr.E{E: err, M: "Header sheet needs a Published date in YYYY-MM-DD format"}
 	}
 	return parsed, nil
 }
@@ -420,7 +390,7 @@ func SheetToMapPages(ctx context.Context, cl *http.Client, sheetID string) ([]Ma
 		return nil, resperr.E{M: "Header sheet missing Slug value"}
 	}
 
-	publishedAt, err := sheetPublished(ctx, hdr.Field("Published"))
+	publishedAt, err := sheetPublished(hdr.Field("Published"))
 	if err != nil {
 		return nil, err
 	}

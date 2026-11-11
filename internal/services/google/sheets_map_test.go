@@ -94,3 +94,13 @@ func TestMapPageToMarkdown(t *testing.T) {
 	be.Equal(page.ShareImagePath(), "2026/07/share.png")
 	be.Equal(MapPage{}.ShareImagePath(), defaultShareImage)
 }
+
+func TestSheetPublished(t *testing.T) {
+	be := assert.FailsNow(t)
+	got := be.OK(sheetPublished("2026-07-20"))
+	be.Equal(got.Format("2006-01-02 MST"), "2026-07-20 EDT")
+	_, err := sheetPublished("")
+	be.Nonzero(err)
+	_, err = sheetPublished("July 20")
+	be.Nonzero(err)
+}
