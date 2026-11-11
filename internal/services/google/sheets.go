@@ -131,6 +131,7 @@ func (sm *SheetMap) Next() bool {
 
 func (sm *SheetMap) Rows() iter.Seq[int] {
 	return func(yield func(int) bool) {
+		sm.row = 0
 		for sm.Next() {
 			if !yield(sm.row) {
 				return
