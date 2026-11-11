@@ -20,51 +20,86 @@ This is distinct from the existing `redirect` table in PostgreSQL,
 which is for role-gated SSR redirects served by the Go API.
 This plan does not change SSR redirects.
 
-**Why SiteConfig and not Page:**
-The existing `GET /api/site-data` and `POST /api/site-data` endpoints
-already read and write arbitrary files in the content store via `?location=`.
-`redirects.toml` is configuration data, not a Hugo content page,
-so the SiteConfig path is the right fit.
-The Page path is ruled out because `(*Page).ToTOML()` wraps output
-in `+++ ... +++` Hugo frontmatter delimiters — wrong structure for `redirects.toml`.
-
-**Why not `SiteParamsBase`:**
-`SiteParamsBase` exists to surface the scheduling UI.
-We don't need scheduling for redirects
-(redirect rules take effect at the next Netlify deploy, not at a wall-clock time),
-so the view is built as a simple dedicated component
-that calls `getSiteData`/`postSiteData` directly,
-the same way `ViewFrontpageEditor.vue` does.
+**Why Page and not SiteConfig:**
+The Page infrastructure already handles reading and writing files
+of multiple formats in the content store.
+`FromMD` already auto-detects format on read (tries `+++TOML+++`, falls back to JSON).
+The write side currently has two separate methods (`ToTOML`, `ToJSON`)
+and two separate service paths (`PublishPage`, `PublishJSONPage`)
+that callers choose between by convention.
+This plan unifies serialization into a single `(*Page).Serialize()` method
+that dispatches on `FilePath` extension,
+and collapses `PublishPage`/`PublishJSONPage` into one path.
+`redirects.toml` then becomes a plain Page like any other.
 
 ---
 
-## PR 1 — Backend: TOML serialization in `PublishSiteConfig`
+## PR 1 — Backend: extension-based serialization on `Page`
 
-Goal: make the site-data publish path write TOML when the file location ends in `.toml`.
+Goal: teach `Page` to serialize itself correctly based on its file extension,
+and unify the two publish paths.
 
-- In `internal/almsvc/service-site-data.go`,
-  extract a helper `marshalForLoc(loc string, data db.Map) ([]byte, error)`
-  that returns `toml.Marshal(data)` when `strings.HasSuffix(loc, ".toml")`
-  and `json.MarshalIndent(data, "", "  ")` otherwise.
-  Replace the `json.MarshalIndent` call in `PublishSiteConfig` with this helper.
+### Add `(*Page).Serialize() ([]byte, error)` in `internal/db/page.go`
 
-- Add `"redirects.toml"` to `MessageForLoc` in `internal/almsvc/site-data.go`:
-  ```go
-  "redirects.toml": "Updating redirect rules",
-  ```
+Dispatches on `page.FilePath`:
 
-- Add a unit test in `internal/almsvc/` that calls `marshalForLoc` with a `.toml`
-  location and verifies the output parses back to the same data.
-  Confirm existing JSON locations are unaffected.
+- **`.md`** — existing `ToTOML()` logic (Hugo `+++TOML+++` frontmatter + body).
+- **`.json`** — existing `ToJSON()` logic (plain JSON, optional body).
+- **`.toml`** — new: encode `page.Frontmatter` as pure TOML with no delimiters,
+  using `toml.NewEncoder` (same package already imported).
+  `page.Body` is ignored for `.toml` files.
+- Unknown extension: return an error.
 
+Leave `ToTOML()` and `ToJSON()` in place for now;
+they will be inlined into `Serialize()` or removed in a follow-up.
+
+### Update `PublishPage` in `internal/almsvc/service-page.go`
+
+Replace the `page.ToTOML()` call with `page.Serialize()`.
+Remove `PublishJSONPage`;
+its callers (YouTube pages and the `postPageJSON` handler in `routes-spotlightpa.go`)
+should switch to `PublishPage`.
+Verify that the YouTube `FilePath` values end in `.json`
+so they will serialize correctly through `Serialize()`.
+
+Also replace the two `ToTOML()` calls in `RefreshPageContents`
+(used to diff before/after) with `Serialize()`.
+
+### Tests
+
+- Unit tests for `Serialize()` covering `.md`, `.json`, `.toml`, and unknown extension.
+- Confirm the `.toml` output round-trips through `toml.Decode` back to the same map.
 - Run `go test ./...`.
 
 ---
 
-## PR 2 — Frontend: Redirect Manager page
+## PR 2 — Backend: `redirects.toml` as a Page
 
-Goal: an admin page for listing, editing, adding, and removing redirect rules,
-built on the existing `SiteParamsBase` component.
+Goal: expose `redirects.toml` through the standard page API.
+
+Create the row in the database via a one-time migration or seed:
+
+```sql
+INSERT INTO page (file_path, source_type, source_id, frontmatter)
+VALUES (
+  'redirects.toml',
+  'redirects',
+  'redirects.toml',
+  '{"redirects": []}'
+)
+ON CONFLICT DO NOTHING;
+```
+
+This lets the existing `GET /api/page` and `POST /api/page` handlers
+manage `redirects.toml` with no new endpoints.
+The page is loaded from GitHub on first use via `PageLoadFromContentStore`
+if the frontmatter is empty.
+
+---
+
+## PR 3 — Frontend: Redirect Manager page
+
+Goal: a dedicated admin view for editing redirect rules.
 
 ### New route
 
@@ -82,14 +117,9 @@ In `src/plugins/router.js`, add:
 ### New view: `src/components/ViewRedirects.vue`
 
 Write in TypeScript (`<script setup lang="ts">`).
-Fetch and save with `getSiteData`/`postSiteData` and `?location=redirects.toml`,
-the same way `ViewFrontpageEditor.vue` calls those endpoints directly
-without going through `SiteParamsBase`.
-Use `makeState` for loading/error state.
-
-The data shape returned by the API is `{ configs: [{ data: { redirects: [...] } }] }`.
-Read `configs[0].data.redirects` on load;
-on save, POST `{ configs: [{ schedule_for: <now>, data: { redirects: rules } }] }`.
+Fetch and save using the existing `GET /api/page` and `POST /api/page` endpoints
+with the `redirects.toml` page ID.
+The `frontmatter.redirects` array is the working data.
 
 ```ts
 interface RedirectRule {
@@ -110,6 +140,9 @@ UI (Bulma):
   Add up/down buttons, or drag-and-drop if straightforward.
 - "Add redirect" button appends `{ from: "/", to: "/", status: 301, force: true }`.
 - "Remove" button splices the row.
+- "Save" button POSTs the updated page.
+- "Revert" button re-fetches.
+- Standard `SpinnerProgress` and `ErrorReloader` components.
 
 ### Link in admin nav
 
@@ -123,12 +156,10 @@ near the existing "Sitewide Settings" link.
 
 - `BurntSushi/toml` is already a direct dependency (used by `internal/db/page.go`);
   no `go.mod` changes needed.
-  Follow the same `toml.NewEncoder` pattern from `(*Page).ToTOML()`.
-- The TOML and JSON paths in `marshalForLoc` should both live in
-  `service-site-data.go` to keep the change self-contained.
-- Netlify enforces redirect rule order;
-  the row order in the table is the order written to the file.
+- For `.toml` pages, `Body` is meaningless; `Serialize()` should ignore it.
+  Consider whether `FromMD` should also gain a `.toml` fast-path
+  that calls `toml.Decode` directly instead of looking for `+++` delimiters.
 - The existing `redirect` table and `/ssr/redirect/{slug}` routes are unrelated
   and must not be touched.
-- No new API endpoints are needed.
-  `getSiteData` / `postSiteData` in `src/api/client.ts` already exist.
+- Netlify enforces redirect rule order;
+  the row order in the table is the order written to the file.
