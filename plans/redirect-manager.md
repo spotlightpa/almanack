@@ -53,6 +53,23 @@ Dispatches on `page.FilePath`:
 Leave `ToTOML()` and `ToJSON()` in place for now;
 they will be inlined into `Serialize()` or removed in a follow-up.
 
+### Update `(*Page).FromMD()` in `internal/db/page.go`
+
+Make `FromMD` symmetric with `Serialize()`: dispatch on `page.FilePath` extension
+to determine which deserializer to use, rather than blindly probing the content.
+
+- **`.toml`** — decode directly with `toml.Decode` into `page.Frontmatter`.
+  Set `page.Body = ""`.
+- **`.json`** — decode directly with `json.Unmarshal` into `page.Frontmatter`.
+  Set `page.Body = ""`.
+- **`.md` or unknown** — keep the existing fallback chain:
+  try `+++TOML+++` first, then fall back to JSON,
+  for backwards compatibility with any files stored either way.
+
+Rename `FromMD` to `Deserialize` to match `Serialize` and reflect
+that it now handles more than Markdown.
+Update all call sites.
+
 ### Update `PublishPage` in `internal/almsvc/service-page.go`
 
 Replace the `page.ToTOML()` call with `page.Serialize()`.
@@ -156,9 +173,11 @@ near the existing "Sitewide Settings" link.
 
 - `BurntSushi/toml` is already a direct dependency (used by `internal/db/page.go`);
   no `go.mod` changes needed.
-- For `.toml` pages, `Body` is meaningless; `Serialize()` should ignore it.
-  Consider whether `FromMD` should also gain a `.toml` fast-path
-  that calls `toml.Decode` directly instead of looking for `+++` delimiters.
+- For `.toml` and `.json` pages, `Body` is meaningless;
+  `Serialize()` ignores it and `Deserialize()` sets it to `""`.
+- `FromMD` is renamed to `Deserialize` to match `Serialize`.
+  There are two call sites in `internal/almsvc/service-page.go`
+  (`RefreshPageFromContentStore` and `CreatePageFromGDocsDoc`).
 - The existing `redirect` table and `/ssr/redirect/{slug}` routes are unrelated
   and must not be touched.
 - Netlify enforces redirect rule order;
