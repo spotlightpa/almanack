@@ -20,13 +20,21 @@ This is distinct from the existing `redirect` table in PostgreSQL,
 which is for role-gated SSR redirects served by the Go API.
 This plan does not change SSR redirects.
 
+**Why SiteConfig and not Page:**
 The existing `GET /api/site-data` and `POST /api/site-data` endpoints
 already read and write arbitrary files in the content store via `?location=`.
-The same `SiteParamsBase` frontend component handles scheduling and save/revert UI.
-This plan reuses that entire stack;
-the only new work is teaching `PublishSiteConfig` to serialize TOML
-when the location ends in `.toml`,
-and building the redirect-specific form component.
+`redirects.toml` is configuration data, not a Hugo content page,
+so the SiteConfig path is the right fit.
+The Page path is ruled out because `(*Page).ToTOML()` wraps output
+in `+++ ... +++` Hugo frontmatter delimiters — wrong structure for `redirects.toml`.
+
+**Why not `SiteParamsBase`:**
+`SiteParamsBase` exists to surface the scheduling UI.
+We don't need scheduling for redirects
+(redirect rules take effect at the next Netlify deploy, not at a wall-clock time),
+so the view is built as a simple dedicated component
+that calls `getSiteData`/`postSiteData` directly,
+the same way `ViewFrontpageEditor.vue` does.
 
 ---
 
@@ -73,23 +81,15 @@ In `src/plugins/router.js`, add:
 
 ### New view: `src/components/ViewRedirects.vue`
 
-Follow the same pattern as `ViewSiteParams.vue`:
-render `SiteParamsBase` with `location="redirects.toml"`
-and slot in a `SiteParamsRedirects` form component.
-
-```vue
-<SiteParamsBase title="Redirect Manager" location="redirects.toml">
-  <template #form="{ params, setRef }">
-    <SiteParamsRedirects :ref="setRef" :params="params" />
-  </template>
-</SiteParamsBase>
-```
-
-### New form: `src/components/SiteParamsRedirects.vue`
-
 Write in TypeScript (`<script setup lang="ts">`).
+Fetch and save with `getSiteData`/`postSiteData` and `?location=redirects.toml`,
+the same way `ViewFrontpageEditor.vue` calls those endpoints directly
+without going through `SiteParamsBase`.
+Use `makeState` for loading/error state.
 
-`params.data` will be `{ redirects: RedirectRule[] }` where:
+The data shape returned by the API is `{ configs: [{ data: { redirects: [...] } }] }`.
+Read `configs[0].data.redirects` on load;
+on save, POST `{ configs: [{ schedule_for: <now>, data: { redirects: rules } }] }`.
 
 ```ts
 interface RedirectRule {
@@ -100,10 +100,8 @@ interface RedirectRule {
 }
 ```
 
-`saveParams()` (required by `SiteParamsBase`'s `ParamComponent` interface)
-returns `{ scheduleFor, data: { redirects: rules } }`.
-
 UI (Bulma):
+- Breadcrumbs: Admin → Redirect Manager.
 - A table with columns: From, To, Status, Force, Remove.
 - Each row has editable `<input>` fields.
   Status is a `<select>` with options 301, 302, 200.
