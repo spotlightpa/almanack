@@ -2,6 +2,7 @@ package almsvc
 
 import (
 	"context"
+	"errors"
 	"fmt"
 
 	"github.com/earthboundkid/errorx/v2"
@@ -34,9 +35,7 @@ func (svc Services) SyncMapSheet(ctx context.Context, sheetID string) (err error
 	}
 
 	for _, page := range pages {
-		if perr := svc.publishMapPage(ctx, page.Slug, page.FeaturedDocLink, page.FilePath(), page.ToMarkdown); perr != nil {
-			err = perr
-		}
+		err = errors.Join(err, svc.publishMapPage(ctx, page.Slug, page.FeaturedDocLink, page.FilePath(), page.ToMarkdown))
 	}
 	return
 }
@@ -72,9 +71,7 @@ func (svc Services) SyncScrollyMapSheet(ctx context.Context, sheetID string) (er
 	}
 
 	for _, page := range pages {
-		if perr := svc.publishMapPage(ctx, page.Slug, page.FeaturedDocLink, page.FilePath(), page.ToMarkdown); perr != nil {
-			err = perr
-		}
+		err = errors.Join(err, svc.publishMapPage(ctx, page.Slug, page.FeaturedDocLink, page.FilePath(), page.ToMarkdown))
 	}
 	return
 }
@@ -92,9 +89,9 @@ func (svc Services) publishMapPage(ctx context.Context, slug, featuredDocLink, p
 		md, err := svc.featuredStoryMarkdown(ctx, featuredDocLink)
 		if err != nil {
 			l.ErrorContext(ctx, "publishMapPage: featuredStoryMarkdown", "slug", slug, "err", err)
-		} else {
-			featured = md
+			return err
 		}
+		featured = md
 	}
 
 	content, err := toMarkdown(featured)
