@@ -210,3 +210,10 @@ func TestSizeRatio(t *testing.T) {
 	be.Equal(SizeRatio(1000, 1000), "1:1")
 	be.Equal(SizeRatio(0, 720), "")
 }
+
+func TestScrollyMapShareImagePath(t *testing.T) {
+	be := assert.FailsNow(t)
+	be.Equal(ScrollyMapPage{ShareImage: "a.jpg", TopperImage: "b.jpg"}.ShareImagePath(), "a.jpg")
+	be.Equal(ScrollyMapPage{TopperImage: "b.jpg"}.ShareImagePath(), "b.jpg")
+	be.Equal(ScrollyMapPage{}.ShareImagePath(), defaultShareImage)
+}

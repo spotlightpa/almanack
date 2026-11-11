@@ -68,16 +68,17 @@ func TestMapPageDefaultShareImage(t *testing.T) {
 func TestMapPageToMarkdown(t *testing.T) {
 	be := assert.FailsNow(t)
 	page := MapPage{
-		Slug:            "reading-map",
-		Headline:        "Find Your District",
-		Byline:          "Hanna Holthaus",
-		PublishedAt:     time.Date(2026, 7, 20, 0, 0, 0, 0, time.UTC),
-		TooltipsEnabled: true,
-		TooltipValue:    "<b>{{Member}}</b>\n{{column}}\n<i>{{Party}}</i>",
-		DesktopCards:    true,
-		GeoJSON:         "https://example.com/map.geojson",
-		ShareImage:      "2026/07/share.png",
-		ShareImageDesc:  "Map of Reading council districts",
+		Slug:             "reading-map",
+		Headline:         "Find Your District",
+		Byline:           "Hanna Holthaus",
+		PublishedAt:      time.Date(2026, 7, 20, 0, 0, 0, 0, time.UTC),
+		TooltipsEnabled:  true,
+		TooltipValue:     "<b>{{Member}}</b>\n{{column}}\n<i>{{Party}}</i>",
+		DesktopCards:     true,
+		GeoJSON:          "https://example.com/map.geojson",
+		ShareImage:       "2026/07/share.png",
+		ShareImageDesc:   "Map of Reading council districts",
+		ShareImageCredit: "Reporter / Spotlight PA",
 	}
 	md := be.OK(page.ToMarkdown(""))
 	be.True(strings.Contains(md, `tooltips="true"`)).
@@ -88,5 +89,8 @@ func TestMapPageToMarkdown(t *testing.T) {
 		True(strings.Contains(md, `geojson="https://example.com/map.geojson"`)).
 		True(strings.Contains(md, `image = "2026/07/share.png"`)).
 		True(strings.Contains(md, `image-description = "Map of Reading council districts"`)).
-		True(strings.Contains(md, `image-gravity = "ce"`))
+		True(strings.Contains(md, `image-gravity = "ce"`)).
+		True(strings.Contains(md, `image-credit = "Jane Doe / Spotlight PA"`))
+	be.Equal(page.ShareImagePath(), "2026/07/share.png")
+	be.Equal(MapPage{}.ShareImagePath(), defaultShareImage)
 }

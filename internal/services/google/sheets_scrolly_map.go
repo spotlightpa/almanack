@@ -31,6 +31,7 @@ type ScrollyMapPage struct {
 	Description            string
 	ShareImage             string
 	ShareImageDescription  string
+	ShareImageCredit       string
 	TopperLayout           string
 	TopperMobileLayout     string
 	TopperImage            string
@@ -134,27 +135,37 @@ func writeScrollyMap(sb *strings.Builder, attrs []string, stops []ScrollyMapStop
 	sb.WriteString("{{</featured/scrolly-map>}}\n")
 }
 
+func (m ScrollyMapPage) share() (image, description, gravity string) {
+	if m.ShareImage != "" {
+		return m.ShareImage, m.ShareImageDescription, "ce"
+	}
+	if m.TopperImage != "" {
+		if strings.HasPrefix(sheetOption(m.TopperLayout), "icon") {
+			return m.TopperImage, m.TopperImageDescription, "ce"
+		}
+		return m.TopperImage, m.TopperImageDescription, "sm"
+	}
+	return defaultShareImage, defaultShareImageDescription, "ce"
+}
+
+func (m ScrollyMapPage) ShareImagePath() string {
+	image, _, _ := m.share()
+	return image
+}
+
 func (m ScrollyMapPage) ToMarkdown(featuredMD string) (string, error) {
 	var authors []string
 	if m.Byline != "" {
 		authors = stringx.ExtractNames(m.Byline)
 	}
-	shareImage, shareDescription, shareGravity := m.ShareImage, m.ShareImageDescription, "ce"
-	if shareImage == "" {
-		shareImage, shareDescription = m.TopperImage, m.TopperImageDescription
-		if !strings.HasPrefix(sheetOption(m.TopperLayout), "icon") {
-			shareGravity = "sm"
-		}
-	}
-	if shareImage == "" {
-		shareImage, shareDescription, shareGravity = defaultShareImage, defaultShareImageDescription, "ce"
-	}
+	shareImage, shareDescription, shareGravity := m.share()
 	fm, err := stringx.ToToml(map[string]any{
 		"authors":           authors,
 		"blurb":             m.Blurb,
 		"byline":            m.Byline,
 		"description":       m.Description,
 		"image":             shareImage,
+		"image-credit":      m.ShareImageCredit,
 		"image-description": shareDescription,
 		"image-gravity":     shareGravity,
 		"internal-id":       m.InternalID,

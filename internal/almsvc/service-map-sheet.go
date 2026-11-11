@@ -6,6 +6,7 @@ import (
 
 	"github.com/earthboundkid/errorx/v2"
 	"github.com/spotlightpa/almanack/internal/almlog"
+	"github.com/spotlightpa/almanack/internal/db"
 	"github.com/spotlightpa/almanack/internal/services/gdocs"
 	"github.com/spotlightpa/almanack/internal/services/google"
 )
@@ -24,6 +25,12 @@ func (svc Services) SyncMapSheet(ctx context.Context, sheetID string) (err error
 	pages, err := google.SheetToMapPages(ctx, cl, sheetID)
 	if err != nil {
 		return
+	}
+
+	for i := range pages {
+		if img, ok := svc.mapImage(ctx, pages[i].ShareImagePath()); ok {
+			pages[i].ShareImageCredit = img.Credit
+		}
 	}
 
 	for _, page := range pages {
@@ -50,16 +57,17 @@ func (svc Services) SyncScrollyMapSheet(ctx context.Context, sheetID string) (er
 		return
 	}
 	for i := range pages {
+		if img, ok := svc.mapImage(ctx, pages[i].ShareImagePath()); ok {
+			pages[i].ShareImageCredit = img.Credit
+		}
 		for j := range pages[i].Stops {
 			stop := &pages[i].Stops[j]
 			if stop.Image == "" || stop.ImageRatio != "" {
 				continue
 			}
-			img, ierr := svc.Queries.GetImageByPath(ctx, stop.Image)
-			if ierr != nil {
-				continue
+			if img, ok := svc.mapImage(ctx, stop.Image); ok {
+				stop.ImageRatio = google.SizeRatio(int(img.Width), int(img.Height))
 			}
-			stop.ImageRatio = google.SizeRatio(int(img.Width), int(img.Height))
 		}
 	}
 
@@ -69,6 +77,11 @@ func (svc Services) SyncScrollyMapSheet(ctx context.Context, sheetID string) (er
 		}
 	}
 	return
+}
+
+func (svc Services) mapImage(ctx context.Context, path string) (db.Image, bool) {
+	img, err := svc.Queries.GetImageByPath(ctx, path)
+	return img, err == nil
 }
 
 func (svc Services) publishMapPage(ctx context.Context, slug, featuredDocLink, path string, toMarkdown func(string) (string, error)) error {

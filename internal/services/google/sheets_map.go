@@ -42,6 +42,7 @@ type MapPage struct {
 	Description       string
 	ShareImage        string
 	ShareImageDesc    string
+	ShareImageCredit  string
 	InternalID        string
 	Kicker            string
 	Topics            []string
@@ -84,11 +85,20 @@ const (
 	defaultShareImageDescription = "Spotlight PA"
 )
 
-func (m MapPage) ToMarkdown(featuredMD string) (string, error) {
-	shareImage, shareDescription := m.ShareImage, m.ShareImageDesc
-	if shareImage == "" {
-		shareImage, shareDescription = defaultShareImage, defaultShareImageDescription
+func (m MapPage) share() (image, description string) {
+	if m.ShareImage == "" {
+		return defaultShareImage, defaultShareImageDescription
 	}
+	return m.ShareImage, m.ShareImageDesc
+}
+
+func (m MapPage) ShareImagePath() string {
+	image, _ := m.share()
+	return image
+}
+
+func (m MapPage) ToMarkdown(featuredMD string) (string, error) {
+	shareImage, shareDescription := m.share()
 	var authors []string
 	if m.Byline != "" {
 		authors = stringx.ExtractNames(m.Byline)
@@ -99,6 +109,7 @@ func (m MapPage) ToMarkdown(featuredMD string) (string, error) {
 		"byline":            m.Byline,
 		"description":       m.Description,
 		"image":             shareImage,
+		"image-credit":      m.ShareImageCredit,
 		"image-description": shareDescription,
 		"image-gravity":     "ce",
 		"internal-id":       m.InternalID,
