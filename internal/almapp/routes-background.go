@@ -240,7 +240,7 @@ func (app *appEnv) postMapSheet(w http.ResponseWriter, r *http.Request) http.Han
 	if err := app.svc.SyncMapSheet(r.Context(), sheetID); err != nil {
 		return app.jsonErr(err)
 	}
-	return app.jsonAccepted(http.StatusText(http.StatusAccepted))
+	return app.jsonAccepted("OK")
 }
 
 func (app *appEnv) postScrollyMapSheet(w http.ResponseWriter, r *http.Request) http.Handler {
@@ -252,5 +252,5 @@ func (app *appEnv) postScrollyMapSheet(w http.ResponseWriter, r *http.Request) h
 	if err := app.svc.SyncScrollyMapSheet(r.Context(), sheetID); err != nil {
 		return app.jsonErr(err)
 	}
-	return app.jsonAccepted(http.StatusText(http.StatusAccepted))
+	return app.jsonAccepted("OK")
 }
