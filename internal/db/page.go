@@ -64,8 +64,7 @@ func (page *Page) ToTOML() (string, error) {
 	var buf strings.Builder
 	buf.WriteString("+++\n")
 	buf.WriteString(fm)
-	buf.WriteString("+++\n")
-	buf.WriteString("\n")
+	buf.WriteString("+++\n\n")
 	buf.WriteString(page.Body)
 	buf.WriteString("\n")
 	return buf.String(), nil
