@@ -104,3 +104,26 @@ func TestSheetPublished(t *testing.T) {
 	_, err = sheetPublished("July 20")
 	be.Nonzero(err)
 }
+
+func TestSheetTopics(t *testing.T) {
+	be := assert.Continues(t)
+	be.SlicesEqual(sheetTopics("Local Government, Berks County ,,"), []string{"Local Government", "Berks County"})
+	be.Equal(len(sheetTopics("")), 0)
+}
+
+func TestMapPageCredits(t *testing.T) {
+	be := assert.FailsNow(t)
+	page := MapPage{
+		Slug: "reading-map",
+		Credits: []MapCredit{
+			{Eyebrow: "Reporting", Name: "Hanna Holthaus", Email: "hanna@spotlightpa.org"},
+			{Name: "Alexandra Harris", Role: "Developer"},
+		},
+	}
+	md := be.OK(page.ToMarkdown("Story text"))
+	be.True(strings.Contains(md, "Story text\n{{<featured/footer>}}")).
+		True(strings.Contains(md, `{{<featured/credit eyebrow="Reporting" name="Hanna Holthaus" email="hanna@spotlightpa.org">}}`)).
+		True(strings.Contains(md, `{{<featured/credit name="Alexandra Harris" role="Developer">}}`)).
+		True(strings.HasSuffix(md, "{{</featured/footer>}}\n"))
+	be.False(strings.Contains(be.OK(MapPage{Slug: "x"}.ToMarkdown("")), "featured/footer"))
+}
