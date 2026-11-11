@@ -17,89 +17,50 @@ force = true
 
 Netlify reads this file at deploy time and applies the rules at the CDN edge.
 This is distinct from the existing `redirect` table in PostgreSQL,
-which is for role-gated SSR redirects served by the Go API
-(e.g. `/ssr/redirect/filing-folder`).
+which is for role-gated SSR redirects served by the Go API.
 This plan does not change SSR redirects.
 
----
-
-## PR 1 — Backend: TOML parsing, storage, and API
-
-Goal: teach the backend to read, write, and serve `redirects.toml`
-as a structured list of redirect rules.
-
-### Data model
-
-Define a Go struct for a single redirect rule
-in a new file `internal/almsvc/redirects.go`:
-
-```go
-type RedirectRule struct {
-    From   string `toml:"from"   json:"from"`
-    To     string `toml:"to"     json:"to"`
-    Status int    `toml:"status" json:"status"`
-    Force  bool   `toml:"force"  json:"force"`
-}
-
-type RedirectFile struct {
-    Redirects []RedirectRule `toml:"redirects" json:"redirects"`
-}
-```
-
-Add `github.com/BurntSushi/toml` to `go.mod`
-(check if it's already a transitive dependency first with `go mod download -json`).
-
-### Service methods
-
-In `internal/almsvc/redirects.go`, add two methods on `Services`:
-
-- `GetRedirects(ctx) ([]RedirectRule, error)`
-  — calls `svc.ContentStore.GetFile(ctx, "redirects.toml")`,
-  TOML-decodes it into `RedirectFile`, and returns the slice.
-  Returns an empty slice (not an error) if the file is missing (404).
-
-- `UpdateRedirects(ctx, rules []RedirectRule) error`
-  — encodes a `RedirectFile{Redirects: rules}` back to TOML bytes,
-  then calls `svc.ContentStore.UpdateFile(ctx, "Updating redirects.toml", "redirects.toml", bytes)`.
-  Validation before encoding:
-  - `From` must be non-empty and start with `/`.
-  - `To` must be non-empty.
-  - `Status` must be one of 200, 301, 302.
-  Returns a 400-level `resperr` on validation failure.
-
-### HTTP handlers
-
-In `internal/almapp/routes-spotlightpa.go`, add two handlers
-registered in `router.go` under `spotlightMW`:
-
-```
-GET  /api/redirects      → app.getRedirects
-POST /api/redirects      → app.postRedirects
-```
-
-`getRedirects`: calls `svc.GetRedirects`, replies JSON `{"redirects": [...]}`.
-
-`postRedirects`: reads JSON body `{"redirects": [...]}`,
-calls `svc.UpdateRedirects`,
-replies with the round-tripped rules as `{"redirects": [...]}`
-(re-fetch after save so the response reflects what's in the file).
-
-### Tests
-
-- Unit tests for TOML round-trip in `internal/almsvc/redirects_test.go`.
-- Unit test that validation rejects bad `From`/`Status` values.
-- The mock `ContentStore` (already used by other tests) supports `GetFile`/`UpdateFile`;
-  use it to test `GetRedirects` and `UpdateRedirects` without hitting GitHub.
+The existing `GET /api/site-data` and `POST /api/site-data` endpoints
+already read and write arbitrary files in the content store via `?location=`.
+The same `SiteParamsBase` frontend component handles scheduling and save/revert UI.
+This plan reuses that entire stack;
+the only new work is teaching `PublishSiteConfig` to serialize TOML
+when the location ends in `.toml`,
+and building the redirect-specific form component.
 
 ---
 
-## PR 2 — Frontend: Redirect Manager UI
+## PR 1 — Backend: TOML serialization in `PublishSiteConfig`
 
-Goal: a simple admin page for listing, editing, adding, and removing redirects.
+Goal: make the site-data publish path write TOML when the file location ends in `.toml`.
+
+- In `internal/almsvc/service-site-data.go`,
+  extract a helper `marshalForLoc(loc string, data db.Map) ([]byte, error)`
+  that returns `toml.Marshal(data)` when `strings.HasSuffix(loc, ".toml")`
+  and `json.MarshalIndent(data, "", "  ")` otherwise.
+  Replace the `json.MarshalIndent` call in `PublishSiteConfig` with this helper.
+
+- Add `"redirects.toml"` to `MessageForLoc` in `internal/almsvc/site-data.go`:
+  ```go
+  "redirects.toml": "Updating redirect rules",
+  ```
+
+- Add a unit test in `internal/almsvc/` that calls `marshalForLoc` with a `.toml`
+  location and verifies the output parses back to the same data.
+  Confirm existing JSON locations are unaffected.
+
+- Run `go test ./...`.
+
+---
+
+## PR 2 — Frontend: Redirect Manager page
+
+Goal: an admin page for listing, editing, adding, and removing redirect rules,
+built on the existing `SiteParamsBase` component.
 
 ### New route
 
-In `src/plugins/router.js`, add under the Spotlight PA section:
+In `src/plugins/router.js`, add:
 
 ```js
 {
@@ -110,55 +71,66 @@ In `src/plugins/router.js`, add under the Spotlight PA section:
 },
 ```
 
-### New component: `src/components/ViewRedirects.vue`
+### New view: `src/components/ViewRedirects.vue`
 
-Write this in TypeScript (`<script setup lang="ts">`).
+Follow the same pattern as `ViewSiteParams.vue`:
+render `SiteParamsBase` with `location="redirects.toml"`
+and slot in a `SiteParamsRedirects` form component.
 
-State:
-- `rules: Ref<RedirectRule[]>` — the working copy of the list.
-- Load/save via `get(getRedirects)` / `post(postRedirects, { redirects: rules })`
-  using `makeState` (same pattern as `SiteParamsBase.vue`).
+```vue
+<SiteParamsBase title="Redirect Manager" location="redirects.toml">
+  <template #form="{ params, setRef }">
+    <SiteParamsRedirects :ref="setRef" :params="params" />
+  </template>
+</SiteParamsBase>
+```
 
-UI (Bulma):
-- Breadcrumbs: Admin → Redirect Manager.
-- A table with columns: From, To, Status, Force, Actions.
-- Each row is editable in-place (plain `<input>` fields bound to the rule object).
-  Status is a `<select>` with options 301, 302, 200.
-  Force is a checkbox.
-- "Remove" button per row (splice from array).
-- "Add redirect" button appends a blank rule
-  (`{ from: "/", to: "/", status: 301, force: true }`).
-- "Save" button POSTs the full list.
-- "Revert" button re-fetches.
-- Standard `SpinnerProgress` and `ErrorReloader` components.
+### New form: `src/components/SiteParamsRedirects.vue`
 
-Add API constants to `src/api/client.ts`:
+Write in TypeScript (`<script setup lang="ts">`).
+
+`params.data` will be `{ redirects: RedirectRule[] }` where:
 
 ```ts
-export const getRedirects = "/api/redirects";
-export const postRedirects = "/api/redirects";
+interface RedirectRule {
+  from: string;
+  to: string;
+  status: number;
+  force: boolean;
+}
 ```
+
+`saveParams()` (required by `SiteParamsBase`'s `ParamComponent` interface)
+returns `{ scheduleFor, data: { redirects: rules } }`.
+
+UI (Bulma):
+- A table with columns: From, To, Status, Force, Remove.
+- Each row has editable `<input>` fields.
+  Status is a `<select>` with options 301, 302, 200.
+  Force is a checkbox.
+- Rows can be reordered; Netlify applies rules in order.
+  Add up/down buttons, or drag-and-drop if straightforward.
+- "Add redirect" button appends `{ from: "/", to: "/", status: 301, force: true }`.
+- "Remove" button splices the row.
 
 ### Link in admin nav
 
 In `src/components/ViewAdmin.vue`,
-add a `<LinkRoute>` entry pointing to the new `redirects` route,
+add a `<LinkRoute>` to the `redirects` route
 near the existing "Sitewide Settings" link.
 
 ---
 
 ## Notes for the implementer
 
-- The TOML library's `Encoder` preserves array-of-tables (`[[redirects]]`) correctly
-  when encoding `RedirectFile`; verify this in the round-trip unit test.
+- `BurntSushi/toml` is already a direct dependency (used by `internal/db/page.go`);
+  no `go.mod` changes needed.
+  Follow the same `toml.NewEncoder` pattern from `(*Page).ToTOML()`.
+- The TOML and JSON paths in `marshalForLoc` should both live in
+  `service-site-data.go` to keep the change self-contained.
 - Netlify enforces redirect rule order;
-  the UI table row order is the canonical order sent to the file.
+  the row order in the table is the order written to the file.
 - The existing `redirect` table and `/ssr/redirect/{slug}` routes are unrelated
   and must not be touched.
-- `ContentStore.UpdateFile` is a no-op when the content hasn't changed
-  (the GitHub client checks SHA before committing);
-  this means saving an unchanged list is safe.
-- `MessageForLoc` in `internal/almsvc/site-data.go` does not need to be updated
-  because `UpdateRedirects` supplies its own commit message directly.
-- Keep validation server-side only for now;
-  the frontend should surface the error response string from the API.
+- No new API endpoints are needed.
+  `getSiteData` / `postSiteData` in `src/api/client.ts` already exist.
