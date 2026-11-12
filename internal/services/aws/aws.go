@@ -125,8 +125,7 @@ func (bs BlobStore) SignGetURL(ctx context.Context, srcPath string) (signedURL s
 			var opts *s3.GetObjectInput
 			if as(&opts) {
 				filename := path.Base(srcPath)
-				download := httpx.AttachmentName(filename)
-				opts.ResponseContentDisposition = &download
+				opts.ResponseContentDisposition = new(httpx.AttachmentName(filename))
 			}
 			return nil
 		},
