@@ -217,3 +217,34 @@ func TestScrollyMapShareImagePath(t *testing.T) {
 	be.Equal(ScrollyMapPage{TopperImage: "b.jpg"}.ShareImagePath(), "b.jpg")
 	be.Equal(ScrollyMapPage{}.ShareImagePath(), defaultShareImage)
 }
+
+func TestScrollyMapStopAttrs(t *testing.T) {
+	be := assert.FailsNow(t)
+	page := ScrollyMapPage{
+		Slug:             "regions",
+		Headline:         "Regions",
+		ShareImageCredit: "Jane Doe / Spotlight PA",
+		Stops: []ScrollyMapStop{{
+			Label:         "Demo",
+			Dots:          "Altoona: 40.5187, -78.3947",
+			Datawrapper:   "1Dg8P",
+			MediaPosition: "Bottom",
+			CardPosition:  "Center",
+			CardClass:     "bg-beige!",
+			TextClass:     "italic",
+		}},
+	}
+	md := be.OK(page.ToMarkdown(""))
+	for _, want := range []string{
+		`image-credit = "Jane Doe / Spotlight PA"`,
+		`dots="Altoona: 40.5187, -78.3947"`,
+		`datawrapper="1Dg8P"`,
+		`media-position="bottom"`,
+		`align="center"`,
+		`card-class="bg-beige!"`,
+		`text-class="italic"`,
+	} {
+		be.True(strings.Contains(md, want))
+	}
+	be.False(strings.Contains(md, "image-ratio"))
+}
