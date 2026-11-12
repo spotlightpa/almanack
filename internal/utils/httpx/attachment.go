@@ -2,9 +2,8 @@
 package httpx
 
 import (
-	"fmt"
+	"mime"
 	"net/http"
-	"net/url"
 )
 
 func SetAttachmentName(h http.Header, filename string) {
@@ -12,5 +11,7 @@ func SetAttachmentName(h http.Header, filename string) {
 }
 
 func AttachmentName(filename string) string {
-	return fmt.Sprintf("attachment; filename*=UTF-8''%s", url.PathEscape(filename))
+	return mime.FormatMediaType("attachment", map[string]string{
+		"filename": filename,
+	})
 }
