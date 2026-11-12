@@ -340,7 +340,9 @@ func createIntermediateDoc(docHTML *html.Node) (
 	intermediateDoc *html.Node,
 ) {
 	// Now collect the embeds array and metadata
+	tableN := 0
 	for tbl := range tableaux.Tables(docHTML) {
+		tableN++
 		switch label := tbl.Label(); label {
 		case "html", "embed", "raw", "script":
 			embedHTML := xhtml.TextContent(tbl.At(1, 0))
@@ -417,7 +419,7 @@ func createIntermediateDoc(docHTML *html.Node) (
 			}
 			if imageEmbed, warning := processImage(tbl.Cells, kind); warning != "" {
 				tbl.RemoveFromParent()
-				warnings = append(warnings, warning)
+				warnings = append(warnings, fmt.Sprintf("Table #%d: %s", tableN, warning))
 			} else {
 				embeds.AppendImage(*imageEmbed)
 				if kind != "spl" {
@@ -522,7 +524,7 @@ func createIntermediateDoc(docHTML *html.Node) (
 
 		default:
 			warnings = append(warnings, fmt.Sprintf(
-				"Unrecognized table type: %q", label,
+				"Table #%d has unrecognized type: %q", tableN, label,
 			))
 			tbl.RemoveFromParent()
 		}
