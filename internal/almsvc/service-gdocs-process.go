@@ -417,15 +417,15 @@ func createIntermediateDoc(docHTML *html.Node) (
 			default:
 				kind = "all"
 			}
-			if imageEmbed, warning := processImage(tbl.Cells, kind); warning != "" {
+			imageEmbed := processImage(tbl.Cells, kind)
+			if imageEmbed.Path == "" {
 				tbl.RemoveFromParent()
-				warnings = append(warnings, fmt.Sprintf("Table #%d: %s", tableN, warning))
+				warnings = append(warnings, fmt.Sprintf("Table #%d: missing image", tableN))
 			} else {
 				embeds.AppendImage(*imageEmbed)
-				if kind != "spl" {
-					if stringx.IsWhitespace(imageEmbed.Description) {
-						warnings = append(warnings, fmt.Sprintf("Image embed #%d missing alt description.", embeds.Last().N))
-					}
+				if kind != "spl" && stringx.IsWhitespace(imageEmbed.Description) {
+
+					warnings = append(warnings, fmt.Sprintf("Image embed #%d missing alt description.", embeds.Last().N))
 				}
 				data := newDataTag(dtDBEmbed, dbEmbedToString(embeds.Last()))
 				tbl.ReplaceWith(data)
@@ -587,7 +587,7 @@ func markdownify(n *html.Node) string {
 	return blocko.Blockize(n)
 }
 
-func processImage(rows tableaux.Cells, kind string) (imageEmbed *db.EmbedImage, warning string) {
+func processImage(rows tableaux.Cells, kind string) (imageEmbed *db.EmbedImage) {
 	var width, height int
 	if w := xhtml.TextContent(rows.Value("width")); w != "" {
 		width, _ = strconv.Atoi(w)
@@ -595,7 +595,7 @@ func processImage(rows tableaux.Cells, kind string) (imageEmbed *db.EmbedImage, 
 	if h := xhtml.TextContent(rows.Value("height")); h != "" {
 		height, _ = strconv.Atoi(h)
 	}
-	imageEmbed = &db.EmbedImage{
+	return &db.EmbedImage{
 		Credit:  xhtml.TextContent(rows.Value("credit")),
 		Caption: xhtml.TextContent(rows.Value("caption")),
 		Description: cmp.Or(
@@ -606,13 +606,8 @@ func processImage(rows tableaux.Cells, kind string) (imageEmbed *db.EmbedImage, 
 		Height: height,
 		Kind:   kind,
 		Focus:  xhtml.TextContent(rows.Value("focus")),
+		Path:   xhtml.TextContent(rows.Value("path")),
 	}
-
-	if path := xhtml.TextContent(rows.Value("path")); path != "" {
-		imageEmbed.Path = path
-		return imageEmbed, ""
-	}
-	return nil, "Table missing image"
 }
 
 func processMetadata(rows tableaux.Cells, metadata *db.GDocsMetadata) {
