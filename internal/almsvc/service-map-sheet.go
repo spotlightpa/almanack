@@ -56,8 +56,10 @@ func (svc Services) SyncScrollyMapSheet(ctx context.Context, sheetID string) (er
 		return
 	}
 	for i := range pages {
-		if img, ok := svc.mapImage(ctx, pages[i].ShareImagePath()); ok {
-			pages[i].ShareImageCredit = img.Credit
+		if pages[i].ShareImageCredit == "" {
+			if img, ok := svc.mapImage(ctx, pages[i].ShareImagePath()); ok {
+				pages[i].ShareImageCredit = img.Credit
+			}
 		}
 		for j := range pages[i].Stops {
 			stop := &pages[i].Stops[j]

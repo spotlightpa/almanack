@@ -318,6 +318,8 @@ func SheetToScrollyMapPages(ctx context.Context, cl *http.Client, sheetID string
 		return nil, resperr.E{M: "No data rows in Map Settings sheet"}
 	}
 
+	basemap := sheetOption(set.Field("Basemap"))
+
 	slug := hdr.Field("Slug")
 	if slug == "" {
 		return nil, resperr.E{M: "Header sheet missing Slug value"}
@@ -376,6 +378,7 @@ func SheetToScrollyMapPages(ctx context.Context, cl *http.Client, sheetID string
 		Description:            hdr.Field("Description"),
 		ShareImage:             hdr.Field("Share Image"),
 		ShareImageDescription:  hdr.Field("Share Image Description"),
+		ShareImageCredit:       hdr.Field("Share Image Credit"),
 		TopperLayout:           hdr.Field("Topper Layout"),
 		TopperMobileLayout:     hdr.Field("Mobile Topper Layout"),
 		TopperImage:            hdr.Field("Topper Image"),
@@ -383,8 +386,8 @@ func SheetToScrollyMapPages(ctx context.Context, cl *http.Client, sheetID string
 		Color:                  set.Field("Map Color"),
 		ColorOpacity:           sheetPercent(set.Field("Map Color Opacity")),
 		CardPosition:           set.Field("Default Card Position"),
-		BasemapHidden:          strings.EqualFold(set.Field("Basemap"), "Hide"),
-		BasemapThrough:         sheetOption(set.Field("Basemap")) == "show-through",
+		BasemapHidden:          basemap == "hide",
+		BasemapThrough:         basemap == "show-through",
 		Background:             set.Field("Background Color"),
 		OutlineOff:             sheetUnchecked(set.Field("State Outline")),
 		OutlineColor:           set.Field("Outline Color"),
