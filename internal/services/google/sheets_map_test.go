@@ -90,7 +90,7 @@ func TestMapPageToMarkdown(t *testing.T) {
 		True(strings.Contains(md, `image = "2026/07/share.png"`)).
 		True(strings.Contains(md, `image-description = "Map of Reading council districts"`)).
 		True(strings.Contains(md, `image-gravity = "ce"`)).
-		True(strings.Contains(md, `image-credit = "Jane Doe / Spotlight PA"`))
+		True(strings.Contains(md, `image-credit = "Reporter / Spotlight PA"`))
 	be.Equal(page.ShareImagePath(), "2026/07/share.png")
 	be.Equal(MapPage{}.ShareImagePath(), defaultShareImage)
 }
@@ -99,10 +99,8 @@ func TestSheetPublished(t *testing.T) {
 	be := assert.FailsNow(t)
 	got := be.OK(sheetPublished("2026-07-20"))
 	be.Equal(got.Format("2006-01-02 MST"), "2026-07-20 EDT")
-	_, err := sheetPublished("")
-	be.Nonzero(err)
-	_, err = sheetPublished("July 20")
-	be.Nonzero(err)
+	be.NotOK(sheetPublished(""))
+	be.NotOK(sheetPublished("July 20"))
 }
 
 func TestSheetTopics(t *testing.T) {
