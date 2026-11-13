@@ -81,3 +81,32 @@ type EmbedImage struct {
 	Kind        string `json:"kind"`
 	Focus       string `json:"focus,omitzero"`
 }
+
+type Embeds []Embed
+
+func (embeds Embeds) Last() *Embed {
+	if len(embeds) == 0 {
+		return nil
+	}
+	return &embeds[len(embeds)-1]
+}
+
+func (embeds *Embeds) Append(embedType EmbedType, value string) {
+	*embeds = append(*embeds, Embed{
+		N:     len(*embeds) + 1,
+		Type:  embedType,
+		Value: value,
+	})
+}
+
+func (embeds *Embeds) AppendImage(embed EmbedImage) {
+	*embeds = append(*embeds, Embed{
+		N:     len(*embeds) + 1,
+		Type:  ImageEmbedTag,
+		Value: embed,
+	})
+}
+
+func (embeds *Embeds) DropLast() {
+	*embeds = (*embeds)[:len(*embeds)-1]
+}
