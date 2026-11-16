@@ -1,0 +1,13 @@
+HTTP/2.0 200 OK
+Content-Security-Policy: default-src 'none'; frame-ancestors 'none'
+Content-Type: application/json
+Date: Mon, 16 Nov 2026 22:35:17 GMT
+Request-Id: req_011Ch7QSLqp8DisMwMaFFoA4
+Server: cloudflare
+Server-Timing: x-originResponse;dur=2064
+Strict-Transport-Security: max-age=31536000; includeSubDomains; preload
+Traceresponse: 00-049ddf2f1e4c60ebc69d027c51fcfa5b-10cde38cb556ea52-01
+Vary: Accept-Encoding
+X-Robots-Tag: none
+
+{"model":"claude-sonnet-5-5","id":"msg_011Ch7QSM6SdPibt5PcDguoz","type":"message","role":"assistant","content":[{"type":"text","text":"A group of about ten people stands in front of a red \"Good Intent Hose Company\" fire truck on the street before the green-domed Pennsylvania State Capitol, under a cloudy sky."}],"container":null,"stop_reason":"end_turn","stop_sequence":null,"stop_details":null,"usage":{"input_tokens":1091,"cache_creation_input_tokens":0,"cache_read_input_tokens":0,"cache_creation":{"ephemeral_5m_input_tokens":0,"ephemeral_1h_input_tokens":0},"output_tokens":63,"output_tokens_details":{"thinking_tokens":0},"service_tier":"standard","inference_geo":"global","speed":"standard"},"diagnostics":null}
