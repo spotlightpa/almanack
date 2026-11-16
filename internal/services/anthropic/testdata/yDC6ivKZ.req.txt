@@ -1,0 +1,7 @@
+POST /v1/messages HTTP/1.1
+Host: api.anthropic.com
+Anthropic-Version: 2026-10-21
+Content-Type: application/json
+X-Api-Key: abc123
+
+{"model":"claude-sonnet-5-5","max_tokens":300,"system":"You write alt text for web images. Output only the alt text, one or two concise sentences.","messages":[{"role":"user","content":[{"type":"image","source":{"type":"url","url":"https://www.spotlightpa.org/imgproxy/insecure/rt:fill/w:1000/h:800/g:ce/el:1/q:75/MjAyNi8xMS8wMW5mLTQyejItY2g2dy1oeWRqLmpwZWc=.webp"}},{"type":"text","text":"Write alt text for this image."}]}]}
