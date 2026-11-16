@@ -8,6 +8,7 @@ import (
 	"github.com/carlmjohnson/requests"
 	"github.com/earthboundkid/errorx/v2"
 	"github.com/spotlightpa/almanack/internal/almlog"
+	"golang.org/x/exp/collection/set"
 )
 
 func (gsvc *Service) GAClient(ctx context.Context) (cl *http.Client, err error) {
@@ -67,16 +68,14 @@ func (gsvc *Service) MostPopularNews(ctx context.Context, cl *http.Client) (page
 	}
 
 	pages = make([]string, 0, len(data.Rows))
-	pagesSet := make(map[string]bool, len(data.Rows))
+	pagesSet := make(set.Set[string], len(data.Rows))
 	for _, row := range data.Rows {
 		if len(row.DimensionValues) != 1 {
 			return nil, fmt.Errorf("got bad row length: %d", len(row.DimensionValues))
 		}
 		// TODO: We could go through and add up all the query string variants
 		// then re-sort, but seems like overkill
-		page := row.DimensionValues[0].Value
-		if !pagesSet[page] {
-			pagesSet[page] = true
+		if page := row.DimensionValues[0].Value; pagesSet.Insert(page) {
 			pages = append(pages, page)
 		}
 	}

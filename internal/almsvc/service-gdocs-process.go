@@ -78,7 +78,7 @@ func removeTail(n *html.Node) {
 		if c.DataAtom == atom.Table {
 			continue
 		}
-		if !blocko.BlockElements[c.DataAtom] {
+		if !blocko.BlockElements.Contains(c.DataAtom) {
 			continue
 		}
 		if text := xhtml.TextContent(c); text != "###" {
@@ -424,7 +424,6 @@ func createIntermediateDoc(docHTML *html.Node) (
 			} else {
 				embeds.AppendImage(*imageEmbed)
 				if kind != "spl" && stringx.IsWhitespace(imageEmbed.Description) {
-
 					warnings = append(warnings, fmt.Sprintf("Image embed #%d missing alt description.", embeds.Last().N))
 				}
 				data := newDataTag(dtDBEmbed, dbEmbedToString(embeds.Last()))
@@ -557,7 +556,7 @@ func createIntermediateDoc(docHTML *html.Node) (
 	// Warn about TK in document
 	tkRe := regexp.MustCompile(`(?i)\b(TK)+\b`)
 	for n := range intermediateDoc.ChildNodes() {
-		if !blocko.BlockElements[n.DataAtom] {
+		if !blocko.BlockElements.Contains(n.DataAtom) {
 			continue
 		}
 		text := xhtml.TextContent(n)
