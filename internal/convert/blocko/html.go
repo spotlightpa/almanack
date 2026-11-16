@@ -2,56 +2,57 @@ package blocko
 
 import (
 	"github.com/spotlightpa/almanack/internal/utils/stringx"
+	"golang.org/x/exp/collection/set"
 	"golang.org/x/net/html"
 	"golang.org/x/net/html/atom"
 )
 
-var BlockElements = map[atom.Atom]bool{
-	atom.P:  true,
-	atom.H1: true,
-	atom.H2: true,
-	atom.H3: true,
-	atom.H4: true,
-	atom.H5: true,
-	atom.H6: true,
-	atom.Ul: true,
-	atom.Ol: true,
-}
+var BlockElements = set.Of(
+	atom.P,
+	atom.H1,
+	atom.H2,
+	atom.H3,
+	atom.H4,
+	atom.H5,
+	atom.H6,
+	atom.Ul,
+	atom.Ol,
+)
 
-var InlineElements = map[atom.Atom]bool{
-	atom.A:       true,
-	atom.Abbr:    true,
-	atom.Acronym: true,
-	atom.B:       true,
-	atom.Bdi:     true,
-	atom.Bdo:     true,
-	atom.Big:     true,
-	atom.Cite:    true,
-	atom.Code:    true,
-	atom.Del:     true,
-	atom.Dfn:     true,
-	atom.Em:      true,
-	atom.I:       true,
-	atom.Ins:     true,
-	atom.Kbd:     true,
-	atom.Label:   true,
-	atom.Mark:    true,
-	atom.Meter:   true,
-	atom.Output:  true,
-	atom.Q:       true,
-	atom.Ruby:    true,
-	atom.S:       true,
-	atom.Samp:    true,
-	atom.Small:   true,
-	atom.Span:    true,
-	atom.Strong:  true,
-	atom.Sub:     true,
-	atom.Sup:     true,
-	atom.U:       true,
-	atom.Tt:      true,
-	atom.Var:     true,
-	atom.Wbr:     true,
-}
+var InlineElements = set.Of(
+	atom.A,
+	atom.Abbr,
+	atom.Acronym,
+	atom.B,
+	atom.Bdi,
+	atom.Bdo,
+	atom.Big,
+	atom.Cite,
+	atom.Code,
+	atom.Del,
+	atom.Dfn,
+	atom.Em,
+	atom.I,
+	atom.Ins,
+	atom.Kbd,
+	atom.Label,
+	atom.Mark,
+	atom.Meter,
+	atom.Output,
+	atom.Q,
+	atom.Ruby,
+	atom.S,
+	atom.Samp,
+	atom.Small,
+	atom.Span,
+	atom.Strong,
+	atom.Sub,
+	atom.Sup,
+	atom.U,
+	atom.Tt,
+	atom.Var,
+	atom.Wbr,
+)
 
 func isEmpty(n *html.Node) bool {
 	for n := range n.Descendants() {
@@ -61,7 +62,7 @@ func isEmpty(n *html.Node) bool {
 				return false
 			}
 		case html.ElementNode:
-			if !InlineElements[n.DataAtom] {
+			if !InlineElements.Contains(n.DataAtom) {
 				return false
 			}
 		default:

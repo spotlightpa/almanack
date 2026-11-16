@@ -3,15 +3,14 @@ package slicex
 
 import (
 	"slices"
+
+	"golang.org/x/exp/collection/set"
 )
 
 // UniquesFunc deduplicates the slice by removing any items with the same key according to the keyfunc.
 func UniquesFunc[S ~[]T, T any, K comparable](s *S, keyfunc func(T) K) {
-	priorSet := make(map[K]struct{})
+	priorSet := set.Of[K]()
 	*s = slices.DeleteFunc(*s, func(value T) bool {
-		key := keyfunc(value)
-		_, seen := priorSet[key]
-		priorSet[key] = struct{}{}
-		return seen
+		return !priorSet.Insert(keyfunc(value))
 	})
 }
