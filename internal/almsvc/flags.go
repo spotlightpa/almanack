@@ -10,6 +10,7 @@ import (
 	"github.com/spotlightpa/almanack/internal/almlog"
 	"github.com/spotlightpa/almanack/internal/db"
 	"github.com/spotlightpa/almanack/internal/services/anf"
+	"github.com/spotlightpa/almanack/internal/services/anthropic"
 	"github.com/spotlightpa/almanack/internal/services/aws"
 	"github.com/spotlightpa/almanack/internal/services/github"
 	"github.com/spotlightpa/almanack/internal/services/google"
@@ -43,6 +44,7 @@ func AddFlags(fl *flag.FlagSet) func() (svc Services, err error) {
 	mailServiceListID := fl.String("mc-list-id", "", "List `ID` MailChimp v2 campaign")
 	hc := fl.String("healthchecks-uuid", "", "`UUID` for Healthchecks.io alert")
 	yt := youtube.AddFlags(fl)
+	llm := anthropic.AddFlags(fl)
 
 	return func() (svc Services, err error) {
 		if err = flagx.MustHave(fl, "postgres"); err != nil {
@@ -56,6 +58,7 @@ func AddFlags(fl *flag.FlagSet) func() (svc Services, err error) {
 		is, fs := getS3Store()
 		mc := mailchimp.NewMailService(*mailServiceAPIKey, *mailServiceListID, &client)
 		anfService.Client = &client
+		llm.Client = &client
 
 		return Services{
 			IsLambda:             *isLambda,
@@ -78,6 +81,7 @@ func AddFlags(fl *flag.FlagSet) func() (svc Services, err error) {
 			NewsFeed:             newsfeed,
 			ANF:                  anfService,
 			YT:                   yt,
+			LLM:                  llm,
 		}, nil
 	}
 }
