@@ -6,6 +6,7 @@ import (
 	"github.com/earthboundkid/slackhook/v2"
 	"github.com/spotlightpa/almanack/internal/db"
 	"github.com/spotlightpa/almanack/internal/services/anf"
+	"github.com/spotlightpa/almanack/internal/services/anthropic"
 	"github.com/spotlightpa/almanack/internal/services/aws"
 	"github.com/spotlightpa/almanack/internal/services/github"
 	"github.com/spotlightpa/almanack/internal/services/google"
@@ -36,6 +37,7 @@ type Services struct {
 	NewsFeed         *jsonfeed.NewsFeed
 	ANF              *anf.Service
 	mailchimp.EmailService
-	HC healthchecksio.Client
-	YT *youtube.Feed
+	HC  healthchecksio.Client
+	YT  *youtube.Feed
+	LLM *anthropic.Service
 }
