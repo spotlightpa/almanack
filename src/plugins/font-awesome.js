@@ -32,6 +32,7 @@ import {
   faUserCircle,
   faUserClock,
   faVideo,
+  faWandMagicSparkles,
 } from "@fortawesome/free-solid-svg-icons";
 
 library.add(
@@ -63,7 +64,8 @@ library.add(
   faTrashAlt,
   faUserCircle,
   faUserClock,
-  faVideo
+  faVideo,
+  faWandMagicSparkles
 );
 
 export default {

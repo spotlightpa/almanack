@@ -1,7 +1,11 @@
 <script setup>
+import { makeState } from "@/api/loader.ts";
+import { get } from "@/api/client.ts";
+import { getDescribeImage } from "@/api/endpoints.ts";
+
 import { formatDate } from "@/utils/time-format.ts";
 
-defineProps({
+const props = defineProps({
   image: { type: Object, required: true },
 });
 
@@ -12,6 +16,12 @@ defineEmits([
   "update-is-licensed",
   "update-image-list",
 ]);
+
+const { apiStateRefs, exec } = makeState();
+
+function onClick() {
+  return exec(() => get(getDescribeImage, { image: props.image.path }));
+}
 </script>
 
 <template>
@@ -46,6 +56,13 @@ defineEmits([
           :height="image.height"
           @update="$emit('update-image-list')"
         ></ImageSize>
+        <LinkButton
+          :class="{ 'mt-1': true, 'is-loading': apiStateRefs.isLoading.value }"
+          color="is-success"
+          :icon="['fas', 'magic-wand-sparkles']"
+          label="Generate description"
+          @click.prevent="onClick"
+        ></LinkButton>
       </div>
     </td>
     <td>
@@ -110,6 +127,14 @@ defineEmits([
           size="is-small"
         ></CopyWithButton>
       </p>
+      <p v-if="apiStateRefs.rawData.value">
+        <CopyWithButton
+          :value="apiStateRefs.rawData.value"
+          label="LLM description"
+          size="is-small"
+        ></CopyWithButton>
+      </p>
+      <ErrorSimple :error="apiStateRefs.error.value"></ErrorSimple>
     </td>
     <td></td>
   </tr>

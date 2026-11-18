@@ -8,6 +8,7 @@ export const postAuthorizedEmailAddress = `/api/authorized-addresses`;
 export const listAuthorizedEmailAddresses = `/api/authorized-addresses`;
 export const createSignedUpload = `/api/create-signed-upload`;
 export const postDonorWall = `/api/donor-wall`;
+export const getDescribeImage = `/api/describe-image`;
 export const createFile = `/api/files-create`;
 export const listFiles = `/api/files-list`;
 export const updateFile = `/api/files-update`;
