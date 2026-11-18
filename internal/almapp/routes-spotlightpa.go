@@ -1164,3 +1164,12 @@ func (app *appEnv) deletePromotion(w http.ResponseWriter, r *http.Request) http.
 	}
 	return app.jsonOK("OK")
 }
+
+func (app *appEnv) getDescribeImage(w http.ResponseWriter, r *http.Request) http.Handler {
+	imagePath := r.URL.Query().Get("image")
+	desc, err := app.svc.DescribeImage(r.Context(), imagePath)
+	if err != nil {
+		return app.jsonErr(err)
+	}
+	return app.jsonOK(desc)
+}

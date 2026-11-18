@@ -57,6 +57,7 @@ func (app *appEnv) routes() http.Handler {
 		HandleFunc(mux, `GET /api/authorized-domains`, app.listDomains).
 		HandleFunc(mux, `POST /api/authorized-domains`, app.postDomain).
 		HandleFunc(mux, `POST /api/create-signed-upload`, app.postSignedUpload).
+		Control(mux, `GET /api/describe-image`, app.getDescribeImage).
 		Control(mux, `POST /api/donor-wall`, app.postDonorWall).
 		HandleFunc(mux, `POST /api/files-create`, app.postFileCreate).
 		HandleFunc(mux, `GET /api/files-list`, app.listFiles).
