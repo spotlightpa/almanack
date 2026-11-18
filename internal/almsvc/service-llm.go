@@ -14,7 +14,7 @@ func (svc Services) DescribeImage(ctx context.Context, imgproxyPath string) (des
 
 	const (
 		model        = "claude-haiku-5-5"
-		systemPrompt = `You write alt text for images on a Pennsylvannia based news website. Output only the alt text, one or two concise sentences in AP style.`
+		systemPrompt = `You write alt text for images on a Pennsylvannia based news website. Output only the alt text, one concise sentence in AP style.`
 	)
 	url, err := svc.ImageStore.SignGetURL(ctx, imgproxyPath)
 	if err != nil {
