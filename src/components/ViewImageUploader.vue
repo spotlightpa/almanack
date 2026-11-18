@@ -6,7 +6,6 @@ import { get, post, listImages, postImageUpdate } from "@/api/client.ts";
 import { makeState, watchAPI } from "@/api/loader.ts";
 import imgproxyURL from "@/api/imgproxy-url.js";
 
-import { formatDate } from "@/utils/time-format.ts";
 import humanSize from "@/utils/human-size.ts";
 
 const props = defineProps({
@@ -179,101 +178,16 @@ function updateIsLicensed(image) {
 
     <table class="table is-striped is-fullwidth">
       <tbody>
-        <tr v-for="image of images" :key="image.id">
-          <td>
-            <div class="max-128">
-              <a :href="image.downloadURL" class="is-flex">
-                <picture
-                  class="image is-3x4 has-background-grey-lighter has-margin-bottom"
-                >
-                  <img
-                    :src="image.url"
-                    class="border-thick"
-                    width="256"
-                    height="192"
-                    loading="lazy"
-                  />
-                </picture>
-              </a>
-            </div>
-            <div class="mt-4">
-              <LinkHref
-                :label="image.size ? `Original (${image.size})` : 'Original'"
-                color="is-success"
-                :icon="['fas', 'file-download']"
-                :href="image.downloadURL"
-              ></LinkHref>
-              <ImageSize
-                class="mt-1"
-                :path="image.path"
-                :width="image.width"
-                :height="image.height"
-                @update="fetch"
-              ></ImageSize>
-            </div>
-          </td>
-          <td>
-            <p>
-              <a
-                class="has-text-weight-semibold"
-                @click="updateDescription(image)"
-              >
-                Description:
-              </a>
-              {{ image.description }}
-            </p>
-
-            <p>
-              <a class="has-text-weight-semibold" @click="updateCredit(image)">
-                Credit:
-              </a>
-              {{ image.credit }}
-            </p>
-
-            <p>
-              <a
-                class="has-text-weight-semibold"
-                @click="updateKeywords(image)"
-              >
-                Keywords:
-              </a>
-              {{ image.keywords }}
-            </p>
-            <p>
-              <a @click="updateIsLicensed(image)">
-                <span class="has-text-weight-semibold">License: </span>
-                <span v-if="image.isLicensed">
-                  <span class="has-text-black">Reuse permitted</span>
-                  <span class="icon is-size-6 has-text-success">
-                    <font-awesome-icon
-                      :icon="['fas', 'check-circle']"
-                    ></font-awesome-icon>
-                  </span>
-                </span>
-                <span v-else>
-                  <span class="has-text-black">Reuse not permitted</span>
-                  <span class="icon is-size-6 has-text-danger">
-                    <font-awesome-icon
-                      :icon="['fas', 'circle-exclamation']"
-                    ></font-awesome-icon>
-                  </span>
-                </span>
-              </a>
-            </p>
-            <p>
-              <strong>Date:</strong>
-              {{ formatDate(image.date) }}
-            </p>
-            <p class="has-margin-top-thin">
-              <CopyWithButton
-                :value="image.path"
-                label="path"
-                size="is-small"
-              ></CopyWithButton>
-            </p>
-          </td>
-          <td></td>
-        </tr>
+        <ImageUploadRow
+          v-for="image of images"
+          :key="image.id"
+          :image="image"
+          @update-description="updateDescription"
+          @update-credit="updateCredit"
+          @update-keywords="updateKeywords"
+          @update-is-licensed="updateIsLicensed"
+          @update-image-list="fetch"
+        ></ImageUploadRow>
       </tbody>
     </table>
     <div class="buttons mt-5">
@@ -287,15 +201,3 @@ function updateIsLicensed(image) {
     </div>
   </div>
 </template>
-
-<style scoped>
-.max-128 {
-  height: 72px;
-  width: 128px;
-  min-height: 1rem;
-  min-width: 1rem;
-}
-.border-thick {
-  border: 2px solid #ccc;
-}
-</style>
