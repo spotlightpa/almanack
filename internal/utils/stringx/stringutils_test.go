@@ -1,7 +1,9 @@
 package stringx_test
 
 import (
+	"strings"
 	"testing"
+	"time"
 
 	"github.com/earthboundkid/assert"
 	"github.com/earthboundkid/assert/testfile"
@@ -204,4 +206,29 @@ func TestIsWhitespace(t *testing.T) {
 	}, func(be assert.TB, tc testcase) {
 		be.Equal(stringx.IsWhitespace(tc.input), tc.want)
 	})
+}
+
+func TestToToml(t *testing.T) {
+	be := assert.FailsNow(t)
+	got := be.OK(stringx.ToToml(map[string]any{
+		"title":     "Find Your District",
+		"blank":     "",
+		"none":      nil,
+		"zero":      0.0,
+		"empty":     []string{},
+		"topics":    []string{"Local Government"},
+		"ads":       true,
+		"published": time.Date(2026, 7, 20, 4, 0, 0, 0, time.UTC),
+	}))
+	for _, want := range []string{
+		"ads = true",
+		"published = 2026-07-20T00:00:00-04:00",
+		`title = "Find Your District"`,
+		"Local Government",
+	} {
+		be.True(strings.Contains(got, want))
+	}
+	for _, key := range []string{"blank", "none", "zero", "empty"} {
+		be.False(strings.Contains(got, key))
+	}
 }

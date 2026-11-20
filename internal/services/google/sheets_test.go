@@ -48,3 +48,22 @@ func TestSheetMap(t *testing.T) {
 	}
 	assert.FailsNow(t).SlicesEqual(got, []abc{{"1", "2", "3"}, {"4", "5", "6"}})
 }
+
+func TestSheetMapRows(t *testing.T) {
+	sheet := &spreadsheet.Sheet{
+		Rows: [][]spreadsheet.Cell{
+			{{Value: "a"}, {Value: "b"}, {Value: "c"}},
+			{{Value: "1"}},
+			{},
+			{{Value: "4"}, {Value: "5"}, {Value: "6"}},
+		},
+	}
+	sm := google.NewSheetMap(sheet)
+	for range 2 {
+		got := []string{}
+		for range sm.Rows() {
+			got = append(got, sm.Field("a")+sm.Field("c"))
+		}
+		assert.FailsNow(t).SlicesEqual(got, []string{"1", "46"})
+	}
+}
