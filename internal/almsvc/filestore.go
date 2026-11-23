@@ -17,7 +17,8 @@ func GetSignedFileUpload(ctx context.Context, is aws.BlobStore, filename, mimety
 	filepath := makeFilePath(filename)
 	fileURL = is.BuildURL(filepath)
 	h := http.Header{}
-	httpx.SetAttachmentName(h, filename)
+	disposition = httpx.AttachmentName(filename)
+	h.Set("Content-Disposition", disposition)
 	h.Set("Content-Type", mimetype)
 	cachecontrol = "public,max-age=365000000,immutable"
 	h.Set("Cache-Control", cachecontrol)
