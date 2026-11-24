@@ -168,10 +168,28 @@ Authenticated with the same shared secret as `/_groundhog/build`.
 6. Return 200 with new HEAD SHA
 ```
 
-Almanack's existing background cron handler calls this endpoint once daily at 3am,
-using the same pattern as other scheduled work in Almanack:
-the Netlify scheduled function pings `/api-background/cron`,
-which checks whether it is time to sync and calls `/_groundhog/sync` if so.
+Almanack tracks sync state in Postgres:
+
+```sql
+CREATE TABLE groundhog_syncs (
+    synced_at  TIMESTAMPTZ NOT NULL,
+    error      TEXT
+);
+```
+
+A row is inserted after every sync attempt, whether successful or not.
+`error` is NULL on success and contains the error message on failure.
+
+Almanack's existing background cron (runs every 3 minutes) checks:
+> Has there been a successful sync (`error IS NULL`) since 3am today?
+
+If not, it calls `/_groundhog/sync`, then inserts a row recording
+the outcome. This means the first cron tick after 3am each day
+triggers the sync; subsequent ticks that day are no-ops.
+Failed syncs are retried on the next cron tick until one succeeds.
+
+Error rows are visible to operators via Almanack's existing
+infrastructure for surfacing background task failures (e.g. Slack alerts).
 No new Netlify scheduled function is needed.
 
 For an out-of-schedule sync (e.g. after a significant poor-richard template change),
