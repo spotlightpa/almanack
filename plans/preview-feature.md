@@ -82,8 +82,9 @@ Response (immediately, before build starts):
 ```
 
 Groundhog runs the build in a goroutine and returns immediately.
-If a build is already in progress (mutex held), Groundhog returns 409 Conflict.
-Almanack should surface this to the editor as "a preview is already building, try again shortly."
+If a build is already in progress, the new build waits on the mutex
+rather than rejecting the request.
+With ~3s build times the wait is short and transparent to the editor.
 
 ### `GET /_groundhog/build-status?id=XXX`
 
@@ -303,8 +304,7 @@ so static credentials in the env file are used.
 3. Almanack serializes the article to Hugo frontmatter + Markdown
    (same conversion used at publish time — must be identical).
 4. Almanack POSTs to `{GROUNDHOG_URL}/_groundhog/build` with HMAC signature.
-5. If 409: return "preview already building" to frontend; spinner stops with an error message.
-6. If 200: Almanack returns `{build_id}` to frontend.
+5. Almanack returns `{build_id}` to frontend.
 7. Frontend polls `GET /api/article/{id}/preview-status?build_id=XXX` on Almanack every 300ms.
    Almanack proxies the status check to `{GROUNDHOG_URL}/_groundhog/build-status?id=XXX`.
 8. While polling: spinner continues.
