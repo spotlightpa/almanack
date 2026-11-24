@@ -2,339 +2,330 @@
 
 Editors want to preview what a draft story will look like on the Poor Richard Hugo site
 before pushing it live.
+This plan describes a new standalone service, **Groundhog**
+(Groundhog Day — it forgets everything every morning),
+and the corresponding changes to Almanack.
 
-## Constraints and Decisions Reached
+## Constraints
 
 - **poor-richard is a public GitHub repo.**
-  Draft content must never be committed to any branch of it,
-  or it becomes publicly readable before publication.
-  Pushing to a preview branch, using Netlify branch deploys,
-  or triggering GitHub Actions on that repo are all ruled out.
+  Draft content must never be committed to any branch of it.
 
 - **Hugo full-site builds take ~15 seconds** on the site's current content volume.
-  Keeping `hugo server` running for incremental builds is unreliable:
-  frequent `git pull`s while Hugo is watching the filesystem cause crashes.
-  One-shot `hugo` builds with `--contentDir` pointing to a temp directory
-  containing only the draft article are fast (under 2 seconds)
-  because Hugo has almost no content to process.
-  The tradeoff is that related-articles widgets and taxonomy index pages
-  will be empty or show only one article;
-  this is acceptable for a preview of the article page itself.
+  Building with a single article via `--contentDir` takes ~3 seconds and produces ~5 MB of output.
+  Related-articles widgets and taxonomy index pages will be empty or contain only the draft article;
+  this is acceptable for checking article layout, typography, and shortcode rendering.
 
-- **Asset shearing is not a concern if old hashed assets are not purged.**
-  Hugo fingerprints CSS and JS by content hash.
-  If the production deployment never deletes old versioned asset files from S3/CDN,
-  then a preview HTML page referencing `main.a1b2c3.css` remains valid
-  even after subsequent deploys rotate to `main.d4e5f6.css`.
-  This is standard practice for content-addressed static assets
-  and should be verified/enforced in poor-richard's deployment config.
-
-- **Preview HTML is small** (a few KB per page) once assets are excluded.
-  Storing rendered HTML in Postgres is fine;
-  the earlier concern about blob size was about bundling the full asset tree,
-  which is unnecessary when assets resolve from the production CDN.
-
-- **Hosting: AWS Lightsail**, using existing AWS credits and account
-  (Spotlight PA already uses S3 for image storage).
-  Lightsail gives a fixed-IP always-on VM with no cold-start,
-  managed by systemd, without the VPC/IAM complexity of raw EC2.
-  exe.dev is not suitable: its proxy authenticates the VM owner,
-  not Spotlight PA editors.
+- **The zip is self-contained.**
+  Hugo's output includes compiled, fingerprinted CSS and JS.
+  Bundling them in the zip avoids any dependency on the production CDN
+  and eliminates asset shearing when the production site redeploys.
 
 ---
 
-## Architecture Overview
+## Groundhog: Architecture Overview
+
+Groundhog is a small Go HTTP server running on an AWS Lightsail instance
+(existing AWS account; credits available).
+It does two things: build previews, and serve them.
 
 ```
-Editor browser
-    │  clicks "Preview"
+Almanack backend
+    │  POST /build  (HMAC-signed)
     ▼
-Almanack (Netlify Function)
-    │  inserts article_previews row (status: pending)
-    │  UI polls status
+Groundhog (groundhog.spotlightpa.org)
+    │  acquires in-memory mutex
+    │  writes draft .md to tempdir
+    │  runs: hugo --contentDir tempdir --baseURL https://groundhog.spotlightpa.org/
+    │  zips hugo output
+    │  uploads zip to S3 (random key, 24h lifecycle)
+    │  releases mutex
     ▼
-Almanack background cron (every 3 min)
-    │  picks up pending rows
-    │  POSTs draft content to preview server
+Almanack frontend
+    │  polls GET /build/{id}/status every 300ms
     ▼
-Preview server (AWS Lightsail)
-    │  writes content to temp dir
-    │  runs: hugo --contentDir /tmp/preview-{id}/ ...
-    │  reads rendered HTML
-    │  cleans up temp dir
-    │  returns HTML to Almanack
-    ▼
-Almanack
-    │  stores HTML in article_previews row (status: done)
+Groundhog
+    │  when done: 302 to /articles/{slug}/
+    │            Set-Cookie: preview_zip={s3key}; Path=/; HttpOnly; Max-Age=86400
     ▼
 Editor browser
-    │  UI shows preview link
+    │  lands on /articles/{slug}/  (served from zip via cookie)
+    │  browser fetches /css/main.a1b2c3.css
     ▼
-Almanack (Netlify Function, /ssr/preview/{id})
-    │  verifies editor is authenticated
-    │  reads HTML from DB
-    │  serves to browser
-    │  assets (CSS, JS, images) load from production CDN
+Groundhog
+    │  reads preview_zip cookie
+    │  fetches zip from S3 (cached in memory)
+    │  extracts and serves css/main.a1b2c3.css
 ```
 
 ---
 
-## Components
+## Groundhog: API
 
-### 1. Postgres: `article_previews` table
+### `POST /build`
 
-```sql
-CREATE TABLE article_previews (
-    id          UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    article_id  INTEGER NOT NULL REFERENCES articles(id),
-    status      TEXT NOT NULL DEFAULT 'pending',
-        -- pending | building | done | failed
-    html        TEXT,
-    error       TEXT,
-    requested_by TEXT,  -- editor email, for logging
-    requested_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-    built_at    TIMESTAMPTZ
-);
+Authenticated by HMAC-SHA256 signature over the request body,
+using a shared secret (same pattern as GitHub webhooks:
+`X-Hub-Signature-256: sha256={hex}`).
 
-CREATE INDEX ON article_previews (article_id, requested_at DESC);
+Request body (JSON):
+```json
+{
+  "article_path": "content/articles/my-story.md",
+  "article_content": "---\ntitle: My Story\n...\n---\n\nBody here."
+}
 ```
 
-A `pending` row is created immediately when the editor clicks Preview.
-The background cron picks it up, sets status to `building`,
-calls the preview server, and updates to `done` or `failed`.
+Response (immediately, before build starts):
+```json
+{"build_id": "f47ac10b-58cc-4372-a567-0e02b2c3d479"}
+```
 
-If a row has been `building` for more than 5 minutes,
-the cron treats it as failed and resets it
-(handles preview server crashes or hangs mid-build).
+Groundhog runs the build in a goroutine and returns immediately.
+If a build is already in progress (mutex held), Groundhog returns 409 Conflict.
+Almanack should surface this to the editor as "a preview is already building, try again shortly."
 
-Rows older than 48 hours are deleted by the cron.
+### `GET /build/{id}/status`
 
-### 2. Preview Server (AWS Lightsail)
+Polled by the Almanack frontend every 300ms.
 
-A small Go HTTP binary running under systemd on a Lightsail `nano` instance
-(1 GB RAM, 2 vCPU burst, $5/mo before credits).
+While building:
+```json
+{"status": "building"}
+```
 
-**Endpoints:**
+On failure:
+```json
+{"status": "failed", "error": "hugo exited with code 1: ..."}
+```
 
-`POST /build`
-- Authenticated with a shared secret in the `Authorization` header.
-- Request body: JSON with article frontmatter and body content.
-- Writes a Hugo content file to `/tmp/preview-{uuid}/content/articles/{slug}.md`.
-- Runs `hugo --contentDir /tmp/preview-{uuid}/content
-         --destination /tmp/preview-{uuid}/output
-         --baseURL https://www.spotlightpa.org
-         --gc --minify`
-  with a 30-second timeout.
-- Reads `/tmp/preview-{uuid}/output/articles/{slug}/index.html`.
-- Deletes the temp directory.
-- Returns the HTML as a JSON string.
+On success: `302 Found` to `/articles/{slug}/`
+with `Set-Cookie: preview_zip={s3key}; Path=/; HttpOnly; SameSite=Lax; Max-Age=86400`.
 
-`GET /health`
-- Returns 200 OK. Polled by Almanack's cron for monitoring.
+Build state is kept in an in-memory map (`map[string]*buildState` guarded by a sync.RWMutex).
+Since there is exactly one Groundhog instance, no external state store is needed.
+Entries are pruned after 1 hour.
 
-`POST /sync`
-- Authenticated with the same shared secret.
-- Runs `git pull` on the poor-richard working tree.
-- Called by Almanack after each successful poor-richard deployment
-  (via a webhook or build hook), not on a timer.
-- Must not run while a build is in progress;
-  the server holds an in-process mutex during builds
-  and returns 409 Conflict if sync is requested during one.
-- Returns 200 when the pull completes or 500 on failure.
+### `GET /*` (preview serving)
 
-### 3. Almanack Changes
+All other requests check for the `preview_zip` session cookie.
+If present, Groundhog fetches the named zip from S3
+(LRU cache in memory, holds up to ~100 MB worth of zips),
+extracts the requested path, and serves it with an appropriate `Content-Type`.
 
-**Backend:**
-- New sqlc queries and migration for `article_previews`.
-- Background cron handler: picks up `pending` rows,
-  calls `POST /build` on the preview server,
-  stores result.
-- New SSR route `/ssr/preview/{id}` that reads HTML from DB
-  and serves it to authenticated editors.
-- Health check for the preview server
-  (ping `/health`; alert via Slack if down).
+If the cookie is absent or the key does not exist in S3: 404.
 
-**Frontend:**
-- "Preview" button on the article editor page.
-- Polls the preview status every 3 seconds while `pending` or `building`.
-- Shows a spinner with estimated wait time.
-- When `done`, shows a link that opens `/ssr/preview/{id}` in a new tab.
-- When `failed`, shows the error and a "Try again" button.
+This means multiple editors can browse their respective previews concurrently;
+each editor's browser carries their own cookie pointing to their zip.
+
+### `GET /health`
+
+Returns 200 with the current poor-richard HEAD SHA and whether a build is in progress.
+Polled by Almanack's cron for monitoring.
 
 ---
 
-## Auth
+## Groundhog: Build Process
 
-**Almanack → Preview server:**
-A shared secret (a random 32-byte hex string) stored as an Almanack
-environment variable and on the Lightsail instance.
-The Almanack cron sets it in the `Authorization: Bearer {secret}` header.
-The preview server rejects any request without a valid secret with 401.
+```
+1. Acquire sync.Mutex (one build at a time)
+2. Create tempdir: /tmp/groundhog-{buildID}/content/articles/
+3. Write article_content to /tmp/groundhog-{buildID}/content/articles/{slug}.md
+4. Run with 60s timeout:
+     hugo \
+       --source /srv/poor-richard \
+       --contentDir /tmp/groundhog-{buildID}/content \
+       --destination /tmp/groundhog-{buildID}/output \
+       --baseURL https://groundhog.spotlightpa.org/ \
+       --gc --minify --quiet
+5. Walk /tmp/groundhog-{buildID}/output and write a zip to /tmp/groundhog-{buildID}/output.zip
+6. Upload output.zip to S3: previews/{random-uuid}.zip
+7. Store s3key in buildState; mark done
+8. defer os.RemoveAll("/tmp/groundhog-{buildID}") — runs even on failure
+9. Release mutex
+```
 
-The preview server is not firewalled to specific source IPs
-because Netlify Functions do not have fixed egress IPs.
-Application-level auth over HTTPS is sufficient.
-
-**Editor → Preview HTML:**
-The `/ssr/preview/{id}` route in Almanack uses the existing
-Netlify Identity auth check (same as other `/ssr/` routes).
-Editors must be logged in to Almanack to view a preview.
-No separate auth mechanism is needed.
-
----
-
-## TLS on Lightsail
-
-Assign a Lightsail static IP.
-Point a subdomain (e.g., `preview-api.spotlightpa.org`) at it.
-Run certbot with the Let's Encrypt HTTP-01 challenge for a free certificate.
-The preview server binary terminates TLS directly (using Go's `crypto/tls`)
-or runs behind nginx on the same instance.
-certbot's cron handles renewal.
+The S3 bucket has a lifecycle rule that expires objects under `previews/` after 24 hours.
 
 ---
 
-## Template Sync
+## Groundhog: Template Sync
 
-The preview server holds a local clone of the poor-richard repo
-(public, so no credentials needed).
-It is synced by calling `POST /sync` from Almanack
-after a poor-richard deployment completes.
+Groundhog maintains a local clone of `github.com/spotlightpa/poor-richard` at `/srv/poor-richard`.
+A background goroutine runs every 10 minutes:
 
-Poor Richard's deployment can send a webhook to Almanack's background API,
-or Almanack's cron can detect new commits by polling GitHub's API
-for the latest commit SHA on `main` and comparing to a stored value.
+```
+1. If build mutex is held: skip this cycle, try again in 10 minutes
+2. Lock the mutex (blocks any incoming build during sync)
+3. git -C /srv/poor-richard pull --ff-only
+4. If yarn.lock changed since last pull: yarn --cwd /srv/poor-richard install
+5. Release mutex
+```
 
-The sync endpoint is not called on a timer specifically to avoid
-running `git pull` while Hugo may be active,
-which has been observed to cause Hugo crashes.
-The in-process mutex prevents the race if a sync and a build
-happen to be requested at the same time.
+Running `git pull` while Hugo is watching the filesystem causes crashes
+(observed in practice).
+The mutex prevents any overlap between sync and build.
 
-On first setup and after a manual reset, sync is triggered by SSH'ing in
-and running `git clone` or `git pull` manually with the server stopped.
+Node and yarn must be installed on the Lightsail instance alongside Hugo,
+since poor-richard uses a node-based asset pipeline.
 
 ---
 
-## Operational Challenges
+## Groundhog: Deployment
 
-### Preview server availability
+**Instance**: AWS Lightsail `nano_3_0` (1 GB RAM, 2 vCPU burst, $5/mo before credits).
 
-The preview server is a single point of failure.
-If it is down, editors cannot preview — but they can still publish.
-Almanack's cron pings `/health` and posts to the Slack error channel if it fails.
-Lightsail instances can be configured with automatic restart after failure
-via systemd's `Restart=on-failure`.
+**DNS**: `groundhog.spotlightpa.org` → Lightsail static IP.
 
-A Lightsail instance reboots for OS patches occasionally.
-The systemd unit ensures the preview server restarts automatically.
-In-flight builds at reboot time are detected by the 5-minute
-`building` timeout in the cron and re-queued.
+**TLS**: nginx on the instance terminates HTTPS via Let's Encrypt (certbot).
+Groundhog listens on `localhost:8080`; nginx proxies to it.
 
-### Stuck or leaked temp directories
+**Systemd unit** (`/etc/systemd/system/groundhog.service`):
+```ini
+[Unit]
+Description=Groundhog Preview Server
+After=network.target
 
-If the preview server process is killed during a build,
-the temp directory is not cleaned up.
-On startup, the server deletes any `/tmp/preview-*` directories
-left over from previous runs.
-In normal operation, `defer os.RemoveAll(tmpDir)` in Go
-ensures cleanup even on Hugo subprocess failure.
+[Service]
+Type=simple
+User=groundhog
+WorkingDirectory=/srv/groundhog
+ExecStart=/srv/groundhog/groundhog
+Restart=on-failure
+RestartSec=5
+EnvironmentFile=/srv/groundhog/.env
 
-### Hugo subprocess hangs
+[Install]
+WantedBy=multi-user.target
+```
 
-Hugo is given a 30-second `context.WithTimeout`.
-If it exceeds this, the subprocess is killed, the temp dir is cleaned up,
-and the preview row is marked `failed` with an error message.
-Hangs are uncommon with a minimal content directory
-but can occur if Hugo tries to fetch remote resources.
-The `--offline` flag should be passed to prevent network calls during build.
+**`.env`** (on instance, not in repo):
+```
+GROUNDHOG_SHARED_SECRET=...
+GROUNDHOG_AWS_ACCESS_KEY_ID=...
+GROUNDHOG_AWS_SECRET_ACCESS_KEY=...
+GROUNDHOG_S3_BUCKET=spotlightpa-previews
+GROUNDHOG_POOR_RICHARD_DIR=/srv/poor-richard
+GROUNDHOG_LISTEN=127.0.0.1:8080
+```
 
-### Disk space
+**Deploying a new Groundhog binary**:
+```bash
+GOOS=linux GOARCH=amd64 go build -o groundhog ./cmd/groundhog
+scp groundhog user@groundhog.spotlightpa.org:/srv/groundhog/groundhog.new
+ssh user@groundhog.spotlightpa.org \
+  'mv /srv/groundhog/groundhog.new /srv/groundhog/groundhog && systemctl restart groundhog'
+```
 
-Hugo builds generate output under `/tmp`.
-With proper cleanup this is bounded,
-but monitoring disk usage on the Lightsail instance is worthwhile.
-A simple cron alert if `/tmp` exceeds a threshold catches any leak.
+Groundhog changes infrequently; manual deploy is fine to start.
 
-### Article content format
+**IAM**: A dedicated IAM user with a policy allowing only
+`s3:PutObject`, `s3:GetObject` on `arn:aws:s3:::spotlightpa-previews/previews/*`.
+Lightsail instances do not support IAM instance roles directly,
+so static credentials in the env file are used.
 
-Almanack must send the draft content in the same format Hugo expects:
-Markdown with TOML or YAML frontmatter, matching the schema
-that poor-richard's templates consume.
-If Almanack stores articles in a different internal format (e.g. structured JSON),
-a conversion step is needed before sending to the preview server.
-This should be the same conversion that runs at publish time,
-so preview and publish are always in sync.
+---
 
-### Template staleness
+## Almanack Changes
 
-If the sync mechanism fails (GitHub is down, the webhook misfires),
-the preview server builds against stale templates.
-The preview still works; it just may not reflect recent template changes.
-The `/health` endpoint can include the current HEAD SHA of the poor-richard clone,
-which Almanack can compare against GitHub's API and surface as a warning.
+**New environment variables**: `ALMANACK_GROUNDHOG_URL` and `ALMANACK_GROUNDHOG_SECRET`.
 
-### Preview staleness for editors
+**Editor action**: "Preview" button on the article editor page.
 
-After an editor generates a preview and then edits the article,
-the preview is stale but the UI has no way to know.
-Show the preview generation timestamp prominently.
-Consider invalidating the preview (setting status to `stale`)
-when the article is saved after the preview was built,
-so the editor sees "Preview is out of date — regenerate?"
+**Flow**:
+1. Frontend POSTs to Almanack API: `POST /api/article/{id}/preview`.
+2. Almanack serializes the article to Hugo frontmatter + Markdown
+   (same conversion used at publish time — must be identical).
+3. Almanack POSTs to `{GROUNDHOG_URL}/build` with HMAC signature.
+4. If 409: return "preview already building" to frontend.
+5. If 200: return `{build_id}` to frontend.
+6. Frontend opens a new tab to `{GROUNDHOG_URL}/build/{build_id}/status`
+   and polls it at 300ms.
+   When Groundhog returns the redirect, the browser follows it;
+   the editor lands on their preview page with the cookie set.
 
-### Multiple previews per article
+No Almanack database changes are required.
+Build state lives in Groundhog's memory.
+Almanack does not need to poll or store preview status;
+the frontend tab handles it directly against Groundhog.
 
-An editor may request several previews as they iterate.
-Keep the most recent N previews per article (e.g. 3)
-and delete older ones.
-The UI shows a list of recent previews with timestamps.
+**Health monitoring**: Almanack's existing background cron
+pings `{GROUNDHOG_URL}/health` and posts to Slack if it fails.
 
-### Queue depth
+---
 
-With a 3-minute cron window and builds taking ~2 seconds,
-queue depth is unlikely to be a problem.
-If many editors request previews simultaneously,
-they will be processed in order within a few cron cycles.
-The UI shows "queued" status so editors know to wait.
-If this becomes a pain point, the preview build can be triggered
-directly from the Almanack background API endpoint
-(bypassing the cron delay) using an HTTP call from the frontend
-to a new `/api-background/build-preview` route.
+## Operational Considerations
 
-### Deployment of the preview server
+**Mutex contention**: Only one build at a time.
+If two editors click Preview simultaneously, the second gets a 409
+and Almanack tells them to try again in a few seconds.
+With ~3s build time this is a minor inconvenience.
 
-The preview server binary is built from a small Go package,
-probably within the Almanack repo under `cmd/preview-server`.
-Deployment: build locally or in CI, `scp` to the Lightsail instance,
-`systemctl restart preview-server`.
-This is intentionally simple; the preview server changes infrequently.
+**Hugo subprocess hangs**: Builds run with a 60-second `context.WithTimeout`.
+On timeout, the subprocess is killed, the temp dir is cleaned up via `defer`,
+and the build state is marked failed.
+
+**Groundhog crash during build**: On restart, in-memory build state is lost.
+Any frontend tab polling a build that was in-progress at crash time
+will eventually get a 404 on `/build/{id}/status`.
+Almanack should treat a 404 from the status endpoint as a failure
+and prompt the editor to retry.
+In-flight temp directories are cleaned up on startup via `filepath.Glob("/tmp/groundhog-*")`.
+
+**Instance reboot**: systemd restarts Groundhog automatically.
+Same recovery path as a crash.
+
+**Disk space**: Hugo builds go to `/tmp` and are always removed by `defer`.
+Monitor with a simple cron alert if `/tmp` exceeds a threshold.
+
+**Zip cache eviction**: The in-memory LRU zip cache is bounded by size
+(e.g., 200 MB, ~40 zips).
+S3 is the source of truth; cache misses re-fetch transparently.
+An editor returning to a preview after the cache has been evicted
+will see a slightly slower first load (S3 fetch) but no error.
+
+**Preview after article edit**: The session cookie points to a zip
+built from a previous version of the article.
+If the editor edits the article after previewing, the preview is stale.
+The Almanack frontend should show the preview generation time
+and offer a "Rebuild preview" button.
+The old cookie/zip remains valid until the lifecycle policy expires it;
+triggering a new build sets a new cookie, replacing the old one.
+
+**Template staleness**: The 10-minute sync cycle means previews may use
+templates up to 10 minutes old.
+This is acceptable; poor-richard template deploys are infrequent.
+If a template change is urgent, SSH in and run
+`git -C /srv/poor-richard pull && systemctl restart groundhog`
+(the restart flushes in-memory state and re-syncs cleanly on next cycle).
+
+**Yarn install duration**: `yarn install` with a warm cache takes a few seconds.
+Running it in the sync goroutine while the mutex is held means
+a build request during yarn install will block briefly.
+This is preferable to running yarn and hugo simultaneously.
+
+**Multiple editors viewing concurrently**: Each editor's browser carries
+its own `preview_zip` cookie from when they triggered their own build.
+Groundhog serves each correctly from their respective zip.
+No per-editor state is needed beyond the cookie.
 
 ---
 
 ## Open Questions
 
-- **Multiple `--contentDir` mounts via config:**
-  Hugo's `--contentDir` flag accepts only one path.
-  Hugo's module mount system (configured in `hugo.toml`) supports layering
-  multiple content directories and could be used to build with
-  all published articles plus the draft
-  (giving correct related-articles and homepage context).
-  This would require generating a temporary `hugo.toml` per build
-  and would bring build time back toward 15 seconds.
-  Worth prototyping once the basic single-article preview is working
-  to see if the speed penalty is acceptable.
+**Article content format**: The conversion from Almanack's internal representation
+to Hugo-ready Markdown+frontmatter must be identical to the publish-time conversion.
+If they diverge, editors approve a preview that doesn't match what goes live.
+This should be a shared function called by both paths.
 
-- **Which content types need preview:**
-  Articles are the primary use case.
-  Pages, newsletters, and other content types may need the same feature
-  with different Hugo content paths.
-  The preview server API should be designed to accept a content type
-  and path alongside the article body from the start.
+**Full-site build option**: Hugo's module mount system supports layering
+multiple content directories via a generated `hugo.toml`.
+Building with all published content alongside the draft
+would give correct related-articles and homepage context,
+at the cost of returning to ~15s build times.
+Worth prototyping as a "high fidelity" mode once the basic preview ships.
 
-- **Poor Richard asset purging policy:**
-  Confirm that the production deployment does not delete old
-  content-hashed CSS/JS files from S3 on deploy.
-  If it does, shearing becomes a real problem
-  and assets must be included in the preview artifact.
-  This should be verified before shipping the feature.
+**Slug derivation**: The redirect from `/build/{id}/status` needs to know
+the article's URL path. Almanack should include the expected Hugo output path
+(`article_output_path`) in the `/build` request so Groundhog can construct
+the correct redirect target.
