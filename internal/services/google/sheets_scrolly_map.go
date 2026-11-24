@@ -1,9 +1,7 @@
 package google
 
 import (
-	"context"
 	"fmt"
-	"net/http"
 	"slices"
 	"strconv"
 	"strings"
@@ -73,11 +71,7 @@ type ScrollyMapStop struct {
 	TextClass        string
 }
 
-func (m ScrollyMapPage) FilePath() string {
-	return mapContentPath(m.Section, m.Slug, m.InternalID, m.PublishedAt)
-}
-
-func (m ScrollyMapPage) storySplit(featuredMD string) int {
+func (m *ScrollyMapPage) storySplit(featuredMD string) int {
 	if featuredMD == "" {
 		return -1
 	}
@@ -135,7 +129,7 @@ func writeScrollyMap(sb *strings.Builder, attrs []string, stops []ScrollyMapStop
 	sb.WriteString("{{</featured/scrolly-map>}}\n")
 }
 
-func (m ScrollyMapPage) share() (image, description, gravity string) {
+func (m *ScrollyMapPage) share() (image, description, gravity string) {
 	if m.ShareImage != "" {
 		return m.ShareImage, m.ShareImageDescription, "ce"
 	}
@@ -148,18 +142,18 @@ func (m ScrollyMapPage) share() (image, description, gravity string) {
 	return defaultShareImage, defaultShareImageDescription, "ce"
 }
 
-func (m ScrollyMapPage) ShareImagePath() string {
+func (m *ScrollyMapPage) ShareImagePath() string {
 	image, _, _ := m.share()
 	return image
 }
 
-func (m ScrollyMapPage) ToMarkdown(featuredMD string) (string, error) {
+func (m *ScrollyMapPage) Frontmatter() map[string]any {
 	var authors []string
 	if m.Byline != "" {
 		authors = stringx.ExtractNames(m.Byline)
 	}
 	shareImage, shareDescription, shareGravity := m.share()
-	fm, err := stringx.ToToml(map[string]any{
+	return map[string]any{
 		"authors":           authors,
 		"blurb":             m.Blurb,
 		"byline":            m.Byline,
@@ -177,16 +171,11 @@ func (m ScrollyMapPage) ToMarkdown(featuredMD string) (string, error) {
 		"title":             m.Headline,
 		"title-tag":         m.Headline,
 		"topics":            m.Topics,
-	})
-	if err != nil {
-		return "", err
 	}
+}
 
+func (m *ScrollyMapPage) Body(featuredMD string) string {
 	var sb strings.Builder
-	sb.WriteString("+++\n")
-	sb.WriteString(fm)
-	sb.WriteString("+++\n")
-	sb.WriteString("\n")
 
 	var attrs []string
 	attrs = appendAttr(attrs, "eyebrow", m.Eyebrow)
@@ -232,9 +221,17 @@ func (m ScrollyMapPage) ToMarkdown(featuredMD string) (string, error) {
 		sb.WriteString("\n")
 	}
 
-	writeMapCredits(&sb, m.Credits)
+	writeMapCredits(&sb, m.Credits, featuredMD != "" && split < 0)
 
-	return sb.String(), nil
+	return sb.String()
+}
+
+func (m *ScrollyMapPage) FeaturedDoc() string {
+	return m.FeaturedDocLink
+}
+
+func (m *ScrollyMapPage) PageKind() string {
+	return sheetSection(m.Section)
 }
 
 func appendAttr(attrs []string, key, value string) []string {
@@ -281,13 +278,7 @@ func sheetText(s string) string {
 	return strings.TrimSpace(s)
 }
 
-func SheetToScrollyMapPages(ctx context.Context, cl *http.Client, sheetID string) ([]ScrollyMapPage, error) {
-	service := spreadsheet.NewServiceWithClient(cl)
-	doc, err := service.FetchSpreadsheet(sheetID)
-	if err != nil {
-		return nil, resperr.E{E: err, M: "Problem fetching scrolly map config sheet"}
-	}
-
+func sheetToScrollyMapPage(doc *spreadsheet.Spreadsheet) (*ScrollyMapPage, error) {
 	headerSheet, err := doc.SheetByTitle("Header")
 	if err != nil {
 		return nil, resperr.E{E: err, M: "Spreadsheet missing 'Header' sheet"}
@@ -362,7 +353,7 @@ func SheetToScrollyMapPages(ctx context.Context, cl *http.Client, sheetID string
 		return nil, resperr.E{M: "No stops in Stops sheet"}
 	}
 
-	page := ScrollyMapPage{
+	page := &ScrollyMapPage{
 		Slug:                   slug,
 		Section:                hdr.Field("Section"),
 		Headline:               hdr.Field("Headline"),
@@ -399,5 +390,5 @@ func SheetToScrollyMapPages(ctx context.Context, cl *http.Client, sheetID string
 		Credits:                sheetCredits(creditsSheet),
 	}
 
-	return []ScrollyMapPage{page}, nil
+	return page, nil
 }

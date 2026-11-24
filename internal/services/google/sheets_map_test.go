@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/earthboundkid/assert"
+	"github.com/spotlightpa/almanack/internal/utils/stringx"
 )
 
 func TestTooltipCards(t *testing.T) {
@@ -48,19 +49,34 @@ func TestTemplateAttr(t *testing.T) {
 		Equal(templateAttr(`<div class="x">`), "<div class='x'>")
 }
 
-func TestMapContentPath(t *testing.T) {
-	published := time.Date(2026, 7, 20, 0, 0, 0, 0, time.UTC)
+func toMarkdown(m MapSheet, featuredMD string) (string, error) {
+	fm, err := stringx.ToToml(m.Frontmatter())
+	if err != nil {
+		return "", err
+	}
+	return "+++\n" + fm + "+++\n\n" + m.Body(featuredMD), nil
+}
+
+func TestNormalizeSheetID(t *testing.T) {
+	id := strings.Repeat("aB3-_", 8) + "xyz0"
+	be := assert.Continues(t)
+	be.Equal(be.OK(NormalizeSheetID(id)), id)
+	be.Equal(be.OK(NormalizeSheetID("https://docs.google.com/spreadsheets/d/"+id+"/edit#gid=0")), id)
+	be.NotOK(NormalizeSheetID(""))
+	be.NotOK(NormalizeSheetID("https://docs.google.com/document/d/" + id + "/edit"))
+	be.NotOK(NormalizeSheetID(id[1:] + "!"))
+}
+
+func TestSheetSection(t *testing.T) {
 	assert.Continues(t).
-		Equal(mapContentPath("", "reading-map", "splreadingmap", published),
-			"content/news/2026-07-20-SPLREADINGMAP.md").
-		Equal(mapContentPath("News", "reading-map", "", time.Time{}),
-			"content/news/reading-map.md")
+		Equal(sheetSection(""), "news").
+		Equal(sheetSection(" Berks "), "berks")
 }
 
 func TestMapPageDefaultShareImage(t *testing.T) {
 	be := assert.FailsNow(t)
 	page := MapPage{Slug: "reading-map", Headline: "Find Your District"}
-	md := be.OK(page.ToMarkdown(""))
+	md := be.OK(toMarkdown(&page, ""))
 	be.True(strings.Contains(md, `image = "2020/06/01fdjfj1nf20rwxt.jpeg"`)).
 		True(strings.Contains(md, `image-description = "Spotlight PA"`))
 }
@@ -80,7 +96,7 @@ func TestMapPageToMarkdown(t *testing.T) {
 		ShareImageDesc:   "Map of Reading council districts",
 		ShareImageCredit: "Reporter / Spotlight PA",
 	}
-	md := be.OK(page.ToMarkdown(""))
+	md := be.OK(toMarkdown(&page, ""))
 	be.True(strings.Contains(md, `tooltips="true"`)).
 		True(strings.Contains(md, `desktop-display="card"`)).
 		False(strings.Contains(md, "mobile-display")).
@@ -92,7 +108,7 @@ func TestMapPageToMarkdown(t *testing.T) {
 		True(strings.Contains(md, `image-gravity = "ce"`)).
 		True(strings.Contains(md, `image-credit = "Reporter / Spotlight PA"`))
 	be.Equal(page.ShareImagePath(), "2026/07/share.png")
-	be.Equal(MapPage{}.ShareImagePath(), defaultShareImage)
+	be.Equal((&MapPage{}).ShareImagePath(), defaultShareImage)
 }
 
 func TestSheetPublished(t *testing.T) {
@@ -118,10 +134,11 @@ func TestMapPageCredits(t *testing.T) {
 			{Name: "Alexandra Harris", Role: "Developer"},
 		},
 	}
-	md := be.OK(page.ToMarkdown("Story text"))
+	md := be.OK(toMarkdown(&page, "Story text"))
 	be.True(strings.Contains(md, "Story text\n{{<featured/footer>}}")).
 		True(strings.Contains(md, `{{<featured/credit eyebrow="Reporting" name="Hanna Holthaus" email="hanna@spotlightpa.org">}}`)).
 		True(strings.Contains(md, `{{<featured/credit name="Alexandra Harris" role="Developer">}}`)).
 		True(strings.HasSuffix(md, "{{</featured/footer>}}\n"))
-	be.False(strings.Contains(be.OK(MapPage{Slug: "x"}.ToMarkdown("")), "featured/footer"))
+	be.False(strings.Contains(be.OK(toMarkdown(&MapPage{Slug: "x"}, "")), "featured/footer"))
+	be.True(strings.HasSuffix(be.OK(toMarkdown(&MapPage{Slug: "x"}, "Story text")), "Story text\n{{<featured/footer>}}\n{{</featured/footer>}}\n"))
 }

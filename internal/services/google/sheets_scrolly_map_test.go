@@ -61,7 +61,7 @@ func TestScrollyMapPageToMarkdown(t *testing.T) {
 			{Label: "Central PA", GeoJSON: "https://example.com/a.geojson", CardText: "Hello", ZoomTo: "Shaded", ImageRatio: "16:9"},
 		},
 	}
-	md := be.OK(page.ToMarkdown(""))
+	md := be.OK(toMarkdown(&page, ""))
 	for _, want := range []string{
 		`image-gravity = "ce"`,
 		`topper-layout="icon-light"`,
@@ -87,19 +87,19 @@ func TestScrollyMapShareImageFallback(t *testing.T) {
 		TopperLayout:           "Right",
 		Stops:                  []ScrollyMapStop{{Label: "A"}},
 	}
-	md := be.OK(page.ToMarkdown(""))
+	md := be.OK(toMarkdown(&page, ""))
 	be.True(strings.Contains(md, `image = "2026/09/topper.png"`)).
 		True(strings.Contains(md, `image-description = "Illustrated map of Pennsylvania"`)).
 		True(strings.Contains(md, `image-gravity = "sm"`))
 
 	page.TopperLayout = "Icon Light"
-	md = be.OK(page.ToMarkdown(""))
+	md = be.OK(toMarkdown(&page, ""))
 	be.True(strings.Contains(md, `image-gravity = "ce"`))
 
 	page.ShareImage = "2026/09/share.png"
 	page.ShareImageDescription = "Share art"
 	page.TopperLayout = "Right"
-	md = be.OK(page.ToMarkdown(""))
+	md = be.OK(toMarkdown(&page, ""))
 	be.True(strings.Contains(md, `image = "2026/09/share.png"`)).
 		True(strings.Contains(md, `image-description = "Share art"`)).
 		True(strings.Contains(md, `image-gravity = "ce"`)).
@@ -114,15 +114,15 @@ func TestScrollyMapTopperSkippedWithoutImage(t *testing.T) {
 		TopperLayout: "Icon Light",
 		Stops:        []ScrollyMapStop{{Label: "A"}},
 	}
-	md := be.OK(page.ToMarkdown(""))
+	md := be.OK(toMarkdown(&page, ""))
 	be.False(strings.Contains(md, "topper-layout")).
 		False(strings.Contains(md, "topper-image")).
 		True(strings.Contains(md, `image = "2020/06/01fdjfj1nf20rwxt.jpeg"`)).
 		True(strings.Contains(md, `image-gravity = "ce"`))
 }
 
-func storyPage(position, stop string) ScrollyMapPage {
-	return ScrollyMapPage{
+func storyPage(position, stop string) *ScrollyMapPage {
+	return &ScrollyMapPage{
 		Slug:                  "regions",
 		Headline:              "Regions",
 		FeaturedStoryPosition: position,
@@ -151,7 +151,7 @@ func TestScrollyMapStoryPosition(t *testing.T) {
 		{"After a specific Stop", "", []string{"One", "Two", "Three", "/featured/scrolly-map", story}},
 	}
 	for _, tc := range cases {
-		md, err := storyPage(tc.position, tc.stop).ToMarkdown(story)
+		md, err := toMarkdown(storyPage(tc.position, tc.stop), story)
 		assert.Continues(t).OK(md, err)
 		pos := 0
 		for _, want := range tc.want {
@@ -167,11 +167,12 @@ func TestScrollyMapStoryPosition(t *testing.T) {
 			wantSplits = 2
 		}
 		assert.Continues(t).Equal(splits, wantSplits)
+		assert.Continues(t).Equal(strings.Contains(md, "featured/footer"), wantSplits == 1)
 	}
 }
 
 func TestScrollyMapStoryPositionWithoutStory(t *testing.T) {
-	md, err := storyPage("Before the Map", "").ToMarkdown("")
+	md, err := toMarkdown(storyPage("Before the Map", ""), "")
 	assert.FailsNow(t).OK(md, err)
 	assert.Continues(t).
 		False(strings.Contains(md, "continues")).
@@ -199,7 +200,7 @@ func TestScrollyMapBasemapThrough(t *testing.T) {
 		BasemapThrough: true,
 		Stops:          []ScrollyMapStop{{Label: "A"}},
 	}
-	md := be.OK(page.ToMarkdown(""))
+	md := be.OK(toMarkdown(&page, ""))
 	be.True(strings.Contains(md, `basemap="show-through"`))
 }
 
@@ -213,9 +214,9 @@ func TestSizeRatio(t *testing.T) {
 
 func TestScrollyMapShareImagePath(t *testing.T) {
 	be := assert.FailsNow(t)
-	be.Equal(ScrollyMapPage{ShareImage: "a.jpg", TopperImage: "b.jpg"}.ShareImagePath(), "a.jpg")
-	be.Equal(ScrollyMapPage{TopperImage: "b.jpg"}.ShareImagePath(), "b.jpg")
-	be.Equal(ScrollyMapPage{}.ShareImagePath(), defaultShareImage)
+	be.Equal((&ScrollyMapPage{ShareImage: "a.jpg", TopperImage: "b.jpg"}).ShareImagePath(), "a.jpg")
+	be.Equal((&ScrollyMapPage{TopperImage: "b.jpg"}).ShareImagePath(), "b.jpg")
+	be.Equal((&ScrollyMapPage{}).ShareImagePath(), defaultShareImage)
 }
 
 func TestScrollyMapStopAttrs(t *testing.T) {
@@ -234,7 +235,7 @@ func TestScrollyMapStopAttrs(t *testing.T) {
 			TextClass:     "italic",
 		}},
 	}
-	md := be.OK(page.ToMarkdown(""))
+	md := be.OK(toMarkdown(&page, ""))
 	for _, want := range []string{
 		`image-credit = "Jane Doe / Spotlight PA"`,
 		`dots="Altoona: 40.5187, -78.3947"`,

@@ -1,14 +1,15 @@
 package google
 
 import (
+	"cmp"
 	"context"
-	"fmt"
 	"iter"
 	"net/http"
 	"strconv"
 	"strings"
 	"time"
 
+	"github.com/earthboundkid/bytemap/v2"
 	"github.com/earthboundkid/resperr/v2"
 	"github.com/spotlightpa/almanack/internal/utils/shortcode"
 	"github.com/spotlightpa/almanack/internal/utils/stringx"
@@ -45,10 +46,56 @@ type MapPage struct {
 	InternalID        string
 	Kicker            string
 	Topics            []string
-	Body              string
+	Intro             string
 	Layout            string
 	MobileLayout      string
 	Credits           []MapCredit
+}
+
+type MapSheet interface {
+	Frontmatter() map[string]any
+	Body(featuredMD string) string
+	FeaturedDoc() string
+	PageKind() string
+	ShareImagePath() string
+}
+
+func SheetToMap(ctx context.Context, cl *http.Client, sheetID string) (MapSheet, error) {
+	service := spreadsheet.NewServiceWithClient(cl)
+	doc, err := service.FetchSpreadsheet(sheetID)
+	if err != nil {
+		return nil, resperr.E{E: err, M: "Problem fetching map sheet"}
+	}
+	if _, err := doc.SheetByTitle("Stops"); err == nil {
+		return sheetToScrollyMapPage(&doc)
+	}
+	return sheetToMapPage(&doc)
+}
+
+var validSheetIDChars = bytemap.Union(
+	bytemap.Range('A', 'Z'),
+	bytemap.Range('a', 'z'),
+	bytemap.Range('0', '9'),
+	bytemap.Make("-_"),
+)
+
+func NormalizeSheetID(id string) (string, error) {
+	const magicLength = 44
+	var v resperr.Validator
+	v.AddIf("sheet_id", id == "", "ID must be set")
+	if after, ok := strings.CutPrefix(id, "https://docs.google.com/spreadsheets/d/"); ok {
+		id, _, _ = strings.Cut(after, "/")
+	}
+	v.AddIfUnset("sheet_id", len(id) != magicLength, "Invalid Google Sheet ID or link")
+	v.AddIfUnset("sheet_id", !validSheetIDChars.Contains(id), "Illegal characters in Google Sheet ID")
+	if err := v.Err(); err != nil {
+		return "", err
+	}
+	return id, nil
+}
+
+func sheetSection(s string) string {
+	return cmp.Or(strings.ToLower(strings.TrimSpace(s)), "news")
 }
 
 type MapCredit struct {
@@ -58,51 +105,30 @@ type MapCredit struct {
 	Email   string
 }
 
-func (m MapPage) FilePath() string {
-	return mapContentPath(m.Section, m.Slug, m.InternalID, m.PublishedAt)
-}
-
-func mapContentPath(section, slug, internalID string, publishedAt time.Time) string {
-	if section == "" {
-		section = "news"
-	}
-	section = strings.ToLower(section)
-
-	name := slug
-	if internalID != "" && !publishedAt.IsZero() {
-		name = fmt.Sprintf("%s-%s",
-			publishedAt.Format("2006-01-02"),
-			strings.ToUpper(internalID),
-		)
-	}
-
-	return fmt.Sprintf("content/%s/%s.md", section, name)
-}
-
 const (
 	defaultShareImage            = "2020/06/01fdjfj1nf20rwxt.jpeg"
 	defaultShareImageDescription = "Spotlight PA"
 )
 
-func (m MapPage) share() (image, description string) {
+func (m *MapPage) share() (image, description string) {
 	if m.ShareImage == "" {
 		return defaultShareImage, defaultShareImageDescription
 	}
 	return m.ShareImage, m.ShareImageDesc
 }
 
-func (m MapPage) ShareImagePath() string {
+func (m *MapPage) ShareImagePath() string {
 	image, _ := m.share()
 	return image
 }
 
-func (m MapPage) ToMarkdown(featuredMD string) (string, error) {
+func (m *MapPage) Frontmatter() map[string]any {
 	shareImage, shareDescription := m.share()
 	var authors []string
 	if m.Byline != "" {
 		authors = stringx.ExtractNames(m.Byline)
 	}
-	fm, err := stringx.ToToml(map[string]any{
+	return map[string]any{
 		"authors":           authors,
 		"blurb":             m.Blurb,
 		"byline":            m.Byline,
@@ -120,16 +146,11 @@ func (m MapPage) ToMarkdown(featuredMD string) (string, error) {
 		"title":             m.Headline,
 		"title-tag":         m.Headline,
 		"topics":            m.Topics,
-	})
-	if err != nil {
-		return "", err
 	}
+}
 
+func (m *MapPage) Body(featuredMD string) string {
 	var sb strings.Builder
-	sb.WriteString("+++\n")
-	sb.WriteString(fm)
-	sb.WriteString("+++\n")
-	sb.WriteString("\n")
 
 	var attrs []string
 	attrs = appendAttr(attrs, "eyebrow", m.Eyebrow)
@@ -168,8 +189,8 @@ func (m MapPage) ToMarkdown(featuredMD string) (string, error) {
 	attrs = appendAttr(attrs, "geojson", m.GeoJSON)
 	sb.WriteString(shortcode.New("featured/map-header", attrs...))
 	sb.WriteString("\n")
-	if m.Body != "" {
-		sb.WriteString(m.Body)
+	if m.Intro != "" {
+		sb.WriteString(m.Intro)
 		sb.WriteString("\n")
 	}
 	sb.WriteString("{{</featured/map-header>}}\n\n")
@@ -179,13 +200,21 @@ func (m MapPage) ToMarkdown(featuredMD string) (string, error) {
 		sb.WriteString("\n")
 	}
 
-	writeMapCredits(&sb, m.Credits)
+	writeMapCredits(&sb, m.Credits, featuredMD != "")
 
-	return sb.String(), nil
+	return sb.String()
 }
 
-func writeMapCredits(sb *strings.Builder, credits []MapCredit) {
-	if len(credits) == 0 {
+func (m *MapPage) FeaturedDoc() string {
+	return m.FeaturedDocLink
+}
+
+func (m *MapPage) PageKind() string {
+	return sheetSection(m.Section)
+}
+
+func writeMapCredits(sb *strings.Builder, credits []MapCredit, storyAbove bool) {
+	if len(credits) == 0 && !storyAbove {
 		return
 	}
 	sb.WriteString(shortcode.New("featured/footer"))
@@ -335,13 +364,7 @@ func sheetCredits(sheet *spreadsheet.Sheet) []MapCredit {
 	return credits
 }
 
-func SheetToMapPages(ctx context.Context, cl *http.Client, sheetID string) ([]MapPage, error) {
-	service := spreadsheet.NewServiceWithClient(cl)
-	doc, err := service.FetchSpreadsheet(sheetID)
-	if err != nil {
-		return nil, resperr.E{E: err, M: "Problem fetching map config sheet"}
-	}
-
+func sheetToMapPage(doc *spreadsheet.Spreadsheet) (*MapPage, error) {
 	headerSheet, err := doc.SheetByTitle("Header")
 	if err != nil {
 		return nil, resperr.E{E: err, M: "Spreadsheet missing 'Header' sheet"}
@@ -399,7 +422,7 @@ func SheetToMapPages(ctx context.Context, cl *http.Client, sheetID string) ([]Ma
 
 	geojson := dat.Field("Map Data")
 
-	page := MapPage{
+	page := &MapPage{
 		Slug:              slug,
 		Section:           hdr.Field("Section"),
 		Headline:          hdr.Field("Headline"),
@@ -409,7 +432,7 @@ func SheetToMapPages(ctx context.Context, cl *http.Client, sheetID string) ([]Ma
 		Date:              hdr.Field("Display Date"),
 		Layout:            hdr.Field("Map Layout"),
 		MobileLayout:      hdr.Field("Mobile Map Layout"),
-		Body:              hdr.Field("Introduction"),
+		Intro:             hdr.Field("Introduction"),
 		PublishedAt:       publishedAt,
 		Color:             set.Field("Map Color"),
 		ColorOpacity:      sheetPercent(set.Field("Map Color Opacity")),
@@ -434,5 +457,5 @@ func SheetToMapPages(ctx context.Context, cl *http.Client, sheetID string) ([]Ma
 		Credits:           credits,
 	}
 
-	return []MapPage{page}, nil
+	return page, nil
 }

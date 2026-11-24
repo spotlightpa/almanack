@@ -2,17 +2,21 @@ package almsvc
 
 import (
 	"context"
-	"errors"
-	"fmt"
+	"maps"
+	"slices"
 
 	"github.com/earthboundkid/errorx/v2"
-	"github.com/spotlightpa/almanack/internal/almlog"
+	"github.com/earthboundkid/resperr/v2"
+	"github.com/jackc/pgx/v5"
 	"github.com/spotlightpa/almanack/internal/db"
 	"github.com/spotlightpa/almanack/internal/services/gdocs"
 	"github.com/spotlightpa/almanack/internal/services/google"
+	"github.com/spotlightpa/almanack/internal/utils/pgxutil"
 )
 
-func (svc Services) SyncMapSheet(ctx context.Context, sheetID string) (err error) {
+const MapSheetSourceType = "sheet-map"
+
+func (svc Services) GetMapSheet(ctx context.Context, sheetID string) (sheet google.MapSheet, err error) {
 	defer errorx.Trace(&err)
 
 	if err = svc.ConfigureGoogleCert(ctx); err != nil {
@@ -22,47 +26,24 @@ func (svc Services) SyncMapSheet(ctx context.Context, sheetID string) (err error
 	if err != nil {
 		return
 	}
-
-	pages, err := google.SheetToMapPages(ctx, cl, sheetID)
+	sheet, err = google.SheetToMap(ctx, cl, sheetID)
 	if err != nil {
 		return
 	}
 
-	for i := range pages {
-		if img, ok := svc.mapImage(ctx, pages[i].ShareImagePath()); ok {
-			pages[i].ShareImageCredit = img.Credit
+	switch m := sheet.(type) {
+	case *google.MapPage:
+		if img, ok := svc.mapImage(ctx, m.ShareImagePath()); ok {
+			m.ShareImageCredit = img.Credit
 		}
-	}
-
-	for _, page := range pages {
-		err = errors.Join(err, svc.publishMapPage(ctx, page.Slug, page.FeaturedDocLink, page.FilePath(), page.ToMarkdown))
-	}
-	return
-}
-
-func (svc Services) SyncScrollyMapSheet(ctx context.Context, sheetID string) (err error) {
-	defer errorx.Trace(&err)
-
-	if err = svc.ConfigureGoogleCert(ctx); err != nil {
-		return
-	}
-	cl, err := svc.Gsvc.SheetsClient(ctx)
-	if err != nil {
-		return
-	}
-
-	pages, err := google.SheetToScrollyMapPages(ctx, cl, sheetID)
-	if err != nil {
-		return
-	}
-	for i := range pages {
-		if pages[i].ShareImageCredit == "" {
-			if img, ok := svc.mapImage(ctx, pages[i].ShareImagePath()); ok {
-				pages[i].ShareImageCredit = img.Credit
+	case *google.ScrollyMapPage:
+		if m.ShareImageCredit == "" {
+			if img, ok := svc.mapImage(ctx, m.ShareImagePath()); ok {
+				m.ShareImageCredit = img.Credit
 			}
 		}
-		for j := range pages[i].Stops {
-			stop := &pages[i].Stops[j]
+		for i := range m.Stops {
+			stop := &m.Stops[i]
 			if stop.Image == "" || stop.ImageRatio != "" {
 				continue
 			}
@@ -71,11 +52,7 @@ func (svc Services) SyncScrollyMapSheet(ctx context.Context, sheetID string) (er
 			}
 		}
 	}
-
-	for _, page := range pages {
-		err = errors.Join(err, svc.publishMapPage(ctx, page.Slug, page.FeaturedDocLink, page.FilePath(), page.ToMarkdown))
-	}
-	return
+	return sheet, nil
 }
 
 func (svc Services) mapImage(ctx context.Context, path string) (db.Image, bool) {
@@ -83,57 +60,102 @@ func (svc Services) mapImage(ctx context.Context, path string) (db.Image, bool) 
 	return img, err == nil
 }
 
-func (svc Services) publishMapPage(ctx context.Context, slug, featuredDocLink, path string, toMarkdown func(string) (string, error)) error {
-	l := almlog.FromContext(ctx)
-
-	var featured string
-	if featuredDocLink != "" {
-		md, err := svc.featuredStoryMarkdown(ctx, featuredDocLink)
-		if err != nil {
-			l.ErrorContext(ctx, "publishMapPage: featuredStoryMarkdown", "slug", slug, "err", err)
-			return err
-		}
-		featured = md
+func MapSheetFeaturedDocID(sheet google.MapSheet) (string, error) {
+	link := sheet.FeaturedDoc()
+	if link == "" {
+		return "", nil
 	}
-
-	content, err := toMarkdown(featured)
+	id, err := gdocs.NormalizeID(link)
 	if err != nil {
-		l.ErrorContext(ctx, "publishMapPage: ToMarkdown", "slug", slug, "err", err)
-		return err
+		return "", resperr.E{E: err, M: "Map Settings has an invalid Featured Story Document Link."}
 	}
-	msg := fmt.Sprintf("Maps: publish %q from sheet", slug)
-	if err := svc.ContentStore.UpdateFile(ctx, msg, path, []byte(content)); err != nil {
-		l.ErrorContext(ctx, "publishMapPage: UpdateFile", "slug", slug, "err", err)
-		return err
-	}
-	l.InfoContext(ctx, "publishMapPage: published", "slug", slug, "path", path)
-	return nil
+	return id, nil
 }
 
-func (svc Services) featuredStoryMarkdown(ctx context.Context, docLink string) (md string, err error) {
+func (svc Services) mapSheetBody(ctx context.Context, sheet google.MapSheet) (body string, err error) {
 	defer errorx.Trace(&err)
 
-	l := almlog.FromContext(ctx)
-
-	id, err := gdocs.NormalizeID(docLink)
+	docID, err := MapSheetFeaturedDocID(sheet)
 	if err != nil {
-		return "", fmt.Errorf("invalid featured story doc link: %w", err)
+		return
 	}
+	var featured string
+	if docID != "" {
+		dbDoc, err := svc.Queries.GetGDocsByExternalIDWhereProcessed(ctx, docID)
+		if err != nil {
+			return "", pgxutil.NoRowsAs404(err,
+				"featured story doc %q has not been processed", docID)
+		}
+		featured = dbDoc.ArticleMarkdown
+	}
+	return sheet.Body(featured), nil
+}
 
-	l.InfoContext(ctx, "featuredStoryMarkdown: fetching + processing", "doc_id", id)
+func (svc Services) CreatePageFromMapSheet(ctx context.Context, sheetID string) (page *db.Page, err error) {
+	defer errorx.Trace(&err)
 
-	newDoc, err := svc.CreateGDocsDoc(ctx, id)
+	sheet, err := svc.GetMapSheet(ctx, sheetID)
 	if err != nil {
-		return "", fmt.Errorf("fetching featured story doc: %w", err)
+		return
 	}
-	if err := svc.ProcessGDocsDoc(ctx, *newDoc); err != nil {
-		return "", fmt.Errorf("processing featured story doc: %w", err)
+	kind := sheet.PageKind()
+	if !slices.Contains([]string{"news", "statecollege", "berks", "sponsored"}, kind) {
+		return nil, resperr.E{M: "Header sheet has an invalid Section."}
+	}
+	fm := sheet.Frontmatter()
+	if fm["internal-id"] == "" {
+		return nil, resperr.E{M: "Header sheet missing Internal ID value"}
+	}
+	body, err := svc.mapSheetBody(ctx, sheet)
+	if err != nil {
+		return
 	}
 
-	processed, err := svc.Queries.GetGDocsByExternalIDWhereProcessed(ctx, id)
-	if err != nil {
-		return "", fmt.Errorf("fetching processed featured story doc: %w", err)
+	page = &db.Page{
+		FilePath:    buildFilePath(fm, kind),
+		Frontmatter: fm,
+		Body:        body,
+		SourceType:  MapSheetSourceType,
+		SourceID:    sheetID,
 	}
-	l.InfoContext(ctx, "featuredStoryMarkdown: processed", "doc_id", id)
-	return processed.ArticleMarkdown, nil
+	if existing, err := svc.Queries.GetPageByFilePath(ctx, page.FilePath); err == nil {
+		return &existing, nil
+	} else if !pgxutil.IsNotFound(err) {
+		return nil, err
+	}
+	err = svc.DB.Tx(ctx, pgx.TxOptions{}, func(txq *db.Queries) error {
+		return page.Save(ctx, txq, false)
+	})
+	if err != nil {
+		return nil, err
+	}
+	return page, nil
+}
+
+func (svc Services) RefreshPageFromMapSheet(ctx context.Context, page *db.Page, refreshMetadata bool) (err error) {
+	defer errorx.Trace(&err)
+
+	sheet, err := svc.GetMapSheet(ctx, page.SourceID)
+	if err != nil {
+		return
+	}
+	body, err := svc.mapSheetBody(ctx, sheet)
+	if err != nil {
+		return
+	}
+	if refreshMetadata {
+		if page.Frontmatter == nil {
+			page.Frontmatter = make(db.Map)
+		}
+		fm := sheet.Frontmatter()
+		delete(fm, "published")
+		delete(fm, "internal-id")
+		maps.DeleteFunc(fm, func(key string, v any) bool {
+			s, ok := v.(string)
+			return ok && s == ""
+		})
+		maps.Copy(page.Frontmatter, fm)
+	}
+	page.Body = body
+	return nil
 }
