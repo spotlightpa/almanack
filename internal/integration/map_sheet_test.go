@@ -1,8 +1,6 @@
 package integration_test
 
 import (
-	"bytes"
-	"io"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -10,7 +8,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/carlmjohnson/requests"
+	"github.com/carlmjohnson/requests/reqtest"
 	"github.com/earthboundkid/assert"
 	"github.com/jackc/pgx/v5"
 	"github.com/spotlightpa/almanack/internal/almlog"
@@ -27,27 +25,6 @@ const (
 	scrollySheetID    = "scrolly000000000000000000000000000000000000x"
 )
 
-func mapSheetClient() *http.Client {
-	return &http.Client{
-		Transport: requests.RoundTripFunc(func(req *http.Request) (*http.Response, error) {
-			name := "searchable.json"
-			if strings.Contains(req.URL.Path, scrollySheetID) {
-				name = "scrolly.json"
-			}
-			b, err := os.ReadFile(filepath.Join("testdata/map sheet", name))
-			if err != nil {
-				return nil, err
-			}
-			return &http.Response{
-				StatusCode: http.StatusOK,
-				Header:     http.Header{"Content-Type": {"application/json"}},
-				Body:       io.NopCloser(bytes.NewReader(b)),
-				Request:    req,
-			}, nil
-		}),
-	}
-}
-
 func TestMapSheetPage(t *testing.T) {
 	be := assert.FailsNow(t)
 	almlog.UseTestLogger(t)
@@ -63,7 +40,7 @@ func TestMapSheetPage(t *testing.T) {
 		ContentStore: github.NewMockClient(tmp),
 		Indexer:      index.MockIndexer{},
 	}
-	svc.Gsvc.SetMockClient(mapSheetClient())
+	svc.Gsvc.SetMockClient(&http.Client{Transport: reqtest.Replay("testdata/map sheet")})
 	_ = be.OK(svc.Queries.UpsertImage(ctx, db.UpsertImageParams{
 		Path:   "2026/11/share.jpeg",
 		Type:   "jpeg",

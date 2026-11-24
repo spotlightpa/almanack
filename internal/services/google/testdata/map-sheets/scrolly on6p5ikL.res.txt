@@ -1,5 +1,9 @@
+HTTP/1.1 200 OK
+Content-Length: 8221
+Content-Type: application/json; charset=UTF-8
+
 {
- "spreadsheetId": "searchable",
+ "spreadsheetId": "scrolly",
  "properties": {
   "title": "test"
  },
@@ -9,7 +13,7 @@
     "title": "Header",
     "gridProperties": {
      "rowCount": 3,
-     "columnCount": 18
+     "columnCount": 20
     }
    },
    "data": [
@@ -63,13 +67,19 @@
          "formattedValue": "Share Image Description"
         },
         {
-         "formattedValue": "Introduction"
+         "formattedValue": "Share Image Credit"
         },
         {
-         "formattedValue": "Map Layout"
+         "formattedValue": "Topper Layout"
         },
         {
-         "formattedValue": "Mobile Map Layout"
+         "formattedValue": "Mobile Topper Layout"
+        },
+        {
+         "formattedValue": "Topper Image"
+        },
+        {
+         "formattedValue": "Topper Image Description"
         }
        ]
       },
@@ -128,65 +138,65 @@
         },
         {
          "formattedValue": "(description)"
+        },
+        {
+         "formattedValue": "(description)"
+        },
+        {
+         "formattedValue": "(description)"
         }
        ]
       },
       {
        "values": [
         {
-         "formattedValue": "test-district-map"
+         "formattedValue": "test-regions"
         },
         {
          "formattedValue": "News"
         },
         {
-         "formattedValue": "2026-11-13"
+         "formattedValue": "2026-11-14"
         },
         {
-         "formattedValue": "SPLTESTMAP"
+         "formattedValue": "SPLTESTSCROLLY"
         },
         {
-         "formattedValue": "Interactive"
+         "formattedValue": "Explainer"
         },
         {
-         "formattedValue": "Find Your District"
+         "formattedValue": "Regions"
         },
         {
-         "formattedValue": "Enter your address."
+         "formattedValue": "How we define them."
         },
         {
          "formattedValue": "Jane Reporter"
         },
         {
-         "formattedValue": "Nov. 13, 2026"
+         "formattedValue": "Nov. 14, 2026"
         },
         {
-         "formattedValue": "Local Government"
+         "formattedValue": "Politics"
         },
         {
-         "formattedValue": "Local Government"
+         "formattedValue": "Politics"
         },
         {
-         "formattedValue": "A blurb"
+         "formattedValue": "Blurb"
         },
         {
-         "formattedValue": "A description"
+         "formattedValue": "Description"
         },
+        {},
+        {},
+        {},
         {
-         "formattedValue": "2026/11/share.jpeg"
+         "formattedValue": "None"
         },
-        {
-         "formattedValue": "Share description"
-        },
-        {
-         "formattedValue": "Intro text"
-        },
-        {
-         "formattedValue": "Right"
-        },
-        {
-         "formattedValue": "Top"
-        }
+        {},
+        {},
+        {}
        ]
       }
      ]
@@ -198,7 +208,7 @@
     "title": "Map Settings",
     "gridProperties": {
      "rowCount": 3,
-     "columnCount": 8
+     "columnCount": 7
     }
    },
    "data": [
@@ -213,22 +223,19 @@
          "formattedValue": "Map Color Opacity"
         },
         {
-         "formattedValue": "Search Bar"
+         "formattedValue": "Default Card Position"
         },
         {
-         "formattedValue": "Search Bar Text"
-        },
-        {
-         "formattedValue": "Search Bar Use Location"
-        },
-        {
-         "formattedValue": "Read More"
+         "formattedValue": "Basemap"
         },
         {
          "formattedValue": "Featured Story Document Link"
         },
         {
-         "formattedValue": "Custom Code"
+         "formattedValue": "Featured Story Position"
+        },
+        {
+         "formattedValue": "Featured Story Stop"
         }
        ]
       },
@@ -254,32 +261,24 @@
         },
         {
          "formattedValue": "(description)"
-        },
-        {
-         "formattedValue": "(description)"
         }
        ]
       },
       {
        "values": [
         {
-         "formattedValue": "Blue"
+         "formattedValue": "Navy"
         },
         {
-         "formattedValue": "20%"
+         "formattedValue": "75%"
         },
         {
-         "formattedValue": "TRUE"
+         "formattedValue": "Left"
         },
         {
-         "formattedValue": "Enter your address"
+         "formattedValue": "Show"
         },
-        {
-         "formattedValue": "FALSE"
-        },
-        {
-         "formattedValue": "TRUE"
-        },
+        {},
         {},
         {}
        ]
@@ -290,10 +289,10 @@
   },
   {
    "properties": {
-    "title": "Map Data",
+    "title": "Stops",
     "gridProperties": {
-     "rowCount": 3,
-     "columnCount": 1
+     "rowCount": 5,
+     "columnCount": 6
     }
    },
    "data": [
@@ -302,7 +301,22 @@
       {
        "values": [
         {
-         "formattedValue": "Map Data"
+         "formattedValue": "Label"
+        },
+        {
+         "formattedValue": "GeoJSON"
+        },
+        {
+         "formattedValue": "Card Text"
+        },
+        {
+         "formattedValue": "Zoom To"
+        },
+        {
+         "formattedValue": "Image"
+        },
+        {
+         "formattedValue": "Image Ratio"
         }
        ]
       },
@@ -310,46 +324,13 @@
        "values": [
         {
          "formattedValue": "(description)"
-        }
-       ]
-      },
-      {
-       "values": [
-        {
-         "formattedValue": "https://example.com/districts.geojson"
-        }
-       ]
-      }
-     ]
-    }
-   ]
-  },
-  {
-   "properties": {
-    "title": "Map Tooltips",
-    "gridProperties": {
-     "rowCount": 3,
-     "columnCount": 3
-    }
-   },
-   "data": [
-    {
-     "rowData": [
-      {
-       "values": [
-        {
-         "formattedValue": "Tooltips Enabled"
         },
         {
-         "formattedValue": "Tooltip Type"
+         "formattedValue": "(description)"
         },
         {
-         "formattedValue": "Tooltip Value"
-        }
-       ]
-      },
-      {
-       "values": [
+         "formattedValue": "(description)"
+        },
         {
          "formattedValue": "(description)"
         },
@@ -364,14 +345,49 @@
       {
        "values": [
         {
-         "formattedValue": "TRUE"
+         "formattedValue": "Central PA"
         },
         {
-         "formattedValue": "Cards"
+         "formattedValue": "https://example.com/a.geojson"
         },
         {
-         "formattedValue": "<b>{{Member}}</b>"
-        }
+         "formattedValue": "Card one"
+        },
+        {
+         "formattedValue": "Shaded"
+        },
+        {
+         "formattedValue": "2026/11/stop.jpeg"
+        },
+        {}
+       ]
+      },
+      {
+       "values": [
+        {},
+        {},
+        {},
+        {},
+        {},
+        {}
+       ]
+      },
+      {
+       "values": [
+        {
+         "formattedValue": "Coal Region"
+        },
+        {
+         "formattedValue": "https://example.com/b.geojson"
+        },
+        {
+         "formattedValue": "Card two"
+        },
+        {
+         "formattedValue": "All"
+        },
+        {},
+        {}
        ]
       }
      ]

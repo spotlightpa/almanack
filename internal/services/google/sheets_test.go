@@ -9,6 +9,7 @@ import (
 	"github.com/earthboundkid/assert/testfile"
 	"github.com/spotlightpa/almanack/internal/almlog"
 	"github.com/spotlightpa/almanack/internal/services/google"
+	"github.com/spotlightpa/almanack/internal/utils/stringx"
 	"gopkg.in/Iwark/spreadsheet.v2"
 )
 
@@ -28,6 +29,30 @@ func TestSheetToFileObjects(t *testing.T) {
 
 	obj := be.OK(google.SheetToDonorWall(ctx, cl, "abc123"))
 	testfile.EqualJSON(t, "testdata/sheets/want.json", obj)
+}
+
+func TestSheetToMap(t *testing.T) {
+	ctx := t.Context()
+	almlog.UseTestLogger(t)
+
+	cl := &http.Client{}
+	cl.Transport = reqtest.Replay("testdata/map-sheets")
+	if false {
+		be := assert.FailsNow(t)
+		svc := google.Service{}
+		gcl := be.OK(svc.SheetsClient(ctx))
+		cl.Transport = reqtest.Caching(gcl.Transport, "testdata/map-sheets")
+	}
+
+	for _, name := range []string{"searchable-map", "scrolly-map"} {
+		t.Run(name, func(t *testing.T) {
+			be := assert.FailsNow(t)
+			sheet := be.OK(google.SheetToMap(ctx, cl, name))
+			fm := be.OK(stringx.ToToml(sheet.Frontmatter()))
+			md := "+++\n" + fm + "+++\n\n" + sheet.Body("")
+			testfile.Equal(t, "testdata/map-sheets/"+name+".md", md)
+		})
+	}
 }
 
 func TestSheetMap(t *testing.T) {
