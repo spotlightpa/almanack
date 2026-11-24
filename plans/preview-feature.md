@@ -99,24 +99,33 @@ On failure:
 {"status": "failed", "error": "hugo exited with code 1: ..."}
 ```
 
-On success: `302 Found` to `/articles/{slug}/`
-with `Set-Cookie: preview_zip={s3key}; Path=/; HttpOnly; SameSite=Lax; Max-Age=86400`.
+On success:
+```json
+{"status": "done", "preview_id": "f47ac10b", "article_path": "articles/my-story"}
+```
+
+Almanack stores `preview_id` and `article_path` in Postgres (see below)
+and constructs the preview page URL.
 
 Build state is kept in an in-memory map (`map[string]*buildState` guarded by a sync.RWMutex).
 Since there is exactly one Groundhog instance, no external state store is needed.
 Entries are pruned after 1 hour.
 
-### `GET /*` (preview serving)
+### `GET /_preview/{preview_id}/{path}`
 
-All other requests check for the `preview_zip` session cookie.
-If present, Groundhog fetches the named zip from S3
+Groundhog fetches `previews/{preview_id}.zip` from S3
 (LRU cache in memory, holds up to ~100 MB worth of zips),
-extracts the requested path, and serves it with an appropriate `Content-Type`.
+extracts `{path}`, and serves it with an appropriate `Content-Type`.
 
-If the cookie is absent or the key does not exist in S3: 404.
+If the zip does not exist in S3: 404.
 
-This means multiple editors can browse their respective previews concurrently;
-each editor's browser carries their own cookie pointing to their zip.
+Multiple editors can view the same preview simultaneously by sharing
+the Almanack preview page URL — no session cookie needed.
+Groundhog serves preview pages with:
+```
+Content-Security-Policy: frame-ancestors https://almanack.spotlightpa.org
+```
+This allows Almanack to iframe Groundhog but prevents other sites from doing so.
 
 ### `GET /_groundhog/health`
 
@@ -129,21 +138,26 @@ Polled by Almanack's cron for monitoring.
 
 ```
 1. Acquire sync.Mutex (one build at a time)
-2. Create tempdir: /tmp/groundhog-{buildID}/content/articles/
-3. Write article_content to /tmp/groundhog-{buildID}/content/articles/{slug}.md
-4. Run with 60s timeout:
+2. Generate preview_id (a random UUID) — used as both the S3 key and the baseURL path
+3. Create tempdir: /tmp/groundhog-{buildID}/content/articles/
+4. Write article_content to /tmp/groundhog-{buildID}/content/articles/{slug}.md
+5. Run with 60s timeout:
      hugo \
        --source /srv/poor-richard \
        --contentDir /tmp/groundhog-{buildID}/content \
        --destination /tmp/groundhog-{buildID}/output \
-       --baseURL https://groundhog.spotlightpa.org/ \
+       --baseURL https://groundhog.spotlightpa.org/_preview/{preview_id}/ \
        --gc --minify --quiet
-5. Walk /tmp/groundhog-{buildID}/output and write a zip to /tmp/groundhog-{buildID}/output.zip
-6. Upload output.zip to S3: previews/{random-uuid}.zip
-7. Store s3key in buildState; mark done
-8. defer os.RemoveAll("/tmp/groundhog-{buildID}") — runs even on failure
-9. Release mutex
+6. Walk /tmp/groundhog-{buildID}/output and write a zip to /tmp/groundhog-{buildID}/output.zip
+7. Upload output.zip to S3: previews/{preview_id}.zip
+8. Store preview_id and article_path in buildState; mark done
+9. defer os.RemoveAll("/tmp/groundhog-{buildID}") — runs even on failure
+10. Release mutex
 ```
+
+Generating the UUID before the build means Hugo can embed the correct
+`/_preview/{preview_id}/` prefix in all internal links and asset URLs
+without any post-processing.
 
 The S3 bucket has a lifecycle rule that expires objects under `previews/` after 24 hours.
 
@@ -269,21 +283,30 @@ so static credentials in the env file are used.
 **Editor action**: "Preview" button on the article editor page.
 
 **Flow**:
-1. Frontend POSTs to Almanack API: `POST /api/article/{id}/preview`.
-2. Almanack serializes the article to Hugo frontmatter + Markdown
+1. Editor clicks Preview. A spinner appears in the current tab.
+2. Frontend POSTs to Almanack API: `POST /api/article/{id}/preview`.
+3. Almanack serializes the article to Hugo frontmatter + Markdown
    (same conversion used at publish time — must be identical).
-3. Almanack POSTs to `{GROUNDHOG_URL}/_groundhog/build` with HMAC signature.
-4. If 409: return "preview already building" to frontend.
-5. If 200: return `{build_id}` to frontend.
-6. Frontend opens a new tab to `{GROUNDHOG_URL}/_groundhog/build-status?id={build_id}`
-   and polls it at 300ms.
-   When Groundhog returns the redirect, the browser follows it;
-   the editor lands on their preview page with the cookie set.
+4. Almanack POSTs to `{GROUNDHOG_URL}/_groundhog/build` with HMAC signature.
+5. If 409: return "preview already building" to frontend; spinner stops with an error message.
+6. If 200: Almanack returns `{build_id}` to frontend.
+7. Frontend polls `GET /api/article/{id}/preview-status?build_id=XXX` on Almanack every 300ms.
+   Almanack proxies the status check to `{GROUNDHOG_URL}/_groundhog/build-status?id=XXX`.
+8. While polling: spinner continues.
+9. On failure: spinner stops; error message shown in the current tab.
+10. On success: Almanack stores `preview_id` and `article_path` in Postgres.
+    Frontend opens a new tab to the Almanack preview page
+    (e.g. `/admin/preview/{article_id}`) and the spinner stops.
 
-No Almanack database changes are required.
-Build state lives in Groundhog's memory.
-Almanack does not need to poll or store preview status;
-the frontend tab handles it directly against Groundhog.
+**Almanack preview page** (`/admin/preview/{article_id}`):
+- Behind Almanack auth (Netlify Identity); safe to share the URL with any logged-in editor.
+- Shows two iframes side by side:
+  - Mobile: constrained to ~390px wide
+  - Tablet: constrained to ~768px wide
+- Both iframes src: `https://groundhog.spotlightpa.org/_preview/{preview_id}/{article_path}/`
+- Shows the preview build timestamp so editors know how fresh it is.
+- "Rebuild" button triggers a new build in-place:
+  spinner replaces the iframes, new iframes load when done.
 
 **Health monitoring**: Almanack's existing background cron
 pings `{GROUNDHOG_URL}/_groundhog/health` and posts to Slack if it fails.
