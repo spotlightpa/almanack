@@ -152,19 +152,33 @@ The S3 bucket has a lifecycle rule that expires objects under `previews/` after 
 ## Groundhog: Template Sync
 
 Groundhog maintains a local clone of `github.com/spotlightpa/poor-richard` at `/srv/poor-richard`.
-A background goroutine runs every 10 minutes:
+Sync is triggered externally via a dedicated endpoint rather than a background goroutine,
+keeping Groundhog's internal state simple.
+
+### `POST /sync`
+
+Authenticated with the same shared secret as `/build`.
 
 ```
-1. If build mutex is held: skip this cycle, try again in 10 minutes
-2. Lock the mutex (blocks any incoming build during sync)
+1. If build mutex is held: return 409 Conflict
+2. Acquire mutex
 3. git -C /srv/poor-richard pull --ff-only
 4. If yarn.lock changed since last pull: yarn --cwd /srv/poor-richard install
 5. Release mutex
+6. Return 200 with new HEAD SHA
 ```
 
-Running `git pull` while Hugo is watching the filesystem causes crashes
-(observed in practice).
-The mutex prevents any overlap between sync and build.
+Almanack's cron calls this endpoint once daily at 3am.
+This is handled by a dedicated Netlify scheduled function
+(separate from the existing every-3-minutes cron)
+with a `0 3 * * *` schedule expression in `netlify.toml`.
+
+For an out-of-schedule sync (e.g. after a significant poor-richard template change),
+the endpoint can be called manually with curl:
+```bash
+curl -X POST https://groundhog.spotlightpa.org/sync \
+  -H "Authorization: Bearer {secret}"
+```
 
 Node and yarn must be installed on the Lightsail instance alongside Hugo,
 since poor-richard uses a node-based asset pipeline.
