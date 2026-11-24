@@ -31,7 +31,7 @@ It does two things: build previews, and serve them.
 
 ```
 Almanack backend
-    │  POST /build  (HMAC-signed)
+    │  POST /_groundhog/build  (HMAC-signed)
     ▼
 Groundhog (groundhog.spotlightpa.org)
     │  acquires in-memory mutex
@@ -42,7 +42,7 @@ Groundhog (groundhog.spotlightpa.org)
     │  releases mutex
     ▼
 Almanack frontend
-    │  polls GET /build/{id}/status every 300ms
+    │  polls GET /_groundhog/build-status?id=XXX every 300ms
     ▼
 Groundhog
     │  when done: 302 to /articles/{slug}/
@@ -62,7 +62,7 @@ Groundhog
 
 ## Groundhog: API
 
-### `POST /build`
+### `POST /_groundhog/build`
 
 Authenticated by HMAC-SHA256 signature over the request body,
 using a shared secret (same pattern as GitHub webhooks:
@@ -85,7 +85,7 @@ Groundhog runs the build in a goroutine and returns immediately.
 If a build is already in progress (mutex held), Groundhog returns 409 Conflict.
 Almanack should surface this to the editor as "a preview is already building, try again shortly."
 
-### `GET /build/{id}/status`
+### `GET /_groundhog/build-status?id=XXX`
 
 Polled by the Almanack frontend every 300ms.
 
@@ -118,7 +118,7 @@ If the cookie is absent or the key does not exist in S3: 404.
 This means multiple editors can browse their respective previews concurrently;
 each editor's browser carries their own cookie pointing to their zip.
 
-### `GET /health`
+### `GET /_groundhog/health`
 
 Returns 200 with the current poor-richard HEAD SHA and whether a build is in progress.
 Polled by Almanack's cron for monitoring.
@@ -155,9 +155,9 @@ Groundhog maintains a local clone of `github.com/spotlightpa/poor-richard` at `/
 Sync is triggered externally via a dedicated endpoint rather than a background goroutine,
 keeping Groundhog's internal state simple.
 
-### `POST /sync`
+### `POST /_groundhog/sync`
 
-Authenticated with the same shared secret as `/build`.
+Authenticated with the same shared secret as `/_groundhog/build`.
 
 ```
 1. If build mutex is held: return 409 Conflict
@@ -176,7 +176,7 @@ with a `0 3 * * *` schedule expression in `netlify.toml`.
 For an out-of-schedule sync (e.g. after a significant poor-richard template change),
 the endpoint can be called manually with curl:
 ```bash
-curl -X POST https://groundhog.spotlightpa.org/sync \
+curl -X POST https://groundhog.spotlightpa.org/_groundhog/sync \
   -H "Authorization: Bearer {secret}"
 ```
 
@@ -250,10 +250,10 @@ so static credentials in the env file are used.
 1. Frontend POSTs to Almanack API: `POST /api/article/{id}/preview`.
 2. Almanack serializes the article to Hugo frontmatter + Markdown
    (same conversion used at publish time — must be identical).
-3. Almanack POSTs to `{GROUNDHOG_URL}/build` with HMAC signature.
+3. Almanack POSTs to `{GROUNDHOG_URL}/_groundhog/build` with HMAC signature.
 4. If 409: return "preview already building" to frontend.
 5. If 200: return `{build_id}` to frontend.
-6. Frontend opens a new tab to `{GROUNDHOG_URL}/build/{build_id}/status`
+6. Frontend opens a new tab to `{GROUNDHOG_URL}/_groundhog/build-status?id={build_id}`
    and polls it at 300ms.
    When Groundhog returns the redirect, the browser follows it;
    the editor lands on their preview page with the cookie set.
@@ -264,7 +264,7 @@ Almanack does not need to poll or store preview status;
 the frontend tab handles it directly against Groundhog.
 
 **Health monitoring**: Almanack's existing background cron
-pings `{GROUNDHOG_URL}/health` and posts to Slack if it fails.
+pings `{GROUNDHOG_URL}/_groundhog/health` and posts to Slack if it fails.
 
 ---
 
@@ -281,7 +281,7 @@ and the build state is marked failed.
 
 **Groundhog crash during build**: On restart, in-memory build state is lost.
 Any frontend tab polling a build that was in-progress at crash time
-will eventually get a 404 on `/build/{id}/status`.
+will eventually get a 404 on `/_groundhog/build-status`.
 Almanack should treat a 404 from the status endpoint as a failure
 and prompt the editor to retry.
 In-flight temp directories are cleaned up on startup via `filepath.Glob("/tmp/groundhog-*")`.
@@ -339,7 +339,7 @@ would give correct related-articles and homepage context,
 at the cost of returning to ~15s build times.
 Worth prototyping as a "high fidelity" mode once the basic preview ships.
 
-**Slug derivation**: The redirect from `/build/{id}/status` needs to know
+**Slug derivation**: The redirect from `/_groundhog/build-status` needs to know
 the article's URL path. Almanack should include the expected Hugo output path
-(`article_output_path`) in the `/build` request so Groundhog can construct
+(`article_output_path`) in the `/_groundhog/build` request so Groundhog can construct
 the correct redirect target.
