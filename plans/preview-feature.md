@@ -305,13 +305,12 @@ so static credentials in the env file are used.
    (same conversion used at publish time — must be identical).
 4. Almanack POSTs to `{GROUNDHOG_URL}/_groundhog/build` with HMAC signature.
 5. Almanack returns `{build_id}` to frontend.
-7. Frontend polls `GET /api/article/{id}/preview-status?build_id=XXX` on Almanack every 300ms.
-   Almanack proxies the status check to `{GROUNDHOG_URL}/_groundhog/build-status?id=XXX`.
+7. Frontend polls `GET {GROUNDHOG_URL}/_groundhog/build-status?id=XXX` directly every 300ms.
 8. While polling: spinner continues.
 9. On failure: spinner stops; error message shown in the current tab.
-10. On success: Almanack stores `preview_id` and `article_path` in Postgres.
-    Frontend opens a new tab to the Almanack preview page
-    (e.g. `/admin/preview/{article_id}`) and the spinner stops.
+10. On success: frontend POSTs `preview_id` and `article_path` to Almanack
+    (e.g. `POST /api/preview-save`) to store in Postgres,
+    then opens a new tab to the Almanack preview page and the spinner stops.
 
 **Almanack preview page** (`/admin/preview/{article_id}`):
 - Behind Almanack auth (Netlify Identity); safe to share the URL with any logged-in editor.
