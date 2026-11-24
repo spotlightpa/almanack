@@ -123,7 +123,10 @@ to stay in sync with template changes.
 **Cons**
 - Another service to operate, patch, and monitor.
 - Concurrent previews from multiple editors can corrupt the working tree.
-  Mitigation: a request queue, or per-editor temp directories (complicates cleanup).
+  Mitigation: Almanack already has PostgreSQL;
+  a `pg_try_advisory_lock` call before invoking the preview server
+  serializes builds without any extra table or service.
+  Editors who lose the lock get a "build in progress, try again shortly" response.
 - Preview server must be reachable from Almanack's backend
   (Netlify Functions → preview server requires a stable URL and auth).
 - Single point of failure; needs a health check and restart policy.
@@ -235,7 +238,8 @@ presigned URL handling, storage bucket, Almanack polling + UI.
   A Fly.io Machine costs nothing at idle,
   the template sync is a plain `git pull`,
   and incremental Hugo rebuilds are fast.
-  The main engineering risk is concurrent-editor isolation.
+  Concurrent-editor isolation is handled by a PostgreSQL advisory lock
+  already available in Almanack, so no extra infrastructure is needed for that.
 
 - **If the team prefers zero ops**: Option B (serverless + R2)
   or Option A (private mirror + Netlify) —
