@@ -105,8 +105,7 @@ On success:
 {"status": "done", "preview_id": "f47ac10b", "article_path": "articles/my-story"}
 ```
 
-Almanack stores `preview_id` and `article_path` in Postgres (see below)
-and constructs the preview page URL.
+The frontend opens `/admin/preview?id={preview_id}&path={article_path}` in a new tab.
 
 Build state is kept in an in-memory map (`map[string]*buildState` guarded by a sync.RWMutex).
 Since there is exactly one Groundhog instance, no external state store is needed.
@@ -308,17 +307,17 @@ so static credentials in the env file are used.
 7. Frontend polls `GET {GROUNDHOG_URL}/_groundhog/build-status?id=XXX` directly every 300ms.
 8. While polling: spinner continues.
 9. On failure: spinner stops; error message shown in the current tab.
-10. On success: frontend POSTs `preview_id` and `article_path` to Almanack
-    (e.g. `POST /api/preview-save`) to store in Postgres,
-    then opens a new tab to the Almanack preview page and the spinner stops.
+10. On success: frontend opens a new tab to
+    `/admin/preview?id={preview_id}&path={article_path}`
+    and the spinner stops.
 
-**Almanack preview page** (`/admin/preview/{article_id}`):
+**Almanack preview page** (`/admin/preview?id={preview_id}&path={article_path}`):
 - Behind Almanack auth (Netlify Identity); safe to share the URL with any logged-in editor.
+- Reads `preview_id` and `article_path` from the URL query params.
 - Shows two iframes side by side:
   - Mobile: constrained to ~390px wide
   - Tablet: constrained to ~768px wide
 - Both iframes src: `https://groundhog.spotlightpa.org/_groundhog/set-preview?id={preview_id}&to=/{article_path}/`
-- Shows the preview build timestamp so editors know how fresh it is.
 - "Rebuild" button triggers a new build in-place:
   spinner replaces the iframes, new iframes load when done.
 
