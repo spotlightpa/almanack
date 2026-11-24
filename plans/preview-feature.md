@@ -168,17 +168,21 @@ Authenticated with the same shared secret as `/_groundhog/build`.
 6. Return 200 with new HEAD SHA
 ```
 
-Almanack's cron calls this endpoint once daily at 3am.
-This is handled by a dedicated Netlify scheduled function
-(separate from the existing every-3-minutes cron)
-with a `0 3 * * *` schedule expression in `netlify.toml`.
+Almanack's existing background cron handler calls this endpoint once daily at 3am,
+using the same pattern as other scheduled work in Almanack:
+the Netlify scheduled function pings `/api-background/cron`,
+which checks whether it is time to sync and calls `/_groundhog/sync` if so.
+No new Netlify scheduled function is needed.
 
 For an out-of-schedule sync (e.g. after a significant poor-richard template change),
-the endpoint can be called manually with curl:
+Almanack exposes a background route (e.g. `/api-background/groundhog-sync`)
+that can be triggered manually with curl in the same way operators
+already trigger other Almanack background tasks:
 ```bash
-curl -X POST https://groundhog.spotlightpa.org/_groundhog/sync \
-  -H "Authorization: Bearer {secret}"
+curl -X POST https://almanack.spotlightpa.org/api-background/groundhog-sync \
+  -H "Authorization: Bearer {almanack-background-secret}"
 ```
+Almanack then forwards the request to Groundhog with the Groundhog shared secret.
 
 Node and yarn must be installed on the Lightsail instance alongside Hugo,
 since poor-richard uses a node-based asset pipeline.
