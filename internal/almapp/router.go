@@ -66,6 +66,8 @@ func (app *appEnv) routes() http.Handler {
 		HandleFunc(mux, `POST /api/gdocs-doc`, app.postGDocsDoc).
 		HandleFunc(mux, `POST /api/image-update`, app.postImageUpdate).
 		HandleFunc(mux, `GET /api/images`, app.listImages).
+		Control(mux, `GET /api/map-sheet`, app.getMapSheet).
+		Control(mux, `POST /api/map-sheet`, app.postMapSheet).
 		HandleFunc(mux, `POST /api/message`, app.postMessage).
 		HandleFunc(mux, `GET /api/page`, app.getPage).
 		HandleFunc(mux, `POST /api/page`, app.postPage).

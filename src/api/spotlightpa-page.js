@@ -12,6 +12,7 @@ import {
   postPageRefresh,
 } from "@/api/client.ts";
 import { processGDocsDoc } from "@/api/gdocs.js";
+import { prepareMapSheet } from "@/api/map-sheet.js";
 import imgproxyURL from "@/api/imgproxy-url.js";
 import { toRel } from "@/utils/link.ts";
 import maybeDate from "@/utils/maybe-date.ts";
@@ -101,6 +102,17 @@ export class Page {
     return this.sourceType === "gdocs";
   }
 
+  get isMapSheet() {
+    return this.sourceType === "sheet-map";
+  }
+
+  get sourceURL() {
+    if (this.isMapSheet) {
+      return `https://docs.google.com/spreadsheets/d/${this.sourceID}/edit`;
+    }
+    return this.gdocsURL;
+  }
+
   get link() {
     if (this.urlPath) {
       return new URL(this.urlPath, "https://www.spotlightpa.org").href;
@@ -178,6 +190,9 @@ export class Page {
   }
 
   get sharedViewRoute() {
+    if (this.isMapSheet) {
+      return null;
+    }
     return {
       name: "shared-article-redirect-from-page",
       query: { id: this.sourceID, source_type: this.sourceType },
@@ -185,6 +200,9 @@ export class Page {
   }
 
   get sharedAdminRoute() {
+    if (this.isMapSheet) {
+      return null;
+    }
     return {
       name: "shared-article-admin-redirect-from-page",
       query: { id: this.sourceID, source_type: this.sourceType },
@@ -368,6 +386,12 @@ export function usePage(id) {
       return exec(async () => {
         if (page.value.isGDoc) {
           let [, err] = await processGDocsDoc(page.value.sourceID);
+          if (err) {
+            return [null, err];
+          }
+        }
+        if (page.value.isMapSheet) {
+          let [, err] = await prepareMapSheet(page.value.sourceID);
           if (err) {
             return [null, err];
           }

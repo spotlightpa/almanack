@@ -1,0 +1,461 @@
+HTTP/1.1 200 OK
+Content-Length: 8221
+Content-Type: application/json; charset=UTF-8
+
+{
+ "spreadsheetId": "scrolly",
+ "properties": {
+  "title": "test"
+ },
+ "sheets": [
+  {
+   "properties": {
+    "title": "Header",
+    "gridProperties": {
+     "rowCount": 3,
+     "columnCount": 20
+    }
+   },
+   "data": [
+    {
+     "rowData": [
+      {
+       "values": [
+        {
+         "formattedValue": "Slug"
+        },
+        {
+         "formattedValue": "Section"
+        },
+        {
+         "formattedValue": "Published"
+        },
+        {
+         "formattedValue": "Internal ID"
+        },
+        {
+         "formattedValue": "Eyebrow"
+        },
+        {
+         "formattedValue": "Headline"
+        },
+        {
+         "formattedValue": "Deck"
+        },
+        {
+         "formattedValue": "Author"
+        },
+        {
+         "formattedValue": "Display Date"
+        },
+        {
+         "formattedValue": "Kicker"
+        },
+        {
+         "formattedValue": "Topics"
+        },
+        {
+         "formattedValue": "Blurb"
+        },
+        {
+         "formattedValue": "Description"
+        },
+        {
+         "formattedValue": "Share Image"
+        },
+        {
+         "formattedValue": "Share Image Description"
+        },
+        {
+         "formattedValue": "Share Image Credit"
+        },
+        {
+         "formattedValue": "Topper Layout"
+        },
+        {
+         "formattedValue": "Mobile Topper Layout"
+        },
+        {
+         "formattedValue": "Topper Image"
+        },
+        {
+         "formattedValue": "Topper Image Description"
+        }
+       ]
+      },
+      {
+       "values": [
+        {
+         "formattedValue": "(description)"
+        },
+        {
+         "formattedValue": "(description)"
+        },
+        {
+         "formattedValue": "(description)"
+        },
+        {
+         "formattedValue": "(description)"
+        },
+        {
+         "formattedValue": "(description)"
+        },
+        {
+         "formattedValue": "(description)"
+        },
+        {
+         "formattedValue": "(description)"
+        },
+        {
+         "formattedValue": "(description)"
+        },
+        {
+         "formattedValue": "(description)"
+        },
+        {
+         "formattedValue": "(description)"
+        },
+        {
+         "formattedValue": "(description)"
+        },
+        {
+         "formattedValue": "(description)"
+        },
+        {
+         "formattedValue": "(description)"
+        },
+        {
+         "formattedValue": "(description)"
+        },
+        {
+         "formattedValue": "(description)"
+        },
+        {
+         "formattedValue": "(description)"
+        },
+        {
+         "formattedValue": "(description)"
+        },
+        {
+         "formattedValue": "(description)"
+        },
+        {
+         "formattedValue": "(description)"
+        },
+        {
+         "formattedValue": "(description)"
+        }
+       ]
+      },
+      {
+       "values": [
+        {
+         "formattedValue": "test-regions"
+        },
+        {
+         "formattedValue": "News"
+        },
+        {
+         "formattedValue": "2026-11-14"
+        },
+        {
+         "formattedValue": "SPLTESTSCROLLY"
+        },
+        {
+         "formattedValue": "Explainer"
+        },
+        {
+         "formattedValue": "Regions"
+        },
+        {
+         "formattedValue": "How we define them."
+        },
+        {
+         "formattedValue": "Jane Reporter"
+        },
+        {
+         "formattedValue": "Nov. 14, 2026"
+        },
+        {
+         "formattedValue": "Politics"
+        },
+        {
+         "formattedValue": "Politics"
+        },
+        {
+         "formattedValue": "Blurb"
+        },
+        {
+         "formattedValue": "Description"
+        },
+        {},
+        {},
+        {},
+        {
+         "formattedValue": "None"
+        },
+        {},
+        {},
+        {}
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "properties": {
+    "title": "Map Settings",
+    "gridProperties": {
+     "rowCount": 3,
+     "columnCount": 7
+    }
+   },
+   "data": [
+    {
+     "rowData": [
+      {
+       "values": [
+        {
+         "formattedValue": "Map Color"
+        },
+        {
+         "formattedValue": "Map Color Opacity"
+        },
+        {
+         "formattedValue": "Default Card Position"
+        },
+        {
+         "formattedValue": "Basemap"
+        },
+        {
+         "formattedValue": "Featured Story Document Link"
+        },
+        {
+         "formattedValue": "Featured Story Position"
+        },
+        {
+         "formattedValue": "Featured Story Stop"
+        }
+       ]
+      },
+      {
+       "values": [
+        {
+         "formattedValue": "(description)"
+        },
+        {
+         "formattedValue": "(description)"
+        },
+        {
+         "formattedValue": "(description)"
+        },
+        {
+         "formattedValue": "(description)"
+        },
+        {
+         "formattedValue": "(description)"
+        },
+        {
+         "formattedValue": "(description)"
+        },
+        {
+         "formattedValue": "(description)"
+        }
+       ]
+      },
+      {
+       "values": [
+        {
+         "formattedValue": "Navy"
+        },
+        {
+         "formattedValue": "75%"
+        },
+        {
+         "formattedValue": "Left"
+        },
+        {
+         "formattedValue": "Show"
+        },
+        {},
+        {},
+        {}
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "properties": {
+    "title": "Stops",
+    "gridProperties": {
+     "rowCount": 5,
+     "columnCount": 6
+    }
+   },
+   "data": [
+    {
+     "rowData": [
+      {
+       "values": [
+        {
+         "formattedValue": "Label"
+        },
+        {
+         "formattedValue": "GeoJSON"
+        },
+        {
+         "formattedValue": "Card Text"
+        },
+        {
+         "formattedValue": "Zoom To"
+        },
+        {
+         "formattedValue": "Image"
+        },
+        {
+         "formattedValue": "Image Ratio"
+        }
+       ]
+      },
+      {
+       "values": [
+        {
+         "formattedValue": "(description)"
+        },
+        {
+         "formattedValue": "(description)"
+        },
+        {
+         "formattedValue": "(description)"
+        },
+        {
+         "formattedValue": "(description)"
+        },
+        {
+         "formattedValue": "(description)"
+        },
+        {
+         "formattedValue": "(description)"
+        }
+       ]
+      },
+      {
+       "values": [
+        {
+         "formattedValue": "Central PA"
+        },
+        {
+         "formattedValue": "https://example.com/a.geojson"
+        },
+        {
+         "formattedValue": "Card one"
+        },
+        {
+         "formattedValue": "Shaded"
+        },
+        {
+         "formattedValue": "2026/11/stop.jpeg"
+        },
+        {}
+       ]
+      },
+      {
+       "values": [
+        {},
+        {},
+        {},
+        {},
+        {},
+        {}
+       ]
+      },
+      {
+       "values": [
+        {
+         "formattedValue": "Coal Region"
+        },
+        {
+         "formattedValue": "https://example.com/b.geojson"
+        },
+        {
+         "formattedValue": "Card two"
+        },
+        {
+         "formattedValue": "All"
+        },
+        {},
+        {}
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "properties": {
+    "title": "Credits",
+    "gridProperties": {
+     "rowCount": 3,
+     "columnCount": 4
+    }
+   },
+   "data": [
+    {
+     "rowData": [
+      {
+       "values": [
+        {
+         "formattedValue": "Eyebrow"
+        },
+        {
+         "formattedValue": "Name"
+        },
+        {
+         "formattedValue": "Role"
+        },
+        {
+         "formattedValue": "Email"
+        }
+       ]
+      },
+      {
+       "values": [
+        {
+         "formattedValue": "(description)"
+        },
+        {
+         "formattedValue": "(description)"
+        },
+        {
+         "formattedValue": "(description)"
+        },
+        {
+         "formattedValue": "(description)"
+        }
+       ]
+      },
+      {
+       "values": [
+        {
+         "formattedValue": "Reporting"
+        },
+        {
+         "formattedValue": "Jane Reporter"
+        },
+        {
+         "formattedValue": "Reporter"
+        },
+        {
+         "formattedValue": "jane@spotlightpa.org"
+        }
+       ]
+      }
+     ]
+    }
+   ]
+  }
+ ]
+}

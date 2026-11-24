@@ -694,6 +694,13 @@ func (app *appEnv) postPageRefresh(w http.ResponseWriter, r *http.Request) {
 		page.Body = dbDoc.ArticleMarkdown
 		app.replyJSON(http.StatusOK, w, &page)
 		return
+	case almsvc.MapSheetSourceType:
+		if err = app.svc.RefreshPageFromMapSheet(r.Context(), &page, req.RefreshMetadata); err != nil {
+			app.replyErr(w, r, err)
+			return
+		}
+		app.replyJSON(http.StatusOK, w, &page)
+		return
 	case "mailchimp":
 		app.replyNewErr(http.StatusConflict, w, r, "can not refresh source-type mailchimp; id=%d", id)
 		return
@@ -1042,6 +1049,45 @@ func (app *appEnv) postPageLoad(w http.ResponseWriter, r *http.Request) http.Han
 		return app.jsonErr(err)
 	}
 	page, err := app.svc.PageLoadFromContentStore(r.Context(), path)
+	if err != nil {
+		return app.jsonErr(err)
+	}
+	return app.jsonOK(page.ID)
+}
+
+func (app *appEnv) getMapSheet(w http.ResponseWriter, r *http.Request) http.Handler {
+	app.logStart(r)
+	id, err := google.NormalizeSheetID(r.URL.Query().Get("id"))
+	if err != nil {
+		return app.jsonErr(err)
+	}
+	sheet, err := app.svc.GetMapSheet(r.Context(), id)
+	if err != nil {
+		return app.jsonErr(err)
+	}
+	docID, err := almsvc.MapSheetFeaturedDocID(sheet)
+	if err != nil {
+		return app.jsonErr(err)
+	}
+	return app.jsonOK(struct {
+		SheetID       string `json:"sheet_id"`
+		FeaturedDocID string `json:"featured_doc_id"`
+	}{id, docID})
+}
+
+func (app *appEnv) postMapSheet(w http.ResponseWriter, r *http.Request) http.Handler {
+	app.logStart(r)
+	var req struct {
+		ID string `json:"id"`
+	}
+	if !app.readJSON(w, r, &req) {
+		return nil
+	}
+	id, err := google.NormalizeSheetID(req.ID)
+	if err != nil {
+		return app.jsonErr(err)
+	}
+	page, err := app.svc.CreatePageFromMapSheet(r.Context(), id)
 	if err != nil {
 		return app.jsonErr(err)
 	}

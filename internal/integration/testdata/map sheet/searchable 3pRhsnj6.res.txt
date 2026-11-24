@@ -1,0 +1,449 @@
+HTTP/1.1 200 OK
+Content-Length: 7977
+Content-Type: application/json; charset=UTF-8
+
+{
+ "spreadsheetId": "searchable",
+ "properties": {
+  "title": "test"
+ },
+ "sheets": [
+  {
+   "properties": {
+    "title": "Header",
+    "gridProperties": {
+     "rowCount": 3,
+     "columnCount": 18
+    }
+   },
+   "data": [
+    {
+     "rowData": [
+      {
+       "values": [
+        {
+         "formattedValue": "Slug"
+        },
+        {
+         "formattedValue": "Section"
+        },
+        {
+         "formattedValue": "Published"
+        },
+        {
+         "formattedValue": "Internal ID"
+        },
+        {
+         "formattedValue": "Eyebrow"
+        },
+        {
+         "formattedValue": "Headline"
+        },
+        {
+         "formattedValue": "Deck"
+        },
+        {
+         "formattedValue": "Author"
+        },
+        {
+         "formattedValue": "Display Date"
+        },
+        {
+         "formattedValue": "Kicker"
+        },
+        {
+         "formattedValue": "Topics"
+        },
+        {
+         "formattedValue": "Blurb"
+        },
+        {
+         "formattedValue": "Description"
+        },
+        {
+         "formattedValue": "Share Image"
+        },
+        {
+         "formattedValue": "Share Image Description"
+        },
+        {
+         "formattedValue": "Introduction"
+        },
+        {
+         "formattedValue": "Map Layout"
+        },
+        {
+         "formattedValue": "Mobile Map Layout"
+        }
+       ]
+      },
+      {
+       "values": [
+        {
+         "formattedValue": "(description)"
+        },
+        {
+         "formattedValue": "(description)"
+        },
+        {
+         "formattedValue": "(description)"
+        },
+        {
+         "formattedValue": "(description)"
+        },
+        {
+         "formattedValue": "(description)"
+        },
+        {
+         "formattedValue": "(description)"
+        },
+        {
+         "formattedValue": "(description)"
+        },
+        {
+         "formattedValue": "(description)"
+        },
+        {
+         "formattedValue": "(description)"
+        },
+        {
+         "formattedValue": "(description)"
+        },
+        {
+         "formattedValue": "(description)"
+        },
+        {
+         "formattedValue": "(description)"
+        },
+        {
+         "formattedValue": "(description)"
+        },
+        {
+         "formattedValue": "(description)"
+        },
+        {
+         "formattedValue": "(description)"
+        },
+        {
+         "formattedValue": "(description)"
+        },
+        {
+         "formattedValue": "(description)"
+        },
+        {
+         "formattedValue": "(description)"
+        }
+       ]
+      },
+      {
+       "values": [
+        {
+         "formattedValue": "test-district-map"
+        },
+        {
+         "formattedValue": "News"
+        },
+        {
+         "formattedValue": "2026-11-13"
+        },
+        {
+         "formattedValue": "SPLTESTMAP"
+        },
+        {
+         "formattedValue": "Interactive"
+        },
+        {
+         "formattedValue": "Find Your District"
+        },
+        {
+         "formattedValue": "Enter your address."
+        },
+        {
+         "formattedValue": "Jane Reporter"
+        },
+        {
+         "formattedValue": "Nov. 13, 2026"
+        },
+        {
+         "formattedValue": "Local Government"
+        },
+        {
+         "formattedValue": "Local Government"
+        },
+        {
+         "formattedValue": "A blurb"
+        },
+        {
+         "formattedValue": "A description"
+        },
+        {
+         "formattedValue": "2026/11/share.jpeg"
+        },
+        {
+         "formattedValue": "Share description"
+        },
+        {
+         "formattedValue": "Intro text"
+        },
+        {
+         "formattedValue": "Right"
+        },
+        {
+         "formattedValue": "Top"
+        }
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "properties": {
+    "title": "Map Settings",
+    "gridProperties": {
+     "rowCount": 3,
+     "columnCount": 8
+    }
+   },
+   "data": [
+    {
+     "rowData": [
+      {
+       "values": [
+        {
+         "formattedValue": "Map Color"
+        },
+        {
+         "formattedValue": "Map Color Opacity"
+        },
+        {
+         "formattedValue": "Search Bar"
+        },
+        {
+         "formattedValue": "Search Bar Text"
+        },
+        {
+         "formattedValue": "Search Bar Use Location"
+        },
+        {
+         "formattedValue": "Read More"
+        },
+        {
+         "formattedValue": "Featured Story Document Link"
+        },
+        {
+         "formattedValue": "Custom Code"
+        }
+       ]
+      },
+      {
+       "values": [
+        {
+         "formattedValue": "(description)"
+        },
+        {
+         "formattedValue": "(description)"
+        },
+        {
+         "formattedValue": "(description)"
+        },
+        {
+         "formattedValue": "(description)"
+        },
+        {
+         "formattedValue": "(description)"
+        },
+        {
+         "formattedValue": "(description)"
+        },
+        {
+         "formattedValue": "(description)"
+        },
+        {
+         "formattedValue": "(description)"
+        }
+       ]
+      },
+      {
+       "values": [
+        {
+         "formattedValue": "Blue"
+        },
+        {
+         "formattedValue": "20%"
+        },
+        {
+         "formattedValue": "TRUE"
+        },
+        {
+         "formattedValue": "Enter your address"
+        },
+        {
+         "formattedValue": "FALSE"
+        },
+        {
+         "formattedValue": "TRUE"
+        },
+        {},
+        {}
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "properties": {
+    "title": "Map Data",
+    "gridProperties": {
+     "rowCount": 3,
+     "columnCount": 1
+    }
+   },
+   "data": [
+    {
+     "rowData": [
+      {
+       "values": [
+        {
+         "formattedValue": "Map Data"
+        }
+       ]
+      },
+      {
+       "values": [
+        {
+         "formattedValue": "(description)"
+        }
+       ]
+      },
+      {
+       "values": [
+        {
+         "formattedValue": "https://example.com/districts.geojson"
+        }
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "properties": {
+    "title": "Map Tooltips",
+    "gridProperties": {
+     "rowCount": 3,
+     "columnCount": 3
+    }
+   },
+   "data": [
+    {
+     "rowData": [
+      {
+       "values": [
+        {
+         "formattedValue": "Tooltips Enabled"
+        },
+        {
+         "formattedValue": "Tooltip Type"
+        },
+        {
+         "formattedValue": "Tooltip Value"
+        }
+       ]
+      },
+      {
+       "values": [
+        {
+         "formattedValue": "(description)"
+        },
+        {
+         "formattedValue": "(description)"
+        },
+        {
+         "formattedValue": "(description)"
+        }
+       ]
+      },
+      {
+       "values": [
+        {
+         "formattedValue": "TRUE"
+        },
+        {
+         "formattedValue": "Cards"
+        },
+        {
+         "formattedValue": "<b>{{Member}}</b>"
+        }
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "properties": {
+    "title": "Credits",
+    "gridProperties": {
+     "rowCount": 3,
+     "columnCount": 4
+    }
+   },
+   "data": [
+    {
+     "rowData": [
+      {
+       "values": [
+        {
+         "formattedValue": "Eyebrow"
+        },
+        {
+         "formattedValue": "Name"
+        },
+        {
+         "formattedValue": "Role"
+        },
+        {
+         "formattedValue": "Email"
+        }
+       ]
+      },
+      {
+       "values": [
+        {
+         "formattedValue": "(description)"
+        },
+        {
+         "formattedValue": "(description)"
+        },
+        {
+         "formattedValue": "(description)"
+        },
+        {
+         "formattedValue": "(description)"
+        }
+       ]
+      },
+      {
+       "values": [
+        {
+         "formattedValue": "Reporting"
+        },
+        {
+         "formattedValue": "Jane Reporter"
+        },
+        {
+         "formattedValue": "Reporter"
+        },
+        {
+         "formattedValue": "jane@spotlightpa.org"
+        }
+       ]
+      }
+     ]
+    }
+   ]
+  }
+ ]
+}

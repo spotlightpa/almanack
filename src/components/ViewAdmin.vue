@@ -303,6 +303,8 @@ const nextPage = computedProp("next_page", (page) => ({
       <ErrorSimple :error="gdocsState.error.value"></ErrorSimple>
     </div>
 
+    <MapSheetImporter></MapSheetImporter>
+
     <h2 class="mt-5 title">Shareable Articles</h2>
 
     <div class="table-container">

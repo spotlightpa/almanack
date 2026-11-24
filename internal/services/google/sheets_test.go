@@ -9,6 +9,7 @@ import (
 	"github.com/earthboundkid/assert/testfile"
 	"github.com/spotlightpa/almanack/internal/almlog"
 	"github.com/spotlightpa/almanack/internal/services/google"
+	"github.com/spotlightpa/almanack/internal/utils/stringx"
 	"gopkg.in/Iwark/spreadsheet.v2"
 )
 
@@ -30,6 +31,30 @@ func TestSheetToFileObjects(t *testing.T) {
 	testfile.EqualJSON(t, "testdata/sheets/want.json", obj)
 }
 
+func TestSheetToMap(t *testing.T) {
+	ctx := t.Context()
+	almlog.UseTestLogger(t)
+
+	cl := &http.Client{}
+	cl.Transport = reqtest.Replay("testdata/map-sheets")
+	if false {
+		be := assert.FailsNow(t)
+		svc := google.Service{}
+		gcl := be.OK(svc.SheetsClient(ctx))
+		cl.Transport = reqtest.Caching(gcl.Transport, "testdata/map-sheets")
+	}
+
+	for _, name := range []string{"searchable-map", "scrolly-map"} {
+		t.Run(name, func(t *testing.T) {
+			be := assert.FailsNow(t)
+			sheet := be.OK(google.SheetToMap(ctx, cl, name))
+			fm := be.OK(stringx.ToToml(sheet.Frontmatter()))
+			md := "+++\n" + fm + "+++\n\n" + sheet.Body("")
+			testfile.Equal(t, "testdata/map-sheets/"+name+".md", md)
+		})
+	}
+}
+
 func TestSheetMap(t *testing.T) {
 	sheet := &spreadsheet.Sheet{
 		Rows: [][]spreadsheet.Cell{
@@ -47,4 +72,23 @@ func TestSheetMap(t *testing.T) {
 		got = append(got, abc{sm.Field("a"), b, sm.Field("c")})
 	}
 	assert.FailsNow(t).SlicesEqual(got, []abc{{"1", "2", "3"}, {"4", "5", "6"}})
+}
+
+func TestSheetMapRows(t *testing.T) {
+	sheet := &spreadsheet.Sheet{
+		Rows: [][]spreadsheet.Cell{
+			{{Value: "a"}, {Value: "b"}, {Value: "c"}},
+			{{Value: "1"}},
+			{},
+			{{Value: "4"}, {Value: "5"}, {Value: "6"}},
+		},
+	}
+	sm := google.NewSheetMap(sheet)
+	for range 2 {
+		got := []string{}
+		for range sm.Rows() {
+			got = append(got, sm.Field("a")+sm.Field("c"))
+		}
+		assert.FailsNow(t).SlicesEqual(got, []string{"1", "46"})
+	}
 }

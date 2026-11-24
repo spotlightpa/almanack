@@ -328,6 +328,12 @@ let router = createRouter({
       },
     },
     {
+      path: "/admin/map-sheet",
+      name: "map-sheet",
+      component: load(() => import("@/components/ViewMapSheet.vue")),
+      meta: { requiresAuth: isSpotlightPAUser },
+    },
+    {
       path: "/admin/page-load",
       name: "page-load",
       component: load(() => import("@/components/ViewPageLoad.vue")),

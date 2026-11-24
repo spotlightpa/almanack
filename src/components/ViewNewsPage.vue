@@ -91,6 +91,13 @@ export default {
         >
           Google Docs
         </TagLink>
+        <TagLink
+          v-if="page && page.isMapSheet"
+          :href="page.sourceURL"
+          :icon="['fas', 'link']"
+        >
+          Google Sheet
+        </TagLink>
         <a
           v-if="page && page.status === 'pub' && page.link"
           :href="page.link"
@@ -519,16 +526,17 @@ export default {
       <BulmaField help="Remember to save pages after refreshing">
         <div class="buttons">
           <button
-            v-if="page.isGDoc"
+            v-if="page.isGDoc || page.isMapSheet"
             class="block button is-warning is-small has-text-weight-semibold"
             :class="{ 'is-loading': isLoadingThrottled }"
             type="button"
             @click.prevent="refreshFromSource({ metadata: false })"
           >
-            Refresh content from Google Docs
+            Refresh content from Google
+            {{ page.isMapSheet ? "Sheet" : "Docs" }}
           </button>
           <button
-            v-if="page.isGDoc"
+            v-if="page.isGDoc || page.isMapSheet"
             class="block button is-warning is-small has-text-weight-semibold"
             :class="{ 'is-loading': isLoadingThrottled }"
             type="button"
@@ -537,12 +545,12 @@ export default {
             Refresh content and metadata
           </button>
           <a
-            v-if="page.isGDoc"
+            v-if="page.isGDoc || page.isMapSheet"
             class="block button is-primary is-small has-text-weight-semibold"
-            :href="page.gdocsURL"
+            :href="page.sourceURL"
             target="_blank"
           >
-            Open Google Doc
+            Open Google {{ page.isMapSheet ? "Sheet" : "Doc" }}
           </a>
         </div>
       </BulmaField>
