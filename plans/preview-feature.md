@@ -111,17 +111,36 @@ Build state is kept in an in-memory map (`map[string]*buildState` guarded by a s
 Since there is exactly one Groundhog instance, no external state store is needed.
 Entries are pruned after 1 hour.
 
-### `GET /_preview/{preview_id}/{path}`
+### `GET /_groundhog/set-preview?id={preview_id}&to={path}`
 
+Sets a session cookie and redirects to `{path}`:
+```
+Set-Cookie: preview={preview_id}; Path=/; HttpOnly; SameSite=Lax; Secure; Max-Age=86400
+302 → {path}
+```
+
+This is the iframe src that Almanack uses.
+After the redirect, the iframe's browser context has the cookie
+and all subsequent requests within the iframe send it automatically.
+
+Since both Almanack (`almanack.spotlightpa.org`) and Groundhog
+(`groundhog.spotlightpa.org`) share the `spotlightpa.org` registrable domain,
+they are same-site and `SameSite=Lax` works across the iframe boundary.
+
+For sharing: any logged-in editor who opens the Almanack preview page
+gets their own iframe, which hits `/_groundhog/set-preview` and gets the cookie set.
+No coordination needed; the preview_id is embedded in the Almanack page, not the URL.
+
+### `GET /*` (preview serving)
+
+All requests (other than `/_groundhog/*`) check for the `preview` session cookie.
 Groundhog fetches `previews/{preview_id}.zip` from S3
 (LRU cache in memory, holds up to ~100 MB worth of zips),
-extracts `{path}`, and serves it with an appropriate `Content-Type`.
+extracts the requested path, and serves it with an appropriate `Content-Type`.
 
-If the zip does not exist in S3: 404.
+If the cookie is absent or the zip does not exist in S3: 404.
 
-Multiple editors can view the same preview simultaneously by sharing
-the Almanack preview page URL — no session cookie needed.
-Groundhog serves preview pages with:
+Groundhog serves all preview pages with:
 ```
 Content-Security-Policy: frame-ancestors https://almanack.spotlightpa.org
 ```
@@ -138,7 +157,7 @@ Polled by Almanack's cron for monitoring.
 
 ```
 1. Acquire sync.Mutex (one build at a time)
-2. Generate preview_id (a random UUID) — used as both the S3 key and the baseURL path
+2. Generate preview_id (a random UUID) — used as the S3 key
 3. Create tempdir: /tmp/groundhog-{buildID}/content/articles/
 4. Write article_content to /tmp/groundhog-{buildID}/content/articles/{slug}.md
 5. Run with 60s timeout:
@@ -146,7 +165,7 @@ Polled by Almanack's cron for monitoring.
        --source /srv/poor-richard \
        --contentDir /tmp/groundhog-{buildID}/content \
        --destination /tmp/groundhog-{buildID}/output \
-       --baseURL https://groundhog.spotlightpa.org/_preview/{preview_id}/ \
+       --baseURL https://groundhog.spotlightpa.org/ \
        --gc --minify --quiet
 6. Walk /tmp/groundhog-{buildID}/output and write a zip to /tmp/groundhog-{buildID}/output.zip
 7. Upload output.zip to S3: previews/{preview_id}.zip
@@ -154,10 +173,6 @@ Polled by Almanack's cron for monitoring.
 9. defer os.RemoveAll("/tmp/groundhog-{buildID}") — runs even on failure
 10. Release mutex
 ```
-
-Generating the UUID before the build means Hugo can embed the correct
-`/_preview/{preview_id}/` prefix in all internal links and asset URLs
-without any post-processing.
 
 The S3 bucket has a lifecycle rule that expires objects under `previews/` after 24 hours.
 
@@ -303,7 +318,7 @@ so static credentials in the env file are used.
 - Shows two iframes side by side:
   - Mobile: constrained to ~390px wide
   - Tablet: constrained to ~768px wide
-- Both iframes src: `https://groundhog.spotlightpa.org/_preview/{preview_id}/{article_path}/`
+- Both iframes src: `https://groundhog.spotlightpa.org/_groundhog/set-preview?id={preview_id}&to=/{article_path}/`
 - Shows the preview build timestamp so editors know how fresh it is.
 - "Rebuild" button triggers a new build in-place:
   spinner replaces the iframes, new iframes load when done.
