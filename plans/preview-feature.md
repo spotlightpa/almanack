@@ -5,209 +5,243 @@ before pushing it live.
 Almanack currently publishes by committing files to the Poor Richard GitHub repository;
 the public site is built from that repository.
 All options below must generate a rendered Hugo site from draft content
-without touching the production branch.
+without exposing that content publicly.
+
+## Key Constraint: poor-richard is a Public Repo
+
+The Poor Richard GitHub repository is public.
+Any draft content committed to any branch of that repo — even a temporary one —
+is immediately readable by anyone.
+Options A, B, and E from the initial plan (push to a preview branch,
+per-article branch, or trigger GitHub Actions) are therefore **not viable as described**.
+
+**Important distinction**: the Hugo templates, layouts, assets, and config in poor-richard
+are *not* secret — they are already public.
+Only the unpublished article *content* is sensitive.
+This means we can freely clone or reference the public repo for its build tooling;
+we just must never commit draft content to it.
+
+All viable options inject content at build time without it ever touching GitHub.
 
 ---
 
-## Option A: Netlify Deploy Previews via a Preview Branch
+## Option A: Private Mirror of poor-richard + Netlify Branch Deploys
 
 **How it works**
 
-Almanack pushes draft content to a dedicated `preview` branch of the Poor Richard repo
-instead of `main`.
-Netlify's branch-deploy feature automatically builds and hosts that branch at a stable
-subdomain (e.g. `preview--poor-richard.netlify.app`).
-The Almanack UI links editors to that URL.
+Create a private GitHub repository (`spotlightpa/poor-richard-preview`) that mirrors
+poor-richard's templates, assets, and config.
+Almanack pushes draft content to a branch of this private repo.
+Netlify is configured to build the private repo; branch deploys produce isolated preview URLs.
+
+The private mirror must stay in sync with poor-richard.
+The simplest mechanism: a GitHub Actions workflow on poor-richard
+that pushes changes to the private mirror on every merge to `main`.
 
 **Pros**
-- Minimal new infrastructure: Netlify already builds Poor Richard.
-- The preview is a full Hugo build, identical to production.
-- Netlify handles SSL, CDN, auth options (Netlify Identity).
-- No new services to operate or pay for separately.
-- Branch deploys are retained and linkable per commit.
+- Full Hugo build; preview is pixel-identical to production.
+- Isolated per-article preview URLs; shareable within the org.
+- No persistent servers to operate.
+- Netlify handles SSL and hosting.
 
 **Cons**
-- Multiple editors writing simultaneously share one preview branch,
-  so their changes will collide or bleed into each other's previews.
-- Each preview requires a full Netlify build (usually 1–3 min); no instant feedback.
-- Editors see each other's unpublished drafts (potential information leak within the org).
-- Requires configuring branch-deploy rules and protecting the branch on GitHub.
+- Two-repo setup: sync lag means previews may use slightly stale templates.
+- Sync failures (the Actions mirror job) silently break previews.
+- Still a 1–3 min Netlify build wait per preview.
+- Branch proliferation in private repo; needs automated cleanup.
+- Almanack needs a Netlify API client to poll for deploy status and return the URL.
+- Additional Netlify site to configure and monitor.
 
-**Effort**: Low — a flag swap (`-github-branch preview`) for a preview-mode publish,
-plus a link in the UI.
+**Effort**: Medium-High — private repo setup, sync workflow,
+Netlify site configuration, Almanack Netlify API client, UI for build status.
 
 ---
 
-## Option B: Per-Article Netlify Deploy Previews (One Branch per Story)
+## Option B: On-Demand Hugo Build in a Netlify Background Function
 
 **How it works**
 
-For each preview request, Almanack creates or force-pushes a short-lived branch
-(e.g. `preview/article-slug`) to the Poor Richard repo.
-Netlify builds it and returns a unique deploy URL
-(Netlify's API exposes `deploy.deploy_ssl_url` per branch deploy).
-Almanack stores that URL and shows it to the editor.
+A new Netlify background function (up to 15 min timeout) is triggered by Almanack
+when an editor requests a preview.
+The function:
+1. Clones the public poor-richard repo (templates only — no secrets).
+2. Writes the draft content (passed in the request or fetched from Almanack's API)
+   into the working tree.
+3. Runs `hugo` to build the full site.
+4. Uploads the result to a private S3 or Cloudflare R2 bucket under a content-addressed path.
+5. Returns the preview URL to the editor.
+
+The editor's browser loads the preview from the bucket.
+CSS and JS already reference the production CDN (poor-richard's assets are deployed there),
+so asset paths resolve correctly without rewriting.
 
 **Pros**
-- Isolated per article: editors cannot see each other's drafts.
-- Each preview URL is stable and shareable (useful for editor-in-chief sign-off).
-- Still a full Hugo build with no new runtime infrastructure.
+- No persistent servers.
+- Full Hugo build; production-faithful rendering.
+- Draft content never touches any Git repository.
+- Each preview is isolated and content-addressed.
 
 **Cons**
-- Branch proliferation in the repo (needs automated cleanup).
-- Still a 1–3 min build wait.
-- Netlify API integration needed to poll for the deploy URL and status.
-- More complex Almanack code: branch create/delete, deploy status polling.
+- Cold-start: cloning poor-richard + running Hugo takes 1–3 min.
+- Netlify Function size budget (50 MB compressed) must accommodate the Hugo binary;
+  this is tight but feasible if Hugo is fetched at runtime rather than bundled.
+- Preview pages served from S3 need CloudFront or R2's public bucket feature;
+  direct S3 URLs are unsigned and clunky.
+- Cleanup of stale preview paths needs a separate scheduled job.
+- Harder to debug than a persistent server.
 
-**Effort**: Medium — Almanack needs Netlify API client code,
-branch lifecycle management, and UI to show build status + link.
-
----
-
-## Option C: On-Demand Hugo Build in a Netlify Function (Serverless)
-
-**How it works**
-
-A new Netlify background function (or AWS Lambda) receives the draft content,
-clones the Poor Richard repo, runs `hugo` to build a single page or the full site,
-then uploads the resulting HTML to a temporary S3/R2 bucket path
-or returns it inline.
-The editor sees the rendered page served from that path.
-
-**Pros**
-- No persistent servers to run.
-- Could be nearly instant for a single-page build
-  (Hugo can render one page in well under a second).
-- Fully isolated per request.
-
-**Cons**
-- Netlify Functions have a 50 MB deployment size limit and a 15 s timeout
-  (background functions: 15 min), making a full Hugo + git clone marginal.
-- Hugo binary + Poor Richard repo together are large; cold starts are slow.
-- Partial builds (single page) require Hugo's `--contentDir` tricks and
-  may miss cross-page data (related articles, nav).
-- Output needs to be hosted somewhere with working asset references
-  (CSS/JS paths will break if served from an S3 key).
-- Higher operational complexity; debugging is hard.
-
-**Effort**: High — requires custom Lambda/function code, asset-path rewriting,
-temporary hosting, and cleanup.
+**Effort**: Medium-High — function code, S3/R2 bucket + CDN config,
+Almanack integration to trigger and poll, UI for status and link.
 
 ---
 
-## Option D: Long-Running EC2 (or Fly.io) Preview Server
+## Option C: Dedicated Preview Server (EC2 / Fly.io)
 
 **How it works**
 
-A small always-on server (e.g. `t4g.nano` EC2, ~$3/mo, or Fly.io free tier)
-runs Hugo in server mode (`hugo server`) with a checkout of the Poor Richard repo.
-When an editor requests a preview, Almanack calls this server's API to:
-1. Write the draft content to the working tree.
-2. Trigger `hugo` to rebuild.
-3. Return a URL to the rendered page (served by the preview server).
+A small always-on server (e.g. Fly.io free tier, or `t4g.nano` EC2 at ~$3/mo)
+maintains a local clone of the public poor-richard repo.
+It exposes a small private HTTP API (called by Almanack's backend, not the browser directly).
+When an editor requests a preview:
+1. Almanack posts the draft content to the preview server's API.
+2. The server writes the content into the working tree and runs `hugo`
+   (or uses `hugo server`'s watch mode for near-instant incremental rebuilds).
+3. The server proxies the rendered page back to Almanack,
+   which forwards it to the editor's browser.
+   Alternatively, the server hosts it on a password-protected endpoint.
 
-Access is gated by Almanack's existing auth or an HTTP basic-auth header.
+The preview server periodically pulls the latest poor-richard `main`
+to stay in sync with template changes.
 
 **Pros**
-- Incremental Hugo rebuilds are very fast (milliseconds to seconds).
-- Full Hugo feature support: shortcodes, templates, related content, pagination.
+- Incremental Hugo rebuilds take milliseconds to a few seconds — best editor experience.
+- Full Hugo feature support: shortcodes, related content, pagination, etc.
+- Draft content never touches any repo.
 - Simple mental model; easy to debug by SSHing in.
-- Can serve previews indefinitely for review workflows.
+- Template sync is a plain `git pull` on a cron, not a mirroring pipeline.
 
 **Cons**
 - Another service to operate, patch, and monitor.
-- `hugo server` is not designed for concurrent multi-user writes;
-  simultaneous previews can corrupt the working tree.
-  (Mitigated by a queue or per-editor checkout directories.)
-- Preview server is a single point of failure.
-- Needs to be accessible from Almanack's backend (or the editor's browser directly).
+- Concurrent previews from multiple editors can corrupt the working tree.
+  Mitigation: a request queue, or per-editor temp directories (complicates cleanup).
+- Preview server must be reachable from Almanack's backend
+  (Netlify Functions → preview server requires a stable URL and auth).
+- Single point of failure; needs a health check and restart policy.
 
-**Effort**: Medium — server setup + a small HTTP API wrapper around Hugo +
-Almanack integration. High if isolation per editor is required.
-
----
-
-## Option E: GitHub Actions Preview (CI-triggered Build + Pages/R2 Upload)
-
-**How it works**
-
-Almanack pushes draft content to a preview branch and triggers a GitHub Actions workflow
-(via `workflow_dispatch` or a branch-push trigger).
-The workflow runs `hugo`, then uploads the built site to a Cloudflare R2 bucket
-(or AWS S3 + CloudFront) under a path keyed by article slug or commit SHA.
-Almanack polls the Actions API for completion and surfaces the resulting URL.
-
-**Pros**
-- Uses existing GitHub relationship; no new SaaS account needed beyond storage.
-- Full Hugo build in a clean, reproducible environment.
-- Artifacts are content-addressed (SHA-keyed), so each preview is immutable and linkable.
-- GitHub Actions free tier is generous; unlikely to cost anything.
-
-**Cons**
-- Workflow dispatch + poll adds 1–4 min of latency.
-- Requires R2/S3 bucket configuration and asset-path handling
-  (same path problem as Option C).
-- More moving parts: branch push → Actions → upload → URL → Almanack display.
-- Cleanup of old preview paths needs a separate job.
-
-**Effort**: Medium-High — GitHub Actions workflow, storage bucket setup,
-Almanack polling loop, URL display in UI.
+**Effort**: Medium — server setup, small API wrapper around Hugo,
+Almanack integration, auth between Almanack and the preview server.
+Higher if per-editor isolation is required.
 
 ---
 
-## Option F: Hugo Running Inside Almanack Itself (Embedded Preview)
+## Option D: Hugo Embedded in Almanack (Subprocess, No External Calls)
 
 **How it works**
 
-The Poor Richard repo (or a subset: templates, assets, config) is vendored or
-cloned into Almanack's server at deploy time.
-When an editor requests a preview, Almanack writes the draft content to a temp directory,
-shells out to `hugo` (or calls a Hugo library if one exists), captures the HTML output,
-and returns it as a proxied response to the editor's browser.
-CSS and JS are rewritten to point to the production CDN so assets resolve correctly.
+The poor-richard Hugo templates, layouts, assets, and config are vendored
+(checked into Almanack or fetched at deploy time from the public repo).
+When an editor requests a preview, Almanack's backend:
+1. Writes the draft content to a temp directory alongside the vendored templates.
+2. Shells out to `hugo` with that temp dir as the content source.
+3. Captures the HTML output.
+4. Rewrites any asset paths that reference the local build output
+   to point to the production CDN (most Hugo themes already output absolute CDN paths,
+   so this may be a no-op).
+5. Returns the HTML as an HTTP response proxied to the editor's browser.
 
 **Pros**
-- No external service calls or network round-trips; response in under a second.
-- No persistent preview infrastructure.
-- Completely isolated per request (temp dirs).
-- No build wait time for the editor.
+- Sub-second preview; no network calls, no build queue.
+- No external service dependencies at preview time.
+- Draft content is processed entirely in-process (or in a temp dir) and never persisted.
+- Completely isolated per request.
 
 **Cons**
-- Almanack runs as a Netlify Function (15 s timeout, 50 MB limit);
-  bundling Hugo + Poor Richard templates may exceed the size limit.
-- The Poor Richard template set must be kept in sync with Almanack's deployment.
-- Asset-path rewriting is fiddly; inline styles, `srcset`, and JS imports all need handling.
-- Hugo is not designed to be called as a library; subprocess management under a
-  serverless runtime is unreliable.
+- Almanack runs as a Netlify Function (15 s timeout, 50 MB limit).
+  Bundling Hugo + poor-richard's template tree may push the size limit.
+  Hugo can be fetched at cold-start if bundling fails, adding ~2 s.
+- Templates must be kept in sync with poor-richard's `main`.
+  Out-of-sync templates mean the preview doesn't match production.
+  Options: re-fetch at deploy time (adds complexity to Almanack's CI),
+  or run a sync job and commit the vendor snapshot.
+- Subprocess management under a serverless runtime is unreliable
+  (signal handling, temp file cleanup, concurrent requests).
+- Full-site Hugo features (related articles, paginated indexes)
+  don't work for a single-page build; editors see the article page only,
+  not surrounding navigation or sidebar context.
 
-**Effort**: High — significant engineering for the subprocess, path rewriting,
-and keeping template snapshots in sync.
+**Effort**: High — vendoring strategy, subprocess management,
+path-rewriting logic, keeping templates in sync with poor-richard.
+
+---
+
+## Option E: GitHub Actions on a Private Workflow + R2/S3 Upload
+
+**How it works**
+
+This option avoids committing draft content to any repo by using
+GitHub Actions' `workflow_dispatch` with inputs.
+Almanack triggers the workflow and passes the draft content as a JSON input
+(GitHub Actions inputs are limited to ~65 KB; larger content needs a presigned S3 URL).
+The workflow:
+1. Clones the public poor-richard repo.
+2. Writes the content from the input (or downloads it from a presigned URL).
+3. Runs `hugo`.
+4. Uploads the built site to Cloudflare R2 or S3 under a content-addressed path.
+5. Almanack polls the Actions API for completion and surfaces the URL.
+
+Workflow runs are private (not visible in the public poor-richard repo)
+because the workflow lives in a private Almanack-side repo or is triggered
+via a repository dispatch on a private repo.
+
+**Pros**
+- Full Hugo build in a clean, reproducible GitHub-hosted runner (free tier).
+- Draft content is passed as a parameter, not committed to any repo.
+- Output is content-addressed and immutable; each preview is linkable.
+- No persistent servers to operate.
+
+**Cons**
+- 1–4 min latency (Actions runner queue + clone + build).
+- Input size limit requires a presigned-URL dance for large articles with images.
+- Requires a private GitHub repo to host the workflow
+  (can't put it in the public poor-richard repo without exposing it).
+- Almanack needs a GitHub Actions API client and a polling loop.
+- R2/S3 bucket + CDN setup still required for hosting the output.
+- Operational complexity: several failure points with no easy live debugging.
+
+**Effort**: Medium-High — private workflow repo, Actions API client,
+presigned URL handling, storage bucket, Almanack polling + UI.
 
 ---
 
 ## Summary Matrix
 
-| Option | Build Wait | Infra Overhead | Isolation | Complexity | Cost |
-|--------|-----------|----------------|-----------|------------|------|
-| A: Shared Netlify branch | 1–3 min | None | ❌ Shared | Low | $0 |
-| B: Per-article Netlify branch | 1–3 min | None | ✅ Per-article | Medium | $0 |
-| C: Serverless Lambda build | Marginal | Low | ✅ Per-request | High | Low |
-| D: EC2/Fly.io Hugo server | Seconds | Medium | ⚠️ Needs care | Medium | ~$3/mo |
-| E: GitHub Actions + R2 | 1–4 min | Low | ✅ Per-commit | Medium-High | ~$0 |
-| F: Hugo inside Almanack | <1 s | None | ✅ Per-request | High | $0 |
+| Option | Build Wait | Draft Hits Repo? | Infra Overhead | Isolation | Complexity | Cost |
+|--------|-----------|-----------------|----------------|-----------|------------|------|
+| A: Private mirror + Netlify | 1–3 min | Private repo only | Low (sync job) | ✅ Per-article | Medium-High | $0 |
+| B: Serverless Hugo build + R2 | 1–3 min | Never | Low | ✅ Per-request | Medium-High | Low |
+| C: Dedicated Hugo server | Seconds | Never | Medium | ⚠️ Needs care | Medium | ~$3/mo |
+| D: Hugo inside Almanack | <1 s | Never | None | ✅ Per-request | High | $0 |
+| E: GitHub Actions + R2 | 1–4 min | Never | Low | ✅ Per-run | Medium-High | ~$0 |
 
 ---
 
 ## Recommendation Notes
 
-- **Quickest to ship**: Option A (shared branch).
-  Good enough if only one editor previews at a time and information leakage between
-  editors is acceptable.
-- **Best balance**: Option B (per-article Netlify branch).
-  Builds on existing Netlify infrastructure, gives isolated and shareable URLs,
-  and the main cost is the build wait time.
-- **Best editor experience** (no wait): Option D (dedicated Hugo server)
-  if the team is comfortable operating a small VM.
-- **Most adventurous / high-reward**: Option F,
-  but only if Almanack moves off the serverless constraint
-  (e.g. to a long-running Fly.io or EC2 deployment).
+- **Best editor experience** (no wait, no extra infra): Option D,
+  but only if Almanack moves off the serverless constraint,
+  or if the Hugo binary + template bundle fits within Netlify's limits.
+
+- **Best balance of simplicity and correctness**: Option C (dedicated Hugo server).
+  A Fly.io Machine costs nothing at idle,
+  the template sync is a plain `git pull`,
+  and incremental Hugo rebuilds are fast.
+  The main engineering risk is concurrent-editor isolation.
+
+- **If the team prefers zero ops**: Option B (serverless + R2)
+  or Option A (private mirror + Netlify) —
+  both trade build wait time for no persistent infrastructure.
+  Option A is simpler code but adds a sync pipeline;
+  Option B is more code but no second repo to maintain.
+
+- **Option E** is the most complex for the least gain over B;
+  not recommended unless GitHub Actions is already deeply integrated.
