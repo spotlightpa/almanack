@@ -111,25 +111,23 @@ Build state is kept in an in-memory map (`map[string]*buildState` guarded by a s
 Since there is exactly one Groundhog instance, no external state store is needed.
 Entries are pruned after 1 hour.
 
-### `GET /_groundhog/set-preview?id={preview_id}&to={path}`
+### `GET /_groundhog/serve?zip={preview_id}&to={path}&sig={hmac}&exp={unix_timestamp}`
 
-Sets a session cookie and redirects to `{path}`:
+Almanack's SSR handler generates this URL server-side using the shared secret.
+Groundhog verifies:
+- `exp` is in the future (short TTL, e.g. 60 seconds — just long enough for the page load)
+- `sig` is a valid HMAC-SHA256 over `zip|to|exp` using the shared secret
+
+If valid:
 ```
 Set-Cookie: preview={preview_id}; Path=/; HttpOnly; SameSite=Lax; Secure; Max-Age=86400
 302 → {path}
 ```
 
-This is the iframe src that Almanack uses.
 After the redirect, the iframe's browser context has the cookie
-and all subsequent requests within the iframe send it automatically.
-
-Since both Almanack (`almanack.spotlightpa.org`) and Groundhog
-(`groundhog.spotlightpa.org`) share the `spotlightpa.org` registrable domain,
-they are same-site and `SameSite=Lax` works across the iframe boundary.
-
-For sharing: any logged-in editor who opens the Almanack preview page
-gets their own iframe, which hits `/_groundhog/set-preview` and gets the cookie set.
-No coordination needed; the preview_id is embedded in the Almanack page, not the URL.
+and all subsequent asset requests send it automatically.
+Groundhog never issues a cookie without a valid Almanack-signed request;
+it has no concept of users or sessions of its own.
 
 ### `GET /*` (preview serving)
 
@@ -140,7 +138,7 @@ extracts the requested path, and serves it with an appropriate `Content-Type`.
 
 If the cookie is absent or the zip does not exist in S3: 404.
 
-Groundhog serves all preview pages with:
+Groundhog serves all responses with:
 ```
 Content-Security-Policy: frame-ancestors https://almanack.spotlightpa.org
 ```
@@ -236,6 +234,25 @@ since poor-richard uses a node-based asset pipeline.
 
 ---
 
+## Auth
+
+One shared secret (a random 32-byte hex string) covers all Almanack→Groundhog trust:
+
+**Almanack → Groundhog API** (`/_groundhog/build`, `/_groundhog/sync`):
+HMAC-SHA256 signature in `X-Hub-Signature-256` header, same pattern as GitHub webhooks.
+
+**Editor → Preview** (`/_groundhog/serve`):
+Almanack's SSR handler generates a short-lived signed URL
+(HMAC-SHA256 over `zip|to|exp`, 60-second TTL).
+Groundhog verifies the signature and expiry before issuing the session cookie.
+An editor must be authenticated with Almanack to receive a signed URL;
+Groundhog has no user concept of its own.
+
+Netlify Functions have no fixed egress IPs, so network-level firewall rules are not viable.
+Application-level HMAC over HTTPS is sufficient for all endpoints.
+
+---
+
 ## Groundhog: Deployment
 
 **Instance**: AWS Lightsail `nano_3_0` (1 GB RAM, 2 vCPU burst, $5/mo before credits).
@@ -312,14 +329,17 @@ so static credentials in the env file are used.
     and the spinner stops.
 
 **Almanack preview page** (`/admin/preview?id={preview_id}&path={article_path}`):
-- Behind Almanack auth (Netlify Identity); safe to share the URL with any logged-in editor.
-- Reads `preview_id` and `article_path` from the URL query params.
-- Shows two iframes side by side:
+- An SSR endpoint in Almanack's Go backend (existing SSR infrastructure).
+- Verifies Netlify Identity auth server-side before rendering.
+- Reads `preview_id` and `article_path` from query params.
+- Generates a short-lived signed URL for Groundhog using the shared secret:
+  `/_groundhog/serve?zip={preview_id}&to=/{article_path}/&sig={hmac}&exp={timestamp}`
+- Renders an HTML page with two iframes, both pointing at the signed URL:
   - Mobile: constrained to ~390px wide
   - Tablet: constrained to ~768px wide
-- Both iframes src: `https://groundhog.spotlightpa.org/_groundhog/set-preview?id={preview_id}&to=/{article_path}/`
-- "Rebuild" button triggers a new build in-place:
-  spinner replaces the iframes, new iframes load when done.
+- Safe to share: any logged-in Almanack editor who opens the URL
+  gets a fresh signed URL generated server-side for their page load.
+- "Rebuild" button links back to the article editor to trigger a new build.
 
 **Health monitoring**: Almanack's existing background cron
 pings `{GROUNDHOG_URL}/_groundhog/health` and posts to Slack if it fails.
